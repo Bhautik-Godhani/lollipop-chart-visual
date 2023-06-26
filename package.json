@@ -1,0 +1,30 @@
+{
+  "name": "visual",
+  "scripts": {
+    "pbiviz": "pbiviz",
+    "start": "pbiviz start node --max-old-space-size=8000",
+    "package": "pbiviz package",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
+  },
+  "dependencies": {
+    "@babel/runtime": "7.6.0",
+    "@babel/runtime-corejs2": "7.6.0",
+    "@truviz/shadow": "^1.0.10",
+    "@types/d3": "^6.7.0",
+    "core-js": "3.2.1",
+    "echarts": "^5.2.1",
+    "powerbi-visuals-api": "~2.6.1",
+    "powerbi-visuals-utils-chartutils": "^2.6.0",
+    "powerbi-visuals-utils-dataviewutils": "2.2.1",
+    "powerbi-visuals-utils-tooltiputils": "^2.5.2",
+    "process": "^0.11.10",
+    "react-select": "^4.3.1"
+  },
+  "devDependencies": {
+    "d3": "^6.7.0",
+    "ts-loader": "6.1.0",
+    "tslint": "^5.18.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.6.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+    "visual": {
+        "name": "lollipopChart",
+        "displayName": "LollipopChart",
+        "guid": "lollipopChart50393786178B4137A75F3257CB590B96",
+        "visualClassName": "Visual",
+        "version": "1.0.0",
+        "description": "Dynamic Lollipop Chart",
+        "supportUrl": "-",
+        "gitHubUrl": ""
+    },
+    "apiVersion": "2.6.0",
+    "author": {
+        "name": "Bhautik Godhani",
+        "email": "Bhautikgodhani123@gmail.com"
+    },
+    "assets": {
+        "icon": "assets/icon.png"
+    },
+    "externalJS": null,
+    "style": "style/visual.less",
+    "capabilities": "capabilities.json",
+    "dependencies": null,
+    "stringResources": []
+}

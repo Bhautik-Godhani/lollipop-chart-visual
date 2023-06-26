@@ -1,0 +1,60 @@
+.color-picker-module {
+  height: 24px;
+
+  .color {
+    width: 36px;
+    height: 14px;
+    border-radius: 2px;
+  }
+
+  .swatch {
+    padding: 5px;
+    background: #fff;
+    border-radius: "1px";
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .color-popover {
+    position: fixed;
+    z-index: 11;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .cover {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    z-index: -1;
+  }
+
+  .cover-button-container {
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .sketch-picker-container {
+    padding: 10px;
+    background: rgb(255, 255, 255);
+    border-radius: 4px;
+    box-shadow: rgb(0 0 0 / 15%) 0px 0px 0px 1px, rgb(0 0 0 / 15%) 0px 8px 16px;
+
+    .sketch-picker {
+      background-color: transparent !important;
+      border: 0 !important;
+      box-shadow: unset !important;
+      padding: 0 !important;
+    }
+  }
+}
