@@ -55,7 +55,7 @@ const GridLinesSettings = (props) => {
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         <div className="config config-switch">
           <label className="config-label" htmlFor={EGridLinesSettings.show}>
             X-axis Grid Lines
@@ -255,7 +255,7 @@ const GridLinesSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

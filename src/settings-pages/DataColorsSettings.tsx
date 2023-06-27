@@ -7,7 +7,6 @@ import {
   CircleType,
   ColorPaletteType,
   DataRolesName,
-  EChartConfig,
   EChartSettings,
   EDataColorsSettings,
   EVisualConfig,
@@ -57,9 +56,7 @@ const DataColorsSettings = (props) => {
     );
   };
 
-  let chartSettings: IChartSettings = JSON.parse(
-    vizOptions.formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings]
-  );
+  let chartSettings: IChartSettings = shadow.chartSettings;
 
   if (!Object.keys(chartSettings).length) {
     chartSettings = { ...CHART_SETTINGS };
@@ -160,7 +157,7 @@ const DataColorsSettings = (props) => {
 
   return (
     <>
-      <div className="config-container config-container-vertical config-container-colors">
+      {/* <div className="config-container config-container-vertical config-container-colors">
         <div>
           {isDumbbellChart &&
             chartSettings.lollipopType === LollipopType.Circle && (
@@ -262,74 +259,68 @@ const DataColorsSettings = (props) => {
               </div>
             )}
 
-          {/* {!isDumbbellChart && configValues.dataType === CircleType.Circle1 ? (
-            <div className="config-container-label">Circle 1 Colors:</div>
-          ) : (
-            <div className="config-container-label">Pie 1 Colors:</div>
-          )} */}
-
           {!(
             isDumbbellChart &&
             chartSettings.lollipopType === LollipopType.Circle
           ) && (
-            <div className="config">
-              <label className="config-label" htmlFor="colorPalette">
-                Color Palette
-              </label>
-              <div className="config-option">
-                <select
-                  id="colorPalette"
-                  value={
-                    isDumbbellChart &&
-                    chartSettings.lollipopType === LollipopType.Circle
-                      ? ColorPaletteType.Single
-                      : configValues[dataType].fillType
-                  }
-                  onChange={(e: any) => handleValue(e.target.value, "fillType")}
-                >
-                  <option value={ColorPaletteType.Single}>Single</option>
-                  <option
-                    value={ColorPaletteType.PowerBi}
-                    disabled={isDisableGradientColorPalette}
+              <div className="config">
+                <label className="config-label" htmlFor="colorPalette">
+                  Color Palette
+                </label>
+                <div className="config-option">
+                  <select
+                    id="colorPalette"
+                    value={
+                      isDumbbellChart &&
+                        chartSettings.lollipopType === LollipopType.Circle
+                        ? ColorPaletteType.Single
+                        : configValues[dataType].fillType
+                    }
+                    onChange={(e: any) => handleValue(e.target.value, "fillType")}
                   >
-                    Power BI Theme
-                  </option>
-                  <option
-                    value={ColorPaletteType.Gradient}
-                    disabled={isDisableGradientColorPalette}
-                  >
-                    Gradient
-                  </option>
-                  {chartSettings.lollipopType !== LollipopType.Circle && (
+                    <option value={ColorPaletteType.Single}>Single</option>
                     <option
-                      value={ColorPaletteType.ByCategory}
+                      value={ColorPaletteType.PowerBi}
                       disabled={isDisableGradientColorPalette}
                     >
-                      By Category
+                      Power BI Theme
                     </option>
-                  )}
-                  <option
-                    value={ColorPaletteType.Sequential}
-                    disabled={isDisableGradientColorPalette}
-                  >
-                    Sequential
-                  </option>
-                  <option
-                    value={ColorPaletteType.Diverging}
-                    disabled={isDisableGradientColorPalette}
-                  >
-                    Diverging
-                  </option>
-                  <option
-                    value={ColorPaletteType.Qualitative}
-                    disabled={isDisableGradientColorPalette}
-                  >
-                    Qualitative
-                  </option>
-                </select>
+                    <option
+                      value={ColorPaletteType.Gradient}
+                      disabled={isDisableGradientColorPalette}
+                    >
+                      Gradient
+                    </option>
+                    {chartSettings.lollipopType !== LollipopType.Circle && (
+                      <option
+                        value={ColorPaletteType.ByCategory}
+                        disabled={isDisableGradientColorPalette}
+                      >
+                        By Category
+                      </option>
+                    )}
+                    <option
+                      value={ColorPaletteType.Sequential}
+                      disabled={isDisableGradientColorPalette}
+                    >
+                      Sequential
+                    </option>
+                    <option
+                      value={ColorPaletteType.Diverging}
+                      disabled={isDisableGradientColorPalette}
+                    >
+                      Diverging
+                    </option>
+                    <option
+                      value={ColorPaletteType.Qualitative}
+                      disabled={isDisableGradientColorPalette}
+                    >
+                      Qualitative
+                    </option>
+                  </select>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {configValues[dataType].fillType === ColorPaletteType.Single &&
             chartSettings.lollipopType === LollipopType.Circle && (
@@ -342,7 +333,7 @@ const DataColorsSettings = (props) => {
                     <ColorPicker
                       color={splitRGB(
                         configValues[dataType][
-                          EDataColorsSettings.circleFillColor
+                        EDataColorsSettings.circleFillColor
                         ]
                       )}
                       handleChange={(c) =>
@@ -360,7 +351,7 @@ const DataColorsSettings = (props) => {
                     <ColorPicker
                       color={splitRGB(
                         configValues[dataType][
-                          EDataColorsSettings.circleStrokeColor
+                        EDataColorsSettings.circleStrokeColor
                         ]
                       )}
                       handleChange={(c) =>
@@ -495,7 +486,7 @@ const DataColorsSettings = (props) => {
                       id="categoriesList"
                       value={
                         configValues[dataType][
-                          EDataColorsSettings.selectedCategoryName
+                        EDataColorsSettings.selectedCategoryName
                         ] ?? subCategories[0]
                       }
                       onChange={(e: any) =>
@@ -523,7 +514,7 @@ const DataColorsSettings = (props) => {
                     <ColorPicker
                       color={splitRGB(
                         configValues[dataType][
-                          EDataColorsSettings.selectedCategoryColor
+                        EDataColorsSettings.selectedCategoryColor
                         ]
                       )}
                       handleChange={(c) =>
@@ -541,98 +532,91 @@ const DataColorsSettings = (props) => {
           {["diverging", "qualitative", "sequential"].includes(
             configValues[dataType].fillType
           ) && (
-            <>
-              <div>
-                <div className="config">
-                  <label className="config-label" htmlFor="numberOfDataClasses">
-                    Number of data classes
-                  </label>
-                  <div className="config-option">
-                    <select
-                      id="numberOfDataClasses"
-                      value={configValues[dataType].numberOfClasses}
-                      onChange={(e: any) =>
-                        handleValue(e.target.value, "numberOfClasses")
-                      }
-                    >
-                      {classesArray[configValues[dataType].fillType].map(
-                        (num) => {
-                          return <option value={num}>{num}</option>;
+              <>
+                <div>
+                  <div className="config">
+                    <label className="config-label" htmlFor="numberOfDataClasses">
+                      Number of data classes
+                    </label>
+                    <div className="config-option">
+                      <select
+                        id="numberOfDataClasses"
+                        value={configValues[dataType].numberOfClasses}
+                        onChange={(e: any) =>
+                          handleValue(e.target.value, "numberOfClasses")
                         }
-                      )}
-                    </select>
+                      >
+                        {classesArray[configValues[dataType].fillType].map(
+                          (num) => {
+                            return <option value={num}>{num}</option>;
+                          }
+                        )}
+                      </select>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="color-palette-container">
-                {Object.values(
-                  COLORBREWER[configValues[dataType].fillType]
-                ).map((el) => {
-                  const co = el[configValues[dataType].numberOfClasses];
-                  if (!co) return null;
-                  return (
-                    <div
-                      className={`color-palette ${
-                        JSON.stringify(co) ===
-                        JSON.stringify(configValues[dataType].schemeColors)
+                <div className="color-palette-container">
+                  {Object.values(
+                    COLORBREWER[configValues[dataType].fillType]
+                  ).map((el) => {
+                    const co = el[configValues[dataType].numberOfClasses];
+                    if (!co) return null;
+                    return (
+                      <div
+                        className={`color-palette ${JSON.stringify(co) ===
+                          JSON.stringify(configValues[dataType].schemeColors)
                           ? "color-palette-selected"
                           : ""
-                      }`}
-                      onClick={() => setColorPalette(co)}
-                    >
-                      {co.map((cs) => {
-                        return (
-                          <>
-                            <div
-                              className="color-palette-individual"
-                              style={{ backgroundColor: cs }}
-                            ></div>
-                          </>
-                        );
-                      })}
-
-                      {/* {
-													JSON.stringify(co) === JSON.stringify(configValues.schemeColors) && (
-														<FontAwesomeIcon icon={faCheck} color="#ffffff" style={{marginLeft: '10px'}} />
-													)
-												} */}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="config config-checkbox">
-                <label className="config-label" htmlFor="reverseColor">
-                  Reverse Color
-                </label>
-                <div className="config-option">
-                  <input
-                    id="reverseColor"
-                    type="checkbox"
-                    checked={configValues[dataType].reverse}
-                    onClick={() => handleCheckbox("reverse")}
-                  />
+                          }`}
+                        onClick={() => setColorPalette(co)}
+                      >
+                        {co.map((cs) => {
+                          return (
+                            <>
+                              <div
+                                className="color-palette-individual"
+                                style={{ backgroundColor: cs }}
+                              ></div>
+                            </>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
 
-              {configValues[dataType].fillType != "qualitative" && (
                 <div className="config config-checkbox">
-                  <label className="config-label" htmlFor="makeGradient">
-                    Make Gradient
+                  <label className="config-label" htmlFor="reverseColor">
+                    Reverse Color
                   </label>
                   <div className="config-option">
                     <input
-                      id="makeGradient"
+                      id="reverseColor"
                       type="checkbox"
-                      checked={configValues[dataType].isGradient}
-                      onClick={() => handleCheckbox("isGradient")}
+                      checked={configValues[dataType].reverse}
+                      onClick={() => handleCheckbox("reverse")}
                     />
                   </div>
                 </div>
-              )}
-            </>
-          )}
+
+                {configValues[dataType].fillType != "qualitative" && (
+                  <div className="config config-checkbox">
+                    <label className="config-label" htmlFor="makeGradient">
+                      Make Gradient
+                    </label>
+                    <div className="config-option">
+                      <input
+                        id="makeGradient"
+                        type="checkbox"
+                        checked={configValues[dataType].isGradient}
+                        onClick={() => handleCheckbox("isGradient")}
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
         </div>
 
         <div className="config-btn-group">
@@ -646,7 +630,7 @@ const DataColorsSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

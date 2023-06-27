@@ -66,7 +66,7 @@ const LineSettings = (props) => {
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         <div className="config config-switch">
           <label className="config-label" htmlFor={ELineSettings.show}>
             Display Line
@@ -144,7 +144,7 @@ const LineSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

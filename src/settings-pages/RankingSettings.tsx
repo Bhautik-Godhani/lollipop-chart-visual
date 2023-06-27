@@ -1,7 +1,6 @@
 import * as React from "react";
 import { RANKING_SETTINGS } from "../constants";
 import {
-  EChartConfig,
   ERankingSettings,
   EVisualConfig,
   LollipopType,
@@ -117,13 +116,11 @@ const RankingSettings = (props) => {
   const value1DisplayName = categorical.values[0]?.source.displayName;
   const value2DisplayName = categorical.values[1]?.source.displayName;
 
-  const chartSettings: IChartSettings = JSON.parse(
-    vizOptions.formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings]
-  );
+  const chartSettings: IChartSettings = shadow.chartSettings;
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         <div className="config config-switch">
           <label className="config-label" htmlFor="isRankingEnabled">
             Enable Ranking
@@ -526,7 +523,7 @@ const RankingSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

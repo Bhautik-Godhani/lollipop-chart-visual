@@ -122,7 +122,7 @@ const ChartSettings = (props) => {
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         <div className="config">
           <label className="config-label" htmlFor={EChartSettings.lollipopType}>
             Lollipop Type
@@ -299,52 +299,52 @@ const ChartSettings = (props) => {
 
             {pieConfigValues[pieConfigValues.pieType].pieSize ===
               PieSize.Auto && (
-              <div className="config">
-                <label
-                  className="config-label"
-                  htmlFor={EPieSettings.maxPieRadius}
-                >
-                  Max {configValues[EChartSettings.lollipopType]} Radius
-                </label>
-                <div className="config-option">
-                  <input
-                    id={EPieSettings.maxPieRadius}
-                    type="number"
-                    value={
-                      pieConfigValues[pieConfigValues.pieType].maxPieRadius
-                    }
-                    onChange={(e: any) => {
-                      handlePieChange(
-                        +e.target.value,
-                        EPieSettings.maxPieRadius
-                      );
-                    }}
-                  />
+                <div className="config">
+                  <label
+                    className="config-label"
+                    htmlFor={EPieSettings.maxPieRadius}
+                  >
+                    Max {configValues[EChartSettings.lollipopType]} Radius
+                  </label>
+                  <div className="config-option">
+                    <input
+                      id={EPieSettings.maxPieRadius}
+                      type="number"
+                      value={
+                        pieConfigValues[pieConfigValues.pieType].maxPieRadius
+                      }
+                      onChange={(e: any) => {
+                        handlePieChange(
+                          +e.target.value,
+                          EPieSettings.maxPieRadius
+                        );
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {pieConfigValues[pieConfigValues.pieType].pieSize ===
               PieSize.Custom && (
-              <div className="config">
-                <label
-                  className="config-label"
-                  htmlFor={EPieSettings.pieRadius}
-                >
-                  {configValues[EChartSettings.lollipopType]} Radius
-                </label>
-                <div className="config-option">
-                  <input
-                    id={EPieSettings.pieRadius}
-                    type="number"
-                    value={pieConfigValues[pieConfigValues.pieType].pieRadius}
-                    onChange={(e: any) => {
-                      handlePieChange(+e.target.value, EPieSettings.pieRadius);
-                    }}
-                  />
+                <div className="config">
+                  <label
+                    className="config-label"
+                    htmlFor={EPieSettings.pieRadius}
+                  >
+                    {configValues[EChartSettings.lollipopType]} Radius
+                  </label>
+                  <div className="config-option">
+                    <input
+                      id={EPieSettings.pieRadius}
+                      type="number"
+                      value={pieConfigValues[pieConfigValues.pieType].pieRadius}
+                      onChange={(e: any) => {
+                        handlePieChange(+e.target.value, EPieSettings.pieRadius);
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </React.Fragment>
         )}
 
@@ -359,7 +359,7 @@ const ChartSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

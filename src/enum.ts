@@ -1,3 +1,31 @@
+export enum EVisualConfig {
+    ChartConfig = "chartConfig",
+    DataColorsConfig = "dataColorsConfig",
+    CircleConfig = "circleConfig",
+    LineConfig = "lineConfig",
+    DataLabelsConfig = "dataLabelsConfig",
+    GridLinesConfig = "gridLinesConfig",
+    RankingConfig = "rankingConfig",
+    XAxisConfig = "xAxisConfig",
+    YAxisConfig = "yAxisConfig",
+}
+
+export enum EVisualSettings {
+    License = "license",
+    VisualGeneralSettings = "visualGeneralSettings",
+    ChartSettings = "chartSettings",
+    DataColorsSettings = "dataColorsSettings",
+    CircleSettings = "circleSettings",
+    LineSettings = "lineSettings",
+    DataLabelsSettings = "dataLabelsSettings",
+    GridLinesSettings = "gridLinesSettings",
+    RankingSettings = "rankingSettings",
+    XAxisSettings = "xAxisSettings",
+    YAxisSettings = "yAxisSettings",
+    Legend = "legend",
+    NumberFormatting = "numberFormatting"
+}
+
 export enum LineType {
     Dotted = 'dotted',
     Dashed = 'dashed',
@@ -126,37 +154,6 @@ export enum FontStyle {
     Italic = 'italic',
     Bold = 'bold',
     None = 'none'
-}
-
-export enum EVisualConfig {
-    ChartConfig = 'chartConfig',
-    CircleConfig = 'circleConfig',
-    Circle2Config = 'circle2Config',
-    LineConfig = 'lineConfig',
-    DataLabelsConfig = 'dataLabelsConfig',
-    XGridLinesConfig = 'xGridLinesConfig',
-    YGridLinesConfig = 'yGridLinesConfig',
-    GridLinesConfig = 'gridLinesConfig',
-    PieConfig = 'pieConfig',
-    DataColorsConfig = 'dataColorsConfig',
-    RankingConfig = 'rankingConfig'
-}
-
-export enum EChartConfig {
-    ChartSettings = 'chartSettings',
-    CircleSettings = 'circleSettings',
-    Circle2Settings = 'circle2Settings',
-    LineSettings = 'lineSettings',
-    DataLabelsSettings = 'dataLabelsSettings',
-    XAxisSettings = 'xAxisSettings',
-    YAxisSettings = 'yAxisSettings',
-    LegendSettings = 'legendSettings',
-    NumberSettings = 'numberSettings',
-    XGridLinesSettings = 'xGridLinesSettings',
-    YGridLinesSettings = 'yGridLinesSettings',
-    GridLinesSettings = 'gridLinesSettings',
-    DataColorsSettings = 'dataColorsSettings',
-    RankingSettings = 'rankingSettings'
 }
 
 export enum EChartSettings {

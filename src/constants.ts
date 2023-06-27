@@ -11,7 +11,9 @@ import {
     IPiePropsSettings,
     IRankingPropsSettings,
     IRankingSettings,
+    IXAxisSettings,
     IXGridLinesSettings,
+    IYAxisSettings,
     IYGridLinesSettings
 } from "./visual-settings.interface"
 
@@ -226,4 +228,34 @@ export const RANKING_SETTINGS: IRankingSettings = {
     valueType: RankingDataValuesType.Value1,
     value1: VALUE1_RANKING_SETTINGS,
     value2: VALUE2_RANKING_SETTINGS,
+}
+
+export const X_AXIS_SETTINGS: IXAxisSettings = {
+    position: Position.Bottom,
+    isDisplayTitle: false,
+    titleName: '',
+    titleColor: null,
+    titleFontSize: 12,
+    titleFontFamily: 'Segoe UI',
+    isDisplayLabel: true,
+    labelColor: null,
+    labelFontFamily: 'Segoe UI',
+    labelFontSize: 12,
+    isLabelAutoTilt: true,
+    labelTilt: 30,
+    labelCharLimit: 10
+}
+
+export const Y_AXIS_SETTINGS: IYAxisSettings = {
+    position: Position.Left,
+    isDisplayTitle: false,
+    titleName: '',
+    titleColor: null,
+    titleFontSize: 12,
+    titleFontFamily: 'Segoe UI',
+    isDisplayLabel: true,
+    labelColor: null,
+    labelFontFamily: 'Segoe UI',
+    labelFontSize: 12,
+    labelCharLimit: 10
 }

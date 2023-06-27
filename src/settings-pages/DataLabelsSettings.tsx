@@ -3,9 +3,9 @@ import { DATA_LABELS_SETTINGS } from "../constants";
 import {
   DataLabelsFontSizeType,
   DataLabelsPlacement,
-  EChartConfig,
   EDataLabelsSettings,
   EVisualConfig,
+  EVisualSettings,
   FontStyle,
   LollipopType,
   Orientation,
@@ -70,13 +70,11 @@ const DataLabelsSettings = (props) => {
     }));
   };
 
-  const chartSettings: IChartSettings = JSON.parse(
-    vizOptions.formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings]
-  );
+  const chartSettings: IChartSettings = shadow.chartSettings;
 
   const dataLabelsSettings: IDataLabelsSettings = JSON.parse(
     vizOptions.formatTab[EVisualConfig.DataLabelsConfig][
-      EChartConfig.DataLabelsSettings
+    EVisualSettings.DataLabelsSettings
     ]
   );
 
@@ -89,7 +87,7 @@ const DataLabelsSettings = (props) => {
       chartSettings.lollipopType !== LollipopType.Circle) ||
     (dataLabelsSettings.placement === DataLabelsPlacement.Inside &&
       configValues[EDataLabelsSettings.placement] ===
-        DataLabelsPlacement.Outside)
+      DataLabelsPlacement.Outside)
   ) {
     configValues[EDataLabelsSettings.fontSize] = 12;
     const color = configValues[EDataLabelsSettings.color];
@@ -110,7 +108,7 @@ const DataLabelsSettings = (props) => {
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         <div className="config config-switch">
           <label className="config-label" htmlFor={EDataLabelsSettings.show}>
             Show Data Labels
@@ -473,7 +471,7 @@ const DataLabelsSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

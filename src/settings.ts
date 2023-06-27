@@ -27,130 +27,62 @@
 "use strict";
 
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
-import { DisplayUnits, Position, ILegendPosition } from "./enum";
-import { IXAxisSettings, IYAxisSettings } from "./visual-settings.interface";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
 export class VisualSettings extends DataViewObjectsParser {
       public license = new License();
+      public visualGeneralSettings = new VisualGeneralSettings();
       public chartConfig = new ChartConfig();
       public dataColorsConfig = new DataColorsConfig();
       public circleConfig = new CircleConfig();
       public lineConfig = new LineConfig();
       public dataLabelsConfig = new DataLabelsConfig();
-      public xAxisConfig = new XAxisConfig();
-      public yAxisConfig = new YAxisConfig();
-      public numberConfig = new NumberConfig();
       public gridLinesConfig = new GridLinesConfig();
       public rankingConfig = new RankingConfig();
-      public pieConfig = new PieConfig();
-      public legendSettings = new LegendSettings();
-      public numberSettings = new NumberSettings();
-      public xAxisSettings: IXAxisSettings = new XAxisSettings();
-      public yAxisSettings: IYAxisSettings = new YAxisSettings();
+      public xAxisConfig = new XAxisConfig();
+      public yAxisConfig = new YAxisConfig();
+      public legend = new Legend();
+      public numberFormatting = new NumberFormatting();
+
 }
 
 export class License {
       public purchased: string = ""; public customer: string = ""; public key: string = "";
 }
+export class VisualGeneralSettings {
+      public advancedSettings: boolean = true; public theme: string = "dark"; public summaryTable: boolean = true; public annotationsToggle: boolean = true; public advancedSettingsToggle: boolean = true;
+}
 export class ChartConfig {
       public chartSettings: string = "{}";
 }
-
 export class DataColorsConfig {
       public dataColorsSettings: string = "{}";
 }
-
 export class CircleConfig {
       public circleSettings: string = "{}";
 }
-
 export class LineConfig {
       public lineSettings: string = "{}";
 }
-
 export class DataLabelsConfig {
       public dataLabelsSettings: string = "{}";
 }
-
-export class XAxisConfig {
-      public xAxisSettings: string = "{}";
-}
-
-export class YAxisConfig {
-      public yAxisSettings: string = "{}";
-}
-export class NumberConfig {
-      public numberSettings: string = "{}";
-}
-
 export class GridLinesConfig {
       public gridLinesSettings: string = "{}";
 }
-
 export class RankingConfig {
       public rankingSettings: string = "{}";
 }
-
-export class PieConfig {
-      public pieSettings: string = "{}";
+export class XAxisConfig {
+      public xAxisSettings: string = "{}";
 }
-
-export class LegendSettings {
-      public show: boolean = true;
-      public position: ILegendPosition = ILegendPosition.Top;
-      public labelColor: string = null;
-      public labelFontFamily: string = 'Segoe UI';
-      public labelFontSize: number = 10;
-      public isShowTitle: boolean = true;
-      public legendTitleText: string = '';
-      public legend1TitleText: string = '';
-      public legend2TitleText: string = '';
-      public titleColor: string = null;
-      public titleFontFamily: string = 'Segoe UI Semibold';
+export class YAxisConfig {
+      public yAxisSettings: string = "{}";
 }
-
-export class NumberSettings {
-      public show: boolean = true;
-      public decimalSeparator: string = '.';
-      public thousandsSeparator: string = ',';
-      public decimalPlaces: number = 0;
-      public displayUnits: DisplayUnits = DisplayUnits.Auto;
-      public prefix: string = '';
-      public suffix: string = '';
-      public thousands: string = 'K';
-      public million: string = 'M';
-      public billion: string = 'B';
-      public trillion: string = 'T';
+export class Legend {
+      public show: boolean = true; public legendPosition: string = "TopLeft"; public showTitle: boolean = true; public legendTitle: string = ""; public legendColor: string = "#000000"; public fontSize: string = "8"; public fontFamily: string = "Segoe UI";
 }
-
-export class XAxisSettings {
-      public position: Position = Position.Bottom;
-      public isDisplayTitle: boolean = false;
-      public titleName: string = '';
-      public titleColor: string = null;
-      public titleFontSize: number = 12;
-      public titleFontFamily: string = 'Segoe UI';
-      public isDisplayLabel: boolean = true;
-      public labelColor: string = null;
-      public labelFontFamily: string = 'Segoe UI';
-      public labelFontSize: number = 12;
-      public isLabelAutoTilt: boolean = true;
-      public labelTilt: number = 30;
-      public labelCharLimit: number = 10;
-}
-
-export class YAxisSettings {
-      public position: Position = Position.Left;
-      public isDisplayTitle: boolean = false;
-      public titleName: string = '';
-      public titleColor: string = null;
-      public titleFontSize: number = 12;
-      public titleFontFamily: string = 'Segoe UI';
-      public isDisplayLabel: boolean = true;
-      public labelColor: string = null;
-      public labelFontFamily: string = 'Segoe UI';
-      public labelFontSize: number = 12;
-      public labelCharLimit: number = 10;
+export class NumberFormatting {
+      public show: boolean = true; public decimalSeparator: string = "."; public thousandsSeparator: string = ","; public decimalPlaces: number = 2; public scaling: string = "auto"; public prefix: string = ""; public suffix: string = ""; public scalingLabel: boolean = false; public thousandScalingLabel: string = "K"; public millionScalingLabel: string = "M"; public billionScalingLabel: string = "B"; public trillionScalingLabel: string = "T"; public semanticFormatting: boolean = false; public negativeFormat: string = "-x"; public negativeColor: string = "#ff0000"; public positiveFormat: string = "x"; public positiveColor: string = "#00ff00";
 }
 

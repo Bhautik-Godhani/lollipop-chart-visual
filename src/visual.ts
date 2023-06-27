@@ -11,7 +11,7 @@ import IColorPalette = powerbi.extensibility.IColorPalette;
 import * as d3 from "d3";
 
 import { IChartSubCategory, ILollipopChartRow, TooltipData } from './model';
-import { CategoryDataColorProps, CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, DataRolesName, DisplayUnits, EChartConfig, EDataLabelsSettings, EVisualConfig, FontStyle, ILegendPosition, LegendType, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
+import { CategoryDataColorProps, CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, DataRolesName, DisplayUnits, EDataLabelsSettings, EVisualConfig, EVisualSettings, FontStyle, ILegendPosition, LegendType, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { createLegend, positionChartArea } from "powerbi-visuals-utils-chartutils/lib/legend/legend";
 import { ILegend, LegendData, LegendDataPoint, LegendPosition } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
@@ -28,7 +28,7 @@ import LineSettings from './settings-pages/LineSettings';
 import DataLabelsSettings from './settings-pages/DataLabelsSettings';
 import GridLinesSettings from './settings-pages/GridLinesSettings';
 import RankingSettings from './settings-pages/RankingSettings';
-import { CHART_SETTINGS, CIRCLE_SETTINGS, DATA_COLORS, DATA_LABELS_SETTINGS, GRID_LINES_SETTINGS, LINE_SETTINGS, RANKING_SETTINGS, } from "./constants";
+import { CHART_SETTINGS, CIRCLE_SETTINGS, DATA_COLORS, DATA_LABELS_SETTINGS, GRID_LINES_SETTINGS, LINE_SETTINGS, RANKING_SETTINGS, X_AXIS_SETTINGS, Y_AXIS_SETTINGS, } from "./constants";
 import { IChartSettings, ICirclePropsSettings, ICircleSettings, IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, INumberSettings, IPiePropsSettings, IPieSettings, IRankingSettings, IXAxisSettings, IXGridLinesSettings, IYAxisSettings, IYGridLinesSettings } from './visual-settings.interface'
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
@@ -178,6 +178,23 @@ export class Visual extends Shadow {
 
     constructor(options: VisualConstructorOptions) {
         super(options, VisualSettings, {
+            summaryTable: true,
+            theme: {
+                sectionName: "visualGeneralSettings",
+                propertyName: "theme",
+            },
+            advancedSettingsToggle: {
+                sectionName: "visualGeneralSettings",
+                propertyName: "advancedSettingsToggle",
+            },
+            annotationsToggle: {
+                sectionName: "visualGeneralSettings",
+                propertyName: "annotationsToggle",
+            },
+            summaryTableToggle: {
+                sectionName: "visualGeneralSettings",
+                propertyName: "summaryTable",
+            },
             landingPage: {
                 description: "Test",
                 sliderImages: [],
@@ -325,6 +342,8 @@ export class Visual extends Shadow {
         this.isInFocusMode = vizOptions.options.isInFocus;
         this.setChartData();
         this.setVisualSettings();
+
+        console.log(this.xAxisSettings)
 
         const popupOptions = document.querySelector('.popup-options');
         this.settingsPopupOptionsWidth = popupOptions ? popupOptions.clientWidth : 0;
@@ -511,14 +530,14 @@ export class Visual extends Shadow {
     setVisualSettings(): void {
         const formatTab = this.visualUpdateOptions.formatTab;
 
-        const chartConfig = JSON.parse(formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings]);
+        const chartConfig = JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]);
         this.chartSettings = {
             ...CHART_SETTINGS,
             ...chartConfig,
         };
         this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 
-        const circleConfig = JSON.parse(formatTab[EVisualConfig.CircleConfig][EChartConfig.CircleSettings]);
+        const circleConfig = JSON.parse(formatTab[EVisualConfig.CircleConfig][EVisualSettings.CircleSettings]);
         this.circleSettings = {
             ...CIRCLE_SETTINGS,
             ...circleConfig,
@@ -527,25 +546,35 @@ export class Visual extends Shadow {
         this.circle1Settings = this.circleSettings.circle1;
         this.circle2Settings = this.circleSettings.circle2;
 
-        const lineConfig = JSON.parse(formatTab[EVisualConfig.LineConfig][EChartConfig.LineSettings]);
+        const lineConfig = JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]);
         this.lineSettings = {
             ...LINE_SETTINGS,
             ...lineConfig,
         };
 
         const clonedDataLabelsSettings = JSON.parse(JSON.stringify(this.dataLabelsSettings ?? {}));
-        const dataLabelsConfig = JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EChartConfig.DataLabelsSettings]);
+        const dataLabelsConfig = JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]);
         this.dataLabelsSettings = {
             ...DATA_LABELS_SETTINGS,
             ...dataLabelsConfig,
         };
 
-        this.legendSettings = formatTab[EChartConfig.LegendSettings];
-        this.numberSettings = formatTab[EChartConfig.NumberSettings];
-        this.xAxisSettings = formatTab[EChartConfig.XAxisSettings];
-        this.yAxisSettings = formatTab[EChartConfig.YAxisSettings];
+        this.legendSettings = formatTab[EVisualSettings.Legend];
+        this.numberSettings = formatTab[EVisualSettings.NumberFormatting];
 
-        const gridLinesConfig = JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EChartConfig.GridLinesSettings]);
+        const xAxisConfig = JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]);
+        this.xAxisSettings = {
+            ...X_AXIS_SETTINGS,
+            ...xAxisConfig,
+        };
+
+        const yAxisConfig = JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings]);
+        this.yAxisSettings = {
+            ...Y_AXIS_SETTINGS,
+            ...yAxisConfig,
+        };
+
+        const gridLinesConfig = JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EVisualSettings.GridLinesSettings]);
         this.gridSettings = {
             ...GRID_LINES_SETTINGS,
             ...gridLinesConfig,
@@ -569,14 +598,14 @@ export class Visual extends Shadow {
             DATA_COLORS.circle2.fillType = ColorPaletteType.Single;
         }
 
-        const dataColorsConfig = JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EChartConfig.DataColorsSettings]);
+        const dataColorsConfig = JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]);
         this.dataColorsSettings = {
             ...DATA_COLORS,
             ...dataColorsConfig,
         };
 
         const clonedRankingSettings = JSON.parse(JSON.stringify(this.rankingSettings ?? {}));
-        const rankingConfig = JSON.parse(formatTab[EVisualConfig.RankingConfig][EChartConfig.RankingSettings]);
+        const rankingConfig = JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]);
         this.rankingSettings = {
             ...RANKING_SETTINGS,
             ...rankingConfig,
@@ -588,16 +617,16 @@ export class Visual extends Shadow {
             CHART_SETTINGS.isLollipopTypeChanged = false;
             this.chartSettings.isLollipopTypeChanged = false;
             const chartConfig: IChartSettings = { ...this.chartSettings, lollipopType: LollipopType.Circle, isLollipopTypeChanged: false };
-            formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings] = JSON.stringify(chartConfig);
+            formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings] = JSON.stringify(chartConfig);
             const dataColorsConfig: IDataColorsSettings = { ...this.dataColorsSettings, dataType: CircleType.Circle1 };
-            formatTab[EVisualConfig.DataColorsConfig][EChartConfig.DataColorsSettings] = JSON.stringify(dataColorsConfig);
+            formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings] = JSON.stringify(dataColorsConfig);
         } else {
             if (!this.chartSettings.isLollipopTypeChanged) {
                 this.chartSettings.lollipopType = LollipopType.Donut;
                 const chartConfig: IChartSettings = { ...this.chartSettings, lollipopType: LollipopType.Donut };
-                formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings] = JSON.stringify(chartConfig);
+                formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings] = JSON.stringify(chartConfig);
                 const dataColorsConfig: IDataColorsSettings = { ...this.dataColorsSettings, dataType: PieType.Pie1 };
-                formatTab[EVisualConfig.DataColorsConfig][EChartConfig.DataColorsSettings] = JSON.stringify(dataColorsConfig);
+                formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings] = JSON.stringify(dataColorsConfig);
             }
         }
 

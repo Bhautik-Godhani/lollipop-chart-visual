@@ -4,7 +4,6 @@ import {
   CircleFillOption,
   CircleSize,
   CircleType,
-  EChartConfig,
   ECircleSettings,
   EVisualConfig,
 } from "../enum";
@@ -69,16 +68,14 @@ const CircleSettings = (props) => {
     }));
   };
 
-  const chartSettings: IChartSettings = JSON.parse(
-    vizOptions.formatTab[EVisualConfig.ChartConfig][EChartConfig.ChartSettings]
-  );
+  const chartSettings: IChartSettings = shadow.chartSettings;
 
   const isDumbbellChart =
     !!vizOptions.options.dataViews[0].categorical.values[1];
 
   return (
     <>
-      <div className="config-container">
+      {/* <div className="config-container">
         {isDumbbellChart && (
           <div className="config">
             <label
@@ -212,7 +209,7 @@ const CircleSettings = (props) => {
             Apply
           </button>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };
