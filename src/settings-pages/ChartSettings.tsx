@@ -9,6 +9,219 @@ import {
   PieSize,
   PieType,
 } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption } from "@truviz/shadow/dist/Components";
+import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
+
+const ORIENTATIONS: ILabelValuePair[] = [
+  {
+    label: "VERTICAL",
+    value: Orientation.Vertical,
+  },
+  {
+    label: "HORIZONTAL",
+    value: Orientation.Horizontal,
+  },
+];
+
+const LOLLIPOP_DISTANCE_TYPES: ILabelValuePair[] = [
+  {
+    label: "Auto",
+    value: LollipopDistanceType.Auto,
+  },
+  {
+    label: "Custom",
+    value: LollipopDistanceType.Custom,
+  },
+];
+
+const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>): void => {
+  setConfigValues((d) => ({
+    ...d,
+    [n]: val,
+  }));
+};
+
+const handlePieChange = (val, n, pieType: PieType, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
+  setPieConfigValues((d) => ({
+    ...d,
+    [pieType]: { ...d[pieType], [n]: val },
+  }));
+};
+
+const handlePieTypeChange = (val, n, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
+  setPieConfigValues((d) => ({
+    ...d,
+    [n]: val,
+  }));
+};
+
+const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+  return (
+    <Footer
+      cancelButtonHandler={closeCurrentSettingHandler}
+      saveButtonConfig={{
+        isDisabled: false,
+        text: "APPLY",
+        handler: applyChanges,
+      }}
+      resetButtonHandler={resetChanges}
+    />
+  );
+};
+
+const UIGeneralChartSettings = (
+  configValues: IChartSettings,
+  isHasSubCategories: boolean,
+  setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
+) => {
+  const LOLLIPOP_TYPES: ILabelValuePair[] = [
+    {
+      label: "Circle",
+      value: LollipopType.Circle
+    }
+  ];
+
+  if (isHasSubCategories) {
+    LOLLIPOP_TYPES.push(
+      {
+        label: "Pie",
+        value: LollipopType.Pie
+      },
+      {
+        label: "Donut",
+        value: LollipopType.Donut
+      },
+      {
+        label: "Rose",
+        value: LollipopType.Rose
+      }
+    )
+  }
+
+  return <>
+    <Row>
+      <Column>
+        <SelectInput
+          label={"Lollipop Type"}
+          value={configValues.lollipopType}
+          optionsList={LOLLIPOP_TYPES}
+          handleChange={(value) => handleChange(value, EChartSettings.lollipopType, setConfigValues)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <SwitchOption
+          label={"Orientation"}
+          value={configValues.orientation}
+          optionsList={ORIENTATIONS}
+          handleChange={(value) => handleChange(value, EChartSettings.orientation, setConfigValues)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <SelectInput
+          label={"Distance Between Lollipop"}
+          value={configValues.lollipopDistanceType}
+          optionsList={LOLLIPOP_DISTANCE_TYPES}
+          handleChange={(value) => handleChange(value, EChartSettings.lollipopDistanceType, setConfigValues)}
+        />
+      </Column>
+    </Row>
+
+    <ConditionalWrapper visible={configValues.lollipopDistanceType === LollipopDistanceType.Custom}>
+      <Row>
+        <Column>
+          <InputControl
+            min={0}
+            type="number"
+            label="Distance Value"
+            value={configValues.lollipopDistance.toString()}
+            handleChange={(value) => handleChange(+value, EChartSettings.lollipopDistance, setConfigValues)}
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+  </>
+}
+
+const UIPieTypeSettings = (
+  configValues: IChartSettings,
+  pieConfigValues: IPieSettings,
+  isDumbbellChart: boolean,
+  setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>
+) => {
+  const pieType = pieConfigValues.pieType;
+  const PIE_TYPES: ILabelValuePair[] = [
+    {
+      label: `${configValues[EChartSettings.lollipopType]} 1`,
+      value: PieType.Pie1,
+    },
+    {
+      label: `${configValues[EChartSettings.lollipopType]} 2`,
+      value: PieType.Pie2,
+    },
+  ];
+
+  return <>
+    <ConditionalWrapper visible={isDumbbellChart}>
+      <Row>
+        <Column>
+          <RadioOption
+            label={`Select ${configValues[EChartSettings.lollipopType]}`}
+            value={pieConfigValues[EPieSettings.pieType]}
+            optionsList={PIE_TYPES}
+            handleChange={value => handlePieTypeChange(value, EPieSettings.pieType, setPieConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <SelectInput
+            label={`${configValues[EChartSettings.lollipopType]} Size`}
+            value={pieConfigValues[pieConfigValues.pieType].pieSize}
+            optionsList={LOLLIPOP_DISTANCE_TYPES}
+            handleChange={(value) => handlePieChange(value, EPieSettings.pieSize, pieType, setPieConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={pieConfigValues[pieConfigValues.pieType].pieSize ===
+        PieSize.Auto}>
+        <Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label={`Max ${configValues[EChartSettings.lollipopType]} Radius`}
+              value={pieConfigValues[pieConfigValues.pieType].maxPieRadius.toString()}
+              handleChange={(value) => handlePieChange(value, EPieSettings.maxPieRadius, pieType, setPieConfigValues)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={pieConfigValues[pieConfigValues.pieType].pieSize ===
+        PieSize.Custom}>
+        <Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label={`${configValues[EChartSettings.lollipopType]} Radius`}
+              value={pieConfigValues[pieConfigValues.pieType].pieRadius.toString()}
+              handleChange={(value) => handlePieChange(value, EPieSettings.pieRadius, pieType, setPieConfigValues)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+    </ConditionalWrapper>
+  </>
+}
 
 const ChartSettings = (props) => {
   const {
@@ -38,43 +251,17 @@ const ChartSettings = (props) => {
     closeCurrentSettingHandler();
   };
 
-  const [configValues, setConfigValues] = React.useState({
+  const resetChanges = () => {
+    setConfigValues({ ...CHART_SETTINGS });
+  };
+
+  const [configValues, setConfigValues] = React.useState<IChartSettings>({
     ...initialStates,
   });
 
-  const [pieConfigValues, setPieConfigValues] = React.useState({
+  const [pieConfigValues, setPieConfigValues] = React.useState<IPieSettings>({
     ...initialStates[EChartSettings.pieSettings],
   });
-
-  const handleLollipopDistanceChange = (val, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: val,
-      isLollipopDistanceChange: true,
-    }));
-  };
-
-  const handleChange = (val, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: val,
-    }));
-  };
-
-  const pieType = pieConfigValues.pieType;
-  const handlePieChange = (val, n) => {
-    setPieConfigValues((d) => ({
-      ...d,
-      [pieType]: { ...d[pieType], [n]: val },
-    }));
-  };
-
-  const handlePieTypeChange = (val, n) => {
-    setPieConfigValues((d) => ({
-      ...d,
-      [n]: val,
-    }));
-  };
 
   const [isHasSubCategories] = React.useState(
     !!vizOptions.options.dataViews[0].categorical.categories[1]
@@ -83,7 +270,6 @@ const ChartSettings = (props) => {
   const isDumbbellChart =
     !!vizOptions.options.dataViews[0].categorical.values[1];
 
-  let lollipopType = configValues.lollipopType;
   const [isLollipopTypeChanged, setIsLollipopTypeChanged] = React.useState(
     configValues.isLollipopTypeChanged
   );
@@ -122,244 +308,13 @@ const ChartSettings = (props) => {
 
   return (
     <>
-      {/* <div className="config-container">
-        <div className="config">
-          <label className="config-label" htmlFor={EChartSettings.lollipopType}>
-            Lollipop Type
-          </label>
-          <div className="config-option">
-            <select
-              id={EChartSettings.lollipopType}
-              value={lollipopType}
-              onChange={(e) => {
-                handleChange(e.target.value, EChartSettings.lollipopType);
-                setIsLollipopTypeChanged(true);
-                setConfigValues((d) => ({
-                  ...d,
-                  [EChartSettings.isLollipopTypeChanged]: true,
-                }));
-              }}
-            >
-              <option value={LollipopType.Circle}>Circle</option>
-              <option
-                value={LollipopType.Pie}
-                className={!isHasSubCategories ? "disabled" : ""}
-                disabled={!isHasSubCategories}
-              >
-                Pie
-              </option>
-              <option
-                value={LollipopType.Donut}
-                className={!isHasSubCategories ? "disabled" : ""}
-                disabled={!isHasSubCategories}
-              >
-                Donut
-              </option>
-              <option
-                value={LollipopType.Rose}
-                className={!isHasSubCategories ? "disabled" : ""}
-                disabled={!isHasSubCategories}
-              >
-                Rose
-              </option>
-            </select>
-          </div>
-        </div>
+      {UIGeneralChartSettings(configValues, isHasSubCategories, setConfigValues)}
 
-        <div className="config">
-          <label className="config-label" htmlFor={EChartSettings.orientation}>
-            Orientation
-          </label>
-          <div className="config-option">
-            <select
-              id={EChartSettings.orientation}
-              value={configValues.orientation}
-              onChange={(e) =>
-                handleChange(e.target.value, EChartSettings.orientation)
-              }
-            >
-              <option value={Orientation.Horizontal}>Horizontal</option>
-              <option value={Orientation.Vertical}>Vertical</option>
-            </select>
-          </div>
-        </div>
+      <ConditionalWrapper visible={configValues[EChartSettings.lollipopType] !== LollipopType.Circle}>
+        {UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)}
+      </ConditionalWrapper>
 
-        <div className="config">
-          <label
-            className="config-label"
-            htmlFor={EChartSettings.lollipopDistanceType}
-          >
-            Distance Between Lollipop
-          </label>
-          <div className="config-option">
-            <select
-              id={EChartSettings.lollipopDistanceType}
-              value={configValues.lollipopDistanceType}
-              onChange={(e) =>
-                handleChange(
-                  e.target.value,
-                  EChartSettings.lollipopDistanceType
-                )
-              }
-            >
-              <option value={LollipopDistanceType.Auto}>Auto</option>
-              <option value={LollipopDistanceType.Custom}>Custom</option>
-            </select>
-          </div>
-        </div>
-
-        {configValues.lollipopDistanceType === LollipopDistanceType.Custom && (
-          <div className="config">
-            <label
-              className="config-label"
-              htmlFor={EChartSettings.lollipopDistance}
-            >
-              Distance Value
-            </label>
-            <div className="config-option">
-              <input
-                id={EChartSettings.lollipopDistance}
-                type="number"
-                value={configValues.lollipopDistance}
-                onChange={(e: any) => {
-                  handleLollipopDistanceChange(
-                    +e.target.value,
-                    EChartSettings.lollipopDistance
-                  );
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {configValues[EChartSettings.lollipopType] !== LollipopType.Circle && (
-          <React.Fragment>
-            {isDumbbellChart && (
-              <div
-                className="radio-button-group"
-                onChange={(e: any) =>
-                  handlePieTypeChange(e.target.value, EPieSettings.pieType)
-                }
-              >
-                <span className="radio-group-title">
-                  Select {configValues[EChartSettings.lollipopType]}:
-                </span>
-                <div className="radio-buttons">
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="pie1"
-                      id="pie1"
-                      value={PieType.Pie1}
-                      checked={
-                        pieConfigValues[EPieSettings.pieType] === PieType.Pie1
-                      }
-                    />
-                    <label className="radio-label" htmlFor="pie1">
-                      {configValues[EChartSettings.lollipopType]} 1
-                    </label>
-                  </div>
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="pie2"
-                      id="pie2"
-                      value={PieType.Pie2}
-                      checked={
-                        pieConfigValues[EPieSettings.pieType] === PieType.Pie2
-                      }
-                    />
-                    <label className="radio-label" htmlFor="pie2">
-                      {configValues[EChartSettings.lollipopType]} 2
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="config">
-              <label className="config-label" htmlFor={EPieSettings.pieSize}>
-                {configValues[EChartSettings.lollipopType]} Size
-              </label>
-              <div className="config-option">
-                <select
-                  id={EPieSettings.pieSize}
-                  value={pieConfigValues[pieConfigValues.pieType].pieSize}
-                  onChange={(e) =>
-                    handlePieChange(e.target.value, EPieSettings.pieSize)
-                  }
-                >
-                  <option value={PieSize.Auto}>Auto</option>
-                  <option value={PieSize.Custom}>Custom</option>
-                </select>
-              </div>
-            </div>
-
-            {pieConfigValues[pieConfigValues.pieType].pieSize ===
-              PieSize.Auto && (
-                <div className="config">
-                  <label
-                    className="config-label"
-                    htmlFor={EPieSettings.maxPieRadius}
-                  >
-                    Max {configValues[EChartSettings.lollipopType]} Radius
-                  </label>
-                  <div className="config-option">
-                    <input
-                      id={EPieSettings.maxPieRadius}
-                      type="number"
-                      value={
-                        pieConfigValues[pieConfigValues.pieType].maxPieRadius
-                      }
-                      onChange={(e: any) => {
-                        handlePieChange(
-                          +e.target.value,
-                          EPieSettings.maxPieRadius
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-
-            {pieConfigValues[pieConfigValues.pieType].pieSize ===
-              PieSize.Custom && (
-                <div className="config">
-                  <label
-                    className="config-label"
-                    htmlFor={EPieSettings.pieRadius}
-                  >
-                    {configValues[EChartSettings.lollipopType]} Radius
-                  </label>
-                  <div className="config-option">
-                    <input
-                      id={EPieSettings.pieRadius}
-                      type="number"
-                      value={pieConfigValues[pieConfigValues.pieType].pieRadius}
-                      onChange={(e: any) => {
-                        handlePieChange(+e.target.value, EPieSettings.pieRadius);
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-          </React.Fragment>
-        )}
-
-        <div className="config-btn-group">
-          <button
-            className="cancel-btn btn"
-            onClick={closeCurrentSettingHandler}
-          >
-            Cancel
-          </button>
-          <button className="apply-btn btn" onClick={applyChanges}>
-            Apply
-          </button>
-        </div>
-      </div> */}
+      {UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
     </>
   );
 };

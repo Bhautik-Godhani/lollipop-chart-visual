@@ -197,3 +197,9 @@ export interface IDataColorsPropsSettings {
     selectedCategoryName?: string,
     selectedCategoryColor?: string;
 }
+
+export interface ILabelValuePair {
+    label: string;
+    value: string;
+    icon?: React.ReactNode;
+}
