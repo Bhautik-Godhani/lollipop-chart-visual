@@ -5,11 +5,77 @@ import {
   CircleSize,
   CircleType,
   ECircleSettings,
-  EVisualConfig,
 } from "../enum";
-import { adjoinRGB, splitRGB } from "../methods";
-import { IChartSettings } from "../visual-settings.interface";
-import ColorPicker from "./ColorPicker";
+import { ICircleSettings, ILabelValuePair } from "../visual-settings.interface";
+import { Column, ConditionalWrapper, Footer, InputControl, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
+
+const CIRCLE_TYPES: ILabelValuePair[] = [
+  {
+    label: "Circle1",
+    value: CircleType.Circle1,
+  },
+  {
+    label: "Circle2",
+    value: CircleType.Circle2,
+  },
+];
+
+const CIRCLE_FILL_OPTIONS: ILabelValuePair[] = [
+  {
+    label: "Yes",
+    value: CircleFillOption.Yes,
+  },
+  {
+    label: "No",
+    value: CircleFillOption.No,
+  },
+];
+
+const CIRCLE_SIZE_OPTIONS: ILabelValuePair[] = [
+  {
+    label: "Auto",
+    value: CircleSize.Auto,
+  },
+  {
+    label: "Custom",
+    value: CircleSize.Custom,
+  },
+];
+
+const handleChange = (val, n, circleType: CircleType, setConfigValues: React.Dispatch<React.SetStateAction<ICircleSettings>>) => {
+  setConfigValues((d) => ({
+    ...d,
+    [circleType]: { ...d[circleType], [n]: val },
+  }));
+};
+
+const handleCircleTypeChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<ICircleSettings>>) => {
+  setConfigValues((d) => ({
+    ...d,
+    [n]: val,
+  }));
+};
+
+const handleCheckbox = (n, circleType: CircleType, setConfigValues: React.Dispatch<React.SetStateAction<ICircleSettings>>) => {
+  setConfigValues((d) => ({
+    ...d,
+    [circleType]: { ...d[circleType], [n]: !d[circleType][n] },
+  }));
+};
+
+const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+  return (
+    <Footer
+      cancelButtonHandler={closeCurrentSettingHandler}
+      saveButtonConfig={{
+        isDisabled: false,
+        text: "APPLY",
+        handler: applyChanges,
+      }}
+      resetButtonHandler={resetChanges}
+    />
+  );
+};
 
 const CircleSettings = (props) => {
   const {
@@ -35,181 +101,102 @@ const CircleSettings = (props) => {
     closeCurrentSettingHandler();
   };
 
-  const [configValues, setConfigValues] = React.useState({
+  const resetChanges = () => {
+    setConfigValues({ ...CIRCLE_SETTINGS });
+  };
+
+  const [configValues, setConfigValues] = React.useState<ICircleSettings>({
     ...initialStates,
   });
 
   const circleType = configValues.circleType;
-  const handleChange = (val, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [circleType]: { ...d[circleType], [n]: val },
-    }));
-  };
-
-  const handleCircleTypeChange = (val, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: val,
-    }));
-  };
-
-  const handleCheckbox = (n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [circleType]: { ...d[circleType], [n]: !d[circleType][n] },
-    }));
-  };
-
-  const handleColor = ({ rgb }, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [circleType]: { ...d[circleType], [n]: adjoinRGB(rgb) },
-    }));
-  };
-
-  const chartSettings: IChartSettings = shadow.chartSettings;
-
   const isDumbbellChart =
     !!vizOptions.options.dataViews[0].categorical.values[1];
 
+  React.useEffect(() => {
+    console.log(configValues)
+  }, [configValues])
+
+
   return (
     <>
-      {/* <div className="config-container">
-        {isDumbbellChart && (
-          <div className="config">
-            <label
-              className="config-label"
-              htmlFor={ECircleSettings.circleType}
-            >
-              Circle Type
-            </label>
-            <div className="config-option">
-              <select
-                id={ECircleSettings.circleType}
-                value={configValues.circleType}
-                onChange={(e) =>
-                  handleCircleTypeChange(
-                    e.target.value,
-                    ECircleSettings.circleType
-                  )
-                }
-              >
-                <option value={CircleType.Circle1}>Circle1</option>
-                <option value={CircleType.Circle2}>Circle2</option>
-              </select>
-            </div>
-          </div>
-        )}
-
-        <div className="config config-switch">
-          <label className="config-label" htmlFor={ECircleSettings.show}>
-            Display Circle
-          </label>
-          <div className="config-option">
-            <label className="switch">
-              <input
-                id={ECircleSettings.show}
-                type="checkbox"
-                checked={configValues[configValues.circleType].show}
-                onChange={(e: any) => {
-                  handleCheckbox(ECircleSettings.show);
-                }}
-              />
-              <span className="slider round"></span>
-            </label>
-          </div>
-        </div>
-
-        <div className="config">
-          <label
-            className="config-label"
-            htmlFor={ECircleSettings.isCircleFilled}
-          >
-            Fill the circle
-          </label>
-          <div className="config-option">
-            <select
-              id={ECircleSettings.isCircleFilled}
-              value={configValues[configValues.circleType].isCircleFilled}
-              onChange={(e) =>
-                handleChange(e.target.value, ECircleSettings.isCircleFilled)
-              }
-            >
-              <option value={CircleFillOption.Yes}>Yes</option>
-              <option value={CircleFillOption.No}>No</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="config">
-          <label className="config-label" htmlFor={ECircleSettings.circleSize}>
-            Circle Size
-          </label>
-          <div className="config-option">
-            <select
-              id={ECircleSettings.circleSize}
-              value={configValues[configValues.circleType].circleSize}
-              onChange={(e) =>
-                handleChange(e.target.value, ECircleSettings.circleSize)
-              }
-            >
-              <option value={CircleSize.Auto}>Auto</option>
-              <option value={CircleSize.Custom}>Custom</option>
-            </select>
-          </div>
-        </div>
-
-        {configValues[configValues.circleType].circleSize ===
-          CircleSize.Custom && (
-          <div className="config">
-            <label
-              className="config-label"
-              htmlFor={ECircleSettings.circleRadius}
-            >
-              Size Value
-            </label>
-            <div className="config-option">
-              <input
-                id={ECircleSettings.circleRadius}
-                type="number"
-                value={configValues[configValues.circleType].circleRadius}
-                onChange={(e: any) => {
-                  handleChange(+e.target.value, ECircleSettings.circleRadius);
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="config">
-          <label className="config-label" htmlFor={ECircleSettings.strokeWidth}>
-            Border Width
-          </label>
-          <div className="config-option">
-            <input
-              id={ECircleSettings.strokeWidth}
-              type="number"
-              value={configValues[configValues.circleType].strokeWidth}
-              onChange={(e: any) => {
-                handleChange(+e.target.value, ECircleSettings.strokeWidth);
-              }}
+      <ConditionalWrapper visible={isDumbbellChart}>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Circle Type"}
+              value={configValues.circleType}
+              optionsList={CIRCLE_TYPES}
+              handleChange={(value) => handleCircleTypeChange(
+                value,
+                ECircleSettings.circleType,
+                setConfigValues
+              )}
             />
-          </div>
-        </div>
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
-        <div className="config-btn-group">
-          <button
-            className="cancel-btn btn"
-            onClick={closeCurrentSettingHandler}
-          >
-            Cancel
-          </button>
-          <button className="apply-btn btn" onClick={applyChanges}>
-            Apply
-          </button>
-        </div>
-      </div> */}
+      <Row>
+        <Column>
+          <ToggleButton
+            label={"Display Circle"}
+            value={configValues[configValues.circleType].show}
+            handleChange={() => handleCheckbox(ECircleSettings.show, circleType, setConfigValues)}
+            appearance="checkbox"
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Fill the circle"}
+            value={configValues[configValues.circleType].isCircleFilled}
+            optionsList={CIRCLE_FILL_OPTIONS}
+            handleChange={(value) => handleChange(value, ECircleSettings.isCircleFilled, circleType, setConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Circle Size"}
+            value={configValues[configValues.circleType].circleSize}
+            optionsList={CIRCLE_SIZE_OPTIONS}
+            handleChange={(value) => handleChange(value, ECircleSettings.circleSize, circleType, setConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={configValues[configValues.circleType].circleSize === CircleSize.Custom}>
+        <Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label="Size Value"
+              value={configValues[configValues.circleType].circleRadius}
+              handleChange={(value) => handleChange(value, ECircleSettings.circleRadius, circleType, setConfigValues)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <Row>
+        <Column>
+          <InputControl
+            min={0}
+            type="number"
+            label="Border Width"
+            value={configValues[configValues.circleType].strokeWidth}
+            handleChange={(value) => handleChange(value, ECircleSettings.strokeWidth, circleType, setConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      {UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
     </>
   );
 };
