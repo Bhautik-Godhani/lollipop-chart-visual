@@ -72,20 +72,20 @@ export const LINE_SETTINGS: ILineSettings = {
     show: true,
     lineType: LineType.Solid,
     lineWidth: 8,
-    lineColor: 'rgb(91,121,185)'
+    lineColor: 'rgba(91,121,185,1)'
 }
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
     show: true,
     color: '#fff',
-    borderColor: 'rgb(255, 255, 255)',
+    borderColor: 'rgba(255, 255, 255,1)',
     borderWidth: 2,
     orientation: Orientation.Horizontal,
     fontSize: 12,
     pieDataLabelFontSize: 12,
     fontFamily: 'Segoe UI',
     showBackground: true,
-    backgroundColor: 'rgb(0,0,0)',
+    backgroundColor: 'rgba(0,0,0,1)',
     transparency: 90,
     fontStyle: FontStyle.None,
     placement: DataLabelsPlacement.Inside,
@@ -96,14 +96,14 @@ export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
     show: false,
     lineType: LineType.Dotted,
     lineWidth: 1,
-    lineColor: 'rgb(151,151,151)'
+    lineColor: 'rgba(151,151,151,1)'
 }
 
 export const Y_GRID_LINES_SETTINGS: IYGridLinesSettings = {
     show: false,
     lineType: LineType.Dotted,
     lineWidth: 1,
-    lineColor: 'rgb(151,151,151)'
+    lineColor: 'rgba(151,151,151,1)'
 }
 
 export const GRID_LINES_SETTINGS: IGridLinesSettings = {
@@ -112,73 +112,73 @@ export const GRID_LINES_SETTINGS: IGridLinesSettings = {
 }
 
 export const CIRCLE1_DATA_COLORS: IDataColorsPropsSettings = {
-    fillmin: "rgb(92,113,187)",
+    fillmin: "rgba(92,113,187,1)",
     midcolor: false,
-    fillmid: "rgb(3,194,129)",
-    fillmax: "rgb(253,98,94)",
-    fillnull: "rgb(242,242,242)",
+    fillmid: "rgba(3,194,129,1)",
+    fillmax: "rgba(253,98,94,1)",
+    fillnull: "rgba(242,242,242,1)",
     fillType: ColorPaletteType.Single,
     numberOfClasses: 5,
     byCategoryColors: [],
-    schemeColors: ["rgb(241,238,246)", "rgb(189,201,225)", "rgb(116,169,207)", "rgb(43,140,190)", "rgb(4,90,141)"],
+    schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
     reverse: false,
     isGradient: false,
-    singleColor: "rgb(91,121,185)",
-    circleFillColor: "rgb(91,121,185)",
-    circleStrokeColor: "rgb(91,121,185)"
+    singleColor: "rgba(91,121,185,1)",
+    circleFillColor: "rgba(91,121,185,1)",
+    circleStrokeColor: "rgba(91,121,185,1)"
 };
 
 export const CIRCLE2_DATA_COLORS: IDataColorsPropsSettings = {
-    fillmin: "rgb(92,113,187)",
+    fillmin: "rgba(92,113,187,1)",
     midcolor: false,
-    fillmid: "rgb(3,194,129)",
-    fillmax: "rgb(253,98,94)",
-    fillnull: "rgb(242,242,242)",
+    fillmid: "rgba(3,194,129,1)",
+    fillmax: "rgba(253,98,94,1)",
+    fillnull: "rgba(242,242,242,1)",
     fillType: ColorPaletteType.Single,
     numberOfClasses: 5,
     byCategoryColors: [],
-    schemeColors: ["rgb(241,238,246)", "rgb(189,201,225)", "rgb(116,169,207)", "rgb(43,140,190)", "rgb(4,90,141)"],
+    schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
     reverse: false,
     isGradient: false,
-    singleColor: "rgb(5,183,155)",
-    circleFillColor: "rgb(5,183,155)",
-    circleStrokeColor: "rgb(5,183,155)"
+    singleColor: "rgba(5,183,155,1)",
+    circleFillColor: "rgba(5,183,155,1)",
+    circleStrokeColor: "rgba(5,183,155,1)"
 };
 
 export const PIE1_DATA_COLORS: IDataColorsPropsSettings = {
-    fillmin: "rgb(92,113,187)",
+    fillmin: "rgba(92,113,187,1)",
     midcolor: false,
-    fillmid: "rgb(3,194,129)",
-    fillmax: "rgb(253,98,94)",
-    fillnull: "rgb(242,242,242)",
+    fillmid: "rgba(3,194,129,1)",
+    fillmax: "rgba(253,98,94,1)",
+    fillnull: "rgba(242,242,242,1)",
     fillType: ColorPaletteType.Gradient,
     numberOfClasses: 5,
     byCategoryColors: [],
-    schemeColors: ["rgb(241,238,246)", "rgb(189,201,225)", "rgb(116,169,207)", "rgb(43,140,190)", "rgb(4,90,141)"],
+    schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
     reverse: false,
     isGradient: false,
-    singleColor: "rgb(92,113,187)",
-    defaultColor: "rgb(92,113,187)",
+    singleColor: "rgba(92,113,187,1)",
+    defaultColor: "rgba(92,113,187,1)",
     selectedCategoryName: null,
-    selectedCategoryColor: "rgb(5, 183, 155)"
+    selectedCategoryColor: "rgba(5, 183, 155,1)"
 };
 
 export const PIE2_DATA_COLORS: IDataColorsPropsSettings = {
-    fillmin: "rgb(92,113,187)",
+    fillmin: "rgba(92,113,187,1)",
     midcolor: false,
-    fillmid: "rgb(3,194,129)",
-    fillmax: "rgb(253,98,94)",
-    fillnull: "rgb(242,242,242)",
+    fillmid: "rgba(3,194,129,1)",
+    fillmax: "rgba(253,98,94,1)",
+    fillnull: "rgba(242,242,242,1)",
     fillType: ColorPaletteType.Gradient,
     numberOfClasses: 5,
     byCategoryColors: [],
-    schemeColors: ["rgb(241,238,246)", "rgb(189,201,225)", "rgb(116,169,207)", "rgb(43,140,190)", "rgb(4,90,141)"],
+    schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
     reverse: false,
     isGradient: false,
-    singleColor: "rgb(92,113,187)",
-    defaultColor: "rgb(92,113,187)",
+    singleColor: "rgba(92,113,187,1)",
+    defaultColor: "rgba(92,113,187,1)",
     selectedCategoryName: null,
-    selectedCategoryColor: "rgb(5, 183, 155)"
+    selectedCategoryColor: "rgba(5, 183, 155,1)"
 };
 
 export const DATA_COLORS: IDataColorsSettings = {
@@ -194,15 +194,15 @@ export const VALUE1_RANKING_SETTINGS: IRankingPropsSettings = {
     count: 5,
     showRemainingAsOthers: false,
     isSubcategoriesRanking: false,
-    circleFillColor: 'rgb(84, 84, 84)',
-    circleStrokeColor: 'rgb(84, 84, 84)',
-    pieSliceColor: 'rgb(84, 84, 84)',
-    lineColor: 'rgb(84, 84, 84)',
+    circleFillColor: 'rgba(84, 84, 84,1)',
+    circleStrokeColor: 'rgba(84, 84, 84,1)',
+    pieSliceColor: 'rgba(84, 84, 84,1)',
+    lineColor: 'rgba(84, 84, 84,1)',
     subCategoriesRanking: {
         filterType: RankingFilterType.TopN,
         count: 10,
         showRemainingAsOthers: false,
-        pieSliceColor: 'rgb(84, 84, 84)'
+        pieSliceColor: 'rgba(84, 84, 84,1)'
     }
 };
 
@@ -211,15 +211,15 @@ export const VALUE2_RANKING_SETTINGS: IRankingPropsSettings = {
     count: 5,
     showRemainingAsOthers: false,
     isSubcategoriesRanking: false,
-    circleFillColor: 'rgb(84, 84, 84)',
-    circleStrokeColor: 'rgb(84, 84, 84)',
-    pieSliceColor: 'rgb(84, 84, 84)',
-    lineColor: 'rgb(84, 84, 84)',
+    circleFillColor: 'rgba(84, 84, 84,1)',
+    circleStrokeColor: 'rgba(84, 84, 84,1)',
+    pieSliceColor: 'rgba(84, 84, 84,1)',
+    lineColor: 'rgba(84, 84, 84,1)',
     subCategoriesRanking: {
         filterType: RankingFilterType.TopN,
         count: 10,
         showRemainingAsOthers: false,
-        pieSliceColor: 'rgb(84, 84, 84)'
+        pieSliceColor: 'rgba(84, 84, 84,1)'
     }
 };
 

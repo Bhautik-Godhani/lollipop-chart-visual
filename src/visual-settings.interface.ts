@@ -186,7 +186,7 @@ export interface IDataColorsPropsSettings {
     fillnull: string,
     fillType: string,
     numberOfClasses: number,
-    byCategoryColors: string[],
+    byCategoryColors: { name: string, color: string }[],
     schemeColors: string[],
     reverse: boolean,
     isGradient: boolean,

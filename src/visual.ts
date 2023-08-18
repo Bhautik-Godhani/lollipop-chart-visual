@@ -1009,12 +1009,12 @@ export class Visual extends Shadow {
     }
 
     setVisualOptionsColor(): void {
-        this.xAxisSettings.labelColor = this.xAxisSettings.labelColor ?? '#666666';
-        this.xAxisSettings.titleColor = this.xAxisSettings.titleColor ?? '#000';
-        this.yAxisSettings.labelColor = this.yAxisSettings.labelColor ?? '#666666';
-        this.yAxisSettings.titleColor = this.yAxisSettings.titleColor ?? '#000';
-        this.legendSettings.labelColor = this.legendSettings.labelColor ?? '#000';
-        this.legendSettings.titleColor = this.legendSettings.titleColor ?? '#000';
+        this.xAxisSettings.labelColor = this.xAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
+        this.xAxisSettings.titleColor = this.xAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
+        this.yAxisSettings.labelColor = this.yAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
+        this.yAxisSettings.titleColor = this.yAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
+        this.legendSettings.labelColor = this.legendSettings.labelColor ?? 'rgba(0, 0, 0, 1)';
+        this.legendSettings.titleColor = this.legendSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
     }
 
     setChartWidthHeight(): void {

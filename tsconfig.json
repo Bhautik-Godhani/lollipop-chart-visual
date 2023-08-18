@@ -1,17 +1,19 @@
 {
-  "compilerOptions": {
-    "jsx": "react",
-    "types": ["react", "react-dom"],
-    "allowJs": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true, 
-    "target": "es6",
-    "sourceMap": true,
-    "outDir": "./.tmp/build/",
-    "moduleResolution": "node",
-    "declaration": true,
-    "lib": ["es2017", "dom"]
-  },
-  "files": ["./src/visual.ts"]
+	"compilerOptions": {
+		"jsx": "react",
+		"types": ["react", "react-dom", "node"],
+		"allowJs": false,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"target": "es6",
+		"sourceMap": true,
+		"outDir": "./.tmp/build/",
+		"moduleResolution": "node",
+		"declaration": true,
+		"lib": ["ES2017", "es2015", "ES2019", "dom"],
+		"preserveSymlinks": true
+	},
+	"include": ["src/**/*.tsx", "src/**/*.ts", "src/**/*.json"],
+	"files": ["./src/visual.ts", "custom.d.ts"]
 }

@@ -1,638 +1,432 @@
 import * as React from "react";
-import ColorPicker from "./ColorPicker";
-import { CHART_SETTINGS, DATA_COLORS } from "../constants";
-import { adjoinRGB, splitRGB } from "../methods";
-import { COLORBREWER } from "../color-schemes";
-import {
-  CircleType,
-  ColorPaletteType,
-  DataRolesName,
-  EChartSettings,
-  EDataColorsSettings,
-  EVisualConfig,
-  LollipopType,
-  PieType,
-} from "../enum";
-import { IChartSettings } from "../visual-settings.interface";
+import { DATA_COLORS } from "../constants";
+import { CircleType, ColorPaletteType, DataRolesName, EChartSettings, EDataColorsSettings, LollipopType, PieType } from "../enum";
+import { IChartSettings, IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { ColorPicker, Column, ConditionalWrapper, Footer, GradientPicker, RadioOption, Row, SelectInput } from "@truviz/shadow/dist/Components";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+
+const CIRCLE_TYPES: ILabelValuePair[] = [
+	{
+		label: "Circle 1",
+		value: CircleType.Circle1,
+	},
+	{
+		label: "Circle 2",
+		value: CircleType.Circle2,
+	},
+];
+
+const COLOR_PALETTE_TYPES = [
+	{
+		label: "Single",
+		value: ColorPaletteType.Single,
+	},
+	{
+		label: "Power BI Theme",
+		value: ColorPaletteType.PowerBi,
+	},
+	{
+		label: "Gradient",
+		value: ColorPaletteType.Gradient,
+	},
+	{
+		label: "Sequential",
+		value: ColorPaletteType.Sequential,
+	},
+	{
+		label: "Diverging",
+		value: ColorPaletteType.Diverging,
+	},
+	{
+		label: "Qualitative",
+		value: ColorPaletteType.Qualitative,
+	},
+];
+
+const getCategoricalValuesIndexByKey = (vizOptions: ShadowUpdateOptions, key: string): number => {
+	return vizOptions.options.dataViews[0].categorical.values.findIndex((data) => data.source.roles[key] === true);
+};
+
+const handleChange = (
+	rgb: string,
+	n: string,
+	dataType: CircleType | PieType,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+): void => {
+	setConfigValues((d: any) => ({
+		...d,
+		[dataType]: { ...d[dataType], [n]: rgb },
+	}));
+};
+
+const handleByCategoryChange = (
+	rgb: string,
+	index: number,
+	dataType: CircleType | PieType,
+	configValues: IDataColorsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+): void => {
+	const updatedColors = [...configValues[dataType].byCategoryColors];
+	updatedColors[index].color = rgb;
+	setConfigValues((d: any) => ({
+		...d,
+		[dataType]: { ...d[dataType], byCategoryColors: updatedColors },
+	}));
+};
+
+const handleCheckbox = (
+	key: string,
+	dataType: CircleType | PieType,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+): void => {
+	setConfigValues((d: any) => ({
+		...d,
+		[dataType]: { ...d[dataType], [key]: !d[dataType][key] },
+	}));
+};
+
+const handleRadioButtonChange = (key: string, value: string, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>): void => {
+	setConfigValues((d) => ({
+		...d,
+		[key]: value,
+	}));
+};
+
+const UIByCategoryColorSettings = (
+	vizOptions: ShadowUpdateOptions,
+	chartSettings: IChartSettings,
+	configValues: IDataColorsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+) => {
+	const dataType = configValues.dataType;
+	const subCategories = vizOptions.options.dataViews[0].categorical.categories[1].values.map((value) => value.toString());
+	subCategories.sort((a, b) => a.localeCompare(b));
+
+	const SUBCATEGORIES_LIST: ILabelValuePair[] = subCategories.map((category) => {
+		return { label: category, value: category };
+	});
+
+	return (
+		<>
+			<ConditionalWrapper
+				visible={configValues[dataType].fillType === ColorPaletteType.ByCategory && chartSettings.lollipopType !== LollipopType.Circle}
+			>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Categories Default Color"
+							color={configValues[dataType].defaultColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.defaultColor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<SelectInput
+							label="Select Category"
+							value={configValues[dataType].selectedCategoryName ? configValues[dataType].selectedCategoryName : subCategories[0]}
+							optionsList={SUBCATEGORIES_LIST}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.selectedCategoryName, dataType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Category Color"
+							color={configValues[dataType].selectedCategoryColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.selectedCategoryColor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+		</>
+	);
+};
+
+const UIDataColorsSettings1 = (
+	isDumbbellChart: boolean,
+	dataType: CircleType | PieType,
+	vizOptions: ShadowUpdateOptions,
+	chartSettings: IChartSettings,
+	configValues: IDataColorsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+) => {
+	const PIE_TYPES: ILabelValuePair[] = [
+		{
+			label: `${chartSettings[EChartSettings.lollipopType]} 1`,
+			value: CircleType.Circle1,
+		},
+		{
+			label: `${chartSettings[EChartSettings.lollipopType]} 2`,
+			value: CircleType.Circle2,
+		},
+	];
+
+	return (
+		<>
+			<ConditionalWrapper visible={isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle}>
+				<Row>
+					<Column>
+						<RadioOption
+							label={`Select ${chartSettings.lollipopType}`}
+							value={configValues.dataType}
+							optionsList={CIRCLE_TYPES}
+							handleChange={(value) => handleRadioButtonChange(EDataColorsSettings.dataType, value, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={isDumbbellChart && chartSettings.lollipopType !== LollipopType.Circle}>
+				<Row>
+					<Column>
+						<RadioOption
+							label={`Select ${chartSettings.lollipopType}`}
+							value={configValues.dataType}
+							optionsList={PIE_TYPES}
+							handleChange={(value) => handleRadioButtonChange(EDataColorsSettings.dataType, value, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={!(isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle)}>
+				<Row>
+					<Column>
+						<SelectInput
+							label="Color Palette"
+							value={
+								isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle ? ColorPaletteType.Single : configValues[dataType].fillType
+							}
+							optionsList={COLOR_PALETTE_TYPES}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.fillType, dataType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && chartSettings.lollipopType === LollipopType.Circle}>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Circle Color"
+							color={configValues[dataType].circleFillColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.circleFillColor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Circle Border Color"
+							color={configValues[dataType].circleStrokeColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.circleStrokeColor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && chartSettings.lollipopType !== LollipopType.Circle}>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Pie Slice Color"
+							color={configValues[dataType].singleColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.singleColor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+		</>
+	);
+};
+
+const UIDataColorsSettings2 = (
+	dataType: CircleType | PieType,
+	vizOptions: ShadowUpdateOptions,
+	chartSettings: IChartSettings,
+	configValues: IDataColorsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+) => {
+	return (
+		<>
+			<ConditionalWrapper visible={configValues[dataType].fillType === "byCategory"}>
+				{configValues[dataType].byCategoryColors.map((category, index) => {
+					<Row>
+						<Column>
+							<ColorPicker
+								label={category.name}
+								color={category.color}
+								handleChange={(value) => handleByCategoryChange(value, index, dataType, configValues, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>;
+				})}
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={configValues[dataType].fillType === "gradient"}>
+				<Row>
+					<Column>
+						<GradientPicker
+							minColor={configValues[dataType].fillmin}
+							midColor={configValues[dataType].fillmid}
+							maxColor={configValues[dataType].fillmax}
+							handleMinColorChange={(value) => handleChange(value, EDataColorsSettings.fillmin, dataType, setConfigValues)}
+							handleMidColorChange={(value) => handleChange(value, EDataColorsSettings.fillmid, dataType, setConfigValues)}
+							handleMaxColorChange={(value) => handleChange(value, EDataColorsSettings.fillmax, dataType, setConfigValues)}
+							enableMidColor={configValues[dataType].midcolor}
+							toggleEnableMidColor={() => handleCheckbox(EDataColorsSettings.midcolor, dataType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							label=""
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			{UIByCategoryColorSettings(vizOptions, chartSettings, configValues, setConfigValues)}
+
+			{/* <ConditionalWrapper visible={configValues[dataType].fillType != "qualitative"}>
+				<Row>
+					<Column>
+						<ColorSchemePicker state={configValues} setState={setConfigValues} />
+					</Column>
+				</Row>
+			</ConditionalWrapper> */}
+		</>
+	);
+};
+
+const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+	return (
+		<Footer
+			cancelButtonHandler={closeCurrentSettingHandler}
+			saveButtonConfig={{
+				isDisabled: false,
+				text: "APPLY",
+				handler: applyChanges,
+			}}
+			resetButtonHandler={resetChanges}
+		/>
+	);
+};
 
 const DataColorsSettings = (props) => {
-  const {
-    shadow,
-    compConfig: { sectionName, propertyName },
-    config,
-    vizOptions,
-    closeCurrentSettingHandler,
-    closeAdvancedSettingsHandler,
-  } = props;
+	const {
+		shadow,
+		compConfig: { sectionName, propertyName },
+		vizOptions,
+		closeCurrentSettingHandler,
+	} = props;
 
-  let initialStates = vizOptions.formatTab[sectionName][propertyName];
+	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
-  try {
-    initialStates = JSON.parse(initialStates);
-    initialStates = {
-      ...DATA_COLORS,
-      ...initialStates,
-    };
-  } catch (e) {
-    initialStates = { ...DATA_COLORS };
-  }
+	try {
+		initialStates = JSON.parse(initialStates);
+		initialStates = {
+			...DATA_COLORS,
+			...initialStates,
+		};
+	} catch (e) {
+		initialStates = { ...DATA_COLORS };
+	}
 
-  const [configValues, setConfigValues] = React.useState({
-    ...initialStates,
-  });
+	const [configValues, setConfigValues] = React.useState<IDataColorsSettings>({
+		...initialStates,
+	});
 
-  const applyChanges = () => {
-    if (!configValues[dataType][EDataColorsSettings.selectedCategoryName]) {
-      configValues[dataType][EDataColorsSettings.selectedCategoryName] =
-        subCategories[0];
-    }
-    shadow.persistProperties(sectionName, propertyName, configValues);
-    closeCurrentSettingHandler();
-  };
+	const applyChanges = () => {
+		// if (!configValues[dataType][EDataColorsSettings.selectedCategoryName]) {
+		// 	configValues[dataType][EDataColorsSettings.selectedCategoryName] = subCategories[0];
+		// }
+		shadow.persistProperties(sectionName, propertyName, configValues);
+		closeCurrentSettingHandler();
+	};
 
-  const getCategoricalValuesIndexByKey = (key: string): number => {
-    return vizOptions.options.dataViews[0].categorical.values?.findIndex(
-      (data) => data.source.roles[key] === true
-    );
-  };
+	const resetChanges = () => {
+		setConfigValues({ ...DATA_COLORS });
+	};
 
-  let chartSettings: IChartSettings = shadow.chartSettings;
+	const chartSettings: IChartSettings = shadow.chartSettings;
+	if (chartSettings.lollipopType !== LollipopType.Circle) {
+		COLOR_PALETTE_TYPES.push({
+			label: "By Category",
+			value: ColorPaletteType.ByCategory,
+		});
+	}
 
-  if (!Object.keys(chartSettings).length) {
-    chartSettings = { ...CHART_SETTINGS };
-  }
+	const isDumbbellChart = getCategoricalValuesIndexByKey(vizOptions, DataRolesName.Value2) !== -1;
+	const dataType = configValues[EDataColorsSettings.dataType];
 
-  const isDumbbellChart =
-    getCategoricalValuesIndexByKey(DataRolesName.Value2) !== -1;
+	React.useEffect(() => {
+		if (isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle) {
+			setConfigValues((d: IDataColorsSettings) => ({
+				...d,
+				[dataType]: { ...d[dataType], fillType: ColorPaletteType.Single },
+			}));
+			configValues[configValues[EDataColorsSettings.dataType]].fillType = ColorPaletteType.Single;
+		}
 
-  if (isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle) {
-    configValues[configValues[EDataColorsSettings.dataType]].fillType =
-      ColorPaletteType.Single;
-  }
+		if (!isDumbbellChart) {
+			if (configValues[EDataColorsSettings.dataType] === CircleType.Circle2) {
+				setConfigValues((d: IDataColorsSettings) => ({
+					...d,
+					[EDataColorsSettings.dataType]: CircleType.Circle1,
+				}));
+				configValues[EDataColorsSettings.dataType] = CircleType.Circle1;
+			}
 
-  if (!isDumbbellChart) {
-    if (configValues[EDataColorsSettings.dataType] === CircleType.Circle2) {
-      configValues[EDataColorsSettings.dataType] = CircleType.Circle1;
-    }
-    if (configValues[EDataColorsSettings.dataType] === PieType.Pie2) {
-      configValues[EDataColorsSettings.dataType] = PieType.Pie1;
-    }
-  }
+			if (configValues[EDataColorsSettings.dataType] === PieType.Pie2) {
+				setConfigValues((d: IDataColorsSettings) => ({
+					...d,
+					[EDataColorsSettings.dataType]: PieType.Pie1,
+				}));
+			}
+		}
 
-  if (
-    chartSettings.lollipopType === LollipopType.Pie &&
-    (configValues[EDataColorsSettings.dataType] === CircleType.Circle1 ||
-      configValues[EDataColorsSettings.dataType] === CircleType.Circle2)
-  ) {
-    configValues[EDataColorsSettings.dataType] = PieType.Pie1;
-  }
+		if (
+			chartSettings.lollipopType === LollipopType.Pie &&
+			(configValues[EDataColorsSettings.dataType] === CircleType.Circle1 || configValues[EDataColorsSettings.dataType] === CircleType.Circle2)
+		) {
+			setConfigValues((d: IDataColorsSettings) => ({
+				...d,
+				[EDataColorsSettings.dataType]: PieType.Pie1,
+			}));
+		}
 
-  if (
-    chartSettings.lollipopType === LollipopType.Circle &&
-    (configValues[EDataColorsSettings.dataType] === PieType.Pie1 ||
-      configValues[EDataColorsSettings.dataType] === PieType.Pie2)
-  ) {
-    configValues[EDataColorsSettings.dataType] = CircleType.Circle1;
-  }
+		if (
+			chartSettings.lollipopType === LollipopType.Circle &&
+			(configValues[EDataColorsSettings.dataType] === PieType.Pie1 || configValues[EDataColorsSettings.dataType] === PieType.Pie2)
+		) {
+			setConfigValues((d: IDataColorsSettings) => ({
+				...d,
+				[EDataColorsSettings.dataType]: CircleType.Circle1,
+			}));
+		}
+	}, []);
 
-  const dataType = configValues[EDataColorsSettings.dataType];
-  const handleValue = (v, n) => {
-    setConfigValues((d: any) => ({
-      ...d,
-      [dataType]: { ...d[dataType], [n]: v },
-    }));
-  };
-
-  const classesArray = {
-    diverging: [3, 4, 5, 6, 7, 8, 9, 10, 11],
-    qualitative: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    sequential: [3, 4, 5, 6, 7, 8, 9],
-  };
-
-  const handleChange = ({ rgb }, n) => {
-    setConfigValues((d: any) => ({
-      ...d,
-      [dataType]: { ...d[dataType], [n]: adjoinRGB(rgb) },
-    }));
-  };
-
-  const handleByCategoryChange = ({ rgb }, index) => {
-    let updatedColors = [...configValues[dataType].byCategoryColors];
-    updatedColors[index].color = adjoinRGB(rgb);
-    setConfigValues((d: any) => ({
-      ...d,
-      [dataType]: { ...d[dataType], byCategoryColors: updatedColors },
-    }));
-  };
-
-  const handleCheckbox = (key) => {
-    setConfigValues((d: any) => ({
-      ...d,
-      [dataType]: { ...d[dataType], [key]: !d[dataType][key] },
-    }));
-  };
-
-  const setColorPalette = (co) => {
-    setConfigValues((d: any) => ({
-      ...d,
-      [dataType]: { ...d[dataType], schemeColors: co },
-    }));
-  };
-
-  const handleRadioButtonChange = (key: string, value: string) => {
-    setConfigValues((d) => ({
-      ...d,
-      [key]: value,
-    }));
-  };
-
-  const isDisableGradientColorPalette =
-    isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle;
-
-  const subCategories =
-    vizOptions.options.dataViews[0].categorical?.categories[1]?.values.map(
-      (value) => value.toString()
-    ) ?? [];
-  subCategories.sort((a, b) => a.localeCompare(b));
-
-  return (
-    <>
-      {/* <div className="config-container config-container-vertical config-container-colors">
-        <div>
-          {isDumbbellChart &&
-            chartSettings.lollipopType === LollipopType.Circle && (
-              <div
-                className="radio-button-group"
-                onChange={(e: any) =>
-                  handleRadioButtonChange(
-                    EDataColorsSettings.dataType,
-                    e.target.value
-                  )
-                }
-              >
-                <span className="radio-group-title">Select Circle:</span>
-                <div className="radio-buttons">
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="circle1"
-                      id="circle1"
-                      value={CircleType.Circle1}
-                      checked={
-                        configValues[EDataColorsSettings.dataType] ===
-                        CircleType.Circle1
-                      }
-                    />
-                    <label className="radio-label" htmlFor="circle1">
-                      Circle 1
-                    </label>
-                  </div>
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="circle2"
-                      id="circle2"
-                      value={CircleType.Circle2}
-                      checked={
-                        configValues[EDataColorsSettings.dataType] ===
-                        CircleType.Circle2
-                      }
-                    />
-                    <label className="radio-label" htmlFor="circle2">
-                      Circle 2
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          {isDumbbellChart &&
-            chartSettings.lollipopType !== LollipopType.Circle && (
-              <div
-                className="radio-button-group"
-                onChange={(e: any) =>
-                  handleRadioButtonChange(
-                    EDataColorsSettings.dataType,
-                    e.target.value
-                  )
-                }
-              >
-                <span className="radio-group-title">
-                  Select {chartSettings[EChartSettings.lollipopType]}:
-                </span>
-                <div className="radio-buttons">
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="pie1"
-                      id="pie1"
-                      value={PieType.Pie1}
-                      checked={
-                        configValues[EDataColorsSettings.dataType] ===
-                        PieType.Pie1
-                      }
-                    />
-                    <label className="radio-label" htmlFor="pie1">
-                      {chartSettings[EChartSettings.lollipopType]} 1
-                    </label>
-                  </div>
-                  <div className="radio-button">
-                    <input
-                      className="radio-input"
-                      type="radio"
-                      name="pie2"
-                      id="pie2"
-                      value={PieType.Pie2}
-                      checked={
-                        configValues[EDataColorsSettings.dataType] ===
-                        PieType.Pie2
-                      }
-                    />
-                    <label className="radio-label" htmlFor="pie2">
-                      {chartSettings[EChartSettings.lollipopType]} 2
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-          {!(
-            isDumbbellChart &&
-            chartSettings.lollipopType === LollipopType.Circle
-          ) && (
-              <div className="config">
-                <label className="config-label" htmlFor="colorPalette">
-                  Color Palette
-                </label>
-                <div className="config-option">
-                  <select
-                    id="colorPalette"
-                    value={
-                      isDumbbellChart &&
-                        chartSettings.lollipopType === LollipopType.Circle
-                        ? ColorPaletteType.Single
-                        : configValues[dataType].fillType
-                    }
-                    onChange={(e: any) => handleValue(e.target.value, "fillType")}
-                  >
-                    <option value={ColorPaletteType.Single}>Single</option>
-                    <option
-                      value={ColorPaletteType.PowerBi}
-                      disabled={isDisableGradientColorPalette}
-                    >
-                      Power BI Theme
-                    </option>
-                    <option
-                      value={ColorPaletteType.Gradient}
-                      disabled={isDisableGradientColorPalette}
-                    >
-                      Gradient
-                    </option>
-                    {chartSettings.lollipopType !== LollipopType.Circle && (
-                      <option
-                        value={ColorPaletteType.ByCategory}
-                        disabled={isDisableGradientColorPalette}
-                      >
-                        By Category
-                      </option>
-                    )}
-                    <option
-                      value={ColorPaletteType.Sequential}
-                      disabled={isDisableGradientColorPalette}
-                    >
-                      Sequential
-                    </option>
-                    <option
-                      value={ColorPaletteType.Diverging}
-                      disabled={isDisableGradientColorPalette}
-                    >
-                      Diverging
-                    </option>
-                    <option
-                      value={ColorPaletteType.Qualitative}
-                      disabled={isDisableGradientColorPalette}
-                    >
-                      Qualitative
-                    </option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-          {configValues[dataType].fillType === ColorPaletteType.Single &&
-            chartSettings.lollipopType === LollipopType.Circle && (
-              <div>
-                <div className="config">
-                  <label className="config-label" htmlFor="circleColor">
-                    Circle Color
-                  </label>
-                  <div className="config-option" id="circleColor">
-                    <ColorPicker
-                      color={splitRGB(
-                        configValues[dataType][
-                        EDataColorsSettings.circleFillColor
-                        ]
-                      )}
-                      handleChange={(c) =>
-                        handleChange(c, EDataColorsSettings.circleFillColor)
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="config">
-                  <label className="config-label" htmlFor="borderColor">
-                    Circle Border Color
-                  </label>
-                  <div className="config-option" id="borderColor">
-                    <ColorPicker
-                      color={splitRGB(
-                        configValues[dataType][
-                        EDataColorsSettings.circleStrokeColor
-                        ]
-                      )}
-                      handleChange={(c) =>
-                        handleChange(c, EDataColorsSettings.circleStrokeColor)
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-          {configValues[dataType].fillType === ColorPaletteType.Single &&
-            chartSettings.lollipopType !== LollipopType.Circle && (
-              <div className="config">
-                <label className="config-label" htmlFor="singleColor">
-                  Pie Slice Color
-                </label>
-                <div className="config-option" id="singleColor">
-                  <ColorPicker
-                    color={splitRGB(
-                      configValues[dataType][EDataColorsSettings.singleColor]
-                    )}
-                    handleChange={(c) =>
-                      handleChange(c, EDataColorsSettings.singleColor)
-                    }
-                  />
-                </div>
-              </div>
-            )}
-
-          {configValues[dataType].fillType === "byCategory" &&
-            configValues[dataType].byCategoryColors.map((category, index) => {
-              return (
-                <div className="color-container">
-                  <p className="config-label">{category.name}</p>
-                  <ColorPicker
-                    color={splitRGB(category.color)}
-                    handleChange={(c) => handleByCategoryChange(c, index)}
-                  />
-                </div>
-              );
-            })}
-
-          {configValues[dataType].fillType === "gradient" && (
-            <>
-              <div>
-                <div className="config">
-                  <label className="config-label" htmlFor="minColor">
-                    Min Color
-                  </label>
-                  <div className="config-option" id="minColor">
-                    <ColorPicker
-                      color={splitRGB(configValues[dataType].fillmin)}
-                      handleChange={(c) => handleChange(c, "fillmin")}
-                    />
-                  </div>
-                </div>
-
-                <div className="config config-switch">
-                  <label className="config-label" htmlFor="midColor">
-                    Use Mid Color
-                  </label>
-                  <div className="config-option">
-                    <label className="switch">
-                      <input
-                        id="midColor"
-                        type="checkbox"
-                        checked={configValues[dataType].midcolor}
-                        onChange={() => {
-                          handleCheckbox("midcolor");
-                        }}
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                  </div>
-                </div>
-
-                {configValues[dataType].midcolor && (
-                  <div className="config">
-                    <label className="config-label" htmlFor="midColor">
-                      Mid Color
-                    </label>
-                    <div className="config-option" id="midColor">
-                      <ColorPicker
-                        color={splitRGB(configValues[dataType].fillmid)}
-                        handleChange={(c) => handleChange(c, "fillmid")}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="config">
-                  <label className="config-label" htmlFor="maxColor">
-                    Max Color
-                  </label>
-                  <div className="config-option" id="maxColor">
-                    <ColorPicker
-                      color={splitRGB(configValues[dataType].fillmax)}
-                      handleChange={(c) => handleChange(c, "fillmax")}
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-
-          {configValues[dataType].fillType === ColorPaletteType.ByCategory &&
-            chartSettings.lollipopType !== LollipopType.Circle && (
-              <React.Fragment>
-                <div className="config">
-                  <label className="config-label" htmlFor="defaultColor">
-                    Categories Default Color
-                  </label>
-                  <div className="config-option" id="defaultColor">
-                    <ColorPicker
-                      color={splitRGB(
-                        configValues[dataType][EDataColorsSettings.defaultColor]
-                      )}
-                      handleChange={(c) =>
-                        handleChange(c, EDataColorsSettings.defaultColor)
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="config">
-                  <label className="config-label" htmlFor="categoriesList">
-                    Select Category
-                  </label>
-                  <div className="config-option">
-                    <select
-                      id="categoriesList"
-                      value={
-                        configValues[dataType][
-                        EDataColorsSettings.selectedCategoryName
-                        ] ?? subCategories[0]
-                      }
-                      onChange={(e: any) =>
-                        handleValue(
-                          e.target.value,
-                          EDataColorsSettings.selectedCategoryName
-                        )
-                      }
-                    >
-                      {subCategories.map((category) => {
-                        return <option value={category}>{category}</option>;
-                      })}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="config">
-                  <label
-                    className="config-label"
-                    htmlFor="selectedCategoryColor"
-                  >
-                    Category Color
-                  </label>
-                  <div className="config-option" id="selectedCategoryColor">
-                    <ColorPicker
-                      color={splitRGB(
-                        configValues[dataType][
-                        EDataColorsSettings.selectedCategoryColor
-                        ]
-                      )}
-                      handleChange={(c) =>
-                        handleChange(
-                          c,
-                          EDataColorsSettings.selectedCategoryColor
-                        )
-                      }
-                    />
-                  </div>
-                </div>
-              </React.Fragment>
-            )}
-
-          {["diverging", "qualitative", "sequential"].includes(
-            configValues[dataType].fillType
-          ) && (
-              <>
-                <div>
-                  <div className="config">
-                    <label className="config-label" htmlFor="numberOfDataClasses">
-                      Number of data classes
-                    </label>
-                    <div className="config-option">
-                      <select
-                        id="numberOfDataClasses"
-                        value={configValues[dataType].numberOfClasses}
-                        onChange={(e: any) =>
-                          handleValue(e.target.value, "numberOfClasses")
-                        }
-                      >
-                        {classesArray[configValues[dataType].fillType].map(
-                          (num) => {
-                            return <option value={num}>{num}</option>;
-                          }
-                        )}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="color-palette-container">
-                  {Object.values(
-                    COLORBREWER[configValues[dataType].fillType]
-                  ).map((el) => {
-                    const co = el[configValues[dataType].numberOfClasses];
-                    if (!co) return null;
-                    return (
-                      <div
-                        className={`color-palette ${JSON.stringify(co) ===
-                          JSON.stringify(configValues[dataType].schemeColors)
-                          ? "color-palette-selected"
-                          : ""
-                          }`}
-                        onClick={() => setColorPalette(co)}
-                      >
-                        {co.map((cs) => {
-                          return (
-                            <>
-                              <div
-                                className="color-palette-individual"
-                                style={{ backgroundColor: cs }}
-                              ></div>
-                            </>
-                          );
-                        })}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="config config-checkbox">
-                  <label className="config-label" htmlFor="reverseColor">
-                    Reverse Color
-                  </label>
-                  <div className="config-option">
-                    <input
-                      id="reverseColor"
-                      type="checkbox"
-                      checked={configValues[dataType].reverse}
-                      onClick={() => handleCheckbox("reverse")}
-                    />
-                  </div>
-                </div>
-
-                {configValues[dataType].fillType != "qualitative" && (
-                  <div className="config config-checkbox">
-                    <label className="config-label" htmlFor="makeGradient">
-                      Make Gradient
-                    </label>
-                    <div className="config-option">
-                      <input
-                        id="makeGradient"
-                        type="checkbox"
-                        checked={configValues[dataType].isGradient}
-                        onClick={() => handleCheckbox("isGradient")}
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-        </div>
-
-        <div className="config-btn-group">
-          <button
-            className="cancel-btn btn"
-            onClick={closeCurrentSettingHandler}
-          >
-            Cancel
-          </button>
-          <button className="apply-btn btn" onClick={applyChanges}>
-            Apply
-          </button>
-        </div>
-      </div> */}
-    </>
-  );
+	return (
+		<>
+			{UIDataColorsSettings1(isDumbbellChart, dataType, vizOptions, chartSettings, configValues, setConfigValues)}
+			{UIDataColorsSettings2(dataType, vizOptions, chartSettings, configValues, setConfigValues)}
+			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+		</>
+	);
 };
 
 export default DataColorsSettings;
