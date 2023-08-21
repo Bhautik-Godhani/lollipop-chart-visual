@@ -1472,8 +1472,8 @@ export class Visual extends Shadow {
             .attr('dy', '0.02em')
             .attr('font-size', this.getDataLabelsFontSize(isData2Label))
             .style('font-family', dataLabelsSettings.fontFamily)
-            .style('font-weight', dataLabelsSettings.fontStyle === FontStyle.Bold ? 'bold' : '')
-            .style('font-style', dataLabelsSettings.fontStyle === FontStyle.Italic ? 'italic' : '')
+            // .style('font-weight', dataLabelsSettings.fontStyle === FontStyle.Bold ? 'bold' : '')
+            // .style('font-style', dataLabelsSettings.fontStyle === FontStyle.Italic ? 'italic' : '')
             .text(d => this.getFormattedNumber(d[key]));
 
         rectSelection

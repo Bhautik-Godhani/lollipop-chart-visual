@@ -141,7 +141,7 @@ export interface IDataLabelsSettings {
     showBackground: boolean;
     backgroundColor: string;
     transparency: number;
-    fontStyle: FontStyle,
+    fontStyle: string[],
     placement: DataLabelsPlacement,
     fontSizeType: DataLabelsFontSizeType
 }
