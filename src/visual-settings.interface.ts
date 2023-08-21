@@ -163,12 +163,14 @@ export interface IRankingPropsSettings {
     circleStrokeColor: string,
     pieSliceColor: string;
     lineColor: string;
-    subCategoriesRanking: {
-        filterType: RankingFilterType;
-        count: number;
-        showRemainingAsOthers: boolean;
-        pieSliceColor: string;
-    }
+    subCategoriesRanking: ISubCategoriesRankingProps;
+}
+
+export interface ISubCategoriesRankingProps {
+    filterType: RankingFilterType;
+    count: number;
+    showRemainingAsOthers: boolean;
+    pieSliceColor: string;
 }
 
 export interface IRankingSettings {
