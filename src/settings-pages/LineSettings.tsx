@@ -1,152 +1,149 @@
 import * as React from "react";
 import { LINE_SETTINGS } from "../constants";
 import { ELineSettings, LineType } from "../enum";
-import { adjoinRGB, splitRGB } from "../methods";
-import ColorPicker from "./ColorPicker";
+import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
+import { ILineSettings } from "../visual-settings.interface";
+import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
+
+const LINE_TYPES = [
+	{
+		label: <SolidLineIcon fill="currentColor" />,
+		value: LineType.Solid,
+	},
+	{
+		label: <DashedLineIcon fill="currentColor" />,
+		value: LineType.Dashed,
+	},
+	{
+		label: <DottedLineIcon fill="currentColor" />,
+		value: LineType.Dotted,
+	},
+];
+
+const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+	return (
+		<Footer
+			cancelButtonHandler={closeCurrentSettingHandler}
+			saveButtonConfig={{
+				isDisabled: false,
+				text: "APPLY",
+				handler: applyChanges,
+			}}
+			resetButtonHandler={resetChanges}
+		/>
+	);
+};
 
 const LineSettings = (props) => {
-  const {
-    shadow,
-    compConfig: { sectionName, propertyName },
-    vizOptions,
-    closeCurrentSettingHandler,
-  } = props;
-  let initialStates = vizOptions.formatTab[sectionName][propertyName];
+	const {
+		shadow,
+		compConfig: { sectionName, propertyName },
+		vizOptions,
+		closeCurrentSettingHandler,
+	} = props;
+	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
-  try {
-    initialStates = JSON.parse(initialStates);
-    initialStates = {
-      ...LINE_SETTINGS,
-      ...initialStates,
-    };
-  } catch (e) {
-    initialStates = { ...LINE_SETTINGS };
-  }
+	try {
+		initialStates = JSON.parse(initialStates);
+		initialStates = {
+			...LINE_SETTINGS,
+			...initialStates,
+		};
+	} catch (e) {
+		initialStates = { ...LINE_SETTINGS };
+	}
 
-  const applyChanges = () => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
-    closeCurrentSettingHandler();
-  };
+	const applyChanges = () => {
+		shadow.persistProperties(sectionName, propertyName, configValues);
+		closeCurrentSettingHandler();
+	};
 
-  const [configValues, setConfigValues] = React.useState({
-    ...initialStates,
-  });
+	const resetChanges = () => {
+		setConfigValues({ ...LINE_SETTINGS });
+	};
 
-  const handleChange = (val, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: val,
-    }));
-  };
+	const [configValues, setConfigValues] = React.useState<ILineSettings>({
+		...initialStates,
+	});
 
-  const handleCheckbox = (n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: !d[n],
-    }));
-  };
+	const handleChange = (val, n) => {
+		setConfigValues((d) => ({
+			...d,
+			[n]: val,
+		}));
+	};
 
-  const handleColor = ({ rgb }, n) => {
-    setConfigValues((d) => ({
-      ...d,
-      [n]: adjoinRGB(rgb),
-    }));
-  };
+	const handleCheckbox = (n) => {
+		setConfigValues((d) => ({
+			...d,
+			[n]: !d[n],
+		}));
+	};
 
-  const isDumbbellChart =
-    !!vizOptions.options.dataViews[0].categorical.values[1];
+	const handleColor = (rgb, n) => {
+		setConfigValues((d) => ({
+			...d,
+			[n]: rgb,
+		}));
+	};
 
-  if (
-    isDumbbellChart &&
-    (configValues[ELineSettings.lineColor] === "rgb(91,121,185)" ||
-      configValues[ELineSettings.lineColor] === "rgba(91,121,185,1)")
-  ) {
-    configValues[ELineSettings.lineColor] = "rgb(150,150,150,60)";
-  }
+	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
-  return (
-    <>
-      {/* <div className="config-container">
-        <div className="config config-switch">
-          <label className="config-label" htmlFor={ELineSettings.show}>
-            Display Line
-          </label>
-          <div className="config-option">
-            <label className="switch">
-              <input
-                id={ELineSettings.show}
-                type="checkbox"
-                checked={configValues.show}
-                onChange={(e: any) => {
-                  handleCheckbox(ELineSettings.show);
-                }}
-              />
-              <span className="slider round"></span>
-            </label>
-          </div>
-        </div>
+	if (
+		isDumbbellChart &&
+		(configValues[ELineSettings.lineColor] === "rgb(91,121,185)" || configValues[ELineSettings.lineColor] === "rgba(91,121,185,1)")
+	) {
+		configValues[ELineSettings.lineColor] = "rgb(150,150,150,60)";
+	}
 
-        <div className="config">
-          <label className="config-label" htmlFor={ELineSettings.lineType}>
-            Line Type
-          </label>
-          <div className="config-option">
-            <select
-              id={ELineSettings.lineType}
-              value={configValues.lineType}
-              onChange={(e) =>
-                handleChange(e.target.value, ELineSettings.lineType)
-              }
-            >
-              <option value={LineType.Solid}>Solid</option>
-              <option value={LineType.Dashed}>Dashed</option>
-              <option value={LineType.Dotted}>Dotted</option>
-            </select>
-          </div>
-        </div>
+	return (
+		<>
+			<Row>
+				<Column>
+					<ToggleButton label={"Display Line"} value={configValues.show} handleChange={() => handleCheckbox(ELineSettings.show)} />
+				</Column>
+			</Row>
 
-        <div className="config">
-          <label className="config-label" htmlFor={ELineSettings.lineColor}>
-            Line Color
-          </label>
-          <div className="config-option" id={ELineSettings.lineColor}>
-            <ColorPicker
-              color={splitRGB(configValues.lineColor)}
-              handleChange={(c) => handleColor(c, "lineColor")}
-            />
-          </div>
-        </div>
+			<ConditionalWrapper visible={configValues.show}>
+				<Row>
+					<Column>
+						<SwitchOption
+							label="Line Style"
+							value={configValues.lineType}
+							optionsList={LINE_TYPES}
+							handleChange={(value) => handleChange(value, ELineSettings.lineType)}
+						/>
+					</Column>
+				</Row>
 
-        <div className="config">
-          <label className="config-label" htmlFor={ELineSettings.lineWidth}>
-            Line Width
-          </label>
-          <div className="config-option">
-            <input
-              id={ELineSettings.lineWidth}
-              type="number"
-              value={configValues.lineWidth}
-              onChange={(e: any) => {
-                handleChange(+e.target.value, ELineSettings.lineWidth);
-              }}
-            />
-          </div>
-        </div>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Line Color"
+							color={configValues.lineColor}
+							handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
 
-        <div className="config-btn-group">
-          <button
-            className="cancel-btn btn"
-            onClick={closeCurrentSettingHandler}
-          >
-            Cancel
-          </button>
-          <button className="apply-btn btn" onClick={applyChanges}>
-            Apply
-          </button>
-        </div>
-      </div> */}
-    </>
-  );
+				<Row>
+					<Column>
+						<InputControl
+							min={1}
+							type="number"
+							label="Line Width"
+							value={configValues.lineWidth}
+							handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+		</>
+	);
 };
 
 export default LineSettings;
