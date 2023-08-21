@@ -55,7 +55,7 @@ export enum ColorPaletteType {
 export enum CategoryDataColorProps {
     fillColor = 'fillColor',
     strokeColor = 'strokeColor'
-};
+}
 
 export enum PieType {
     Pie1 = 'pie1',
