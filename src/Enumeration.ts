@@ -1,4 +1,4 @@
-import { EnumerateSectionType } from '@truviz/shadow/dist/types/EnumerateSectionType'
+import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
 
 export class Enumeration {
 	public static GET(): EnumerateSectionType[] {
@@ -16,287 +16,287 @@ export class Enumeration {
 			getYAxisConfigSelection(),
 			getLegendSelection(),
 			getNumberFormattingSelection(),
-		]
+		];
 	}
 }
 
 function getLicenseSelection(): EnumerateSectionType {
 	return {
-		name: 'license',
+		name: "license",
 		isShow: true,
 		properties: [
 			{
-				name: 'purchased',
+				name: "purchased",
 				isShow: true,
 			},
 			{
-				name: 'customer',
+				name: "customer",
 				isShow: true,
 			},
 			{
-				name: 'key',
+				name: "key",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getVisualGeneralSettingsSelection(): EnumerateSectionType {
 	return {
-		name: 'visualGeneralSettings',
+		name: "visualGeneralSettings",
 		isShow: true,
 		properties: [
 			{
-				name: 'advancedSettings',
+				name: "advancedSettings",
 				isShow: true,
 			},
 			{
-				name: 'theme',
+				name: "theme",
 				isShow: true,
 			},
 			{
-				name: 'summaryTable',
+				name: "summaryTable",
 				isShow: true,
 			},
 			{
-				name: 'annotationsToggle',
+				name: "annotationsToggle",
 				isShow: true,
 			},
 			{
-				name: 'advancedSettingsToggle',
+				name: "advancedSettingsToggle",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getChartConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'chartConfig',
+		name: "chartConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'chartSettings',
+				name: "chartSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getDataColorsConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'dataColorsConfig',
+		name: "dataColorsConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'dataColorsSettings',
+				name: "dataColorsSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getCircleConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'circleConfig',
+		name: "circleConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'circleSettings',
+				name: "circleSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getLineConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'lineConfig',
+		name: "lineConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'lineSettings',
+				name: "lineSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getDataLabelsConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'dataLabelsConfig',
+		name: "dataLabelsConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'dataLabelsSettings',
+				name: "dataLabelsSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getGridLinesConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'gridLinesConfig',
+		name: "gridLinesConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'gridLinesSettings',
+				name: "gridLinesSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getRankingConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'rankingConfig',
+		name: "rankingConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'rankingSettings',
+				name: "rankingSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getXAxisConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'xAxisConfig',
+		name: "xAxisConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'xAxisSettings',
+				name: "xAxisSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getYAxisConfigSelection(): EnumerateSectionType {
 	return {
-		name: 'yAxisConfig',
+		name: "yAxisConfig",
 		isShow: true,
 		properties: [
 			{
-				name: 'yAxisSettings',
+				name: "yAxisSettings",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getLegendSelection(): EnumerateSectionType {
 	return {
-		name: 'legend',
+		name: "legend",
 		isShow: true,
 		properties: [
 			{
-				name: 'show',
+				name: "show",
 				isShow: true,
 			},
 			{
-				name: 'legendPosition',
+				name: "legendPosition",
 				isShow: true,
 			},
 			{
-				name: 'showTitle',
+				name: "showTitle",
 				isShow: true,
 			},
 			{
-				name: 'legendTitle',
+				name: "legendTitle",
 				isShow: true,
 			},
 			{
-				name: 'legendColor',
+				name: "legendColor",
 				isShow: true,
 			},
 			{
-				name: 'fontSize',
+				name: "fontSize",
 				isShow: true,
 			},
 			{
-				name: 'fontFamily',
+				name: "fontFamily",
 				isShow: true,
 			},
 		],
-	}
+	};
 }
 
 function getNumberFormattingSelection(): EnumerateSectionType {
 	return {
-		name: 'numberFormatting',
+		name: "numberFormatting",
 		isShow: true,
 		properties: [
 			{
-				name: 'show',
+				name: "show",
 				isShow: true,
 			},
 			{
-				name: 'decimalSeparator',
+				name: "decimalSeparator",
 				isShow: true,
 			},
 			{
-				name: 'thousandsSeparator',
+				name: "thousandsSeparator",
 				isShow: true,
 			},
 			{
-				name: 'decimalPlaces',
+				name: "decimalPlaces",
 				isShow: true,
 			},
 			{
-				name: 'scaling',
+				name: "scaling",
 				isShow: true,
 			},
 			{
-				name: 'prefix',
+				name: "prefix",
 				isShow: true,
 			},
 			{
-				name: 'suffix',
+				name: "suffix",
 				isShow: true,
 			},
 			{
-				name: 'scalingLabel',
+				name: "scalingLabel",
 				isShow: true,
 			},
 			{
-				name: 'thousandScalingLabel',
+				name: "thousandScalingLabel",
 				isShow: true,
 			},
 			{
-				name: 'millionScalingLabel',
+				name: "millionScalingLabel",
 				isShow: true,
 			},
 			{
-				name: 'billionScalingLabel',
+				name: "billionScalingLabel",
 				isShow: true,
 			},
 			{
-				name: 'trillionScalingLabel',
+				name: "trillionScalingLabel",
 				isShow: true,
 			},
 			{
-				name: 'semanticFormatting',
+				name: "semanticFormatting",
 				isShow: true,
 			},
 			{
-				name: 'negativeFormat',
+				name: "negativeFormat",
 				isShow: true,
 			},
 			{
-				name: 'negativeColor',
+				name: "negativeColor",
 				isShow: true,
 			},
 			{
-				name: 'positiveFormat',
+				name: "positiveFormat",
 				isShow: true,
 			},
 			{
-				name: 'positiveColor',
+				name: "positiveColor",
 				isShow: true,
 			},
 		],
-	}
+	};
 }

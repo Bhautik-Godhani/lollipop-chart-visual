@@ -1,51 +1,51 @@
-import * as React from 'react'
-import { CHART_SETTINGS } from '../constants'
-import { EChartSettings, EPieSettings, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType } from '../enum'
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption } from '@truviz/shadow/dist/Components'
-import { IChartSettings, ILabelValuePair, IPieSettings } from '../visual-settings.interface'
+import * as React from "react";
+import { CHART_SETTINGS } from "../constants";
+import { EChartSettings, EPieSettings, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption } from "@truviz/shadow/dist/Components";
+import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
-		label: 'VERTICAL',
+		label: "VERTICAL",
 		value: Orientation.Vertical,
 	},
 	{
-		label: 'HORIZONTAL',
+		label: "HORIZONTAL",
 		value: Orientation.Horizontal,
 	},
-]
+];
 
 const LOLLIPOP_DISTANCE_TYPES: ILabelValuePair[] = [
 	{
-		label: 'Auto',
+		label: "Auto",
 		value: LollipopDistanceType.Auto,
 	},
 	{
-		label: 'Custom',
+		label: "Custom",
 		value: LollipopDistanceType.Custom,
 	},
-]
+];
 
 const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>): void => {
 	setConfigValues((d) => ({
 		...d,
 		[n]: val,
-	}))
-}
+	}));
+};
 
 const handlePieChange = (val, n, pieType: PieType, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
 	setPieConfigValues((d) => ({
 		...d,
 		[pieType]: { ...d[pieType], [n]: val },
-	}))
-}
+	}));
+};
 
 const handlePieTypeChange = (val, n, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
 	setPieConfigValues((d) => ({
 		...d,
 		[n]: val,
-	}))
-}
+	}));
+};
 
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
@@ -53,13 +53,13 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 			cancelButtonHandler={closeCurrentSettingHandler}
 			saveButtonConfig={{
 				isDisabled: false,
-				text: 'APPLY',
+				text: "APPLY",
 				handler: applyChanges,
 			}}
 			resetButtonHandler={resetChanges}
 		/>
-	)
-}
+	);
+};
 
 const UIGeneralChartSettings = (
 	configValues: IChartSettings,
@@ -68,26 +68,26 @@ const UIGeneralChartSettings = (
 ) => {
 	const LOLLIPOP_TYPES: ILabelValuePair[] = [
 		{
-			label: 'Circle',
+			label: "Circle",
 			value: LollipopType.Circle,
 		},
-	]
+	];
 
 	if (isHasSubCategories) {
 		LOLLIPOP_TYPES.push(
 			{
-				label: 'Pie',
+				label: "Pie",
 				value: LollipopType.Pie,
 			},
 			{
-				label: 'Donut',
+				label: "Donut",
 				value: LollipopType.Donut,
 			},
 			{
-				label: 'Rose',
+				label: "Rose",
 				value: LollipopType.Rose,
 			}
-		)
+		);
 	}
 
 	return (
@@ -95,7 +95,7 @@ const UIGeneralChartSettings = (
 			<Row>
 				<Column>
 					<SelectInput
-						label={'Lollipop Type'}
+						label={"Lollipop Type"}
 						value={configValues.lollipopType}
 						optionsList={LOLLIPOP_TYPES}
 						handleChange={(value) => handleChange(value, EChartSettings.lollipopType, setConfigValues)}
@@ -106,7 +106,7 @@ const UIGeneralChartSettings = (
 			<Row>
 				<Column>
 					<SwitchOption
-						label={'Orientation'}
+						label={"Orientation"}
 						value={configValues.orientation}
 						optionsList={ORIENTATIONS}
 						handleChange={(value) => handleChange(value, EChartSettings.orientation, setConfigValues)}
@@ -117,7 +117,7 @@ const UIGeneralChartSettings = (
 			<Row>
 				<Column>
 					<SelectInput
-						label={'Distance Between Lollipop'}
+						label={"Distance Between Lollipop"}
 						value={configValues.lollipopDistanceType}
 						optionsList={LOLLIPOP_DISTANCE_TYPES}
 						handleChange={(value) => handleChange(value, EChartSettings.lollipopDistanceType, setConfigValues)}
@@ -139,8 +139,8 @@ const UIGeneralChartSettings = (
 				</Row>
 			</ConditionalWrapper>
 		</>
-	)
-}
+	);
+};
 
 const UIPieTypeSettings = (
 	configValues: IChartSettings,
@@ -148,7 +148,7 @@ const UIPieTypeSettings = (
 	isDumbbellChart: boolean,
 	setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>
 ) => {
-	const pieType = pieConfigValues.pieType
+	const pieType = pieConfigValues.pieType;
 	const PIE_TYPES: ILabelValuePair[] = [
 		{
 			label: `${configValues[EChartSettings.lollipopType]} 1`,
@@ -158,7 +158,7 @@ const UIPieTypeSettings = (
 			label: `${configValues[EChartSettings.lollipopType]} 2`,
 			value: PieType.Pie2,
 		},
-	]
+	];
 
 	return (
 		<>
@@ -214,8 +214,8 @@ const UIPieTypeSettings = (
 				</ConditionalWrapper>
 			</ConditionalWrapper>
 		</>
-	)
-}
+	);
+};
 
 const ChartSettings = (props) => {
 	const {
@@ -223,77 +223,77 @@ const ChartSettings = (props) => {
 		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
-	} = props
-	let initialStates = vizOptions.formatTab[sectionName][propertyName]
+	} = props;
+	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {
-		initialStates = JSON.parse(initialStates)
+		initialStates = JSON.parse(initialStates);
 		initialStates = {
 			...CHART_SETTINGS,
 			...initialStates,
-		}
+		};
 	} catch (e) {
-		initialStates = { ...CHART_SETTINGS }
+		initialStates = { ...CHART_SETTINGS };
 	}
 
 	const applyChanges = () => {
 		const configProps = {
 			...configValues,
 			[EChartSettings.pieSettings]: pieConfigValues,
-		}
-		shadow.persistProperties(sectionName, propertyName, configProps)
-		closeCurrentSettingHandler()
-	}
+		};
+		shadow.persistProperties(sectionName, propertyName, configProps);
+		closeCurrentSettingHandler();
+	};
 
 	const resetChanges = () => {
-		setConfigValues({ ...CHART_SETTINGS })
-	}
+		setConfigValues({ ...CHART_SETTINGS });
+	};
 
 	const [configValues, setConfigValues] = React.useState<IChartSettings>({
 		...initialStates,
-	})
+	});
 
 	const [pieConfigValues, setPieConfigValues] = React.useState<IPieSettings>({
 		...initialStates[EChartSettings.pieSettings],
-	})
+	});
 
-	const [isHasSubCategories] = React.useState(!!vizOptions.options.dataViews[0].categorical.categories[1])
+	const [isHasSubCategories] = React.useState(!!vizOptions.options.dataViews[0].categorical.categories[1]);
 
-	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1]
+	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
-	const [isLollipopTypeChanged, setIsLollipopTypeChanged] = React.useState(configValues.isLollipopTypeChanged)
+	const [isLollipopTypeChanged, setIsLollipopTypeChanged] = React.useState(configValues.isLollipopTypeChanged);
 
 	React.useEffect(() => {
 		if (!isHasSubCategories) {
 			setConfigValues((d) => ({
 				...d,
 				[EChartSettings.lollipopType]: LollipopType.Circle,
-			}))
+			}));
 			setConfigValues((d) => ({
 				...d,
 				[EChartSettings.isLollipopTypeChanged]: false,
-			}))
-			setIsLollipopTypeChanged(false)
+			}));
+			setIsLollipopTypeChanged(false);
 			const configProps = {
 				...configValues,
 				[EChartSettings.isLollipopTypeChanged]: false,
 				[EChartSettings.pieSettings]: pieConfigValues,
-			}
-			shadow.persistProperties(sectionName, propertyName, configProps)
+			};
+			shadow.persistProperties(sectionName, propertyName, configProps);
 		} else {
 			if (!isLollipopTypeChanged) {
 				setConfigValues((d) => ({
 					...d,
 					[EChartSettings.lollipopType]: LollipopType.Donut,
-				}))
+				}));
 			}
 			const configProps = {
 				...configValues,
 				[EChartSettings.pieSettings]: pieConfigValues,
-			}
-			shadow.persistProperties(sectionName, propertyName, configProps)
+			};
+			shadow.persistProperties(sectionName, propertyName, configProps);
 		}
-	}, [])
+	}, []);
 
 	return (
 		<>
@@ -305,7 +305,7 @@ const ChartSettings = (props) => {
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
-	)
-}
+	);
+};
 
-export default ChartSettings
+export default ChartSettings;

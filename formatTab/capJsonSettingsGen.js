@@ -1,175 +1,175 @@
-const fs = require('fs')
+const fs = require("fs");
 //const { visualPath, sectionKVPair, formatTab } = require("./waterfallInput");
-const readline = require('readline')
+const readline = require("readline");
 
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout,
-})
+});
 
-let chartPath = 'Initial value'
+let chartPath = "Initial value";
 
 const allCharts = [
 	{
-		name: 'Lollipop',
-		path: './lollipopChartInput.js',
+		name: "Lollipop",
+		path: "./lollipopChartInput.js",
 	},
-]
+];
 
-const allChartsNames = allCharts.map((chart, index) => `${index + 1}. ${chart.name}`).join('\n')
+const allChartsNames = allCharts.map((chart, index) => `${index + 1}. ${chart.name}`).join("\n");
 
 rl.question(`Pick your chart input type \n${allChartsNames}\n`, function (num) {
-	const index = num - 1
+	const index = num - 1;
 	if (!allCharts[index]) {
-		console.log(`Please enter value from 1 to ${allCharts.length}`)
-		return
+		console.log(`Please enter value from 1 to ${allCharts.length}`);
+		return;
 	}
-	chartPath = allCharts[index].path
-	const toGenerateEnumerationTs = false
-	rl.question('Do you want to generate Enumeration.ts for this? (Y/N): ', function (ans) {
-		fileGen(chartPath)
-		if (ans.toUpperCase() === 'Y') {
-			generateEnumeration(chartPath)
+	chartPath = allCharts[index].path;
+	const toGenerateEnumerationTs = false;
+	rl.question("Do you want to generate Enumeration.ts for this? (Y/N): ", function (ans) {
+		fileGen(chartPath);
+		if (ans.toUpperCase() === "Y") {
+			generateEnumeration(chartPath);
 		}
-		rl.close()
-	})
-})
+		rl.close();
+	});
+});
 
 function fileGen(chartPath) {
-	const { visualPath, sectionKVPair, formatTab } = require(chartPath)
+	const { visualPath, sectionKVPair, formatTab } = require(chartPath);
 
 	//Below code is to generate capabilities.json file
 
-	let objects = {}
+	let objects = {};
 
 	sectionKVPair.forEach((obj, index) => {
 		Object.keys(obj).forEach((key) => {
-			objects[key] = {}
-			objects[key].displayName = sectionKVPair[index][key]
-			objects[key].properties = {}
+			objects[key] = {};
+			objects[key].displayName = sectionKVPair[index][key];
+			objects[key].properties = {};
 
 			formatTab[key].forEach((obj) => {
-				objects[key].properties[obj.technicalName] = {}
-				objects[key].properties[obj.technicalName].displayName = obj.displayName
-				objects[key].properties[obj.technicalName].description = obj.description
-				const type = obj.type
-				if (type === 'color') {
+				objects[key].properties[obj.technicalName] = {};
+				objects[key].properties[obj.technicalName].displayName = obj.displayName;
+				objects[key].properties[obj.technicalName].description = obj.description;
+				const type = obj.type;
+				if (type === "color") {
 					objects[key].properties[obj.technicalName].type = {
 						fill: {
 							solid: {
 								color: true,
 							},
 						},
-					}
-				} else if (type === 'dropdown') {
-					objects[key].properties[obj.technicalName].type = {}
-					let enumeration = []
+					};
+				} else if (type === "dropdown") {
+					objects[key].properties[obj.technicalName].type = {};
+					let enumeration = [];
 					obj.options.forEach((option) => {
-						let objVal = {}
-						objVal.displayName = option.key
-						objVal.value = option.value
-						enumeration.push(objVal)
-						objects[key].properties[obj.technicalName].type.enumeration = enumeration
-					})
-				} else if (type === 'font') {
+						let objVal = {};
+						objVal.displayName = option.key;
+						objVal.value = option.value;
+						enumeration.push(objVal);
+						objects[key].properties[obj.technicalName].type.enumeration = enumeration;
+					});
+				} else if (type === "font") {
 					objects[key].properties[obj.technicalName].type = {
 						formatting: {
 							fontFamily: true,
 						},
-					}
-				} else if (type === 'fontSize') {
+					};
+				} else if (type === "fontSize") {
 					objects[key].properties[obj.technicalName].type = {
 						formatting: {
 							fontSize: true,
 						},
-					}
-				} else if (type === 'alignment') {
+					};
+				} else if (type === "alignment") {
 					objects[key].properties[obj.technicalName].type = {
 						formatting: {
 							alignment: true,
 						},
-					}
-				} else if (type === 'labelDisplayUnits') {
+					};
+				} else if (type === "labelDisplayUnits") {
 					objects[key].properties[obj.technicalName].type = {
 						formatting: {
 							labelDisplayUnits: true,
 						},
-					}
+					};
 				} else {
 					objects[key].properties[obj.technicalName].type = {
 						[obj.type]: true,
-					}
+					};
 				}
-			})
-		})
-	})
+			});
+		});
+	});
 
-	let capabilities = {}
+	let capabilities = {};
 
-	fs.readFile(`${visualPath}/capabilities.json`, 'utf-8', function (err, data) {
-		capabilities = JSON.parse(data)
-		capabilities.objects = objects
-		const jsonData = JSON.stringify(capabilities)
+	fs.readFile(`${visualPath}/capabilities.json`, "utf-8", function (err, data) {
+		capabilities = JSON.parse(data);
+		capabilities.objects = objects;
+		const jsonData = JSON.stringify(capabilities);
 
 		fs.writeFile(`${visualPath}/capabilities.json`, jsonData, function (err, data) {
 			if (err) {
-				return console.log(err)
+				return console.log(err);
 			} else {
-				return console.log('Capability JSON file has been edited successfully')
+				return console.log("Capability JSON file has been edited successfully");
 			}
-		})
-	})
+		});
+	});
 
 	//Below code is to generate settings.ts file
 
-	let objectCreationLines = ''
-	let classCreationLines = ''
+	let objectCreationLines = "";
+	let classCreationLines = "";
 
 	function getClassNameFromObj(obj) {
-		const firstLetter = obj.slice(0, 1).toUpperCase()
-		const className = firstLetter + obj.slice(1)
-		return className
+		const firstLetter = obj.slice(0, 1).toUpperCase();
+		const className = firstLetter + obj.slice(1);
+		return className;
 	}
 
 	function createObject(obj) {
-		return `public ${obj} = new ${getClassNameFromObj(obj)}();`
+		return `public ${obj} = new ${getClassNameFromObj(obj)}();`;
 	}
 
 	function getClassPropertyDeclarations(arr) {
-		let declarations = ''
+		let declarations = "";
 
 		arr.forEach((content) => {
 			const type = {
-				bool: 'boolean',
-				numeric: 'number',
-				integer: 'number',
-				text: 'string',
-				color: 'string',
-				dropdown: 'string',
-				font: 'string',
-				fontSize: 'string',
-				alignment: 'string',
-				labelDisplayUnits: 'string',
-			}
-			const value = type[content.type] === 'string' ? `"${content.defaultValue}"` : content.defaultValue
-			declarations += `public ${content.technicalName}: ${type[content.type]} = ${value};`
-		})
+				bool: "boolean",
+				numeric: "number",
+				integer: "number",
+				text: "string",
+				color: "string",
+				dropdown: "string",
+				font: "string",
+				fontSize: "string",
+				alignment: "string",
+				labelDisplayUnits: "string",
+			};
+			const value = type[content.type] === "string" ? `"${content.defaultValue}"` : content.defaultValue;
+			declarations += `public ${content.technicalName}: ${type[content.type]} = ${value};`;
+		});
 
-		return declarations
+		return declarations;
 	}
 
 	function createClass(obj, obj2) {
 		return `export class ${getClassNameFromObj(obj2)} {
         ${getClassPropertyDeclarations(obj[obj2])}
-  }\n`
+  }\n`;
 	}
 
 	sectionKVPair.forEach((obj, index) => {
 		Object.keys(obj).forEach((key) => {
-			objectCreationLines += '   ' + createObject(key) + '\n'
-			classCreationLines += createClass(formatTab, key)
-		})
-	})
+			objectCreationLines += "   " + createObject(key) + "\n";
+			classCreationLines += createClass(formatTab, key);
+		});
+	});
 
 	const settingsTSData = `/*
 *  Power BI Visualizations
@@ -207,35 +207,35 @@ export class VisualSettings extends DataViewObjectsParser {
 }
 
 ${classCreationLines}
-`
+`;
 
 	fs.writeFile(`${visualPath}/src/settings.ts`, settingsTSData, function (err, data) {
 		if (err) {
-			return console.log(err)
+			return console.log(err);
 		} else {
-			return console.log('Settings.ts file has been created successfully')
+			return console.log("Settings.ts file has been created successfully");
 		}
-	})
+	});
 }
 
 function generateEnumeration(chartPath) {
-	const { visualPath, sectionKVPair, formatTab } = require(chartPath)
+	const { visualPath, sectionKVPair, formatTab } = require(chartPath);
 
-	let allFunctions = ``
-	let allCalledFunctions = []
+	let allFunctions = ``;
+	let allCalledFunctions = [];
 
 	sectionKVPair.forEach((obj, index) => {
-		const key = Object.keys(obj)[0]
-		const fn = `get${key.charAt(0).toUpperCase() + key.slice(1)}Selection`
+		const key = Object.keys(obj)[0];
+		const fn = `get${key.charAt(0).toUpperCase() + key.slice(1)}Selection`;
 
-		allCalledFunctions.push(`       ${fn}(),`)
+		allCalledFunctions.push(`       ${fn}(),`);
 
 		const allPropertiesIterated = formatTab[key].map(
 			(el) => `      {
         name: '${el.technicalName}',
         isShow: true
       },`
-		)
+		);
 
 		allFunctions += `
 function ${fn}(): EnumerateSectionType {
@@ -243,12 +243,12 @@ function ${fn}(): EnumerateSectionType {
     name: '${key}',
     isShow: true,
     properties: [
-${allPropertiesIterated.join('\n')}
+${allPropertiesIterated.join("\n")}
     ]
   }
 }
-`
-	})
+`;
+	});
 
 	let template = `import powerbi from "powerbi-visuals-api";
 import VisualObjectInstance = powerbi.VisualObjectInstance;
@@ -258,19 +258,19 @@ import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSection
 export class Enumeration {
   public static GET(): EnumerateSectionType[] {
     return [
-${allCalledFunctions.join('\n')}
+${allCalledFunctions.join("\n")}
     ];
   }
 }
 
 ${allFunctions}
-`
+`;
 
 	fs.writeFile(`${visualPath}/src/Enumeration.ts`, template, function (err, data) {
 		if (err) {
-			return console.log(err)
+			return console.log(err);
 		} else {
-			return console.log('Enumeration.ts is created successfully.')
+			return console.log("Enumeration.ts is created successfully.");
 		}
-	})
+	});
 }

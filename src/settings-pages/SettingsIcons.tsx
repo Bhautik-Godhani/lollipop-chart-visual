@@ -1,32 +1,32 @@
-import * as React from 'react'
-import { SVGProps } from 'react'
+import * as React from "react";
+import { SVGProps } from "react";
 
 export const BarVerticalOrientationIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="14" height="14" viewBox="0 0 14 14" xmlns="https://www.w3.org/2000/svg" {...props}>
 		<path
 			d="M0 1.75C0 0.783502 0.783502 0 1.75 0H6.125C7.0915 0 7.875 0.783502 7.875 1.75C7.875 2.7165 7.0915 3.5 6.125 3.5H1.75C0.783502 3.5 0 2.7165 0 1.75ZM1.75 0.875C1.26675 0.875 0.875 1.26675 0.875 1.75C0.875 2.23325 1.26675 2.625 1.75 2.625H6.125C6.60825 2.625 7 2.23325 7 1.75C7 1.26675 6.60825 0.875 6.125 0.875H1.75ZM0 7C0 6.0335 0.783502 5.25 1.75 5.25H8.75C9.7165 5.25 10.5 6.0335 10.5 7C10.5 7.9665 9.7165 8.75 8.75 8.75H1.75C0.783502 8.75 0 7.9665 0 7ZM1.75 6.125C1.26675 6.125 0.875 6.51675 0.875 7C0.875 7.48325 1.26675 7.875 1.75 7.875H8.75C9.23325 7.875 9.625 7.48325 9.625 7C9.625 6.51675 9.23325 6.125 8.75 6.125H1.75ZM0 12.25C0 11.2835 0.783502 10.5 1.75 10.5H12.25C13.2165 10.5 14 11.2835 14 12.25C14 13.2165 13.2165 14 12.25 14H1.75C0.783502 14 0 13.2165 0 12.25ZM1.75 11.375C1.26675 11.375 0.875 11.7668 0.875 12.25C0.875 12.7332 1.26675 13.125 1.75 13.125H12.25C12.7332 13.125 13.125 12.7332 13.125 12.25C13.125 11.7668 12.7332 11.375 12.25 11.375H1.75Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 	</svg>
-)
+);
 
 export const BarHorizontalOrientationIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="15" height="14" viewBox="0 0 15 14" xmlns="https://www.w3.org/2000/svg" {...props}>
 		<path
 			d="M2.25 14C1.2835 14 0.5 13.2165 0.5 12.25L0.5 7.875C0.5 6.9085 1.2835 6.125 2.25 6.125C3.2165 6.125 4 6.9085 4 7.875L4 12.25C4 13.2165 3.2165 14 2.25 14ZM1.375 12.25C1.375 12.7332 1.76675 13.125 2.25 13.125C2.73325 13.125 3.125 12.7332 3.125 12.25L3.125 7.875C3.125 7.39175 2.73325 7 2.25 7C1.76675 7 1.375 7.39175 1.375 7.875L1.375 12.25ZM7.5 14C6.5335 14 5.75 13.2165 5.75 12.25L5.75 5.25C5.75 4.2835 6.5335 3.5 7.5 3.5C8.4665 3.5 9.25 4.2835 9.25 5.25L9.25 12.25C9.25 13.2165 8.4665 14 7.5 14ZM6.625 12.25C6.625 12.7332 7.01675 13.125 7.5 13.125C7.98325 13.125 8.375 12.7332 8.375 12.25L8.375 5.25C8.375 4.76675 7.98325 4.375 7.5 4.375C7.01675 4.375 6.625 4.76675 6.625 5.25L6.625 12.25ZM12.75 14C11.7835 14 11 13.2165 11 12.25L11 1.75C11 0.783501 11.7835 -4.93218e-07 12.75 -5.35465e-07C13.7165 -5.77711e-07 14.5 0.783501 14.5 1.75L14.5 12.25C14.5 13.2165 13.7165 14 12.75 14ZM11.875 12.25C11.875 12.7332 12.2668 13.125 12.75 13.125C13.2332 13.125 13.625 12.7332 13.625 12.25L13.625 1.75C13.625 1.26675 13.2332 0.874999 12.75 0.874999C12.2668 0.874999 11.875 1.26675 11.875 1.75L11.875 12.25Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 	</svg>
-)
+);
 
 export const ChartSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
 		<path
 			d="M1.75 14C0.783502 14 -3.42479e-08 13.2165 -7.64949e-08 12.25L-2.67732e-07 7.875C-3.09979e-07 6.9085 0.783501 6.125 1.75 6.125C2.7165 6.125 3.5 6.9085 3.5 7.875L3.5 12.25C3.5 13.2165 2.7165 14 1.75 14ZM0.875 12.25C0.875 12.7332 1.26675 13.125 1.75 13.125C2.23325 13.125 2.625 12.7332 2.625 12.25L2.625 7.875C2.625 7.39175 2.23325 7 1.75 7C1.26675 7 0.875 7.39175 0.875 7.875L0.875 12.25ZM7 14C6.0335 14 5.25 13.2165 5.25 12.25L5.25 5.25C5.25 4.2835 6.0335 3.5 7 3.5C7.9665 3.5 8.75 4.2835 8.75 5.25L8.75 12.25C8.75 13.2165 7.9665 14 7 14ZM6.125 12.25C6.125 12.7332 6.51675 13.125 7 13.125C7.48325 13.125 7.875 12.7332 7.875 12.25L7.875 5.25C7.875 4.76675 7.48325 4.375 7 4.375C6.51675 4.375 6.125 4.76675 6.125 5.25L6.125 12.25ZM12.25 14C11.2835 14 10.5 13.2165 10.5 12.25L10.5 1.75C10.5 0.783501 11.2835 -4.93218e-07 12.25 -5.35465e-07C13.2165 -5.77711e-07 14 0.783501 14 1.75L14 12.25C14 13.2165 13.2165 14 12.25 14ZM11.375 12.25C11.375 12.7332 11.7668 13.125 12.25 13.125C12.7332 13.125 13.125 12.7332 13.125 12.25L13.125 1.75C13.125 1.26675 12.7332 0.874999 12.25 0.874999C11.7668 0.874999 11.375 1.26675 11.375 1.75L11.375 12.25Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 	</svg>
-)
+);
 
 export const DataColorIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -35,25 +35,25 @@ export const DataColorIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const BoldIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="9" height="12" viewBox="0 0 9 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
 		<path d="M0 1.1C0 0.5 0.5 0 1.1 0H4.1C6.2 0 7.5 1.4 7.5 3.4C7.5 4.3 7.2 5.4 6.8 6C7.6 6.6 8.2 7.2 8.2 8.5C8.2 11.2 6.1 12 4.6 12H1.1C0.5 12 0 11.5 0 10.9V1.1ZM2 7V10H4.4C5.1 10 5.9 9.5 5.9 8.5C5.9 7.5 5.1 7 4.4 7H2ZM2 5H4.2C5.1 5 5.7 4.3 5.7 3.5C5.7 2.7 5.1 2 4.3 2H2V5Z" />
 	</svg>
-)
+);
 
 export const ItalicIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
 		<path d="M11 0.000244141H5C4.72386 0.000244141 4.5 0.224102 4.5 0.500244C4.5 0.776386 4.72386 1.00024 5 1.00024H7.47388L3.65575 11.0001L1 11.0002C0.723858 11.0002 0.5 11.2241 0.5 11.5002C0.5 11.7764 0.723858 12.0002 1 12.0002H3.98833C3.99606 12.0004 4.00378 12.0004 4.01148 12.0002H7C7.27614 12.0002 7.5 11.7764 7.5 11.5002C7.5 11.2241 7.27614 11.0002 7 11.0002L4.72617 11.0001L8.5443 1.00024H11C11.2761 1.00024 11.5 0.776386 11.5 0.500244C11.5 0.224102 11.2761 0.000244141 11 0.000244141Z" />
 	</svg>
-)
+);
 
 export const UnderlineIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
 		<path d="M0.5 0C0.776142 0 1 0.223858 1 0.5V6C1 7.62386 2.37614 9 4 9C5.62386 9 7 7.62386 7 6V0.5C7 0.223858 7.22386 0 7.5 0C7.77614 0 8 0.223858 8 0.5V6C8 8.17614 6.17614 10 4 10C1.82386 10 0 8.17614 0 6V0.5C0 0.223858 0.223858 0 0.5 0ZM0 11.5C0 11.2239 0.223858 11 0.5 11H7.5C7.77614 11 8 11.2239 8 11.5C8 11.7761 7.77614 12 7.5 12H0.5C0.223858 12 0 11.7761 0 11.5Z" />
 	</svg>
-)
+);
 
 export const ConditionalFormattingIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -62,7 +62,7 @@ export const ConditionalFormattingIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const SortIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="12" height="9" viewBox="0 0 12 9" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -71,7 +71,7 @@ export const SortIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const RankingIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="10" height="14" viewBox="0 0 10 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -80,7 +80,7 @@ export const RankingIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const ReferenceLinesIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -89,7 +89,7 @@ export const ReferenceLinesIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const FillPatternsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -98,7 +98,7 @@ export const FillPatternsIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const DataLabelsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -107,7 +107,7 @@ export const DataLabelsIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const ShowConditionIcon = (props) => (
 	<svg width={12} height={8} fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -116,7 +116,7 @@ export const ShowConditionIcon = (props) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const FunnelSettingsIcon = (props) => (
 	<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -125,7 +125,7 @@ export const FunnelSettingsIcon = (props) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const NonePatternIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width={14} height={14} fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -136,7 +136,7 @@ export const NonePatternIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const ImagePatternIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width={16} height={16} fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -148,7 +148,7 @@ export const ImagePatternIcon = (props: SVGProps<SVGSVGElement>) => (
 			fill="var(--activeSelected)"
 		/>
 	</svg>
-)
+);
 
 export const ConversionRateSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -175,7 +175,7 @@ export const ConversionRateSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
 			</g>
 		</g>
 	</svg>
-)
+);
 
 export const TotalsSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
@@ -187,33 +187,33 @@ export const TotalsSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
 			/>
 		</g>
 	</svg>
-)
+);
 
 export const SolidLineIcon = (props) => (
 	<svg width="33" height="2" viewBox="0 0 33 2" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
-		<path d="M0.333313 1H32.3333" stroke={props.fill || 'var(--activeSelected)'} stroke-width="2" />
+		<path d="M0.333313 1H32.3333" stroke={props.fill || "var(--activeSelected)"} stroke-width="2" />
 	</svg>
-)
+);
 
 export const DashedLineIcon = (props) => (
 	<svg width="30" height="2" viewBox="0 0 30 2" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
-		<path d="M0 1H7.24138M11.3793 1H18.6207M22.7586 1H30" stroke={props.fill || 'var(--activeSelected)'} stroke-width="2" />
+		<path d="M0 1H7.24138M11.3793 1H18.6207M22.7586 1H30" stroke={props.fill || "var(--activeSelected)"} stroke-width="2" />
 	</svg>
-)
+);
 
 export const DottedLineIcon = (props) => (
 	<svg width="21" height="4" viewBox="0 0 21 4" fill="none" xmlns="https://www.w3.org/2000/svg" {...props} style={props.style || {}}>
 		<path
 			d="M4.66663 2C4.66663 3.10457 3.7712 4 2.66663 4C1.56206 4 0.666626 3.10457 0.666626 2C0.666626 0.895431 1.56206 0 2.66663 0C3.7712 0 4.66663 0.895431 4.66663 2Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 		<path
 			d="M12.6666 2C12.6666 3.10457 11.7712 4 10.6666 4C9.56206 4 8.66663 3.10457 8.66663 2C8.66663 0.895431 9.56206 0 10.6666 0C11.7712 0 12.6666 0.895431 12.6666 2Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 		<path
 			d="M20.6666 2C20.6666 3.10457 19.7712 4 18.6666 4C17.5621 4 16.6666 3.10457 16.6666 2C16.6666 0.895431 17.5621 0 18.6666 0C19.7712 0 20.6666 0.895431 20.6666 2Z"
-			fill={props.fill || 'var(--activeSelected)'}
+			fill={props.fill || "var(--activeSelected)"}
 		/>
 	</svg>
-)
+);
