@@ -1,4 +1,4 @@
-import { CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, FontStyle, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from "./enum"
+import { CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from "./enum"
 import {
     IChartSettings,
     ICirclePropsSettings,

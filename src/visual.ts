@@ -11,7 +11,7 @@ import IColorPalette = powerbi.extensibility.IColorPalette;
 import * as d3 from "d3";
 
 import { IChartSubCategory, ILollipopChartRow, TooltipData } from './model';
-import { CategoryDataColorProps, CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, DataRolesName, DisplayUnits, EDataLabelsSettings, EVisualConfig, EVisualSettings, FontStyle, ILegendPosition, LegendType, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
+import { CategoryDataColorProps, CircleFillOption, CircleSize, CircleType, ColorPaletteType, DataLabelsFontSizeType, DataLabelsPlacement, DataRolesName, DisplayUnits, EVisualConfig, EVisualSettings, ILegendPosition, LegendType, LineType, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { createLegend, positionChartArea } from "powerbi-visuals-utils-chartutils/lib/legend/legend";
 import { ILegend, LegendData, LegendDataPoint, LegendPosition } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
@@ -336,7 +336,7 @@ export class Visual extends Shadow {
             return;
         } else if (!this.isChartInit) {
             this.initChart();
-        };
+        }
 
         this.visualUpdateOptions = vizOptions;
         this.isInFocusMode = vizOptions.options.isInFocus;
@@ -438,10 +438,10 @@ export class Visual extends Shadow {
         const tooltipFields = [];
 
         this.isDumbbellChart = this.getCategoricalValuesIndexByKey(DataRolesName.Value2) !== -1;
-        this.categoryDisplayName = categorical.categories[0]?.source.displayName;
-        this.subCategoryDisplayName = categorical.categories[1]?.source.displayName;
-        this.value1DisplayName = categorical.values[0]?.source.displayName;
-        this.value2DisplayName = categorical.values[1]?.source.displayName;
+        this.categoryDisplayName = categorical.categories[0] ? categorical.categories[0].source.displayName : '';
+        this.subCategoryDisplayName = categorical.categories[1] ? categorical.categories[1].source.displayName : '';
+        this.value1DisplayName = categorical.values[0] ? categorical.values[0].source.displayName : '';
+        this.value2DisplayName = categorical.values[1] ? categorical.values[1].source.displayName : '';
         this.isHasSubcategories = this.getCategoricalCategoriesIndexByKey(DataRolesName.SubCategory) !== -1;
         this.isHasCategories = this.getCategoricalCategoriesIndexByKey(DataRolesName.Category) !== -1;
         this.isHasValue2 = this.getCategoricalValuesIndexByKey(DataRolesName.Value2) !== -1;
@@ -463,14 +463,14 @@ export class Visual extends Shadow {
         }
 
         const getSubCategoriesByCategory = (categoryName: string): any => {
-            const subCategories = categorical.categories[1]?.values.reduce((arr, cat, i): any[] => {
+            const subCategories = (categorical.categories[1] ? categorical.categories[1].values : []).reduce((arr, cat, i): any[] => {
                 if (categorical.categories[0].values[i] === categoryName) {
                     const category = {
                         category: cat,
-                        value1: categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value1)]?.values[i],
-                        value2: categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value2)]?.values[i],
+                        value1: categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value1)].values[i],
+                        value2: categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value2)].values[i],
                         styles: { pie1: { color: '' }, pie2: { color: '' } },
-                        tooltipFields: tooltipFields[i] ?? []
+                        tooltipFields: tooltipFields[i] ? tooltipFields[i] : []
                     }
                     arr.push(category);
                 }
@@ -483,9 +483,9 @@ export class Visual extends Shadow {
             (cat, idx) => (
                 {
                     city: <string>cat,
-                    value1: <number>categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value1)]?.values[idx],
-                    value2: <number>categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value2)]?.values[idx],
-                    tooltipFields: tooltipFields[idx] ?? [],
+                    value1: <number>categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value1)].values[idx],
+                    value2: <number>categorical.values[this.getCategoricalValuesIndexByKey(DataRolesName.Value2)].values[idx],
+                    tooltipFields: tooltipFields[idx] ? tooltipFields[idx] : [],
                     subCategories: categorical.categories[1] ? getSubCategoriesByCategory(<string>cat) : [],
                     styles: { circle1: { fillColor: '', strokeColor: '' }, circle2: { fillColor: '', strokeColor: '' }, line: { color: '' } }
                 }
@@ -524,7 +524,7 @@ export class Visual extends Shadow {
     }
 
     private createLegendContainer(legendType: LegendType): void {
-        this[legendType] = createLegend(this.hostContainer, false, null, true, LegendPosition[this.legendSettings.position] ?? LegendPosition.Top);
+        this[legendType] = createLegend(this.hostContainer, false, null, true, LegendPosition[this.legendSettings.position] ? LegendPosition[this.legendSettings.position] : LegendPosition.Top);
     }
 
     setVisualSettings(): void {
@@ -535,7 +535,6 @@ export class Visual extends Shadow {
             ...CHART_SETTINGS,
             ...chartConfig,
         };
-        this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 
         const circleConfig = JSON.parse(formatTab[EVisualConfig.CircleConfig][EVisualSettings.CircleSettings]);
         this.circleSettings = {
@@ -543,16 +542,13 @@ export class Visual extends Shadow {
             ...circleConfig,
         };
 
-        this.circle1Settings = this.circleSettings.circle1;
-        this.circle2Settings = this.circleSettings.circle2;
-
         const lineConfig = JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]);
         this.lineSettings = {
             ...LINE_SETTINGS,
             ...lineConfig,
         };
 
-        const clonedDataLabelsSettings = JSON.parse(JSON.stringify(this.dataLabelsSettings ?? {}));
+        const clonedDataLabelsSettings = JSON.parse(JSON.stringify(this.dataLabelsSettings ? this.dataLabelsSettings : {}));
         const dataLabelsConfig = JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]);
         this.dataLabelsSettings = {
             ...DATA_LABELS_SETTINGS,
@@ -580,12 +576,6 @@ export class Visual extends Shadow {
             ...gridLinesConfig,
         };
 
-        this.xGridSettings = this.gridSettings.xGridLines;
-        this.yGridSettings = this.gridSettings.yGridLines;
-
-        this.pie1Settings = this.chartSettings.pieSettings.pie1;
-        this.pie2Settings = this.chartSettings.pieSettings.pie2;
-
         // Data Colors Settings
         // if (this.chartSettings.lollipopType === LollipopType.Circle) {
         //     DATA_COLORS.dataType = CircleType.Circle1;
@@ -604,7 +594,7 @@ export class Visual extends Shadow {
             ...dataColorsConfig,
         };
 
-        const clonedRankingSettings = JSON.parse(JSON.stringify(this.rankingSettings ?? {}));
+        const clonedRankingSettings = JSON.parse(JSON.stringify(this.rankingSettings ? this.rankingSettings : {}));
         const rankingConfig = JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]);
         this.rankingSettings = {
             ...RANKING_SETTINGS,
@@ -639,6 +629,16 @@ export class Visual extends Shadow {
                 this.dataLabelsSettings.color = "rgb(102,102,102)";
             }
         }
+    }
+
+    changeVisualSettings(): void {
+        this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
+        this.circle1Settings = this.circleSettings.circle1;
+        this.circle2Settings = this.circleSettings.circle2;
+        this.xGridSettings = this.gridSettings.xGridLines;
+        this.yGridSettings = this.gridSettings.yGridLines;
+        this.pie1Settings = this.chartSettings.pieSettings.pie1;
+        this.pie2Settings = this.chartSettings.pieSettings.pie2;
 
         if (!this.isDumbbellChart) {
             this.chartData.sort((a, b) => this.isHorizontalChart ? a.value1 - b.value1 : b.value1 - a.value1);
@@ -975,7 +975,7 @@ export class Visual extends Shadow {
                 data.styles.circle1.strokeColor = color;
             } else {
                 data.styles.circle1.fillColor = schemeColors[colorIdx];
-                data.styles.circle1.strokeColor = schemeColors[colorIdx];;
+                data.styles.circle1.strokeColor = schemeColors[colorIdx];
             }
         });
     }
@@ -1009,12 +1009,12 @@ export class Visual extends Shadow {
     }
 
     setVisualOptionsColor(): void {
-        this.xAxisSettings.labelColor = this.xAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
-        this.xAxisSettings.titleColor = this.xAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
-        this.yAxisSettings.labelColor = this.yAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
-        this.yAxisSettings.titleColor = this.yAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
-        this.legendSettings.labelColor = this.legendSettings.labelColor ?? 'rgba(0, 0, 0, 1)';
-        this.legendSettings.titleColor = this.legendSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
+        // this.xAxisSettings.labelColor = this.xAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
+        // this.xAxisSettings.titleColor = this.xAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
+        // this.yAxisSettings.labelColor = this.yAxisSettings.labelColor ?? 'rgba(102, 102, 102, 1)';
+        // this.yAxisSettings.titleColor = this.yAxisSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
+        // this.legendSettings.labelColor = this.legendSettings.labelColor ?? 'rgba(0, 0, 0, 1)';
+        // this.legendSettings.titleColor = this.legendSettings.titleColor ?? 'rgba(0, 0, 0, 1)';
     }
 
     setChartWidthHeight(): void {
@@ -1046,13 +1046,13 @@ export class Visual extends Shadow {
     }
 
     drawVerticalBrush(): void {
-        const newRageHeight = (this.chartSettings.lollipopDistance * this.height / this.scaleBandWidth);
+        // const newRageHeight = (this.chartSettings.lollipopDistance * this.height / this.scaleBandWidth);
         const yScaleDomain = this.yScale2.domain();
-        const minPos = this.yScale(yScaleDomain[this.xAxisSettings.position === Position.Bottom ? yScaleDomain.length - 1 : 0]);
+        // const minPos = this.yScale(yScaleDomain[this.xAxisSettings.position === Position.Bottom ? yScaleDomain.length - 1 : 0]);
 
         const brushed = ({ selection }) => {
-            var newInput = [];
-            var brushArea = selection;
+            const newInput = [];
+            let brushArea = selection;
             if (brushArea === null) brushArea = this.yScale.range();
 
             yScaleDomain.forEach((d) => {
@@ -1112,7 +1112,7 @@ export class Visual extends Shadow {
             .extent([[0, 0], [this.brushWidth - 2, this.height]])
             .on("brush", brushed)
 
-        const scrollBrushHeight = this.height - (newRageHeight - this.height);
+        // const scrollBrushHeight = this.height - (newRageHeight - this.height);
         const expectedLollipop = Math.ceil(this.height / this.chartSettings.lollipopDistance);
         const totalLollipop = this.chartData.length;
         const heightByExpectedLollipop = expectedLollipop * this.height / totalLollipop;
@@ -1131,16 +1131,16 @@ export class Visual extends Shadow {
     }
 
     drawHorizontalBrush(): void {
-        const newWidth = (this.chartSettings.lollipopDistance * this.width / this.scaleBandWidth);
+        // const newWidth = (this.chartSettings.lollipopDistance * this.width / this.scaleBandWidth);
         const xScaleDomain = this.xScale2.domain();
-        const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
+        // const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
         const brushed = ({ selection }) => {
             const newInput = [];
             let brushArea = selection;
             if (brushArea === null) brushArea = this.xScale.range();
 
             xScaleDomain.forEach((d) => {
-                var pos = this.xScale2(d) + this.xScale2.bandwidth() / 2;
+                const pos = this.xScale2(d) + this.xScale2.bandwidth() / 2;
                 if (pos >= brushArea[0] && pos <= brushArea[1]) {
                     newInput.push(d);
                 }
@@ -1150,7 +1150,7 @@ export class Visual extends Shadow {
 
             if (this.isLollipopChartDrawn) {
                 this.lineSelection
-                    .attr('x1', (d, i) => {
+                    .attr('x1', (d) => {
                         return this.xScale(d.city);
                     })
                     .attr('x2', (d) => {
@@ -1162,7 +1162,7 @@ export class Visual extends Shadow {
 
                 this.circle1Selection
                     .attr('cx', (d) => {
-                        return this.xScale(d.city) ?? 0;
+                        return this.xScale(d.city) ? this.xScale(d.city) : 0;
                     })
                     .attr('opacity', (d) => {
                         return this.xScale(d.city) ? 1 : 0;
@@ -1170,7 +1170,7 @@ export class Visual extends Shadow {
 
                 this.circle2Selection
                     .attr('cx', (d) => {
-                        return this.xScale(d.city) ?? 0;
+                        return this.xScale(d.city) ? this.xScale(d.city) : 0;
                     })
                     .attr('opacity', (d) => {
                         return this.xScale(d.city) ? 1 : 0;
@@ -1230,7 +1230,7 @@ export class Visual extends Shadow {
             const pie1ViewBoxRadius = this.pie1Radius + this.pie1Radius * (this.pieEmphasizeScaleSize * 2) / 100;
             const pie2ViewBoxRadius = this.pie2Radius + this.pie2Radius * (this.pieEmphasizeScaleSize * 2) / 100;
             this.pieG.selectAll('#pie1ForeignObject')
-                .attr('x', (d, i) => {
+                .attr('x', (d) => {
                     const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d['value1'] : d.city));
                     return pieX > 0 ? pieX - pie1ViewBoxRadius : pieX - pie1ViewBoxRadius / 2;
                 })
@@ -1248,7 +1248,7 @@ export class Visual extends Shadow {
 
             if (this.isDumbbellChart) {
                 this.pieG.selectAll('#pie2ForeignObject')
-                    .attr('x', (d, i) => {
+                    .attr('x', (d) => {
                         const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d['value2'] : d.city));
                         return pieX > 0 ? pieX - pie2ViewBoxRadius : pieX - pie2ViewBoxRadius / 2;
                     })
@@ -1268,15 +1268,15 @@ export class Visual extends Shadow {
     }
 
     getCategoricalValuesIndexByKey(key: string): number {
-        return this.visualUpdateOptions.options.dataViews[0].categorical.values?.findIndex(data => data.source.roles[key] === true);
+        return this.visualUpdateOptions.options.dataViews[0].categorical.values.findIndex(data => data.source.roles[key] === true);
     }
 
     isHasCategoricalValuesIndexByKey(key: string): number {
-        return this.visualUpdateOptions.options.dataViews[0].categorical.values?.findIndex(data => data.source.roles[key] === true);
+        return this.visualUpdateOptions.options.dataViews[0].categorical.values.findIndex(data => data.source.roles[key] === true);
     }
 
     getCategoricalCategoriesIndexByKey(key: string): number {
-        return this.visualUpdateOptions.options.dataViews[0].categorical.categories?.findIndex(data => data.source.roles[key] === true);
+        return this.visualUpdateOptions.options.dataViews[0].categorical.categories.findIndex(data => data.source.roles[key] === true);
     }
 
     drawLollipopChart(): void {
@@ -1412,7 +1412,7 @@ export class Visual extends Shadow {
             let marginRight = this.margin.right;
             let marginTop = this.margin.top;
             let marginBottom = this.margin.bottom;
-            let settingsBtnHeight = this.settingsBtnHeight;
+            const settingsBtnHeight = this.settingsBtnHeight;
             const legendPosition = this.legendSettings.position;
 
             if (this.legendSettings.show) {
@@ -1438,7 +1438,6 @@ export class Visual extends Shadow {
                 return 'block';
             }
         }
-
     }
 
     getDataLabelsFontSize(isData2Label: boolean = false): number {
@@ -1525,200 +1524,230 @@ export class Visual extends Shadow {
         return { x, y }
     }
 
-    transformData1LabelOutside(labelSelection: any): void {
+    transformHorizontalData1LabelOutside(labelSelection: any, labelDistance: number): void {
         const dataLabelsSettings = this.dataLabelsSettings;
-        const labelDistance = this.chartSettings.lollipopType === LollipopType.Circle ?
-            this.circle1Radius / 0.7 : this.pie1Radius / 0.7;
-        const self = this;
+
+        const fn = (d: any, bBox: any) => {
+            const XY = this.getDataLabelXY(d);
+            const x = XY.x;
+            const y = XY.y;
+            if (this.isDumbbellChart) {
+                if (this.yAxisSettings.position === Position.Left && d.value1 < d.value2 ||
+                    this.yAxisSettings.position === Position.Right && d.value1 > d.value2) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width - labelDistance},
+                    ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height - labelDistance},
+                    ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                }
+                else {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x + labelDistance},
+                    ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x + labelDistance},
+                    ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                }
+            } else {
+                if (this.yAxisSettings.position === Position.Left) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x + labelDistance},
+                    ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x + labelDistance},
+                    ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                } else {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width - labelDistance},
+                    ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height - labelDistance},
+                    ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                }
+            }
+        }
 
         labelSelection
             .attr('transform', function (d) {
                 const bBox = this.getBBox();
-                if (self.isHorizontalChart) {
-                    const XY = self.getDataLabelXY(d);
-                    const x = XY.x;
-                    const y = XY.y;
-                    if (self.isDumbbellChart) {
-                        if (self.yAxisSettings.position === Position.Left && d.value1 < d.value2 ||
-                            self.yAxisSettings.position === Position.Right && d.value1 > d.value2) {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width - labelDistance},
-                            ${y - bBox.height / 2}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x - bBox.height - labelDistance},
-                            ${y + bBox.width / 2}), rotate(${270})`
-                            }
-                        }
-                        else {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x + labelDistance},
-                            ${y - bBox.height / 2}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x + labelDistance},
-                            ${y + bBox.width / 2}), rotate(${270})`
-                            }
-                        }
-                    } else {
-                        if (self.yAxisSettings.position === Position.Left) {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x + labelDistance},
-                            ${y - bBox.height / 2}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x + labelDistance},
-                            ${y + bBox.width / 2}), rotate(${270})`
-                            }
-                        } else {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width - labelDistance},
-                            ${y - bBox.height / 2}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x - bBox.height - labelDistance},
-                            ${y + bBox.width / 2}), rotate(${270})`
-                            }
-                        }
+                return fn(d, bBox);
+            });
+    }
+
+    transformVerticalData1LabelOutside(labelSelection: any, labelDistance: number): void {
+        const dataLabelsSettings = this.dataLabelsSettings;
+
+        const fn = (d: any, bBox: any) => {
+            const XY = this.getDataLabelXY(d);
+            const x = XY.x;
+            const y = XY.y;
+            if (this.isDumbbellChart) {
+                if (this.xAxisSettings.position === Position.Bottom && d.value1 < d.value2 ||
+                    this.xAxisSettings.position === Position.Top && d.value1 > d.value2) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y + labelDistance}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height / 2},
+                        ${y + labelDistance + bBox.width}), rotate(${270})`
                     }
                 } else {
-                    const XY = self.getDataLabelXY(d);
-                    const x = XY.x;
-                    const y = XY.y;
-                    if (self.isDumbbellChart) {
-                        if (self.xAxisSettings.position === Position.Bottom && d.value1 < d.value2 ||
-                            self.xAxisSettings.position === Position.Top && d.value1 > d.value2) {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width / 2},
-                                ${y + labelDistance}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x - bBox.height / 2},
-                                ${y + labelDistance + bBox.width}), rotate(${270})`
-                            }
-                        } else {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width / 2},
-                                ${y - labelDistance - bBox.height}), rotate(${0})`
-                            } else {
-                                return `translate(${x - bBox.height / 2},
-                                ${y - labelDistance}), rotate(${270})`
-                            }
-                        }
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y - labelDistance - bBox.height}), rotate(${0})`
                     } else {
-                        if (self.xAxisSettings.position === Position.Bottom) {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width / 2},
-                                ${y - labelDistance - bBox.height}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x - bBox.height / 2},
-                                ${y - labelDistance}), rotate(${270})`
-                            }
-                        } else {
-                            if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                                return `translate(${x - bBox.width / 2},
-                                ${y + labelDistance}), rotate(${0})`
-                            }
-                            else {
-                                return `translate(${x - bBox.height / 2},
-                                ${y + bBox.width + labelDistance}), rotate(${270})`
-                            }
-                        }
+                        return `translate(${x - bBox.height / 2},
+                        ${y - labelDistance}), rotate(${270})`
                     }
                 }
-            })
+            } else {
+                if (this.xAxisSettings.position === Position.Bottom) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y - labelDistance - bBox.height}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height / 2},
+                        ${y - labelDistance}), rotate(${270})`
+                    }
+                } else {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y + labelDistance}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height / 2},
+                        ${y + bBox.width + labelDistance}), rotate(${270})`
+                    }
+                }
+            }
+        }
+
+        labelSelection
+            .attr('transform', function (d) {
+                const bBox = this.getBBox();
+                return fn(d, bBox);
+            });
+    }
+
+    transformData1LabelOutside(labelSelection: any): void {
+        const labelDistance = this.chartSettings.lollipopType === LollipopType.Circle ?
+            this.circle1Radius / 0.7 : this.pie1Radius / 0.7;
+
+        if (this.isHorizontalChart) {
+            this.transformHorizontalData1LabelOutside(labelSelection, labelDistance);
+        } else {
+            this.transformVerticalData1LabelOutside(labelSelection, labelDistance);
+        }
     }
 
     transformData2LabelOutside(labelSelection: any): void {
         const dataLabelsSettings = this.dataLabelsSettings;
         const labelDistance = this.chartSettings.lollipopType === LollipopType.Circle ?
             this.circle2Radius / 0.7 : this.pie2Radius / 0.7;
-        const self = this;
+
+        const fn = (d, bBox) => {
+            if (this.isHorizontalChart) {
+                const XY = this.getDataLabelXY(d, true);
+                const x = XY.x;
+                const y = XY.y;
+                if (this.yAxisSettings.position === Position.Left && d.value1 < d.value2 ||
+                    this.yAxisSettings.position === Position.Right && d.value1 > d.value2) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x + labelDistance},
+                            ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x + labelDistance},
+                            ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                }
+                else {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width - labelDistance},
+                        ${y - bBox.height / 2}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height - labelDistance},
+                        ${y + bBox.width / 2}), rotate(${270})`
+                    }
+                }
+            } else {
+                const XY = this.getDataLabelXY(d, true);
+                const x = XY.x;
+                const y = XY.y;
+                if (this.xAxisSettings.position === Position.Bottom && d.value1 < d.value2 ||
+                    this.xAxisSettings.position === Position.Top && d.value1 > d.value2) {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y - labelDistance - bBox.height}), rotate(${0})`
+                    }
+                    else {
+                        return `translate(${x - bBox.height / 2},
+                        ${y - labelDistance}), rotate(${270})`
+                    }
+                } else {
+                    if (dataLabelsSettings.orientation === Orientation.Horizontal) {
+                        return `translate(${x - bBox.width / 2},
+                        ${y + labelDistance}), rotate(${0})`
+                    } else {
+                        return `translate(${x - bBox.height / 2},
+                        ${y + labelDistance + bBox.width}), rotate(${270})`
+                    }
+                }
+            }
+        }
 
         labelSelection
             .attr('transform', function (d) {
                 const bBox = this.getBBox();
-                if (self.isHorizontalChart) {
-                    const XY = self.getDataLabelXY(d, true);
-                    const x = XY.x;
-                    const y = XY.y;
-                    if (self.yAxisSettings.position === Position.Left && d.value1 < d.value2 ||
-                        self.yAxisSettings.position === Position.Right && d.value1 > d.value2) {
-                        if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                            return `translate(${x + labelDistance},
-                                ${y - bBox.height / 2}), rotate(${0})`
-                        }
-                        else {
-                            return `translate(${x + labelDistance},
-                                ${y + bBox.width / 2}), rotate(${270})`
-                        }
-                    }
-                    else {
-                        if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                            return `translate(${x - bBox.width - labelDistance},
-                            ${y - bBox.height / 2}), rotate(${0})`
-                        }
-                        else {
-                            return `translate(${x - bBox.height - labelDistance},
-                            ${y + bBox.width / 2}), rotate(${270})`
-                        }
-                    }
-                } else {
-                    const XY = self.getDataLabelXY(d, true);
-                    const x = XY.x;
-                    const y = XY.y;
-                    if (self.xAxisSettings.position === Position.Bottom && d.value1 < d.value2 ||
-                        self.xAxisSettings.position === Position.Top && d.value1 > d.value2) {
-                        if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                            return `translate(${x - bBox.width / 2},
-                            ${y - labelDistance - bBox.height}), rotate(${0})`
-                        }
-                        else {
-                            return `translate(${x - bBox.height / 2},
-                            ${y - labelDistance}), rotate(${270})`
-                        }
-                    } else {
-                        if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-                            return `translate(${x - bBox.width / 2},
-                            ${y + labelDistance}), rotate(${0})`
-                        } else {
-                            return `translate(${x - bBox.height / 2},
-                            ${y + labelDistance + bBox.width}), rotate(${270})`
-                        }
-                    }
-                }
+                return fn(d, bBox);
             })
     }
 
     transformData1LabelInside(labelsSelection: any): void {
-        const THIS = this;
-        labelsSelection.attr('transform', function (d) {
-            const labelBBox = this.getBBox();
-            const x = THIS.getCircleCX(THIS.xScale(THIS.isHorizontalChart ? d.value1 : d.city));
-            const y = THIS.getCircleCY(THIS.yScale(THIS.isHorizontalChart ? d.city : d.value1));
+        const fn = (d, labelBBox: any) => {
+            const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value1 : d.city));
+            const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value1));
             const transX = x - labelBBox.width / 2;
             const transY = y - labelBBox.height / 2;
-            return `translate(${transX}, ${transY})`;
+            return `translate(${transX}, ${transY})`
+        }
+
+        labelsSelection.attr('transform', function (d) {
+            const labelBBox = this.getBBox();
+            return fn(d, labelBBox);
         });
     }
 
     transformData2LabelInside(labelsSelection: any): void {
-        const THIS = this;
+        const fn = (d, labelBBox) => {
+            const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value2 : d.city));
+            const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value2));
+            const transX = x - labelBBox.width / 2;
+            const transY = y - labelBBox.height / 2;
+            return `translate(${transX}, ${transY})`;
+        }
+
         labelsSelection.attr('transform', function (d) {
             const labelBBox = this.getBBox();
-            const x = THIS.getCircleCX(THIS.xScale(THIS.isHorizontalChart ? d.value2 : d.city));
-            const y = THIS.getCircleCY(THIS.yScale(THIS.isHorizontalChart ? d.city : d.value2));
-            const transX = x - labelBBox.width / 2;
-            const transY = y - this.getBBox().height / 2;
-            return `translate(${transX}, ${transY})`;
+            return fn(d, labelBBox);
         });
     }
 
     drawData1Labels(data: ILollipopChartRow[]): void {
         const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
         this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
-        const self = this;
 
         const labelsData = data.filter(data => {
             return this.isHorizontalChart ? this.yScale(data.city) : this.xScale(data.city);
@@ -1744,9 +1773,13 @@ export class Visual extends Shadow {
                     this.transformData1LabelInside(dataLabelGSelection);
                 }
 
+                const fn = (ele: any) => {
+                    return this.getDataLabelDisplayStyle(ele);
+                }
+
                 dataLabelGSelection
                     .attr('display', function () {
-                        return self.getDataLabelDisplayStyle(this);
+                        return fn(this);
                     })
             },
             update => {
@@ -1766,9 +1799,13 @@ export class Visual extends Shadow {
                     this.transformData1LabelInside(dataLabelGSelection);
                 }
 
+                const fn = (ele: any) => {
+                    return this.getDataLabelDisplayStyle(ele);
+                }
+
                 dataLabelGSelection
                     .attr('display', function () {
-                        return self.getDataLabelDisplayStyle(this);
+                        return fn(this);
                     })
             }
         )
@@ -1779,7 +1816,6 @@ export class Visual extends Shadow {
     drawData2Labels(data: ILollipopChartRow[]): void {
         const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
         this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
-        const self = this;
 
         const labelsData = data.filter(data => {
             return this.isHorizontalChart ? this.yScale(data.city) : this.xScale(data.city);
@@ -1805,9 +1841,13 @@ export class Visual extends Shadow {
                     this.transformData2LabelInside(dataLabelGSelection);
                 }
 
+                const fn = (ele: any) => {
+                    return this.getDataLabelDisplayStyle(ele);
+                }
+
                 dataLabelGSelection
                     .attr('display', function () {
-                        return self.getDataLabelDisplayStyle(this);
+                        return fn(this);
                     })
             },
             update => {
@@ -1827,9 +1867,13 @@ export class Visual extends Shadow {
                     this.transformData2LabelInside(dataLabelGSelection);
                 }
 
+                const fn = (ele: any) => {
+                    return this.getDataLabelDisplayStyle(ele);
+                }
+
                 dataLabelGSelection
                     .attr('display', function () {
-                        return self.getDataLabelDisplayStyle(this);
+                        return fn(this);
                     })
             }
         )
@@ -1840,13 +1884,13 @@ export class Visual extends Shadow {
     drawTooltip(): void {
         this.tooltipServiceWrapper.addTooltip(d3.selectAll('.chart-circle1'),
             (datapoint: any) => this.isDumbbellChart && this.isHasValue2
-                ? getClevelandTooltipData(datapoint, true) : getTooltipData(datapoint, true),
+                ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, true),
             (datapoint: any) => datapoint.selectionId
         );
 
         this.tooltipServiceWrapper.addTooltip(d3.selectAll('.chart-circle2'),
             (datapoint: any) => this.isDumbbellChart && this.isHasValue2
-                ? getClevelandTooltipData(datapoint, false) : getTooltipData(datapoint, false),
+                ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, false),
             (datapoint: any) => datapoint.selectionId
         );
 
@@ -1865,14 +1909,14 @@ export class Visual extends Shadow {
                 tooltipData.push({
                     displayName: data.displayName,
                     value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
-                    color: data.color ?? 'transparent'
+                    color: data.color ? data.color : 'transparent'
                 })
             });
 
             return tooltipData;
         }
 
-        const getClevelandTooltipData = (value: ILollipopChartRow, isCircle1: boolean): VisualTooltipDataItem[] => {
+        const getClevelandTooltipData = (value: ILollipopChartRow): VisualTooltipDataItem[] => {
             const tooltipData: TooltipData[] = [{
                 displayName: this.categoryDisplayName,
                 value: typeof value.city === "string" ? value.city.toUpperCase() : value.city,
@@ -1891,7 +1935,7 @@ export class Visual extends Shadow {
                 tooltipData.push({
                     displayName: data.displayName,
                     value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
-                    color: data.color ?? 'transparent'
+                    color: data.color ? data.color : 'transparent'
                 })
             });
             return tooltipData;
@@ -1921,7 +1965,7 @@ export class Visual extends Shadow {
             xAxisSettings.titleName = xAxisTitle;
         }
         this.xAxisTitleText
-            .text(xAxisSettings.titleName ?? xAxisTitle);
+            .text(xAxisSettings.titleName ? xAxisSettings.titleName : xAxisTitle);
 
         const yAxisTitle = this.isHorizontalChart ? this.categoryTitle : this.valuesTitle;
         if (!yAxisSettings.titleName) {
@@ -1929,7 +1973,7 @@ export class Visual extends Shadow {
             yAxisSettings.titleName = yAxisTitle;
         }
         this.yAxisTitleText
-            .text(yAxisSettings.titleName ?? yAxisTitle);
+            .text(yAxisSettings.titleName ? yAxisSettings.titleName : yAxisTitle);
 
         if (xAxisSettings.position === Position.Bottom) {
             this.xAxisTitleG
@@ -1976,7 +2020,6 @@ export class Visual extends Shadow {
         const tickYScale = d3.scaleLinear().range([9, 0]);
         tickYScale.domain([0, 90]);
 
-        const THIS = this;
         const xAxisSettings = this.xAxisSettings;
         const maxLabelTilt = 20;
         this.xAxisG
@@ -1994,39 +2037,39 @@ export class Visual extends Shadow {
                     return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, -10)rotate(${this.getXAxisLabelTilt()})`
                 }
             })
-            .each(function (d) {
-                if (THIS.isHorizontalChart && typeof d === "number") {
-                    THIS.setAxisNumberFormatting(this, d);
+            .each((d) => {
+                if (this.isHorizontalChart && typeof d === "number") {
+                    this.setAxisNumberFormatting(this, d);
                 }
             })
             // .call(wrap, this.scaleBandWidth)
             .each(function () {
-                THIS.trimXAxisTick(this);
+                this.trimXAxisTick(this);
             });
 
-        function wrap(text: any, width: number): void {
-            text.each(function () {
-                const text = d3.select(this);
-                let words = text.text().split(/\s+/).reverse();
-                let word;
-                let line = [];
-                let lineNumber = 0;
-                const lineHeight = 1.1;
-                const y = text.attr('y');
-                const dy = parseFloat(text.attr('dy'));
-                let tspan = text.text(null).append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em');
-                while (word = words.pop()) {
-                    line.push(word);
-                    tspan.text(line.join(' '));
-                    if (tspan.node().getComputedTextLength() > width - width * 0.1) {
-                        line.pop();
-                        tspan.text(line.join(' '));
-                        line = [word];
-                        tspan = text.append('tspan').attr('x', 0).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
-                    }
-                }
-            });
-        }
+        // function wrap(text: any, width: number): void {
+        //     text.each(function () {
+        //         const text = d3.select(this);
+        //         const words = text.text().split(/\s+/).reverse();
+        //         let word;
+        //         let line = [];
+        //         let lineNumber = 0;
+        //         const lineHeight = 1.1;
+        //         const y = text.attr('y');
+        //         const dy = parseFloat(text.attr('dy'));
+        //         let tspan = text.text(null).append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em');
+        //         while (word === words.pop()) {
+        //             line.push(word);
+        //             tspan.text(line.join(' '));
+        //             if (tspan.node().getComputedTextLength() > width - width * 0.1) {
+        //                 line.pop();
+        //                 tspan.text(line.join(' '));
+        //                 line = [word];
+        //                 tspan = text.append('tspan').attr('x', 0).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
+        //             }
+        //         }
+        //     });
+        // }
     }
 
     getXAxisLabelTilt(): number {
@@ -2061,7 +2104,6 @@ export class Visual extends Shadow {
     }
 
     setYAxisTickStyle(): void {
-        const THIS = this;
         const yAxisSettings = this.yAxisSettings;
         this.yAxisG.
             selectAll('text')
@@ -2070,13 +2112,13 @@ export class Visual extends Shadow {
             .attr('font-size', yAxisSettings.labelFontSize)
             .attr('display', yAxisSettings.isDisplayLabel ? 'block' : 'none')
             .style('text-anchor', yAxisSettings.position === Position.Left ? 'end' : 'start')
-            .each(function (d) {
-                if (!THIS.isHorizontalChart && typeof d === "number") {
-                    THIS.setAxisNumberFormatting(this, d);
+            .each((d) => {
+                if (!this.isHorizontalChart && typeof d === "number") {
+                    this.setAxisNumberFormatting(this, d);
                 }
             })
-            .each(function () {
-                THIS.trimYAxisTick(this);
+            .each(() => {
+                this.trimYAxisTick(this);
             });
     }
 
@@ -2094,7 +2136,7 @@ export class Visual extends Shadow {
 
     trimYAxisTick(tickEle: any): void {
         const self = d3.select(tickEle);
-        const textLength = self.node().getComputedTextLength();
+        // const textLength = self.node().getComputedTextLength();
         const text = self.text();
         if (text.length > this.yAxisSettings.labelCharLimit) {
             const newText = text.substr(0, this.yAxisSettings.labelCharLimit);
@@ -2250,7 +2292,6 @@ export class Visual extends Shadow {
     }
 
     drawXYAxis(): void {
-        const THIS = this;
         this.setXYAxisDomain();
         this.setXYAxisRange(this.width, this.height);
         this.setScaleBandwidth();
@@ -2262,14 +2303,22 @@ export class Visual extends Shadow {
         this.setXAxisTickStyle();
         this.setYAxisTickStyle();
 
+        const setYScaleGWidth = (width: number) => {
+            this.yScaleGWidth = width;
+            this.setMargins();
+        }
+
+        const setXScaleGHeight = (height: number) => {
+            this.xScaleGHeight = height;
+            this.setMargins();
+        }
+
         this.svg.select('.yAxisG').each(function () {
-            THIS.yScaleGWidth = this.getBBox().width;
-            THIS.setMargins();
+            setYScaleGWidth(this.getBBox().width);
         })
 
         this.svg.select('.xAxisG').each(function () {
-            THIS.xScaleGHeight = this.getBBox().height;
-            THIS.setMargins();
+            setXScaleGHeight(this.getBBox().height);
         })
 
         this.callXYScaleOnAxisGroup();
@@ -2344,7 +2393,7 @@ export class Visual extends Shadow {
             .attr('x1', (d) => this.xScale(d.city))
             .attr('x2', (d) => this.xScale(d.city))
             .attr('y1', (d) => this.yScale(d.value1))
-            .attr('y2', (d) => this.yScale(this.isDumbbellChart ? d.value2 ?? 0 : 0))
+            .attr('y2', (d) => this.yScale(this.isDumbbellChart ? d.value2 ? d.value2 : 0 : 0))
             .attr('stroke', d => d.styles.line.color)
             .attr('stroke-width', this.getLineStrokeWidth())
             .attr('opacity', 1)
@@ -2693,7 +2742,6 @@ export class Visual extends Shadow {
     }
 
     enterPieChart(pieForeignObjectSelection: any, isPie2: boolean = false): void {
-        const THIS = this;
         isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
         const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
         const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
@@ -2712,26 +2760,27 @@ export class Visual extends Shadow {
                 const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey]))
                 return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
             })
-            .attr('opacity', (d) => 1)
+            .attr('opacity', () => 1)
             .append('xhtml:div')
             .attr('id', 'pie')
             .style('width', '100%')
             .style('height', '100%')
-            .each(function (d) {
-                const ePieChart = echarts.init(this);
-                ePieChart.setOption(THIS.getPieChartOptions(d.city, isPie2));
+            .each((d, i, nodes) => {
+                const ele = d3.select(nodes[i]);
+                const ePieChart = echarts.init(ele.node());
+                ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
 
-                d3.select(this).selectAll('path').data(d.subCategories);
-                d3.select(this)
+                ele.selectAll('path').data(d.subCategories);
+                ele
                     .selectAll('path')
                     .attr('class', (pieData: IChartSubCategory) => {
-                        return THIS.getPieSliceClass(d.city, pieData.category);
+                        return this.getPieSliceClass(d.city, pieData.category);
                     })
                     .style('fill', (d: IChartSubCategory) => {
                         return d.styles[pieType].color;
                     });
 
-                d3.select(this)
+                ele
                     .select('g')
                     .append('rect')
                     .lower()
@@ -2742,27 +2791,27 @@ export class Visual extends Shadow {
                     .attr('y', (pieRadius - (pieRadius * 30 / 100) / 2) / 2)
                     .attr('fill', '#fff');
 
-                THIS.tooltipServiceWrapper.addTooltip(d3.select(this).selectAll('path'),
+                this.tooltipServiceWrapper.addTooltip(ele.selectAll('path'),
                     (datapoint: IChartSubCategory) => getTooltipData(datapoint),
                     (datapoint: IChartSubCategory) => datapoint.selectionId
                 );
 
                 const getTooltipData = (pieData: IChartSubCategory): VisualTooltipDataItem[] => {
                     const tooltipData: TooltipData[] = [{
-                        displayName: THIS.categoryDisplayName,
+                        displayName: this.categoryDisplayName,
                         value: pieData.category,
                         color: 'transparent'
                     }, {
-                        displayName: isPie2 ? THIS.value2DisplayName : THIS.value1DisplayName,
-                        value: THIS.getFormattedNumber(pieData[valueKey]),
+                        displayName: isPie2 ? this.value2DisplayName : this.value1DisplayName,
+                        value: this.getFormattedNumber(pieData[valueKey]),
                         color: pieData.styles[pieType].color
                     }];
 
                     pieData.tooltipFields.forEach(data => {
                         tooltipData.push({
                             displayName: data.displayName,
-                            value: typeof data.value === "number" ? THIS.getFormattedNumber(data.value) : data.value,
-                            color: data.color ?? 'transparent'
+                            value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
+                            color: data.color ? data.color : 'transparent'
                         })
                     });
 
@@ -2771,19 +2820,18 @@ export class Visual extends Shadow {
             })
 
         this.pieG.on('mouseover', (e) => {
-            if (e.path?.length && e.path[5]) {
+            if (e.path.length && e.path[5]) {
                 d3.select(e.path[5]).raise();
             }
         })
 
-        this.pieG.on('mouseout', (e) => {
+        this.pieG.on('mouseout', () => {
             this.pieG.selectAll('foreignObject')
                 .sort((a, b) => d3.ascending(a.sortId, b.sortId))
         })
     }
 
     updatePieChart(pieForeignObjectSelection: any, isPie2: boolean = false): void {
-        const THIS = this;
         isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
         const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
         const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
@@ -2793,7 +2841,7 @@ export class Visual extends Shadow {
         pieForeignObjectSelection
             .attr('width', d)
             .attr('height', d)
-            .attr('x', (d, i) => {
+            .attr('x', (d) => {
                 const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city));
                 return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
             })
@@ -2801,22 +2849,23 @@ export class Visual extends Shadow {
                 const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey]))
                 return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
             })
-            .attr('opacity', (d) => 1)
+            .attr('opacity', () => 1)
             .select('#pie')
             .style('width', '100%')
             .style('height', '100%')
-            .each(function (d) {
-                const ePieChart = echarts.init(this);
-                ePieChart.setOption(THIS.getPieChartOptions(d.city, isPie2));
+            .each((d, i, nodes) => {
+                const ele = d3.select(nodes[i]);
+                const ePieChart = echarts.init(ele.node());
+                ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
                 ePieChart.resize();
 
-                d3.select(this).selectAll('path').data(d.subCategories);
-                d3.select(this)
+                ele.selectAll('path').data(d.subCategories);
+                ele
                     .selectAll('path')
-                    .attr('class', (pieData: IChartSubCategory) => THIS.getPieSliceClass(d.city, pieData.category))
-                    .style('fill', (d: IChartSubCategory, i) => d.styles[pieType].color);
+                    .attr('class', (pieData: IChartSubCategory) => this.getPieSliceClass(d.city, pieData.category))
+                    .style('fill', (d: IChartSubCategory) => d.styles[pieType].color);
 
-                d3.select(this)
+                ele
                     .selectAll('.innerCenterRect')
                     .attr('width', pieRadius + pieRadius * 30 / 100)
                     .attr('height', pieRadius + pieRadius * 30 / 100)
@@ -2970,11 +3019,11 @@ export class Visual extends Shadow {
         const legend2ViewPort = this.legend2.getMargins();
 
         if (this.isDisplayLegend2) {
-            this.legendViewPort.width = (legend1ViewPort.width ?? 0) + (legend2ViewPort.width ?? 0);
-            this.legendViewPort.height = (legend1ViewPort.height ?? 0) + (legend2ViewPort.height ?? 0);
+            this.legendViewPort.width = (legend1ViewPort.width ? legend1ViewPort.width : 0) + (legend2ViewPort.width ? legend2ViewPort.width : 0);
+            this.legendViewPort.height = (legend1ViewPort.height ? legend1ViewPort.height : 0) + (legend2ViewPort.height ? legend2ViewPort.height : 0);
         } else {
-            this.legendViewPort.width = legend1ViewPort.width ?? 0;
-            this.legendViewPort.height = legend1ViewPort.height ?? 0;
+            this.legendViewPort.width = legend1ViewPort.width ? legend1ViewPort.width : 0;
+            this.legendViewPort.height = legend1ViewPort.height ? legend1ViewPort.height : 0;
         }
 
         this.setLegendStyles();
@@ -3075,8 +3124,9 @@ export class Visual extends Shadow {
         style.id = styleId;
         style.type = 'text/css';
         const styleTag = document.getElementById(styleId);
-        const stylesInnerHtml = `.${className} ${extraClasses} ${styles}`;
-        style.innerHTML = stylesInnerHtml;
+        // const stylesInnerHtml = `.${className} ${extraClasses} ${styles}`;
+        // style.innerHTML = stylesInnerHtml;
+        console.log(extraClasses)
         if (styleTag) {
             document.getElementsByTagName('head')[0].removeChild(styleTag);
         }
@@ -3099,12 +3149,13 @@ export class Visual extends Shadow {
                 break;
 
             case ILegendPosition.Bottom:
-            case ILegendPosition.BottomCenter:
+            case ILegendPosition.BottomCenter: {
                 const marginTop = parseFloat(legend1Ele.style('margin-top'));
                 legend1Ele.style('margin-top', marginTop + 'px');
                 legendStyles = `{ margin-left: ${this.legend1MarginLeft}px; }`;
                 legend1Ele.classed(styleClassName, true);
                 break;
+            }
         }
 
         if (this.isInFocusMode) {
@@ -3174,32 +3225,37 @@ export class Visual extends Shadow {
 
         switch (legendPosition) {
             case ILegendPosition.Top:
-            case ILegendPosition.TopCenter:
+            case ILegendPosition.TopCenter: {
                 legendStyles = `{ margin-top: ${legend2ViewPort.height}px; margin-left: ${this.legend2MarginLeft}px; }`;
                 legend2Ele.classed(styleClassName, true);
                 break;
+            }
 
             case ILegendPosition.Bottom:
             case ILegendPosition.BottomCenter:
-                chartContainerEle.style('margin-top', 0);
-                const legend2MarginTop = parseFloat(legend2Ele.style('margin-top'));
-                legendStyles = `{ margin-top: ${legend2MarginTop}px !important; margin-left: ${this.legend2MarginLeft}px; }`;
-                legend2Ele.classed(styleClassName, true);
-                break;
+                {
+                    chartContainerEle.style('margin-top', 0);
+                    const legend2MarginTop = parseFloat(legend2Ele.style('margin-top'));
+                    legendStyles = `{ margin-top: ${legend2MarginTop}px !important; margin-left: ${this.legend2MarginLeft}px; }`;
+                    legend2Ele.classed(styleClassName, true);
+                    break;
+                }
 
             case ILegendPosition.Left:
-            case ILegendPosition.LeftCenter:
+            case ILegendPosition.LeftCenter: {
                 chartContainerEle.style('margin-left', this.legendViewPort.width + 'px');
                 legendStyles = `{ margin-left: ${legend2ViewPort.width}px; }`;
                 legend2Ele.classed(styleClassName, true);
                 break;
+            }
 
             case ILegendPosition.Right:
-            case ILegendPosition.RightCenter:
-                const marginLeft = parseFloat(legend1Ele.style('margin-left'));
+            case ILegendPosition.RightCenter: {
+                const marginLeft = legend1Ele.style('margin-left');
                 legendStyles = `{ margin-left: ${marginLeft}px !important; }`;
                 legend2Ele.classed(styleClassName, true);
                 break;
+            }
         }
 
         if (this.isInFocusMode) {
@@ -3272,8 +3328,8 @@ export class Visual extends Shadow {
         this.chartContainer.style.marginLeft = null;
         this.chartContainer.style.marginTop = null;
         legend.drawLegend({ dataPoints: [] }, this.visualUpdateOptions.options.viewport);
-        this.legendViewPort.width = legend.getMargins().width ?? 0;
-        this.legendViewPort.height = legend.getMargins().height ?? 0;
+        this.legendViewPort.width = legend.getMargins().width ? legend.getMargins().width : 0;
+        this.legendViewPort.height = legend.getMargins().height ? legend.getMargins().height : 0;
         d3.select(this.chartContainer).style('width', `calc(100vw - ${this.settingsPopupOptionsWidth}px)`)
         d3.select(this.hostContainer).selectAll('.legend').style('left', null);
     }

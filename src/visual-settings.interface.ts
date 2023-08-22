@@ -1,4 +1,4 @@
-import { CircleSize, CircleType, DataLabelsFontSizeType, DataLabelsPlacement, DisplayUnits, FontStyle, ILegendPosition, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
+import { CircleSize, CircleType, DataLabelsFontSizeType, DataLabelsPlacement, DisplayUnits, ILegendPosition, LollipopDistanceType, LollipopType, Orientation, PieSize, PieType, Position, RankingDataValuesType, RankingFilterType } from './enum';
 
 export interface IXAxisSettings {
     position: Position;

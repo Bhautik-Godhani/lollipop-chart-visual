@@ -14,12 +14,12 @@ export interface ILollipopChartRow {
         circle2: IChartCircleStyles,
         line: { color: string }
     }
-};
+}
 
 export interface IChartCircleStyles {
     fillColor: string,
     strokeColor: string
-};
+}
 
 export interface IChartSubCategory {
     category: string,
@@ -31,7 +31,7 @@ export interface IChartSubCategory {
         pie1: { color: string },
         pie2: { color: string },
     }
-};
+}
 
 export interface VisualTooltipDataItem {
     displayName: string;

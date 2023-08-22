@@ -312,9 +312,9 @@ const RankingSettings = (props) => {
 		valueType = RankingDataValuesType.Value1;
 	}
 
-	const categorical = vizOptions.options.dataViews[0].categorical;
-	const value1DisplayName = categorical.values[0] ? categorical.values[0].source.displayName : "";
-	const value2DisplayName = categorical.values[1] ? categorical.values[1].source.displayName : "";
+	// const categorical = vizOptions.options.dataViews[0].categorical;
+	// const value1DisplayName = categorical.values[0] ? categorical.values[0].source.displayName : "";
+	// const value2DisplayName = categorical.values[1] ? categorical.values[1].source.displayName : "";
 
 	const chartSettings: IChartSettings = shadow.chartSettings;
 
