@@ -1,5 +1,5 @@
-import { PaidPropertiesType } from "@truviz/shadow/dist/types/PaidPropertiesType";
+import { PaidPropertiesType } from '@truviz/shadow/dist/types/PaidPropertiesType'
 
 export const paidProperties: PaidPropertiesType = [
-  // { sectionName: "test", propertyName: "sample" },
-];
+	// { sectionName: "test", propertyName: "sample" },
+]

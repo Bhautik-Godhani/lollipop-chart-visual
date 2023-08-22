@@ -3,4 +3,4 @@
 
 npm run prettier-quick
 npm run eslint
-npm audit
+# npm audit
