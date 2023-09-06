@@ -5,15 +5,16 @@ import {
 	ColorPaletteType,
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
+	ERankingType,
+	ESortOrderTypes,
 	LineType,
-	LollipopDistanceType,
 	LollipopType,
 	Orientation,
 	PieSize,
 	PieType,
 	Position,
 	RankingDataValuesType,
-	RankingFilterType,
+	lollipopCategoryWidthType,
 } from "./enum";
 import {
 	IChartSettings,
@@ -25,8 +26,8 @@ import {
 	IGridLinesSettings,
 	ILineSettings,
 	IPiePropsSettings,
-	IRankingPropsSettings,
 	IRankingSettings,
+	ISortingSettings,
 	IXAxisSettings,
 	IXGridLinesSettings,
 	IYAxisSettings,
@@ -47,11 +48,12 @@ export const PIE2_SETTINGS: IPiePropsSettings = {
 
 export const CHART_SETTINGS: IChartSettings = {
 	lollipopType: LollipopType.Circle,
+	lollipopInnerPadding: 30,
 	isLollipopTypeChanged: false,
 	isHasSubCategories: false,
 	orientation: Orientation.Vertical,
-	lollipopDistanceType: LollipopDistanceType.Auto,
-	lollipopDistance: 60,
+	lollipopCategoryWidthType: lollipopCategoryWidthType.Auto,
+	lollipopCategoryWidth: 60,
 	isLollipopDistanceChange: false,
 	pieSettings: {
 		pieType: PieType.Pie1,
@@ -205,56 +207,33 @@ export const DATA_COLORS: IDataColorsSettings = {
 	pie2: PIE2_DATA_COLORS,
 };
 
-export const VALUE1_RANKING_SETTINGS: IRankingPropsSettings = {
-	filterType: RankingFilterType.TopN,
-	count: 5,
-	showRemainingAsOthers: false,
-	isSubcategoriesRanking: false,
-	circleFillColor: "rgba(84, 84, 84,1)",
-	circleStrokeColor: "rgba(84, 84, 84,1)",
-	pieSliceColor: "rgba(84, 84, 84,1)",
-	lineColor: "rgba(84, 84, 84,1)",
-	subCategoriesRanking: {
-		filterType: RankingFilterType.TopN,
-		count: 10,
-		showRemainingAsOthers: false,
-		pieSliceColor: "rgba(84, 84, 84,1)",
-	},
-};
-
-export const VALUE2_RANKING_SETTINGS: IRankingPropsSettings = {
-	filterType: RankingFilterType.TopN,
-	count: 5,
-	showRemainingAsOthers: false,
-	isSubcategoriesRanking: false,
-	circleFillColor: "rgba(84, 84, 84,1)",
-	circleStrokeColor: "rgba(84, 84, 84,1)",
-	pieSliceColor: "rgba(84, 84, 84,1)",
-	lineColor: "rgba(84, 84, 84,1)",
-	subCategoriesRanking: {
-		filterType: RankingFilterType.TopN,
-		count: 10,
-		showRemainingAsOthers: false,
-		pieSliceColor: "rgba(84, 84, 84,1)",
-	},
-};
-
 export const RANKING_SETTINGS: IRankingSettings = {
-	isRankingEnabled: false,
-	valueType: RankingDataValuesType.Value1,
-	value1: VALUE1_RANKING_SETTINGS,
-	value2: VALUE2_RANKING_SETTINGS,
+	category: {
+		enabled: true,
+		valueType: RankingDataValuesType.Value1,
+		rankingType: ERankingType.TopN,
+		count: 10,
+		showRemainingAsOthers: false,
+		othersColor: "rgba(84, 84, 84, 1)",
+	},
+	subCategory: {
+		enabled: true,
+		rankingType: ERankingType.TopN,
+		count: 10,
+		showRemainingAsOthers: false,
+		othersColor: "rgba(84, 84, 84, 1)",
+	},
 };
 
 export const X_AXIS_SETTINGS: IXAxisSettings = {
 	position: Position.Bottom,
 	isDisplayTitle: false,
 	titleName: "",
-	titleColor: null,
+	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
 	titleFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	isDisplayLabel: true,
-	labelColor: null,
+	labelColor: "rgba(84, 84, 84, 1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
 	isLabelAutoTilt: true,
@@ -266,12 +245,31 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	position: Position.Left,
 	isDisplayTitle: false,
 	titleName: "",
-	titleColor: null,
+	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
 	titleFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	isDisplayLabel: true,
-	labelColor: null,
+	labelColor: "rgba(84, 84, 84, 1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
 	labelCharLimit: 10,
+};
+
+export const SORTING_SETTINGS: ISortingSettings = {
+	category: {
+		enabled: true,
+		sortBy: undefined,
+		sortOrder: ESortOrderTypes.DESC,
+		isSortByCategory: false,
+		isSortByMeasure: true,
+		isSortByExtraSortField: false,
+	},
+	subCategory: {
+		enabled: true,
+		sortBy: undefined,
+		sortOrder: ESortOrderTypes.ASC,
+		isSortByCategory: true,
+		isSortByMeasure: false,
+		isSortByExtraSortField: false,
+	},
 };

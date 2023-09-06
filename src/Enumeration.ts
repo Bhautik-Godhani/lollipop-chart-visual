@@ -1,4 +1,7 @@
-import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
+import powerbi from "powerbi-visuals-api";
+import VisualObjectInstance = powerbi.VisualObjectInstance;
+import {VisualSettings} from "./settings";
+import {EnumerateSectionType} from "@truviz/shadow/dist/types/EnumerateSectionType";
 
 export class Enumeration {
 	public static GET(): EnumerateSectionType[] {
@@ -12,6 +15,7 @@ export class Enumeration {
 			getDataLabelsConfigSelection(),
 			getGridLinesConfigSelection(),
 			getRankingConfigSelection(),
+			getSortingConfigSelection(),
 			getXAxisConfigSelection(),
 			getYAxisConfigSelection(),
 			getLegendSelection(),
@@ -47,15 +51,11 @@ function getVisualGeneralSettingsSelection(): EnumerateSectionType {
 		isShow: true,
 		properties: [
 			{
-				name: "advancedSettings",
+				name: "darkMode",
 				isShow: true,
 			},
 			{
-				name: "theme",
-				isShow: true,
-			},
-			{
-				name: "summaryTable",
+				name: "summaryTableToggle",
 				isShow: true,
 			},
 			{
@@ -155,6 +155,19 @@ function getRankingConfigSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "rankingSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getSortingConfigSelection(): EnumerateSectionType {
+	return {
+		name: "sortingConfig",
+		isShow: true,
+		properties: [
+			{
+				name: "sorting",
 				isShow: true,
 			},
 		],

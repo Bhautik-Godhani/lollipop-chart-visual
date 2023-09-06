@@ -6,6 +6,7 @@ export enum EVisualConfig {
 	DataLabelsConfig = "dataLabelsConfig",
 	GridLinesConfig = "gridLinesConfig",
 	RankingConfig = "rankingConfig",
+	SortingConfig = "sortingConfig",
 	XAxisConfig = "xAxisConfig",
 	YAxisConfig = "yAxisConfig",
 }
@@ -20,6 +21,7 @@ export enum EVisualSettings {
 	DataLabelsSettings = "dataLabelsSettings",
 	GridLinesSettings = "gridLinesSettings",
 	RankingSettings = "rankingSettings",
+	Sorting = "sorting",
 	XAxisSettings = "xAxisSettings",
 	YAxisSettings = "yAxisSettings",
 	Legend = "legend",
@@ -90,7 +92,7 @@ export enum Orientation {
 	Horizontal = "horizontal",
 }
 
-export enum LollipopDistanceType {
+export enum lollipopCategoryWidthType {
 	Auto = "auto",
 	Custom = "custom",
 }
@@ -100,10 +102,9 @@ export enum DataLabelsFontSizeType {
 	Custom = "custom",
 }
 
-export enum RankingFilterType {
+export enum ERankingType {
 	TopN = "topN",
 	BottomN = "bottomN",
-	None = "none",
 }
 
 export enum RankingDataValuesType {
@@ -135,12 +136,14 @@ export enum DisplayUnits {
 	Trillions = "trillions",
 }
 
-export enum DataRolesName {
+export enum EDataRolesName {
 	Category = "category",
 	SubCategory = "subCategory",
-	Value1 = "measure1",
-	Value2 = "measure2",
-	Tooltips = "tooltip",
+	Measure = "measure",
+	Measure1 = "measure1",
+	Measure2 = "measure2",
+	Tooltip = "tooltip",
+	Sort = "sort",
 }
 
 export enum LollipopType {
@@ -250,15 +253,16 @@ export enum EDataColorsSettings {
 }
 
 export enum ERankingSettings {
-	valueType = "valueType",
-	filterType = "filterType",
-	count = "count",
-	showRemainingAsOthers = "showRemainingAsOthers",
-	isSubcategoriesRanking = "isSubcategoriesRanking",
-	subCategoriesRanking = "subCategoriesRanking",
-	pieSliceColor = "pieSliceColor",
-	circleFillColor = "circleFillColor",
-	circleStrokeColor = "circleStrokeColor",
-	lineColor = "lineColor",
-	isRankingEnabled = "isRankingEnabled",
+	Category = "category",
+	SubCategory = "subCategory",
+	Enabled = "enabled",
+	RankingType = "rankingType",
+	Count = "count",
+	ShowRemainingAsOthers = "showRemainingAsOthers",
+	OthersColor = "othersColor",
+}
+
+export enum ESortOrderTypes {
+	ASC = "1",
+	DESC = "2",
 }

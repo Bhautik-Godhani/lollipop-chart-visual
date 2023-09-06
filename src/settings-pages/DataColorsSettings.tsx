@@ -1,9 +1,9 @@
 import * as React from "react";
-import { DATA_COLORS } from "../constants";
-import { CircleType, ColorPaletteType, DataRolesName, EChartSettings, EDataColorsSettings, LollipopType, PieType } from "../enum";
-import { IChartSettings, IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
-import { ColorPicker, Column, ConditionalWrapper, Footer, GradientPicker, RadioOption, Row, SelectInput } from "@truviz/shadow/dist/Components";
-import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import {DATA_COLORS} from "../constants";
+import {CircleType, ColorPaletteType, EDataRolesName, EChartSettings, EDataColorsSettings, LollipopType, PieType} from "../enum";
+import {IChartSettings, IDataColorsSettings, ILabelValuePair} from "../visual-settings.interface";
+import {ColorPicker, Column, ConditionalWrapper, Footer, GradientPicker, RadioOption, Row, SelectInput} from "@truviz/shadow/dist/Components";
+import {ShadowUpdateOptions} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const CIRCLE_TYPES: ILabelValuePair[] = [
 	{
@@ -55,7 +55,7 @@ const handleChange = (
 ): void => {
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: { ...d[dataType], [n]: rgb },
+		[dataType]: {...d[dataType], [n]: rgb},
 	}));
 };
 
@@ -70,7 +70,7 @@ const handleByCategoryChange = (
 	updatedColors[index].color = rgb;
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: { ...d[dataType], byCategoryColors: updatedColors },
+		[dataType]: {...d[dataType], byCategoryColors: updatedColors},
 	}));
 };
 
@@ -81,7 +81,7 @@ const handleCheckbox = (
 ): void => {
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: { ...d[dataType], [key]: !d[dataType][key] },
+		[dataType]: {...d[dataType], [key]: !d[dataType][key]},
 	}));
 };
 
@@ -103,7 +103,7 @@ const UIByCategoryColorSettings = (
 	subCategories.sort((a, b) => a.localeCompare(b));
 
 	const SUBCATEGORIES_LIST: ILabelValuePair[] = subCategories.map((category) => {
-		return { label: category, value: category };
+		return {label: category, value: category};
 	});
 
 	return (
@@ -329,7 +329,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 const DataColorsSettings = (props) => {
 	const {
 		shadow,
-		compConfig: { sectionName, propertyName },
+		compConfig: {sectionName, propertyName},
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
@@ -343,7 +343,7 @@ const DataColorsSettings = (props) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = { ...DATA_COLORS };
+		initialStates = {...DATA_COLORS};
 	}
 
 	const [configValues, setConfigValues] = React.useState<IDataColorsSettings>({
@@ -359,7 +359,7 @@ const DataColorsSettings = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({ ...DATA_COLORS });
+		setConfigValues({...DATA_COLORS});
 	};
 
 	const chartSettings: IChartSettings = shadow.chartSettings;
@@ -370,14 +370,14 @@ const DataColorsSettings = (props) => {
 		});
 	}
 
-	const isDumbbellChart = getCategoricalValuesIndexByKey(vizOptions, DataRolesName.Value2) !== -1;
+	const isDumbbellChart = getCategoricalValuesIndexByKey(vizOptions, EDataRolesName.Measure2) !== -1;
 	const dataType = configValues[EDataColorsSettings.dataType];
 
 	React.useEffect(() => {
 		if (isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle) {
 			setConfigValues((d: IDataColorsSettings) => ({
 				...d,
-				[dataType]: { ...d[dataType], fillType: ColorPaletteType.Single },
+				[dataType]: {...d[dataType], fillType: ColorPaletteType.Single},
 			}));
 			configValues[configValues[EDataColorsSettings.dataType]].fillType = ColorPaletteType.Single;
 		}

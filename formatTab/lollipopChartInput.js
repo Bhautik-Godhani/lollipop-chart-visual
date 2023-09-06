@@ -1,19 +1,20 @@
 const visualPath = "../";
 
 const sectionKVPair = [
-	{ license: "PowerVIZ License" },
-	{ visualGeneralSettings: "Visual General Settings" },
-	{ chartConfig: "Chart Configuration" },
-	{ dataColorsConfig: "DataColors Configuration" },
-	{ circleConfig: "Circle Configuration" },
-	{ lineConfig: "Line Configuration" },
-	{ dataLabelsConfig: "DataLabels Configuration" },
-	{ gridLinesConfig: "GridLines Configuration" },
-	{ rankingConfig: "Ranking Configuration" },
-	{ xAxisConfig: "X Axis Configuration" },
-	{ yAxisConfig: "Y Axis Configuration" },
-	{ legend: "legend" },
-	{ numberFormatting: "numberFormatting" },
+	{license: "PowerVIZ License"},
+	{visualGeneralSettings: "Visual General Settings"},
+	{chartConfig: "Chart Configuration"},
+	{dataColorsConfig: "DataColors Configuration"},
+	{circleConfig: "Circle Configuration"},
+	{lineConfig: "Line Configuration"},
+	{dataLabelsConfig: "DataLabels Configuration"},
+	{gridLinesConfig: "GridLines Configuration"},
+	{rankingConfig: "Ranking Configuration"},
+	{sortingConfig: "Sorting"},
+	{xAxisConfig: "X Axis Configuration"},
+	{yAxisConfig: "Y Axis Configuration"},
+	{legend: "legend"},
+	{numberFormatting: "numberFormatting"},
 ];
 
 const formatTab = {
@@ -41,22 +42,15 @@ const formatTab = {
 	],
 	visualGeneralSettings: [
 		{
-			technicalName: "advancedSettings",
-			displayName: "Advanced Settings",
+			technicalName: "darkMode",
+			displayName: "Dark Mode",
 			type: "bool",
 			description: "",
-			defaultValue: true,
+			defaultValue: false,
 		},
 		{
-			technicalName: "theme",
-			displayName: "Theme",
-			type: "text",
-			description: "",
-			defaultValue: "dark",
-		},
-		{
-			technicalName: "summaryTable",
-			displayName: "Summary Table",
+			technicalName: "summaryTableToggle",
+			displayName: "Grid View",
 			type: "bool",
 			description: "",
 			defaultValue: "true",
@@ -139,6 +133,15 @@ const formatTab = {
 			defaultValue: "{}",
 		},
 	],
+	sortingConfig: [
+		{
+			technicalName: "sorting",
+			displayName: "Sorting",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
 	xAxisConfig: [
 		{
 			technicalName: "xAxisSettings",
@@ -171,18 +174,18 @@ const formatTab = {
 			description: "",
 			type: "dropdown",
 			options: [
-				{ key: "Top Left", value: "TopLeft" },
-				{ key: "Top Center", value: "TopCenter" },
-				{ key: "Top Right", value: "TopRight" },
-				{ key: "Bottom Left", value: "BottomLeft" },
-				{ key: "Bottom Center", value: "BottomCenter" },
-				{ key: "Bottom Right", value: "BottomRight" },
-				{ key: "Right Top", value: "RightTop" },
-				{ key: "Right Center", value: "RightCenter" },
-				{ key: "Right Bottom", value: "RightBottom" },
-				{ key: "Left Top", value: "LeftTop" },
-				{ key: "Left Center", value: "LeftCenter" },
-				{ key: "Left Bottom", value: "LeftBottom" },
+				{key: "Top Left", value: "TopLeft"},
+				{key: "Top Center", value: "TopCenter"},
+				{key: "Top Right", value: "TopRight"},
+				{key: "Bottom Left", value: "BottomLeft"},
+				{key: "Bottom Center", value: "BottomCenter"},
+				{key: "Bottom Right", value: "BottomRight"},
+				{key: "Right Top", value: "RightTop"},
+				{key: "Right Center", value: "RightCenter"},
+				{key: "Right Bottom", value: "RightBottom"},
+				{key: "Left Top", value: "LeftTop"},
+				{key: "Left Center", value: "LeftCenter"},
+				{key: "Left Bottom", value: "LeftBottom"},
 			],
 			defaultValue: "TopLeft",
 		},
@@ -403,4 +406,4 @@ const formatTab = {
 	],
 };
 
-module.exports = { visualPath, sectionKVPair, formatTab };
+module.exports = {visualPath, sectionKVPair, formatTab};

@@ -4,15 +4,16 @@ import {
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
+	ERankingType,
+	ESortOrderTypes,
 	ILegendPosition,
-	LollipopDistanceType,
 	LollipopType,
 	Orientation,
 	PieSize,
 	PieType,
 	Position,
 	RankingDataValuesType,
-	RankingFilterType,
+	lollipopCategoryWidthType,
 } from "./enum";
 
 export interface IXAxisSettings {
@@ -139,9 +140,10 @@ export interface IChartSettings {
 	isHasSubCategories: boolean;
 	orientation: Orientation;
 	isLollipopDistanceChange: boolean;
-	lollipopDistanceType: LollipopDistanceType;
-	lollipopDistance: number;
+	lollipopCategoryWidthType: lollipopCategoryWidthType;
+	lollipopCategoryWidth: number;
 	pieSettings: IPieSettings;
+	lollipopInnerPadding: number;
 }
 
 export interface IDataLabelsSettings {
@@ -169,30 +171,26 @@ export interface IDataColorsSettings {
 	pie2: IDataColorsPropsSettings;
 }
 
-export interface IRankingPropsSettings {
-	filterType: RankingFilterType;
+export interface ICategoryRankingProps {
+	enabled: boolean;
+	valueType: RankingDataValuesType;
+	rankingType: ERankingType;
 	count: number;
 	showRemainingAsOthers: boolean;
-	isSubcategoriesRanking: boolean;
-	circleFillColor: string;
-	circleStrokeColor: string;
-	pieSliceColor: string;
-	lineColor: string;
-	subCategoriesRanking: ISubCategoriesRankingProps;
+	othersColor: string;
 }
 
-export interface ISubCategoriesRankingProps {
-	filterType: RankingFilterType;
+export interface ISubCategoryRankingProps {
+	enabled: boolean;
+	rankingType: ERankingType;
 	count: number;
 	showRemainingAsOthers: boolean;
-	pieSliceColor: string;
+	othersColor: string;
 }
 
 export interface IRankingSettings {
-	isRankingEnabled: boolean;
-	valueType: RankingDataValuesType;
-	value1: IRankingPropsSettings;
-	value2: IRankingPropsSettings;
+	category: ICategoryRankingProps;
+	subCategory: ISubCategoryRankingProps;
 }
 
 export interface IDataColorsPropsSettings {
@@ -203,7 +201,7 @@ export interface IDataColorsPropsSettings {
 	fillnull: string;
 	fillType: string;
 	numberOfClasses: number;
-	byCategoryColors: { name: string; color: string }[];
+	byCategoryColors: {name: string; color: string}[];
 	schemeColors: string[];
 	reverse: boolean;
 	isGradient: boolean;
@@ -219,4 +217,33 @@ export interface ILabelValuePair {
 	label: string;
 	value: string;
 	icon?: React.ReactNode;
+}
+
+export interface ISortingSettings {
+	category: ISortingProps;
+	subCategory: ISortingProps;
+}
+
+export interface ISortingProps {
+	enabled: boolean;
+	sortBy: string;
+	sortOrder: ESortOrderTypes;
+	isSortByCategory: boolean;
+	isSortByMeasure: boolean;
+	isSortByExtraSortField: boolean;
+}
+
+export interface IBrushConfig {
+	brushG: SVGElement;
+	brushXPos: number;
+	brushYPos: number;
+	barDistance: number;
+	totalBarsCount: number;
+	scaleWidth: number;
+	scaleHeight: number;
+	smallMultiplesGridItemContent?: {[category: string]: any};
+	smallMultiplesGridItemId: string;
+	categoricalData: any;
+	XAxisG?: SVGElement | null;
+	brushNumber?: number;
 }

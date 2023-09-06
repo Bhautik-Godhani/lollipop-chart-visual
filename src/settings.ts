@@ -26,7 +26,7 @@
 
 "use strict";
 
-import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
+import {dataViewObjectsParser} from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
 export class VisualSettings extends DataViewObjectsParser {
@@ -39,6 +39,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public dataLabelsConfig = new DataLabelsConfig();
 	public gridLinesConfig = new GridLinesConfig();
 	public rankingConfig = new RankingConfig();
+	public sortingConfig = new SortingConfig();
 	public xAxisConfig = new XAxisConfig();
 	public yAxisConfig = new YAxisConfig();
 	public legend = new Legend();
@@ -51,9 +52,8 @@ export class License {
 	public key: string = "";
 }
 export class VisualGeneralSettings {
-	public advancedSettings: boolean = true;
-	public theme: string = "dark";
-	public summaryTable: boolean = true;
+	public darkMode: boolean = false;
+	public summaryTableToggle: boolean = true;
 	public annotationsToggle: boolean = true;
 	public advancedSettingsToggle: boolean = true;
 }
@@ -77,6 +77,9 @@ export class GridLinesConfig {
 }
 export class RankingConfig {
 	public rankingSettings: string = "{}";
+}
+export class SortingConfig {
+	public sorting: string = "{}";
 }
 export class XAxisConfig {
 	public xAxisSettings: string = "{}";

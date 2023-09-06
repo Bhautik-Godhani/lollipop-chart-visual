@@ -11,18 +11,18 @@
 			"kind": "Grouping"
 		},
 		{
-			"displayName": "Value1",
-			"name": "measure1",
-			"kind": "Measure"
-		},
-		{
-			"displayName": "Value2",
-			"name": "measure2",
+			"displayName": "Measure",
+			"name": "measure",
 			"kind": "Measure"
 		},
 		{
 			"displayName": "Tooltips",
 			"name": "tooltip",
+			"kind": "Measure"
+		},
+		{
+			"displayName": "Sort",
+			"name": "sort",
 			"kind": "Measure"
 		}
 	],
@@ -30,53 +30,51 @@
 		{
 			"conditions": [
 				{
-					"category": {
-						"min": 1,
-						"max": 1
-					},
 					"measure": {
 						"max": 2
+					},
+					"subCategory": {
+						"max": 1
 					}
 				}
 			],
 			"categorical": {
 				"categories": {
-					"select": [
-						{
-							"for": {
-								"in": "category"
-							}
-						},
-						{
-							"for": {
-								"in": "subCategory"
-							}
-						}
-					],
+					"for": {
+						"in": "category"
+					},
 					"dataReductionAlgorithm": {
 						"top": {
-							"count": 2000
+							"count": 30000
 						}
 					}
 				},
 				"values": {
-					"select": [
-						{
-							"bind": {
-								"to": "measure1"
+					"group": {
+						"by": "subCategory",
+						"select": [
+							{
+								"bind": {
+									"to": "measure"
+								}
+							},
+							{
+								"bind": {
+									"to": "tooltip"
+								}
+							},
+							{
+								"bind": {
+									"to": "sort"
+								}
 							}
-						},
-						{
-							"bind": {
-								"to": "measure2"
-							}
-						},
-						{
-							"bind": {
-								"to": "tooltip"
+						],
+						"dataReductionAlgorithm": {
+							"top": {
+								"count": 30000
 							}
 						}
-					]
+					}
 				}
 			}
 		}
@@ -110,22 +108,15 @@
 		"visualGeneralSettings": {
 			"displayName": "Visual General Settings",
 			"properties": {
-				"advancedSettings": {
-					"displayName": "Advanced Settings",
+				"darkMode": {
+					"displayName": "Dark Mode",
 					"description": "",
 					"type": {
 						"bool": true
 					}
 				},
-				"theme": {
-					"displayName": "Theme",
-					"description": "",
-					"type": {
-						"text": true
-					}
-				},
-				"summaryTable": {
-					"displayName": "Summary Table",
+				"summaryTableToggle": {
+					"displayName": "Grid View",
 					"description": "",
 					"type": {
 						"bool": true
@@ -224,6 +215,18 @@
 			"properties": {
 				"rankingSettings": {
 					"displayName": "Ranking Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
+		"sortingConfig": {
+			"displayName": "Sorting",
+			"properties": {
+				"sorting": {
+					"displayName": "Sorting",
 					"description": "",
 					"type": {
 						"text": true
@@ -554,12 +557,22 @@
 			}
 		}
 	},
+	"drilldown": {
+		"roles": ["category"]
+	},
 	"tooltips": {
 		"supportedTypes": {
 			"default": true,
 			"canvas": true
 		},
-		"roles": ["Tooltips"]
+		"roles": ["tooltip"]
+	},
+	"supportsHighlight": true,
+	"supportsLandingPage": true,
+	"supportsMultiVisualSelection": true,
+	"supportsKeyboardFocus": true,
+	"sorting": {
+		"custom": {}
 	},
 	"privileges": []
 }
