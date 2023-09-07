@@ -66,8 +66,8 @@ export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
 	show: true,
 	isCircleFilled: CircleFillOption.Yes,
 	circleSize: CircleSize.Auto,
-	maxCircleRadius: 23,
-	circleRadius: 23,
+	maxCircleRadius: 10,
+	circleRadius: 10,
 	strokeWidth: 6,
 };
 
@@ -75,8 +75,8 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 	show: true,
 	isCircleFilled: CircleFillOption.Yes,
 	circleSize: CircleSize.Auto,
-	maxCircleRadius: 23,
-	circleRadius: 23,
+	maxCircleRadius: 10,
+	circleRadius: 10,
 	strokeWidth: 6,
 };
 

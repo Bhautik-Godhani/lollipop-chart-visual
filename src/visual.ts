@@ -1180,7 +1180,7 @@ export class Visual extends Shadow {
 				}
 			}
 
-			// this.drawLollipopChart();
+			this.drawLollipopChart();
 			// this.displayBrush();
 			// this.drawTooltip();
 		} catch (error) {
@@ -1282,7 +1282,7 @@ export class Visual extends Shadow {
 		return textSize;
 	}
 
-	setChartData(categorical: powerbi.DataViewCategorical): void {
+	setChartData(categoricalData: powerbi.DataViewCategorical): void {
 		// if (this.isExpandAllApplied) {
 		// 	this.categoricalCategoriesFields.forEach((d) => {
 		// 		if (!d["isIdToCategoryAdded"]) {
@@ -1303,7 +1303,7 @@ export class Visual extends Shadow {
 		) as string[];
 
 		const measureGroup = d3.group(this.categoricalMeasureFields, (d) => d.source.displayName);
-		const subCategoriesGroup = d3.group(this.categoricalData.values, (d) => d.source.groupName);
+		const subCategoriesGroup = d3.group(categoricalData.values, (d) => d.source.groupName);
 
 		const getSubCategoryData = (idx: number): IChartSubCategory[] => {
 			const data = this.subCategoriesName.reduce((arr, cur, i) => {
@@ -1335,7 +1335,13 @@ export class Visual extends Shadow {
 			value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
 			tooltipFields: this.categoricalTooltipFields.map((d) => ({displayName: d.source.displayName, value: d.values[idx], color: ""} as TooltipData)),
 			subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
-			styles: {circle1: {fillColor: "", strokeColor: ""}, circle2: {fillColor: "", strokeColor: ""}, line: {color: this.lineSettings.lineColor}},
+			styles: {
+				circle1: {fillColor: "", strokeColor: ""},
+				circle2: {fillColor: "", strokeColor: ""},
+				line: {color: this.lineSettings.lineColor},
+				pie1: {color: ""},
+				pie2: {color: ""},
+			},
 		}));
 
 		if (this.isHasSubcategories) {
@@ -1972,6 +1978,12 @@ export class Visual extends Shadow {
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
+				this.setColorsByDataColorsSettings();
+
+				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
+					this.setRemainingAsOthersDataColor();
+				}
+
 				// this.lineSelection
 				// 	.attr("y1", (d) => this.yScale(d.city))
 				// 	.attr("y2", (d) => this.yScale(d.city))
@@ -2008,6 +2020,8 @@ export class Visual extends Shadow {
 				}
 
 				CallExpandAllYScaleOnAxisGroup(this, this.width * 0.06);
+
+				this.drawLollipopChart();
 
 				// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
 				// if (this.isHasMultiMeasure) {
@@ -2047,6 +2061,184 @@ export class Visual extends Shadow {
 
 		this.brushG.selectAll("rect").attr("width", this.brushWidth).attr("rx", 4).attr("ry", 4).attr("cursor", "default");
 		this.brushG.selectAll(".handle").remove();
+	}
+
+	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
+		const smallMultiplesGridItemId = config.smallMultiplesGridItemId;
+		const brushG: SVGElement = config.brushG;
+		const brushXPos: number = config.brushXPos;
+		const brushYPos: number = config.brushYPos;
+		const barDistance: number = config.barDistance;
+		const totalBarsCount: number = config.totalBarsCount;
+		const scaleWidth: number = config.scaleWidth;
+		const scaleHeight: number = config.scaleHeight;
+		const categoricalData: any = JSON.parse(JSON.stringify(config.categoricalData));
+
+		// const newWidth = (this.chartSettings.lollipopCategoryWidth * this.width / this.scaleBandWidth);
+		const xScaleDomain = this.brushScaleBand.domain();
+		this.brushScaleBand.range(this.xScale.range());
+
+		categoricalData.categories.forEach((d, i) => {
+			if (i < categoricalData.categories.length - 1) {
+				const xScaleCopy = self.xScale.copy();
+				self[d.source.displayName + "Scale"] = xScaleCopy;
+				self[`${d.source.displayName}ScaleDomain`] = d.values;
+			}
+		});
+
+		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
+		const brushed = ({selection}) => {
+			if (this.isExpandAllApplied) {
+				this.expandAllCategoriesName.forEach((d) => {
+					if (self[`${d}ScaleDomain`]) {
+						self[`${d}ScaleNewDomain`] = [];
+					}
+				});
+			}
+
+			const newXScaleDomain = [];
+			let brushArea = selection;
+			if (brushArea === null) brushArea = this.xScale.range();
+
+			xScaleDomain.forEach((d, i) => {
+				const pos = this.brushScaleBand(d);
+				if (pos >= brushArea[0] && pos <= brushArea[1]) {
+					newXScaleDomain.push(d);
+
+					if (self.isExpandAllApplied) {
+						self.expandAllCategoriesName.forEach((d) => {
+							if (self[`${d}ScaleDomain`]) {
+								self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
+							}
+						});
+					}
+				}
+			});
+
+			this.newScaleDomainByBrush = newXScaleDomain;
+
+			if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied) {
+				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+				);
+
+				const categoricalData2 = JSON.parse(JSON.stringify(categoricalData));
+
+				categoricalData2.categories.forEach((d, i) => {
+					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+				});
+
+				categoricalData2.values.forEach((d, i) => {
+					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+					if (d.highlights) {
+						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+					}
+				});
+
+				console.log(categoricalData2);
+
+				console.log(this.chartData);
+
+				this.setCategoricalDataFields(categoricalData2);
+				this.setChartData(categoricalData2);
+
+				this.setColorsByDataColorsSettings();
+
+				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
+					this.setRemainingAsOthersDataColor();
+				}
+
+				// this.lineSelection
+				// 	.attr("x1", (d) => {
+				// 		return this.xScale(d.city);
+				// 	})
+				// 	.attr("x2", (d) => {
+				// 		return this.xScale(d.city);
+				// 	})
+				// 	.attr("opacity", (d) => {
+				// 		return this.xScale(d.city) ? 1 : 0;
+				// 	});
+
+				// this.circle1Selection
+				// 	.attr("cx", (d) => {
+				// 		return this.xScale(d.city) ? this.xScale(d.city) : 0;
+				// 	})
+				// 	.attr("opacity", (d) => {
+				// 		return this.xScale(d.city) ? 1 : 0;
+				// 	});
+
+				// this.circle2Selection
+				// 	.attr("cx", (d) => {
+				// 		return this.xScale(d.city) ? this.xScale(d.city) : 0;
+				// 	})
+				// 	.attr("opacity", (d) => {
+				// 		return this.xScale(d.city) ? 1 : 0;
+				// 	});
+
+				// this.xGridLinesSelection.attr("x1", (d) => this.xScale(d)).attr("x2", (d) => this.xScale(d));
+
+				this.drawXYAxis();
+
+				if (self.isExpandAllApplied) {
+					self.expandAllCategoriesName.forEach((d, i) => {
+						self[`${d}Scale`].domain(self[`${d}ScaleNewDomain`]);
+					});
+				}
+
+				CallExpandAllXScaleOnAxisGroup(this, scaleWidth, scaleHeight);
+
+				this.drawLollipopChart();
+
+				// if (this.xAxisSettings.position === Position.Bottom) {
+				// 	this.xAxisG
+				// 		.attr("transform", "translate(0," + this.height + ")")
+				// 		.call(d3.axisBottom(this.xScale))
+				// 		.selectAll("text");
+				// } else if (this.xAxisSettings.position === Position.Top) {
+				// 	this.xAxisG
+				// 		.attr("transform", "translate(0," + 0 + ")")
+				// 		.call(d3.axisTop(this.xScale))
+				// 		.selectAll("text")
+				// 		.attr("transform", `translate(-10, -10)rotate(${this.xAxisSettings.labelTilt})`);
+				// }
+
+				// this.setXAxisTickStyle();
+				// this.drawData1Labels(this.chartData);
+				// if (this.isHasMultiMeasure) {
+				// 	this.drawData2Labels(this.chartData);
+				// }
+				// this.updatePiePositionOnBrushMove();
+			} else {
+				this.isHorizontalBrushDisplayed = false;
+				this.isScrollBrushDisplayed = false;
+				this.brushHeight = 0;
+				this.drawXYAxis();
+			}
+		};
+
+		const brush = d3
+			.brushX()
+			.extent([
+				[0, 0],
+				[this.width, this.brushHeight],
+			])
+			.on("brush", brushed);
+
+		const expectedBar = Math.ceil(scaleWidth / barDistance);
+		const totalBar = totalBarsCount;
+		let widthByExpectedBar = (expectedBar * scaleWidth) / totalBar;
+
+		widthByExpectedBar = widthByExpectedBar > this.width ? this.width : widthByExpectedBar;
+
+		d3.select(brushG)
+			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos})`)
+			.call(brush as any)
+			.call(brush.move as any, [0, widthByExpectedBar]);
+
+		d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 4).attr("ry", 4).attr("cursor", "default");
+		d3.select(brushG).selectAll(".handle").remove();
 	}
 
 	initVerticalBrush(config: IBrushConfig): void {
@@ -2137,172 +2329,6 @@ export class Visual extends Shadow {
 		d3.select(brushG).selectAll(".handle").remove();
 	}
 
-	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
-		const smallMultiplesGridItemId = config.smallMultiplesGridItemId;
-		const brushG: SVGElement = config.brushG;
-		const brushXPos: number = config.brushXPos;
-		const brushYPos: number = config.brushYPos;
-		const barDistance: number = config.barDistance;
-		const totalBarsCount: number = config.totalBarsCount;
-		const scaleWidth: number = config.scaleWidth;
-		const scaleHeight: number = config.scaleHeight;
-		const categoricalData: any = JSON.parse(JSON.stringify(config.categoricalData));
-
-		// const newWidth = (this.chartSettings.lollipopCategoryWidth * this.width / this.scaleBandWidth);
-		const xScaleDomain = this.brushScaleBand.domain();
-		this.brushScaleBand.range(this.xScale.range());
-
-		categoricalData.categories.forEach((d, i) => {
-			if (i < categoricalData.categories.length - 1) {
-				const xScaleCopy = self.xScale.copy();
-				self[d.source.displayName + "Scale"] = xScaleCopy;
-				self[`${d.source.displayName}ScaleDomain`] = d.values;
-			}
-		});
-
-		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
-		const brushed = ({selection}) => {
-			if (this.isExpandAllApplied) {
-				this.expandAllCategoriesName.forEach((d) => {
-					if (self[`${d}ScaleDomain`]) {
-						self[`${d}ScaleNewDomain`] = [];
-					}
-				});
-			}
-
-			const newXScaleDomain = [];
-			let brushArea = selection;
-			if (brushArea === null) brushArea = this.xScale.range();
-
-			xScaleDomain.forEach((d, i) => {
-				const pos = this.brushScaleBand(d);
-				if (pos >= brushArea[0] && pos <= brushArea[1]) {
-					newXScaleDomain.push(d);
-
-					if (self.isExpandAllApplied) {
-						self.expandAllCategoriesName.forEach((d) => {
-							if (self[`${d}ScaleDomain`]) {
-								self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
-							}
-						});
-					}
-				}
-			});
-
-			this.newScaleDomainByBrush = newXScaleDomain;
-
-			if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied) {
-				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-				);
-
-				const categoricalData2 = JSON.parse(JSON.stringify(categoricalData));
-
-				categoricalData2.categories.forEach((d, i) => {
-					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-				});
-
-				categoricalData2.values.forEach((d, i) => {
-					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-					if (d.highlights) {
-						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-					}
-				});
-
-				this.setCategoricalDataFields(categoricalData2);
-				this.setChartData(categoricalData2);
-
-				// this.lineSelection
-				// 	.attr("x1", (d) => {
-				// 		return this.xScale(d.city);
-				// 	})
-				// 	.attr("x2", (d) => {
-				// 		return this.xScale(d.city);
-				// 	})
-				// 	.attr("opacity", (d) => {
-				// 		return this.xScale(d.city) ? 1 : 0;
-				// 	});
-
-				// this.circle1Selection
-				// 	.attr("cx", (d) => {
-				// 		return this.xScale(d.city) ? this.xScale(d.city) : 0;
-				// 	})
-				// 	.attr("opacity", (d) => {
-				// 		return this.xScale(d.city) ? 1 : 0;
-				// 	});
-
-				// this.circle2Selection
-				// 	.attr("cx", (d) => {
-				// 		return this.xScale(d.city) ? this.xScale(d.city) : 0;
-				// 	})
-				// 	.attr("opacity", (d) => {
-				// 		return this.xScale(d.city) ? 1 : 0;
-				// 	});
-
-				// this.xGridLinesSelection.attr("x1", (d) => this.xScale(d)).attr("x2", (d) => this.xScale(d));
-
-				this.drawXYAxis();
-
-				if (self.isExpandAllApplied) {
-					self.expandAllCategoriesName.forEach((d, i) => {
-						self[`${d}Scale`].domain(self[`${d}ScaleNewDomain`]);
-					});
-				}
-
-				CallExpandAllXScaleOnAxisGroup(this, scaleWidth, scaleHeight);
-
-				// if (this.xAxisSettings.position === Position.Bottom) {
-				// 	this.xAxisG
-				// 		.attr("transform", "translate(0," + this.height + ")")
-				// 		.call(d3.axisBottom(this.xScale))
-				// 		.selectAll("text");
-				// } else if (this.xAxisSettings.position === Position.Top) {
-				// 	this.xAxisG
-				// 		.attr("transform", "translate(0," + 0 + ")")
-				// 		.call(d3.axisTop(this.xScale))
-				// 		.selectAll("text")
-				// 		.attr("transform", `translate(-10, -10)rotate(${this.xAxisSettings.labelTilt})`);
-				// }
-
-				// this.setXAxisTickStyle();
-				// this.drawData1Labels(this.chartData);
-				// if (this.isHasMultiMeasure) {
-				// 	this.drawData2Labels(this.chartData);
-				// }
-				// this.updatePiePositionOnBrushMove();
-			} else {
-				this.isHorizontalBrushDisplayed = false;
-				this.isScrollBrushDisplayed = false;
-				this.brushHeight = 0;
-				this.drawXYAxis();
-			}
-		};
-
-		const brush = d3
-			.brushX()
-			.extent([
-				[0, 0],
-				[this.width, this.brushHeight],
-			])
-			.on("brush", brushed);
-
-		const expectedBar = Math.ceil(scaleWidth / barDistance);
-		const totalBar = totalBarsCount;
-		let widthByExpectedBar = (expectedBar * scaleWidth) / totalBar;
-
-		widthByExpectedBar = widthByExpectedBar > this.width ? this.width : widthByExpectedBar;
-
-		d3.select(brushG)
-			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos})`)
-			.call(brush as any)
-			.call(brush.move as any, [0, widthByExpectedBar]);
-
-		d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 4).attr("ry", 4).attr("cursor", "default");
-		d3.select(brushG).selectAll(".handle").remove();
-	}
-
 	updatePiePositionOnBrushMove(): void {
 		if (this.chartSettings.lollipopType !== LollipopType.Circle) {
 			const pie1ViewBoxRadius = this.pie1Radius + (this.pie1Radius * (this.pieEmphasizeScaleSize * 2)) / 100;
@@ -2361,54 +2387,52 @@ export class Visual extends Shadow {
 
 	drawLollipopChart(): void {
 		this.isLollipopChartDrawn = true;
-		if (this.getCategoricalValuesIndexByKey(EDataRolesName.Measure) !== -1) {
-			// this.drawXYAxis();
-			// this.drawXYAxisTitle();
-			this.drawLines();
+		// this.drawXYAxis();
+		// this.drawXYAxisTitle();
+		this.drawLines();
 
-			const onCaseLollipopTypePie = () => {
-				this.drawCircle1([]);
-				this.drawCircle2([]);
-				this.drawPie1Chart(this.chartData);
-				if (this.isHasMultiMeasure) {
-					this.drawPie2Chart(this.chartData);
-				} else {
-					this.drawPie2Chart([]);
-				}
-				this.drawData1Labels([]);
-				if (this.isHasMultiMeasure) {
-					this.drawData2Labels([]);
-				} else {
-					this.drawData2Labels([]);
-				}
-			};
+		const onCaseLollipopTypePie = () => {
+			this.drawCircle1([]);
+			this.drawCircle2([]);
+			this.drawPie1Chart(this.chartData);
+			if (this.isHasMultiMeasure) {
+				this.drawPie2Chart(this.chartData);
+			} else {
+				this.drawPie2Chart([]);
+			}
+			// this.drawData1Labels([]);
+			// if (this.isHasMultiMeasure) {
+			// 	this.drawData2Labels([]);
+			// } else {
+			// 	this.drawData2Labels([]);
+			// }
+		};
 
-			switch (this.chartSettings.lollipopType) {
-				case LollipopType.Circle: {
-					this.drawPie1Chart([]);
-					this.drawPie2Chart([]);
-					this.drawCircle1(this.chartData);
-					this.drawCircle2(this.isHasMultiMeasure ? this.chartData : []);
-					this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
-					if (this.isHasMultiMeasure) {
-						this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
-					} else {
-						this.drawData2Labels([]);
-					}
-					break;
-				}
-				case LollipopType.Pie: {
-					onCaseLollipopTypePie();
-					break;
-				}
-				case LollipopType.Donut: {
-					onCaseLollipopTypePie();
-					break;
-				}
-				case LollipopType.Rose: {
-					onCaseLollipopTypePie();
-					break;
-				}
+		switch (this.chartSettings.lollipopType) {
+			case LollipopType.Circle: {
+				this.drawPie1Chart([]);
+				this.drawPie2Chart([]);
+				this.drawCircle1(this.chartData);
+				this.drawCircle2(this.isHasMultiMeasure ? this.chartData : []);
+				// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
+				// if (this.isHasMultiMeasure) {
+				// 	this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
+				// } else {
+				// 	this.drawData2Labels([]);
+				// }
+				break;
+			}
+			case LollipopType.Pie: {
+				onCaseLollipopTypePie();
+				break;
+			}
+			case LollipopType.Donut: {
+				onCaseLollipopTypePie();
+				break;
+			}
+			case LollipopType.Rose: {
+				onCaseLollipopTypePie();
+				break;
 			}
 		}
 	}
@@ -3115,6 +3139,7 @@ export class Visual extends Shadow {
 			.selectAll("text")
 			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", isApplyTilt ? "-0.5em" : "0.32em")
+			// .attr("dy", isApplyTilt ? "0" : "0.32em")
 			.attr("fill", xAxisSettings.labelColor)
 			.style("font-family", xAxisSettings.labelFontFamily)
 			.attr("font-size", xAxisSettings.labelFontSize)
@@ -3264,8 +3289,17 @@ export class Visual extends Shadow {
 		const values = this.chartData.reduce((arr, d) => {
 			return [...arr, d.value1, d.value2];
 		}, []);
+
+		let min = d3.min(this.isHasMultiMeasure ? values.map((val) => val) : this.chartData.map((d) => d.value1));
+		min += min * 0.15;
+
+		if (min > 0) {
+			min = 0;
+		}
+
 		let max = d3.max(this.isHasMultiMeasure ? values.map((val) => val) : this.chartData.map((d) => d.value1));
 		max += max * 0.15;
+
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number";
 
 		if (this.isHorizontalChart) {
@@ -3274,7 +3308,7 @@ export class Visual extends Shadow {
 			this.yScale2 = d3.scaleBand();
 
 			if (isLinearScale) {
-				this.xScale.domain([0, max]);
+				this.xScale.domain([min, max]);
 			} else {
 				this.xScale.domain(this.chartData.map((d) => d.value1));
 			}
@@ -3289,7 +3323,7 @@ export class Visual extends Shadow {
 			this.xScale.domain(this.chartData.map((d) => d.city));
 			// this.xScale2.domain(this.chartData.map((d) => d.city));
 			if (isLinearScale) {
-				this.yScale.domain([0, max]);
+				this.yScale.domain([min, max]);
 			} else {
 				this.yScale.domain(this.chartData.map((d) => d.value1));
 			}
@@ -3310,21 +3344,49 @@ export class Visual extends Shadow {
 
 	callXYScaleOnAxisGroup(): void {
 		if (this.xAxisSettings.position === Position.Bottom) {
-			this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(d3.axisBottom(this.xScale).ticks(this.width / 90));
+			this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
+				d3
+					.axisBottom(this.xScale)
+					.ticks(this.width / 90)
+					.tickFormat((d) => {
+						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+					})
+			);
 			// .selectAll('text')
 			// .attr('dy', '0.35em')
 			// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
 		} else if (this.xAxisSettings.position === Position.Top) {
-			this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(d3.axisTop(this.xScale).ticks(this.width / 90));
+			this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
+				d3
+					.axisTop(this.xScale)
+					.ticks(this.width / 90)
+					.tickFormat((d) => {
+						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+					})
+			);
 			// .selectAll('text')
 			// .attr('dy', '0.35em')
 			// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
 		}
 
 		if (this.yAxisSettings.position === Position.Left) {
-			this.yAxisG.attr("transform", `translate(0, 0)`).call(d3.axisLeft(this.yScale).ticks(this.height / 70));
+			this.yAxisG.attr("transform", `translate(0, 0)`).call(
+				d3
+					.axisLeft(this.yScale)
+					.ticks(this.height / 70)
+					.tickFormat((d) => {
+						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+					})
+			);
 		} else if (this.yAxisSettings.position === Position.Right) {
-			this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(d3.axisRight(this.yScale).ticks(this.height / 70));
+			this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
+				d3
+					.axisRight(this.yScale)
+					.ticks(this.height / 70)
+					.tickFormat((d) => {
+						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+					})
+			);
 		}
 	}
 
@@ -3564,10 +3626,10 @@ export class Visual extends Shadow {
 			.classed("chart-line", true)
 			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0))
 			.attr("x2", (d) => this.xScale(d.value1))
-			.attr("y1", (d) => this.yScale(d.city))
-			.attr("y2", (d) => this.yScale(d.city))
+			.attr("y1", (d) => this.yScale(d.city) + this.scaleBandWidth / 2)
+			.attr("y2", (d) => this.yScale(d.city) + this.scaleBandWidth / 2)
 			.attr("stroke", (d) => d.styles.line.color)
-			.attr("stroke-width", this.getLineStrokeWidth())
+			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
@@ -3589,12 +3651,12 @@ export class Visual extends Shadow {
 		linesSelection
 			.attr("class", this.lineSettings.lineType)
 			.classed("chart-line", true)
-			.attr("x1", (d) => this.xScale(d.city))
-			.attr("x2", (d) => this.xScale(d.city))
+			.attr("x1", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
+			.attr("x2", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
 			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0))
 			.attr("stroke", (d) => d.styles.line.color)
-			.attr("stroke-width", this.getLineStrokeWidth())
+			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
@@ -3642,7 +3704,7 @@ export class Visual extends Shadow {
 			if (this.isHorizontalChart) {
 				this.circle1Radius = this.height * 0.04 < maxCircleRadius ? this.height * 0.04 : maxCircleRadius;
 			} else {
-				this.circle1Radius = this.width * 0.04 < maxCircleRadius ? this.width * 0.04 : maxCircleRadius;
+				this.circle1Radius = this.width * 0.02 < maxCircleRadius ? this.width * 0.02 : maxCircleRadius;
 			}
 		} else {
 			this.circle1Radius = this.circle1Settings.circleRadius;
@@ -3696,8 +3758,14 @@ export class Visual extends Shadow {
 		this.setCircle1Radius();
 		circleSelection
 			.attr("class", "chart-circle1")
-			.attr("cx", (d) => this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value1 : d.city)))
-			.attr("cy", (d) => this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value1)))
+			.attr("cx", (d) => {
+				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.city);
+				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
+			})
+			.attr("cy", (d) => {
+				const cy = this.yScale(this.isHorizontalChart ? d.city : d.value1);
+				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
+			})
 			.attr("r", this.circle1Radius)
 			.attr("stroke", (d) => d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle1Settings.strokeWidth)
@@ -3712,8 +3780,14 @@ export class Visual extends Shadow {
 		this.setCircle2Radius();
 		circleSelection
 			.attr("class", "chart-circle2")
-			.attr("cx", (d) => this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value2 : d.city)))
-			.attr("cy", (d) => this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value2)))
+			.attr("cx", (d) => {
+				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.city);
+				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
+			})
+			.attr("cy", (d) => {
+				const cy = this.yScale(this.isHorizontalChart ? d.city : d.value2);
+				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
+			})
 			.attr("r", this.circle2Radius)
 			.attr("stroke", (d) => d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle2Settings.strokeWidth)
@@ -3954,11 +4028,13 @@ export class Visual extends Shadow {
 			.attr("width", d)
 			.attr("height", d)
 			.attr("x", (d) => {
-				const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city));
+				const pieX =
+					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
 			})
 			.attr("y", (d) => {
-				const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey]));
+				const pieY =
+					this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
 			})
 			.attr("opacity", () => 1)
@@ -3975,9 +4051,9 @@ export class Visual extends Shadow {
 				ele
 					.selectAll("path")
 					.attr("class", (pieData: IChartSubCategory) => {
-						return this.getPieSliceClass(d.city, pieData.category);
+						return this.getPieSliceClass(d.city, pieData ? pieData.category : "");
 					})
-					.style("fill", (d: IChartSubCategory) => {
+					.attr("fill", (d: IChartSubCategory) => {
 						return d.styles[pieType].color;
 					});
 
@@ -4046,11 +4122,13 @@ export class Visual extends Shadow {
 			.attr("width", d)
 			.attr("height", d)
 			.attr("x", (d) => {
-				const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city));
+				const pieX =
+					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
 			})
 			.attr("y", (d) => {
-				const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey]));
+				const pieY =
+					this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
 			})
 			.attr("opacity", () => 1)

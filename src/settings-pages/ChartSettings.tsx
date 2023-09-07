@@ -257,7 +257,7 @@ const ChartSettings = (props) => {
 		...initialStates[EChartSettings.pieSettings],
 	});
 
-	const [isHasSubCategories] = React.useState(!!vizOptions.options.dataViews[0].categorical.categories[1]);
+	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);
 
 	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
