@@ -212,14 +212,14 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		enabled: true,
 		valueType: RankingDataValuesType.Value1,
 		rankingType: ERankingType.TopN,
-		count: 10,
+		count: 50,
 		showRemainingAsOthers: false,
 		othersColor: "rgba(84, 84, 84, 1)",
 	},
 	subCategory: {
 		enabled: true,
 		rankingType: ERankingType.TopN,
-		count: 10,
+		count: 50,
 		showRemainingAsOthers: false,
 		othersColor: "rgba(84, 84, 84, 1)",
 	},
@@ -262,6 +262,7 @@ export const SORTING_SETTINGS: ISortingSettings = {
 		sortOrder: ESortOrderTypes.DESC,
 		isSortByCategory: false,
 		isSortByMeasure: true,
+		isSortByMultiMeasure: false,
 		isSortByExtraSortField: false,
 	},
 	subCategory: {
@@ -270,6 +271,7 @@ export const SORTING_SETTINGS: ISortingSettings = {
 		sortOrder: ESortOrderTypes.ASC,
 		isSortByCategory: true,
 		isSortByMeasure: false,
+		isSortByMultiMeasure: false,
 		isSortByExtraSortField: false,
 	},
 };

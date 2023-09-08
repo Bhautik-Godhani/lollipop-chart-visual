@@ -266,3 +266,19 @@ export enum ESortOrderTypes {
 	ASC = "1",
 	DESC = "2",
 }
+
+export enum ESortByTypes {
+	CATEGORY = "category",
+	VALUE = "value",
+}
+
+export enum ESortingSettings {
+	Category = "category",
+	SubCategory = "subCategory",
+	Enabled = "enabled",
+	SortBy = "sortBy",
+	SortOrder = "sortOrder",
+	IsSortByCategory = "isSortByCategory",
+	IsSortByMeasure = "isSortByMeasure",
+	IsSortByExtraSortField = "isSortByExtraSortField",
+}

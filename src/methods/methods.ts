@@ -169,3 +169,17 @@ export const formatNumber = (number: number | string, options: NumberFormatting,
 
 	return _num.trim();
 };
+
+export const parseObject = (obj, def) => {
+	let initialStates = def;
+	try {
+		initialStates = JSON.parse(obj);
+		initialStates = {
+			...def,
+			...initialStates,
+		};
+	} catch (e) {
+		initialStates = {...def};
+	}
+	return initialStates;
+};

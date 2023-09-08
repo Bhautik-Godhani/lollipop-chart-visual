@@ -217,6 +217,10 @@ export interface ILabelValuePair {
 	label: string;
 	value: string;
 	icon?: React.ReactNode;
+	isSortByCategory?: boolean;
+	isSortByMeasure?: boolean;
+	isSortByMultiMeasure?: boolean;
+	isSortByExtraSortField?: boolean;
 }
 
 export interface ISortingSettings {
@@ -230,6 +234,7 @@ export interface ISortingProps {
 	sortOrder: ESortOrderTypes;
 	isSortByCategory: boolean;
 	isSortByMeasure: boolean;
+	isSortByMultiMeasure: boolean;
 	isSortByExtraSortField: boolean;
 }
 

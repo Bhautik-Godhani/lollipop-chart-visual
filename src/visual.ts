@@ -39,6 +39,7 @@ import {
 	ESortOrderTypes,
 	ERankingType,
 	lollipopCategoryWidthType,
+	ESortByTypes,
 } from "./enum";
 import {createTooltipServiceWrapper, ITooltipServiceWrapper} from "powerbi-visuals-utils-tooltiputils";
 import {createLegend, positionChartArea} from "powerbi-visuals-utils-chartutils/lib/legend/legend";
@@ -57,6 +58,7 @@ import LineSettings from "./settings-pages/LineSettings";
 import DataLabelsSettings from "./settings-pages/DataLabelsSettings";
 import GridLinesSettings from "./settings-pages/GridLinesSettings";
 import RankingSettings from "./settings-pages/RankingSettings";
+import SortingSettings from "./settings-pages/SortingSettings";
 import {
 	CHART_SETTINGS,
 	CIRCLE_SETTINGS,
@@ -365,6 +367,12 @@ export class Visual extends Shadow {
 					propertyName: "rankingSettings",
 					Component: () => RankingSettings,
 				},
+				{
+					name: "Sorting",
+					sectionName: "sortingConfig",
+					propertyName: "sorting",
+					Component: () => SortingSettings,
+				},
 			],
 		});
 		this.init(this.afterUpdate, this.getEnumeration, paidProperties);
@@ -554,8 +562,8 @@ export class Visual extends Shadow {
 		};
 
 		const sortByMeasure = (measureValues: powerbi.DataViewValueColumn[]) => {
-			const index = measureValues[0].source.index;
-			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure1}${index}`;
+			const index = measureValues.find((d) => d.source.displayName === sortingSettings.sortBy).source.index;
+			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
 
 			if (this.isHorizontalChart) {
 				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
@@ -608,14 +616,14 @@ export class Visual extends Shadow {
 
 		// Axis Settings
 		if (isMeasure && !isSortByExternalFields) {
-			if (this.isHasSubcategories || this.isHasMultiMeasure) {
+			if (this.isHasSubcategories || sortingSettings.isSortByMultiMeasure) {
 				sortByMultiMeasure(measureKeys);
 			} else {
 				sortByMeasure(categoricalMeasureFields);
 			}
 		} else if (isSortByExternalFields) {
 			if (isMeasure) {
-				if (this.isHasSubcategories || this.isHasMultiMeasure) {
+				if (this.isHasSubcategories || sortingSettings.isSortByMultiMeasure) {
 					sortByMultiMeasure(sortKeys);
 				} else {
 					const sortField = categoricalSortFields.filter((d) => d.source.displayName === sortingSettings.sortBy);
@@ -702,95 +710,140 @@ export class Visual extends Shadow {
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.isHasMultiMeasure = categoricalMeasureFields.length > 1;
 		this.isHasSubcategories = !!categoricalSubCategoryField;
+		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))];
 
-		// this.setCategoricalDataBySubcategoryRanking(categoricalData);
-		// this.categoricalDataPairs = categoricalData.categories[categoricalCategoriesLastIndex].values.reduce(
-		// 	(arr, category: string, index: number) => {
-		// 		const obj = {
-		// 			category: category !== null && category !== undefined && category !== "" ? category : this.blankText,
-		// 			hasNegative: false,
-		// 			hasZero: false,
-		// 		};
-		// 		this.expandAllCategoriesName.forEach((d, i) => {
-		// 			obj[d] = categoricalData.categories[i].values[index];
-		// 		});
-		// 		categoricalData.values.forEach((d) => {
-		// 			const roles = Object.keys(d.source.roles);
-		// 			roles.forEach((role) => {
-		// 				if (Object.keys(d.source).includes("groupName")) {
-		// 					if (d.values[index] === null || d.values[index] === undefined) {
-		// 						d.values[index] = 0;
-		// 					}
+		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
+		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
 
-		// 					if (role === EDataRolesName.Measure && +d.values[index] < 0) {
-		// 						d.values[index] = 0;
-		// 					}
+		this.subCategoriesName = categoricalMeasureFields
+			.map((d) => d.source.groupName)
+			.filter((d) => d && d !== null && d !== undefined && d !== "")
+			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-		// 					if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "") {
-		// 						obj[`${role}${d.source.index}${d.source.groupName}`] = d.values[index];
-		// 					} else {
-		// 						obj[`${role}${d.source.index}${this.blankText}`] = d.values[index];
-		// 					}
-		// 				} else {
-		// 					obj[`${role}${d.source.index}`] = d.values[index];
+		this.isSortDataFieldsAdded = categoricalSortFields.length > 0;
+		this.sortFieldsDisplayName =
+			categoricalSortFields.length > 0
+				? categoricalSortFields
+						.map((d) => ({
+							label: d.source.displayName,
+							value: d.source.displayName,
+							isSortByCategory: d.source.type.text,
+							isSortByMeasure: d.source.type.numeric,
+							isSortByExtraSortField: true,
+						}))
+						.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
 
-		// 					if (role === EDataRolesName.Measure && +d.values[index] < 0) {
-		// 						obj.hasNegative = true;
-		// 					}
-		// 				}
-		// 			});
-		// 		});
-		// 		return [...arr, obj];
-		// 	},
-		// 	[]
-		// );
+		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : "";
+		this.measure2DisplayName = categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : "";
 
-		// // this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
+		if (
+			this.sortingSettings.category.isSortByExtraSortField &&
+			!this.sortFieldsDisplayName.find((d) => d.label === this.sortingSettings.category.sortBy)
+		) {
+			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
+			this.sortingSettings.category.isSortByCategory = false;
+			this.sortingSettings.category.isSortByMeasure = true;
+			this.sortingSettings.category.isSortByMultiMeasure = false;
+			this.sortingSettings.category.isSortByExtraSortField = false;
+		}
 
-		// const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
+		if (
+			!this.sortingSettings.category.sortBy ||
+			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure)
+		) {
+			this.sortingSettings.category.sortBy = this.measure1DisplayName;
+		}
 
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
+		if (!this.sortingSettings.subCategory.sortBy) {
+			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+		}
 
-		// if (!this.isHasSubcategories) {
-		// 	this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
-		// }
+		this.setCategoricalDataBySubcategoryRanking(categoricalData);
+		this.categoricalDataPairs = categoricalData.categories[categoricalCategoriesLastIndex].values.reduce((arr, category: string, index: number) => {
+			const obj = {
+				category: category !== null && category !== undefined && category !== "" ? category : this.blankText,
+				hasNegative: false,
+				hasZero: false,
+			};
+			this.expandAllCategoriesName.forEach((d, i) => {
+				obj[d] = categoricalData.categories[i].values[index];
+			});
+			categoricalData.values.forEach((d) => {
+				const roles = Object.keys(d.source.roles);
+				roles.forEach((role) => {
+					if (Object.keys(d.source).includes("groupName")) {
+						if (d.values[index] === null || d.values[index] === undefined) {
+							d.values[index] = 0;
+						}
 
-		// this.setCategoricalDataPairsByRanking();
+						if (role === EDataRolesName.Measure && +d.values[index] < 0) {
+							d.values[index] = 0;
+						}
 
-		// if (this.sortingSettings.category.enabled) {
-		// 	const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+						if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "") {
+							obj[`${role}${d.source.index}${d.source.groupName}`] = d.values[index];
+						} else {
+							obj[`${role}${d.source.index}${this.blankText}`] = d.values[index];
+						}
+					} else {
+						obj[`${role}${d.source.index}`] = d.values[index];
 
-		// 	if (!this.isHasSubcategories) {
-		// 		const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index);
-		// 		const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index);
-		// 		this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
-		// 	} else {
-		// 		const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
-		// 		const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
-		// 		this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
-		// 	}
-		// }
+						if (role === EDataRolesName.Measure && +d.values[index] < 0) {
+							obj.hasNegative = true;
+						}
+					}
+				});
+			});
+			return [...arr, obj];
+		}, []);
 
-		// categoricalData.categories.forEach((d, i) => {
-		// 	if (i === this.categoricalCategoriesLastIndex) {
-		// 		d.values = this.categoricalDataPairs.map((pair) => pair.category);
-		// 	} else {
-		// 		d.values = this.categoricalDataPairs.map((pair) => pair[d.source.displayName]);
-		// 	}
-		// });
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
 
-		// categoricalData.values.forEach((d) => {
-		// 	if (Object.keys(d.source).includes("groupName")) {
-		// 		if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "" && d.source.groupName !== this.blankText) {
-		// 			d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${d.source.groupName}`]);
-		// 		} else {
-		// 			d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${this.blankText}`]);
-		// 		}
-		// 	} else {
-		// 		d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}`]);
-		// 	}
-		// });
+		const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
+
+		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
+		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
+
+		if (!this.isHasSubcategories) {
+			this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
+		}
+
+		this.setCategoricalDataPairsByRanking();
+
+		if (this.sortingSettings.category.enabled) {
+			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+
+			if (!this.isHasSubcategories) {
+				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index);
+				const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
+			} else {
+				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
+				const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
+			}
+		}
+
+		categoricalData.categories.forEach((d, i) => {
+			if (i === this.categoricalCategoriesLastIndex) {
+				d.values = this.categoricalDataPairs.map((pair) => pair.category);
+			} else {
+				d.values = this.categoricalDataPairs.map((pair) => pair[d.source.displayName]);
+			}
+		});
+
+		categoricalData.values.forEach((d) => {
+			if (Object.keys(d.source).includes("groupName")) {
+				if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "" && d.source.groupName !== this.blankText) {
+					d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${d.source.groupName}`]);
+				} else {
+					d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${this.blankText}`]);
+				}
+			} else {
+				d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}`]);
+			}
+		});
 
 		if (this.isExpandAllApplied) {
 			clonedCategoricalData.categories
@@ -932,7 +985,6 @@ export class Visual extends Shadow {
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		this.categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
 		this.categoricalSortFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Sort]);
-		this.measureNames = [...new Set(this.categoricalMeasureFields.map((d) => d.source.displayName))];
 
 		if (this.measureNames.length > 1) {
 			this.categoricalMeasure1Field = this.categoricalMeasureFields[0];
@@ -955,31 +1007,6 @@ export class Visual extends Shadow {
 		// 		return;
 		// 	}
 		// }
-
-		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
-		this.subCategoryDisplayName = this.categoricalSubCategoryField ? this.categoricalSubCategoryField.displayName : "";
-
-		this.subCategoriesName = this.categoricalMeasureFields
-			.map((d) => d.source.groupName)
-			.filter((d) => d && d !== null && d !== undefined && d !== "")
-			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
-
-		this.isSortDataFieldsAdded = this.categoricalSortFields.length > 0;
-		this.sortFieldsDisplayName =
-			this.categoricalSortFields.length > 0
-				? this.categoricalSortFields
-						.map((d) => ({
-							label: d.source.displayName,
-							value: d.source.displayName,
-							isSortByCategory: d.source.type.text,
-							isSortByMeasure: d.source.type.numeric,
-							isSortByExtraSortField: true,
-						}))
-						.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
-				: [];
-
-		this.measure1DisplayName = this.categoricalMeasureFields.length > 0 ? this.categoricalMeasureFields[0].source.displayName : "";
-		this.measure2DisplayName = this.categoricalMeasureFields.length > 1 ? this.categoricalMeasureFields[1].source.displayName : "";
 	}
 
 	expandAllCode(): void {
@@ -1091,6 +1118,7 @@ export class Visual extends Shadow {
 			}
 
 			if (!this.isScrollBrushDisplayed) {
+				this.sortSubcategoryData();
 				this.setCategoricalDataFields(this.categoricalData);
 				this.setChartData(this.categoricalData);
 			}
@@ -1186,6 +1214,84 @@ export class Visual extends Shadow {
 		} catch (error) {
 			console.error("Error", error);
 		}
+	}
+
+	private sortSubcategoryData(): void {
+		const {enabled, sortOrder, sortBy, isSortByCategory} = this.sortingSettings.subCategory;
+		if (enabled && this.isHasSubcategories) {
+			if (isSortByCategory) {
+				if (this.isHorizontalChart) {
+					if (sortOrder === ESortOrderTypes.DESC) {
+						this.categoricalData.values.sort((a, b) => {
+							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
+							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+								return b.source.groupName - a.source.groupName;
+							}
+						});
+					} else {
+						this.categoricalData.values.sort((a, b) => {
+							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
+							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+								return a.source.groupName - b.source.groupName;
+							}
+						});
+					}
+				} else {
+					if (sortOrder === ESortOrderTypes.ASC) {
+						this.categoricalData.values.sort((a, b) => {
+							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
+							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+								return a.source.groupName - b.source.groupName;
+							}
+						});
+					} else {
+						this.categoricalData.values.sort((a, b) => {
+							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
+							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+								return b.source.groupName - a.source.groupName;
+							}
+						});
+					}
+				}
+			} else {
+				const clonedCategoricalDataValues: powerbi.DataViewValueColumn[] = JSON.parse(JSON.stringify(this.categoricalData.values));
+				const displayNames = clonedCategoricalDataValues.map((d) => d.source.displayName);
+
+				if (displayNames.includes(sortBy)) {
+					const categoricalValuesBySort = clonedCategoricalDataValues.filter((d) => d.source.displayName === sortBy);
+					categoricalValuesBySort.forEach((d) => {
+						d["total"] = d3.sum(d.values, (v) => +v);
+					});
+
+					if (sortOrder === ESortOrderTypes.DESC) {
+						categoricalValuesBySort.sort((a, b) => b["total"] - a["total"]);
+					} else {
+						categoricalValuesBySort.sort((a, b) => a["total"] - b["total"]);
+					}
+
+					const sortedGroupNames: string[] = categoricalValuesBySort.map((d) => d.source.groupName as string);
+					sortedGroupNames.forEach((d, i) => {
+						const valuesByGroupName = clonedCategoricalDataValues.filter((v) => v.source.groupName === d);
+						valuesByGroupName.forEach((v, j) => {
+							this.categoricalData.values[i * valuesByGroupName.length + j] = v;
+						});
+					});
+				}
+			}
+		}
+
+		const categoricalMeasureFields = this.categoricalData.values
+			? this.categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure])
+			: [];
+
+		this.subCategoriesName = categoricalMeasureFields
+			.map((d) => d.source.groupName)
+			.filter((d) => d && d !== null && d !== undefined && d !== "")
+			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 	}
 
 	public renderErrorMessages(): boolean {
@@ -1459,15 +1565,7 @@ export class Visual extends Shadow {
 			...sortingConfig,
 		};
 
-		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
-		this.circle1Settings = this.circleSettings.circle1;
-		this.circle2Settings = this.circleSettings.circle2;
-		this.xGridSettings = this.gridSettings.xGridLines;
-		this.yGridSettings = this.gridSettings.yGridLines;
-		this.pie1Settings = this.chartSettings.pieSettings.pie1;
-		this.pie2Settings = this.chartSettings.pieSettings.pie2;
-		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
-		this.isLeftYAxis = this.yAxisSettings.position === Position.Left;
+		this.changeVisualSettings();
 
 		// if (!this.isHasSubcategories) {
 		// 	this.chartSettings.lollipopType = LollipopType.Circle;
@@ -1503,16 +1601,6 @@ export class Visual extends Shadow {
 		this.yGridSettings = this.gridSettings.yGridLines;
 		this.pie1Settings = this.chartSettings.pieSettings.pie1;
 		this.pie2Settings = this.chartSettings.pieSettings.pie2;
-
-		if (!this.isHasMultiMeasure) {
-			this.chartData.sort((a, b) => (this.isHorizontalChart ? a.value1 - b.value1 : b.value1 - a.value1));
-		}
-		if (this.isHasMultiMeasure) {
-			this.chartData.sort((a, b) =>
-				this.isHorizontalChart ? a.value1 + a.value2 - (b.value1 + b.value2) : b.value1 + b.value2 - (a.value1 + a.value2)
-			);
-		}
-
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
 		// }
@@ -1975,6 +2063,7 @@ export class Visual extends Shadow {
 					}
 				});
 
+				this.sortSubcategoryData();
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
@@ -2137,10 +2226,7 @@ export class Visual extends Shadow {
 					}
 				});
 
-				console.log(categoricalData2);
-
-				console.log(this.chartData);
-
+				this.sortSubcategoryData();
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
