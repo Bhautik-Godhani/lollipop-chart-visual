@@ -1,22 +1,21 @@
 import * as React from "react";
 import {RANKING_SETTINGS} from "../constants";
-import {ERankingSettings, ERankingType, LollipopType, RankingDataValuesType} from "../enum";
-import {IChartSettings, ILabelValuePair, ICategoryRankingProps, ISubCategoryRankingProps, IRankingSettings} from "../visual-settings.interface";
-import {ColorPicker, Column, ConditionalWrapper, Footer, InputControl, RadioOption, Row, ToggleButton} from "@truviz/shadow/dist/Components";
+import {
+	Accordion,
+	// ColorPicker,
+	Column,
+	ConditionalWrapper,
+	Footer,
+	InputControl,
+	Row,
+	SwitchOption,
+	ToggleButton,
+} from "@truviz/shadow/dist/Components";
+import {ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps} from "../visual-settings.interface";
+import {ERankingSettings, ERankingType} from "../enum";
 import {ShadowUpdateOptions} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
-const VALUE_TYPES: ILabelValuePair[] = [
-	{
-		label: "Value 1",
-		value: RankingDataValuesType.Value1,
-	},
-	{
-		label: "Value 2",
-		value: RankingDataValuesType.Value2,
-	},
-];
-
-const FILTER_TYPES: ILabelValuePair[] = [
+const RANKING_TYPES: ILabelValuePair[] = [
 	{
 		label: "Top N",
 		value: ERankingType.TopN,
@@ -27,220 +26,169 @@ const FILTER_TYPES: ILabelValuePair[] = [
 	},
 ];
 
-const handleChange = (val, n, valueType: RankingDataValuesType, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
+const handleChange = (val, n, key, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[valueType]: {...d[valueType], [n]: val},
+		[key]: {
+			...d[key],
+			[n]: val,
+		},
 	}));
 };
 
-const handleSubCategoriesChange = (val, n, setSubCategoriesConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setSubCategoriesConfigValues((d) => ({
-		...d,
-		[n]: val,
-	}));
-};
-
-const handleRadioButtonChange = (key: string, value: string, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
+const handleCheckbox = (n, key, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[key]: value,
+		[key]: {
+			...d[key],
+			[n]: !d[key][n],
+		},
 	}));
 };
 
-const handleCheckbox = (n, valueType: RankingDataValuesType, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setConfigValues((d) => ({
-		...d,
-		[valueType]: {...d[valueType], [n]: !d[valueType][n]},
-	}));
-};
-
-const handleSubCategoriesCheckbox = (n, setSubCategoriesConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setSubCategoriesConfigValues((d) => ({
-		...d,
-		[n]: !d[n],
-	}));
-};
-
-const handleColorChange = (rgb, n, valueType: RankingDataValuesType, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setConfigValues((d: any) => ({
-		...d,
-		[valueType]: {...d[valueType], [n]: rgb},
-	}));
-};
-
-const handleSubCategoriesColorChange = (rgb, n, setSubCategoriesConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setSubCategoriesConfigValues((d: any) => ({
-		...d,
-		[n]: rgb,
-	}));
-};
-
-const UICategoryRankingSettings = (
+const UIByCategoryRankingSettings = (
 	vizOptions: ShadowUpdateOptions,
-	chartSettings: IChartSettings,
-	valueType: RankingDataValuesType,
-	configValues: IRankingSettings,
+	categoryRanking: ICategoryRankingProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
 ) => {
 	return (
-		<></>
-		// <>
-		// 	<Row>
-		// 		<Column>
-		// 			<InputControl
-		// 				min={1}
-		// 				type="number"
-		// 				label="Count"
-		// 				value={configValues[valueType].count}
-		// 				handleChange={(value) => handleChange(value, ERankingSettings.count, valueType, setConfigValues)}
-		// 			/>
-		// 		</Column>
-		// 	</Row>
+		<>
+			<Row appearance="padded">
+				<Column>
+					<Row>
+						<Column>
+							<SwitchOption
+								value={categoryRanking.rankingType}
+								optionsList={RANKING_TYPES}
+								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.Category, setConfigValues)}
+							/>
+						</Column>
+					</Row>
 
-		// 	<Row>
-		// 		<Column>
-		// 			<ToggleButton
-		// 				label={"Show remaining as Others"}
-		// 				value={configValues[valueType].showRemainingAsOthers}
-		// 				handleChange={() => handleCheckbox(ERankingSettings.showRemainingAsOthers, valueType, setConfigValues)}
-		// 			/>
-		// 		</Column>
-		// 	</Row>
+					<Row style={{width: "50%"}}>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Count"
+								value={categoryRanking.count.toString()}
+								handleChange={(value) => handleChange(+value, ERankingSettings.Count, ERankingSettings.Category, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+				</Column>
+			</Row>
 
-		// 	<ConditionalWrapper visible={configValues[valueType].showRemainingAsOthers}>
-		// 		<ConditionalWrapper visible={chartSettings.lollipopType === LollipopType.Circle}>
-		// 			<Row>
-		// 				<Column>
-		// 					<ColorPicker
-		// 						label="Circle Color"
-		// 						color={configValues[valueType].circleFillColor}
-		// 						handleChange={(value) => handleColorChange(value, ERankingSettings.circleFillColor, valueType, setConfigValues)}
-		// 						colorPalette={vizOptions.host.colorPalette}
-		// 						size="sm"
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-
-		// 			<Row>
-		// 				<Column>
-		// 					<ColorPicker
-		// 						label="Circle Border Color"
-		// 						color={configValues[valueType].circleStrokeColor}
-		// 						handleChange={(value) => handleColorChange(value, ERankingSettings.circleStrokeColor, valueType, setConfigValues)}
-		// 						colorPalette={vizOptions.host.colorPalette}
-		// 						size="sm"
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-		// 		</ConditionalWrapper>
-
-		// 		<ConditionalWrapper visible={chartSettings.lollipopType !== LollipopType.Circle}>
-		// 			<Row>
-		// 				<Column>
-		// 					<ColorPicker
-		// 						label={`${chartSettings.lollipopType} Slice Color`}
-		// 						color={configValues[valueType].pieSliceColor}
-		// 						handleChange={(value) => handleColorChange(value, ERankingSettings.pieSliceColor, valueType, setConfigValues)}
-		// 						colorPalette={vizOptions.host.colorPalette}
-		// 						size="sm"
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-		// 		</ConditionalWrapper>
-
-		// 		<Row>
-		// 			<Column>
-		// 				<ColorPicker
-		// 					label="Line Color"
-		// 					color={configValues[valueType].lineColor}
-		// 					handleChange={(value) => handleColorChange(value, ERankingSettings.lineColor, valueType, setConfigValues)}
-		// 					colorPalette={vizOptions.host.colorPalette}
-		// 					size="sm"
-		// 				/>
-		// 			</Column>
-		// 		</Row>
-		// 	</ConditionalWrapper>
-		// </>
+			{/* {UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)} */}
+		</>
 	);
 };
 
-const UISubCategoryRankingSettings = (
+// const UIByCategoryRankingOthersSettings = (
+// 	vizOptions: ShadowUpdateOptions,
+// 	categoryRanking: IRankingProps,
+// 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+// ) => {
+// 	return (
+// 		<>
+// 			<Row>
+// 				<Column>
+// 					<ToggleButton
+// 						label={"Show remaining as 'Others'"}
+// 						value={categoryRanking.showRemainingAsOthers}
+// 						handleChange={() => handleCheckbox(ERankingSettings.ShowRemainingAsOthers, ERankingSettings.Category, setConfigValues)}
+// 						appearance="toggle"
+// 					/>
+// 				</Column>
+// 			</Row>
+
+// 			<ConditionalWrapper visible={categoryRanking.showRemainingAsOthers}>
+// 				<Row>
+// 					<Column>
+// 						<ColorPicker
+// 							label={"'Others' Bar Color"}
+// 							color={categoryRanking.othersColor}
+// 							handleChange={(value) => handleColorChange(value, ERankingSettings.OthersColor, ERankingSettings.Category, setConfigValues)}
+// 							colorPalette={vizOptions.host.colorPalette}
+// 						/>
+// 					</Column>
+// 				</Row>
+// 			</ConditionalWrapper>
+// 		</>
+// 	);
+// };
+
+const UIByGroupRankingSettings = (
 	vizOptions: ShadowUpdateOptions,
-	chartSettings: IChartSettings,
-	valueType: RankingDataValuesType,
-	configValues: IRankingSettings,
-	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>,
-	setSubCategoriesConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+	groupByRanking: ISubCategoryRankingProps,
+	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
 ) => {
 	return (
-		// <>
-		// 	<Row>
-		// 		<Column>
-		// 			<ToggleButton
-		// 				label={"Sub Category Ranking"}
-		// 				value={configValues[valueType].isSubcategoriesRanking}
-		// 				handleChange={() => handleCheckbox(ERankingSettings.isSubcategoriesRanking, valueType, setConfigValues)}
-		// 			/>
-		// 		</Column>
-		// 	</Row>
+		<>
+			<Row appearance="padded">
+				<Column>
+					<Row>
+						<Column>
+							<SwitchOption
+								value={groupByRanking.rankingType}
+								optionsList={RANKING_TYPES}
+								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
+							/>
+						</Column>
+					</Row>
 
-		// 	<ConditionalWrapper visible={configValues[valueType].isSubcategoriesRanking}>
-		// 		<Row>
-		// 			<Column>
-		// 				<RadioOption
-		// 					label="Filter Type"
-		// 					value={configValues[valueType][ERankingSettings.subCategoriesRanking].filterType}
-		// 					optionsList={FILTER_TYPES}
-		// 					handleChange={(value) => handleSubCategoriesChange(value, ERankingSettings.filterType, setSubCategoriesConfigValues)}
-		// 				/>
-		// 			</Column>
-		// 		</Row>
+					<Row style={{width: "50%"}}>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Count"
+								value={groupByRanking.count.toString()}
+								handleChange={(value) => handleChange(+value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+				</Column>
+			</Row>
 
-		// 		<ConditionalWrapper
-		// 			visible={configValues[valueType][ERankingSettings.subCategoriesRanking][ERankingSettings.filterType] !== ERankingType.None}
-		// 		>
-		// 			<Row>
-		// 				<Column>
-		// 					<InputControl
-		// 						min={1}
-		// 						type="number"
-		// 						label="Count"
-		// 						value={configValues[valueType].subCategoriesRanking.count}
-		// 						handleChange={(value) => handleSubCategoriesChange(value, ERankingSettings.count, setSubCategoriesConfigValues)}
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-
-		// 			<Row>
-		// 				<Column>
-		// 					<ToggleButton
-		// 						label={"Show remaining as Others"}
-		// 						value={configValues[valueType].subCategoriesRanking.showRemainingAsOthers}
-		// 						handleChange={() => handleSubCategoriesCheckbox(ERankingSettings.showRemainingAsOthers, setSubCategoriesConfigValues)}
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-
-		// 			<ConditionalWrapper visible={configValues[valueType].subCategoriesRanking.showRemainingAsOthers}>
-		// 				<Row>
-		// 					<Column>
-		// 						<ColorPicker
-		// 							label={`${chartSettings.lollipopType} Slice Color`}
-		// 							color={configValues[valueType].subCategoriesRanking.pieSliceColor}
-		// 							handleChange={(value) => handleSubCategoriesColorChange(value, ERankingSettings.pieSliceColor, setSubCategoriesConfigValues)}
-		// 							colorPalette={vizOptions.host.colorPalette}
-		// 							size="sm"
-		// 						/>
-		// 					</Column>
-		// 				</Row>
-		// 			</ConditionalWrapper>
-		// 		</ConditionalWrapper>
-		// 	</ConditionalWrapper>
-		// </>
-		<></>
+			{/* {UIByGroupRankingOthersSettings(vizOptions, groupByRanking, setConfigValues)} */}
+		</>
 	);
 };
+
+// const UIByGroupRankingOthersSettings = (
+// 	vizOptions: ShadowUpdateOptions,
+// 	groupByRanking: IRankingProps,
+// 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+// ) => {
+// 	return (
+// 		<>
+// 			<Row>
+// 				<Column>
+// 					<ToggleButton
+// 						label={"Show remaining as 'Others'"}
+// 						value={groupByRanking.showRemainingAsOthers}
+// 						handleChange={() => handleCheckbox(ERankingSettings.ShowRemainingAsOthers, ERankingSettings.GroupBy, setConfigValues)}
+// 						appearance="toggle"
+// 					/>
+// 				</Column>
+// 			</Row>
+
+// 			<ConditionalWrapper visible={groupByRanking.showRemainingAsOthers}>
+// 				<Row>
+// 					<Column>
+// 						<ColorPicker
+// 							label={"'Others' Bar Color"}
+// 							color={groupByRanking.othersColor}
+// 							handleChange={(value) => handleColorChange(value, ERankingSettings.OthersColor, ERankingSettings.GroupBy, setConfigValues)}
+// 							colorPalette={vizOptions.host.colorPalette}
+// 						/>
+// 					</Column>
+// 				</Row>
+// 			</ConditionalWrapper>
+// 		</>
+// 	);
+// };
 
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
@@ -256,7 +204,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 	);
 };
 
-const RankingSettings = (props) => {
+const Ranking = (props) => {
 	const {
 		shadow,
 		compConfig: {sectionName, propertyName},
@@ -288,88 +236,50 @@ const RankingSettings = (props) => {
 		...initialStates,
 	});
 
-	let valueType = configValues.category.valueType;
-
-	const [subCategoriesConfigValues, setSubCategoriesConfigValues] = React.useState<ISubCategoryRankingProps>(
-		configValues[valueType][ERankingSettings.SubCategory]
-	);
-
-	React.useEffect(() => {
-		setConfigValues((d) => ({
-			...d,
-			[valueType]: {
-				...d[valueType],
-				[ERankingSettings.SubCategory]: subCategoriesConfigValues,
-			},
-		}));
-	}, [subCategoriesConfigValues]);
-
-	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
-
-	if (!isDumbbellChart) {
-		valueType = RankingDataValuesType.Value1;
-	}
-
-	// const categorical = vizOptions.options.dataViews[0].categorical;
-	// const value1DisplayName = categorical.values[0] ? categorical.values[0].source.displayName : "";
-	// const value2DisplayName = categorical.values[1] ? categorical.values[1].source.displayName : "";
-
-	const chartSettings: IChartSettings = shadow.chartSettings;
+	const categoryRanking = configValues.category;
+	const groupByRanking = configValues.subCategory;
 
 	return (
-		// <>
-		// 	<Row>
-		// 		<Column>
-		// 			<ToggleButton
-		// 				label={"Enable Ranking"}
-		// 				value={configValues[ERankingSettings.isRankingEnabled]}
-		// 				handleChange={() =>
-		// 					setConfigValues((d) => ({
-		// 						...d,
-		// 						[ERankingSettings.isRankingEnabled]: !d[ERankingSettings.isRankingEnabled],
-		// 					}))
-		// 				}
-		// 			/>
-		// 		</Column>
-		// 	</Row>
+		<>
+			<Accordion title="By Category" childBottomPadding>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Enable"}
+							value={categoryRanking.enabled}
+							handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.Category, setConfigValues)}
+							appearance="toggle"
+						/>
+					</Column>
+				</Row>
 
-		// 	<ConditionalWrapper visible={configValues.isRankingEnabled}>
-		// 		<ConditionalWrapper visible={isDumbbellChart}>
-		// 			<Row>
-		// 				<Column>
-		// 					<RadioOption
-		// 						label="Select Category"
-		// 						value={configValues.valueType}
-		// 						optionsList={VALUE_TYPES}
-		// 						handleChange={(value) => handleRadioButtonChange(ERankingSettings.valueType, value, setConfigValues)}
-		// 					/>
-		// 				</Column>
-		// 			</Row>
-		// 		</ConditionalWrapper>
+				<ConditionalWrapper visible={categoryRanking.enabled}>
+					{UIByCategoryRankingSettings(vizOptions, categoryRanking, setConfigValues)}
+				</ConditionalWrapper>
+			</Accordion>
 
-		// 		<Row>
-		// 			<Column>
-		// 				<RadioOption
-		// 					label="Filter Type"
-		// 					value={configValues[valueType].filterType}
-		// 					optionsList={FILTER_TYPES}
-		// 					handleChange={(value) => handleChange(value, ERankingSettings.filterType, valueType, setConfigValues)}
-		// 				/>
-		// 			</Column>
-		// 		</Row>
+			<ConditionalWrapper visible={shadow.isGroupingPresent}>
+				<Accordion title="By Legend" childBottomPadding>
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Enable"}
+								value={groupByRanking.enabled}
+								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SubCategory, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
 
-		// 		<ConditionalWrapper visible={configValues[valueType].filterType !== RankingFilterType.None}>
-		// 			{UICategoryRankingSettings(vizOptions, chartSettings, valueType, configValues, setConfigValues)}
-		// 		</ConditionalWrapper>
-		// 		<ConditionalWrapper visible={chartSettings.lollipopType !== LollipopType.Circle}>
-		// 			{UISubCategoryRankingSettings(vizOptions, chartSettings, valueType, configValues, setConfigValues, setSubCategoriesConfigValues)}
-		// 		</ConditionalWrapper>
-		// 	</ConditionalWrapper>
+					<ConditionalWrapper visible={groupByRanking.enabled}>
+						{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
+					</ConditionalWrapper>
+				</Accordion>
+			</ConditionalWrapper>
 
-		// 	{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
-		// </>
-		<></>
+			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+		</>
 	);
 };
 
-export default RankingSettings;
+export default Ranking;
