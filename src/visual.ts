@@ -51,14 +51,6 @@ import {EnumerateSectionType} from "@truviz/shadow/dist/types/EnumerateSectionTy
 import {Enumeration} from "./Enumeration";
 import {paidProperties} from "./PaidProperties";
 import {NumberFormatting, VisualSettings} from "./settings";
-import ChartSettings from "./settings-pages/ChartSettings";
-import DataColorsSettings from "./settings-pages/DataColorsSettings";
-import CircleSettings from "./settings-pages/CircleSettings";
-import LineSettings from "./settings-pages/LineSettings";
-import DataLabelsSettings from "./settings-pages/DataLabelsSettings";
-import GridLinesSettings from "./settings-pages/GridLinesSettings";
-import RankingSettings from "./settings-pages/RankingSettings";
-import SortingSettings from "./settings-pages/SortingSettings";
 import {
 	CHART_SETTINGS,
 	CIRCLE_SETTINGS,
@@ -105,6 +97,16 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
+
+import ChartSettings from "./settings-pages/ChartSettings";
+import DataColorsSettings from "./settings-pages/DataColorsSettings";
+import CircleSettings from "./settings-pages/CircleSettings";
+import LineSettings from "./settings-pages/LineSettings";
+import DataLabelsSettings from "./settings-pages/DataLabelsSettings";
+import GridLinesSettings from "./settings-pages/GridLinesSettings";
+import RankingSettings from "./settings-pages/RankingSettings";
+import SortingSettings from "./settings-pages/SortingSettings";
+
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 export class Visual extends Shadow {
