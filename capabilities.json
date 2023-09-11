@@ -24,6 +24,19 @@
 			"displayName": "Sort",
 			"name": "sort",
 			"kind": "Measure"
+		},
+		{
+			"displayName": "Show",
+			"name": "showBucket",
+			"kind": "Measure",
+			"requiredTypes": [
+				{
+					"numeric": true
+				},
+				{
+					"integer": true
+				}
+			]
 		}
 	],
 	"dataViewMappings": [
@@ -34,6 +47,9 @@
 						"max": 2
 					},
 					"subCategory": {
+						"max": 1
+					},
+					"showBucket": {
 						"max": 1
 					}
 				}
@@ -66,6 +82,11 @@
 							{
 								"bind": {
 									"to": "sort"
+								}
+							},
+							{
+								"bind": {
+									"to": "showBucket"
 								}
 							}
 						],
@@ -552,6 +573,18 @@
 								"color": true
 							}
 						}
+					}
+				}
+			}
+		},
+		"showBucketConfig": {
+			"displayName": "Show Bucket",
+			"properties": {
+				"showBucket": {
+					"displayName": "Show Bucket",
+					"description": "",
+					"type": {
+						"text": true
 					}
 				}
 			}

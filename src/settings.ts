@@ -44,6 +44,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public yAxisConfig = new YAxisConfig();
 	public legend = new Legend();
 	public numberFormatting = new NumberFormatting();
+	public showBucketConfig = new ShowBucketConfig();
 }
 
 export class License {
@@ -114,4 +115,8 @@ export class NumberFormatting {
 	public negativeColor: string = "#ff0000";
 	public positiveFormat: string = "x";
 	public positiveColor: string = "#00ff00";
+}
+
+export class ShowBucketConfig {
+	public showBucket: string = "{}";
 }

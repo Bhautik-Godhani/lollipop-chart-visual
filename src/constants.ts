@@ -27,6 +27,7 @@ import {
 	ILineSettings,
 	IPiePropsSettings,
 	IRankingSettings,
+	IShowBucketSettings,
 	ISortingSettings,
 	IXAxisSettings,
 	IXGridLinesSettings,
@@ -274,4 +275,15 @@ export const SORTING_SETTINGS: ISortingSettings = {
 		isSortByMultiMeasure: false,
 		isSortByExtraSortField: false,
 	},
+};
+
+export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
+	enable: true,
+	showBucketField: "",
+	message: "Show chart condition is not fulfilled",
+	showIcon: true,
+	fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	fontSize: 20,
+	styling: [],
+	color: "rgba(84, 84, 84, 1)",
 };

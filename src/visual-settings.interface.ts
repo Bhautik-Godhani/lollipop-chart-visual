@@ -252,3 +252,14 @@ export interface IBrushConfig {
 	XAxisG?: SVGElement | null;
 	brushNumber?: number;
 }
+
+export interface IShowBucketSettings {
+	enable: boolean;
+	showBucketField: string;
+	message: string;
+	showIcon: boolean;
+	fontFamily: string;
+	fontSize: number;
+	styling: string[];
+	color: string;
+}

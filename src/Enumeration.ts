@@ -20,6 +20,7 @@ export class Enumeration {
 			getYAxisConfigSelection(),
 			getLegendSelection(),
 			getNumberFormattingSelection(),
+			getShowBucketConfigSelection(),
 		];
 	}
 }
@@ -308,6 +309,19 @@ function getNumberFormattingSelection(): EnumerateSectionType {
 			},
 			{
 				name: "positiveColor",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getShowBucketConfigSelection(): EnumerateSectionType {
+	return {
+		name: "showBucketConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "showBucket",
 				isShow: true,
 			},
 		],

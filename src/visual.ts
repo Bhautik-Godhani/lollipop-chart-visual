@@ -59,6 +59,7 @@ import {
 	GRID_LINES_SETTINGS,
 	LINE_SETTINGS,
 	RANKING_SETTINGS,
+	SHOW_BUCKET_SETTINGS,
 	SORTING_SETTINGS,
 	X_AXIS_SETTINGS,
 	Y_AXIS_SETTINGS,
@@ -78,6 +79,7 @@ import {
 	IPiePropsSettings,
 	IPieSettings,
 	IRankingSettings,
+	IShowBucketSettings,
 	ISortingProps,
 	ISortingSettings,
 	IXAxisSettings,
@@ -106,6 +108,7 @@ import DataLabelsSettings from "./settings-pages/DataLabelsSettings";
 import GridLinesSettings from "./settings-pages/GridLinesSettings";
 import RankingSettings from "./settings-pages/RankingSettings";
 import SortingSettings from "./settings-pages/SortingSettings";
+import ShowBucket from "./settings-pages/ShowBucket";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -270,6 +273,11 @@ export class Visual extends Shadow {
 	legendViewPortWidth: number = 0;
 	legendViewPortHeight: number = 0;
 
+	// show bucket
+	isValidShowBucket = true;
+	isShowBucketChartFieldCheck: boolean;
+	isShowBucketChartFieldName: string;
+
 	// settings
 	isHorizontalChart: boolean = false;
 	circleSettings: ICircleSettings;
@@ -291,6 +299,7 @@ export class Visual extends Shadow {
 	dataColorsSettings: IDataColorsSettings;
 	rankingSettings: IRankingSettings;
 	sortingSettings: ISortingSettings;
+	showBucketSettings: IShowBucketSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -374,6 +383,12 @@ export class Visual extends Shadow {
 					sectionName: "sortingConfig",
 					propertyName: "sorting",
 					Component: () => SortingSettings,
+				},
+				{
+					name: "Show Condition",
+					sectionName: "showBucketConfig",
+					propertyName: "showBucket",
+					Component: () => ShowBucket,
 				},
 			],
 		});
@@ -1049,6 +1064,7 @@ export class Visual extends Shadow {
 			this.categoricalData = this.visualUpdateOptions.options.dataViews[0].categorical as any;
 			this.categoricalMetadata = this.visualUpdateOptions.options.dataViews[0].metadata;
 			this.isInFocusMode = vizOptions.options.isInFocus;
+			this.isValidShowBucket = true;
 			this.brushWidth = 0;
 			this.brushHeight = 0;
 
@@ -1060,6 +1076,12 @@ export class Visual extends Shadow {
 
 			if (!this.isChartInit) {
 				this.initChart();
+			}
+
+			this.handleShowBucket();
+
+			if (!this.isValidShowBucket) {
+				return;
 			}
 
 			this.expandAllXAxisG.selectAll("*").remove();
@@ -4710,5 +4732,42 @@ export class Visual extends Shadow {
 		this.legendViewPort.height = legend.getMargins().height ? legend.getMargins().height : 0;
 		d3.select(this.chartContainer).style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
 		d3.select(this.hostContainer).selectAll(".legend").style("left", null);
+	}
+
+	handleShowBucket(): void {
+		const showBucketConfig = JSON.parse(this.visualUpdateOptions.formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]);
+		this.showBucketSettings = {
+			...SHOW_BUCKET_SETTINGS,
+			...showBucketConfig,
+		};
+
+		const categoricalShowBucketField = this.categoricalData.values.find((d) => d.source.roles[EDataRolesName.ShowBucket]);
+		this.isShowBucketChartFieldCheck = !!categoricalShowBucketField;
+		this.isShowBucketChartFieldName = this.isShowBucketChartFieldCheck ? categoricalShowBucketField.source.displayName : "";
+
+		const {enable, fontSize, fontFamily, styling, color, message, showIcon} = this.showBucketSettings;
+
+		if (this.isShowBucketChartFieldCheck) {
+			if (this.showBucketSettings.enable) {
+				this.isValidShowBucket = !categoricalShowBucketField.values.some((d) => d === 0);
+			}
+
+			if (!this.isValidShowBucket) {
+				this.renderShowConditionPage({
+					enable: enable,
+					fontSize: fontSize,
+					fontFamily: fontFamily,
+					fontStyling: styling,
+					color: color,
+					message: message,
+					showIcon: showIcon,
+				});
+				return;
+			} else {
+				this.removeShowConditionPage();
+			}
+		} else {
+			this.removeShowConditionPage();
+		}
 	}
 }

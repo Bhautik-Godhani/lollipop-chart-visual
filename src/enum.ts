@@ -9,6 +9,7 @@ export enum EVisualConfig {
 	SortingConfig = "sortingConfig",
 	XAxisConfig = "xAxisConfig",
 	YAxisConfig = "yAxisConfig",
+	ShowBucketConfig = "showBucketConfig",
 }
 
 export enum EVisualSettings {
@@ -26,6 +27,7 @@ export enum EVisualSettings {
 	YAxisSettings = "yAxisSettings",
 	Legend = "legend",
 	NumberFormatting = "numberFormatting",
+	ShowBucketFormatting = "showBucket",
 }
 
 export enum LineType {
@@ -144,6 +146,7 @@ export enum EDataRolesName {
 	Measure2 = "measure2",
 	Tooltip = "tooltip",
 	Sort = "sort",
+	ShowBucket = "showBucket",
 }
 
 export enum LollipopType {
@@ -281,4 +284,15 @@ export enum ESortingSettings {
 	IsSortByCategory = "isSortByCategory",
 	IsSortByMeasure = "isSortByMeasure",
 	IsSortByExtraSortField = "isSortByExtraSortField",
+}
+
+export enum EShowBucketSettings {
+	Enable = "enable",
+	ShowBucketField = "showBucketField",
+	Message = "message",
+	ShowIcon = "showIcon",
+	FontFamily = "fontFamily",
+	FontSize = "fontSize",
+	Styling = "styling",
+	Color = "color",
 }

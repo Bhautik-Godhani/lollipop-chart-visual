@@ -15,6 +15,7 @@ const sectionKVPair = [
 	{yAxisConfig: "Y Axis Configuration"},
 	{legend: "legend"},
 	{numberFormatting: "numberFormatting"},
+	{showBucketConfig: "Show Bucket"},
 ];
 
 const formatTab = {
@@ -402,6 +403,15 @@ const formatTab = {
 			description: "",
 			type: "color",
 			defaultValue: "#00ff00",
+		},
+	],
+	showBucketConfig: [
+		{
+			technicalName: "showBucket",
+			displayName: "Show Bucket",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
 		},
 	],
 };
