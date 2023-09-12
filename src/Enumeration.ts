@@ -1,7 +1,7 @@
 import powerbi from "powerbi-visuals-api";
 import VisualObjectInstance = powerbi.VisualObjectInstance;
-import {VisualSettings} from "./settings";
-import {EnumerateSectionType} from "@truviz/shadow/dist/types/EnumerateSectionType";
+import { VisualSettings } from "./settings";
+import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
 
 export class Enumeration {
 	public static GET(): EnumerateSectionType[] {
@@ -21,6 +21,7 @@ export class Enumeration {
 			getLegendSelection(),
 			getNumberFormattingSelection(),
 			getShowBucketConfigSelection(),
+			getFooterSelection(),
 		];
 	}
 }
@@ -326,4 +327,61 @@ function getShowBucketConfigSelection(): EnumerateSectionType {
 			},
 		],
 	};
+}
+
+function getFooterSelection(): EnumerateSectionType {
+	return {
+		name: 'footer',
+		isShow: true,
+		properties: [
+			{
+				name: 'show',
+				isShow: true
+			},
+			{
+				name: 'text',
+				isShow: true
+			},
+			{
+				name: 'webURL',
+				isShow: true
+			},
+			{
+				name: 'color',
+				isShow: true
+			},
+			{
+				name: 'fontSize',
+				isShow: true
+			},
+			{
+				name: 'fontFamily',
+				isShow: true
+			},
+			{
+				name: 'isShowDivider',
+				isShow: true
+			},
+			{
+				name: 'dividerColor',
+				isShow: (settings: VisualSettings) => settings.footer.isShowDivider,
+			},
+			{
+				name: 'dividerThickness',
+				isShow: (settings: VisualSettings) => settings.footer.isShowDivider,
+			},
+			{
+				name: 'backgroundColor',
+				isShow: true
+			},
+			{
+				name: 'backgroundTransparency',
+				isShow: true
+			},
+			{
+				name: 'alignment',
+				isShow: true
+			},
+		]
+	}
 }

@@ -28,6 +28,7 @@ export enum EVisualSettings {
 	Legend = "legend",
 	NumberFormatting = "numberFormatting",
 	ShowBucketFormatting = "showBucket",
+	Footer = "footer",
 }
 
 export enum LineType {

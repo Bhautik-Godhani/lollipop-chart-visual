@@ -1,42 +1,58 @@
 @import "./color-picker.less";
 @import "./data-colors.less";
 
-.lollipopChart {
-	.xAxisG,
-	.yAxisG,
-	.expandAllXAxisG,
-	.expandAllYAxisG {
-		.domain {
-			display: none;
-		}
-		.tick {
-			line {
+.visual-container {
+	display: flex !important;
+	flex-direction: column;
+	position: relative !important;
+
+	.lollipopChart {
+		.xAxisG,
+		.yAxisG,
+		.expandAllXAxisG,
+		.expandAllYAxisG {
+			.domain {
 				display: none;
+			}
+			.tick {
+				line {
+					display: none;
+				}
+			}
+		}
+
+		.solid {
+			stroke-dasharray: none !important;
+		}
+
+		.dotted {
+			stroke-linecap: round;
+		}
+
+		.brush {
+			.overlay {
+				fill: #e1e1e1;
+				fill-opacity: 0.5;
+				z-index: inherit;
+				cursor: default !important;
+				pointer-events: none !important;
+			}
+
+			.selection {
+				fill: #000;
+				fill-opacity: 0.24;
+				cursor: default !important;
 			}
 		}
 	}
 
-	.solid {
-		stroke-dasharray: none !important;
-	}
-
-	.dotted {
-		stroke-linecap: round;
-	}
-
-	.brush {
-		.overlay {
-			fill: #e1e1e1;
-			fill-opacity: 0.5;
-			z-index: inherit;
-			cursor: default !important;
-			pointer-events: none !important;
-		}
-
-		.selection {
-			fill: #000;
-			fill-opacity: 0.24;
-			cursor: default !important;
-		}
+	.footer-container {
+		box-sizing: content-box;
+		display: flex;
+		align-items: center;
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0px;
 	}
 }

@@ -1,7 +1,7 @@
-import {textMeasurementService, wordBreaker} from "powerbi-visuals-utils-formattingutils";
-import {TextProperties} from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
-import {NumberFormatting} from "../settings";
-import {valueFormatter} from "powerbi-visuals-utils-formattingutils";
+import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
+import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
+import { NumberFormatting } from "../settings";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import IValueFormatter = valueFormatter.IValueFormatter;
 
 export const getSVGTextSize = (
@@ -11,7 +11,7 @@ export const getSVGTextSize = (
 	fontWeight: string = null,
 	fontStyle: string = null,
 	textDecoration: string = null
-): {width: number; height: number} => {
+): { width: number; height: number } => {
 	const textProperties = {
 		text,
 		fontFamily,
@@ -24,7 +24,7 @@ export const getSVGTextSize = (
 	const measureSvgTextWidth = textMeasurementService.measureSvgTextWidth(textProperties, text);
 	const measureSvgTextHeight = textMeasurementService.measureSvgTextHeight(textProperties, text);
 
-	return {width: measureSvgTextWidth, height: measureSvgTextHeight};
+	return { width: measureSvgTextWidth, height: measureSvgTextHeight };
 };
 
 export const GetWordsSplitByWidth = (text: string, textProperties: TextProperties, maxWidth: number, maxLines: number): string[] => {
@@ -39,7 +39,7 @@ export const GetWordsSplitByWidth = (text: string, textProperties: TextPropertie
 	return wordBreaker.splitByWidth(text, textProperties, calcTextWidth, maxWidth, maxLines, textTruncator);
 };
 
-const scaleNumber = (num, scaling): {n: number; scaledTo: string} => {
+const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
 	if (scaling === "auto") {
 		const l = Math.floor(num).toString().length;
 		if (l <= 3) {
@@ -144,7 +144,7 @@ export const formatNumber = (number: number | string, options: NumberFormatting,
 			if (!options.thousandsSeparator) {
 				_num = __n.toFixed(decimals).toString();
 			} else {
-				_num = __n.toLocaleString(undefined, {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
+				_num = __n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 			}
 		} else {
 			_num = __n;
@@ -179,7 +179,20 @@ export const parseObject = (obj, def) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = {...def};
+		initialStates = { ...def };
 	}
 	return initialStates;
+};
+
+export const hexToRGB = (hex: string, alpha: number): string => {
+	if (hex.indexOf("rgb") !== -1) return hex;
+	const r = parseInt(hex.slice(1, 3), 16),
+		g = parseInt(hex.slice(3, 5), 16),
+		b = parseInt(hex.slice(5, 7), 16);
+
+	if (alpha >= 0 && alpha <= 1) {
+		return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+	} else {
+		return "rgb(" + r + ", " + g + ", " + b + ")";
+	}
 };

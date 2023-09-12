@@ -588,17 +588,139 @@
 					}
 				}
 			}
+		},
+		"footer": {
+			"displayName": "Footer",
+			"properties": {
+				"show": {
+					"displayName": "Show",
+					"description": "",
+					"type": {
+						"bool": true
+					}
+				},
+				"text": {
+					"displayName": "Text",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				},
+				"webURL": {
+					"displayName": "Web URL",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				},
+				"color": {
+					"displayName": "Text Color",
+					"description": "",
+					"type": {
+						"fill": {
+							"solid": {
+								"color": true
+							}
+						}
+					}
+				},
+				"fontSize": {
+					"displayName": "Text Size",
+					"description": "",
+					"type": {
+						"formatting": {
+							"fontSize": true
+						}
+					}
+				},
+				"fontFamily": {
+					"displayName": "Font family",
+					"description": "",
+					"type": {
+						"formatting": {
+							"fontFamily": true
+						}
+					}
+				},
+				"isShowDivider": {
+					"displayName": "Divider",
+					"description": "",
+					"type": {
+						"bool": true
+					}
+				},
+				"dividerColor": {
+					"displayName": "Divider Color",
+					"description": "",
+					"type": {
+						"fill": {
+							"solid": {
+								"color": true
+							}
+						}
+					}
+				},
+				"dividerThickness": {
+					"displayName": "Divider Width",
+					"description": "",
+					"type": {
+						"numeric": true
+					}
+				},
+				"backgroundColor": {
+					"displayName": "Background Color",
+					"description": "",
+					"type": {
+						"fill": {
+							"solid": {
+								"color": true
+							}
+						}
+					}
+				},
+				"backgroundTransparency": {
+					"displayName": "Background Transparency",
+					"description": "",
+					"type": {
+						"numeric": true
+					}
+				},
+				"alignment": {
+					"displayName": "Alignment",
+					"description": "",
+					"type": {
+						"enumeration": [
+							{
+								"displayName": "Left",
+								"value": "left"
+							},
+							{
+								"displayName": "Center",
+								"value": "center"
+							},
+							{
+								"displayName": "Right",
+								"value": "right"
+							}
+						]
+					}
+				}
+			}
 		}
 	},
 	"drilldown": {
-		"roles": ["category"]
+		"roles": [
+			"category"
+		]
 	},
 	"tooltips": {
 		"supportedTypes": {
 			"default": true,
 			"canvas": true
 		},
-		"roles": ["tooltip"]
+		"roles": [
+			"tooltip"
+		]
 	},
 	"supportsHighlight": true,
 	"supportsLandingPage": true,

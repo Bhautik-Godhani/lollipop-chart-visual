@@ -26,7 +26,7 @@
 
 "use strict";
 
-import {dataViewObjectsParser} from "powerbi-visuals-utils-dataviewutils";
+import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
 export class VisualSettings extends DataViewObjectsParser {
@@ -45,6 +45,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public legend = new Legend();
 	public numberFormatting = new NumberFormatting();
 	public showBucketConfig = new ShowBucketConfig();
+	public footer = new Footer();
 }
 
 export class License {
@@ -119,4 +120,8 @@ export class NumberFormatting {
 
 export class ShowBucketConfig {
 	public showBucket: string = "{}";
+}
+
+export class Footer {
+	public show: boolean = false; public text: string = ""; public webURL: string = ""; public color: string = "#404040"; public fontSize: string = "16"; public fontFamily: string = "Segoe UI"; public isShowDivider: boolean = false; public dividerColor: string = "#404040"; public dividerThickness: number = 1; public backgroundColor: string = "#ffffff"; public backgroundTransparency: number = 0; public alignment: string = "center";
 }

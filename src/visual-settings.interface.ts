@@ -201,7 +201,7 @@ export interface IDataColorsPropsSettings {
 	fillnull: string;
 	fillType: string;
 	numberOfClasses: number;
-	byCategoryColors: {name: string; color: string}[];
+	byCategoryColors: { name: string; color: string }[];
 	schemeColors: string[];
 	reverse: boolean;
 	isGradient: boolean;
@@ -246,7 +246,7 @@ export interface IBrushConfig {
 	totalBarsCount: number;
 	scaleWidth: number;
 	scaleHeight: number;
-	smallMultiplesGridItemContent?: {[category: string]: any};
+	smallMultiplesGridItemContent?: { [category: string]: any };
 	smallMultiplesGridItemId: string;
 	categoricalData: any;
 	XAxisG?: SVGElement | null;
@@ -262,4 +262,27 @@ export interface IShowBucketSettings {
 	fontSize: number;
 	styling: string[];
 	color: string;
+}
+
+export interface IFooterSettings {
+	show: boolean;
+	text: string;
+	webURL: string;
+	isShowDivider: boolean;
+	dividerColor: string;
+	dividerThickness: number;
+	color: string;
+	fontSize: number;
+	fontFamily: string;
+	backgroundColor: string;
+	backgroundTransparency: number;
+	alignment: string;
+}
+
+export interface IHighContrastDetails {
+	isHighContrast: boolean;
+	foregroundColor?: string;
+	backgroundColor?: string;
+	foregroundSelectedColor?: string;
+	hyperlinkColor?: string;
 }
