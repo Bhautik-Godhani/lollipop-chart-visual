@@ -12,6 +12,7 @@ import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 import IColorPalette = powerbi.extensibility.IColorPalette;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
+import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 import * as d3 from "d3";
 
@@ -119,6 +120,7 @@ export class Visual extends Shadow {
 	public chartContainer: HTMLElement;
 	public hostContainer: HTMLElement;
 	public visualUpdateOptions: ShadowUpdateOptions;
+	private selectionManager: ISelectionManager;
 	public tooltipServiceWrapper: ITooltipServiceWrapper;
 	public legend1: ILegend;
 	public legend2: ILegend;
@@ -406,6 +408,7 @@ export class Visual extends Shadow {
 		this.tooltipServiceWrapper = createTooltipServiceWrapper(options.host.tooltipService, options.element);
 		this._events = options.host.eventService;
 		this._host = options.host;
+		this.selectionManager = options.host.createSelectionManager();
 		this.initChart();
 	}
 
@@ -1086,6 +1089,7 @@ export class Visual extends Shadow {
 				this.initChart();
 			}
 
+			this.renderContextMenu();
 			this.setHighContrastDetails();
 			this.handleShowBucket();
 
@@ -4830,5 +4834,16 @@ export class Visual extends Shadow {
 			foregroundSelectedColor: this._host.colorPalette.foregroundSelected.value,
 			hyperlinkColor: this._host.colorPalette.hyperlink.value,
 		};
+	}
+
+	private renderContextMenu(): void {
+		d3.select(this.chartContainer).on("contextmenu", (event) => {
+			const dataPoint: any = d3.select(event.target).datum();
+			this.selectionManager.showContextMenu(dataPoint && (dataPoint.identity ? dataPoint.identity : {}), {
+				x: event.clientX,
+				y: event.clientY,
+			});
+			event.preventDefault();
+		});
 	}
 }
