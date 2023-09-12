@@ -196,3 +196,10 @@ export const hexToRGB = (hex: string, alpha: number): string => {
 		return "rgb(" + r + ", " + g + ", " + b + ")";
 	}
 };
+
+export const powerBiNumberFormat = (
+	number: number,
+	formatter: IValueFormatter,
+): string => {
+	return formatter.format(number);
+}

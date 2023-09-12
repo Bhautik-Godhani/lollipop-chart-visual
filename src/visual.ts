@@ -6,6 +6,8 @@ import "core-js/stable";
 import "./../style/visual.less";
 import "regenerator-runtime/runtime";
 import powerbi from "powerbi-visuals-api";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
@@ -13,9 +15,9 @@ import IColorPalette = powerbi.extensibility.IColorPalette;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
+import IValueFormatter = valueFormatter.IValueFormatter;
 
 import * as d3 from "d3";
-
 import { IChartSubCategory, ILollipopChartRow, TooltipData } from "./model";
 import {
 	CategoryDataColorProps,
@@ -95,7 +97,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB } from "./methods/methods";
+import { GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -180,6 +182,12 @@ export class Visual extends Shadow {
 	blankText: string = "(Blank)";
 	othersBarText = "Others";
 	totalLollipopCount: number = 0;
+
+	// number formatter
+	public measureNumberFormatter: IValueFormatter[];
+	public tooltipNumberFormatter: IValueFormatter[];
+	public sortValuesNumberFormatter: IValueFormatter[];
+	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter, role: EDataRolesName } } = {};
 
 	// svg
 	public svg: any;
@@ -740,6 +748,8 @@ export class Visual extends Shadow {
 		this.isHasSubcategories = !!categoricalSubCategoryField;
 		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))];
 
+		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields);
+
 		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
 
@@ -1251,6 +1261,8 @@ export class Visual extends Shadow {
 			}
 
 			this.drawLollipopChart();
+			this.setSummaryTableConfig();
+
 			// this.displayBrush();
 			// this.drawTooltip();
 		} catch (error) {
@@ -4845,5 +4857,105 @@ export class Visual extends Shadow {
 			});
 			event.preventDefault();
 		});
+	}
+
+	setSummaryTableConfig(): void {
+		this.summaryTableConfig = {
+			excludeNegativeDataBy: this.isHasSubcategories ? "cell" : "row",
+			categoricalGroupedDatarole: "subCategory",
+			excludeDataRolesFromTable: ["showBucket"],
+			dataView: this.visualUpdateOptions.options.dataViews as any,
+			gridView: "tabular",
+			gridConfig: {
+				sidebar: { columns: true, filters: true },
+				allowedAggregations: true,
+			},
+			numberFormatter: (value, field) => {
+				console.log(field)
+				if (this.isHasSubcategories) {
+					field = field.split("_").splice(3).join("_");
+				}
+
+				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
+					return this.numberSettings.show ?
+						formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter) :
+						powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+				} else {
+					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+				}
+			},
+			themeValue: this.visualUpdateOptions.formatTab["visualGeneralSettings"]["darkMode"],
+			viewport: {
+				width: this.visualUpdateOptions.options.viewport.width,
+				height: this.visualUpdateOptions.options.viewport.height,
+			},
+		};
+
+		if (this.rankingSettings.category.enabled) {
+			this.summaryTableConfig = {
+				...this.summaryTableConfig,
+				matrixRanking: {
+					row: {
+						rank: this.rankingSettings.category.rankingType,
+						count: this.rankingSettings.category.count
+					},
+					column: {
+						rank: this.rankingSettings.subCategory.rankingType,
+						count: this.rankingSettings.subCategory.count
+					}
+				},
+			}
+		}
+
+		if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
+			const matrixSorting = { row: [], column: [] };
+			if (this.sortingSettings.category.enabled) {
+				matrixSorting.row.push({
+					column: this.sortingSettings.category.sortBy,
+					order: +this.sortingSettings.category.sortOrder === 1 ? "asc" : "desc",
+				})
+			}
+
+			if (this.sortingSettings.subCategory.enabled) {
+				matrixSorting.column.push({
+					column: this.sortingSettings.subCategory.sortBy,
+					order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc"
+				})
+			}
+
+			this.summaryTableConfig = {
+				...this.summaryTableConfig,
+				matrixSorting: matrixSorting
+			}
+		}
+	}
+
+	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields): void {
+		this.measureNumberFormatter = categoricalMeasureFields
+			.map(d => {
+				return valueFormatter.create({ format: d.source.format });
+			});
+
+		this.tooltipNumberFormatter = categoricalTooltipFields
+			.map(d => {
+				return valueFormatter.create({ format: d.source.format });
+			});
+
+		this.sortValuesNumberFormatter = categoricalSortFields
+			.map(d => {
+				return valueFormatter.create({ format: d.source.format });
+			});
+
+		categoricalMeasureFields.forEach((d, i) => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure };
+		})
+
+		categoricalTooltipFields.forEach((d, i) => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip };
+		})
+
+		categoricalSortFields.forEach((d, i) => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort };
+		})
 	}
 }
