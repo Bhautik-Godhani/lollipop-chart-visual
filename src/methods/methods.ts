@@ -104,12 +104,12 @@ const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
 	};
 };
 
-export const formatNumber = (number: number | string, options: NumberFormatting, formatter: IValueFormatter): string => {
+export const formatNumber = (number: number | string, options: NumberFormatting, formatter: IValueFormatter = undefined): string => {
 	if (typeof number !== "number") {
 		return number;
 	}
 
-	if (!options.show) {
+	if (!options.show && formatter) {
 		return formatter.format(number);
 	}
 

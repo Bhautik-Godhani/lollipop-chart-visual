@@ -129,6 +129,7 @@ export class Visual extends Shadow {
 	public colorPalette: IColorPalette;
 	public _events: IVisualEventService;
 	private _host: IVisualHost;
+	public formatNumber: (value: number | string, numberFormatter: IValueFormatter) => string;
 
 	// props
 	public width: number;
@@ -1102,6 +1103,7 @@ export class Visual extends Shadow {
 			this.renderContextMenu();
 			this.setHighContrastDetails();
 			this.handleShowBucket();
+			this.formatNumber = (value, numberFormatter) => formatNumber(value, this.numberSettings, numberFormatter);
 
 			if (!this.isValidShowBucket) {
 				return;
@@ -2589,49 +2591,6 @@ export class Visual extends Shadow {
 		return fNumber;
 	}
 
-	getFormattedNumber(number: number): string {
-		return number.toString();
-
-		// const numberSettings = this.numberSettings;
-
-		// if (!numberSettings.show) {
-		// 	return number + "";
-		// }
-
-		// let formattedNumber: string = "0";
-		// switch (numberSettings.displayUnits) {
-		// 	case DisplayUnits.Auto: {
-		// 		formattedNumber = this.getAutoUnitFormattedNumber(number);
-		// 		break;
-		// 	}
-		// 	case DisplayUnits.None: {
-		// 		formattedNumber = this.thousandsSeparator(parseInt(number.toFixed(numberSettings.decimalPlaces)));
-		// 		break;
-		// 	}
-		// 	case DisplayUnits.Thousands: {
-		// 		formattedNumber = this.decimalSeparator(+(number / 1.0e3).toFixed(numberSettings.decimalPlaces)) + numberSettings.thousands;
-		// 		break;
-		// 	}
-		// 	case DisplayUnits.Millions: {
-		// 		formattedNumber = this.decimalSeparator(+(number / 1.0e6).toFixed(numberSettings.decimalPlaces)) + numberSettings.million;
-		// 		break;
-		// 	}
-		// 	case DisplayUnits.Billions: {
-		// 		formattedNumber = this.decimalSeparator(+(number / 1.0e9).toFixed(numberSettings.decimalPlaces)) + numberSettings.billion;
-		// 		break;
-		// 	}
-		// 	case DisplayUnits.Trillions: {
-		// 		formattedNumber = this.decimalSeparator(+(number / 1.0e12).toFixed(numberSettings.decimalPlaces)) + numberSettings.trillion;
-		// 		break;
-		// 	}
-		// 	default: {
-		// 		formattedNumber = this.getAutoUnitFormattedNumber(number);
-		// 	}
-		// }
-
-		// return numberSettings.prefix + " " + formattedNumber + " " + numberSettings.suffix;
-	}
-
 	// Data Labels
 	getDataLabelDisplayStyle(labelEle: any): string {
 		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
@@ -2709,7 +2668,7 @@ export class Visual extends Shadow {
 			.style("font-family", dataLabelsSettings.fontFamily)
 			// .style('font-weight', dataLabelsSettings.fontStyle === FontStyle.Bold ? 'bold' : '')
 			// .style('font-style', dataLabelsSettings.fontStyle === FontStyle.Italic ? 'italic' : '')
-			.text((d) => this.getFormattedNumber(d[key]));
+			.text((d) => this.formatNumber(d[key], this.measureNumberFormatter[isData2Label ? 1 : 0]));
 
 		rectSelection
 			.classed("dataLabelRect", true)
@@ -3102,6 +3061,12 @@ export class Visual extends Shadow {
 			(datapoint: any) => datapoint.selectionId
 		);
 
+		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
+			return this.numberSettings.show ?
+				formatNumber(value, this.numberSettings, numberFormatter) :
+				powerBiNumberFormat(value, numberFormatter);
+		}
+
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean): VisualTooltipDataItem[] => {
 			const tooltipData: TooltipData[] = [
 				{
@@ -3111,15 +3076,17 @@ export class Visual extends Shadow {
 				},
 				{
 					displayName: isCircle1 ? this.measure1DisplayName : this.measure2DisplayName,
-					value: isCircle1 ? this.getFormattedNumber(value.value1) : this.getFormattedNumber(value.value2),
+					value: isCircle1 ? numberFormatter(value.value1, this.measureNumberFormatter[0]) : numberFormatter(value.value2, this.measureNumberFormatter[1]),
 					color: value.styles.circle1.fillColor,
 				},
 			];
 
-			value.tooltipFields.forEach((data) => {
+			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
 					displayName: data.displayName,
-					value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
+					value: typeof data.value === "number"
+						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
+						: data.value,
 					color: data.color ? data.color : "transparent",
 				});
 			});
@@ -3136,20 +3103,22 @@ export class Visual extends Shadow {
 				},
 				{
 					displayName: this.measure1DisplayName,
-					value: this.getFormattedNumber(value.value1),
+					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
 					color: value.styles.circle1.fillColor,
 				},
 				{
 					displayName: this.measure2DisplayName,
-					value: this.getFormattedNumber(value.value2),
+					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
 					color: value.styles.circle2.fillColor,
 				},
 			];
 
-			value.tooltipFields.forEach((data) => {
+			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
 					displayName: data.displayName,
-					value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
+					value: typeof data.value === "number"
+						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
+						: data.value,
 					color: data.color ? data.color : "transparent",
 				});
 			});
@@ -3305,12 +3274,7 @@ export class Visual extends Shadow {
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
-					ele.append("tspan").text(THIS.getFormattedNumber(parseFloat(text)));
-				}
-			})
-			.each((d) => {
-				if (this.isHorizontalChart && typeof d === "number") {
-					this.setAxisNumberFormatting(this, d);
+					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
 				}
 			});
 	}
@@ -3375,7 +3339,7 @@ export class Visual extends Shadow {
 				};
 
 				if (!THIS.isHorizontalChart) {
-					ele.append("tspan").text(THIS.getFormattedNumber(parseFloat(text)));
+					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * 0.06);
 					ele.append("tspan").text(truncatedText);
@@ -3403,11 +3367,6 @@ export class Visual extends Shadow {
 			const newText = text.substr(0, this.yAxisSettings.labelCharLimit);
 			self.text(newText + "..");
 		}
-	}
-
-	setAxisNumberFormatting(tickEle: any, number: number): void {
-		const self = d3.select(tickEle);
-		self.text(this.getFormattedNumber(number));
 	}
 
 	setXYAxisDomain(): void {
@@ -4199,6 +4158,12 @@ export class Visual extends Shadow {
 					(datapoint: IChartSubCategory) => datapoint.selectionId
 				);
 
+				const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
+					return this.numberSettings.show ?
+						formatNumber(value, this.numberSettings, numberFormatter) :
+						powerBiNumberFormat(value, numberFormatter);
+				}
+
 				const getTooltipData = (pieData: IChartSubCategory): VisualTooltipDataItem[] => {
 					const tooltipData: TooltipData[] = [
 						{
@@ -4208,7 +4173,7 @@ export class Visual extends Shadow {
 						},
 						{
 							displayName: isPie2 ? this.measure2DisplayName : this.measure1DisplayName,
-							value: this.getFormattedNumber(pieData[valueKey]),
+							value: numberFormatter(pieData[valueKey], isPie2 ? this.measureNumberFormatter[1] : this.measureNumberFormatter[0]),
 							color: pieData.styles[pieType].color,
 						},
 					];
@@ -4216,7 +4181,9 @@ export class Visual extends Shadow {
 					pieData.tooltipFields.forEach((data) => {
 						tooltipData.push({
 							displayName: data.displayName,
-							value: typeof data.value === "number" ? this.getFormattedNumber(data.value) : data.value,
+							value: typeof data.value === "number"
+								? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
+								: data.value,
 							color: data.color ? data.color : "transparent",
 						});
 					});
