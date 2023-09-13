@@ -6,7 +6,7 @@ import "core-js/stable";
 import "./../style/visual.less";
 import "regenerator-runtime/runtime";
 import powerbi from "powerbi-visuals-api";
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
+import {valueFormatter} from "powerbi-visuals-utils-formattingutils";
 
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -18,7 +18,7 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IValueFormatter = valueFormatter.IValueFormatter;
 
 import * as d3 from "d3";
-import { IChartSubCategory, ILollipopChartRow, TooltipData } from "./model";
+import {IChartSubCategory, ILollipopChartRow, TooltipData} from "./model";
 import {
 	CategoryDataColorProps,
 	CircleFillOption,
@@ -45,16 +45,17 @@ import {
 	lollipopCategoryWidthType,
 	ESortByTypes,
 } from "./enum";
-import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
-import { createLegend, positionChartArea } from "powerbi-visuals-utils-chartutils/lib/legend/legend";
-import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
-import { ILegend, LegendData, LegendDataPoint, LegendPosition } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
-import { Shadow } from "@truviz/shadow/dist/Shadow";
-import { ShadowUpdateOptions, landingPageProp } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
-import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
-import { Enumeration } from "./Enumeration";
-import { paidProperties } from "./PaidProperties";
-import { NumberFormatting, VisualSettings } from "./settings";
+import {createTooltipServiceWrapper, ITooltipServiceWrapper} from "powerbi-visuals-utils-tooltiputils";
+import {interactivitySelectionService, interactivityBaseService} from "powerbi-visuals-utils-interactivityutils";
+import {createLegend, positionChartArea} from "powerbi-visuals-utils-chartutils/lib/legend/legend";
+import {textMeasurementService, wordBreaker} from "powerbi-visuals-utils-formattingutils";
+import {ILegend, LegendData, LegendDataPoint, LegendPosition} from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
+import {Shadow} from "@truviz/shadow/dist/Shadow";
+import {ShadowUpdateOptions, landingPageProp} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import {EnumerateSectionType} from "@truviz/shadow/dist/types/EnumerateSectionType";
+import {Enumeration} from "./Enumeration";
+import {paidProperties} from "./PaidProperties";
+import {NumberFormatting, VisualSettings} from "./settings";
 import {
 	CHART_SETTINGS,
 	CIRCLE_SETTINGS,
@@ -94,11 +95,11 @@ import {
 	IYGridLinesSettings,
 } from "./visual-settings.interface";
 import * as echarts from "echarts/core";
-import { PieChart } from "echarts/charts";
-import { SVGRenderer } from "echarts/renderers";
-import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
-import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
+import {PieChart} from "echarts/charts";
+import {SVGRenderer} from "echarts/renderers";
+import {EChartsOption} from "echarts";
+import {GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat} from "./methods/methods";
+import {TextProperties} from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
 	CallExpandAllYScaleOnAxisGroup,
@@ -115,6 +116,7 @@ import GridLinesSettings from "./settings-pages/GridLinesSettings";
 import RankingSettings from "./settings-pages/RankingSettings";
 import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
+import {Behavior, SetAndBindChartBehaviorOptions} from "./methods/Behaviour.methods";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -122,7 +124,7 @@ export class Visual extends Shadow {
 	public chartContainer: HTMLElement;
 	public hostContainer: HTMLElement;
 	public visualUpdateOptions: ShadowUpdateOptions;
-	private selectionManager: ISelectionManager;
+	public selectionManager: ISelectionManager;
 	public tooltipServiceWrapper: ITooltipServiceWrapper;
 	public legend1: ILegend;
 	public legend2: ILegend;
@@ -130,6 +132,8 @@ export class Visual extends Shadow {
 	public _events: IVisualEventService;
 	private _host: IVisualHost;
 	public formatNumber: (value: number | string, numberFormatter: IValueFormatter) => string;
+	public interactivityService: interactivityBaseService.IInteractivityService<any>;
+	public behavior: Behavior;
 
 	// props
 	public width: number;
@@ -138,16 +142,16 @@ export class Visual extends Shadow {
 	public settingsBtnWidth: number = 152;
 	public viewPortWidth: number;
 	public viewPortHeight: number;
-	public margin: { top: number; right: number; bottom: number; left: number };
+	public margin: {top: number; right: number; bottom: number; left: number};
 	public valuesTitle: string;
 	public chartData: ILollipopChartRow[];
-	public legends1Data: LegendData = { dataPoints: [] };
-	public legends2Data: LegendData = { dataPoints: [] };
-	public legendViewPort: { width: number; height: number } = { width: 0, height: 0 };
+	public legends1Data: LegendData = {dataPoints: []};
+	public legends2Data: LegendData = {dataPoints: []};
+	public legendViewPort: {width: number; height: number} = {width: 0, height: 0};
 	public isInFocusMode: boolean = false;
 	public isVisualResized: boolean = false;
 	public footerHeight: number = 0;
-	private highContrastDetails: IHighContrastDetails = { isHighContrast: false };
+	private highContrastDetails: IHighContrastDetails = {isHighContrast: false};
 
 	// CATEGORICAL DATA
 	public categoricalData: powerbi.DataViewCategorical;
@@ -173,7 +177,7 @@ export class Visual extends Shadow {
 	subCategoriesName: string[] = [];
 	measure1DisplayName: string;
 	measure2DisplayName: string;
-	subCategories: { name: string; color1: string; color2: string }[] = [];
+	subCategories: {name: string; color1: string; color2: string}[] = [];
 	isDisplayLegend2: boolean;
 	isHasMultiMeasure: boolean;
 	isHasSubcategories: boolean;
@@ -184,11 +188,15 @@ export class Visual extends Shadow {
 	othersBarText = "Others";
 	totalLollipopCount: number = 0;
 
+	// selection id
+	selectionIdByCategories: {[category: string]: ISelectionId} = {};
+	selectionIdBySubCategories: {[subcategory: string]: ISelectionId} = {};
+
 	// number formatter
 	public measureNumberFormatter: IValueFormatter[];
 	public tooltipNumberFormatter: IValueFormatter[];
 	public sortValuesNumberFormatter: IValueFormatter[];
-	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter, role: EDataRolesName } } = {};
+	public allNumberFormatter: {[name: string]: {formatter: IValueFormatter; role: EDataRolesName}} = {};
 
 	// svg
 	public svg: any;
@@ -218,7 +226,7 @@ export class Visual extends Shadow {
 	public xAxisTitleMargin: number = 0;
 	public xAxisTitleG: Selection<SVGElement>;
 	public xAxisTitleText: any;
-	public xAxisTitleSize: { width: number; height: number };
+	public xAxisTitleSize: {width: number; height: number};
 	public xScaleGHeight: number = 0;
 	public xScaleWidth: number;
 	public xScalePaddingOuter: number = 0.25;
@@ -231,7 +239,7 @@ export class Visual extends Shadow {
 	public yAxisTitleText: any;
 	public yAxisTitleMargin: number = 0;
 	public yAxisTitleG: Selection<SVGElement>;
-	public yAxisTitleSize: { width: number; height: number };
+	public yAxisTitleSize: {width: number; height: number};
 	public yScaleGWidth: number = 0;
 	public yScaleHeight: number;
 	public isLeftYAxis: boolean;
@@ -245,19 +253,33 @@ export class Visual extends Shadow {
 	public isIdToCategoryAdded: boolean = false;
 	public isExpandAllApplied: boolean = false;
 
+	// lollipop
+	public lollipopSelection: Selection<SVGElement>;
+	public lollipopG: Selection<SVGElement>;
+
 	// line
 	public lineSelection: any;
 	public lineG: any;
+	public lineClass: string = "lollipop-line";
+	public lineClassSelector: string = ".lollipop-line";
+
+	// circle
+	public circleClass: string = "lollipop-circle";
+	public circleClassSelector: string = ".lollipop-circle";
 
 	// circle1
 	public circle1G: any;
 	public circle1Selection: any;
 	public circle1Radius: any;
+	public circle1Class: string = "lollipop-circle1";
+	public circle1ClassSelector: string = ".lollipop-circle1";
 
 	// circle2
 	public circle2G: any;
 	public circle2Selection: any;
 	public circle2Radius: number;
+	public circle2Class: string = "lollipop-circle2";
+	public circle2ClassSelector: string = ".lollipop-circle2";
 
 	// data labels
 	public dataLabelsSelection: any;
@@ -418,6 +440,8 @@ export class Visual extends Shadow {
 		this._events = options.host.eventService;
 		this._host = options.host;
 		this.selectionManager = options.host.createSelectionManager();
+		this.interactivityService = interactivitySelectionService.createInteractivitySelectionService(this._host) as any;
+		this.behavior = new Behavior();
 		this.initChart();
 	}
 
@@ -426,7 +450,7 @@ export class Visual extends Shadow {
 	}
 
 	public initChart(): void {
-		this.margin = { top: 10, right: 30, bottom: this.xAxisTitleMargin, left: this.yAxisTitleMargin };
+		this.margin = {top: 10, right: 30, bottom: this.xAxisTitleMargin, left: this.yAxisTitleMargin};
 
 		this.svg = d3.select(this.chartContainer).append("svg").classed("lollipopChart", true);
 
@@ -437,6 +461,8 @@ export class Visual extends Shadow {
 		this.xGridLinesG = this.container.append("g").classed("xGridLinesG", true);
 
 		this.yGridLinesG = this.container.append("g").classed("yGridLinesG", true);
+
+		this.lollipopG = this.container.append("g").classed("lollipopG", true);
 
 		this.lineG = this.container.append("g").classed("lineG", true);
 
@@ -571,7 +597,7 @@ export class Visual extends Shadow {
 	}
 
 	sortCategoryDataPairs(
-		data: { category: string }[],
+		data: {category: string}[],
 		categoryKey: string,
 		measureKeys: string[],
 		sortKeys: string[],
@@ -674,7 +700,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	defaultSortCategoryDataPairs(data: { category: string }[], measureKeys: string[], categoricalMeasureFields: powerbi.DataViewValueColumn[]): void {
+	defaultSortCategoryDataPairs(data: {category: string}[], measureKeys: string[], categoricalMeasureFields: powerbi.DataViewValueColumn[]): void {
 		const sortByMeasure = (measureValues: powerbi.DataViewValueColumn[]) => {
 			const index = measureValues[0].source.index;
 			const measureIndex = `${EDataRolesName.Measure1}${index}`;
@@ -763,14 +789,14 @@ export class Visual extends Shadow {
 		this.sortFieldsDisplayName =
 			categoricalSortFields.length > 0
 				? categoricalSortFields
-					.map((d) => ({
-						label: d.source.displayName,
-						value: d.source.displayName,
-						isSortByCategory: d.source.type.text,
-						isSortByMeasure: d.source.type.numeric,
-						isSortByExtraSortField: true,
-					}))
-					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+						.map((d) => ({
+							label: d.source.displayName,
+							value: d.source.displayName,
+							isSortByCategory: d.source.type.text,
+							isSortByMeasure: d.source.type.numeric,
+							isSortByExtraSortField: true,
+						}))
+						.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
 				: [];
 
 		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : "";
@@ -1050,7 +1076,7 @@ export class Visual extends Shadow {
 
 	expandAllCode(): void {
 		if (this.isExpandAllApplied) {
-			const { labelFontFamily, labelFontSize } = this.xAxisSettings;
+			const {labelFontFamily, labelFontSize} = this.xAxisSettings;
 			if (!this.isHorizontalChart) {
 				this.expandAllYScaleGWidth = 0;
 				this.expandAllXScaleGHeight = getSVGTextSize("XAxis", labelFontFamily, labelFontSize).height * this.expandAllCategoriesName.length;
@@ -1150,10 +1176,44 @@ export class Visual extends Shadow {
 
 			this.expandAllCode();
 
-			const { height: footerHeight } = this.createFooter(this.footerSettings, this.chartContainer);
+			const {height: footerHeight} = this.createFooter(this.footerSettings, this.chartContainer);
 			this.footerHeight = this.footerSettings.show ? footerHeight : 0;
 
-			console.log("footerHeight", footerHeight);
+			const isHasSubcategories = !!this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
+
+			if (!isHasSubcategories) {
+				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
+					const selectionId = this.visualUpdateOptions.host
+						.createSelectionIdBuilder()
+						.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
+						.createSelectionId();
+					this.selectionIdByCategories[category] = selectionId;
+				});
+			} else {
+				const categoricalData = this.visualUpdateOptions.options.dataViews[0];
+				const series: any[] = categoricalData.categorical.values.grouped();
+				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
+					const selectionId = this.visualUpdateOptions.host
+						.createSelectionIdBuilder()
+						.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
+						.createSelectionId();
+
+					this.selectionIdByCategories[category] = selectionId;
+
+					series.forEach((ser: any, j: number) => {
+						ser.values.forEach((s) => {
+							const seriesSelectionId = this.visualUpdateOptions.host
+								.createSelectionIdBuilder()
+								.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
+								.withSeries(categoricalData.categorical.values, ser)
+								.withMeasure(s.source.queryName)
+								.createSelectionId();
+
+							this.selectionIdBySubCategories[`${category}-${ser.name}`] = seriesSelectionId as any;
+						});
+					});
+				});
+			}
 
 			this.categoricalData = this.setInitialChartData(
 				clonedCategoricalData,
@@ -1185,15 +1245,15 @@ export class Visual extends Shadow {
 			this.settingsBtnHeight = popupOptionsHeader ? popupOptionsHeader.clientHeight : 0;
 			this.isDisplayLegend2 = this.isHasMultiMeasure && this.chartSettings.lollipopType !== LollipopType.Circle;
 
-			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
-			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.xAxisSettings;
+			const {titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily} = this.xAxisSettings;
+			const {titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily} = this.xAxisSettings;
 
 			this.xAxisTitleSize = this.xAxisSettings.isDisplayTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
-				: { width: 0, height: 0 };
+				: {width: 0, height: 0};
 			this.yAxisTitleSize = this.yAxisSettings.isDisplayTitle
 				? getSVGTextSize("Title", yAxisTitleFontFamily, yAxisTitleFontSize)
-				: { width: 0, height: 0 };
+				: {width: 0, height: 0};
 
 			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
 			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
@@ -1267,13 +1327,20 @@ export class Visual extends Shadow {
 
 			// this.displayBrush();
 			// this.drawTooltip();
+
+			if (!this.isHasSubcategories) {
+				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
+			} else {
+				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), this.chartData);
+			}
+			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
 		}
 	}
 
 	private sortSubcategoryData(): void {
-		const { enabled, sortOrder, sortBy, isSortByCategory } = this.sortingSettings.subCategory;
+		const {enabled, sortOrder, sortBy, isSortByCategory} = this.sortingSettings.subCategory;
 		if (enabled && this.isHasSubcategories) {
 			if (isSortByCategory) {
 				if (this.isHorizontalChart) {
@@ -1366,9 +1433,9 @@ export class Visual extends Shadow {
 
 		const categoricalMeasureFields = this.visualUpdateOptions.options.dataViews[0].categorical.values
 			? this.visualUpdateOptions.options.dataViews[0].categorical.values.filter(
-				(d) => !!d.source.roles[EDataRolesName.Measure]
-				// eslint-disable-next-line no-mixed-spaces-and-tabs
-			)
+					(d) => !!d.source.roles[EDataRolesName.Measure]
+					// eslint-disable-next-line no-mixed-spaces-and-tabs
+			  )
 			: [];
 		if (categoricalMeasureFields.length === 0) {
 			this.displayValidationPage("Please enter measure data");
@@ -1465,10 +1532,10 @@ export class Visual extends Shadow {
 					),
 					tooltipFields: subCategoryGroup
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
-						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
+						.map((d) => ({displayName: d.source.displayName, value: d.values[idx], color: ""} as TooltipData)),
 					styles: {
-						pie1: { color: "" },
-						pie2: { color: "" },
+						pie1: {color: ""},
+						pie2: {color: ""},
 					},
 				};
 				return [...arr, obj];
@@ -1480,14 +1547,17 @@ export class Visual extends Shadow {
 			city: <string>cat,
 			value1: !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0,
 			value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
-			tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
+			identity: undefined,
+			selected: false,
+			isHighlight: false,
+			tooltipFields: this.categoricalTooltipFields.map((d) => ({displayName: d.source.displayName, value: d.values[idx], color: ""} as TooltipData)),
 			subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
 			styles: {
-				circle1: { fillColor: "", strokeColor: "" },
-				circle2: { fillColor: "", strokeColor: "" },
-				line: { color: this.lineSettings.lineColor },
-				pie1: { color: "" },
-				pie2: { color: "" },
+				circle1: {fillColor: "", strokeColor: ""},
+				circle2: {fillColor: "", strokeColor: ""},
+				line: {color: this.lineSettings.lineColor},
+				pie1: {color: ""},
+				pie2: {color: ""},
 			},
 		}));
 
@@ -1512,7 +1582,23 @@ export class Visual extends Shadow {
 		// 	});
 		// });
 
+		this.setSelectionIds(data, []);
 		this.chartData = data;
+	}
+
+	setSelectionIds(data: ILollipopChartRow[], subCategories: {name: string}[]): void {
+		if (!this.isHasSubcategories) {
+			data.forEach((el, i) => {
+				el.identity = this.selectionIdByCategories[el.city];
+			});
+		} else {
+			data.forEach((el: ILollipopChartRow, i: number) => {
+				el.identity = this.selectionIdByCategories[el.city];
+				el.subCategories.forEach((d) => {
+					d.identity = this.selectionIdBySubCategories[`${el.city}-${d.category}`];
+				});
+			});
+		}
 	}
 
 	public createLegendContainer(legendType: LegendType): void {
@@ -2001,7 +2087,8 @@ export class Visual extends Shadow {
 		this.viewPortWidth = options.options.viewport.width;
 		this.viewPortHeight = options.options.viewport.height;
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
-		this.height = this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
+		this.height =
+			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
 	}
 
 	displayBrush(): void {
@@ -2055,7 +2142,7 @@ export class Visual extends Shadow {
 			}
 		});
 
-		const brushed = ({ selection }) => {
+		const brushed = ({selection}) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
 					if (this[`${d}ScaleDomain`]) {
@@ -2183,7 +2270,8 @@ export class Visual extends Shadow {
 		this.brushG
 			.attr(
 				"transform",
-				`translate(${this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width}, ${this.margin.top ? this.margin.top : 0
+				`translate(${this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width}, ${
+					this.margin.top ? this.margin.top : 0
 				})`
 			)
 			.call(brush)
@@ -2217,7 +2305,7 @@ export class Visual extends Shadow {
 		});
 
 		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
-		const brushed = ({ selection }) => {
+		const brushed = ({selection}) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
 					if (self[`${d}ScaleDomain`]) {
@@ -2377,7 +2465,7 @@ export class Visual extends Shadow {
 		const scaleHeight: number = config.scaleHeight;
 		const brushDomain = this.brushScaleBand.domain();
 
-		const brushed = ({ selection }) => {
+		const brushed = ({selection}) => {
 			const newYScaleDomain = [];
 			let brushArea = selection;
 			if (brushArea === null) brushArea = this.yScale.range();
@@ -2422,7 +2510,7 @@ export class Visual extends Shadow {
 		const scaleWidth: number = config.scaleWidth;
 		const brushDomain = this.brushScaleBand.domain();
 
-		const brushed = ({ selection }) => {
+		const brushed = ({selection}) => {
 			const newXScaleDomain = [];
 			let brushArea = selection;
 			if (brushArea === null) brushArea = this.xScale.range();
@@ -2516,11 +2604,13 @@ export class Visual extends Shadow {
 		this.isLollipopChartDrawn = true;
 		// this.drawXYAxis();
 		// this.drawXYAxisTitle();
-		this.drawLines();
+		// this.drawLines();
+
+		this.drawLollipop();
 
 		const onCaseLollipopTypePie = () => {
-			this.drawCircle1([]);
-			this.drawCircle2([]);
+			// this.drawCircle1([]);
+			// this.drawCircle2([]);
 			this.drawPie1Chart(this.chartData);
 			if (this.isHasMultiMeasure) {
 				this.drawPie2Chart(this.chartData);
@@ -2535,33 +2625,33 @@ export class Visual extends Shadow {
 			// }
 		};
 
-		switch (this.chartSettings.lollipopType) {
-			case LollipopType.Circle: {
-				this.drawPie1Chart([]);
-				this.drawPie2Chart([]);
-				this.drawCircle1(this.chartData);
-				this.drawCircle2(this.isHasMultiMeasure ? this.chartData : []);
-				// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
-				// if (this.isHasMultiMeasure) {
-				// 	this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
-				// } else {
-				// 	this.drawData2Labels([]);
-				// }
-				break;
-			}
-			case LollipopType.Pie: {
-				onCaseLollipopTypePie();
-				break;
-			}
-			case LollipopType.Donut: {
-				onCaseLollipopTypePie();
-				break;
-			}
-			case LollipopType.Rose: {
-				onCaseLollipopTypePie();
-				break;
-			}
-		}
+		// switch (this.chartSettings.lollipopType) {
+		// 	case LollipopType.Circle: {
+		// 		this.drawPie1Chart([]);
+		// 		this.drawPie2Chart([]);
+		// 		// this.drawCircle1(this.chartData);
+		// 		// this.drawCircle2(this.isHasMultiMeasure ? this.chartData : []);
+		// 		// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
+		// 		// if (this.isHasMultiMeasure) {
+		// 		// 	this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
+		// 		// } else {
+		// 		// 	this.drawData2Labels([]);
+		// 		// }
+		// 		break;
+		// 	}
+		// 	case LollipopType.Pie: {
+		// 		onCaseLollipopTypePie();
+		// 		break;
+		// 	}
+		// 	case LollipopType.Donut: {
+		// 		onCaseLollipopTypePie();
+		// 		break;
+		// 	}
+		// 	case LollipopType.Rose: {
+		// 		onCaseLollipopTypePie();
+		// 		break;
+		// 	}
+		// }
 	}
 
 	// Number Format
@@ -2698,7 +2788,7 @@ export class Visual extends Shadow {
 		});
 	}
 
-	getDataLabelXY(d: ILollipopChartRow, isPie2: boolean = false): { x: number; y: number } {
+	getDataLabelXY(d: ILollipopChartRow, isPie2: boolean = false): {x: number; y: number} {
 		let x = 0;
 		let y = 0;
 
@@ -2713,7 +2803,7 @@ export class Visual extends Shadow {
 				y = this.getCircleCY(this.yScale(isPie2 ? d.value2 : d.value1));
 			}
 		}
-		return { x, y };
+		return {x, y};
 	}
 
 	transformHorizontalData1LabelOutside(labelSelection: any, labelDistance: number): void {
@@ -3062,10 +3152,8 @@ export class Visual extends Shadow {
 		);
 
 		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-			return this.numberSettings.show ?
-				formatNumber(value, this.numberSettings, numberFormatter) :
-				powerBiNumberFormat(value, numberFormatter);
-		}
+			return this.numberSettings.show ? formatNumber(value, this.numberSettings, numberFormatter) : powerBiNumberFormat(value, numberFormatter);
+		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean): VisualTooltipDataItem[] => {
 			const tooltipData: TooltipData[] = [
@@ -3076,7 +3164,9 @@ export class Visual extends Shadow {
 				},
 				{
 					displayName: isCircle1 ? this.measure1DisplayName : this.measure2DisplayName,
-					value: isCircle1 ? numberFormatter(value.value1, this.measureNumberFormatter[0]) : numberFormatter(value.value2, this.measureNumberFormatter[1]),
+					value: isCircle1
+						? numberFormatter(value.value1, this.measureNumberFormatter[0])
+						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
 					color: value.styles.circle1.fillColor,
 				},
 			];
@@ -3084,9 +3174,7 @@ export class Visual extends Shadow {
 			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
 					displayName: data.displayName,
-					value: typeof data.value === "number"
-						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
-						: data.value,
+					value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
 					color: data.color ? data.color : "transparent",
 				});
 			});
@@ -3116,9 +3204,7 @@ export class Visual extends Shadow {
 			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
 					displayName: data.displayName,
-					value: typeof data.value === "number"
-						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
-						: data.value,
+					value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
 					color: data.color ? data.color : "transparent",
 				});
 			});
@@ -3558,7 +3644,7 @@ export class Visual extends Shadow {
 
 		if (!this.isHorizontalChart) {
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+				return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
 			});
 			const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
 			const xAxisMaxHeight = d3.min([this.height * 0.4, xAxisTicksMaxWidth], (d) => d);
@@ -3566,23 +3652,23 @@ export class Visual extends Shadow {
 			if (!this.isHorizontalBrushDisplayed) {
 				const xAxisTickHeight = textMeasurementService.measureSvgTextHeight(textProperties);
 				const xAxisTicks: string[][] = xAxisDomain.map((text) => {
-					return GetWordsSplitByWidth(text, { ...textProperties, text: text }, this.xScale.bandwidth(), 3);
+					return GetWordsSplitByWidth(text, {...textProperties, text: text}, this.xScale.bandwidth(), 3);
 				});
 				const isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3;
 				const xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length) * xAxisTickHeight;
 				this.xScaleGHeight = isApplyTilt ? xAxisMaxHeight : xAxisMaxWordHeight;
 			} else {
 				const xAxisTicks = xAxisDomain.map((text) => {
-					return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, xAxisMaxHeight);
+					return textMeasurementService.getTailoredTextOrDefault({...textProperties, text}, xAxisMaxHeight);
 				});
 				const xAxisTicksWidth = xAxisTicks.map((d) => {
-					return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+					return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
 				});
 				const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
 				this.xScaleGHeight = xAxisTicksMaxWidth;
 			}
 		} else {
-			this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({ ...textProperties });
+			this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({...textProperties});
 		}
 	}
 
@@ -3608,10 +3694,10 @@ export class Visual extends Shadow {
 			this.yScaleGWidth = d3.max(yAxisTicksWidth);
 		} else {
 			const yAxisTicks = yAxisDomain.map((text) => {
-				return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * 0.06);
+				return textMeasurementService.getTailoredTextOrDefault({...textProperties, text}, this.width * 0.06);
 			});
 			const yAxisTicksWidth = yAxisTicks.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+				return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
 			});
 			const yAxisTicksMaxWidth = d3.max(yAxisTicksWidth, (d) => d);
 			this.yScaleGWidth = yAxisTicksMaxWidth;
@@ -3706,8 +3792,6 @@ export class Visual extends Shadow {
 	setHorizontalLinesFormatting(linesSelection: any): void {
 		this.setLineStrokeColor();
 		linesSelection
-			.attr("class", this.lineSettings.lineType)
-			.classed("chart-line", true)
 			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0))
 			.attr("x2", (d) => this.xScale(d.value1))
 			.attr("y1", (d) => this.yScale(d.city) + this.scaleBandWidth / 2)
@@ -3733,8 +3817,6 @@ export class Visual extends Shadow {
 	setVerticalLinesFormatting(linesSelection: any): void {
 		this.setLineStrokeColor();
 		linesSelection
-			.attr("class", this.lineSettings.lineType)
-			.classed("chart-line", true)
 			.attr("x1", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
 			.attr("x2", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
@@ -3749,6 +3831,95 @@ export class Visual extends Shadow {
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
 			.style("display", this.lineSettings.show ? "block" : "none");
+	}
+
+	drawLollipop(): void {
+		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData);
+
+		if (this.isHorizontalChart) {
+			this.lollipopSelection = lollipopSelection.join(
+				(enter) => {
+					const lollipopG = enter.append("g").attr("class", "lollipop-group");
+					const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed("lollipop-line", true);
+					const circle1Selection = lollipopG.append("circle").attr("class", "chart-circle1").classed(this.circleClass, true);
+
+					this.setHorizontalLinesFormatting(lineSelection);
+					this.setCircle1Formatting(circle1Selection);
+					return lollipopG;
+				},
+				(update) => {
+					const lineSelection = update.select(".lollipop-line");
+					const circle1Selection = update.select(".lollipop-circle");
+					this.setHorizontalLinesFormatting(lineSelection);
+					this.setCircle1Formatting(circle1Selection);
+					return update;
+				}
+			) as any;
+		} else {
+			this.lollipopSelection = lollipopSelection.join(
+				(enter) => {
+					const lollipopG = enter.append("g").attr("class", "lollipop-group");
+
+					const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
+					this.setVerticalLinesFormatting(lineSelection);
+
+					if (this.chartSettings.lollipopType === LollipopType.Circle) {
+						const circle1Selection = lollipopG.append("circle").classed(this.circleClass, true).classed(this.circle1Class, true);
+						this.setCircle1Formatting(circle1Selection);
+
+						if (this.isHasMultiMeasure) {
+							const circle2Selection = lollipopG.append("circle").classed(this.circleClass, true).classed(this.circle2Class, true);
+							this.setCircle2Formatting(circle2Selection);
+						}
+					} else {
+						const pie1Selection = lollipopG.append("foreignObject").attr("id", "pie1ForeignObject");
+						this.enterPieChart(pie1Selection);
+
+						if (this.isHasMultiMeasure) {
+							const pie2Selection = lollipopG.append("foreignObject").attr("id", "pie2ForeignObject");
+							this.enterPieChart(pie2Selection, true);
+						}
+
+						this.setPieDataLabelsDisplayStyle();
+					}
+
+					return lollipopG;
+				},
+				(update) => {
+					const lineSelection = update.select(this.lineClassSelector);
+					const circle1Selection = update.select(this.circle1ClassSelector);
+					const circle2Selection = update.select(this.circle2ClassSelector);
+					const pie1Selection = update.select("#pie1ForeignObject");
+					const pie2Selection = update.select("#pie2ForeignObject");
+
+					this.setVerticalLinesFormatting(lineSelection);
+
+					if (this.chartSettings.lollipopType === LollipopType.Circle) {
+						pie1Selection.remove();
+						pie2Selection.remove();
+
+						this.setCircle1Formatting(circle1Selection);
+
+						if (this.isHasMultiMeasure) {
+							this.setCircle2Formatting(circle2Selection);
+						} else {
+							circle2Selection.remove();
+						}
+					} else {
+						circle1Selection.remove();
+						circle2Selection.remove();
+
+						this.updatePieChart(pie1Selection);
+
+						if (this.isHasMultiMeasure) {
+							this.updatePieChart(pie2Selection, true);
+						}
+					}
+
+					return update;
+				}
+			) as any;
+		}
 	}
 
 	drawLines(): void {
@@ -3841,7 +4012,6 @@ export class Visual extends Shadow {
 	setCircle1Formatting(circleSelection: any): void {
 		this.setCircle1Radius();
 		circleSelection
-			.attr("class", "chart-circle1")
 			.attr("cx", (d) => {
 				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.city);
 				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
@@ -3863,7 +4033,6 @@ export class Visual extends Shadow {
 	setCircle2Formatting(circleSelection: any): void {
 		this.setCircle2Radius();
 		circleSelection
-			.attr("class", "chart-circle2")
 			.attr("cx", (d) => {
 				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.city);
 				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
@@ -3975,9 +4144,14 @@ export class Visual extends Shadow {
 		this.setPie2Radius();
 	}
 
-	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false): { value: number; name: string }[] {
+	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false) {
 		const id = this.chartData.findIndex((data) => data.city === category);
-		return this.chartData[id].subCategories.map((data) => ({ value: isPie2 ? data.value2 : data.value1, name: data.category }));
+		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
+		return this.chartData[id].subCategories.map((data) => ({
+			value: isPie2 ? data.value2 : data.value1,
+			name: data.category,
+			itemStyle: {color: data.styles[pieType].color, className: "pie-slice"},
+		}));
 	}
 
 	getPieSliceClass(category: string, subCategory: string): string {
@@ -4030,21 +4204,65 @@ export class Visual extends Shadow {
 
 	getPieChartOptions(category: string, isPie2: boolean = false): EChartsOption {
 		const pieOption: EChartsOption = {
+			animation: false,
+			animationDuration: 0,
+			animationDurationUpdate: 0,
+			animationEasing: "cubicInOut",
+			animationEasingUpdate: "cubicInOut",
+			animationThreshold: 0,
+			progressiveThreshold: 0,
+			progressive: 0,
+			hoverLayerThreshold: 0,
+			useUTC: true,
+			title: {},
+			tooltip: {
+				trigger: "none",
+				show: false,
+			},
+			legend: {
+				show: false,
+			},
+			stateAnimation: {
+				duration: 0,
+				easing: "cubicIn",
+			},
+			axisPointer: [
+				{
+					triggerTooltip: false,
+					triggerEmphasis: false,
+					value: null,
+					status: null,
+					animation: null,
+					animationDurationUpdate: 0,
+				},
+			],
 			series: [
 				{
 					type: "pie",
-					color: ["#000000"],
 					radius: this.getPieChartSeriesRadius(),
 					emphasis: {
-						scaleSize: this.pieEmphasizeScaleSize,
+						scale: false,
 					},
 					data: this.getPieChartSeriesDataByCategory(category),
 				},
 			],
 		};
 
+		// pieOption.series[0].label = {
+		// 	show: this.dataLabelsSettings.show,
+		// 	color: this.dataLabelsSettings.color,
+		// 	textBorderColor: this.dataLabelsSettings.borderColor,
+		// 	textBorderWidth: this.dataLabelsSettings.borderWidth,
+		// 	fontSize: this.getPieDataLabelsFontSize(isPie2),
+		// 	fontFamily: this.dataLabelsSettings.fontFamily,
+		// 	position: "center",
+		// 	formatter: () => {
+		// 		return this.getAutoUnitFormattedNumber(categoryValue);
+		// 	},
+		// };
+
 		pieOption.series[0].label = {
-			show: this.dataLabelsSettings.show,
+			show: false,
 			color: this.dataLabelsSettings.color,
 			textBorderColor: this.dataLabelsSettings.borderColor,
 			textBorderWidth: this.dataLabelsSettings.borderWidth,
@@ -4132,37 +4350,34 @@ export class Visual extends Shadow {
 				ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
 
 				ele.selectAll("path").data(d.subCategories);
-				ele
-					.selectAll("path")
-					.attr("class", (pieData: IChartSubCategory) => {
-						return this.getPieSliceClass(d.city, pieData ? pieData.category : "");
-					})
-					.attr("fill", (d: IChartSubCategory) => {
-						return d.styles[pieType].color;
-					});
+				ele.selectAll("path").attr("class", (pieData: IChartSubCategory) => {
+					return "pie-slice";
+					// return this.getPieSliceClass(d.city, pieData ? pieData.category + " " + "pie-slice" : "");
+				});
+				// .attr("fill", (d: IChartSubCategory) => {
+				// 	return d.styles[pieType].color;
+				// });
 
-				ele
-					.select("g")
-					.append("rect")
-					.lower()
-					.attr("class", "innerCenterRect")
-					.attr("width", pieRadius + (pieRadius * 30) / 100)
-					.attr("height", pieRadius + (pieRadius * 30) / 100)
-					.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-					.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-					.attr("fill", "#fff");
+				// ele
+				// 	.select("g")
+				// 	.append("rect")
+				// 	.lower()
+				// 	.attr("class", "innerCenterRect")
+				// 	.attr("width", pieRadius + (pieRadius * 30) / 100)
+				// 	.attr("height", pieRadius + (pieRadius * 30) / 100)
+				// 	.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
+				// 	.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
+				// 	.attr("fill", "#fff");
 
-				this.tooltipServiceWrapper.addTooltip(
-					ele.selectAll("path"),
-					(datapoint: IChartSubCategory) => getTooltipData(datapoint),
-					(datapoint: IChartSubCategory) => datapoint.selectionId
-				);
+				// this.tooltipServiceWrapper.addTooltip(
+				// 	ele.selectAll("path"),
+				// 	(datapoint: IChartSubCategory) => getTooltipData(datapoint),
+				// 	(datapoint: IChartSubCategory) => datapoint.identity
+				// );
 
 				const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-					return this.numberSettings.show ?
-						formatNumber(value, this.numberSettings, numberFormatter) :
-						powerBiNumberFormat(value, numberFormatter);
-				}
+					return this.numberSettings.show ? formatNumber(value, this.numberSettings, numberFormatter) : powerBiNumberFormat(value, numberFormatter);
+				};
 
 				const getTooltipData = (pieData: IChartSubCategory): VisualTooltipDataItem[] => {
 					const tooltipData: TooltipData[] = [
@@ -4181,9 +4396,7 @@ export class Visual extends Shadow {
 					pieData.tooltipFields.forEach((data) => {
 						tooltipData.push({
 							displayName: data.displayName,
-							value: typeof data.value === "number"
-								? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
-								: data.value,
+							value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
 							color: data.color ? data.color : "transparent",
 						});
 					});
@@ -4192,11 +4405,11 @@ export class Visual extends Shadow {
 				};
 			});
 
-		this.pieG.on("mouseover", (e) => {
-			if (e.path.length && e.path[5]) {
-				d3.select(e.path[5]).raise();
-			}
-		});
+		// this.pieG.on("mouseover", (e) => {
+		// 	if (e.path.length && e.path[5]) {
+		// 		d3.select(e.path[5]).raise();
+		// 	}
+		// });
 
 		this.pieG.on("mouseout", () => {
 			this.pieG.selectAll("foreignObject").sort((a, b) => d3.ascending(a.sortId, b.sortId));
@@ -4373,12 +4586,12 @@ export class Visual extends Shadow {
 		this.setLegendViewPortWidthHeight();
 
 		this.legend1.changeOrientation(LegendPosition[legendPosition]);
-		this.legend1.drawLegend(this.legends1Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
+		this.legend1.drawLegend(this.legends1Data, {width: this.legendViewPortWidth, height: this.legendViewPortHeight});
 		positionChartArea(d3.select(this.chartContainer), this.legend1);
 
 		if (this.isDisplayLegend2) {
 			this.legend2.changeOrientation(LegendPosition[legendPosition]);
-			this.legend2.drawLegend(this.legends2Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
+			this.legend2.drawLegend(this.legends2Data, {width: this.legendViewPortWidth, height: this.legendViewPortHeight});
 			positionChartArea(d3.select(this.chartContainer), this.legend2);
 		}
 
@@ -4470,9 +4683,9 @@ export class Visual extends Shadow {
 			legendPosition === ILegendPosition.Bottom ||
 			legendPosition === ILegendPosition.BottomCenter
 		) {
-			const legendTitlesWidth: { id: number; width: number }[] = [];
+			const legendTitlesWidth: {id: number; width: number}[] = [];
 			d3.selectAll(".legendTitle").each(function (d, i) {
-				legendTitlesWidth.push({ id: i, width: (this as any).getBBox().width });
+				legendTitlesWidth.push({id: i, width: (this as any).getBBox().width});
 			});
 
 			if (legendTitlesWidth.length) {
@@ -4709,7 +4922,7 @@ export class Visual extends Shadow {
 		legend.changeOrientation(LegendPosition.None);
 		this.chartContainer.style.marginLeft = null;
 		this.chartContainer.style.marginTop = null;
-		legend.drawLegend({ dataPoints: [] }, this.visualUpdateOptions.options.viewport);
+		legend.drawLegend({dataPoints: []}, this.visualUpdateOptions.options.viewport);
 		this.legendViewPort.width = legend.getMargins().width ? legend.getMargins().width : 0;
 		this.legendViewPort.height = legend.getMargins().height ? legend.getMargins().height : 0;
 		d3.select(this.chartContainer).style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
@@ -4727,7 +4940,7 @@ export class Visual extends Shadow {
 		this.isShowBucketChartFieldCheck = !!categoricalShowBucketField;
 		this.isShowBucketChartFieldName = this.isShowBucketChartFieldCheck ? categoricalShowBucketField.source.displayName : "";
 
-		const { enable, fontSize, fontFamily, styling, color, message, showIcon } = this.showBucketSettings;
+		const {enable, fontSize, fontFamily, styling, color, message, showIcon} = this.showBucketSettings;
 
 		if (this.isShowBucketChartFieldCheck) {
 			if (this.showBucketSettings.enable) {
@@ -4771,10 +4984,17 @@ export class Visual extends Shadow {
 			const marginBottom = 0;
 			let footerContainerStyles = "";
 			if (footerSettings.isShowDivider) {
-				footerContainerStyles += `border-top: ${footerSettings.dividerThickness}px solid ${this.highContrastDetails.isHighContrast ? this.highContrastDetails.foregroundColor : footerSettings.dividerColor};`;
+				footerContainerStyles += `border-top: ${footerSettings.dividerThickness}px solid ${
+					this.highContrastDetails.isHighContrast ? this.highContrastDetails.foregroundColor : footerSettings.dividerColor
+				};`;
 			}
 
-			footerContainer.setAttribute("style", `justify-content: ${alignmentMapping[footerSettings.alignment]};  margin-top: ${marginTop}px; margin-bottom: ${marginBottom}px; ${footerContainerStyles}`);
+			footerContainer.setAttribute(
+				"style",
+				`justify-content: ${
+					alignmentMapping[footerSettings.alignment]
+				};  margin-top: ${marginTop}px; margin-bottom: ${marginBottom}px; ${footerContainerStyles}`
+			);
 			const footer = document.createElement("div");
 			footer.textContent = footerSettings.text;
 			const transparencyScale = d3.scaleLinear().domain([0, 100]).range([1, 0]);
@@ -4834,19 +5054,18 @@ export class Visual extends Shadow {
 			dataView: this.visualUpdateOptions.options.dataViews as any,
 			gridView: "tabular",
 			gridConfig: {
-				sidebar: { columns: true, filters: true },
+				sidebar: {columns: true, filters: true},
 				allowedAggregations: true,
 			},
 			numberFormatter: (value, field) => {
-				console.log(field)
 				if (this.isHasSubcategories) {
 					field = field.split("_").splice(3).join("_");
 				}
 
 				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
-					return this.numberSettings.show ?
-						formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter) :
-						powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+					return this.numberSettings.show
+						? formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter)
+						: powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
 				} else {
 					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
 				}
@@ -4864,65 +5083,62 @@ export class Visual extends Shadow {
 				matrixRanking: {
 					row: {
 						rank: this.rankingSettings.category.rankingType,
-						count: this.rankingSettings.category.count
+						count: this.rankingSettings.category.count,
 					},
 					column: {
 						rank: this.rankingSettings.subCategory.rankingType,
-						count: this.rankingSettings.subCategory.count
-					}
+						count: this.rankingSettings.subCategory.count,
+					},
 				},
-			}
+			};
 		}
 
 		if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
-			const matrixSorting = { row: [], column: [] };
+			const matrixSorting = {row: [], column: []};
 			if (this.sortingSettings.category.enabled) {
 				matrixSorting.row.push({
 					column: this.sortingSettings.category.sortBy,
 					order: +this.sortingSettings.category.sortOrder === 1 ? "asc" : "desc",
-				})
+				});
 			}
 
 			if (this.sortingSettings.subCategory.enabled) {
 				matrixSorting.column.push({
 					column: this.sortingSettings.subCategory.sortBy,
-					order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc"
-				})
+					order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc",
+				});
 			}
 
 			this.summaryTableConfig = {
 				...this.summaryTableConfig,
-				matrixSorting: matrixSorting
-			}
+				matrixSorting: matrixSorting,
+			};
 		}
 	}
 
 	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields): void {
-		this.measureNumberFormatter = categoricalMeasureFields
-			.map(d => {
-				return valueFormatter.create({ format: d.source.format });
-			});
+		this.measureNumberFormatter = categoricalMeasureFields.map((d) => {
+			return valueFormatter.create({format: d.source.format});
+		});
 
-		this.tooltipNumberFormatter = categoricalTooltipFields
-			.map(d => {
-				return valueFormatter.create({ format: d.source.format });
-			});
+		this.tooltipNumberFormatter = categoricalTooltipFields.map((d) => {
+			return valueFormatter.create({format: d.source.format});
+		});
 
-		this.sortValuesNumberFormatter = categoricalSortFields
-			.map(d => {
-				return valueFormatter.create({ format: d.source.format });
-			});
+		this.sortValuesNumberFormatter = categoricalSortFields.map((d) => {
+			return valueFormatter.create({format: d.source.format});
+		});
 
 		categoricalMeasureFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure };
-		})
+			this.allNumberFormatter[d.source.displayName] = {formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure};
+		});
 
 		categoricalTooltipFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip };
-		})
+			this.allNumberFormatter[d.source.displayName] = {formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip};
+		});
 
 		categoricalSortFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort };
-		})
+			this.allNumberFormatter[d.source.displayName] = {formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort};
+		});
 	}
 }

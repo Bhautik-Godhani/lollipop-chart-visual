@@ -5,14 +5,16 @@ export interface ILollipopChartRow {
 	city: string;
 	value1: number;
 	value2: number;
-	selectionId?: ISelectionId;
+	identity?: ISelectionId;
+	selected: boolean;
+	isHighlight: boolean;
 	tooltipFields?: TooltipData[];
 	sortId?: number;
 	subCategories: IChartSubCategory[];
 	styles: {
 		circle1: IChartCircleStyles;
 		circle2: IChartCircleStyles;
-		line: { color: string };
+		line: {color: string};
 	};
 }
 
@@ -25,11 +27,11 @@ export interface IChartSubCategory {
 	category: string;
 	value1: number;
 	value2: number;
-	selectionId?: ISelectionId;
+	identity?: ISelectionId;
 	tooltipFields?: TooltipData[];
 	styles: {
-		pie1: { color: string };
-		pie2: { color: string };
+		pie1: {color: string};
+		pie2: {color: string};
 	};
 }
 
