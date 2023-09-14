@@ -6,7 +6,7 @@ import "core-js/stable";
 import "./../style/visual.less";
 import "regenerator-runtime/runtime";
 import powerbi from "powerbi-visuals-api";
-import {valueFormatter} from "powerbi-visuals-utils-formattingutils";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -18,7 +18,7 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IValueFormatter = valueFormatter.IValueFormatter;
 
 import * as d3 from "d3";
-import {IChartSubCategory, ILollipopChartRow, TooltipData} from "./model";
+import { IChartSubCategory, ILollipopChartRow, TooltipData } from "./model";
 import {
 	CategoryDataColorProps,
 	CircleFillOption,
@@ -44,18 +44,19 @@ import {
 	ERankingType,
 	lollipopCategoryWidthType,
 	ESortByTypes,
+	DataValuesType,
 } from "./enum";
-import {createTooltipServiceWrapper, ITooltipServiceWrapper} from "powerbi-visuals-utils-tooltiputils";
-import {interactivitySelectionService, interactivityBaseService} from "powerbi-visuals-utils-interactivityutils";
-import {createLegend, positionChartArea} from "powerbi-visuals-utils-chartutils/lib/legend/legend";
-import {textMeasurementService, wordBreaker} from "powerbi-visuals-utils-formattingutils";
-import {ILegend, LegendData, LegendDataPoint, LegendPosition} from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
-import {Shadow} from "@truviz/shadow/dist/Shadow";
-import {ShadowUpdateOptions, landingPageProp} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
-import {EnumerateSectionType} from "@truviz/shadow/dist/types/EnumerateSectionType";
-import {Enumeration} from "./Enumeration";
-import {paidProperties} from "./PaidProperties";
-import {NumberFormatting, VisualSettings} from "./settings";
+import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
+import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
+import { createLegend, positionChartArea } from "powerbi-visuals-utils-chartutils/lib/legend/legend";
+import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
+import { ILegend, LegendData, LegendDataPoint, LegendPosition } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
+import { Shadow } from "@truviz/shadow/dist/Shadow";
+import { ShadowUpdateOptions, landingPageProp } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
+import { Enumeration } from "./Enumeration";
+import { paidProperties } from "./PaidProperties";
+import { NumberFormatting, VisualSettings } from "./settings";
 import {
 	CHART_SETTINGS,
 	CIRCLE_SETTINGS,
@@ -95,17 +96,19 @@ import {
 	IYGridLinesSettings,
 } from "./visual-settings.interface";
 import * as echarts from "echarts/core";
-import {PieChart} from "echarts/charts";
-import {SVGRenderer} from "echarts/renderers";
-import {EChartsOption} from "echarts";
-import {GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat} from "./methods/methods";
-import {TextProperties} from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
+import { PieChart } from "echarts/charts";
+import { SVGRenderer } from "echarts/renderers";
+import { EChartsOption } from "echarts";
+import { GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
+import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
 	CallExpandAllYScaleOnAxisGroup,
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
+import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 
 import ChartSettings from "./settings-pages/ChartSettings";
 import DataColorsSettings from "./settings-pages/DataColorsSettings";
@@ -116,14 +119,14 @@ import GridLinesSettings from "./settings-pages/GridLinesSettings";
 import RankingSettings from "./settings-pages/RankingSettings";
 import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
-import {Behavior, SetAndBindChartBehaviorOptions} from "./methods/Behaviour.methods";
+import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
 export class Visual extends Shadow {
 	public chartContainer: HTMLElement;
 	public hostContainer: HTMLElement;
-	public visualUpdateOptions: ShadowUpdateOptions;
+	public vizOptions: ShadowUpdateOptions;
 	public selectionManager: ISelectionManager;
 	public tooltipServiceWrapper: ITooltipServiceWrapper;
 	public legend1: ILegend;
@@ -142,16 +145,16 @@ export class Visual extends Shadow {
 	public settingsBtnWidth: number = 152;
 	public viewPortWidth: number;
 	public viewPortHeight: number;
-	public margin: {top: number; right: number; bottom: number; left: number};
+	public margin: { top: number; right: number; bottom: number; left: number };
 	public valuesTitle: string;
 	public chartData: ILollipopChartRow[];
-	public legends1Data: LegendData = {dataPoints: []};
-	public legends2Data: LegendData = {dataPoints: []};
-	public legendViewPort: {width: number; height: number} = {width: 0, height: 0};
+	public legends1Data: LegendData = { dataPoints: [] };
+	public legends2Data: LegendData = { dataPoints: [] };
+	public legendViewPort: { width: number; height: number } = { width: 0, height: 0 };
 	public isInFocusMode: boolean = false;
 	public isVisualResized: boolean = false;
 	public footerHeight: number = 0;
-	private highContrastDetails: IHighContrastDetails = {isHighContrast: false};
+	private highContrastDetails: IHighContrastDetails = { isHighContrast: false };
 
 	// CATEGORICAL DATA
 	public categoricalData: powerbi.DataViewCategorical;
@@ -177,7 +180,7 @@ export class Visual extends Shadow {
 	subCategoriesName: string[] = [];
 	measure1DisplayName: string;
 	measure2DisplayName: string;
-	subCategories: {name: string; color1: string; color2: string}[] = [];
+	subCategories: { name: string; color1: string; color2: string }[] = [];
 	isDisplayLegend2: boolean;
 	isHasMultiMeasure: boolean;
 	isHasSubcategories: boolean;
@@ -189,14 +192,14 @@ export class Visual extends Shadow {
 	totalLollipopCount: number = 0;
 
 	// selection id
-	selectionIdByCategories: {[category: string]: ISelectionId} = {};
-	selectionIdBySubCategories: {[subcategory: string]: ISelectionId} = {};
+	selectionIdByCategories: { [category: string]: ISelectionId } = {};
+	selectionIdBySubCategories: { [subcategory: string]: ISelectionId } = {};
 
 	// number formatter
 	public measureNumberFormatter: IValueFormatter[];
 	public tooltipNumberFormatter: IValueFormatter[];
 	public sortValuesNumberFormatter: IValueFormatter[];
-	public allNumberFormatter: {[name: string]: {formatter: IValueFormatter; role: EDataRolesName}} = {};
+	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
 
 	// svg
 	public svg: any;
@@ -226,7 +229,7 @@ export class Visual extends Shadow {
 	public xAxisTitleMargin: number = 0;
 	public xAxisTitleG: Selection<SVGElement>;
 	public xAxisTitleText: any;
-	public xAxisTitleSize: {width: number; height: number};
+	public xAxisTitleSize: { width: number; height: number };
 	public xScaleGHeight: number = 0;
 	public xScaleWidth: number;
 	public xScalePaddingOuter: number = 0.25;
@@ -239,7 +242,7 @@ export class Visual extends Shadow {
 	public yAxisTitleText: any;
 	public yAxisTitleMargin: number = 0;
 	public yAxisTitleG: Selection<SVGElement>;
-	public yAxisTitleSize: {width: number; height: number};
+	public yAxisTitleSize: { width: number; height: number };
 	public yScaleGWidth: number = 0;
 	public yScaleHeight: number;
 	public isLeftYAxis: boolean;
@@ -316,6 +319,10 @@ export class Visual extends Shadow {
 	isValidShowBucket = true;
 	isShowBucketChartFieldCheck: boolean;
 	isShowBucketChartFieldName: string;
+
+	// annotations
+	annotationBarClass: string = "annotation-slice";
+	visualAnnotations: VisualAnnotations;
 
 	// settings
 	isHorizontalChart: boolean = false;
@@ -450,7 +457,7 @@ export class Visual extends Shadow {
 	}
 
 	public initChart(): void {
-		this.margin = {top: 10, right: 30, bottom: this.xAxisTitleMargin, left: this.yAxisTitleMargin};
+		this.margin = { top: 10, right: 30, bottom: this.xAxisTitleMargin, left: this.yAxisTitleMargin };
 
 		this.svg = d3.select(this.chartContainer).append("svg").classed("lollipopChart", true);
 
@@ -597,7 +604,7 @@ export class Visual extends Shadow {
 	}
 
 	sortCategoryDataPairs(
-		data: {category: string}[],
+		data: { category: string }[],
 		categoryKey: string,
 		measureKeys: string[],
 		sortKeys: string[],
@@ -700,7 +707,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	defaultSortCategoryDataPairs(data: {category: string}[], measureKeys: string[], categoricalMeasureFields: powerbi.DataViewValueColumn[]): void {
+	defaultSortCategoryDataPairs(data: { category: string }[], measureKeys: string[], categoricalMeasureFields: powerbi.DataViewValueColumn[]): void {
 		const sortByMeasure = (measureValues: powerbi.DataViewValueColumn[]) => {
 			const index = measureValues[0].source.index;
 			const measureIndex = `${EDataRolesName.Measure1}${index}`;
@@ -789,14 +796,14 @@ export class Visual extends Shadow {
 		this.sortFieldsDisplayName =
 			categoricalSortFields.length > 0
 				? categoricalSortFields
-						.map((d) => ({
-							label: d.source.displayName,
-							value: d.source.displayName,
-							isSortByCategory: d.source.type.text,
-							isSortByMeasure: d.source.type.numeric,
-							isSortByExtraSortField: true,
-						}))
-						.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
 				: [];
 
 		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : "";
@@ -1068,7 +1075,7 @@ export class Visual extends Shadow {
 		// 	const isAllNegative = d3.every(this.categoricalMeasureFields, (d) => d3.every(d.values, (d) => +d < 0));
 		// 	if (isAllNegative && this.categoricalCategoriesFields.length > 0) {
 		// 		this.displayValidationPage("Negative data not supported");
-		// 		this._events.renderingFailed(this.visualUpdateOptions.options, "Negative data not supported");
+		// 		this._events.renderingFailed(this.vizOptions.options, "Negative data not supported");
 		// 		return;
 		// 	}
 		// }
@@ -1076,7 +1083,7 @@ export class Visual extends Shadow {
 
 	expandAllCode(): void {
 		if (this.isExpandAllApplied) {
-			const {labelFontFamily, labelFontSize} = this.xAxisSettings;
+			const { labelFontFamily, labelFontSize } = this.xAxisSettings;
 			if (!this.isHorizontalChart) {
 				this.expandAllYScaleGWidth = 0;
 				this.expandAllXScaleGHeight = getSVGTextSize("XAxis", labelFontFamily, labelFontSize).height * this.expandAllCategoriesName.length;
@@ -1105,12 +1112,12 @@ export class Visual extends Shadow {
 	}
 
 	public afterUpdate(vizOptions: ShadowUpdateOptions) {
-		this.visualUpdateOptions = vizOptions;
+		this.vizOptions = vizOptions;
 		this._events.renderingStarted(vizOptions.options);
 
 		try {
-			this.categoricalData = this.visualUpdateOptions.options.dataViews[0].categorical as any;
-			this.categoricalMetadata = this.visualUpdateOptions.options.dataViews[0].metadata;
+			this.categoricalData = this.vizOptions.options.dataViews[0].categorical as any;
+			this.categoricalMetadata = this.vizOptions.options.dataViews[0].metadata;
 			this.isInFocusMode = vizOptions.options.isInFocus;
 			this.isValidShowBucket = true;
 			this.brushWidth = 0;
@@ -1148,7 +1155,7 @@ export class Visual extends Shadow {
 			this.width = vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width;
 			this.height = vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height;
 
-			const clonedCategoricalData = JSON.parse(JSON.stringify(this.visualUpdateOptions.options.dataViews[0].categorical));
+			const clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
 			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 			this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
 
@@ -1176,24 +1183,24 @@ export class Visual extends Shadow {
 
 			this.expandAllCode();
 
-			const {height: footerHeight} = this.createFooter(this.footerSettings, this.chartContainer);
+			const { height: footerHeight } = this.createFooter(this.footerSettings, this.chartContainer);
 			this.footerHeight = this.footerSettings.show ? footerHeight : 0;
 
 			const isHasSubcategories = !!this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 
 			if (!isHasSubcategories) {
 				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
-					const selectionId = this.visualUpdateOptions.host
+					const selectionId = this.vizOptions.host
 						.createSelectionIdBuilder()
 						.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
 						.createSelectionId();
 					this.selectionIdByCategories[category] = selectionId;
 				});
 			} else {
-				const categoricalData = this.visualUpdateOptions.options.dataViews[0];
+				const categoricalData = this.vizOptions.options.dataViews[0];
 				const series: any[] = categoricalData.categorical.values.grouped();
 				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
-					const selectionId = this.visualUpdateOptions.host
+					const selectionId = this.vizOptions.host
 						.createSelectionIdBuilder()
 						.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
 						.createSelectionId();
@@ -1202,7 +1209,7 @@ export class Visual extends Shadow {
 
 					series.forEach((ser: any, j: number) => {
 						ser.values.forEach((s) => {
-							const seriesSelectionId = this.visualUpdateOptions.host
+							const seriesSelectionId = this.vizOptions.host
 								.createSelectionIdBuilder()
 								.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
 								.withSeries(categoricalData.categorical.values, ser)
@@ -1218,7 +1225,7 @@ export class Visual extends Shadow {
 			this.categoricalData = this.setInitialChartData(
 				clonedCategoricalData,
 				clonedCategoricalData,
-				JSON.parse(JSON.stringify(this.visualUpdateOptions.options.dataViews[0].metadata)),
+				JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].metadata)),
 				vizOptions.options.viewport.width,
 				vizOptions.options.viewport.height
 			);
@@ -1245,15 +1252,15 @@ export class Visual extends Shadow {
 			this.settingsBtnHeight = popupOptionsHeader ? popupOptionsHeader.clientHeight : 0;
 			this.isDisplayLegend2 = this.isHasMultiMeasure && this.chartSettings.lollipopType !== LollipopType.Circle;
 
-			const {titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily} = this.xAxisSettings;
-			const {titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily} = this.xAxisSettings;
+			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
+			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.xAxisSettings;
 
 			this.xAxisTitleSize = this.xAxisSettings.isDisplayTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
-				: {width: 0, height: 0};
+				: { width: 0, height: 0 };
 			this.yAxisTitleSize = this.yAxisSettings.isDisplayTitle
 				? getSVGTextSize("Title", yAxisTitleFontFamily, yAxisTitleFontSize)
-				: {width: 0, height: 0};
+				: { width: 0, height: 0 };
 
 			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
 			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
@@ -1324,6 +1331,7 @@ export class Visual extends Shadow {
 
 			this.drawLollipopChart();
 			this.setSummaryTableConfig();
+			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 
 			// this.displayBrush();
 			// this.drawTooltip();
@@ -1340,7 +1348,7 @@ export class Visual extends Shadow {
 	}
 
 	private sortSubcategoryData(): void {
-		const {enabled, sortOrder, sortBy, isSortByCategory} = this.sortingSettings.subCategory;
+		const { enabled, sortOrder, sortBy, isSortByCategory } = this.sortingSettings.subCategory;
 		if (enabled && this.isHasSubcategories) {
 			if (isSortByCategory) {
 				if (this.isHorizontalChart) {
@@ -1423,30 +1431,30 @@ export class Visual extends Shadow {
 			: false;
 		if (!categoricalCategoriesFields) {
 			this.displayValidationPage("Add at least one dimension in the Category field");
-			this._events.renderingFailed(this.visualUpdateOptions.options, "Add at least one dimension in the Category field");
+			this._events.renderingFailed(this.vizOptions.options, "Add at least one dimension in the Category field");
 			return true;
 		}
 
-		if (this.handleLandingPage(this.visualUpdateOptions)) {
+		if (this.handleLandingPage(this.vizOptions)) {
 			return true;
 		}
 
-		const categoricalMeasureFields = this.visualUpdateOptions.options.dataViews[0].categorical.values
-			? this.visualUpdateOptions.options.dataViews[0].categorical.values.filter(
-					(d) => !!d.source.roles[EDataRolesName.Measure]
-					// eslint-disable-next-line no-mixed-spaces-and-tabs
-			  )
+		const categoricalMeasureFields = this.vizOptions.options.dataViews[0].categorical.values
+			? this.vizOptions.options.dataViews[0].categorical.values.filter(
+				(d) => !!d.source.roles[EDataRolesName.Measure]
+				// eslint-disable-next-line no-mixed-spaces-and-tabs
+			)
 			: [];
 		if (categoricalMeasureFields.length === 0) {
 			this.displayValidationPage("Please enter measure data");
-			this._events.renderingFailed(this.visualUpdateOptions.options, "Please enter measure data");
+			this._events.renderingFailed(this.vizOptions.options, "Please enter measure data");
 			return true;
 		}
 
 		const categoricalCategoryFields = this.categoricalData.categories.filter((d) => d.source.roles[EDataRolesName.Category]);
 		if (!categoricalCategoryFields.some((d) => d.values.length > 1) && categoricalMeasureFields[0].values.length === 0) {
 			this.displayValidationPage("Empty measure and category");
-			this._events.renderingFailed(this.visualUpdateOptions.options, "Empty measure and category");
+			this._events.renderingFailed(this.vizOptions.options, "Empty measure and category");
 			return true;
 		}
 
@@ -1532,10 +1540,10 @@ export class Visual extends Shadow {
 					),
 					tooltipFields: subCategoryGroup
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
-						.map((d) => ({displayName: d.source.displayName, value: d.values[idx], color: ""} as TooltipData)),
+						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 					styles: {
-						pie1: {color: ""},
-						pie2: {color: ""},
+						pie1: { color: "" },
+						pie2: { color: "" },
 					},
 				};
 				return [...arr, obj];
@@ -1550,14 +1558,14 @@ export class Visual extends Shadow {
 			identity: undefined,
 			selected: false,
 			isHighlight: false,
-			tooltipFields: this.categoricalTooltipFields.map((d) => ({displayName: d.source.displayName, value: d.values[idx], color: ""} as TooltipData)),
+			tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 			subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
 			styles: {
-				circle1: {fillColor: "", strokeColor: ""},
-				circle2: {fillColor: "", strokeColor: ""},
-				line: {color: this.lineSettings.lineColor},
-				pie1: {color: ""},
-				pie2: {color: ""},
+				circle1: { fillColor: "", strokeColor: "" },
+				circle2: { fillColor: "", strokeColor: "" },
+				line: { color: this.lineSettings.lineColor },
+				pie1: { color: "" },
+				pie2: { color: "" },
 			},
 		}));
 
@@ -1572,12 +1580,12 @@ export class Visual extends Shadow {
 
 		// const category = this.categoricalData.categories[0];
 		// data.forEach((d, i) => {
-		// 	const selectionId: ISelectionId = this.visualUpdateOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
+		// 	const selectionId: ISelectionId = this.vizOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
 		// 	d.selectionId = selectionId;
 		// });
 		// data.forEach((d, i) => {
 		// 	d.subCategories.forEach((subCategory) => {
-		// 		const selectionId: ISelectionId = this.visualUpdateOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
+		// 		const selectionId: ISelectionId = this.vizOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
 		// 		subCategory.selectionId = selectionId;
 		// 	});
 		// });
@@ -1586,7 +1594,7 @@ export class Visual extends Shadow {
 		this.chartData = data;
 	}
 
-	setSelectionIds(data: ILollipopChartRow[], subCategories: {name: string}[]): void {
+	setSelectionIds(data: ILollipopChartRow[], subCategories: { name: string }[]): void {
 		if (!this.isHasSubcategories) {
 			data.forEach((el, i) => {
 				el.identity = this.selectionIdByCategories[el.city];
@@ -1612,7 +1620,7 @@ export class Visual extends Shadow {
 	}
 
 	setVisualSettings(): void {
-		const formatTab = this.visualUpdateOptions.formatTab;
+		const formatTab = this.vizOptions.formatTab;
 
 		const chartConfig = JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]);
 		this.chartSettings = {
@@ -1687,7 +1695,7 @@ export class Visual extends Shadow {
 		};
 		this.isRankingSettingsChanged = JSON.stringify(clonedRankingSettings) !== JSON.stringify(this.rankingSettings);
 
-		const sortingConfig = JSON.parse(this.visualUpdateOptions.formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]);
+		const sortingConfig = JSON.parse(this.vizOptions.formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]);
 		this.sortingSettings = {
 			...SORTING_SETTINGS,
 			...sortingConfig,
@@ -2083,7 +2091,7 @@ export class Visual extends Shadow {
 	}
 
 	setChartWidthHeight(): void {
-		const options = this.visualUpdateOptions;
+		const options = this.vizOptions;
 		this.viewPortWidth = options.options.viewport.width;
 		this.viewPortHeight = options.options.viewport.height;
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
@@ -2142,7 +2150,7 @@ export class Visual extends Shadow {
 			}
 		});
 
-		const brushed = ({selection}) => {
+		const brushed = ({ selection }) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
 					if (this[`${d}ScaleDomain`]) {
@@ -2270,8 +2278,7 @@ export class Visual extends Shadow {
 		this.brushG
 			.attr(
 				"transform",
-				`translate(${this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width}, ${
-					this.margin.top ? this.margin.top : 0
+				`translate(${this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width}, ${this.margin.top ? this.margin.top : 0
 				})`
 			)
 			.call(brush)
@@ -2305,7 +2312,7 @@ export class Visual extends Shadow {
 		});
 
 		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
-		const brushed = ({selection}) => {
+		const brushed = ({ selection }) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
 					if (self[`${d}ScaleDomain`]) {
@@ -2465,7 +2472,7 @@ export class Visual extends Shadow {
 		const scaleHeight: number = config.scaleHeight;
 		const brushDomain = this.brushScaleBand.domain();
 
-		const brushed = ({selection}) => {
+		const brushed = ({ selection }) => {
 			const newYScaleDomain = [];
 			let brushArea = selection;
 			if (brushArea === null) brushArea = this.yScale.range();
@@ -2510,7 +2517,7 @@ export class Visual extends Shadow {
 		const scaleWidth: number = config.scaleWidth;
 		const brushDomain = this.brushScaleBand.domain();
 
-		const brushed = ({selection}) => {
+		const brushed = ({ selection }) => {
 			const newXScaleDomain = [];
 			let brushArea = selection;
 			if (brushArea === null) brushArea = this.xScale.range();
@@ -2589,15 +2596,15 @@ export class Visual extends Shadow {
 	}
 
 	getCategoricalValuesIndexByKey(key: string): number {
-		return this.visualUpdateOptions.options.dataViews[0].categorical.values.findIndex((data) => data.source.roles[key] === true);
+		return this.vizOptions.options.dataViews[0].categorical.values.findIndex((data) => data.source.roles[key] === true);
 	}
 
 	isHasCategoricalValuesIndexByKey(key: string): number {
-		return this.visualUpdateOptions.options.dataViews[0].categorical.values.findIndex((data) => data.source.roles[key] === true);
+		return this.vizOptions.options.dataViews[0].categorical.values.findIndex((data) => data.source.roles[key] === true);
 	}
 
 	getCategoricalCategoriesIndexByKey(key: string): number {
-		return this.visualUpdateOptions.options.dataViews[0].categorical.categories.findIndex((data) => data.source.roles[key] === true);
+		return this.vizOptions.options.dataViews[0].categorical.categories.findIndex((data) => data.source.roles[key] === true);
 	}
 
 	drawLollipopChart(): void {
@@ -2688,8 +2695,8 @@ export class Visual extends Shadow {
 			return labelTextWidth > this.circle1Radius * 2 ? "none" : "block";
 		} else if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			const prop = labelEle.getBoundingClientRect();
-			// let marginLeft = this.margin.left + (this.visualUpdateOptions.options.isInFocus === true ? this.settingsPopupOptionsWidth : 0);
-			// let marginTop = this.margin.top + this.settingsBtnHeight - (this.visualUpdateOptions.options.isInFocus === true ? this.settingsPopupOptionsHeight : 0);
+			// let marginLeft = this.margin.left + (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsWidth : 0);
+			// let marginTop = this.margin.top + this.settingsBtnHeight - (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsHeight : 0);
 			let marginLeft = this.margin.left;
 			let marginRight = this.margin.right;
 			let marginTop = this.margin.top;
@@ -2788,7 +2795,7 @@ export class Visual extends Shadow {
 		});
 	}
 
-	getDataLabelXY(d: ILollipopChartRow, isPie2: boolean = false): {x: number; y: number} {
+	getDataLabelXY(d: ILollipopChartRow, isPie2: boolean = false): { x: number; y: number } {
 		let x = 0;
 		let y = 0;
 
@@ -2803,7 +2810,7 @@ export class Visual extends Shadow {
 				y = this.getCircleCY(this.yScale(isPie2 ? d.value2 : d.value1));
 			}
 		}
-		return {x, y};
+		return { x, y };
 	}
 
 	transformHorizontalData1LabelOutside(labelSelection: any, labelDistance: number): void {
@@ -3644,7 +3651,7 @@ export class Visual extends Shadow {
 
 		if (!this.isHorizontalChart) {
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
+				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
 			});
 			const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
 			const xAxisMaxHeight = d3.min([this.height * 0.4, xAxisTicksMaxWidth], (d) => d);
@@ -3652,23 +3659,23 @@ export class Visual extends Shadow {
 			if (!this.isHorizontalBrushDisplayed) {
 				const xAxisTickHeight = textMeasurementService.measureSvgTextHeight(textProperties);
 				const xAxisTicks: string[][] = xAxisDomain.map((text) => {
-					return GetWordsSplitByWidth(text, {...textProperties, text: text}, this.xScale.bandwidth(), 3);
+					return GetWordsSplitByWidth(text, { ...textProperties, text: text }, this.xScale.bandwidth(), 3);
 				});
 				const isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3;
 				const xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length) * xAxisTickHeight;
 				this.xScaleGHeight = isApplyTilt ? xAxisMaxHeight : xAxisMaxWordHeight;
 			} else {
 				const xAxisTicks = xAxisDomain.map((text) => {
-					return textMeasurementService.getTailoredTextOrDefault({...textProperties, text}, xAxisMaxHeight);
+					return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, xAxisMaxHeight);
 				});
 				const xAxisTicksWidth = xAxisTicks.map((d) => {
-					return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
+					return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
 				});
 				const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
 				this.xScaleGHeight = xAxisTicksMaxWidth;
 			}
 		} else {
-			this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({...textProperties});
+			this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({ ...textProperties });
 		}
 	}
 
@@ -3694,10 +3701,10 @@ export class Visual extends Shadow {
 			this.yScaleGWidth = d3.max(yAxisTicksWidth);
 		} else {
 			const yAxisTicks = yAxisDomain.map((text) => {
-				return textMeasurementService.getTailoredTextOrDefault({...textProperties, text}, this.width * 0.06);
+				return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * 0.06);
 			});
 			const yAxisTicksWidth = yAxisTicks.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({...textProperties, text: d});
+				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
 			});
 			const yAxisTicksMaxWidth = d3.max(yAxisTicksWidth, (d) => d);
 			this.yScaleGWidth = yAxisTicksMaxWidth;
@@ -3864,19 +3871,38 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection);
 
 					if (this.chartSettings.lollipopType === LollipopType.Circle) {
-						const circle1Selection = lollipopG.append("circle").classed(this.circleClass, true).classed(this.circle1Class, true);
+						const circle1Selection = lollipopG.append("circle")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							})
+							.attr("id", CircleType.Circle1)
+							.classed(this.circleClass, true)
+							.classed(this.circle1Class, true);
 						this.setCircle1Formatting(circle1Selection);
 
 						if (this.isHasMultiMeasure) {
-							const circle2Selection = lollipopG.append("circle").classed(this.circleClass, true).classed(this.circle2Class, true);
+							const circle2Selection = lollipopG.append("circle")
+								.datum(d => {
+									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+								})
+								.attr("id", CircleType.Circle2)
+								.classed(this.circleClass, true).classed(this.circle2Class, true);
 							this.setCircle2Formatting(circle2Selection);
 						}
 					} else {
-						const pie1Selection = lollipopG.append("foreignObject").attr("id", "pie1ForeignObject");
+						const pie1Selection = lollipopG.append("foreignObject")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							})
+							.attr("id", "pie1ForeignObject");
 						this.enterPieChart(pie1Selection);
 
 						if (this.isHasMultiMeasure) {
-							const pie2Selection = lollipopG.append("foreignObject").attr("id", "pie2ForeignObject");
+							const pie2Selection = lollipopG.append("foreignObject")
+								.datum(d => {
+									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+								})
+								.attr("id", "pie2ForeignObject");
 							this.enterPieChart(pie2Selection, true);
 						}
 
@@ -3887,10 +3913,22 @@ export class Visual extends Shadow {
 				},
 				(update) => {
 					const lineSelection = update.select(this.lineClassSelector);
-					const circle1Selection = update.select(this.circle1ClassSelector);
-					const circle2Selection = update.select(this.circle2ClassSelector);
-					const pie1Selection = update.select("#pie1ForeignObject");
-					const pie2Selection = update.select("#pie2ForeignObject");
+					const circle1Selection = update.datum(d => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					}).select(this.circle1ClassSelector);
+					const circle2Selection = update.datum(d => {
+						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+					}).select(this.circle2ClassSelector);
+					const pie1Selection = update
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+						})
+						.select("#pie1ForeignObject");
+					const pie2Selection = update
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+						})
+						.select("#pie2ForeignObject");
 
 					this.setVerticalLinesFormatting(lineSelection);
 
@@ -4150,7 +4188,7 @@ export class Visual extends Shadow {
 		return this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
-			itemStyle: {color: data.styles[pieType].color, className: "pie-slice"},
+			itemStyle: { color: data.styles[pieType].color, className: "pie-slice" },
 		}));
 	}
 
@@ -4344,12 +4382,29 @@ export class Visual extends Shadow {
 			.attr("id", "pie")
 			.style("width", "100%")
 			.style("height", "100%")
-			.each((d, i, nodes) => {
+			.each((d: ILollipopChartRow, i, nodes) => {
 				const ele = d3.select(nodes[i]);
 				const ePieChart = echarts.init(ele.node());
 				ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
 
+				d.subCategories.forEach(s => {
+					s.defaultValue = d.valueType === DataValuesType.Value1 ? s.value1 : s.value2;
+					s.valueType = d.valueType;
+				})
+
 				ele.selectAll("path").data(d.subCategories);
+
+				ele.selectAll("path").each(function () {
+					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
+					d3.select(this).datum((d: any) => {
+						return { ...d, sliceWidth: bBox.width, sliceHeight: bBox.height }
+					})
+				})
+
+				ele.selectAll("path").attr("id", (pieData: IChartSubCategory) => {
+					return pieData.valueType === DataValuesType.Value1 ? PieType.Pie1 : PieType.Pie2;
+				});
+
 				ele.selectAll("path").attr("class", (pieData: IChartSubCategory) => {
 					return "pie-slice";
 					// return this.getPieSliceClass(d.city, pieData ? pieData.category + " " + "pie-slice" : "");
@@ -4396,7 +4451,10 @@ export class Visual extends Shadow {
 					pieData.tooltipFields.forEach((data) => {
 						tooltipData.push({
 							displayName: data.displayName,
-							value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
+
+							value: typeof data.value === "number"
+								? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
+								: data.value,
 							color: data.color ? data.color : "transparent",
 						});
 					});
@@ -4446,11 +4504,11 @@ export class Visual extends Shadow {
 				ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
 				ePieChart.resize();
 
-				ele.selectAll("path").data(d.subCategories);
-				ele
-					.selectAll("path")
-					.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.city, pieData.category))
-					.style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
+				// ele.selectAll("path").data(d.subCategories);
+				// ele
+				// 	.selectAll("path")
+				// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.city, pieData.category))
+				// .style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
 
 				ele
 					.selectAll(".innerCenterRect")
@@ -4511,13 +4569,13 @@ export class Visual extends Shadow {
 					label: this.measure1DisplayName,
 					color: this.dataColorsSettings.circle1.circleFillColor,
 					selected: false,
-					identity: this.visualUpdateOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure1).createSelectionId(),
+					identity: this.vizOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure1).createSelectionId(),
 				},
 				{
 					label: this.measure2DisplayName,
 					color: this.dataColorsSettings.circle2.circleFillColor,
 					selected: false,
-					identity: this.visualUpdateOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure2).createSelectionId(),
+					identity: this.vizOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure2).createSelectionId(),
 				},
 			];
 		} else {
@@ -4525,14 +4583,14 @@ export class Visual extends Shadow {
 				label: category.name,
 				color: category.color1,
 				selected: false,
-				identity: this.visualUpdateOptions.host.createSelectionIdBuilder().createSelectionId(),
+				identity: this.vizOptions.host.createSelectionIdBuilder().createSelectionId(),
 			}));
 
 			legend2DataPoints = this.subCategories.map((category) => ({
 				label: category.name,
 				color: category.color2,
 				selected: false,
-				identity: this.visualUpdateOptions.host.createSelectionIdBuilder().createSelectionId(),
+				identity: this.vizOptions.host.createSelectionIdBuilder().createSelectionId(),
 			}));
 		}
 
@@ -4586,12 +4644,12 @@ export class Visual extends Shadow {
 		this.setLegendViewPortWidthHeight();
 
 		this.legend1.changeOrientation(LegendPosition[legendPosition]);
-		this.legend1.drawLegend(this.legends1Data, {width: this.legendViewPortWidth, height: this.legendViewPortHeight});
+		this.legend1.drawLegend(this.legends1Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
 		positionChartArea(d3.select(this.chartContainer), this.legend1);
 
 		if (this.isDisplayLegend2) {
 			this.legend2.changeOrientation(LegendPosition[legendPosition]);
-			this.legend2.drawLegend(this.legends2Data, {width: this.legendViewPortWidth, height: this.legendViewPortHeight});
+			this.legend2.drawLegend(this.legends2Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
 			positionChartArea(d3.select(this.chartContainer), this.legend2);
 		}
 
@@ -4615,7 +4673,7 @@ export class Visual extends Shadow {
 
 	setLegendViewPortWidthHeight(): void {
 		const legendPosition = this.legendSettings.position;
-		const visualViewPort = this.visualUpdateOptions.options.viewport;
+		const visualViewPort = this.vizOptions.options.viewport;
 		this.legendViewPortHeight = visualViewPort.height - this.settingsBtnHeight;
 
 		if (!this.isDisplayLegend2) {
@@ -4683,9 +4741,9 @@ export class Visual extends Shadow {
 			legendPosition === ILegendPosition.Bottom ||
 			legendPosition === ILegendPosition.BottomCenter
 		) {
-			const legendTitlesWidth: {id: number; width: number}[] = [];
+			const legendTitlesWidth: { id: number; width: number }[] = [];
 			d3.selectAll(".legendTitle").each(function (d, i) {
-				legendTitlesWidth.push({id: i, width: (this as any).getBBox().width});
+				legendTitlesWidth.push({ id: i, width: (this as any).getBBox().width });
 			});
 
 			if (legendTitlesWidth.length) {
@@ -4817,7 +4875,7 @@ export class Visual extends Shadow {
 			.style("margin-top", this.legendViewPort.height + "px")
 			.style(
 				"width",
-				`calc(100vw - ${this.legendViewPort.width + (this.visualUpdateOptions.options.isInFocus ? this.settingsPopupOptionsWidth : 0)}px)`
+				`calc(100vw - ${this.legendViewPort.width + (this.vizOptions.options.isInFocus ? this.settingsPopupOptionsWidth : 0)}px)`
 			)
 			.style("height", `calc(100% - ${this.settingsBtnHeight + this.legendViewPort.height}px)`);
 
@@ -4922,7 +4980,7 @@ export class Visual extends Shadow {
 		legend.changeOrientation(LegendPosition.None);
 		this.chartContainer.style.marginLeft = null;
 		this.chartContainer.style.marginTop = null;
-		legend.drawLegend({dataPoints: []}, this.visualUpdateOptions.options.viewport);
+		legend.drawLegend({ dataPoints: [] }, this.vizOptions.options.viewport);
 		this.legendViewPort.width = legend.getMargins().width ? legend.getMargins().width : 0;
 		this.legendViewPort.height = legend.getMargins().height ? legend.getMargins().height : 0;
 		d3.select(this.chartContainer).style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
@@ -4930,7 +4988,7 @@ export class Visual extends Shadow {
 	}
 
 	handleShowBucket(): void {
-		const showBucketConfig = JSON.parse(this.visualUpdateOptions.formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]);
+		const showBucketConfig = JSON.parse(this.vizOptions.formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]);
 		this.showBucketSettings = {
 			...SHOW_BUCKET_SETTINGS,
 			...showBucketConfig,
@@ -4940,7 +4998,7 @@ export class Visual extends Shadow {
 		this.isShowBucketChartFieldCheck = !!categoricalShowBucketField;
 		this.isShowBucketChartFieldName = this.isShowBucketChartFieldCheck ? categoricalShowBucketField.source.displayName : "";
 
-		const {enable, fontSize, fontFamily, styling, color, message, showIcon} = this.showBucketSettings;
+		const { enable, fontSize, fontFamily, styling, color, message, showIcon } = this.showBucketSettings;
 
 		if (this.isShowBucketChartFieldCheck) {
 			if (this.showBucketSettings.enable) {
@@ -4984,15 +5042,13 @@ export class Visual extends Shadow {
 			const marginBottom = 0;
 			let footerContainerStyles = "";
 			if (footerSettings.isShowDivider) {
-				footerContainerStyles += `border-top: ${footerSettings.dividerThickness}px solid ${
-					this.highContrastDetails.isHighContrast ? this.highContrastDetails.foregroundColor : footerSettings.dividerColor
-				};`;
+				footerContainerStyles += `border-top: ${footerSettings.dividerThickness}px solid ${this.highContrastDetails.isHighContrast ? this.highContrastDetails.foregroundColor : footerSettings.dividerColor
+					};`;
 			}
 
 			footerContainer.setAttribute(
 				"style",
-				`justify-content: ${
-					alignmentMapping[footerSettings.alignment]
+				`justify-content: ${alignmentMapping[footerSettings.alignment]
 				};  margin-top: ${marginTop}px; margin-bottom: ${marginBottom}px; ${footerContainerStyles}`
 			);
 			const footer = document.createElement("div");
@@ -5051,10 +5107,10 @@ export class Visual extends Shadow {
 			excludeNegativeDataBy: this.isHasSubcategories ? "cell" : "row",
 			categoricalGroupedDatarole: "subCategory",
 			excludeDataRolesFromTable: ["showBucket"],
-			dataView: this.visualUpdateOptions.options.dataViews as any,
+			dataView: this.vizOptions.options.dataViews as any,
 			gridView: "tabular",
 			gridConfig: {
-				sidebar: {columns: true, filters: true},
+				sidebar: { columns: true, filters: true },
 				allowedAggregations: true,
 			},
 			numberFormatter: (value, field) => {
@@ -5070,10 +5126,10 @@ export class Visual extends Shadow {
 					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
 				}
 			},
-			themeValue: this.visualUpdateOptions.formatTab["visualGeneralSettings"]["darkMode"],
+			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
 			viewport: {
-				width: this.visualUpdateOptions.options.viewport.width,
-				height: this.visualUpdateOptions.options.viewport.height,
+				width: this.vizOptions.options.viewport.width,
+				height: this.vizOptions.options.viewport.height,
 			},
 		};
 
@@ -5094,7 +5150,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
-			const matrixSorting = {row: [], column: []};
+			const matrixSorting = { row: [], column: [] };
 			if (this.sortingSettings.category.enabled) {
 				matrixSorting.row.push({
 					column: this.sortingSettings.category.sortBy,
@@ -5118,27 +5174,27 @@ export class Visual extends Shadow {
 
 	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields): void {
 		this.measureNumberFormatter = categoricalMeasureFields.map((d) => {
-			return valueFormatter.create({format: d.source.format});
+			return valueFormatter.create({ format: d.source.format });
 		});
 
 		this.tooltipNumberFormatter = categoricalTooltipFields.map((d) => {
-			return valueFormatter.create({format: d.source.format});
+			return valueFormatter.create({ format: d.source.format });
 		});
 
 		this.sortValuesNumberFormatter = categoricalSortFields.map((d) => {
-			return valueFormatter.create({format: d.source.format});
+			return valueFormatter.create({ format: d.source.format });
 		});
 
 		categoricalMeasureFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = {formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure};
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure };
 		});
 
 		categoricalTooltipFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = {formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip};
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip };
 		});
 
 		categoricalSortFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = {formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort};
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort };
 		});
 	}
 }

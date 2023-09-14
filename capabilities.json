@@ -706,6 +706,25 @@
 					}
 				}
 			}
+		},
+		"editor": {
+			"displayName": "Editor",
+			"properties": {
+				"conditionalFormatting": {
+					"displayName": "Conditional Formatting",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				},
+				"annotations": {
+					"displayName": "Annotations",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
 		}
 	},
 	"drilldown": {

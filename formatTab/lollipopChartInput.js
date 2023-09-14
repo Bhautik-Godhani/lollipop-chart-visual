@@ -17,6 +17,7 @@ const sectionKVPair = [
 	{ numberFormatting: "numberFormatting" },
 	{ showBucketConfig: "Show Bucket" },
 	{ footer: "Footer" },
+	{ editor: "Editor" },
 ];
 
 const formatTab = {
@@ -514,6 +515,22 @@ const formatTab = {
 					key: "Right",
 				},
 			],
+		},
+	],
+	editor: [
+		{
+			technicalName: "conditionalFormatting",
+			displayName: "Conditional Formatting",
+			type: "text",
+			description: "",
+			defaultValue: "",
+		},
+		{
+			technicalName: "annotations",
+			displayName: "Annotations",
+			type: "text",
+			description: "",
+			defaultValue: "[]",
 		},
 	],
 };

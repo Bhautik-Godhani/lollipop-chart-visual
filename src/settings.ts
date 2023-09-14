@@ -46,6 +46,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public numberFormatting = new NumberFormatting();
 	public showBucketConfig = new ShowBucketConfig();
 	public footer = new Footer();
+	public editor = new Editor();
 }
 
 export class License {
@@ -124,4 +125,8 @@ export class ShowBucketConfig {
 
 export class Footer {
 	public show: boolean = false; public text: string = ""; public webURL: string = ""; public color: string = "#404040"; public fontSize: string = "16"; public fontFamily: string = "Segoe UI"; public isShowDivider: boolean = false; public dividerColor: string = "#404040"; public dividerThickness: number = 1; public backgroundColor: string = "#ffffff"; public backgroundTransparency: number = 0; public alignment: string = "center";
+}
+
+export class Editor {
+	public conditionalFormatting: string = ""; public annotations: string = "[]";
 }

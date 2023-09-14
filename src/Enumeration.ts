@@ -22,6 +22,7 @@ export class Enumeration {
 			getNumberFormattingSelection(),
 			getShowBucketConfigSelection(),
 			getFooterSelection(),
+			getEditorSelection(),
 		];
 	}
 }
@@ -380,6 +381,22 @@ function getFooterSelection(): EnumerateSectionType {
 			},
 			{
 				name: 'alignment',
+				isShow: true
+			},
+		]
+	}
+}
+function getEditorSelection(): EnumerateSectionType {
+	return {
+		name: 'editor',
+		isShow: false,
+		properties: [
+			{
+				name: 'conditionalFormatting',
+				isShow: true
+			},
+			{
+				name: 'annotations',
 				isShow: true
 			},
 		]

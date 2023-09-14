@@ -297,3 +297,8 @@ export enum EShowBucketSettings {
 	Styling = "styling",
 	Color = "color",
 }
+
+export enum DataValuesType {
+	Value1 = "value1",
+	Value2 = "value2",
+}

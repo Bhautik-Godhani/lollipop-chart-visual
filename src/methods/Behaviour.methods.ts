@@ -1,16 +1,17 @@
-import {select as d3Select, Selection} from "d3-selection";
+import { select as d3Select, select, Selection } from "d3-selection";
 import {
 	IBehaviorOptions,
 	IInteractiveBehavior,
 	IInteractivityService,
 	ISelectionHandler,
 } from "powerbi-visuals-utils-interactivityutils/lib/interactivityBaseService";
-import {SelectableDataPoint} from "powerbi-visuals-utils-interactivityutils/lib/interactivitySelectionService";
-import {Visual} from "../visual";
+import { SelectableDataPoint } from "powerbi-visuals-utils-interactivityutils/lib/interactivitySelectionService";
+import { Visual } from "../visual";
 import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
-import {ILollipopChartRow} from "../model";
+import { ILollipopChartRow } from "../model";
 
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
+import { CircleType, DataValuesType, PieType } from "../enum";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
@@ -34,25 +35,51 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const {lollipopSelection, lineSelection, legendItems, dataPoints, clearCatcher, isHasSubcategories, interactivityService} = options;
+		const { lollipopSelection, lineSelection, legendItems, dataPoints, clearCatcher, isHasSubcategories, interactivityService } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
 
-			// if (visualAnnotations.isAnnotationScreenActivated) {
-			//     visualAnnotations.onAnnotationNodeClick(event, data);
-			// } else {
-			//     if (onSliceClick) {
-			//         onSliceClick(ele);
-			//     }
-
-			selectionHandler.handleSelection(data, event.ctrlKey);
-			event.stopPropagation();
-			// }
+			if (visualAnnotations.isAnnotationScreenActivated) {
+				visualAnnotations.onAnnotationNodeClick(event, data);
+			} else {
+				selectionHandler.handleSelection(data, event.ctrlKey);
+				event.stopPropagation();
+			}
 		};
 
 		lollipopSelection.on("click", function (e) {
-			handleSelection(this, e);
+			const clickedElement = e.target;
+
+			if (clickedElement.id === CircleType.Circle1) {
+				select(this)
+					.datum((d: any) => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					})
+				handleSelection(this, e);
+			} else if (clickedElement.id === CircleType.Circle2) {
+				select(this)
+					.datum((d: any) => {
+						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+					})
+				handleSelection(this, e);
+			} else if (this.id === PieType.Pie1) {
+				const bBox = (select(this).node() as SVGSVGElement).getBBox();
+				select(this)
+					.datum((d: any) => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+					})
+				handleSelection(this, e);
+			} else if (this.id === PieType.Pie2) {
+				const bBox = (select(this).node() as SVGSVGElement).getBBox();
+				select(this)
+					.datum((d: any) => {
+						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2, sliceWidth: bBox.width, sliceHeight: bBox.height }
+					})
+				handleSelection(this, e);
+			} else {
+				handleSelection(this, e);
+			}
 		});
 
 		lineSelection.on("click", function (e) {
@@ -92,11 +119,11 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const {lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager} = this.options;
+		const { lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
 		const handleOpacity = (dataPoint: ILollipopChartRow) => {
-			const {selected, isHighlight} = dataPoint;
+			const { selected, isHighlight } = dataPoint;
 			let opacity = 1;
 			if (isHasHighlights) {
 				opacity = isHighlight ? 1 : 0.4;
