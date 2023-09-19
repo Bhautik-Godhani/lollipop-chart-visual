@@ -589,6 +589,18 @@
 				}
 			}
 		},
+		"brushAndZoomAreaConfig": {
+			"displayName": "Brush And Zoom Area",
+			"properties": {
+				"brushAndZoomAreaSettings": {
+					"displayName": "Brush And Zoom Area",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"footer": {
 			"displayName": "Footer",
 			"properties": {

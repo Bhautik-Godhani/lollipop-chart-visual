@@ -55,3 +55,16 @@ export interface TooltipData {
 	value: string;
 	color?: string;
 }
+
+export interface IBrushLollipopChartData {
+	category: string;
+	value1: number; value2: number;
+	styles: {
+		circle1: {
+			fillColor: string
+		},
+		circle2: {
+			fillColor: string
+		}
+	}
+}

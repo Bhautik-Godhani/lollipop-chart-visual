@@ -286,3 +286,8 @@ export interface IHighContrastDetails {
 	foregroundSelectedColor?: string;
 	hyperlinkColor?: string;
 }
+
+export interface IBrushAndZoomAreaSettings {
+	enabled: boolean;
+	isShowAxis: boolean;
+}

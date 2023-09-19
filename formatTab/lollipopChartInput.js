@@ -18,6 +18,7 @@ const sectionKVPair = [
 	{ showBucketConfig: "Show Bucket" },
 	{ footer: "Footer" },
 	{ editor: "Editor" },
+	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
 ];
 
 const formatTab = {
@@ -416,7 +417,6 @@ const formatTab = {
 			defaultValue: "{}",
 		},
 	],
-
 	footer: [
 		{
 			technicalName: "show",
@@ -531,6 +531,15 @@ const formatTab = {
 			type: "text",
 			description: "",
 			defaultValue: "[]",
+		},
+	],
+	brushAndZoomAreaConfig: [
+		{
+			technicalName: "brushAndZoomAreaSettings",
+			displayName: "Brush And Zoom Area",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
 		},
 	],
 };

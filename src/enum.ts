@@ -10,6 +10,7 @@ export enum EVisualConfig {
 	XAxisConfig = "xAxisConfig",
 	YAxisConfig = "yAxisConfig",
 	ShowBucketConfig = "showBucketConfig",
+	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig"
 }
 
 export enum EVisualSettings {
@@ -29,6 +30,7 @@ export enum EVisualSettings {
 	NumberFormatting = "numberFormatting",
 	ShowBucketFormatting = "showBucket",
 	Footer = "footer",
+	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings"
 }
 
 export enum LineType {
@@ -296,6 +298,11 @@ export enum EShowBucketSettings {
 	FontSize = "fontSize",
 	Styling = "styling",
 	Color = "color",
+}
+
+export enum EBrushAndZoomAreaSettings {
+	Enabled = "enabled",
+	IsShowAxis = "isShowAxis"
 }
 
 export enum DataValuesType {

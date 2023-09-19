@@ -17,6 +17,7 @@ import {
 	lollipopCategoryWidthType,
 } from "./enum";
 import {
+	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
 	ICircleSettings,
@@ -286,4 +287,9 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 	fontSize: 20,
 	styling: [],
 	color: "rgba(84, 84, 84, 1)",
+};
+
+export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
+	enabled: true,
+	isShowAxis: false
 };
