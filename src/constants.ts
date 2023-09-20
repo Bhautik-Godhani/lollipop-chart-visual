@@ -26,6 +26,7 @@ import {
 	IDataLabelsSettings,
 	IGridLinesSettings,
 	ILineSettings,
+	IPatternSettings,
 	IPiePropsSettings,
 	IRankingSettings,
 	IShowBucketSettings,
@@ -70,7 +71,7 @@ export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
 	circleSize: CircleSize.Auto,
 	maxCircleRadius: 10,
 	circleRadius: 10,
-	strokeWidth: 6,
+	strokeWidth: 0,
 };
 
 export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
@@ -79,7 +80,7 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 	circleSize: CircleSize.Auto,
 	maxCircleRadius: 10,
 	circleRadius: 10,
-	strokeWidth: 6,
+	strokeWidth: 0,
 };
 
 export const CIRCLE_SETTINGS: ICircleSettings = {
@@ -292,4 +293,12 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	enabled: true,
 	isShowAxis: false
+};
+
+export const PATTERN_SETTINGS: IPatternSettings = {
+	enabled: false,
+	categoryPatterns: [],
+	subCategoryPatterns: [],
+	isPatternBorderEnabled: false,
+	patternBorderWidth: 1
 };

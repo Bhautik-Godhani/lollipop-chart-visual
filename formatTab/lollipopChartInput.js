@@ -16,6 +16,7 @@ const sectionKVPair = [
 	{ legend: "legend" },
 	{ numberFormatting: "numberFormatting" },
 	{ showBucketConfig: "Show Bucket" },
+	{ patternConfig: "Pattern Configuration" },
 	{ footer: "Footer" },
 	{ editor: "Editor" },
 	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
@@ -537,6 +538,15 @@ const formatTab = {
 		{
 			technicalName: "brushAndZoomAreaSettings",
 			displayName: "Brush And Zoom Area",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	patternConfig: [
+		{
+			technicalName: "patternSettings",
+			displayName: "Pattern Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

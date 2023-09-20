@@ -23,6 +23,7 @@ export class Enumeration {
 			getShowBucketConfigSelection(),
 			getFooterSelection(),
 			getEditorSelection(),
+			getPatternSelection(),
 		];
 	}
 }
@@ -401,4 +402,17 @@ function getEditorSelection(): EnumerateSectionType {
 			},
 		]
 	}
+}
+
+function getPatternSelection(): EnumerateSectionType {
+	return {
+		name: "patternConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "patternSettings",
+				isShow: true,
+			},
+		],
+	};
 }

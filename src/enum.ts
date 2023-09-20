@@ -10,7 +10,8 @@ export enum EVisualConfig {
 	XAxisConfig = "xAxisConfig",
 	YAxisConfig = "yAxisConfig",
 	ShowBucketConfig = "showBucketConfig",
-	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig"
+	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig",
+	PatternConfig = "patternConfig"
 }
 
 export enum EVisualSettings {
@@ -30,7 +31,8 @@ export enum EVisualSettings {
 	NumberFormatting = "numberFormatting",
 	ShowBucketFormatting = "showBucket",
 	Footer = "footer",
-	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings"
+	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings",
+	PatternSettings = "patternSettings",
 }
 
 export enum LineType {
@@ -308,4 +310,12 @@ export enum EBrushAndZoomAreaSettings {
 export enum DataValuesType {
 	Value1 = "value1",
 	Value2 = "value2",
+}
+
+export enum EPatternSettings {
+	Enabled = "enabled",
+	CategoryPatterns = "categoryPatterns",
+	SubcategoryPatterns = "subCategoryPatterns",
+	IsPatternBorderEnabled = "isPatternBorderEnabled",
+	PatternBorderWidth = "patternBorderWidth"
 }

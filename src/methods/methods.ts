@@ -3,6 +3,9 @@ import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/in
 import { NumberFormatting } from "../settings";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import IValueFormatter = valueFormatter.IValueFormatter;
+import { PATTERNS } from "./patterns";
+import { Visual } from "../visual";
+import crypto from "crypto";
 
 export const getSVGTextSize = (
 	text: string,
@@ -203,3 +206,117 @@ export const powerBiNumberFormat = (
 ): string => {
 	return formatter.format(number);
 }
+
+export const generateSecureRandomBytes = (length) => {
+	return crypto.randomBytes(length);
+}
+
+export const createPatternsDefs = (self: Visual, svgRootElement) => {
+	const filterDef = svgRootElement.append("defs");
+	PATTERNS.map((pattern) => {
+		if (self.isHasSubcategories) {
+			self.subCategoriesName.forEach(d => {
+				const filterPreview = filterDef
+					.append("pattern")
+					.attr("id", pattern.patternName + "_PREVIEW")
+					.attr("groupBy", d)
+					.attr("class", "patterns-preview")
+					.attr("patternUnits", "userSpaceOnUse")
+					.attr("width", pattern.w)
+					.attr("height", pattern.h);
+
+				filterPreview
+					.append("path")
+					.attr("d", pattern.d)
+					.attr("stroke", pattern.stroke ? "var(--activeSelected)" : "none")
+					.attr("stroke-width", pattern.stroke ? "2" : "0")
+					.attr("x", 0)
+					.attr("y", 0)
+					.attr("fill", pattern.fill ? "var(--activeSelected)" : "none")
+					.attr("transform", pattern.translate ? pattern.translate : "");
+			})
+		} else {
+			const filterPreview = filterDef
+				.append("pattern")
+				.attr("id", pattern.patternName + "_PREVIEW")
+				.attr("class", "patterns-preview")
+				.attr("patternUnits", "userSpaceOnUse")
+				.attr("width", pattern.w)
+				.attr("height", pattern.h);
+
+			filterPreview
+				.append("path")
+				.attr("d", pattern.d)
+				.attr("stroke", pattern.stroke ? "var(--activeSelected)" : "none")
+				.attr("stroke-width", pattern.stroke ? "2" : "0")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("fill", pattern.fill ? "var(--activeSelected)" : "none")
+				.attr("transform", pattern.translate ? pattern.translate : "");
+		}
+	});
+};
+
+export const generatePattern = (svgRootElement, pattern, color, isLegend = false) => {
+	let defs = svgRootElement.select("defs");
+
+	if (defs.empty()) {
+		defs = svgRootElement.append("defs");
+	}
+	let patternId;
+	if (pattern.isImagePattern) {
+		patternId = "image-pattern".concat("-", generateSecureRandomBytes(16).toString("hex"));
+		const filter = defs.append("pattern").attr("id", patternId);
+
+		if (isLegend) {
+			filter
+				.attr("width", "100%")
+				.attr("height", "100%")
+				.attr("patternContentUnits", "objectBoundingBox")
+				.attr("viewBox", "0 0 1 1")
+				.attr("preserveAspectRatio", "xMidYMid slice");
+		} else {
+			filter
+				.attr("patternUnits", "userSpaceOnUse")
+				.attr("width", pattern.dimensions.width)
+				.attr("height", pattern.dimensions.height);
+		}
+
+		const filterImage = filter.append("image").attr("xlink:href", pattern.patternIdentifier);
+
+		if (isLegend) {
+			filterImage.attr("width", 1).attr("height", 1).attr("preserveAspectRatio", "xMidYMid slice");
+		} else {
+			filterImage.attr("height", pattern.dimensions.height).attr("x", 0).attr("y", 0);
+		}
+	} else {
+		const patternObject = PATTERNS.find(({ patternName }) => patternName == pattern.patternIdentifier);
+		patternId = patternObject.patternName.concat("-", generateSecureRandomBytes(16).toString("hex"));
+
+		const filter = defs
+			.append("pattern")
+			.attr("id", patternId)
+			.attr("patternUnits", "userSpaceOnUse")
+			.attr("width", patternObject.w)
+			.attr("height", patternObject.h);
+
+		filter
+			.append("path")
+			.attr("d", patternObject.d)
+			.attr("stroke", patternObject.stroke == true ? color : "none")
+			.attr("stroke-width", "2")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("fill", patternObject.fill == true ? color : "none")
+			.attr("transform", () => {
+				if (isLegend && patternObject.patternName === "STAR") {
+					return `scale(0.8) translate(6.5, 6.5)`;
+				}
+				else if (isLegend && patternObject.patternName === "HEART") {
+					return `scale(0.75)`;
+				}
+				return patternObject.translate ? patternObject.translate : ""
+			});
+	}
+	return patternId;
+};

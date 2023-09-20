@@ -291,3 +291,26 @@ export interface IBrushAndZoomAreaSettings {
 	enabled: boolean;
 	isShowAxis: boolean;
 }
+
+export interface IPatternProps {
+	name: string;
+	patternIdentifier: string;
+	isImagePattern: boolean;
+	dimensions?: { width: number; height: number };
+}
+
+export interface IPatternSettings {
+	enabled: boolean,
+	categoryPatterns: IPatternProps[],
+	subCategoryPatterns: IPatternProps[],
+	isPatternBorderEnabled: boolean,
+	patternBorderWidth: number
+}
+
+export interface ISinglePatternProps {
+	name: string;
+	patternIdentifier: string;
+	isImagePattern: boolean;
+	imageSlicesDataUrls?: string[];
+	dimensions?: { width: number; height: number };
+}

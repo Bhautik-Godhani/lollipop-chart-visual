@@ -69,7 +69,8 @@ import {
 	SORTING_SETTINGS,
 	X_AXIS_SETTINGS,
 	Y_AXIS_SETTINGS,
-	BRUSH_AND_ZOOM_AREA_SETTINGS
+	BRUSH_AND_ZOOM_AREA_SETTINGS,
+	PATTERN_SETTINGS
 } from "./constants";
 import {
 	IBrushAndZoomAreaSettings,
@@ -86,6 +87,8 @@ import {
 	ILegendSettings,
 	ILineSettings,
 	INumberSettings,
+	IPatternProps,
+	IPatternSettings,
 	IPiePropsSettings,
 	IPieSettings,
 	IRankingSettings,
@@ -101,7 +104,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, formatNumber, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
+import { GetWordsSplitByWidth, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -122,6 +125,7 @@ import RankingSettings from "./settings-pages/RankingSettings";
 import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
+import PatternSettings from "./settings-pages/FillPatterns";
 
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
 
@@ -159,6 +163,7 @@ export class Visual extends Shadow {
 	public isVisualResized: boolean = false;
 	public footerHeight: number = 0;
 	private highContrastDetails: IHighContrastDetails = { isHighContrast: false };
+	private isPatternApplied: boolean;
 
 	// CATEGORICAL DATA
 	public clonedCategoricalData: powerbi.DataViewCategorical;
@@ -338,6 +343,10 @@ export class Visual extends Shadow {
 	annotationBarClass: string = "annotation-slice";
 	visualAnnotations: VisualAnnotations;
 
+	// patterns
+	categoryPatterns: IPatternProps[];
+	subCategoryPatterns: IPatternProps[];
+
 	// settings
 	isHorizontalChart: boolean = false;
 	circleSettings: ICircleSettings;
@@ -362,6 +371,7 @@ export class Visual extends Shadow {
 	showBucketSettings: IShowBucketSettings;
 	footerSettings: IFooterSettings;
 	brushAndZoomAreaSettings: IBrushAndZoomAreaSettings;
+	patternSettings: IPatternSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -451,6 +461,12 @@ export class Visual extends Shadow {
 					sectionName: "sortingConfig",
 					propertyName: "sorting",
 					Component: () => SortingSettings,
+				},
+				{
+					name: "Patterns",
+					sectionName: "patternConfig",
+					propertyName: "patternSettings",
+					Component: () => PatternSettings,
 				},
 				{
 					name: "Show Condition",
@@ -1416,6 +1432,8 @@ export class Visual extends Shadow {
 			// this.displayBrush();
 			// this.drawTooltip();
 
+			createPatternsDefs(this, this.svg);
+
 			if (!this.isHasSubcategories) {
 				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
 			} else {
@@ -1672,6 +1690,27 @@ export class Visual extends Shadow {
 
 		this.setSelectionIds(data, []);
 		this.chartData = data;
+		if (this.patternSettings.enabled) {
+			this.setVisualPatternData();
+		}
+
+		this.categoryPatterns = this.chartData
+			.map((d) => ({
+				name: d.city,
+				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "" : "",
+				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
+				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
+			}));
+
+		if (this.isHasSubcategories) {
+			this.subCategoryPatterns = this.chartData[0].subCategories
+				.map((d) => ({
+					name: d.category,
+					patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "" : "",
+					isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
+					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
+				}));
+		}
 	}
 
 	setSelectionIds(data: ILollipopChartRow[], subCategories: { name: string }[]): void {
@@ -1787,6 +1826,12 @@ export class Visual extends Shadow {
 			...brushAndZoomAreaConfig,
 		};
 
+		const patternConfig = JSON.parse(formatTab[EVisualConfig.PatternConfig][EVisualSettings.PatternSettings]);
+		this.patternSettings = {
+			...PATTERN_SETTINGS,
+			...patternConfig,
+		};
+
 		this.changeVisualSettings();
 
 		// if (!this.isHasSubcategories) {
@@ -1823,9 +1868,23 @@ export class Visual extends Shadow {
 		this.yGridSettings = this.gridSettings.yGridLines;
 		this.pie1Settings = this.chartSettings.pieSettings.pie1;
 		this.pie2Settings = this.chartSettings.pieSettings.pie2;
+		this.isPatternApplied = this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
 		// }
+	}
+
+	setVisualPatternData(): void {
+		this.chartData.forEach((d) => {
+			d.pattern = this.patternSettings.categoryPatterns.find((p) => p.name === d.city);
+		});
+
+		this.chartData.forEach((d) => {
+			d.subCategories.forEach((s) => {
+				s.pattern = this.patternSettings.subCategoryPatterns.find((p) => p.name === s.category);
+			});
+		});
 	}
 
 	setChartDataByRanking(): void {
@@ -3925,14 +3984,6 @@ export class Visual extends Shadow {
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "lollipop-group");
 
-				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
-
-				if (this.isHorizontalChart) {
-					this.setHorizontalLinesFormatting(lineSelection);
-				} else {
-					this.setVerticalLinesFormatting(lineSelection);
-				}
-
 				if (this.chartSettings.lollipopType === LollipopType.Circle) {
 					const circle1Selection = lollipopG.append("circle")
 						.datum(d => {
@@ -3942,16 +3993,6 @@ export class Visual extends Shadow {
 						.classed(this.circleClass, true)
 						.classed(this.circle1Class, true);
 					this.setCircle1Formatting(circle1Selection);
-
-					if (this.isHasMultiMeasure) {
-						const circle2Selection = lollipopG.append("circle")
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-							})
-							.attr("id", CircleType.Circle2)
-							.classed(this.circleClass, true).classed(this.circle2Class, true);
-						this.setCircle2Formatting(circle2Selection);
-					}
 				} else {
 					const pie1Selection = lollipopG.append("foreignObject")
 						.datum(d => {
@@ -3959,17 +4000,35 @@ export class Visual extends Shadow {
 						})
 						.attr("id", "pie1ForeignObject");
 					this.enterPieChart(pie1Selection);
+					this.setPieDataLabelsDisplayStyle();
+				}
 
-					if (this.isHasMultiMeasure) {
+				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
+
+				if (this.isHasMultiMeasure) {
+					if (this.chartSettings.lollipopType === LollipopType.Circle) {
+						const circle2Selection = lollipopG.append("circle")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+							})
+							.attr("id", CircleType.Circle2)
+							.classed(this.circleClass, true).classed(this.circle2Class, true);
+						this.setCircle2Formatting(circle2Selection);
+					} else {
 						const pie2Selection = lollipopG.append("foreignObject")
 							.datum(d => {
 								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 							})
 							.attr("id", "pie2ForeignObject");
 						this.enterPieChart(pie2Selection, true);
+						this.setPieDataLabelsDisplayStyle(true);
 					}
+				}
 
-					this.setPieDataLabelsDisplayStyle();
+				if (this.isHorizontalChart) {
+					this.setHorizontalLinesFormatting(lineSelection);
+				} else {
+					this.setVerticalLinesFormatting(lineSelection);
 				}
 
 				return lollipopG;
@@ -4015,9 +4074,11 @@ export class Visual extends Shadow {
 					circle2Selection.remove();
 
 					this.updatePieChart(pie1Selection);
+					this.setPieDataLabelsDisplayStyle();
 
 					if (this.isHasMultiMeasure) {
 						this.updatePieChart(pie2Selection, true);
+						this.setPieDataLabelsDisplayStyle(true);
 					}
 				}
 
@@ -4128,8 +4189,14 @@ export class Visual extends Shadow {
 			.attr("stroke", (d) => d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle1Settings.strokeWidth)
 			.attr("opacity", 1)
-			.style("fill", (d) =>
-				this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff"
+			.style("fill", (d: ILollipopChartRow) => {
+				const color = this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff";
+				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+				} else {
+					return color;
+				}
+			}
 			)
 			.style("display", this.circle1Settings.show ? "block" : "none");
 	}
@@ -4149,8 +4216,14 @@ export class Visual extends Shadow {
 			.attr("stroke", (d) => d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle2Settings.strokeWidth)
 			.attr("opacity", 1)
-			.style("fill", (d) =>
-				this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff"
+			.style("fill", (d) => {
+				const color = this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff";
+				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+				} else {
+					return color;
+				}
+			}
 			)
 			.style("display", (d) => (this.circle2Settings.show && this.isHasMultiMeasure && d.value2 ? "block" : "none"));
 	}
@@ -4251,10 +4324,19 @@ export class Visual extends Shadow {
 	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false) {
 		const id = this.chartData.findIndex((data) => data.city === category);
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
+		const getColor = (d: IChartSubCategory) => {
+			const color = d.styles[pieType].color;
+			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+				return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+			} else {
+				return color;
+			}
+		}
+
 		return this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
-			itemStyle: { color: data.styles[pieType].color, className: "pie-slice" },
+			itemStyle: { color: getColor(data), className: "pie-slice" },
 		}));
 	}
 

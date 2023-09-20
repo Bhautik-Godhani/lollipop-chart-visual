@@ -1,6 +1,7 @@
 import powerbi from "powerbi-visuals-api";
 import ISelectionId = powerbi.visuals.ISelectionId;
 import { DataValuesType } from "./enum";
+import { IPatternProps } from "./visual-settings.interface";
 
 export interface ILollipopChartRow {
 	city: string;
@@ -19,6 +20,7 @@ export interface ILollipopChartRow {
 	};
 	valueType?: DataValuesType;
 	defaultValue?: number;
+	pattern?: IPatternProps;
 }
 
 export interface IChartCircleStyles {
@@ -39,7 +41,8 @@ export interface IChartSubCategory {
 	valueType?: DataValuesType;
 	defaultValue?: number,
 	sliceWidth?: number,
-	sliceHeight?: number
+	sliceHeight?: number,
+	pattern?: IPatternProps
 }
 
 export interface VisualTooltipDataItem {

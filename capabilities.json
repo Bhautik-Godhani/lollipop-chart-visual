@@ -601,6 +601,18 @@
 				}
 			}
 		},
+		"patternConfig": {
+			"displayName": "Pattern Configuration",
+			"properties": {
+				"patternSettings": {
+					"displayName": "Pattern Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"footer": {
 			"displayName": "Footer",
 			"properties": {

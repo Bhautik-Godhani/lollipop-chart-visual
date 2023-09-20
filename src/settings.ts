@@ -48,6 +48,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public footer = new Footer();
 	public editor = new Editor();
 	public brushAndZoomAreaConfig = new BrushAndZoomAreaConfig();
+	public patternConfig = new PatternConfig();
 }
 
 export class License {
@@ -134,4 +135,8 @@ export class Editor {
 
 export class BrushAndZoomAreaConfig {
 	public brushAndZoomAreaSettings: string = "{}";
+}
+
+export class PatternConfig {
+	public patternSettings: string = "{}";
 }
