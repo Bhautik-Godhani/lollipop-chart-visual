@@ -33,6 +33,8 @@ export interface IChartSubCategory {
 	value1: number;
 	value2: number;
 	identity?: ISelectionId;
+	selected: boolean;
+	isHighlight: boolean;
 	tooltipFields?: TooltipData[];
 	styles: {
 		pie1: { color: string };

@@ -120,10 +120,15 @@ export class Behavior implements IInteractiveBehavior {
 
 	public renderSelection(hasSelection: boolean): void {
 		const { lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager } = this.options;
-		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
+		const subDataPoints = dataPoints.reduce((arr, cur) => {
+			arr = [...arr, ...cur.subCategories];
+			return arr;
+		}, []);
+		const isHasHighlights = (isHasSubcategories ? subDataPoints : dataPoints).some((d) => d.isHighlight);
 
-		const handleOpacity = (dataPoint: ILollipopChartRow) => {
-			const { selected, isHighlight } = dataPoint;
+		const handleOpacity = (dataPoint: ILollipopChartRow, i: number) => {
+			const selected = dataPoint.selected;
+			const isHighlight = isHasSubcategories ? subDataPoints[i].isHighlight : dataPoints[i].isHighlight;
 			let opacity = 1;
 			if (isHasHighlights) {
 				opacity = isHighlight ? 1 : 0.4;
@@ -141,8 +146,7 @@ export class Behavior implements IInteractiveBehavior {
 			return opacity;
 		};
 
-		lollipopSelection.attr("opacity", (dataPoint: ILollipopChartRow) => handleOpacity(dataPoint));
-		// lineSelection.attr("opacity", (dataPoint: ILollipopChartRow) => handleOpacity(dataPoint));
+		lollipopSelection.attr("opacity", (dataPoint: ILollipopChartRow, i) => handleOpacity(dataPoint, i));
 	}
 }
 
@@ -153,13 +157,13 @@ export const SetAndBindChartBehaviorOptions = (
 	dataPoints: ILollipopChartRow[]
 ): void => {
 	if (self.interactivityService) {
-		// const nodeData = [];
-		// const nodeSelection = lollipopSelection;
-		// nodeSelection.each(function () {
-		//     nodeData.push(d3Select(this).datum());
-		// });
+		const nodeData = [];
+		const nodeSelection = lollipopSelection;
+		nodeSelection.each(function () {
+			nodeData.push(d3Select(this).datum());
+		});
 
-		// self.interactivityService.applySelectionStateToData(nodeData);
+		self.interactivityService.applySelectionStateToData(nodeData);
 
 		const behaviorOptions: BehaviorOptions = {
 			lollipopSelection: lollipopSelection,

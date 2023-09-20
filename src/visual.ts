@@ -901,8 +901,16 @@ export class Visual extends Shadow {
 						} else {
 							obj[`${role}${d.source.index}${this.blankText}`] = d.values[index];
 						}
+
+						if (d.highlights) {
+							obj[`${role}${d.source.index}${d.source.groupName}Highlight`] = d.highlights[index];
+						}
 					} else {
 						obj[`${role}${d.source.index}`] = d.values[index];
+
+						if (d.highlights) {
+							obj[`${role}${d.source.index}Highlight`] = d.highlights[index];
+						}
 
 						if (role === EDataRolesName.Measure && +d.values[index] < 0) {
 							obj.hasNegative = true;
@@ -952,11 +960,13 @@ export class Visual extends Shadow {
 			if (Object.keys(d.source).includes("groupName")) {
 				if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "" && d.source.groupName !== this.blankText) {
 					d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${d.source.groupName}`]);
+					d.highlights = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${d.source.groupName}Highlight`]);
 				} else {
 					d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${this.blankText}`]);
 				}
 			} else {
 				d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}`]);
+				d.highlights = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}Highlight`]);
 			}
 		});
 
@@ -1643,6 +1653,8 @@ export class Visual extends Shadow {
 						pie1: { color: "" },
 						pie2: { color: "" },
 					},
+					selected: false,
+					isHighlight: !!subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).highlights[idx]
 				};
 				return [...arr, obj];
 			}, []);
@@ -1655,7 +1667,7 @@ export class Visual extends Shadow {
 			value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
 			identity: undefined,
 			selected: false,
-			isHighlight: false,
+			isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
 			tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 			subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
 			styles: {
