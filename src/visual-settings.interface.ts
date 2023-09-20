@@ -8,12 +8,12 @@ import {
 	ESortOrderTypes,
 	ILegendPosition,
 	LollipopType,
+	LollipopWidthType,
 	Orientation,
 	PieSize,
 	PieType,
 	Position,
 	RankingDataValuesType,
-	lollipopCategoryWidthType,
 } from "./enum";
 
 export interface IXAxisSettings {
@@ -140,8 +140,8 @@ export interface IChartSettings {
 	isHasSubCategories: boolean;
 	orientation: Orientation;
 	isLollipopDistanceChange: boolean;
-	lollipopCategoryWidthType: lollipopCategoryWidthType;
-	lollipopCategoryWidth: number;
+	lollipopWidthType: LollipopWidthType;
+	lollipopWidth: number;
 	pieSettings: IPieSettings;
 	lollipopInnerPadding: number;
 }

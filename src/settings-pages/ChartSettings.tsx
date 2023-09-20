@@ -1,8 +1,9 @@
 import * as React from "react";
-import {CHART_SETTINGS} from "../constants";
-import {EChartSettings, EPieSettings, LollipopType, Orientation, PieSize, PieType, lollipopCategoryWidthType} from "../enum";
-import {InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption} from "@truviz/shadow/dist/Components";
-import {IChartSettings, ILabelValuePair, IPieSettings} from "../visual-settings.interface";
+import { CHART_SETTINGS } from "../constants";
+import { EChartSettings, EPieSettings, LollipopType, LollipopWidthType, Orientation, PieSize, PieType } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption } from "@truviz/shadow/dist/Components";
+import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
+import { Visual } from "../visual";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -18,11 +19,11 @@ const ORIENTATIONS: ILabelValuePair[] = [
 const LOLLIPOP_DISTANCE_TYPES: ILabelValuePair[] = [
 	{
 		label: "Auto",
-		value: lollipopCategoryWidthType.Auto,
+		value: LollipopWidthType.Auto,
 	},
 	{
 		label: "Custom",
-		value: lollipopCategoryWidthType.Custom,
+		value: LollipopWidthType.Custom,
 	},
 ];
 
@@ -36,7 +37,7 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 const handlePieChange = (val, n, pieType: PieType, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
 	setPieConfigValues((d) => ({
 		...d,
-		[pieType]: {...d[pieType], [n]: val},
+		[pieType]: { ...d[pieType], [n]: val },
 	}));
 };
 
@@ -62,6 +63,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 };
 
 const UIGeneralChartSettings = (
+	shadow: Visual,
 	configValues: IChartSettings,
 	isHasSubCategories: boolean,
 	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
@@ -117,23 +119,23 @@ const UIGeneralChartSettings = (
 			<Row>
 				<Column>
 					<SelectInput
-						label={"Distance Between Lollipop"}
-						value={configValues.lollipopCategoryWidth.toString()}
+						label={"Lollipop Width Type"}
+						value={configValues.lollipopWidthType}
 						optionsList={LOLLIPOP_DISTANCE_TYPES}
-						handleChange={(value) => handleChange(value, EChartSettings.lollipopDistanceType, setConfigValues)}
+						handleChange={(value) => handleChange(value, EChartSettings.lollipopWidthType, setConfigValues)}
 					/>
 				</Column>
 			</Row>
 
-			<ConditionalWrapper visible={configValues.lollipopCategoryWidthType === lollipopCategoryWidthType.Custom}>
+			<ConditionalWrapper visible={configValues.lollipopWidthType === LollipopWidthType.Custom}>
 				<Row>
 					<Column>
 						<InputControl
-							min={0}
+							min={shadow.minScaleBandWidth}
 							type="number"
-							label="Distance Value"
-							value={configValues.lollipopCategoryWidth.toString()}
-							handleChange={(value) => handleChange(+value, EChartSettings.lollipopDistance, setConfigValues)}
+							label="Lollipop Width"
+							value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}
+							handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
 						/>
 					</Column>
 				</Row>
@@ -220,7 +222,7 @@ const UIPieTypeSettings = (
 const ChartSettings = (props) => {
 	const {
 		shadow,
-		compConfig: {sectionName, propertyName},
+		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
@@ -233,7 +235,7 @@ const ChartSettings = (props) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = {...CHART_SETTINGS};
+		initialStates = { ...CHART_SETTINGS };
 	}
 
 	const applyChanges = () => {
@@ -246,7 +248,7 @@ const ChartSettings = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({...CHART_SETTINGS});
+		setConfigValues({ ...CHART_SETTINGS });
 	};
 
 	const [configValues, setConfigValues] = React.useState<IChartSettings>({
@@ -297,7 +299,7 @@ const ChartSettings = (props) => {
 
 	return (
 		<>
-			{UIGeneralChartSettings(configValues, isHasSubCategories, setConfigValues)}
+			{UIGeneralChartSettings(shadow, configValues, isHasSubCategories, setConfigValues)}
 
 			<ConditionalWrapper visible={configValues[EChartSettings.lollipopType] !== LollipopType.Circle}>
 				{UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)}

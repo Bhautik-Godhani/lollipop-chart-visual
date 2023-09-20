@@ -99,7 +99,7 @@ export enum Orientation {
 	Horizontal = "horizontal",
 }
 
-export enum lollipopCategoryWidthType {
+export enum LollipopWidthType {
 	Auto = "auto",
 	Custom = "custom",
 }
@@ -172,8 +172,8 @@ export enum EChartSettings {
 	isLollipopTypeChanged = "isLollipopTypeChanged",
 	isHasSubCategories = "isHasSubCategories",
 	orientation = "orientation",
-	lollipopDistanceType = "lollipopDistanceType",
-	lollipopDistance = "lollipopDistance",
+	lollipopWidthType = "lollipopWidthType",
+	lollipopWidth = "lollipopWidth",
 	pieSettings = "pieSettings",
 }
 

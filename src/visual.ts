@@ -39,12 +39,11 @@ import {
 	PieSize,
 	PieType,
 	Position,
-	RankingDataValuesType,
 	ESortOrderTypes,
 	ERankingType,
-	lollipopCategoryWidthType,
 	ESortByTypes,
 	DataValuesType,
+	LollipopWidthType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -1006,11 +1005,11 @@ export class Visual extends Shadow {
 		this.setBrushScaleBandRange(width, height);
 
 		if (
-			this.chartSettings.lollipopCategoryWidth > this.minScaleBandWidth &&
-			this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Custom
+			this.chartSettings.lollipopWidth > this.minScaleBandWidth &&
+			this.chartSettings.lollipopWidthType === LollipopWidthType.Custom
 		) {
-			this.scaleBandWidth = this.chartSettings.lollipopCategoryWidth;
-			this.brushScaleBandBandwidth = this.chartSettings.lollipopCategoryWidth;
+			this.scaleBandWidth = this.chartSettings.lollipopWidth;
+			this.brushScaleBandBandwidth = this.chartSettings.lollipopWidth;
 		} else if (this.brushScaleBand.bandwidth() > this.minScaleBandWidth) {
 			this.scaleBandWidth = this.brushScaleBand.bandwidth();
 			this.brushScaleBandBandwidth = this.brushScaleBand.bandwidth();
@@ -1027,7 +1026,7 @@ export class Visual extends Shadow {
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
 		if (this.isHorizontalChart) {
-			if (Math.ceil(this.height) < expectedHeight && this.scaleBandWidth <= this.minScaleBandWidth) {
+			if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true)) {
 				this.isScrollBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = false;
@@ -1060,7 +1059,7 @@ export class Visual extends Shadow {
 				this.brushG.selectAll("*").remove();
 			}
 		} else {
-			if (Math.ceil(this.width) < expectedWidth && this.scaleBandWidth <= this.minScaleBandWidth) {
+			if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true)) {
 				this.isScrollBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = false;
@@ -1096,7 +1095,7 @@ export class Visual extends Shadow {
 		}
 
 		// || this.height < expectedHeight
-		if (this.width < expectedWidth && this.scaleBandWidth <= this.minScaleBandWidth) {
+		if (this.width < expectedWidth && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true)) {
 			const startIndex = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 			const endIndex = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
@@ -3422,6 +3421,23 @@ export class Visual extends Shadow {
 	setScaleBandwidth(): void {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+
+		if (this.chartSettings.lollipopWidthType === LollipopWidthType.Custom) {
+			if (!this.chartSettings.lollipopWidth) {
+				this.chartSettings.lollipopWidth = this.scaleBandWidth;
+			}
+
+			if (this.chartSettings.lollipopWidth < this.minScaleBandWidth) {
+				this.chartSettings.lollipopWidth = this.minScaleBandWidth;
+			}
+
+			if (this.chartSettings.lollipopWidth < clonedXScale.padding(0).bandwidth()) {
+				this.chartSettings.lollipopWidth = clonedXScale.padding(0).bandwidth();
+			}
+
+			this.chartSettings.lollipopWidth = +Math.round(this.chartSettings.lollipopWidth).toFixed(0);
+		}
+
 		// if (!this.chartSettings.islollipopCategoryWidthChange || this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Auto) {
 		// 	const maxRadius = d3.max([this.circle1Settings.circleRadius, this.circle2Settings.circleRadius]);
 		// 	const circleDDiff = maxRadius * 2 + maxRadius * 2 - Math.floor(this.scaleBandWidth);

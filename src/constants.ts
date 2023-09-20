@@ -9,12 +9,12 @@ import {
 	ESortOrderTypes,
 	LineType,
 	LollipopType,
+	LollipopWidthType,
 	Orientation,
 	PieSize,
 	PieType,
 	Position,
 	RankingDataValuesType,
-	lollipopCategoryWidthType,
 } from "./enum";
 import {
 	IBrushAndZoomAreaSettings,
@@ -55,8 +55,8 @@ export const CHART_SETTINGS: IChartSettings = {
 	isLollipopTypeChanged: false,
 	isHasSubCategories: false,
 	orientation: Orientation.Vertical,
-	lollipopCategoryWidthType: lollipopCategoryWidthType.Auto,
-	lollipopCategoryWidth: 60,
+	lollipopWidthType: LollipopWidthType.Auto,
+	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
 	pieSettings: {
 		pieType: PieType.Pie1,
