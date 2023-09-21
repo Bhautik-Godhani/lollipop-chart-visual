@@ -328,3 +328,29 @@ export enum EHighContrastColorType {
 	Foreground = "foreground",
 	Background = "background",
 }
+
+export enum EXAxisSettings {
+	Position = "position",
+	IsDisplayTitle = "isDisplayTitle",
+	TitleName = "titleName",
+	TitleColor = "titleColor",
+	TitleFontSize = "titleFontSize",
+	TitleFontFamily = "titleFontFamily",
+	IsDisplayLabel = "isDisplayLabel",
+	LabelColor = "labelColor",
+	LabelFontFamily = "labelFontFamily",
+	LabelFontSize = "labelFontSize",
+}
+
+export enum EYAxisSettings {
+	Position = "position",
+	IsDisplayTitle = "isDisplayTitle",
+	TitleName = "titleName",
+	TitleColor = "titleColor",
+	TitleFontSize = "titleFontSize",
+	TitleFontFamily = "titleFontFamily",
+	IsDisplayLabel = "isDisplayLabel",
+	LabelColor = "labelColor",
+	LabelFontFamily = "labelFontFamily",
+	LabelFontSize = "labelFontSize",
+}

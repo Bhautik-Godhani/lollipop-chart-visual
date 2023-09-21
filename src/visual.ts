@@ -128,6 +128,9 @@ import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
 import PatternSettings from "./settings-pages/FillPatterns";
+import XAxisSettings from "./settings-pages/XAxisSettings";
+import YAxisSettings from "./settings-pages/YAxisSettings";
+
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
@@ -472,6 +475,18 @@ export class Visual extends Shadow {
 					sectionName: "patternConfig",
 					propertyName: "patternSettings",
 					Component: () => PatternSettings,
+				},
+				{
+					name: "X Axis",
+					sectionName: EVisualConfig.XAxisConfig,
+					propertyName: EVisualSettings.XAxisSettings,
+					Component: () => XAxisSettings,
+				},
+				{
+					name: "Y Axis",
+					sectionName: EVisualConfig.YAxisConfig,
+					propertyName: EVisualSettings.YAxisSettings,
+					Component: () => YAxisSettings,
 				},
 				{
 					name: "Conditional Formatting",
