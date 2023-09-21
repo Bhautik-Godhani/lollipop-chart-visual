@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import { NumberFormatting } from "../settings";
@@ -6,6 +7,9 @@ import IValueFormatter = valueFormatter.IValueFormatter;
 import { PATTERNS } from "./patterns";
 import { Visual } from "../visual";
 import crypto from "crypto";
+import { IConditionalFormattingProps } from "../visual-settings.interface";
+import { TooltipData } from "../model";
+import { EDataRolesName } from "../enum";
 
 export const getSVGTextSize = (
 	text: string,
@@ -320,3 +324,134 @@ export const generatePattern = (svgRootElement, pattern, color, isLegend = false
 	}
 	return patternId;
 };
+
+export const parseConditionalFormatting = (SETTINGS) => {
+	try {
+		const parsed = JSON.parse(SETTINGS.editor.conditionalFormatting);
+		if (!parsed.values || !Array.isArray(parsed.values)) return [];
+		const flattened = [];
+		parsed.values.forEach((el) => {
+			flattened.push(...(el.conditions || []));
+		});
+		if (!Array.isArray(flattened) || !(flattened ? flattened.length : 0)) {
+			return [];
+		}
+		return flattened;
+	} catch (e) {
+		// console.log("Error parse conditional formatting", SETTINGS.config.conditionalFormatting);
+	}
+	return [];
+};
+
+export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[]) => {
+	const isMeasureMatch = (el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+		const result = { match: false, color: "", sourceName, measureType };
+		const v = +el.staticValue;
+		const v2 = el.secondaryStaticValue;
+		const color = el.color;
+
+		switch (el.operator) {
+			case "===":
+				result.match = value === v;
+				result.color = color;
+				break;
+			case "!==":
+				result.match = value !== v;
+				result.color = color;
+				break;
+			case "<":
+				result.match = value < v;
+				result.color = color;
+				break;
+			case ">":
+				result.match = value > v;
+				result.color = color;
+				break;
+			case "<=":
+				result.match = value <= v;
+				result.color = color;
+				break;
+			case ">=":
+				result.match = value >= v;
+				result.color = color;
+				break;
+			case "<>":
+				result.match = value >= v && value <= +v2;
+				result.color = color;
+				break;
+		}
+
+		return result;
+	}
+
+	try {
+		if (!Array.isArray(flattened) || !flattened) return { match: false, color: "" };
+		let result: { match: boolean, color: string, sourceName?: string, measureType?: EDataRolesName } = { match: false, color: "", sourceName: "", measureType: undefined };
+		for (let index = 0; index < flattened.length; index++) {
+			const el = flattened[index];
+
+			if (!(el.sourceName !== "" && el.sourceName)) {
+				return;
+			}
+
+			if (el.applyTo === "measure") {
+				if (el.measureType.measure) {
+					if (el.measureType.measure1) {
+						result = (isMeasureMatch(el, value1, el.sourceName, EDataRolesName.Measure1));
+					} else if (el.measureType.measure2) {
+						result = isMeasureMatch(el, value2, el.sourceName, EDataRolesName.Measure2);
+					}
+				} else if (el.measureType.tooltip) {
+					const results = tooltips.map(d => isMeasureMatch(el, +d.value, d.displayName));
+					result = results.find(d => d.match && d.sourceName === el.sourceName);
+				}
+				if (result.match) {
+					return result;
+				}
+			} else if (el.applyTo === "category") {
+				const v = el.staticValue;
+				const color = el.color;
+				category = el.categoryType.category ? category : subCategory;
+
+				switch (el.operator) {
+					case "===":
+						result = { match: matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
+						break;
+					case "!==":
+						result = { match: !matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
+						break;
+					case "contains":
+						result = { match: category.toLowerCase().includes(v.toLowerCase()), color };
+						break;
+					case "doesnotcontain":
+						result = { match: !category.toLowerCase().includes(v.toLowerCase()), color };
+						break;
+					case "beginswith":
+						result = { match: category.toLowerCase().startsWith(v.toLowerCase()), color };
+						break;
+					case "doesnotbeginwith":
+						result = { match: !category.toLowerCase().startsWith(v.toLowerCase()), color };
+						break;
+					case "endswith":
+						result = { match: category.toLowerCase().endsWith(v.toLowerCase()), color };
+						break;
+					case "doesnotendwith":
+						result = { match: !category.toLowerCase().endsWith(v.toLowerCase()), color };
+						break;
+				}
+				if (result.match) {
+					return result;
+				}
+			}
+		}
+		return { match: false, color: "" };
+	} catch (e) {
+		console.log("Error fetching conditional formatting colors", flattened);
+	}
+	return { match: false, color: "" };
+};
+
+function matchRuleShort(str, rule) {
+	const escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+	return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
+}

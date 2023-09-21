@@ -26,7 +26,7 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
 
 export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
     const dataPoint = {
-        name: d.city ? d.city : d.category,
+        name: d.category,
         width: self.isHasSubcategories ? d.sliceWidth : self.circle1Settings.circleRadius * 2,
         height: self.isHasSubcategories ? d.sliceHeight : self.circle1Settings.circleRadius * 2,
         originalValue: d.defaultValue,

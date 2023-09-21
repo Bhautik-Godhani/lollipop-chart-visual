@@ -4,7 +4,7 @@ import { DataValuesType } from "./enum";
 import { IPatternProps } from "./visual-settings.interface";
 
 export interface ILollipopChartRow {
-	city: string;
+	category: string;
 	value1: number;
 	value2: number;
 	identity?: ISelectionId;

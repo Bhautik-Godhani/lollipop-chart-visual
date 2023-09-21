@@ -76,6 +76,7 @@ import {
 	IChartSettings,
 	ICirclePropsSettings,
 	ICircleSettings,
+	IConditionalFormattingProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IFooterSettings,
@@ -102,7 +103,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, powerBiNumberFormat } from "./methods/methods";
+import { GetWordsSplitByWidth, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -126,6 +127,7 @@ import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
 import PatternSettings from "./settings-pages/FillPatterns";
+import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -201,6 +203,7 @@ export class Visual extends Shadow {
 	legends: {
 		legendItems: Selection<SVGElement>, legendWrapper: Selection<SVGElement>
 	};
+	conditionalFormattingConditions: IConditionalFormattingProps[] = [];
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -468,6 +471,12 @@ export class Visual extends Shadow {
 					sectionName: "patternConfig",
 					propertyName: "patternSettings",
 					Component: () => PatternSettings,
+				},
+				{
+					name: "Conditional Formatting",
+					sectionName: "editor",
+					propertyName: "conditionalFormatting",
+					Component: Components.ConditionalFormatting,
 				},
 				{
 					name: "Show Condition",
@@ -1211,6 +1220,7 @@ export class Visual extends Shadow {
 			this.setHighContrastDetails();
 			this.handleShowBucket();
 			this.formatNumber = (value, numberFormatter) => formatNumber(value, this.numberSettings, numberFormatter);
+			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab);
 
 			if (!this.isValidShowBucket) {
 				return;
@@ -1304,6 +1314,21 @@ export class Visual extends Shadow {
 				vizOptions.options.viewport.height
 			);
 
+			this.conditionalFormattingConditions
+				.forEach((cf: IConditionalFormattingProps) => {
+					if (cf.applyTo === "measure") {
+						const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
+						cf.measureType = {
+							measure: roles[EDataRolesName.Measure],
+							measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
+							measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
+							tooltip: roles[EDataRolesName.Tooltip]
+						};
+					} else if (cf.applyTo === "category") {
+						cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
+					}
+				});
+
 			if (this.isHorizontalBrushDisplayed) {
 				this.brushHeight = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaHeight : 10;
 			}
@@ -1343,6 +1368,10 @@ export class Visual extends Shadow {
 
 			if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 				this.setRemainingAsOthersDataColor();
+			}
+
+			if (this.conditionalFormattingConditions.length) {
+				this.setConditionalFormattingColor();
 			}
 
 			if (this.chartData.length) {
@@ -1479,6 +1508,38 @@ export class Visual extends Shadow {
 		} catch (error) {
 			console.error("Error", error);
 		}
+	}
+
+	setConditionalFormattingColor(): void {
+		this.chartData.forEach((d) => {
+			if (!this.isHasSubcategories) {
+				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
+				if (conditionalFormattingResult.match) {
+					if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+						d.styles.circle1.fillColor = conditionalFormattingResult.color;
+					} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+						d.styles.circle2.fillColor = conditionalFormattingResult.color;
+					} else {
+						d.styles.circle1.fillColor = conditionalFormattingResult.color;
+						d.styles.circle2.fillColor = conditionalFormattingResult.color;
+					}
+				}
+			} else {
+				d.subCategories.forEach((s) => {
+					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
+					if (conditionalFormattingResult.match) {
+						if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+							s.styles.pie1.color = conditionalFormattingResult.color;
+						} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+							s.styles.pie2.color = conditionalFormattingResult.color;
+						} else {
+							s.styles.pie1.color = conditionalFormattingResult.color;
+							s.styles.pie2.color = conditionalFormattingResult.color;
+						}
+					}
+				});
+			}
+		});
 	}
 
 	public updateChartDimensions(legendContainer: any): void {
@@ -1725,7 +1786,7 @@ export class Visual extends Shadow {
 		};
 
 		const data: ILollipopChartRow[] = this.categoriesName.map((cat, idx) => ({
-			city: <string>cat,
+			category: <string>cat,
 			value1: !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0,
 			value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
 			identity: undefined,
@@ -1771,7 +1832,7 @@ export class Visual extends Shadow {
 
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
-				name: d.city,
+				name: d.category,
 				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "" : "",
 				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
@@ -1791,13 +1852,13 @@ export class Visual extends Shadow {
 	setSelectionIds(data: ILollipopChartRow[], subCategories: { name: string }[]): void {
 		if (!this.isHasSubcategories) {
 			data.forEach((el, i) => {
-				el.identity = this.selectionIdByCategories[el.city];
+				el.identity = this.selectionIdByCategories[el.category];
 			});
 		} else {
 			data.forEach((el: ILollipopChartRow, i: number) => {
-				el.identity = this.selectionIdByCategories[el.city];
+				el.identity = this.selectionIdByCategories[el.category];
 				el.subCategories.forEach((d) => {
-					d.identity = this.selectionIdBySubCategories[`${el.city}-${d.category}`];
+					d.identity = this.selectionIdBySubCategories[`${el.category}-${d.category}`];
 				});
 			});
 		}
@@ -1952,7 +2013,7 @@ export class Visual extends Shadow {
 
 	setVisualPatternData(): void {
 		this.chartData.forEach((d) => {
-			d.pattern = this.patternSettings.categoryPatterns.find((p) => p.name === d.city);
+			d.pattern = this.patternSettings.categoryPatterns.find((p) => p.name === d.category);
 		});
 
 		this.chartData.forEach((d) => {
@@ -2123,10 +2184,10 @@ export class Visual extends Shadow {
 			}
 			case ColorPaletteType.PowerBi: {
 				this.chartData.forEach((data) => {
-					// let colorCode = this.colorPalette.getColor(data.city).value.split('#')[1];
+					// let colorCode = this.colorPalette.getColor(data.category).value.split('#')[1];
 					// const circleFillColor = '#F2' + colorCode;
-					data.styles.circle1.fillColor = this.colorPalette.getColor(data.city).value;
-					data.styles.circle1.strokeColor = this.colorPalette.getColor(data.city).value;
+					data.styles.circle1.fillColor = this.colorPalette.getColor(data.category).value;
+					data.styles.circle1.strokeColor = this.colorPalette.getColor(data.category).value;
 				});
 				break;
 			}
@@ -2432,23 +2493,27 @@ export class Visual extends Shadow {
 					this.setRemainingAsOthersDataColor();
 				}
 
+				if (this.conditionalFormattingConditions.length) {
+					this.setConditionalFormattingColor();
+				}
+
 				// this.lineSelection
-				// 	.attr("y1", (d) => this.yScale(d.city))
-				// 	.attr("y2", (d) => this.yScale(d.city))
-				// 	.attr("opacity", (d) => {
-				// 		return this.yScale(d.city) ? 1 : 0;
+				// 	.attr("y1", (d) => this.yScale(d.category))
+				// 	.attr("y2", (d) => this.yScale(d.category))
+				// 	.attr("opacategory", (d) => {
+				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
 				// this.circle1Selection
-				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.city : d.value1))
-				// 	.attr("opacity", (d) => {
-				// 		return this.yScale(d.city) ? 1 : 0;
+				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.category : d.value1))
+				// 	.attr("opacategory", (d) => {
+				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
 				// this.circle2Selection
-				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.city : d.value1))
-				// 	.attr("opacity", (d) => {
-				// 		return this.yScale(d.city) ? 1 : 0;
+				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.category : d.value1))
+				// 	.attr("opacategory", (d) => {
+				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
 				// this.yGridLinesSelection.attr("y1", (d) => this.yScale(d)).attr("y2", (d) => this.yScale(d));
@@ -2602,6 +2667,10 @@ export class Visual extends Shadow {
 
 				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 					this.setRemainingAsOthersDataColor();
+				}
+
+				if (this.conditionalFormattingConditions.length) {
+					this.setConditionalFormattingColor();
 				}
 
 				this.drawXYAxis();
@@ -2771,18 +2840,18 @@ export class Visual extends Shadow {
 			this.pieG
 				.selectAll("#pie1ForeignObject")
 				.attr("x", (d) => {
-					const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value1"] : d.city));
+					const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value1"] : d.category));
 					return pieX > 0 ? pieX - pie1ViewBoxRadius : pieX - pie1ViewBoxRadius / 2;
 				})
 				.attr("y", (d) => {
-					const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d["value1"]));
+					const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value1"]));
 					return pieY > 0 ? pieY - pie1ViewBoxRadius : pieY - pie1ViewBoxRadius / 2;
 				})
-				.attr("opacity", (d) => {
+				.attr("opacategory", (d) => {
 					if (this.isHorizontalChart) {
-						return this.yScale(d.city) ? 1 : 0;
+						return this.yScale(d.category) ? 1 : 0;
 					} else {
-						return this.xScale(d.city) ? 1 : 0;
+						return this.xScale(d.category) ? 1 : 0;
 					}
 				});
 
@@ -2790,18 +2859,18 @@ export class Visual extends Shadow {
 				this.pieG
 					.selectAll("#pie2ForeignObject")
 					.attr("x", (d) => {
-						const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value2"] : d.city));
+						const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value2"] : d.category));
 						return pieX > 0 ? pieX - pie2ViewBoxRadius : pieX - pie2ViewBoxRadius / 2;
 					})
 					.attr("y", (d) => {
-						const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d["value2"]));
+						const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value2"]));
 						return pieY > 0 ? pieY - pie2ViewBoxRadius : pieY - pie2ViewBoxRadius / 2;
 					})
-					.attr("opacity", (d) => {
+					.attr("opacategory", (d) => {
 						if (this.isHorizontalChart) {
-							return this.yScale(d.city) ? 1 : 0;
+							return this.yScale(d.category) ? 1 : 0;
 						} else {
-							return this.xScale(d.city) ? 1 : 0;
+							return this.xScale(d.category) ? 1 : 0;
 						}
 					});
 			}
@@ -2966,7 +3035,7 @@ export class Visual extends Shadow {
 		labelSelection
 			.attr("class", "dataLabelG")
 			.attr("display", "block")
-			.attr("opacity", dataLabelsSettings.show ? "1" : "0")
+			.attr("opacategory", dataLabelsSettings.show ? "1" : "0")
 			.style("pointer-events", "none");
 
 		textSelection
@@ -2995,10 +3064,10 @@ export class Visual extends Shadow {
 			.attr("rx", 4)
 			.attr("ry", 4)
 			.attr("fill", dataLabelsSettings.backgroundColor)
-			.attr("opacity", "0");
+			.attr("opacategory", "0");
 
 		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-			rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
+			rectSelection.attr("fill-opacategory", `${100 - dataLabelsSettings.transparency}% `).attr("opacategory", dataLabelsSettings.showBackground ? "1" : "0");
 		}
 
 		textSelection.attr("transform", function () {
@@ -3015,11 +3084,11 @@ export class Visual extends Shadow {
 		if (this.isHorizontalChart) {
 			if (this.chartSettings.lollipopType === LollipopType.Circle) {
 				x = this.getCircleCX(this.xScale(isPie2 ? d.value2 : d.value1));
-				y = this.getCircleCY(this.yScale(d.city));
+				y = this.getCircleCY(this.yScale(d.category));
 			}
 		} else {
 			if (this.chartSettings.lollipopType === LollipopType.Circle) {
-				x = this.getCircleCX(this.xScale(d.city));
+				x = this.getCircleCX(this.xScale(d.category));
 				y = this.getCircleCY(this.yScale(isPie2 ? d.value2 : d.value1));
 			}
 		}
@@ -3210,8 +3279,8 @@ export class Visual extends Shadow {
 
 	transformData1LabelInside(labelsSelection: any): void {
 		const fn = (d, labelBBox: any) => {
-			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value1 : d.city));
-			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value1));
+			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value1 : d.category));
+			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.category : d.value1));
 			const transX = x - labelBBox.width / 2;
 			const transY = y - labelBBox.height / 2;
 			return `translate(${transX}, ${transY})`;
@@ -3225,8 +3294,8 @@ export class Visual extends Shadow {
 
 	transformData2LabelInside(labelsSelection: any): void {
 		const fn = (d, labelBBox) => {
-			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value2 : d.city));
-			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.city : d.value2));
+			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value2 : d.category));
+			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.category : d.value2));
 			const transX = x - labelBBox.width / 2;
 			const transY = y - labelBBox.height / 2;
 			return `translate(${transX}, ${transY})`;
@@ -3243,7 +3312,7 @@ export class Visual extends Shadow {
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			return this.isHorizontalChart ? this.yScale(data.city) : this.xScale(data.city);
+			return this.isHorizontalChart ? this.yScale(data.category) : this.xScale(data.category);
 		});
 
 		const dataLabelGSelection = this.dataLabels1G.selectAll(".dataLabelG").data(labelsData);
@@ -3303,7 +3372,7 @@ export class Visual extends Shadow {
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			return this.isHorizontalChart ? this.yScale(data.city) : this.xScale(data.city);
+			return this.isHorizontalChart ? this.yScale(data.category) : this.xScale(data.category);
 		});
 
 		const dataLabelGSelection = this.dataLabels2G.selectAll(".dataLabelG").data(labelsData);
@@ -3379,7 +3448,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: typeof value.city === "string" ? value.city.toUpperCase() : value.city,
+					value: typeof value.category === "string" ? value.category.toUpperCase() : value.category,
 					color: "transparent",
 				},
 				{
@@ -3406,7 +3475,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: typeof value.city === "string" ? value.city.toUpperCase() : value.city,
+					value: typeof value.category === "string" ? value.category.toUpperCase() : value.category,
 					color: "transparent",
 				},
 				{
@@ -3720,15 +3789,15 @@ export class Visual extends Shadow {
 				this.xScale.domain(this.chartData.map((d) => d.value1));
 			}
 
-			this.yScale.domain(this.chartData.map((d) => d.city));
-			this.yScale2.domain(this.chartData.map((d) => d.city));
+			this.yScale.domain(this.chartData.map((d) => d.category));
+			this.yScale2.domain(this.chartData.map((d) => d.category));
 		} else {
 			this.xScale = d3.scaleBand();
 			// this.xScale2 = d3.scaleBand();
 			this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
 
-			this.xScale.domain(this.chartData.map((d) => d.city));
-			// this.xScale2.domain(this.chartData.map((d) => d.city));
+			this.xScale.domain(this.chartData.map((d) => d.category));
+			// this.xScale2.domain(this.chartData.map((d) => d.category));
 			if (isLinearScale) {
 				this.yScale.domain([min, max]);
 			} else {
@@ -3807,7 +3876,7 @@ export class Visual extends Shadow {
 			.attr("y2", this.height)
 			.attr("stroke", this.xGridSettings.lineColor)
 			.attr("stroke-width", this.xGridSettings.lineWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.xGridSettings.lineType === LineType.Dotted
@@ -3827,7 +3896,7 @@ export class Visual extends Shadow {
 			.attr("y2", (d) => this.yScale(d))
 			.attr("stroke", this.yGridSettings.lineColor)
 			.attr("stroke-width", this.yGridSettings.lineWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.yGridSettings.lineType === LineType.Dotted
@@ -4031,11 +4100,11 @@ export class Visual extends Shadow {
 		linesSelection
 			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0))
 			.attr("x2", (d) => this.xScale(d.value1))
-			.attr("y1", (d) => this.yScale(d.city) + this.scaleBandWidth / 2)
-			.attr("y2", (d) => this.yScale(d.city) + this.scaleBandWidth / 2)
+			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
+			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("stroke", (d) => d.styles.line.color)
 			.attr("stroke-width", this.lineSettings.lineWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
@@ -4054,13 +4123,13 @@ export class Visual extends Shadow {
 	setVerticalLinesFormatting(linesSelection: any): void {
 		this.setLineStrokeColor();
 		linesSelection
-			.attr("x1", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
-			.attr("x2", (d) => this.xScale(d.city) + this.scaleBandWidth / 2)
+			.attr("x1", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
+			.attr("x2", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
 			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0))
 			.attr("stroke", (d) => d.styles.line.color)
 			.attr("stroke-width", this.lineSettings.lineWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
@@ -4270,17 +4339,17 @@ export class Visual extends Shadow {
 		this.setCircle1Radius();
 		circleSelection
 			.attr("cx", (d) => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.city);
+				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
 				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
 			})
 			.attr("cy", (d) => {
-				const cy = this.yScale(this.isHorizontalChart ? d.city : d.value1);
+				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
 				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
 			})
 			.attr("r", this.circle1Radius)
 			.attr("stroke", (d) => d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle1Settings.strokeWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.style("fill", (d: ILollipopChartRow) => {
 				const color = this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff";
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -4297,17 +4366,17 @@ export class Visual extends Shadow {
 		this.setCircle2Radius();
 		circleSelection
 			.attr("cx", (d) => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.city);
+				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
 				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
 			})
 			.attr("cy", (d) => {
-				const cy = this.yScale(this.isHorizontalChart ? d.city : d.value2);
+				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
 				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
 			})
 			.attr("r", this.circle2Radius)
 			.attr("stroke", (d) => d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor])
 			.attr("stroke-width", this.circle2Settings.strokeWidth)
-			.attr("opacity", 1)
+			.attr("opacategory", 1)
 			.style("fill", (d) => {
 				const color = this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff";
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -4414,7 +4483,7 @@ export class Visual extends Shadow {
 	}
 
 	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false) {
-		const id = this.chartData.findIndex((data) => data.city === category);
+		const id = this.chartData.findIndex((data) => data.category === category);
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
 		const getColor = (d: IChartSubCategory) => {
 			const color = d.styles[pieType].color;
@@ -4552,7 +4621,7 @@ export class Visual extends Shadow {
 			},
 		};
 
-		const categoryValue = this.chartData.find((d) => d.city === category)[isPie2 ? "value2" : "value1"];
+		const categoryValue = this.chartData.find((d) => d.category === category)[isPie2 ? "value2" : "value1"];
 		switch (this.chartSettings.lollipopType) {
 			case LollipopType.Pie: {
 				pieOption.series[0].itemStyle = {
@@ -4591,7 +4660,7 @@ export class Visual extends Shadow {
 			.selectAll(foreignObjectId)
 			.selectAll("text")
 			.style("pointer-events", "none")
-			.style("opacity", function () {
+			.style("opacategory", function () {
 				return (this as SVGSVGElement).getBBox().width >= pieRadius * 2 ? "0" : "1";
 			});
 	}
@@ -4609,15 +4678,15 @@ export class Visual extends Shadow {
 			.attr("height", d)
 			.attr("x", (d) => {
 				const pieX =
-					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
+					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.category)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
 			})
 			.attr("y", (d) => {
 				const pieY =
-					this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
+					this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
 			})
-			.attr("opacity", () => 1)
+			.attr("opacategory", () => 1)
 			.append("xhtml:div")
 			.attr("id", "pie")
 			.style("width", "100%")
@@ -4625,7 +4694,7 @@ export class Visual extends Shadow {
 			.each((d: ILollipopChartRow, i, nodes) => {
 				const ele = d3.select(nodes[i]);
 				const ePieChart = echarts.init(ele.node());
-				ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
+				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 
 				d.subCategories.forEach(s => {
 					s.defaultValue = d.valueType === DataValuesType.Value1 ? s.value1 : s.value2;
@@ -4647,7 +4716,7 @@ export class Visual extends Shadow {
 
 				ele.selectAll("path").attr("class", (pieData: IChartSubCategory) => {
 					return "pie-slice";
-					// return this.getPieSliceClass(d.city, pieData ? pieData.category + " " + "pie-slice" : "");
+					// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
 				});
 				// .attr("fill", (d: IChartSubCategory) => {
 				// 	return d.styles[pieType].color;
@@ -4726,28 +4795,28 @@ export class Visual extends Shadow {
 			.attr("height", d)
 			.attr("x", (d) => {
 				const pieX =
-					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.city)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
+					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.category)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
 			})
 			.attr("y", (d) => {
 				const pieY =
-					this.getPieY(this.yScale(this.isHorizontalChart ? d.city : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
+					this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
 				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
 			})
-			.attr("opacity", () => 1)
+			.attr("opacategory", () => 1)
 			.select("#pie")
 			.style("width", "100%")
 			.style("height", "100%")
 			.each((d, i, nodes) => {
 				const ele = d3.select(nodes[i]);
 				const ePieChart = echarts.init(ele.node());
-				ePieChart.setOption(this.getPieChartOptions(d.city, isPie2));
+				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 				ePieChart.resize();
 
 				// ele.selectAll("path").data(d.subCategories);
 				// ele
 				// 	.selectAll("path")
-				// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.city, pieData.category))
+				// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.category, pieData.category))
 				// .style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
 
 				ele
@@ -5192,7 +5261,7 @@ export class Visual extends Shadow {
 			}
 			case ColorPaletteType.PowerBi: {
 				chartData.forEach((data) => {
-					// let colorCode = this.colorPalette.getColor(data.city).value.split('#')[1];
+					// let colorCode = this.colorPalette.getColor(data.category).value.split('#')[1];
 					// const circleFillColor = '#F2' + colorCode;
 					data.styles.circle1.fillColor = this.colorPalette.getColor(data.category).value;
 				});

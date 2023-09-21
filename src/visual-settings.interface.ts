@@ -4,6 +4,7 @@ import {
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
+	EDataRolesName,
 	ELegendPosition,
 	ERankingType,
 	ESortOrderTypes,
@@ -313,4 +314,15 @@ export interface ISinglePatternProps {
 	isImagePattern: boolean;
 	imageSlicesDataUrls?: string[];
 	dimensions?: { width: number; height: number };
+}
+
+export interface IConditionalFormattingProps {
+	applyTo: "measure" | "category",
+	categoryType?: { [EDataRolesName.Category]: boolean, [EDataRolesName.SubCategory]: boolean },
+	measureType?: { [EDataRolesName.Measure]: boolean, [EDataRolesName.Measure1]: boolean, [EDataRolesName.Measure2]: boolean, [EDataRolesName.Tooltip]: boolean },
+	color: string,
+	operator: string,
+	secondaryStaticValue: number | string,
+	sourceName: string,
+	staticValue: string
 }
