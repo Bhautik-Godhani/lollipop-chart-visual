@@ -93,11 +93,11 @@ export class YAxisConfig {
 	public yAxisSettings: string = "{}";
 }
 export class Legend {
-	public show: boolean = true;
+	public show: boolean = false;
 	public legendPosition: string = "TopLeft";
 	public showTitle: boolean = true;
 	public legendTitle: string = "";
-	public legendColor: string = "#000000";
+	public legendColor: string = "#404040";
 	public fontSize: string = "8";
 	public fontFamily: string = "Segoe UI";
 }

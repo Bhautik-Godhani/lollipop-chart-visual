@@ -7,6 +7,12 @@
 	position: relative;
 
 	.lollipopChart {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+
 		.xAxisG,
 		.yAxisG,
 		.expandAllXAxisG,
@@ -55,4 +61,10 @@
 		right: 0;
 		bottom: 0px;
 	}
+}
+
+.legend-wrapper::-webkit-scrollbar {
+	height: 0px !important;
+	width: 0px !important;
+	background-color: transparent;
 }

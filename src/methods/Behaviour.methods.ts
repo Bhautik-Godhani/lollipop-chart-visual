@@ -171,7 +171,7 @@ export const SetAndBindChartBehaviorOptions = (
 			// legendItems: self.legends ? self.legends.legendItems : undefined,
 			legendItems: undefined,
 			dataPoints: dataPoints,
-			clearCatcher: d3Select(self.svg),
+			clearCatcher: self.svg,
 			interactivityService: self.interactivityService,
 			selectionManager: self.selectionManager,
 			behavior: self.behavior,

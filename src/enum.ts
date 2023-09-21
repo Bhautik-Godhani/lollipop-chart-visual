@@ -83,15 +83,19 @@ export enum Position {
 	Right = "right",
 }
 
-export enum ILegendPosition {
-	Top = "Top",
-	Bottom = "Bottom",
-	Left = "Left",
-	Right = "Right",
+export enum ELegendPosition {
+	TopLeft = "TopLeft",
 	TopCenter = "TopCenter",
+	TopRight = "TopRight",
+	BottomLeft = "BottomLeft",
 	BottomCenter = "BottomCenter",
+	BottomRight = "BottomRight",
+	LeftTop = "LeftTop",
 	LeftCenter = "LeftCenter",
+	LeftBottom = "LeftBottom",
+	RightTop = "RightTop",
 	RightCenter = "RightCenter",
+	RightBottom = "RightBottom",
 }
 
 export enum Orientation {

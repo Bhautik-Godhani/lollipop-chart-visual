@@ -28,10 +28,8 @@ import {
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	EDataRolesName,
-	DisplayUnits,
 	EVisualConfig,
 	EVisualSettings,
-	ILegendPosition,
 	LegendType,
 	LineType,
 	LollipopType,
@@ -44,6 +42,7 @@ import {
 	ESortByTypes,
 	DataValuesType,
 	LollipopWidthType,
+	ELegendPosition,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -113,6 +112,8 @@ import {
 } from "./methods/expandAllXAxis.methods";
 import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
+import { clearLegends, renderLegends } from "./legendHelper";
+import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
 
 import ChartSettings from "./settings-pages/ChartSettings";
 import DataColorsSettings from "./settings-pages/DataColorsSettings";
@@ -125,8 +126,6 @@ import SortingSettings from "./settings-pages/SortingSettings";
 import ShowBucket from "./settings-pages/ShowBucket";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
 import PatternSettings from "./settings-pages/FillPatterns";
-
-import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -155,8 +154,8 @@ export class Visual extends Shadow {
 	public margin: { top: number; right: number; bottom: number; left: number };
 	public valuesTitle: string;
 	public chartData: ILollipopChartRow[];
-	public legends1Data: LegendData = { dataPoints: [] };
-	public legends2Data: LegendData = { dataPoints: [] };
+	public legends1Data: { data: { name: string, color: string, pattern: string } }[] = [];
+	public legends2Data: { data: { name: string, color: string, pattern: string } }[] = [];
 	public legendViewPort: { width: number; height: number } = { width: 0, height: 0 };
 	public isInFocusMode: boolean = false;
 	public isVisualResized: boolean = false;
@@ -199,6 +198,9 @@ export class Visual extends Shadow {
 	blankText: string = "(Blank)";
 	othersBarText = "Others";
 	totalLollipopCount: number = 0;
+	legends: {
+		legendItems: Selection<SVGElement>, legendWrapper: Selection<SVGElement>
+	};
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -211,7 +213,7 @@ export class Visual extends Shadow {
 	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
 
 	// svg
-	public svg: any;
+	public svg: Selection<SVGElement>;
 	public container: any;
 	public categoryTitle: string;
 	public scaleBandWidth: number;
@@ -1343,6 +1345,15 @@ export class Visual extends Shadow {
 				this.setRemainingAsOthersDataColor();
 			}
 
+			if (this.chartData.length) {
+				this.subCategories = this.chartData[0].subCategories
+					.map((d) => ({
+						name: d.category,
+						color1: d.styles.pie1.color,
+						color2: d.styles.pie2.color
+					}));
+			}
+
 			if (!this.legend1) {
 				this.createLegendContainer(LegendType.Legend1);
 			}
@@ -1351,13 +1362,29 @@ export class Visual extends Shadow {
 				this.createLegendContainer(LegendType.Legend2);
 			}
 
-			// if (this.legendSettings.show && (this.chartSettings.lollipopType !== LollipopType.Circle || this.isHasValue2)) {
-			// 	this.setLegendsData();
-			// 	this.renderLegends();
-			// } else {
-			// 	this.removeLegend(LegendType.Legend1);
-			// 	this.removeLegend(LegendType.Legend2);
-			// }
+			if (this.legendSettings.show && (this.chartSettings.lollipopType !== LollipopType.Circle || this.isHasMultiMeasure)) {
+				d3.select("div.legend-wrapper").style("display", "block");
+				this.setLegendsData();
+				// this.renderLegends()
+
+				this.legends = renderLegends(
+					this,
+					this.chartContainer,
+					this.isHasSubcategories ? this.subCategoryDisplayName : this.categoryDisplayName,
+					this.legends1Data,
+					this.legendSettings,
+					this.patternSettings.enabled,
+				);
+
+				this.updateChartDimensions(this.legends.legendWrapper);
+			} else {
+				d3.select("div.legend-wrapper").style("display", "none");
+				clearLegends();
+				this.legendViewPort.width = 0;
+				this.legendViewPort.height = 0;
+				this.legendViewPortWidth = 0;
+				this.legendViewPortHeight = 0;
+			}
 
 			this.setMargins();
 
@@ -1451,6 +1478,43 @@ export class Visual extends Shadow {
 			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
+		}
+	}
+
+	public updateChartDimensions(legendContainer: any): void {
+		switch (this.legendSettings.legendPosition) {
+			case ELegendPosition.TopLeft:
+			case ELegendPosition.TopCenter:
+			case ELegendPosition.TopRight:
+				this.legendViewPort.width = 0;
+				this.legendViewPort.height = legendContainer.node().getBoundingClientRect().height;
+				this.svg.style("top", this.legendViewPort.height + "px");
+				this.svg.style("left", 0 + "px");
+				break;
+			case ELegendPosition.BottomLeft:
+			case ELegendPosition.BottomCenter:
+			case ELegendPosition.BottomRight:
+				this.legendViewPort.width = 0;
+				this.legendViewPort.height = legendContainer.node().getBoundingClientRect().height;
+				this.svg.style("top", 0 + "px");
+				this.svg.style("left", 0 + "px");
+				break;
+			case ELegendPosition.LeftTop:
+			case ELegendPosition.LeftCenter:
+			case ELegendPosition.LeftBottom:
+				this.legendViewPort.width = legendContainer.node().getBoundingClientRect().width;
+				this.legendViewPort.height = 0;
+				this.svg.style("top", 0 + "px");
+				this.svg.style("left", this.legendViewPort.width + "px");
+				break;
+			case ELegendPosition.RightTop:
+			case ELegendPosition.RightCenter:
+			case ELegendPosition.RightBottom:
+				this.legendViewPort.width = legendContainer.node().getBoundingClientRect().width;
+				this.legendViewPort.height = 0;
+				this.svg.style("top", 0 + "px");
+				this.svg.style("left", 0 + "px");
+				break;
 		}
 	}
 
@@ -1745,7 +1809,7 @@ export class Visual extends Shadow {
 			false,
 			null,
 			true,
-			LegendPosition[this.legendSettings.position] ? LegendPosition[this.legendSettings.position] : LegendPosition.Top
+			LegendPosition[this.legendSettings.legendPosition] ? LegendPosition[this.legendSettings.legendPosition] : LegendPosition.Top
 		);
 	}
 
@@ -2838,47 +2902,47 @@ export class Visual extends Shadow {
 	}
 
 	// Data Labels
-	getDataLabelDisplayStyle(labelEle: any): string {
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-			const labelTextWidth = (d3.select(labelEle).select(".dataLabelText").node() as SVGSVGElement).getBBox().width;
-			return labelTextWidth > this.circle1Radius * 2 ? "none" : "block";
-		} else if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-			const prop = labelEle.getBoundingClientRect();
-			// let marginLeft = this.margin.left + (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsWidth : 0);
-			// let marginTop = this.margin.top + this.settingsBtnHeight - (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsHeight : 0);
-			let marginLeft = this.margin.left;
-			let marginRight = this.margin.right;
-			let marginTop = this.margin.top;
-			let marginBottom = this.margin.bottom;
-			const settingsBtnHeight = this.settingsBtnHeight;
-			const legendPosition = this.legendSettings.position;
+	getDataLabelDisplayStyle(labelEle: any): void {
+		// if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+		// 	const labelTextWidth = (d3.select(labelEle).select(".dataLabelText").node() as SVGSVGElement).getBBox().width;
+		// 	return labelTextWidth > this.circle1Radius * 2 ? "none" : "block";
+		// } else if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+		// 	const prop = labelEle.getBoundingClientRect();
+		// 	// let marginLeft = this.margin.left + (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsWidth : 0);
+		// 	// let marginTop = this.margin.top + this.settingsBtnHeight - (this.vizOptions.options.isInFocus === true ? this.settingsPopupOptionsHeight : 0);
+		// 	let marginLeft = this.margin.left;
+		// 	let marginRight = this.margin.right;
+		// 	let marginTop = this.margin.top;
+		// 	let marginBottom = this.margin.bottom;
+		// 	const settingsBtnHeight = this.settingsBtnHeight;
+		// 	const legendPosition = this.legendSettings.position;
 
-			if (this.legendSettings.show) {
-				if (legendPosition === ILegendPosition.Left || legendPosition === ILegendPosition.LeftCenter) {
-					marginLeft += this.legendViewPort.width;
-				}
-				if (legendPosition === ILegendPosition.Right || legendPosition === ILegendPosition.RightCenter) {
-					marginRight -= this.legendViewPort.width;
-				}
-				if (legendPosition === ILegendPosition.Top || legendPosition === ILegendPosition.TopCenter) {
-					marginTop += this.legendViewPort.height;
-				}
-				if (legendPosition === ILegendPosition.Bottom || legendPosition === ILegendPosition.BottomCenter) {
-					marginBottom += this.legendViewPort.height;
-				}
-			}
+		// 	if (this.legendSettings.show) {
+		// 		if (legendPosition === ILegendPosition.Left || legendPosition === ILegendPosition.LeftCenter) {
+		// 			marginLeft += this.legendViewPort.width;
+		// 		}
+		// 		if (legendPosition === ILegendPosition.Right || legendPosition === ILegendPosition.RightCenter) {
+		// 			marginRight -= this.legendViewPort.width;
+		// 		}
+		// 		if (legendPosition === ILegendPosition.Top || legendPosition === ILegendPosition.TopCenter) {
+		// 			marginTop += this.legendViewPort.height;
+		// 		}
+		// 		if (legendPosition === ILegendPosition.Bottom || legendPosition === ILegendPosition.BottomCenter) {
+		// 			marginBottom += this.legendViewPort.height;
+		// 		}
+		// 	}
 
-			if (
-				prop.x - this.settingsPopupOptionsWidth < marginLeft ||
-				prop.bottom > this.viewPortHeight - marginBottom ||
-				prop.top - settingsBtnHeight < marginTop ||
-				prop.right > this.viewPortWidth - marginRight
-			) {
-				return "none";
-			} else {
-				return "block";
-			}
-		}
+		// 	if (
+		// 		prop.x - this.settingsPopupOptionsWidth < marginLeft ||
+		// 		prop.bottom > this.viewPortHeight - marginBottom ||
+		// 		prop.top - settingsBtnHeight < marginTop ||
+		// 		prop.right > this.viewPortWidth - marginRight
+		// 	) {
+		// 		return "none";
+		// 	} else {
+		// 		return "block";
+		// 	}
+		// }
 	}
 
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
@@ -4528,7 +4592,7 @@ export class Visual extends Shadow {
 			.selectAll("text")
 			.style("pointer-events", "none")
 			.style("opacity", function () {
-				return this.getBBox().width >= pieRadius * 2 ? "0" : "1";
+				return (this as SVGSVGElement).getBBox().width >= pieRadius * 2 ? "0" : "1";
 			});
 	}
 
@@ -4735,432 +4799,46 @@ export class Visual extends Shadow {
 
 	// Legend
 	setLegendsData(): void {
-		let legend1DataPoints: LegendDataPoint[] = [];
-		let legend2DataPoints: LegendDataPoint[] = [];
+		let legend1DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
+		let legend2DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
 		this.subCategories.sort((a, b) => a.name.localeCompare(b.name));
 
 		if (this.chartSettings.lollipopType === LollipopType.Circle) {
-			legend1DataPoints = [
-				{
-					label: this.measure1DisplayName,
+			legend1DataPoints = [{
+				data: {
+					name: this.measure1DisplayName,
 					color: this.dataColorsSettings.circle1.circleFillColor,
-					selected: false,
-					identity: this.vizOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure1).createSelectionId(),
-				},
-				{
-					label: this.measure2DisplayName,
+					pattern: undefined
+				}
+			},
+			{
+				data: {
+					name: this.measure2DisplayName,
 					color: this.dataColorsSettings.circle2.circleFillColor,
-					selected: false,
-					identity: this.vizOptions.host.createSelectionIdBuilder().withMeasure(EDataRolesName.Measure2).createSelectionId(),
-				},
+					pattern: undefined
+				}
+			}
 			];
 		} else {
 			legend1DataPoints = this.subCategories.map((category) => ({
-				label: category.name,
-				color: category.color1,
-				selected: false,
-				identity: this.vizOptions.host.createSelectionIdBuilder().createSelectionId(),
+				data: {
+					name: category.name,
+					color: category.color1,
+					pattern: undefined
+				}
 			}));
 
 			legend2DataPoints = this.subCategories.map((category) => ({
-				label: category.name,
-				color: category.color2,
-				selected: false,
-				identity: this.vizOptions.host.createSelectionIdBuilder().createSelectionId(),
+				data: {
+					name: category.name,
+					color: category.color2,
+					pattern: undefined
+				}
 			}));
 		}
 
-		this.legends1Data = {
-			fontSize: this.legendSettings.labelFontSize / 1.2,
-			dataPoints: legend1DataPoints,
-		};
-
-		this.legends2Data = {
-			fontSize: this.legendSettings.labelFontSize / 1.2,
-			dataPoints: legend2DataPoints,
-		};
-
-		this.setLegendTitleText();
-	}
-
-	setLegendTitleText(): void {
-		let lastTitle: string;
-		let lastTitle1: string;
-		let lastTitle2: string;
-		if (this.legendSettings.isShowTitle) {
-			if (!this.isHasMultiMeasure) {
-				if (this.legendSettings.legendTitleText === "" || this.legendSettings.legendTitleText === lastTitle) {
-					this.legendSettings.legendTitleText = this.measure1DisplayName;
-					lastTitle = this.measure1DisplayName;
-				}
-
-				this.legendSettings.legend1TitleText = undefined;
-				this.legendSettings.legend2TitleText = undefined;
-				this.legends1Data.title = this.legendSettings.legendTitleText;
-			} else {
-				this.legendSettings.legendTitleText = undefined;
-				if (this.legendSettings.legend1TitleText === "" || this.legendSettings.legend1TitleText === lastTitle1) {
-					this.legendSettings.legend1TitleText = this.measure1DisplayName;
-					lastTitle1 = this.measure1DisplayName;
-				}
-
-				if (this.legendSettings.legend2TitleText === "" || this.legendSettings.legend2TitleText === lastTitle2) {
-					this.legendSettings.legend2TitleText = this.measure2DisplayName;
-					lastTitle2 = this.measure2DisplayName;
-				}
-
-				this.legends1Data.title = this.legendSettings.legend1TitleText;
-				this.legends2Data.title = this.legendSettings.legend2TitleText;
-			}
-		}
-	}
-
-	renderLegends(): void {
-		const legendPosition = this.legendSettings.position;
-		this.setLegendViewPortWidthHeight();
-
-		this.legend1.changeOrientation(LegendPosition[legendPosition]);
-		this.legend1.drawLegend(this.legends1Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
-		positionChartArea(d3.select(this.chartContainer), this.legend1);
-
-		if (this.isDisplayLegend2) {
-			this.legend2.changeOrientation(LegendPosition[legendPosition]);
-			this.legend2.drawLegend(this.legends2Data, { width: this.legendViewPortWidth, height: this.legendViewPortHeight });
-			positionChartArea(d3.select(this.chartContainer), this.legend2);
-		}
-
-		d3.select(this.hostContainer)
-			.selectAll(".legend")
-			.attr("id", (d, i) => `legend-${i + 1}`);
-
-		const legend1ViewPort = this.legend1.getMargins();
-		const legend2ViewPort = this.legend2.getMargins();
-
-		if (this.isDisplayLegend2) {
-			this.legendViewPort.width = (legend1ViewPort.width ? legend1ViewPort.width : 0) + (legend2ViewPort.width ? legend2ViewPort.width : 0);
-			this.legendViewPort.height = (legend1ViewPort.height ? legend1ViewPort.height : 0) + (legend2ViewPort.height ? legend2ViewPort.height : 0);
-		} else {
-			this.legendViewPort.width = legend1ViewPort.width ? legend1ViewPort.width : 0;
-			this.legendViewPort.height = legend1ViewPort.height ? legend1ViewPort.height : 0;
-		}
-
-		this.setLegendStyles();
-	}
-
-	setLegendViewPortWidthHeight(): void {
-		const legendPosition = this.legendSettings.position;
-		const visualViewPort = this.vizOptions.options.viewport;
-		this.legendViewPortHeight = visualViewPort.height - this.settingsBtnHeight;
-
-		if (!this.isDisplayLegend2) {
-			this.removeLegend(LegendType.Legend2);
-		}
-
-		this.legendViewPortWidth = visualViewPort.width;
-		if (
-			legendPosition === ILegendPosition.Top ||
-			legendPosition === ILegendPosition.TopCenter ||
-			legendPosition === ILegendPosition.Bottom ||
-			legendPosition === ILegendPosition.BottomCenter
-		) {
-			this.legendViewPortWidth = this.legendViewPortWidth - this.settingsPopupOptionsWidth;
-		}
-	}
-
-	setLegendStyles(): void {
-		const legendPosition = this.legendSettings.position;
-		const chartContainerEle = d3.select(this.chartContainer);
-
-		switch (legendPosition) {
-			case ILegendPosition.Top:
-			case ILegendPosition.TopCenter:
-			case ILegendPosition.Bottom:
-			case ILegendPosition.BottomCenter:
-				chartContainerEle.style("height", `calc(100% - ${this.settingsBtnHeight + this.legendViewPort.height}px)`);
-				break;
-
-			case ILegendPosition.Left:
-			case ILegendPosition.LeftCenter:
-			case ILegendPosition.Right:
-			case ILegendPosition.RightCenter:
-				chartContainerEle.style("width", `calc(100vw - ${this.legendViewPort.width}px)`);
-				chartContainerEle.style("height", `calc(100% - ${this.settingsBtnHeight}px)`);
-				break;
-		}
-
-		if (this.legendSettings.show) {
-			if (this.isHasMultiMeasure && this.chartSettings.lollipopType !== LollipopType.Circle) {
-				this.setLegendMarginLeftByTitle();
-			} else {
-				this.legend1MarginLeft = 0;
-				this.legend2MarginLeft = 0;
-			}
-			this.setLegend1Styles();
-			this.setLegendTextStyles(LegendType.Legend1);
-			this.setLegendTitleStyles(LegendType.Legend1);
-
-			if (this.isDisplayLegend2) {
-				this.setLegend2Styles();
-				this.setLegendTextStyles(LegendType.Legend2);
-				this.setLegendTitleStyles(LegendType.Legend2);
-			}
-		}
-	}
-
-	setLegendMarginLeftByTitle(): void {
-		this.legend2MarginLeft = 0;
-		this.legend1MarginLeft = 0;
-		const legendPosition = this.legendSettings.position;
-		if (
-			legendPosition === ILegendPosition.Top ||
-			legendPosition === ILegendPosition.TopCenter ||
-			legendPosition === ILegendPosition.Bottom ||
-			legendPosition === ILegendPosition.BottomCenter
-		) {
-			const legendTitlesWidth: { id: number; width: number }[] = [];
-			d3.selectAll(".legendTitle").each(function (d, i) {
-				legendTitlesWidth.push({ id: i, width: (this as any).getBBox().width });
-			});
-
-			if (legendTitlesWidth.length) {
-				const legendTitleWithMaxWidth = legendTitlesWidth.reduce((p, c) => (p.width > c.width ? p : c));
-				if (legendTitleWithMaxWidth.id === 0) {
-					this.legend2MarginLeft = legendTitlesWidth[0].width - legendTitlesWidth[1].width;
-				} else if (legendTitleWithMaxWidth.id === 1) {
-					this.legend1MarginLeft = legendTitlesWidth[1].width - legendTitlesWidth[0].width;
-				}
-
-				if (this.legend1MarginLeft > 0) {
-					this.legend1.drawLegend(this.legends1Data, {
-						width: this.legendViewPortWidth - this.legend1MarginLeft,
-						height: this.legendViewPortHeight,
-					});
-					positionChartArea(d3.select(this.chartContainer), this.legend1);
-				}
-
-				if (this.legend2MarginLeft > 0) {
-					this.legend2.drawLegend(this.legends2Data, {
-						width: this.legendViewPortWidth - this.legend2MarginLeft,
-						height: this.legendViewPortHeight,
-					});
-					positionChartArea(d3.select(this.chartContainer), this.legend2);
-				}
-			}
-		}
-	}
-
-	createDynamicStyleClass(className: string, styleId: string, styles: string, extraClasses: string = ""): void {
-		const style = document.createElement("style");
-		style.id = styleId;
-		style.type = "text/css";
-		const styleTag = document.getElementById(styleId);
-		// const stylesInnerHtml = `.${className} ${extraClasses} ${styles}`;
-		// style.innerHTML = stylesInnerHtml;
-		if (styleTag) {
-			document.getElementsByTagName("head")[0].removeChild(styleTag);
-		}
-		document.getElementsByTagName("head")[0].appendChild(style);
-	}
-
-	setLegend1Styles(): void {
-		const legendPosition = this.legendSettings.position;
-		const chartContainerEle = d3.select(this.chartContainer);
-		const legend1Ele = d3.select(this.hostContainer).select("#legend-1");
-		const styleClassName = "legend-1-styles";
-		let legendStyles = "";
-		legend1Ele.classed(styleClassName, false);
-
-		switch (legendPosition) {
-			case ILegendPosition.Top:
-			case ILegendPosition.TopCenter:
-				legendStyles = `{ margin-left: ${this.legend1MarginLeft}px; }`;
-				legend1Ele.classed(styleClassName, true);
-				break;
-
-			case ILegendPosition.Bottom:
-			case ILegendPosition.BottomCenter: {
-				const marginTop = parseFloat(legend1Ele.style("margin-top"));
-				legend1Ele.style("margin-top", marginTop + "px");
-				legendStyles = `{ margin-left: ${this.legend1MarginLeft}px; }`;
-				legend1Ele.classed(styleClassName, true);
-				break;
-			}
-		}
-
-		if (this.isInFocusMode) {
-			chartContainerEle.style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
-			switch (legendPosition) {
-				case ILegendPosition.Top:
-				case ILegendPosition.TopCenter:
-				case ILegendPosition.Bottom:
-				case ILegendPosition.BottomCenter:
-					legendStyles = `{ left: ${this.settingsPopupOptionsWidth}px; margin-left: ${this.legend1MarginLeft}px; }`;
-					legend1Ele.classed(styleClassName, true);
-					break;
-
-				case ILegendPosition.Left:
-				case ILegendPosition.LeftCenter:
-					chartContainerEle.style("width", `calc(100vw - ${this.settingsPopupOptionsWidth + this.legendViewPort.width}px)`);
-					legendStyles = `{ margin-left: ${this.settingsPopupOptionsWidth}px; left: auto }`;
-					legend1Ele.classed(styleClassName, true);
-					break;
-
-				case ILegendPosition.Right:
-				case ILegendPosition.RightCenter:
-					legendStyles = `{ left: auto; }`;
-					legend1Ele.classed(styleClassName, true);
-					break;
-			}
-		} else {
-			legend1Ele.style("left", null);
-		}
-
-		if (this.isHasMultiMeasure && this.chartSettings.lollipopType !== LollipopType.Circle) {
-			if (legendPosition === ILegendPosition.Bottom || legendPosition === ILegendPosition.BottomCenter) {
-				const marginTop = parseFloat(legend1Ele.style("margin-top")) - this.legend2.getMargins().height;
-				legendStyles = `{ margin-top: ${marginTop}px !important; left: ${this.settingsPopupOptionsWidth}px }`;
-				legend1Ele.classed(styleClassName, true);
-			}
-
-			if (legendPosition === ILegendPosition.Right || legendPosition === ILegendPosition.RightCenter) {
-				let marginLeft = parseFloat(legend1Ele.style("margin-left")) - this.legend2.getMargins().width;
-				if (this.isInFocusMode) {
-					marginLeft -= this.settingsPopupOptionsWidth;
-				}
-				legendStyles = `{ margin-left: ${marginLeft}px !important; left: ${this.settingsPopupOptionsWidth}px }`;
-				legend1Ele.classed(styleClassName, true);
-			}
-		}
-
-		this.createDynamicStyleClass(styleClassName, "legend1Style", legendStyles);
-	}
-
-	setLegend2Styles(): void {
-		const legendPosition = this.legendSettings.position;
-		const legend1ViewPort = this.legend1.getMargins();
-		const legend2ViewPort = this.legend2.getMargins();
-		const chartContainerEle = d3.select(this.chartContainer);
-		const legend1Ele = d3.select(this.hostContainer).select("#legend-1");
-		const legend2Ele = d3.select(this.hostContainer).select("#legend-2");
-
-		const styleClassName = "legend-2-styles";
-		let legendStyles = "";
-		legend2Ele.classed(styleClassName, false);
-
-		chartContainerEle
-			.style("margin-top", this.legendViewPort.height + "px")
-			.style(
-				"width",
-				`calc(100vw - ${this.legendViewPort.width + (this.vizOptions.options.isInFocus ? this.settingsPopupOptionsWidth : 0)}px)`
-			)
-			.style("height", `calc(100% - ${this.settingsBtnHeight + this.legendViewPort.height}px)`);
-
-		switch (legendPosition) {
-			case ILegendPosition.Top:
-			case ILegendPosition.TopCenter: {
-				legendStyles = `{ margin-top: ${legend2ViewPort.height}px; margin-left: ${this.legend2MarginLeft}px; }`;
-				legend2Ele.classed(styleClassName, true);
-				break;
-			}
-
-			case ILegendPosition.Bottom:
-			case ILegendPosition.BottomCenter: {
-				chartContainerEle.style("margin-top", 0);
-				const legend2MarginTop = parseFloat(legend2Ele.style("margin-top"));
-				legendStyles = `{ margin-top: ${legend2MarginTop}px !important; margin-left: ${this.legend2MarginLeft}px; }`;
-				legend2Ele.classed(styleClassName, true);
-				break;
-			}
-
-			case ILegendPosition.Left:
-			case ILegendPosition.LeftCenter: {
-				chartContainerEle.style("margin-left", this.legendViewPort.width + "px");
-				legendStyles = `{ margin-left: ${legend2ViewPort.width}px; }`;
-				legend2Ele.classed(styleClassName, true);
-				break;
-			}
-
-			case ILegendPosition.Right:
-			case ILegendPosition.RightCenter: {
-				const marginLeft = legend1Ele.style("margin-left");
-				legendStyles = `{ margin-left: ${marginLeft}px !important; }`;
-				legend2Ele.classed(styleClassName, true);
-				break;
-			}
-		}
-
-		if (this.isInFocusMode) {
-			switch (legendPosition) {
-				case ILegendPosition.Top:
-				case ILegendPosition.TopCenter:
-					legendStyles = `{ margin-top: ${legend1ViewPort.height}px; left: ${this.settingsPopupOptionsWidth}px;
-	                                margin-left: ${this.legend2MarginLeft}px; }`;
-					legend2Ele.classed(styleClassName, true);
-					break;
-
-				case ILegendPosition.Bottom:
-				case ILegendPosition.BottomCenter:
-					legendStyles = `{ left: ${this.settingsPopupOptionsWidth}px; margin-left: ${this.legend2MarginLeft}px; }`;
-					legend2Ele.classed(styleClassName, true);
-					break;
-
-				case ILegendPosition.Left:
-				case ILegendPosition.LeftCenter:
-					chartContainerEle.style("width", `calc(100vw - ${this.settingsPopupOptionsWidth + this.legendViewPort.width}px)`);
-					legendStyles = `{ margin-left: ${this.settingsPopupOptionsWidth + legend2ViewPort.width}px;
-	                                left: auto; }`;
-					legend2Ele.classed(styleClassName, true);
-					break;
-
-				case ILegendPosition.Right:
-				case ILegendPosition.RightCenter:
-					chartContainerEle.style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
-					legendStyles = `{ left: auto; }`;
-					legend2Ele.classed(styleClassName, true);
-					break;
-			}
-		} else {
-			legend2Ele.style("left", null);
-		}
-
-		this.createDynamicStyleClass(styleClassName, "legend2Style", legendStyles);
-	}
-
-	setLegendTextStyles(legendType: LegendType): void {
-		const isLegend2 = legendType === LegendType.Legend2;
-		const legendId = isLegend2 ? "legend-2" : "legend-1";
-		const legendEle = d3.select(this.hostContainer).select(`#${legendId}`);
-		const styleClassName = "legend-text-style";
-		legendEle.classed(styleClassName, true);
-		const legendTextStyle = `{ fill: ${this.legendSettings.labelColor};
-	        font-family: ${this.legendSettings.labelFontFamily};
-	        font-size: ${this.legendSettings.labelFontSize}px !important;
-	        }`;
-		this.createDynamicStyleClass(styleClassName, "legendTextStyle", legendTextStyle, "#legendGroup .legendItem .legendText");
-	}
-
-	setLegendTitleStyles(legendType: LegendType): void {
-		const isLegend2 = legendType === LegendType.Legend2;
-		const legendId = isLegend2 ? "legend-2" : "legend-1";
-		const legendEle = d3.select(this.hostContainer).select(`#${legendId}`);
-		const styleClassName = "legend-title-style";
-		legendEle.classed(styleClassName, true);
-		const legendTitleStyle = `{ fill: ${this.legendSettings.titleColor};
-	        font-family: ${this.legendSettings.titleFontFamily};
-	        }`;
-		this.createDynamicStyleClass(styleClassName, "legendTitleStyle", legendTitleStyle, "#legendGroup .legendTitle");
-	}
-
-	removeLegend(legendType: LegendType) {
-		const legend = legendType === LegendType.Legend1 ? this.legend1 : this.legend2;
-		legend.changeOrientation(LegendPosition.None);
-		this.chartContainer.style.marginLeft = null;
-		this.chartContainer.style.marginTop = null;
-		legend.drawLegend({ dataPoints: [] }, this.vizOptions.options.viewport);
-		this.legendViewPort.width = legend.getMargins().width ? legend.getMargins().width : 0;
-		this.legendViewPort.height = legend.getMargins().height ? legend.getMargins().height : 0;
-		d3.select(this.chartContainer).style("width", `calc(100vw - ${this.settingsPopupOptionsWidth}px)`);
-		d3.select(this.hostContainer).selectAll(".legend").style("left", null);
+		this.legends1Data = legend1DataPoints;
+		this.legends2Data = legend2DataPoints;
 	}
 
 	handleShowBucket(): void {

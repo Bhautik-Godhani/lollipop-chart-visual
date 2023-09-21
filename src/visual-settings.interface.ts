@@ -4,9 +4,9 @@ import {
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
+	ELegendPosition,
 	ERankingType,
 	ESortOrderTypes,
-	ILegendPosition,
 	LollipopType,
 	LollipopWidthType,
 	Orientation,
@@ -122,7 +122,7 @@ export interface INumberSettings {
 
 export interface ILegendSettings {
 	show: boolean;
-	position: ILegendPosition;
+	legendPosition: ELegendPosition;
 	labelColor: string;
 	labelFontFamily: string;
 	labelFontSize: number;
