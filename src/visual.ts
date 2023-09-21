@@ -43,6 +43,7 @@ import {
 	DataValuesType,
 	LollipopWidthType,
 	ELegendPosition,
+	EHighContrastColorType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -1394,6 +1395,8 @@ export class Visual extends Shadow {
 			if (this.legendSettings.show && (this.chartSettings.lollipopType !== LollipopType.Circle || this.isHasMultiMeasure)) {
 				d3.select("div.legend-wrapper").style("display", "block");
 				this.setLegendsData();
+				this.legendSettings.legendColor = this.getColor(this.legendSettings.legendColor, EHighContrastColorType.Foreground);
+
 				// this.renderLegends()
 
 				this.legends = renderLegends(
@@ -3626,7 +3629,7 @@ export class Visual extends Shadow {
 			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", isApplyTilt ? "-0.5em" : "0.32em")
 			// .attr("dy", isApplyTilt ? "0" : "0.32em")
-			.attr("fill", xAxisSettings.labelColor)
+			.attr("fill", this.getColor(xAxisSettings.labelColor, EHighContrastColorType.Foreground))
 			.style("font-family", xAxisSettings.labelFontFamily)
 			.attr("font-size", xAxisSettings.labelFontSize)
 			.attr("display", xAxisSettings.isDisplayLabel ? "block" : "none")
@@ -3708,7 +3711,7 @@ export class Visual extends Shadow {
 		this.yAxisG
 			.selectAll("text")
 			.attr("x", "0")
-			.attr("fill", yAxisSettings.labelColor)
+			.attr("fill", this.getColor(yAxisSettings.labelColor, EHighContrastColorType.Foreground))
 			.style("font-family", yAxisSettings.labelFontFamily)
 			.attr("font-size", yAxisSettings.labelFontSize)
 			.attr("display", yAxisSettings.isDisplayLabel ? "block" : "none")
@@ -4102,7 +4105,7 @@ export class Visual extends Shadow {
 			.attr("x2", (d) => this.xScale(d.value1))
 			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
-			.attr("stroke", (d) => d.styles.line.color)
+			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr("opacategory", 1)
 			.attr(
@@ -4127,7 +4130,7 @@ export class Visual extends Shadow {
 			.attr("x2", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
 			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0))
-			.attr("stroke", (d) => d.styles.line.color)
+			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr("opacategory", 1)
 			.attr(
@@ -4347,11 +4350,11 @@ export class Visual extends Shadow {
 				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
 			})
 			.attr("r", this.circle1Radius)
-			.attr("stroke", (d) => d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor])
+			.attr("stroke", (d) => this.getColor(d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor], EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.circle1Settings.strokeWidth)
 			.attr("opacategory", 1)
 			.style("fill", (d: ILollipopChartRow) => {
-				const color = this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff";
+				const color = this.getColor(this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff", EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -4374,11 +4377,11 @@ export class Visual extends Shadow {
 				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
 			})
 			.attr("r", this.circle2Radius)
-			.attr("stroke", (d) => d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor])
+			.attr("stroke", (d) => this.getColor(d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor], EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.circle2Settings.strokeWidth)
 			.attr("opacategory", 1)
 			.style("fill", (d) => {
-				const color = this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff";
+				const color = this.getColor(this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff", EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -4485,7 +4488,7 @@ export class Visual extends Shadow {
 	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false) {
 		const id = this.chartData.findIndex((data) => data.category === category);
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
-		const getColor = (d: IChartSubCategory) => {
+		const getPieFill = (d: IChartSubCategory) => {
 			const color = d.styles[pieType].color;
 			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 				return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
@@ -4497,7 +4500,7 @@ export class Visual extends Shadow {
 		return this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
-			itemStyle: { color: getColor(data), className: "pie-slice" },
+			itemStyle: { color: this.getColor(getPieFill(data), EHighContrastColorType.Foreground), className: "pie-slice" },
 		}));
 	}
 
@@ -4876,14 +4879,14 @@ export class Visual extends Shadow {
 			legend1DataPoints = [{
 				data: {
 					name: this.measure1DisplayName,
-					color: this.dataColorsSettings.circle1.circleFillColor,
+					color: this.getColor(this.dataColorsSettings.circle1.circleFillColor, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			},
 			{
 				data: {
 					name: this.measure2DisplayName,
-					color: this.dataColorsSettings.circle2.circleFillColor,
+					color: this.getColor(this.dataColorsSettings.circle2.circleFillColor, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			}
@@ -4892,7 +4895,7 @@ export class Visual extends Shadow {
 			legend1DataPoints = this.subCategories.map((category) => ({
 				data: {
 					name: category.name,
-					color: category.color1,
+					color: this.getColor(category.color1, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			}));
@@ -4900,7 +4903,7 @@ export class Visual extends Shadow {
 			legend2DataPoints = this.subCategories.map((category) => ({
 				data: {
 					name: category.name,
-					color: category.color2,
+					color: this.getColor(category.color2, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			}));
@@ -5423,5 +5426,16 @@ export class Visual extends Shadow {
 				return update;
 			}
 		) as any;
+	}
+
+	private getColor(color: string, highContrastColorType: EHighContrastColorType): string {
+		if (this._host.colorPalette.isHighContrast) {
+			if (highContrastColorType == EHighContrastColorType.Foreground) {
+				return this._host.colorPalette.foreground.value;
+			} else if (highContrastColorType == EHighContrastColorType.Background) {
+				return this._host.colorPalette.background.value;
+			}
+		}
+		return color;
 	}
 }

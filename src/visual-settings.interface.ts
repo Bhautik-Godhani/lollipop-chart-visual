@@ -124,15 +124,11 @@ export interface INumberSettings {
 export interface ILegendSettings {
 	show: boolean;
 	legendPosition: ELegendPosition;
-	labelColor: string;
-	labelFontFamily: string;
-	labelFontSize: number;
-	isShowTitle: boolean;
-	legendTitleText: string;
-	legend1TitleText: string;
-	legend2TitleText: string;
-	titleColor: string;
-	titleFontFamily: string;
+	showTitle: boolean;
+	legendTitle: string;
+	legendColor: string;
+	fontSize: string;
+	fontFamily: string;
 }
 
 export interface IChartSettings {

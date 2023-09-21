@@ -323,3 +323,8 @@ export enum EPatternSettings {
 	IsPatternBorderEnabled = "isPatternBorderEnabled",
 	PatternBorderWidth = "patternBorderWidth"
 }
+
+export enum EHighContrastColorType {
+	Foreground = "foreground",
+	Background = "background",
+}
