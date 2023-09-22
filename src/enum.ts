@@ -353,4 +353,5 @@ export enum EYAxisSettings {
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
+	IsShowLabelsAboveLine = "isShowLabelsAboveLine"
 }

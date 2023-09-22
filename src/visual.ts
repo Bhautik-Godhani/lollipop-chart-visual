@@ -273,6 +273,8 @@ export class Visual extends Shadow {
 	public yScaleGWidth: number = 0;
 	public yScaleHeight: number;
 	public isLeftYAxis: boolean;
+	public categoryLabelHeight: number;
+	public categoryLabelMargin: number = 10;
 
 	// EXPAND ALL
 	public expandAllXAxisG: Selection<SVGElement>;
@@ -1045,6 +1047,13 @@ export class Visual extends Shadow {
 			this.brushScaleBandBandwidth = this.minScaleBandWidth;
 		}
 
+		this.categoryLabelHeight = getSVGTextSize("Label", this.yAxisSettings.labelFontFamily, this.yAxisSettings.labelFontSize).height;
+		const maxCirclerRadius = d3.max([this.circle1Radius, this.circle2Radius]);
+
+		if (this.brushScaleBandBandwidth < maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin) {
+			this.brushScaleBandBandwidth += maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin;
+		}
+
 		this.totalLollipopCount = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
 
 		this.xScale = this.brushScaleBand;
@@ -1321,6 +1330,11 @@ export class Visual extends Shadow {
 					});
 				});
 			}
+
+			this.setCircle1Radius();
+			this.setCircle2Radius();
+			this.setPie1Radius();
+			this.setPie2Radius();
 
 			this.categoricalData = this.setInitialChartData(
 				clonedCategoricalData,
@@ -2023,6 +2037,10 @@ export class Visual extends Shadow {
 		this.pie1Settings = this.chartSettings.pieSettings.pie1;
 		this.pie2Settings = this.chartSettings.pieSettings.pie2;
 		this.isPatternApplied = this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
+		if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
+			this.yAxisSettings.isDisplayLabel = false;
+		}
 
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
@@ -3729,7 +3747,6 @@ export class Visual extends Shadow {
 			.attr("fill", this.getColor(yAxisSettings.labelColor, EHighContrastColorType.Foreground))
 			.style("font-family", yAxisSettings.labelFontFamily)
 			.attr("font-size", yAxisSettings.labelFontSize)
-			.attr("display", yAxisSettings.isDisplayLabel ? "block" : "none")
 			.style("text-anchor", yAxisSettings.position === Position.Left ? "end" : "start")
 			// .text((d: any) => {
 			// 	if (!this.isHorizontalChart && typeof d === "number") {
@@ -3882,6 +3899,14 @@ export class Visual extends Shadow {
 					})
 			);
 		}
+
+		this.xAxisG
+			.selectAll("text")
+			.attr("display", this.xAxisSettings.isDisplayLabel ? "block" : "none");
+
+		this.yAxisG
+			.selectAll("text")
+			.attr("display", this.yAxisSettings.isDisplayLabel ? "block" : "none");
 	}
 
 	xGridLinesFormatting(lineSelection: any): void {
@@ -4062,8 +4087,19 @@ export class Visual extends Shadow {
 			this.setYAxisTickStyle();
 		}
 
-		this.xScaleGHeight = this.xAxisG.node().getBoundingClientRect().height;
-		this.yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+		if (this.xAxisSettings.isDisplayLabel) {
+			const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
+			this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+		} else {
+			this.xScaleGHeight = 0;
+		}
+
+		if (this.yAxisSettings.isDisplayLabel) {
+			const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+			this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+		} else {
+			this.yScaleGWidth = 0;
+		}
 
 		this.setMargins();
 
@@ -4157,11 +4193,31 @@ export class Visual extends Shadow {
 			.style("display", this.lineSettings.show ? "block" : "none");
 	}
 
+	categoryLabelsFormatting(labelSelection: Selection<SVGElement>): void {
+		const maxCircleRadius = d3.max([this.circle1Radius, this.circle2Radius]);
+		const maxPieRadius = d3.max([this.pie1Radius, this.pie2Radius]);
+
+		labelSelection
+			.attr("transform", d => {
+				const cx = this.xScale(this.isHasMultiMeasure ? d.value2 : 0);
+				const cy = this.yScale(d.category) + this.scaleBandWidth / 2 - (this.isHasSubcategories ? maxPieRadius : maxCircleRadius) - this.categoryLabelMargin / 2;
+				return `translate(${cx}, ${cy})`;
+			})
+			.text((d: ILollipopChartRow) => {
+				return d.category;
+			})
+			.attr("fill", this.getColor(this.xAxisSettings.labelColor, EHighContrastColorType.Foreground))
+			.style("font-family", this.xAxisSettings.labelFontFamily)
+			.attr("font-size", this.xAxisSettings.labelFontSize)
+			.attr("display", "block");
+	}
+
 	drawLollipop(): void {
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData);
 		this.lollipopSelection = lollipopSelection.join(
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "lollipop-group");
+				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
 				if (this.chartSettings.lollipopType === LollipopType.Circle) {
 					const circle1Selection = lollipopG.append("circle")
@@ -4172,6 +4228,16 @@ export class Visual extends Shadow {
 						.classed(this.circleClass, true)
 						.classed(this.circle1Class, true);
 					this.setCircle1Formatting(circle1Selection);
+
+					if (this.isHasMultiMeasure) {
+						const circle2Selection = lollipopG.append("circle")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+							})
+							.attr("id", CircleType.Circle2)
+							.classed(this.circleClass, true).classed(this.circle2Class, true);
+						this.setCircle2Formatting(circle2Selection);
+					}
 				} else {
 					const pie1Selection = lollipopG.append("foreignObject")
 						.datum(d => {
@@ -4180,20 +4246,8 @@ export class Visual extends Shadow {
 						.attr("id", "pie1ForeignObject");
 					this.enterPieChart(pie1Selection);
 					this.setPieDataLabelsDisplayStyle();
-				}
 
-				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
-
-				if (this.isHasMultiMeasure) {
-					if (this.chartSettings.lollipopType === LollipopType.Circle) {
-						const circle2Selection = lollipopG.append("circle")
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-							})
-							.attr("id", CircleType.Circle2)
-							.classed(this.circleClass, true).classed(this.circle2Class, true);
-						this.setCircle2Formatting(circle2Selection);
-					} else {
+					if (this.isHasMultiMeasure) {
 						const pie2Selection = lollipopG.append("foreignObject")
 							.datum(d => {
 								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
@@ -4210,6 +4264,10 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection);
 				}
 
+				if (this.yAxisSettings.isShowLabelsAboveLine) {
+					const categoryLabelSelection = lollipopG.append("text").attr("class", "category-label");
+					this.categoryLabelsFormatting(categoryLabelSelection);
+				}
 				return lollipopG;
 			},
 			(update) => {
@@ -4230,6 +4288,7 @@ export class Visual extends Shadow {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 					})
 					.select("#pie2ForeignObject");
+				const categoryLabelSelection: Selection<SVGElement> = update.select(".category-label");
 
 				if (this.isHorizontalChart) {
 					this.setHorizontalLinesFormatting(lineSelection);
@@ -4259,6 +4318,12 @@ export class Visual extends Shadow {
 						this.updatePieChart(pie2Selection, true);
 						this.setPieDataLabelsDisplayStyle(true);
 					}
+				}
+
+				if (this.yAxisSettings.isShowLabelsAboveLine) {
+					this.categoryLabelsFormatting(categoryLabelSelection);
+				} else {
+					categoryLabelSelection.attr("display", "none");
 				}
 
 				return update;

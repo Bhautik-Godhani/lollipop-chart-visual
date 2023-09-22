@@ -45,6 +45,7 @@ export interface IYAxisSettings {
 	labelFontFamily: string;
 	labelFontSize: number;
 	labelCharLimit: number;
+	isShowLabelsAboveLine: boolean
 }
 
 export interface ICircleSettings {

@@ -256,6 +256,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
 	labelCharLimit: 10,
+	isShowLabelsAboveLine: false
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {

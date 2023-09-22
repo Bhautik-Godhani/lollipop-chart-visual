@@ -171,6 +171,17 @@ const YAxisSettings = (props) => {
       <ConditionalWrapper visible={configValues.isDisplayLabel}>
         <Row>
           <Column>
+            <ToggleButton
+              label={"Show Labels Above Line"}
+              value={configValues.isShowLabelsAboveLine}
+              handleChange={() => handleCheckbox(EYAxisSettings.IsShowLabelsAboveLine)}
+              appearance="checkbox"
+            />
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
             <ColorPicker
               label={"Color"}
               color={configValues.labelColor}
