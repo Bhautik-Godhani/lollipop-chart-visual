@@ -4264,7 +4264,7 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection);
 				}
 
-				if (this.yAxisSettings.isShowLabelsAboveLine) {
+				if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
 					const categoryLabelSelection = lollipopG.append("text").attr("class", "category-label");
 					this.categoryLabelsFormatting(categoryLabelSelection);
 				}
@@ -4320,7 +4320,7 @@ export class Visual extends Shadow {
 					}
 				}
 
-				if (this.yAxisSettings.isShowLabelsAboveLine) {
+				if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
 					this.categoryLabelsFormatting(categoryLabelSelection);
 				} else {
 					categoryLabelSelection.attr("display", "none");
