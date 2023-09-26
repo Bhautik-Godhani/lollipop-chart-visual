@@ -250,7 +250,6 @@ export class Visual extends Shadow {
 	public brushWidth: number = 0;
 	public isHorizontalBrushDisplayed: boolean;
 	public isVerticalBrushDisplayed: boolean;
-	public isLollipopChartDrawn: boolean = false;
 	public minScaleBandWidth: number = 40;
 	public isScrollBrushDisplayed: boolean;
 	public brushXAxisG: Selection<SVGElement>;
@@ -2989,60 +2988,6 @@ export class Visual extends Shadow {
 		return this.vizOptions.options.dataViews[0].categorical.categories.findIndex((data) => data.source.roles[key] === true);
 	}
 
-	drawLollipopChart(): void {
-		this.isLollipopChartDrawn = true;
-		// this.drawXYAxis();
-		// this.drawXYAxisTitle();
-		// this.drawLines();
-
-		this.drawLollipop();
-
-		const onCaseLollipopTypePie = () => {
-			// this.drawCircle1([]);
-			// this.drawCircle2([]);
-			this.drawPie1Chart(this.chartData);
-			if (this.isHasMultiMeasure) {
-				this.drawPie2Chart(this.chartData);
-			} else {
-				this.drawPie2Chart([]);
-			}
-			// this.drawData1Labels([]);
-			// if (this.isHasMultiMeasure) {
-			// 	this.drawData2Labels([]);
-			// } else {
-			// 	this.drawData2Labels([]);
-			// }
-		};
-
-		// switch (this.chartSettings.lollipopType) {
-		// 	case LollipopType.CIRCLE: {
-		// 		this.drawPie1Chart([]);
-		// 		this.drawPie2Chart([]);
-		// 		// this.drawCircle1(this.chartData);
-		// 		// this.drawCircle2(this.isHasMultiMeasure ? this.chartData : []);
-		// 		// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
-		// 		// if (this.isHasMultiMeasure) {
-		// 		// 	this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
-		// 		// } else {
-		// 		// 	this.drawData2Labels([]);
-		// 		// }
-		// 		break;
-		// 	}
-		// 	case LollipopType.Pie: {
-		// 		onCaseLollipopTypePie();
-		// 		break;
-		// 	}
-		// 	case LollipopType.Donut: {
-		// 		onCaseLollipopTypePie();
-		// 		break;
-		// 	}
-		// 	case LollipopType.Rose: {
-		// 		onCaseLollipopTypePie();
-		// 		break;
-		// 	}
-		// }
-	}
-
 	// Number Format
 	getAutoUnitFormattedNumber(number: number): string {
 		// const numberSettings = this.numberSettings;
@@ -3907,7 +3852,7 @@ export class Visual extends Shadow {
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		if (this.isHorizontalChart) {
-			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
+			this.xScale.range(this.yAxisSettings.position === Position.Left ? [5, xScaleWidth] : [xScaleWidth, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 			this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 		} else {
@@ -4216,13 +4161,12 @@ export class Visual extends Shadow {
 	setHorizontalLinesFormatting(linesSelection: any): void {
 		this.setLineStrokeColor();
 		linesSelection
-			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0))
-			.attr("x2", (d) => this.xScale(d.value1))
+			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0) + 10)
+			.attr("x2", (d) => this.xScale(d.value1) + this.pie1Radius * 2)
 			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
-			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
@@ -4244,10 +4188,9 @@ export class Visual extends Shadow {
 			.attr("x1", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("x2", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
-			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0))
+			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - this.pie2Radius * 2 + 10)
 			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
-			.attr("opacategory", 1)
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
@@ -4304,7 +4247,7 @@ export class Visual extends Shadow {
 			});
 	}
 
-	drawLollipop(): void {
+	drawLollipopChart(): void {
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
 		let marker: IMarkerData;
 
@@ -4498,36 +4441,6 @@ export class Visual extends Shadow {
 		) as any;
 	}
 
-	drawLines(): void {
-		const lineSelection = this.lineG.selectAll(".chart-line").data(this.chartData);
-
-		if (this.isHorizontalChart) {
-			this.lineSelection = lineSelection.join(
-				(enter) => {
-					const linesSelection = enter.append("line");
-					this.setHorizontalLinesFormatting(linesSelection);
-					return linesSelection;
-				},
-				(update) => {
-					this.setHorizontalLinesFormatting(update);
-					return update;
-				}
-			);
-		} else {
-			this.lineSelection = lineSelection.join(
-				(enter) => {
-					const linesSelection = enter.append("line");
-					this.setVerticalLinesFormatting(linesSelection);
-					return linesSelection;
-				},
-				(update) => {
-					this.setVerticalLinesFormatting(update);
-					return update;
-				}
-			);
-		}
-	}
-
 	//.CIRCLE
 	setCircle1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
@@ -4613,7 +4526,7 @@ export class Visual extends Shadow {
 			})
 			.attr("y", (d) => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
-				return !this.isHorizontalChart ? cy - this.circle1Size : cy + this.scaleBandWidth / 2;
+				return !this.isHorizontalChart ? cy - this.circle1Size : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 			})
 			.attr("width", this.circle1Size)
 			.attr("height", this.circle1Size)
@@ -4644,42 +4557,12 @@ export class Visual extends Shadow {
 			})
 			.attr("y", (d) => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
-				return !this.isHorizontalChart ? cy - this.circle2Size : cy + this.scaleBandWidth / 2;
+				return !this.isHorizontalChart ? cy - this.circle2Size : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 			})
 			.attr("width", this.circle2Size)
 			.attr("height", this.circle2Size)
 			.attr("href", d => `#${d.category}_${marker.value}_MARKER`)
 			.style("display", (d) => (this.isHasMultiMeasure && d.value2 ? "block" : "none"));
-	}
-
-	drawCircle1(data: ILollipopChartRow[]): void {
-		// const circleSelection1 = this.circle1G.selectAll(".chart-circle1").data(data);
-		// this.circle1Selection = circleSelection1.join(
-		// 	(enter) => {
-		// 		const circleSelection = enter.append("circle");
-		// 		this.setCircle1Formatting(circleSelection);
-		// 		return circleSelection;
-		// 	},
-		// 	(update) => {
-		// 		this.setCircle1Formatting(update);
-		// 		return update;
-		// 	}
-		// );
-	}
-
-	drawCircle2(data: ILollipopChartRow[]): void {
-		// const circleSelection2 = this.circle2G.selectAll(".chart-circle2").data(data);
-		// this.circle2Selection = circleSelection2.join(
-		// 	(enter) => {
-		// 		const circleSelection = enter.append("circle");
-		// 		this.setCircle2Formatting(circleSelection);
-		// 		return circleSelection;
-		// 	},
-		// 	(update) => {
-		// 		this.setCircle2Formatting(update);
-		// 		return update;
-		// 	}
-		// );
 	}
 
 	// Pie
@@ -4963,9 +4846,8 @@ export class Visual extends Shadow {
 			})
 			.attr("y", (d) => {
 				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
-				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2;
+				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2 - pieRadius;
 			})
-			.attr("opacategory", () => 1)
 			.append("xhtml:div")
 			.attr("id", "pie")
 			.style("width", "100%")
@@ -5078,9 +4960,8 @@ export class Visual extends Shadow {
 			})
 			.attr("y", (d) => {
 				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
-				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2;
+				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2 - pieRadius;
 			})
-			.attr("opacategory", () => 1)
 			.select("#pie")
 			.style("width", "100%")
 			.style("height", "100%")
@@ -5104,43 +4985,6 @@ export class Visual extends Shadow {
 					.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
 					.attr("fill", "#fff");
 			});
-	}
-
-	drawPie1Chart(data: ILollipopChartRow[]): void {
-		// data.forEach((d, i) => (d.sortId = 1000 + i));
-		// if (this.isRankingSettingsChanged) {
-		// 	this.pieG.selectAll("#pie1ForeignObject").remove();
-		// }
-		// const pie1ForeignObjectSelection = this.pieG.selectAll("#pie1ForeignObject").data(data, (d, i) => i);
-		// pie1ForeignObjectSelection.exit().remove();
-		// pie1ForeignObjectSelection.join(
-		// 	(enter) => {
-		// 		const enteredForeignObjects = enter.append("foreignObject");
-		// 		this.enterPieChart(enteredForeignObjects);
-		// 	},
-		// 	(update) => {
-		// 		this.updatePieChart(update);
-		// 	}
-		// );
-		// this.setPieDataLabelsDisplayStyle();
-	}
-
-	drawPie2Chart(data: ILollipopChartRow[]): void {
-		// data.forEach((d, i) => (d.sortId = 2000 + i));
-		// if (this.isRankingSettingsChanged) {
-		// 	this.pieG.selectAll("#pie2ForeignObject").remove();
-		// }
-		// const pie2ForeignObjectSelection = this.pieG.selectAll("#pie2ForeignObject").data(data, (d, i) => i);
-		// pie2ForeignObjectSelection.join(
-		// 	(enter) => {
-		// 		const enteredForeignObjects = enter.append("foreignObject");
-		// 		this.enterPieChart(enteredForeignObjects, true);
-		// 	},
-		// 	(update) => {
-		// 		this.updatePieChart(update, true);
-		// 	}
-		// );
-		// this.setPieDataLabelsDisplayStyle(true);
 	}
 
 	// Legend
