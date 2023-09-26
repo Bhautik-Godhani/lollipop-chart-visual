@@ -1,10 +1,10 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import {SORTING_SETTINGS} from "../constants";
-import {parseObject} from "../methods/methods";
-import {ESortByTypes, ESortOrderTypes, ESortingSettings} from "../enum";
-import {Accordion, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton} from "@truviz/shadow/dist/Components";
-import {ILabelValuePair, ISortingProps, ISortingSettings} from "../visual-settings.interface";
+import { SORTING_SETTINGS } from "../constants";
+import { parseObject } from "../methods/methods";
+import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
+import { Accordion, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
+import { ILabelValuePair, ISortingProps, ISortingSettings } from "../visual-settings.interface";
 
 const SORT_ORDER: ILabelValuePair[] = [
 	{
@@ -226,7 +226,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 const SortingSettings = (props) => {
 	const {
 		shadow,
-		compConfig: {sectionName, propertyName},
+		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
@@ -236,12 +236,11 @@ const SortingSettings = (props) => {
 
 	const applyChanges = () => {
 		shadow.persistProperties(sectionName, propertyName, configValues);
-		console.log(configValues);
 		closeCurrentSettingHandler();
 	};
 
 	const resetChanges = () => {
-		setConfigValues({...SORTING_SETTINGS});
+		setConfigValues({ ...SORTING_SETTINGS });
 	};
 
 	const [configValues, setConfigValues] = React.useState({

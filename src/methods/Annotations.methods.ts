@@ -18,7 +18,6 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
         offsetValues: [0, 0],
         isNodeCentricAnnotation: true,
         isClickNodeFromOutside: true,
-        isPie: true
     });
     self.visualAnnotations.initializeAnnotations();
     self.behavior.setVisualAnnotations(self.visualAnnotations);
@@ -27,8 +26,8 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
 export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
     const dataPoint = {
         name: d.category,
-        width: self.isHasSubcategories ? d.sliceWidth : self.circle1Settings.circleRadius * 2,
-        height: self.isHasSubcategories ? d.sliceHeight : self.circle1Settings.circleRadius * 2,
+        width: self.isHasSubcategories ? d.sliceWidth : self.circle1Size * 2,
+        height: self.isHasSubcategories ? d.sliceHeight : self.circle2Size * 2,
         originalValue: d.defaultValue,
         value: self.formatNumber(d.defaultValue, self.measureNumberFormatter[d.valueType === DataValuesType.Value1 ? 0 : 1]),
     };

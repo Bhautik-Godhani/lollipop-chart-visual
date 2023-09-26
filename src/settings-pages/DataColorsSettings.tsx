@@ -1,9 +1,10 @@
 import * as React from "react";
-import {DATA_COLORS} from "../constants";
-import {CircleType, ColorPaletteType, EDataRolesName, EChartSettings, EDataColorsSettings, LollipopType, PieType} from "../enum";
-import {IChartSettings, IDataColorsSettings, ILabelValuePair} from "../visual-settings.interface";
-import {ColorPicker, Column, ConditionalWrapper, Footer, GradientPicker, RadioOption, Row, SelectInput} from "@truviz/shadow/dist/Components";
-import {ShadowUpdateOptions} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { DATA_COLORS } from "../constants";
+import { CircleType, ColorPaletteType, EDataRolesName, EChartSettings, EDataColorsSettings, PieType } from "../enum";
+import { IChartSettings, IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { ColorPicker, Column, ConditionalWrapper, Footer, GradientPicker, RadioOption, Row, SelectInput } from "@truviz/shadow/dist/Components";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { Visual } from "../visual";
 
 const CIRCLE_TYPES: ILabelValuePair[] = [
 	{
@@ -55,7 +56,7 @@ const handleChange = (
 ): void => {
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: {...d[dataType], [n]: rgb},
+		[dataType]: { ...d[dataType], [n]: rgb },
 	}));
 };
 
@@ -70,7 +71,7 @@ const handleByCategoryChange = (
 	updatedColors[index].color = rgb;
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: {...d[dataType], byCategoryColors: updatedColors},
+		[dataType]: { ...d[dataType], byCategoryColors: updatedColors },
 	}));
 };
 
@@ -81,7 +82,7 @@ const handleCheckbox = (
 ): void => {
 	setConfigValues((d: any) => ({
 		...d,
-		[dataType]: {...d[dataType], [key]: !d[dataType][key]},
+		[dataType]: { ...d[dataType], [key]: !d[dataType][key] },
 	}));
 };
 
@@ -93,6 +94,7 @@ const handleRadioButtonChange = (key: string, value: string, setConfigValues: Re
 };
 
 const UIByCategoryColorSettings = (
+	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
 	chartSettings: IChartSettings,
 	configValues: IDataColorsSettings,
@@ -103,13 +105,13 @@ const UIByCategoryColorSettings = (
 	subCategories.sort((a, b) => a.localeCompare(b));
 
 	const SUBCATEGORIES_LIST: ILabelValuePair[] = subCategories.map((category) => {
-		return {label: category, value: category};
+		return { label: category, value: category };
 	});
 
 	return (
 		<>
 			<ConditionalWrapper
-				visible={configValues[dataType].fillType === ColorPaletteType.ByCategory && chartSettings.lollipopType !== LollipopType.Circle}
+				visible={configValues[dataType].fillType === ColorPaletteType.ByCategory && shadow.isLollipopTypePie}
 			>
 				<Row>
 					<Column>
@@ -151,6 +153,7 @@ const UIByCategoryColorSettings = (
 };
 
 const UIDataColorsSettings1 = (
+	shadow: Visual,
 	isDumbbellChart: boolean,
 	dataType: CircleType | PieType,
 	vizOptions: ShadowUpdateOptions,
@@ -158,20 +161,20 @@ const UIDataColorsSettings1 = (
 	configValues: IDataColorsSettings,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
 ) => {
-	const PIE_TYPES: ILabelValuePair[] = [
-		{
-			label: `${chartSettings[EChartSettings.lollipopType]} 1`,
-			value: CircleType.Circle1,
-		},
-		{
-			label: `${chartSettings[EChartSettings.lollipopType]} 2`,
-			value: CircleType.Circle2,
-		},
-	];
+	// const PIE_TYPES: ILabelValuePair[] = [
+	// 	{
+	// 		label: `${chartSettings[EChartSettings.lollipopType]} 1`,
+	// 		value: CircleType.Circle1,
+	// 	},
+	// 	{
+	// 		label: `${chartSettings[EChartSettings.lollipopType]} 2`,
+	// 		value: CircleType.Circle2,
+	// 	},
+	// ];
 
 	return (
 		<>
-			<ConditionalWrapper visible={isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle}>
+			{/* <ConditionalWrapper visible={isDumbbellChart && shadow.isLollipopTypeCircle}>
 				<Row>
 					<Column>
 						<RadioOption
@@ -184,7 +187,7 @@ const UIDataColorsSettings1 = (
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={isDumbbellChart && chartSettings.lollipopType !== LollipopType.Circle}>
+			<ConditionalWrapper visible={isDumbbellChart && shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<RadioOption
@@ -197,13 +200,13 @@ const UIDataColorsSettings1 = (
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={!(isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle)}>
+			<ConditionalWrapper visible={!(isDumbbellChart && shadow.isLollipopTypeCircle)}>
 				<Row>
 					<Column>
 						<SelectInput
 							label="Color Palette"
 							value={
-								isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle ? ColorPaletteType.Single : configValues[dataType].fillType
+								isDumbbellChart && shadow.isLollipopTypeCircle ? ColorPaletteType.Single : configValues[dataType].fillType
 							}
 							optionsList={COLOR_PALETTE_TYPES}
 							handleChange={(value) => handleChange(value, EDataColorsSettings.fillType, dataType, setConfigValues)}
@@ -212,7 +215,7 @@ const UIDataColorsSettings1 = (
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && chartSettings.lollipopType === LollipopType.Circle}>
+			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && shadow.isLollipopTypeCircle}>
 				<Row>
 					<Column>
 						<ColorPicker
@@ -238,7 +241,7 @@ const UIDataColorsSettings1 = (
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && chartSettings.lollipopType !== LollipopType.Circle}>
+			<ConditionalWrapper visible={configValues[dataType].fillType === ColorPaletteType.Single && shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<ColorPicker
@@ -250,12 +253,13 @@ const UIDataColorsSettings1 = (
 						/>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
+			</ConditionalWrapper> */}
 		</>
 	);
 };
 
 const UIDataColorsSettings2 = (
+	shadow: Visual,
 	dataType: CircleType | PieType,
 	vizOptions: ShadowUpdateOptions,
 	chartSettings: IChartSettings,
@@ -266,7 +270,7 @@ const UIDataColorsSettings2 = (
 		<>
 			<ConditionalWrapper visible={configValues[dataType].fillType === "byCategory"}>
 				{configValues[dataType].byCategoryColors.map((category, index) => {
-					<Row>
+					return <Row>
 						<Column>
 							<ColorPicker
 								label={category.name}
@@ -299,7 +303,7 @@ const UIDataColorsSettings2 = (
 				</Row>
 			</ConditionalWrapper>
 
-			{UIByCategoryColorSettings(vizOptions, chartSettings, configValues, setConfigValues)}
+			{/* {UIByCategoryColorSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)} */}
 
 			{/* <ConditionalWrapper visible={configValues[dataType].fillType != "qualitative"}>
 				<Row>
@@ -329,7 +333,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 const DataColorsSettings = (props) => {
 	const {
 		shadow,
-		compConfig: {sectionName, propertyName},
+		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
@@ -343,7 +347,7 @@ const DataColorsSettings = (props) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = {...DATA_COLORS};
+		initialStates = { ...DATA_COLORS };
 	}
 
 	const [configValues, setConfigValues] = React.useState<IDataColorsSettings>({
@@ -359,11 +363,11 @@ const DataColorsSettings = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({...DATA_COLORS});
+		setConfigValues({ ...DATA_COLORS });
 	};
 
 	const chartSettings: IChartSettings = shadow.chartSettings;
-	if (chartSettings.lollipopType !== LollipopType.Circle) {
+	if (shadow.isLollipopTypePie) {
 		COLOR_PALETTE_TYPES.push({
 			label: "By Category",
 			value: ColorPaletteType.ByCategory,
@@ -374,10 +378,10 @@ const DataColorsSettings = (props) => {
 	const dataType = configValues[EDataColorsSettings.dataType];
 
 	React.useEffect(() => {
-		if (isDumbbellChart && chartSettings.lollipopType === LollipopType.Circle) {
+		if (isDumbbellChart && shadow.isLollipopTypeCircle) {
 			setConfigValues((d: IDataColorsSettings) => ({
 				...d,
-				[dataType]: {...d[dataType], fillType: ColorPaletteType.Single},
+				[dataType]: { ...d[dataType], fillType: ColorPaletteType.Single },
 			}));
 			configValues[configValues[EDataColorsSettings.dataType]].fillType = ColorPaletteType.Single;
 		}
@@ -399,18 +403,18 @@ const DataColorsSettings = (props) => {
 			}
 		}
 
-		if (
-			chartSettings.lollipopType === LollipopType.Pie &&
-			(configValues[EDataColorsSettings.dataType] === CircleType.Circle1 || configValues[EDataColorsSettings.dataType] === CircleType.Circle2)
-		) {
-			setConfigValues((d: IDataColorsSettings) => ({
-				...d,
-				[EDataColorsSettings.dataType]: PieType.Pie1,
-			}));
-		}
+		// if (
+		// 	chartSettings.lollipopType === LollipopType.Pie &&
+		// 	(configValues[EDataColorsSettings.dataType] === CircleType.Circle1 || configValues[EDataColorsSettings.dataType] === CircleType.Circle2)
+		// ) {
+		// 	setConfigValues((d: IDataColorsSettings) => ({
+		// 		...d,
+		// 		[EDataColorsSettings.dataType]: PieType.Pie1,
+		// 	}));
+		// }
 
 		if (
-			chartSettings.lollipopType === LollipopType.Circle &&
+			shadow.isLollipopTypeCircle &&
 			(configValues[EDataColorsSettings.dataType] === PieType.Pie1 || configValues[EDataColorsSettings.dataType] === PieType.Pie2)
 		) {
 			setConfigValues((d: IDataColorsSettings) => ({
@@ -422,8 +426,8 @@ const DataColorsSettings = (props) => {
 
 	return (
 		<>
-			{UIDataColorsSettings1(isDumbbellChart, dataType, vizOptions, chartSettings, configValues, setConfigValues)}
-			{UIDataColorsSettings2(dataType, vizOptions, chartSettings, configValues, setConfigValues)}
+			{UIDataColorsSettings1(shadow, isDumbbellChart, dataType, vizOptions, chartSettings, configValues, setConfigValues)}
+			{UIDataColorsSettings2(shadow, dataType, vizOptions, chartSettings, configValues, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

@@ -33,8 +33,8 @@ export class VisualSettings extends DataViewObjectsParser {
 	public license = new License();
 	public visualGeneralSettings = new VisualGeneralSettings();
 	public chartConfig = new ChartConfig();
+	public markerConfig = new MarkerConfig();
 	public dataColorsConfig = new DataColorsConfig();
-	public circleConfig = new CircleConfig();
 	public lineConfig = new LineConfig();
 	public dataLabelsConfig = new DataLabelsConfig();
 	public gridLinesConfig = new GridLinesConfig();
@@ -65,11 +65,11 @@ export class VisualGeneralSettings {
 export class ChartConfig {
 	public chartSettings: string = "{}";
 }
+export class MarkerConfig {
+	public markerSettings: string = "{}";
+}
 export class DataColorsConfig {
 	public dataColorsSettings: string = "{}";
-}
-export class CircleConfig {
-	public circleSettings: string = "{}";
 }
 export class LineConfig {
 	public lineSettings: string = "{}";

@@ -1,9 +1,11 @@
 import * as React from "react";
 import { CHART_SETTINGS } from "../constants";
-import { EChartSettings, EPieSettings, LollipopType, LollipopWidthType, Orientation, PieSize, PieType } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption } from "@truviz/shadow/dist/Components";
+import { EChartSettings, EPieSettings, LollipopWidthType, Orientation, PieSize, PieType } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
+import { IMarkerData, MarkerPicker } from "./markerSelector";
+import { CATEGORY_MARKERS } from "./markers";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -48,6 +50,16 @@ const handlePieTypeChange = (val, n, setPieConfigValues: React.Dispatch<React.Se
 	}));
 };
 
+const handleCheckbox = (
+	key: string,
+	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
+): void => {
+	setConfigValues((d: any) => ({
+		...d,
+		[key]: !d[key]
+	}));
+};
+
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
@@ -68,42 +80,20 @@ const UIGeneralChartSettings = (
 	isHasSubCategories: boolean,
 	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
 ) => {
-	const LOLLIPOP_TYPES: ILabelValuePair[] = [
-		{
-			label: "Circle",
-			value: LollipopType.Circle,
-		},
-	];
-
-	if (isHasSubCategories) {
-		LOLLIPOP_TYPES.push(
-			{
-				label: "Pie",
-				value: LollipopType.Pie,
-			},
-			{
-				label: "Donut",
-				value: LollipopType.Donut,
-			},
-			{
-				label: "Rose",
-				value: LollipopType.Rose,
-			}
-		);
-	}
-
 	return (
 		<>
-			<Row>
-				<Column>
-					<SelectInput
-						label={"Lollipop Type"}
-						value={configValues.lollipopType}
-						optionsList={LOLLIPOP_TYPES}
-						handleChange={(value) => handleChange(value, EChartSettings.lollipopType, setConfigValues)}
-					/>
-				</Column>
-			</Row>
+			<ConditionalWrapper visible={shadow.isHasImagesData}>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Show Images Marker"}
+							value={configValues.isShowImageMarker}
+							handleChange={() => handleCheckbox(EChartSettings.IsShowImageMarker, setConfigValues)}
+							appearance="checkbox"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 
 			<Row>
 				<Column>
@@ -150,21 +140,21 @@ const UIPieTypeSettings = (
 	isDumbbellChart: boolean,
 	setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>
 ) => {
-	const pieType = pieConfigValues.pieType;
-	const PIE_TYPES: ILabelValuePair[] = [
-		{
-			label: `${configValues[EChartSettings.lollipopType]} 1`,
-			value: PieType.Pie1,
-		},
-		{
-			label: `${configValues[EChartSettings.lollipopType]} 2`,
-			value: PieType.Pie2,
-		},
-	];
+	// const pieType = pieConfigValues.pieType;
+	// const PIE_TYPES: ILabelValuePair[] = [
+	// 	{
+	// 		label: `${configValues[EChartSettings.lollipopType]} 1`,
+	// 		value: PieType.Pie1,
+	// 	},
+	// 	{
+	// 		label: `${configValues[EChartSettings.lollipopType]} 2`,
+	// 		value: PieType.Pie2,
+	// 	},
+	// ];
 
 	return (
 		<>
-			<ConditionalWrapper visible={isDumbbellChart}>
+			{/* <ConditionalWrapper visible={isDumbbellChart}>
 				<Row>
 					<Column>
 						<RadioOption
@@ -214,7 +204,7 @@ const UIPieTypeSettings = (
 						</Column>
 					</Row>
 				</ConditionalWrapper>
-			</ConditionalWrapper>
+			</ConditionalWrapper> */}
 		</>
 	);
 };
@@ -263,46 +253,12 @@ const ChartSettings = (props) => {
 
 	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
-	const [isLollipopTypeChanged, setIsLollipopTypeChanged] = React.useState(configValues.isLollipopTypeChanged);
-
-	React.useEffect(() => {
-		if (!isHasSubCategories) {
-			setConfigValues((d) => ({
-				...d,
-				[EChartSettings.lollipopType]: LollipopType.Circle,
-			}));
-			setConfigValues((d) => ({
-				...d,
-				[EChartSettings.isLollipopTypeChanged]: false,
-			}));
-			setIsLollipopTypeChanged(false);
-			const configProps = {
-				...configValues,
-				[EChartSettings.isLollipopTypeChanged]: false,
-				[EChartSettings.pieSettings]: pieConfigValues,
-			};
-			shadow.persistProperties(sectionName, propertyName, configProps);
-		} else {
-			if (!isLollipopTypeChanged) {
-				setConfigValues((d) => ({
-					...d,
-					[EChartSettings.lollipopType]: LollipopType.Donut,
-				}));
-			}
-			const configProps = {
-				...configValues,
-				[EChartSettings.pieSettings]: pieConfigValues,
-			};
-			shadow.persistProperties(sectionName, propertyName, configProps);
-		}
-	}, []);
-
 	return (
 		<>
 			{UIGeneralChartSettings(shadow, configValues, isHasSubCategories, setConfigValues)}
 
-			<ConditionalWrapper visible={configValues[EChartSettings.lollipopType] !== LollipopType.Circle}>
-				{UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)}
+			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+				{/* {UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)} */}
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}

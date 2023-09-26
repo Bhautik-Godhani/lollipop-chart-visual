@@ -1,6 +1,6 @@
 import * as React from "react";
 import { DATA_LABELS_SETTINGS } from "../constants";
-import { DataLabelsFontSizeType, DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, LollipopType, Orientation } from "../enum";
+import { DataLabelsFontSizeType, DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
 import "../../style/range-slider.less";
 import { IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@truviz/shadow/dist/Components";
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { Visual } from "../visual";
 
 const DATA_LABELS_FONT_SIZE_TYPES: ILabelValuePair[] = [
 	{
@@ -117,6 +118,7 @@ const UIDataLabelsFontFamilyAndStyle = (
 };
 
 const UIDataLabelsFontSettings = (
+	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
 	chartSettings: IChartSettings,
 	configValues: IDataLabelsSettings,
@@ -135,7 +137,7 @@ const UIDataLabelsFontSettings = (
 					/>
 				</Column>
 			</Row>
-			<ConditionalWrapper visible={chartSettings.lollipopType !== LollipopType.Circle}>
+			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<ColorPicker
@@ -161,7 +163,7 @@ const UIDataLabelsFontSettings = (
 				</Row>
 			</ConditionalWrapper>
 			<ConditionalWrapper
-				visible={chartSettings.lollipopType === LollipopType.Circle && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside}
+				visible={shadow.isLollipopTypeCircle && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside}
 			>
 				<Row>
 					<Column>
@@ -176,7 +178,7 @@ const UIDataLabelsFontSettings = (
 			</ConditionalWrapper>
 			<ConditionalWrapper
 				visible={
-					chartSettings.lollipopType === LollipopType.Circle &&
+					shadow.isLollipopTypeCircle &&
 					(configValues[EDataLabelsSettings.fontSizeType] === DataLabelsFontSizeType.Custom ||
 						configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside)
 				}
@@ -193,7 +195,7 @@ const UIDataLabelsFontSettings = (
 					</Column>
 				</Row>
 			</ConditionalWrapper>
-			<ConditionalWrapper visible={chartSettings.lollipopType !== LollipopType.Circle}>
+			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<InputControl
@@ -212,13 +214,14 @@ const UIDataLabelsFontSettings = (
 };
 
 const UICircleLollipopLabelsSettings = (
+	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
 	chartSettings: IChartSettings,
 	configValues: IDataLabelsSettings,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
 	return (
-		<ConditionalWrapper visible={chartSettings.lollipopType === LollipopType.Circle}>
+		<ConditionalWrapper visible={shadow.isLollipopTypeCircle}>
 			<Row>
 				<Column>
 					<SelectInput
@@ -325,12 +328,12 @@ const DataLabelsSettings = (props) => {
 		vizOptions.formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]
 	);
 
-	if (!vizOptions.options.dataViews[0].categorical.categories[1]) {
-		chartSettings.lollipopType = LollipopType.Circle;
-	}
+	// if (!vizOptions.options.dataViews[0].categorical.categories[1]) {
+	// 	chartSettings.lollipopType = LollipopType.CIRCLE;
+	// }
 
 	if (
-		(!Object.keys(dataLabelsSettings).length && chartSettings.lollipopType !== LollipopType.Circle) ||
+		(!Object.keys(dataLabelsSettings).length && shadow.isLollipopTypePie) ||
 		(dataLabelsSettings.placement === DataLabelsPlacement.Inside && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside)
 	) {
 		configValues[EDataLabelsSettings.fontSize] = 12;
@@ -361,8 +364,8 @@ const DataLabelsSettings = (props) => {
 			</Row>
 
 			<ConditionalWrapper visible={configValues.show}>
-				{UIDataLabelsFontSettings(vizOptions, chartSettings, configValues, setConfigValues)}
-				{UICircleLollipopLabelsSettings(vizOptions, chartSettings, configValues, setConfigValues)}
+				{UIDataLabelsFontSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
+				{UICircleLollipopLabelsSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}

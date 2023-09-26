@@ -1,7 +1,7 @@
 export enum EVisualConfig {
 	ChartConfig = "chartConfig",
+	MarkerConfig = "markerConfig",
 	DataColorsConfig = "dataColorsConfig",
-	CircleConfig = "circleConfig",
 	LineConfig = "lineConfig",
 	DataLabelsConfig = "dataLabelsConfig",
 	GridLinesConfig = "gridLinesConfig",
@@ -18,8 +18,8 @@ export enum EVisualSettings {
 	License = "license",
 	VisualGeneralSettings = "visualGeneralSettings",
 	ChartSettings = "chartSettings",
+	MarkerSettings = "markerSettings",
 	DataColorsSettings = "dataColorsSettings",
-	CircleSettings = "circleSettings",
 	LineSettings = "lineSettings",
 	DataLabelsSettings = "dataLabelsSettings",
 	GridLinesSettings = "gridLinesSettings",
@@ -108,6 +108,11 @@ export enum LollipopWidthType {
 	Custom = "custom",
 }
 
+export enum EAutoCustomTypes {
+	Auto = "auto",
+	Custom = "custom",
+}
+
 export enum DataLabelsFontSizeType {
 	Auto = "auto",
 	Custom = "custom",
@@ -155,14 +160,8 @@ export enum EDataRolesName {
 	Measure2 = "measure2",
 	Tooltip = "tooltip",
 	Sort = "sort",
+	ImagesData = "imagesData",
 	ShowBucket = "showBucket",
-}
-
-export enum LollipopType {
-	Circle = "circle",
-	Pie = "pie",
-	Donut = "donut",
-	Rose = "Rose",
 }
 
 export enum FontStyle {
@@ -172,13 +171,12 @@ export enum FontStyle {
 }
 
 export enum EChartSettings {
-	lollipopType = "lollipopType",
-	isLollipopTypeChanged = "isLollipopTypeChanged",
 	isHasSubCategories = "isHasSubCategories",
 	orientation = "orientation",
 	lollipopWidthType = "lollipopWidthType",
 	lollipopWidth = "lollipopWidth",
 	pieSettings = "pieSettings",
+	IsShowImageMarker = "isShowImageMarker"
 }
 
 export enum ECircleSettings {
@@ -354,4 +352,50 @@ export enum EYAxisSettings {
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
 	IsShowLabelsAboveLine = "isShowLabelsAboveLine"
+}
+
+export enum EMarkerSettings {
+	MarkerType = "markerType",
+	MarkerShape = "markerShape",
+	MarkerChart = "markerChart",
+	MarkerShapeValue = "markerShapeValue",
+	MarkerShapePath = "markerShapePath",
+	MarkerShapeBase64Url = "markerShapeBase64Url",
+	DropdownMarkerType = "dropdownMarkerType",
+	Marker1Styles = "marker1Styles",
+	Marker2Styles = "marker2Styles",
+	MarkerStyleType = "markerStyleType"
+}
+
+export enum EMarkerTypes {
+	SHAPE = "shape",
+	CHART = "chart"
+}
+
+export enum EMarkerShapeTypes {
+	DEFAULT = "default",
+	ICONS_LIST = "icons-list",
+	UPLOAD_ICON = "upload-icon"
+}
+
+export enum EMarkerChartTypes {
+	PIE = "pie",
+	DONUT = "donut",
+	ROSE = "rose"
+}
+
+export enum EMarkerDefaultShapes {
+	CIRCLE = "circle",
+	SQUARE = "square",
+	TRIANGLE = "triangle"
+}
+
+export enum EMarkerStyleProps {
+	SizeType = "sizeType",
+	Size = "size"
+}
+
+export enum EMarkerStyleTypes {
+	Marker1Style = "marker1Style",
+	Marker2Style = "marker2Style",
 }

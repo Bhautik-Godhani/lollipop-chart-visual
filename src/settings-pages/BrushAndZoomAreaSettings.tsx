@@ -1,6 +1,6 @@
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS } from "../constants";
 import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
 import { EBrushAndZoomAreaSettings } from "../enum";
@@ -21,15 +21,17 @@ const UIGeneralChartSettings = (
 				</Column>
 			</Row>
 
-			<Row>
-				<Column>
-					<ToggleSwitch
-						label="Show Axis"
-						value={configValues.isShowAxis}
-						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis)}
-					/>
-				</Column>
-			</Row>
+			<ConditionalWrapper visible={configValues.enabled}>
+				<Row>
+					<Column>
+						<ToggleSwitch
+							label="Show Axis"
+							value={configValues.isShowAxis}
+							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 		</>
 	);
 };

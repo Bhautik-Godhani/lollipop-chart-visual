@@ -26,6 +26,11 @@
 			"kind": "Measure"
 		},
 		{
+			"displayName": "Images Data",
+			"name": "imagesData",
+			"kind": "Measure"
+		},
+		{
 			"displayName": "Show",
 			"name": "showBucket",
 			"kind": "Measure",
@@ -82,6 +87,11 @@
 							{
 								"bind": {
 									"to": "sort"
+								}
+							},
+							{
+								"bind": {
+									"to": "imagesData"
 								}
 							},
 							{
@@ -171,11 +181,11 @@
 				}
 			}
 		},
-		"dataColorsConfig": {
-			"displayName": "DataColors Configuration",
+		"markerConfig": {
+			"displayName": "Marker Configuration",
 			"properties": {
-				"dataColorsSettings": {
-					"displayName": "Data Colors",
+				"markerSettings": {
+					"displayName": "Marker Settings",
 					"description": "",
 					"type": {
 						"text": true
@@ -183,11 +193,11 @@
 				}
 			}
 		},
-		"circleConfig": {
-			"displayName": "Circle Configuration",
+		"dataColorsConfig": {
+			"displayName": "DataColors Configuration",
 			"properties": {
-				"circleSettings": {
-					"displayName": "Circle Settings",
+				"dataColorsSettings": {
+					"displayName": "Data Colors",
 					"description": "",
 					"type": {
 						"text": true

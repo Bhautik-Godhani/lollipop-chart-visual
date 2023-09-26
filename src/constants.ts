@@ -5,10 +5,15 @@ import {
 	ColorPaletteType,
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
+	EAutoCustomTypes,
+	EMarkerChartTypes,
+	EMarkerDefaultShapes,
+	EMarkerShapeTypes,
+	EMarkerStyleTypes,
+	EMarkerTypes,
 	ERankingType,
 	ESortOrderTypes,
 	LineType,
-	LollipopType,
 	LollipopWidthType,
 	Orientation,
 	PieSize,
@@ -20,12 +25,12 @@ import {
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
-	ICircleSettings,
 	IDataColorsPropsSettings,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IGridLinesSettings,
 	ILineSettings,
+	IMarkerSettings,
 	IPatternSettings,
 	IPiePropsSettings,
 	IRankingSettings,
@@ -50,19 +55,13 @@ export const PIE2_SETTINGS: IPiePropsSettings = {
 };
 
 export const CHART_SETTINGS: IChartSettings = {
-	lollipopType: LollipopType.Circle,
 	lollipopInnerPadding: 30,
-	isLollipopTypeChanged: false,
 	isHasSubCategories: false,
 	orientation: Orientation.Vertical,
 	lollipopWidthType: LollipopWidthType.Auto,
 	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
-	pieSettings: {
-		pieType: PieType.Pie1,
-		pie1: PIE1_SETTINGS,
-		pie2: PIE2_SETTINGS,
-	},
+	isShowImageMarker: false
 };
 
 export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
@@ -81,12 +80,6 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 	maxCircleRadius: 10,
 	circleRadius: 10,
 	strokeWidth: 0,
-};
-
-export const CIRCLE_SETTINGS: ICircleSettings = {
-	circleType: CircleType.Circle1,
-	circle1: CIRCLE1_SETTINGS,
-	circle2: CIRCLE2_SETTINGS,
 };
 
 export const LINE_SETTINGS: ILineSettings = {
@@ -292,7 +285,7 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 };
 
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
-	enabled: true,
+	enabled: false,
 	isShowAxis: false
 };
 
@@ -302,4 +295,17 @@ export const PATTERN_SETTINGS: IPatternSettings = {
 	subCategoryPatterns: [],
 	isPatternBorderEnabled: false,
 	patternBorderWidth: 1
+};
+
+export const MARKER_SETTINGS: IMarkerSettings = {
+	markerType: EMarkerTypes.SHAPE,
+	markerShape: EMarkerShapeTypes.DEFAULT,
+	markerChart: EMarkerChartTypes.PIE,
+	markerShapeValue: undefined,
+	markerShapePath: "",
+	markerShapeBase64Url: "",
+	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
+	markerStyleType: EMarkerStyleTypes.Marker1Style,
+	marker1Style: { sizeType: EAutoCustomTypes.Auto, size: undefined },
+	marker2Style: { sizeType: EAutoCustomTypes.Auto, size: undefined }
 };

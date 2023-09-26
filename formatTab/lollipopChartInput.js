@@ -4,8 +4,8 @@ const sectionKVPair = [
 	{ license: "PowerVIZ License" },
 	{ visualGeneralSettings: "Visual General Settings" },
 	{ chartConfig: "Chart Configuration" },
+	{ markerConfig: "Marker Configuration" },
 	{ dataColorsConfig: "DataColors Configuration" },
-	{ circleConfig: "Circle Configuration" },
 	{ lineConfig: "Line Configuration" },
 	{ dataLabelsConfig: "DataLabels Configuration" },
 	{ gridLinesConfig: "GridLines Configuration" },
@@ -75,10 +75,10 @@ const formatTab = {
 			defaultValue: "true",
 		},
 	],
-	chartConfig: [
+	markerConfig: [
 		{
-			technicalName: "chartSettings",
-			displayName: "Chart Settings",
+			technicalName: "markerSettings",
+			displayName: "Marker Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",
@@ -88,15 +88,6 @@ const formatTab = {
 		{
 			technicalName: "dataColorsSettings",
 			displayName: "Data Colors",
-			description: "",
-			type: "text",
-			defaultValue: "{}",
-		},
-	],
-	circleConfig: [
-		{
-			technicalName: "circleSettings",
-			displayName: "Circle Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

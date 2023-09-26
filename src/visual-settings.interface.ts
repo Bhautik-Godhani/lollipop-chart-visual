@@ -1,14 +1,19 @@
+import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import {
 	CircleSize,
 	CircleType,
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
+	EAutoCustomTypes,
 	EDataRolesName,
 	ELegendPosition,
+	EMarkerChartTypes,
+	EMarkerShapeTypes,
+	EMarkerStyleTypes,
+	EMarkerTypes,
 	ERankingType,
 	ESortOrderTypes,
-	LollipopType,
 	LollipopWidthType,
 	Orientation,
 	PieSize,
@@ -46,12 +51,6 @@ export interface IYAxisSettings {
 	labelFontSize: number;
 	labelCharLimit: number;
 	isShowLabelsAboveLine: boolean
-}
-
-export interface ICircleSettings {
-	circleType: CircleType;
-	circle1: ICirclePropsSettings;
-	circle2: ICirclePropsSettings;
 }
 
 export interface ICirclePropsSettings {
@@ -133,15 +132,31 @@ export interface ILegendSettings {
 }
 
 export interface IChartSettings {
-	lollipopType: LollipopType;
-	isLollipopTypeChanged: boolean;
 	isHasSubCategories: boolean;
 	orientation: Orientation;
 	isLollipopDistanceChange: boolean;
 	lollipopWidthType: LollipopWidthType;
 	lollipopWidth: number;
-	pieSettings: IPieSettings;
 	lollipopInnerPadding: number;
+	isShowImageMarker: boolean;
+}
+
+export interface IMarkerSettings {
+	markerType: EMarkerTypes;
+	markerShape: EMarkerShapeTypes;
+	markerChart: EMarkerChartTypes;
+	markerShapeValue: IconDefinition;
+	markerShapePath: string;
+	markerShapeBase64Url: string;
+	dropdownMarkerType: string;
+	markerStyleType: EMarkerStyleTypes.Marker1Style,
+	marker1Style: MarkerStyleProps;
+	marker2Style: MarkerStyleProps;
+}
+
+export interface MarkerStyleProps {
+	sizeType: EAutoCustomTypes,
+	size: number
 }
 
 export interface IDataLabelsSettings {

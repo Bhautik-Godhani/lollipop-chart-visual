@@ -4,6 +4,7 @@ import { DataValuesType } from "./enum";
 import { IPatternProps } from "./visual-settings.interface";
 
 export interface ILollipopChartRow {
+	uid: string;
 	category: string;
 	value1: number;
 	value2: number;
@@ -21,6 +22,7 @@ export interface ILollipopChartRow {
 	valueType?: DataValuesType;
 	defaultValue?: number;
 	pattern?: IPatternProps;
+	imageDataUrl?: string;
 }
 
 export interface IChartCircleStyles {

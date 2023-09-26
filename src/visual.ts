@@ -32,7 +32,6 @@ import {
 	EVisualSettings,
 	LegendType,
 	LineType,
-	LollipopType,
 	Orientation,
 	PieSize,
 	PieType,
@@ -44,6 +43,10 @@ import {
 	LollipopWidthType,
 	ELegendPosition,
 	EHighContrastColorType,
+	EMarkerChartTypes,
+	EMarkerTypes,
+	EMarkerShapeTypes,
+	EAutoCustomTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -58,7 +61,7 @@ import { paidProperties } from "./PaidProperties";
 import { NumberFormatting, VisualSettings } from "./settings";
 import {
 	CHART_SETTINGS,
-	CIRCLE_SETTINGS,
+	MARKER_SETTINGS,
 	DATA_COLORS,
 	DATA_LABELS_SETTINGS,
 	GRID_LINES_SETTINGS,
@@ -76,7 +79,6 @@ import {
 	IBrushConfig,
 	IChartSettings,
 	ICirclePropsSettings,
-	ICircleSettings,
 	IConditionalFormattingProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
@@ -86,6 +88,7 @@ import {
 	ILabelValuePair,
 	ILegendSettings,
 	ILineSettings,
+	IMarkerSettings,
 	INumberSettings,
 	IPatternProps,
 	IPatternSettings,
@@ -104,7 +107,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat } from "./methods/methods";
+import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -117,9 +120,9 @@ import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Ann
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
 
+import MarkerSettings from "./settings-pages/MarkerSettings";
 import ChartSettings from "./settings-pages/ChartSettings";
 import DataColorsSettings from "./settings-pages/DataColorsSettings";
-import CircleSettings from "./settings-pages/CircleSettings";
 import LineSettings from "./settings-pages/LineSettings";
 import DataLabelsSettings from "./settings-pages/DataLabelsSettings";
 import GridLinesSettings from "./settings-pages/GridLinesSettings";
@@ -132,6 +135,8 @@ import XAxisSettings from "./settings-pages/XAxisSettings";
 import YAxisSettings from "./settings-pages/YAxisSettings";
 
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
+import { CATEGORY_MARKERS } from "./settings-pages/markers";
+import { IMarkerData } from "./settings-pages/markerSelector";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -168,6 +173,8 @@ export class Visual extends Shadow {
 	public footerHeight: number = 0;
 	private highContrastDetails: IHighContrastDetails = { isHighContrast: false };
 	private isPatternApplied: boolean;
+	public isLollipopTypeCircle: boolean;
+	public isLollipopTypePie: boolean;
 
 	// CATEGORICAL DATA
 	public clonedCategoricalData: powerbi.DataViewCategorical;
@@ -179,6 +186,7 @@ export class Visual extends Shadow {
 	public categoricalMeasure2Field: powerbi.DataViewValueColumn;
 	public categoricalTooltipFields: powerbi.DataViewValueColumn[];
 	public categoricalSortFields: powerbi.DataViewValueColumn[];
+	public categoricalImagesDataField: powerbi.DataViewValueColumn;
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
@@ -199,6 +207,7 @@ export class Visual extends Shadow {
 	isHasMultiMeasure: boolean;
 	isHasSubcategories: boolean;
 	isHasCategories: boolean;
+	isHasImagesData: boolean;
 	isSortDataFieldsAdded: boolean;
 	sortFieldsDisplayName: ILabelValuePair[];
 	blankText: string = "(Blank)";
@@ -261,6 +270,7 @@ export class Visual extends Shadow {
 	public xScaleWidth: number;
 	public xScalePaddingOuter: number = 0.25;
 	public isBottomXAxis: boolean;
+	public xAxisStartMargin: number = 5;
 
 	// yAxis
 	public yAxisG: Selection<SVGElement>;
@@ -298,18 +308,20 @@ export class Visual extends Shadow {
 	// circle
 	public circleClass: string = "lollipop-circle";
 	public circleClassSelector: string = ".lollipop-circle";
+	public minCircleSize: number = 20;
+	public maxCircleSize: number = 40;
 
 	// circle1
 	public circle1G: any;
 	public circle1Selection: any;
-	public circle1Radius: any;
+	public circle1Size: any;
 	public circle1Class: string = "lollipop-circle1";
 	public circle1ClassSelector: string = ".lollipop-circle1";
 
 	// circle2
 	public circle2G: any;
 	public circle2Selection: any;
-	public circle2Radius: number;
+	public circle2Size: number;
 	public circle2Class: string = "lollipop-circle2";
 	public circle2ClassSelector: string = ".lollipop-circle2";
 
@@ -329,6 +341,8 @@ export class Visual extends Shadow {
 	pieEmphasizeScaleSize: number = 4;
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
+	public minPieSize: number = 15;
+	public maxPieSize: number = 30;
 
 	// pie1
 	ePie1ChartOptions: EChartsOption;
@@ -357,19 +371,19 @@ export class Visual extends Shadow {
 	categoryPatterns: IPatternProps[];
 	subCategoryPatterns: IPatternProps[];
 
+	// image marker
+	imageMarkerClass: string = "image-marker";
+	imageMarkerClassSelector: string = ".image-marker";
+
 	// settings
 	isHorizontalChart: boolean = false;
-	circleSettings: ICircleSettings;
-	circle1Settings: ICirclePropsSettings;
-	circle2Settings: ICirclePropsSettings;
 	chartSettings: IChartSettings;
+	markerSettings: IMarkerSettings;
 	dataLabelsSettings: IDataLabelsSettings;
 	xAxisSettings: IXAxisSettings;
 	yAxisSettings: IYAxisSettings;
 	lineSettings: ILineSettings;
 	pieSettings: IPieSettings;
-	pie1Settings: IPiePropsSettings;
-	pie2Settings: IPiePropsSettings;
 	legendSettings: ILegendSettings;
 	numberSettings: NumberFormatting;
 	xGridSettings: IXGridLinesSettings;
@@ -425,16 +439,16 @@ export class Visual extends Shadow {
 					Component: () => ChartSettings,
 				},
 				{
+					name: "Marker Settings",
+					sectionName: "markerConfig",
+					propertyName: "markerSettings",
+					Component: () => MarkerSettings,
+				},
+				{
 					name: "Data Colors",
 					sectionName: "dataColorsConfig",
 					propertyName: "dataColorsSettings",
 					Component: () => DataColorsSettings,
-				},
-				{
-					name: "Circle Settings",
-					sectionName: "circleConfig",
-					propertyName: "circleSettings",
-					Component: () => CircleSettings,
 				},
 				{
 					name: "Line Settings",
@@ -847,11 +861,21 @@ export class Visual extends Shadow {
 		const categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		const categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
 		const categoricalSortFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Sort]);
+		const categoricalImageDataFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ImagesData]);
+
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.isHasMultiMeasure = categoricalMeasureFields.length > 1;
 		this.isHasSubcategories = !!categoricalSubCategoryField;
-		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))];
+		this.isHasImagesData = !!categoricalImageDataFields;
+		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))] as any;
+
+		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
+			this.markerSettings.markerType = EMarkerTypes.SHAPE;
+		}
+
+		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
+		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
 
 		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields);
 
@@ -1048,7 +1072,7 @@ export class Visual extends Shadow {
 		}
 
 		this.categoryLabelHeight = getSVGTextSize("Label", this.yAxisSettings.labelFontFamily, this.yAxisSettings.labelFontSize).height;
-		const maxCirclerRadius = d3.max([this.circle1Radius, this.circle2Radius]);
+		const maxCirclerRadius = d3.max([this.circle1Size, this.circle2Size]);
 
 		if (this.brushScaleBandBandwidth < maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin) {
 			this.brushScaleBandBandwidth += maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin;
@@ -1164,6 +1188,7 @@ export class Visual extends Shadow {
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		this.categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
 		this.categoricalSortFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Sort]);
+		this.categoricalImagesDataField = categoricalData.values.find((d) => !!d.source.roles[EDataRolesName.ImagesData]);
 
 		if (this.measureNames.length > 1) {
 			this.categoricalMeasure1Field = this.categoricalMeasureFields[0];
@@ -1176,6 +1201,7 @@ export class Visual extends Shadow {
 
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
+		this.isHasImagesData = !!this.categoricalImagesDataField;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 
 		// if (!this.isHasSubcategories) {
@@ -1379,7 +1405,7 @@ export class Visual extends Shadow {
 			this.settingsPopupOptionsHeight = popupOptions ? (popupOptions.clientHeight ? popupOptions.clientHeight : 0) : 0;
 			this.settingsBtnWidth = vizOptions.options.isInFocus ? this.settingsPopupOptionsWidth : 0;
 			this.settingsBtnHeight = popupOptionsHeader ? popupOptionsHeader.clientHeight : 0;
-			this.isDisplayLegend2 = this.isHasMultiMeasure && this.chartSettings.lollipopType !== LollipopType.Circle;
+			this.isDisplayLegend2 = this.isHasMultiMeasure && this.isLollipopTypePie;
 
 			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
 			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.xAxisSettings;
@@ -1421,7 +1447,7 @@ export class Visual extends Shadow {
 				this.createLegendContainer(LegendType.Legend2);
 			}
 
-			if (this.legendSettings.show && (this.chartSettings.lollipopType !== LollipopType.Circle || this.isHasMultiMeasure)) {
+			if (this.legendSettings.show && (this.isLollipopTypePie || this.isHasMultiMeasure)) {
 				d3.select("div.legend-wrapper").style("display", "block");
 				this.setLegendsData();
 				this.legendSettings.legendColor = this.getColor(this.legendSettings.legendColor, EHighContrastColorType.Foreground);
@@ -1530,6 +1556,20 @@ export class Visual extends Shadow {
 			// this.drawTooltip();
 
 			createPatternsDefs(this, this.svg);
+			createMarkerDefs(this, this.svg);
+
+			if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+				const marker = this.markerSettings.markerShapeValue;
+
+				const filterDef = this.svg.append("defs");
+				const symbol = filterDef
+					.append("symbol")
+					.attr("id", marker.iconName + "_MARKER")
+					.attr("viewBox", `0 0 ${marker.icon[0]} ${marker.icon[1]}`);
+
+				symbol.append("path")
+					.attr("d", this.markerSettings.markerShapePath);
+			}
 
 			if (!this.isHasSubcategories) {
 				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
@@ -1694,7 +1734,7 @@ export class Visual extends Shadow {
 			? !!this.categoricalData.categories.find((d) => d.source.roles[EDataRolesName.Category])
 			: false;
 		if (!categoricalCategoriesFields) {
-			this.displayValidationPage("Add at least one dimension in the Category field");
+			// this.displayValidationPage("Add at least one dimension in the Category field");
 			this._events.renderingFailed(this.vizOptions.options, "Add at least one dimension in the Category field");
 			return true;
 		}
@@ -1710,14 +1750,14 @@ export class Visual extends Shadow {
 			)
 			: [];
 		if (categoricalMeasureFields.length === 0) {
-			this.displayValidationPage("Please enter measure data");
+			// this.displayValidationPage("Please enter measure data");
 			this._events.renderingFailed(this.vizOptions.options, "Please enter measure data");
 			return true;
 		}
 
 		const categoricalCategoryFields = this.categoricalData.categories.filter((d) => d.source.roles[EDataRolesName.Category]);
 		if (!categoricalCategoryFields.some((d) => d.values.length > 1) && categoricalMeasureFields[0].values.length === 0) {
-			this.displayValidationPage("Empty measure and category");
+			// this.displayValidationPage("Empty measure and category");
 			this._events.renderingFailed(this.vizOptions.options, "Empty measure and category");
 			return true;
 		}
@@ -1789,7 +1829,7 @@ export class Visual extends Shadow {
 		) as string[];
 
 		const measureGroup = d3.group(this.categoricalMeasureFields, (d) => d.source.displayName);
-		const subCategoriesGroup = d3.group(categoricalData.values, (d) => d.source.groupName);
+		const subCategoriesGroup = d3.group(categoricalData.values, (d: any) => d.source.groupName);
 
 		const getSubCategoryData = (idx: number): IChartSubCategory[] => {
 			const data = this.subCategoriesName.reduce((arr, cur, i) => {
@@ -1817,10 +1857,25 @@ export class Visual extends Shadow {
 			return data;
 		};
 
+		const getUID = (category: string) => {
+			return `${category}-
+			${this.isHasSubcategories}-
+			${this.isHasMultiMeasure}-
+			${this.isHasImagesData}-
+			${categoricalData.categories[0].values.length}-
+			${categoricalData.values.length}-
+			${this.markerSettings.markerType}-
+			${this.markerSettings.markerShape}-
+			${this.markerSettings.markerChart}-
+			${this.chartSettings.isShowImageMarker}`;
+		}
+
 		const data: ILollipopChartRow[] = this.categoriesName.map((cat, idx) => ({
+			uid: getUID(cat),
 			category: <string>cat,
 			value1: !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0,
 			value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
+			imageDataUrl: this.isHasImagesData ? <string>this.categoricalImagesDataField.values[idx] : null,
 			identity: undefined,
 			selected: false,
 			isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
@@ -1915,10 +1970,10 @@ export class Visual extends Shadow {
 			...chartConfig,
 		};
 
-		const circleConfig = JSON.parse(formatTab[EVisualConfig.CircleConfig][EVisualSettings.CircleSettings]);
-		this.circleSettings = {
-			...CIRCLE_SETTINGS,
-			...circleConfig,
+		const markerConfig = JSON.parse(formatTab[EVisualConfig.MarkerConfig][EVisualSettings.MarkerSettings]);
+		this.markerSettings = {
+			...MARKER_SETTINGS,
+			...markerConfig,
 		};
 
 		const lineConfig = JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]);
@@ -1957,7 +2012,7 @@ export class Visual extends Shadow {
 		};
 
 		// Data Colors Settings
-		// if (this.chartSettings.lollipopType === LollipopType.Circle) {
+		// if (this.isLollipopTypeCircle) {
 		//     DATA_COLORS.dataType = CircleType.Circle1;
 		// } else {
 		//     DATA_COLORS.dataType = PieType.Pie1;
@@ -2003,10 +2058,10 @@ export class Visual extends Shadow {
 		this.changeVisualSettings();
 
 		// if (!this.isHasSubcategories) {
-		// 	this.chartSettings.lollipopType = LollipopType.Circle;
+		// 	this.isLollipopTypeCircle;
 		// 	CHART_SETTINGS.isLollipopTypeChanged = false;
 		// 	this.chartSettings.isLollipopTypeChanged = false;
-		// 	const chartConfig: IChartSettings = {...this.chartSettings, lollipopType: LollipopType.Circle, isLollipopTypeChanged: false};
+		// 	const chartConfig: IChartSettings = {...this.chartSettings, lollipopType: LollipopType.CIRCLE, isLollipopTypeChanged: false};
 		// 	formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings] = JSON.stringify(chartConfig);
 		// 	const dataColorsConfig: IDataColorsSettings = {...this.dataColorsSettings, dataType: CircleType.Circle1};
 		// 	formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings] = JSON.stringify(dataColorsConfig);
@@ -2020,7 +2075,7 @@ export class Visual extends Shadow {
 		// 	}
 		// }
 
-		// if (!Object.keys(clonedDataLabelsSettings).length || this.chartSettings.lollipopType !== LollipopType.Circle) {
+		// if (!Object.keys(clonedDataLabelsSettings).length || isLollipopTypePie) {
 		// 	const color = this.dataLabelsSettings.color;
 		// 	if (color === "#fff" || color === "rgba(255, 255, 255, 1)") {
 		// 		this.dataLabelsSettings.color = "rgb(102,102,102)";
@@ -2030,12 +2085,8 @@ export class Visual extends Shadow {
 
 	changeVisualSettings(): void {
 		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
-		this.circle1Settings = this.circleSettings.circle1;
-		this.circle2Settings = this.circleSettings.circle2;
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
-		this.pie1Settings = this.chartSettings.pieSettings.pie1;
-		this.pie2Settings = this.chartSettings.pieSettings.pie2;
 		this.isPatternApplied = this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
 
 		if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
@@ -2071,7 +2122,7 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// }
-		// if (this.chartSettings.lollipopType !== LollipopType.Circle && rankingSettings.isSubcategoriesRanking) {
+		// if (isLollipopTypePie && rankingSettings.isSubcategoriesRanking) {
 		// 	const valueType = this.rankingSettings.valueType === RankingDataValuesType.Value1 ? RankingDataValuesType.Value1 : RankingDataValuesType.Value2;
 		// 	this.chartData.forEach((data) => {
 		// 		data.subCategories.sort((a, b) => b[valueType] - a[valueType]);
@@ -2147,7 +2198,7 @@ export class Visual extends Shadow {
 		// 	}
 		// }
 		// if (rankingSettings.isSubcategoriesRanking && subCategoriesRanking.showRemainingAsOthers) {
-		// 	if (this.chartSettings.lollipopType !== LollipopType.Circle) {
+		// 	if (isLollipopTypePie) {
 		// 		if (rankingSettings.subCategoriesRanking.filterType === RankingFilterType.TopN) {
 		// 			this.chartData.forEach((data, i1) => {
 		// 				if (i1 + 1 <= rankingSettings.count) {
@@ -2181,7 +2232,7 @@ export class Visual extends Shadow {
 	}
 
 	setColorsByDataColorsSettings(): void {
-		if (this.chartSettings.lollipopType === LollipopType.Circle) {
+		if (this.isLollipopTypeCircle) {
 			this.setCircleColors();
 		} else {
 			this.setPieColors(PieType.Pie1);
@@ -2209,7 +2260,7 @@ export class Visual extends Shadow {
 			return;
 		}
 
-		// Circle 1 Colors
+		//.CIRCLE 1 Colors
 		switch (this.dataColorsSettings.circle1.fillType) {
 			case ColorPaletteType.Single: {
 				this.chartData.forEach((data) => {
@@ -2607,7 +2658,7 @@ export class Visual extends Shadow {
 				})`
 			)
 			.call(brush)
-			.call(brush.move, [0, heightByExpectedBar]);
+			.call(brush.move as any, [0, heightByExpectedBar]);
 
 		if (this.brushAndZoomAreaSettings.enabled) {
 			this.brushG.selectAll("rect").attr("width", this.brushWidth).attr("rx", 0).attr("ry", 0);
@@ -2823,7 +2874,7 @@ export class Visual extends Shadow {
 				`translate(${this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width}, ${this.margin.top})`
 			)
 			.call(brush)
-			.call(brush.move, [0, heightByExpectedBar]);
+			.call(brush.move as any, [0, heightByExpectedBar]);
 		d3.select(brushG).selectAll(".handle").remove();
 	}
 
@@ -2870,7 +2921,7 @@ export class Visual extends Shadow {
 	}
 
 	updatePiePositionOnBrushMove(): void {
-		if (this.chartSettings.lollipopType !== LollipopType.Circle) {
+		if (this.isLollipopTypePie) {
 			const pie1ViewBoxRadius = this.pie1Radius + (this.pie1Radius * (this.pieEmphasizeScaleSize * 2)) / 100;
 			const pie2ViewBoxRadius = this.pie2Radius + (this.pie2Radius * (this.pieEmphasizeScaleSize * 2)) / 100;
 			this.pieG
@@ -2951,7 +3002,7 @@ export class Visual extends Shadow {
 		};
 
 		// switch (this.chartSettings.lollipopType) {
-		// 	case LollipopType.Circle: {
+		// 	case LollipopType.CIRCLE: {
 		// 		this.drawPie1Chart([]);
 		// 		this.drawPie2Chart([]);
 		// 		// this.drawCircle1(this.chartData);
@@ -3051,7 +3102,7 @@ export class Visual extends Shadow {
 	}
 
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
-		const circleRadius = isData2Label ? this.circle2Radius : this.circle1Radius;
+		const circleRadius = isData2Label ? this.circle2Size : this.circle1Size;
 		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			return this.dataLabelsSettings.fontSize;
 		}
@@ -3118,12 +3169,12 @@ export class Visual extends Shadow {
 		let y = 0;
 
 		if (this.isHorizontalChart) {
-			if (this.chartSettings.lollipopType === LollipopType.Circle) {
+			if (this.isLollipopTypeCircle) {
 				x = this.getCircleCX(this.xScale(isPie2 ? d.value2 : d.value1));
 				y = this.getCircleCY(this.yScale(d.category));
 			}
 		} else {
-			if (this.chartSettings.lollipopType === LollipopType.Circle) {
+			if (this.isLollipopTypeCircle) {
 				x = this.getCircleCX(this.xScale(d.category));
 				y = this.getCircleCY(this.yScale(isPie2 ? d.value2 : d.value1));
 			}
@@ -3242,7 +3293,7 @@ export class Visual extends Shadow {
 	}
 
 	transformData1LabelOutside(labelSelection: any): void {
-		const labelDistance = this.chartSettings.lollipopType === LollipopType.Circle ? this.circle1Radius / 0.7 : this.pie1Radius / 0.7;
+		const labelDistance = this.isLollipopTypeCircle ? this.circle1Size / 0.7 : this.pie1Radius / 0.7;
 
 		if (this.isHorizontalChart) {
 			this.transformHorizontalData1LabelOutside(labelSelection, labelDistance);
@@ -3253,7 +3304,7 @@ export class Visual extends Shadow {
 
 	transformData2LabelOutside(labelSelection: any): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = this.chartSettings.lollipopType === LollipopType.Circle ? this.circle2Radius / 0.7 : this.pie2Radius / 0.7;
+		const labelDistance = this.isLollipopTypeCircle ? this.circle2Size / 0.7 : this.pie2Radius / 0.7;
 
 		const fn = (d, bBox) => {
 			if (this.isHorizontalChart) {
@@ -3849,7 +3900,7 @@ export class Visual extends Shadow {
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
+			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - 5, 0] : [0, yScaleHeight]);
 		}
 	}
 
@@ -3861,7 +3912,7 @@ export class Visual extends Shadow {
 					.ticks(this.width / 90)
 					.tickFormat((d) => {
 						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					})
+					}) as any
 			);
 			// .selectAll('text')
 			// .attr('dy', '0.35em')
@@ -3873,7 +3924,7 @@ export class Visual extends Shadow {
 					.ticks(this.width / 90)
 					.tickFormat((d) => {
 						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					})
+					}) as any
 			);
 			// .selectAll('text')
 			// .attr('dy', '0.35em')
@@ -3887,7 +3938,7 @@ export class Visual extends Shadow {
 					.ticks(this.height / 70)
 					.tickFormat((d) => {
 						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					})
+					}) as any
 			);
 		} else if (this.yAxisSettings.position === Position.Right) {
 			this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
@@ -3896,7 +3947,7 @@ export class Visual extends Shadow {
 					.ticks(this.height / 70)
 					.tickFormat((d) => {
 						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					})
+					}) as any
 			);
 		}
 
@@ -4194,7 +4245,7 @@ export class Visual extends Shadow {
 	}
 
 	categoryLabelsFormatting(labelSelection: Selection<SVGElement>): void {
-		const maxCircleRadius = d3.max([this.circle1Radius, this.circle2Radius]);
+		const maxCircleRadius = d3.max([this.circle1Size, this.circle2Size]);
 		const maxPieRadius = d3.max([this.pie1Radius, this.pie2Radius]);
 
 		labelSelection
@@ -4212,49 +4263,123 @@ export class Visual extends Shadow {
 			.attr("display", "block");
 	}
 
+	imageMarkerFormatting(markerSelection: Selection<SVGImageElement>): void {
+		const maxCircleRadius = d3.max([this.circle1Size, this.circle2Size]);
+		const width = maxCircleRadius * 2;
+		const height = maxCircleRadius * 2;
+		const maxPieRadius = d3.max([this.pie1Radius, this.pie2Radius]);
+
+		markerSelection
+			.attr("x", d => {
+				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
+				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2 - width / 2;
+			})
+			.attr("y", d => {
+				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
+				return cy - maxCircleRadius * 2;
+			})
+			.attr("width", width)
+			.attr("height", height)
+			.attr("xlink:href", (d) => {
+				if (this.isHasImagesData && this.chartSettings.isShowImageMarker && d.imageDataUrl) {
+					return d.imageDataUrl;
+				}
+
+				if (this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url) {
+					return this.markerSettings.markerShapeBase64Url;
+				}
+			});
+	}
+
 	drawLollipop(): void {
-		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData);
+		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
+		let marker: IMarkerData;
+
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = this.markerSettings.markerShapeValue;
+			marker = {
+				label: this.markerSettings.markerShapeValue.iconName,
+				value: this.markerSettings.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: this.markerSettings.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker = CATEGORY_MARKERS.find(d => d.value === this.markerSettings.dropdownMarkerType);
+		}
+
 		this.lollipopSelection = lollipopSelection.join(
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "lollipop-group");
 				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
-				if (this.chartSettings.lollipopType === LollipopType.Circle) {
-					const circle1Selection = lollipopG.append("circle")
-						.datum(d => {
-							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-						})
-						.attr("id", CircleType.Circle1)
-						.classed(this.circleClass, true)
-						.classed(this.circle1Class, true);
-					this.setCircle1Formatting(circle1Selection);
+				if (((this.isHasImagesData && this.chartSettings.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+					const imageMarkerSelection: Selection<any> = lollipopG.append("svg:image")
+						.classed(this.imageMarkerClass, true);
 
-					if (this.isHasMultiMeasure) {
-						const circle2Selection = lollipopG.append("circle")
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-							})
-							.attr("id", CircleType.Circle2)
-							.classed(this.circleClass, true).classed(this.circle2Class, true);
-						this.setCircle2Formatting(circle2Selection);
-					}
+					this.imageMarkerFormatting(imageMarkerSelection);
 				} else {
-					const pie1Selection = lollipopG.append("foreignObject")
-						.datum(d => {
-							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-						})
-						.attr("id", "pie1ForeignObject");
-					this.enterPieChart(pie1Selection);
-					this.setPieDataLabelsDisplayStyle();
+					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+						const symbol = lollipopG.append("defs")
+							.append("symbol")
+							.attr("id", d => `${d.category}_${marker.value}_MARKER`)
+							.attr("class", "marker-symbol")
+							.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
 
-					if (this.isHasMultiMeasure) {
-						const pie2Selection = lollipopG.append("foreignObject")
+						const path1Selection = symbol.append("path")
 							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 							})
-							.attr("id", "pie2ForeignObject");
-						this.enterPieChart(pie2Selection, true);
-						this.setPieDataLabelsDisplayStyle(true);
+							.attr("d", marker.paths[0].d)
+							.attr("class", "marker1-path");
+
+						const circle1Selection = lollipopG.append("use")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							})
+							.attr("id", CircleType.Circle1)
+							.classed(this.circleClass, true)
+							.classed(this.circle1Class, true);
+
+						this.setPath1Formatting(path1Selection);
+						this.setCircle1Formatting(circle1Selection, marker);
+
+						if (this.isHasMultiMeasure) {
+							const path2Selection = symbol.append("path")
+								.datum(d => {
+									return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+								})
+								.attr("d", marker.paths[0].d)
+								.attr("class", "marker2-path");
+
+							const circle2Selection = lollipopG.append("use")
+								.datum(d => {
+									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+								})
+								.attr("id", CircleType.Circle2)
+								.classed(this.circleClass, true).classed(this.circle2Class, true);
+
+							this.setPath2Formatting(path2Selection);
+							this.setCircle2Formatting(circle2Selection, marker);
+						}
+					} else {
+						const pie1Selection = lollipopG.append("foreignObject")
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							})
+							.attr("id", "pie1ForeignObject");
+						this.enterPieChart(pie1Selection);
+						this.setPieDataLabelsDisplayStyle();
+
+						if (this.isHasMultiMeasure) {
+							const pie2Selection = lollipopG.append("foreignObject")
+								.datum(d => {
+									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+								})
+								.attr("id", "pie2ForeignObject");
+							this.enterPieChart(pie2Selection, true);
+							this.setPieDataLabelsDisplayStyle(true);
+						}
 					}
 				}
 
@@ -4272,23 +4397,46 @@ export class Visual extends Shadow {
 			},
 			(update) => {
 				const lineSelection = update.select(this.lineClassSelector);
-				const circle1Selection = update.datum(d => {
+
+				const markerSymbolSelection = update
+					.select(".marker-symbol");
+
+				if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+					markerSymbolSelection
+						.attr("id", d => `${d.category}_${marker.value}_MARKER`)
+						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+				}
+
+				const path1Selection = update.select(".marker1-path").datum(d => {
 					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				}).select(this.circle1ClassSelector);
-				const circle2Selection = update.datum(d => {
+				}).attr("d", this.isLollipopTypeCircle ? marker.paths[0].d : "");
+
+				const circle1Selection = update.select(this.circle1ClassSelector).datum(d => {
+					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				});
+
+				const path2Selection = update.select(".marker1-path").datum(d => {
+					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				}).attr("d", this.isLollipopTypeCircle ? marker.paths[0].d : "");
+
+				const circle2Selection = update.select(this.circle2ClassSelector).datum(d => {
 					return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-				}).select(this.circle2ClassSelector);
+				});
+
 				const pie1Selection = update
+					.select("#pie1ForeignObject")
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-					})
-					.select("#pie1ForeignObject");
+					});
+
 				const pie2Selection = update
+					.select("#pie2ForeignObject")
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-					})
-					.select("#pie2ForeignObject");
+					});
+
 				const categoryLabelSelection: Selection<SVGElement> = update.select(".category-label");
+				const imageMarkerSelection: Selection<any> = update.select(this.imageMarkerClassSelector);
 
 				if (this.isHorizontalChart) {
 					this.setHorizontalLinesFormatting(lineSelection);
@@ -4296,27 +4444,33 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection);
 				}
 
-				if (this.chartSettings.lollipopType === LollipopType.Circle) {
-					pie1Selection.remove();
-					pie2Selection.remove();
-
-					this.setCircle1Formatting(circle1Selection);
-
-					if (this.isHasMultiMeasure) {
-						this.setCircle2Formatting(circle2Selection);
-					} else {
-						circle2Selection.remove();
-					}
+				if (((this.isHasImagesData && this.chartSettings.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+					this.imageMarkerFormatting(imageMarkerSelection);
 				} else {
-					circle1Selection.remove();
-					circle2Selection.remove();
+					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+						pie1Selection.remove();
+						pie2Selection.remove();
 
-					this.updatePieChart(pie1Selection);
-					this.setPieDataLabelsDisplayStyle();
+						this.setPath1Formatting(path1Selection);
+						this.setCircle1Formatting(circle1Selection, marker);
 
-					if (this.isHasMultiMeasure) {
-						this.updatePieChart(pie2Selection, true);
-						this.setPieDataLabelsDisplayStyle(true);
+						if (this.isHasMultiMeasure) {
+							this.setPath2Formatting(path2Selection);
+							this.setCircle2Formatting(circle2Selection, marker);
+						} else {
+							circle2Selection.remove();
+						}
+					} else {
+						circle1Selection.remove();
+						circle2Selection.remove();
+
+						this.updatePieChart(pie1Selection);
+						this.setPieDataLabelsDisplayStyle();
+
+						if (this.isHasMultiMeasure) {
+							this.updatePieChart(pie2Selection, true);
+							this.setPieDataLabelsDisplayStyle(true);
+						}
 					}
 				}
 
@@ -4361,39 +4515,45 @@ export class Visual extends Shadow {
 		}
 	}
 
-	// Circle
+	//.CIRCLE
 	setCircle1Radius(): void {
-		const maxCircleRadius = this.circle1Settings.maxCircleRadius;
-		if (this.circle1Settings.circleSize === CircleSize.Auto) {
-			if (this.isHorizontalChart) {
-				this.circle1Radius = this.height * 0.04 < maxCircleRadius ? this.height * 0.04 : maxCircleRadius;
-			} else {
-				this.circle1Radius = this.width * 0.02 < maxCircleRadius ? this.width * 0.02 : maxCircleRadius;
+		const marker1Style = this.markerSettings.marker1Style;
+		if (marker1Style.sizeType === EAutoCustomTypes.Auto) {
+			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]);
+			if (size < this.maxCircleSize && size > this.minCircleSize) {
+				this.circle1Size = size;
+			} else if (size > this.maxCircleSize) {
+				this.circle1Size = this.maxCircleSize;
+			} else if (size < this.minCircleSize) {
+				this.circle1Size = this.minCircleSize;
 			}
 		} else {
-			this.circle1Radius = this.circle1Settings.circleRadius;
+			this.circle1Size = marker1Style.size;
 		}
 	}
 
 	setCircle2Radius(): void {
-		const maxCircleRadius = this.circle2Settings.maxCircleRadius;
-		if (this.circle2Settings.circleSize === CircleSize.Auto) {
-			if (this.isHorizontalChart) {
-				this.circle2Radius = this.height * 0.04 < maxCircleRadius ? this.height * 0.04 : maxCircleRadius;
-			} else {
-				this.circle2Radius = this.width * 0.04 < maxCircleRadius ? this.width * 0.04 : maxCircleRadius;
+		const marker2Style = this.markerSettings.marker2Style;
+		if (marker2Style.sizeType === EAutoCustomTypes.Auto) {
+			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]);
+			if (size < this.maxCircleSize && size > this.minCircleSize) {
+				this.circle2Size = size;
+			} else if (size > this.maxCircleSize) {
+				this.circle2Size = this.maxCircleSize;
+			} else if (size < this.minCircleSize) {
+				this.circle2Size = this.minCircleSize;
 			}
 		} else {
-			this.circle2Radius = this.circle2Settings.circleRadius;
+			this.circle2Size = marker2Style.size;
 		}
 	}
 
 	getOverflowCircleCXDiff(x: number): number {
 		let diff = 0;
 		if (this.yAxisSettings.position === Position.Left) {
-			diff = x <= this.circle1Radius ? this.circle1Radius - x : 0;
+			diff = x <= this.circle1Size ? this.circle1Size - x : 0;
 		} else {
-			diff = this.width - x <= this.circle1Radius ? this.circle1Radius - (this.width - x) : 0;
+			diff = this.width - x <= this.circle1Size ? this.circle1Size - (this.width - x) : 0;
 		}
 		return diff;
 	}
@@ -4401,67 +4561,57 @@ export class Visual extends Shadow {
 	getOverflowCircleCYDiff(y: number): number {
 		let diff = 0;
 		if (this.xAxisSettings.position === Position.Bottom) {
-			diff = this.height - y <= this.circle1Radius ? this.circle1Radius - (this.height - y) : 0;
+			diff = this.height - y <= this.circle1Size ? this.circle1Size - (this.height - y) : 0;
 		} else {
-			diff = y <= this.circle1Radius ? this.circle1Radius - y : 0;
+			diff = y <= this.circle1Size ? this.circle1Size - y : 0;
 		}
 		return diff;
 	}
 
 	getCircleCX(x: number): number {
 		const diff = this.getOverflowCircleCXDiff(x);
-		return x ? (this.yAxisSettings.position === Position.Left ? x + diff : x - diff) : this.circle1Radius;
+		return x ? (this.yAxisSettings.position === Position.Left ? x + diff : x - diff) : this.circle1Size;
 	}
 
 	getCircleCY(y: number): number {
 		const diff = this.getOverflowCircleCYDiff(y);
-		return y ? (this.xAxisSettings.position === Position.Bottom ? y - diff : y + diff) : this.circle1Radius;
+		return y ? (this.xAxisSettings.position === Position.Bottom ? y - diff : y + diff) : this.circle1Size;
 	}
 
-	setCircle1Formatting(circleSelection: any): void {
+	setPath1Formatting(circleSelection: any): void {
+		circleSelection
+			.style("fill", (d: ILollipopChartRow) => {
+				const color = this.getColor(d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor], EHighContrastColorType.Foreground);
+				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+				} else {
+					return color;
+				}
+			}
+			);
+	}
+
+	setCircle1Formatting(circleSelection: any, marker: IMarkerData): void {
 		this.setCircle1Radius();
 		circleSelection
-			.attr("cx", (d) => {
+			.attr("x", (d) => {
 				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
-				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
+				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
 			})
-			.attr("cy", (d) => {
+			.attr("y", (d) => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
-				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
+				return !this.isHorizontalChart ? cy - this.circle1Size : cy + this.scaleBandWidth / 2;
 			})
-			.attr("r", this.circle1Radius)
-			.attr("stroke", (d) => this.getColor(d.styles[CircleType.Circle1][CategoryDataColorProps.strokeColor], EHighContrastColorType.Foreground))
-			.attr("stroke-width", this.circle1Settings.strokeWidth)
-			.attr("opacategory", 1)
-			.style("fill", (d: ILollipopChartRow) => {
-				const color = this.getColor(this.circle1Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor] : "#fff", EHighContrastColorType.Foreground);
-				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
-				} else {
-					return color;
-				}
-			}
-			)
-			.style("display", this.circle1Settings.show ? "block" : "none");
+			.attr("width", this.circle1Size)
+			.attr("height", this.circle1Size)
+			.attr("href", d => `#${d.category}_${marker.value}_MARKER`)
+			.style("display", "block");
 	}
 
-	setCircle2Formatting(circleSelection: any): void {
-		this.setCircle2Radius();
+	setPath2Formatting(circleSelection: any): void {
 		circleSelection
-			.attr("cx", (d) => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
-				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2;
-			})
-			.attr("cy", (d) => {
-				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
-				return !this.isHorizontalChart ? this.getCircleCY(cy) : cy + this.scaleBandWidth / 2;
-			})
-			.attr("r", this.circle2Radius)
-			.attr("stroke", (d) => this.getColor(d.styles[CircleType.Circle2][CategoryDataColorProps.strokeColor], EHighContrastColorType.Foreground))
-			.attr("stroke-width", this.circle2Settings.strokeWidth)
-			.attr("opacategory", 1)
 			.style("fill", (d) => {
-				const color = this.getColor(this.circle2Settings.isCircleFilled === CircleFillOption.Yes ? d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor] : "#fff", EHighContrastColorType.Foreground);
+				const color = this.getColor(d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor], EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -4469,89 +4619,124 @@ export class Visual extends Shadow {
 				}
 			}
 			)
-			.style("display", (d) => (this.circle2Settings.show && this.isHasMultiMeasure && d.value2 ? "block" : "none"));
+			.style("display", "block");
+	}
+
+	setCircle2Formatting(circleSelection: any, marker: IMarkerData): void {
+		this.setCircle2Radius();
+		circleSelection
+			.attr("x", (d) => {
+				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
+				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+			})
+			.attr("y", (d) => {
+				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
+				return !this.isHorizontalChart ? cy - this.circle2Size : cy + this.scaleBandWidth / 2;
+			})
+			.attr("width", this.circle2Size)
+			.attr("height", this.circle2Size)
+			.attr("href", d => `#${d.category}_${marker.value}_MARKER`)
+			.style("display", (d) => (this.isHasMultiMeasure && d.value2 ? "block" : "none"));
 	}
 
 	drawCircle1(data: ILollipopChartRow[]): void {
-		const circleSelection1 = this.circle1G.selectAll(".chart-circle1").data(data);
-		this.circle1Selection = circleSelection1.join(
-			(enter) => {
-				const circleSelection = enter.append("circle");
-				this.setCircle1Formatting(circleSelection);
-				return circleSelection;
-			},
-			(update) => {
-				this.setCircle1Formatting(update);
-				return update;
-			}
-		);
+		// const circleSelection1 = this.circle1G.selectAll(".chart-circle1").data(data);
+		// this.circle1Selection = circleSelection1.join(
+		// 	(enter) => {
+		// 		const circleSelection = enter.append("circle");
+		// 		this.setCircle1Formatting(circleSelection);
+		// 		return circleSelection;
+		// 	},
+		// 	(update) => {
+		// 		this.setCircle1Formatting(update);
+		// 		return update;
+		// 	}
+		// );
 	}
 
 	drawCircle2(data: ILollipopChartRow[]): void {
-		const circleSelection2 = this.circle2G.selectAll(".chart-circle2").data(data);
-		this.circle2Selection = circleSelection2.join(
-			(enter) => {
-				const circleSelection = enter.append("circle");
-				this.setCircle2Formatting(circleSelection);
-				return circleSelection;
-			},
-			(update) => {
-				this.setCircle2Formatting(update);
-				return update;
-			}
-		);
+		// const circleSelection2 = this.circle2G.selectAll(".chart-circle2").data(data);
+		// this.circle2Selection = circleSelection2.join(
+		// 	(enter) => {
+		// 		const circleSelection = enter.append("circle");
+		// 		this.setCircle2Formatting(circleSelection);
+		// 		return circleSelection;
+		// 	},
+		// 	(update) => {
+		// 		this.setCircle2Formatting(update);
+		// 		return update;
+		// 	}
+		// );
 	}
 
 	// Pie
 	setPie1Radius(): void {
-		const maxPieRadius = this.pie1Settings.maxPieRadius;
-		if (this.pie1Settings.pieSize === PieSize.Auto) {
-			this.pie1Radius = this.scaleBandWidth / 4 < maxPieRadius ? this.scaleBandWidth / 4 : maxPieRadius;
+		const marker1Style = this.markerSettings.marker1Style;
+		if (marker1Style.sizeType === EAutoCustomTypes.Auto) {
+			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]) / 2;
+			if (size < this.maxPieSize && size > this.minPieSize) {
+				this.pie1Radius = size;
+			} else if (size > this.maxPieSize) {
+				this.pie1Radius = this.maxPieSize;
+			} else if (size < this.minPieSize) {
+				this.pie1Radius = this.minPieSize;
+			}
 		} else {
-			this.pie1Radius = this.pie1Settings.pieRadius;
+			this.pie1Radius = marker1Style.size;
 		}
 	}
 
 	setPie2Radius(): void {
-		const maxPieRadius = this.pie2Settings.maxPieRadius;
-		if (this.pie2Settings.pieSize === PieSize.Auto) {
-			this.pie2Radius = this.scaleBandWidth / 4 < maxPieRadius ? this.scaleBandWidth / 4 : maxPieRadius;
+		const marker2Style = this.markerSettings.marker2Style;
+		if (marker2Style.sizeType === EAutoCustomTypes.Auto) {
+			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]) / 2;
+			if (size < this.maxPieSize && size > this.minPieSize) {
+				this.pie2Radius = size;
+			} else if (size > this.maxPieSize) {
+				this.pie2Radius = this.maxPieSize;
+			} else if (size < this.minPieSize) {
+				this.pie2Radius = this.minPieSize;
+			}
 		} else {
-			this.pie2Radius = this.pie2Settings.pieRadius;
+			this.pie2Radius = marker2Style.size;
 		}
 	}
 
 	getOverflowPieXDiff(x: number, isPie2: boolean = false): number {
-		let diff = 0;
-		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		if (this.yAxisSettings.position === Position.Left) {
-			diff = x <= radius ? radius - x : 0;
-		} else {
-			diff = this.width - x <= radius ? radius - (this.width - x) : 0;
-		}
-		return diff;
+		// let diff = 0;
+		// const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
+		// if (this.yAxisSettings.position === Position.Left) {
+		// 	diff = x <= radius ? radius - x : 0;
+		// } else {
+		// 	diff = this.width - x <= radius ? radius - (this.width - x) : 0;
+		// }
+		// return diff;
+		return 0;
 	}
 
 	getOverflowPieYDiff(y: number, isPie2: boolean = false): number {
-		let diff = 0;
-		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		if (this.xAxisSettings.position === Position.Bottom) {
-			diff = this.height - y <= radius ? radius - (this.height - y) : 0;
-		} else {
-			diff = y <= radius ? radius - y : 0;
-		}
-		return diff;
+		// let diff = 0;
+		// const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
+		// if (this.xAxisSettings.position === Position.Bottom) {
+		// 	diff = this.height - y <= radius ? radius - (this.height - y) : 0;
+		// } else {
+		// 	diff = y <= radius ? radius - y : 0;
+		// }
+		// return diff;
+		return 0;
 	}
 
 	getPieX(x: number, isPie2: boolean = false): number {
-		const diff = this.getOverflowPieXDiff(x);
+		// const diff = this.getOverflowPieXDiff(x);
+		const diff = 0;
 		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
 		const pieViewBoxRadius = radius * 2;
 		return x ? (this.yAxisSettings.position === Position.Left ? x + diff : x - diff) : pieViewBoxRadius / 2;
 	}
 
 	getPieY(y: number, isPie2: boolean = false): number {
-		const diff = this.getOverflowPieYDiff(y);
+		// const diff = this.getOverflowPieYDiff(y);
+		const diff = 0;
 		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
 		const pieViewBoxRadius = radius * 2;
 		return y ? (this.xAxisSettings.position === Position.Bottom ? y - diff : y + diff) : pieViewBoxRadius / 2;
@@ -4589,14 +4774,14 @@ export class Visual extends Shadow {
 	}
 
 	getPieChartSeriesRadius(): string | string[] | number[] {
-		switch (this.chartSettings.lollipopType) {
-			case LollipopType.Pie: {
+		switch (this.markerSettings.markerChart) {
+			case EMarkerChartTypes.PIE: {
 				return `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`;
 			}
-			case LollipopType.Donut: {
+			case EMarkerChartTypes.DONUT: {
 				return ["55%", `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`];
 			}
-			case LollipopType.Rose: {
+			case EMarkerChartTypes.ROSE: {
 				return ["30%", `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`];
 			}
 			default: {
@@ -4608,18 +4793,18 @@ export class Visual extends Shadow {
 	getPieDataLabelsFontSize(isPie2: boolean = false): number {
 		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
 		let autoFontSize = this.dataLabelsSettings.pieDataLabelFontSize;
-		switch (this.chartSettings.lollipopType) {
-			case LollipopType.Pie:
+		switch (this.markerSettings.markerChart) {
+			case EMarkerChartTypes.PIE:
 				autoFontSize = pieRadius - pieRadius * (this.pieEmphasizeScaleSize / 100);
 				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize / 2);
 				break;
 
-			case LollipopType.Donut:
+			case EMarkerChartTypes.DONUT:
 				autoFontSize = pieRadius - pieRadius * ((45 + this.pieEmphasizeScaleSize) / 100);
 				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize);
 				break;
 
-			case LollipopType.Rose:
+			case EMarkerChartTypes.ROSE:
 				autoFontSize = pieRadius - pieRadius * ((70 + this.pieEmphasizeScaleSize) / 100);
 				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize);
 				break;
@@ -4705,8 +4890,8 @@ export class Visual extends Shadow {
 		};
 
 		const categoryValue = this.chartData.find((d) => d.category === category)[isPie2 ? "value2" : "value1"];
-		switch (this.chartSettings.lollipopType) {
-			case LollipopType.Pie: {
+		switch (this.markerSettings.markerChart) {
+			case EMarkerChartTypes.PIE: {
 				pieOption.series[0].itemStyle = {
 					borderRadius: 0,
 					borderColor: "#fff",
@@ -4715,7 +4900,7 @@ export class Visual extends Shadow {
 				pieOption.series[0].roseType = "";
 				break;
 			}
-			case LollipopType.Donut: {
+			case EMarkerChartTypes.DONUT: {
 				pieOption.series[0].itemStyle = {
 					borderRadius: 10,
 					borderColor: "#fff",
@@ -4724,7 +4909,7 @@ export class Visual extends Shadow {
 				pieOption.series[0].roseType = "";
 				break;
 			}
-			case LollipopType.Rose: {
+			case EMarkerChartTypes.ROSE: {
 				pieOption.series[0].roseType = "area";
 				pieOption.series[0].center = ["50%", "50%"];
 				pieOption.series[0].itemStyle = {
@@ -4760,14 +4945,12 @@ export class Visual extends Shadow {
 			.attr("width", d)
 			.attr("height", d)
 			.attr("x", (d) => {
-				const pieX =
-					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.category)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
-				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
+				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
+				return this.isHorizontalChart ? pieX : pieX + this.scaleBandWidth / 2 - pieRadius;
 			})
 			.attr("y", (d) => {
-				const pieY =
-					this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
-				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
+				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
+				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2;
 			})
 			.attr("opacategory", () => 1)
 			.append("xhtml:div")
@@ -4877,14 +5060,12 @@ export class Visual extends Shadow {
 			.attr("width", d)
 			.attr("height", d)
 			.attr("x", (d) => {
-				const pieX =
-					this.getPieX(this.xScale(this.isHorizontalChart ? d[valueKey] : d.category)) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
-				return pieX > 0 ? pieX - pieViewBoxRadius : pieX - pieViewBoxRadius / 2;
+				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
+				return this.isHorizontalChart ? pieX : pieX + this.scaleBandWidth / 2 - pieRadius;
 			})
 			.attr("y", (d) => {
-				const pieY =
-					this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d[valueKey])) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0);
-				return pieY > 0 ? pieY - pieViewBoxRadius : pieY - pieViewBoxRadius / 2;
+				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
+				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2;
 			})
 			.attr("opacategory", () => 1)
 			.select("#pie")
@@ -4913,40 +5094,40 @@ export class Visual extends Shadow {
 	}
 
 	drawPie1Chart(data: ILollipopChartRow[]): void {
-		data.forEach((d, i) => (d.sortId = 1000 + i));
-		if (this.isRankingSettingsChanged) {
-			this.pieG.selectAll("#pie1ForeignObject").remove();
-		}
-		const pie1ForeignObjectSelection = this.pieG.selectAll("#pie1ForeignObject").data(data, (d, i) => i);
-		pie1ForeignObjectSelection.exit().remove();
-		pie1ForeignObjectSelection.join(
-			(enter) => {
-				const enteredForeignObjects = enter.append("foreignObject");
-				this.enterPieChart(enteredForeignObjects);
-			},
-			(update) => {
-				this.updatePieChart(update);
-			}
-		);
-		this.setPieDataLabelsDisplayStyle();
+		// data.forEach((d, i) => (d.sortId = 1000 + i));
+		// if (this.isRankingSettingsChanged) {
+		// 	this.pieG.selectAll("#pie1ForeignObject").remove();
+		// }
+		// const pie1ForeignObjectSelection = this.pieG.selectAll("#pie1ForeignObject").data(data, (d, i) => i);
+		// pie1ForeignObjectSelection.exit().remove();
+		// pie1ForeignObjectSelection.join(
+		// 	(enter) => {
+		// 		const enteredForeignObjects = enter.append("foreignObject");
+		// 		this.enterPieChart(enteredForeignObjects);
+		// 	},
+		// 	(update) => {
+		// 		this.updatePieChart(update);
+		// 	}
+		// );
+		// this.setPieDataLabelsDisplayStyle();
 	}
 
 	drawPie2Chart(data: ILollipopChartRow[]): void {
-		data.forEach((d, i) => (d.sortId = 2000 + i));
-		if (this.isRankingSettingsChanged) {
-			this.pieG.selectAll("#pie2ForeignObject").remove();
-		}
-		const pie2ForeignObjectSelection = this.pieG.selectAll("#pie2ForeignObject").data(data, (d, i) => i);
-		pie2ForeignObjectSelection.join(
-			(enter) => {
-				const enteredForeignObjects = enter.append("foreignObject");
-				this.enterPieChart(enteredForeignObjects, true);
-			},
-			(update) => {
-				this.updatePieChart(update, true);
-			}
-		);
-		this.setPieDataLabelsDisplayStyle(true);
+		// data.forEach((d, i) => (d.sortId = 2000 + i));
+		// if (this.isRankingSettingsChanged) {
+		// 	this.pieG.selectAll("#pie2ForeignObject").remove();
+		// }
+		// const pie2ForeignObjectSelection = this.pieG.selectAll("#pie2ForeignObject").data(data, (d, i) => i);
+		// pie2ForeignObjectSelection.join(
+		// 	(enter) => {
+		// 		const enteredForeignObjects = enter.append("foreignObject");
+		// 		this.enterPieChart(enteredForeignObjects, true);
+		// 	},
+		// 	(update) => {
+		// 		this.updatePieChart(update, true);
+		// 	}
+		// );
+		// this.setPieDataLabelsDisplayStyle(true);
 	}
 
 	// Legend
@@ -4955,7 +5136,7 @@ export class Visual extends Shadow {
 		let legend2DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
 		this.subCategories.sort((a, b) => a.name.localeCompare(b.name));
 
-		if (this.chartSettings.lollipopType === LollipopType.Circle) {
+		if (this.isLollipopTypeCircle) {
 			legend1DataPoints = [{
 				data: {
 					name: this.measure1DisplayName,
@@ -5254,7 +5435,7 @@ export class Visual extends Shadow {
 						};
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, 100);
 						return truncatedText;
-					})
+					}) as any
 			);
 
 		this.brushXAxisG
@@ -5285,7 +5466,7 @@ export class Visual extends Shadow {
 						};
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, 100);
 						return truncatedText;
-					})
+					}) as any
 			);
 
 		this.brushYAxisG
@@ -5334,7 +5515,7 @@ export class Visual extends Shadow {
 			return;
 		}
 
-		// Circle 1 Colors
+		//.CIRCLE 1 Colors
 		switch (this.dataColorsSettings.circle1.fillType) {
 			case ColorPaletteType.Single: {
 				chartData.forEach((data) => {

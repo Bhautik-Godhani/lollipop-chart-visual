@@ -28,7 +28,7 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number, heig
 				.call(
 					axisBottom(self[`${category}Scale`])
 						.ticks(width / 90)
-						.tickFormat((d: string) => d.split("-")[0])
+						.tickFormat((d: string) => d.split("-")[0]) as any
 				);
 
 			SetExpandAllXAxisTickStyle(self);
@@ -94,7 +94,7 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 				.call(
 					axisLeft(self[`${category}Scale`])
 						.ticks(expandAllScaleWidth / 90)
-						.tickFormat((d: string) => d.split("-")[0])
+						.tickFormat((d: string) => d.split("-")[0]) as any
 				);
 
 			SetExpandAllYAxisTickStyle(self, expandAllScaleWidth);

@@ -9,8 +9,8 @@ export class Enumeration {
 			getLicenseSelection(),
 			getVisualGeneralSettingsSelection(),
 			getChartConfigSelection(),
+			getMarkerConfigSelection(),
 			getDataColorsConfigSelection(),
-			getCircleConfigSelection(),
 			getLineConfigSelection(),
 			getDataLabelsConfigSelection(),
 			getGridLinesConfigSelection(),
@@ -87,6 +87,20 @@ function getChartConfigSelection(): EnumerateSectionType {
 	};
 }
 
+function getMarkerConfigSelection(): EnumerateSectionType {
+	return {
+		name: "markerConfig",
+		isShow: true,
+		properties: [
+			{
+				name: "markerSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+
 function getDataColorsConfigSelection(): EnumerateSectionType {
 	return {
 		name: "dataColorsConfig",
@@ -94,19 +108,6 @@ function getDataColorsConfigSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "dataColorsSettings",
-				isShow: true,
-			},
-		],
-	};
-}
-
-function getCircleConfigSelection(): EnumerateSectionType {
-	return {
-		name: "circleConfig",
-		isShow: true,
-		properties: [
-			{
-				name: "circleSettings",
 				isShow: true,
 			},
 		],

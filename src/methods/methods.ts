@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { TooltipData } from "../model";
 import { EDataRolesName } from "../enum";
+import { CATEGORY_MARKERS } from "../settings-pages/markers";
 
 export const getSVGTextSize = (
 	text: string,
@@ -258,6 +259,23 @@ export const createPatternsDefs = (self: Visual, svgRootElement) => {
 				.attr("fill", pattern.fill ? "var(--activeSelected)" : "none")
 				.attr("transform", pattern.translate ? pattern.translate : "");
 		}
+	});
+};
+
+export const createMarkerDefs = (self: Visual, svgRootElement) => {
+	const filterDef = svgRootElement.append("defs");
+	CATEGORY_MARKERS.map((marker) => {
+		const symbol = filterDef
+			.append("symbol")
+			.attr("id", marker.value + "_MARKER")
+			.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+		marker.paths.forEach(path => {
+			symbol.append("path")
+				.attr("d", path.d)
+				.attr("fill", path.fill)
+				.attr("stroke", path.stroke);
+		})
 	});
 };
 
