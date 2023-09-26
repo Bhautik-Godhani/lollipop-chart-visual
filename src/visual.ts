@@ -137,6 +137,8 @@ import YAxisSettings from "./settings-pages/YAxisSettings";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
+import { ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, GridIcon, RankingIcon, ShowConditionIcon, SortIcon, XYAxisIcon } from "./settings-pages/SettingsIcons";
+import { PatternIconSVG } from "@truviz/shadow/dist/Components/PatternPicker/PatternPicker";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -437,6 +439,7 @@ export class Visual extends Shadow {
 					sectionName: "chartConfig",
 					propertyName: "chartSettings",
 					Component: () => ChartSettings,
+					icon: ChartSettingsIcon
 				},
 				{
 					name: "Marker Settings",
@@ -449,6 +452,7 @@ export class Visual extends Shadow {
 					sectionName: "dataColorsConfig",
 					propertyName: "dataColorsSettings",
 					Component: () => DataColorsSettings,
+					icon: DataColorIcon
 				},
 				{
 					name: "Line Settings",
@@ -461,6 +465,7 @@ export class Visual extends Shadow {
 					sectionName: "dataLabelsConfig",
 					propertyName: "dataLabelsSettings",
 					Component: () => DataLabelsSettings,
+					icon: DataLabelsIcon
 				},
 				{
 					name: "Brush And Zoom Area",
@@ -473,48 +478,56 @@ export class Visual extends Shadow {
 					sectionName: "gridLinesConfig",
 					propertyName: "gridLinesSettings",
 					Component: () => GridLinesSettings,
+					icon: GridIcon
 				},
 				{
 					name: "Ranking",
 					sectionName: "rankingConfig",
 					propertyName: "rankingSettings",
 					Component: () => RankingSettings,
+					icon: RankingIcon
 				},
 				{
 					name: "Sorting",
 					sectionName: "sortingConfig",
 					propertyName: "sorting",
 					Component: () => SortingSettings,
+					icon: SortIcon
 				},
 				{
 					name: "Patterns",
 					sectionName: "patternConfig",
 					propertyName: "patternSettings",
 					Component: () => PatternSettings,
+					icon: PatternIconSVG
 				},
 				{
 					name: "X Axis",
 					sectionName: EVisualConfig.XAxisConfig,
 					propertyName: EVisualSettings.XAxisSettings,
 					Component: () => XAxisSettings,
+					icon: XYAxisIcon
 				},
 				{
 					name: "Y Axis",
 					sectionName: EVisualConfig.YAxisConfig,
 					propertyName: EVisualSettings.YAxisSettings,
 					Component: () => YAxisSettings,
+					icon: XYAxisIcon
 				},
 				{
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
 					Component: Components.ConditionalFormatting,
+					icon: ConditionalFormattingIcon
 				},
 				{
 					name: "Show Condition",
 					sectionName: "showBucketConfig",
 					propertyName: "showBucket",
 					Component: () => ShowBucket,
+					icon: ShowConditionIcon
 				},
 			],
 		});
