@@ -306,6 +306,6 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerShapeBase64Url: "",
 	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
-	marker1Style: { sizeType: EAutoCustomTypes.Auto, size: undefined },
-	marker2Style: { sizeType: EAutoCustomTypes.Auto, size: undefined }
+	marker1Style: { sizeType: EAutoCustomTypes.Auto, size: 0 },
+	marker2Style: { sizeType: EAutoCustomTypes.Auto, size: 0 }
 };

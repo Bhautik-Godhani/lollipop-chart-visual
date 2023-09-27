@@ -208,7 +208,7 @@ const UIDataLabelsFontSettings = (
 					</Column>
 				</Row>
 			</ConditionalWrapper>
-			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)};
+			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)}
 		</>
 	);
 };

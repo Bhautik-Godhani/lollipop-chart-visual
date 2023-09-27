@@ -447,17 +447,17 @@ export class Visual extends Shadow {
 					Component: () => MarkerSettings,
 				},
 				{
+					name: "Line Settings",
+					sectionName: "lineConfig",
+					propertyName: "lineSettings",
+					Component: () => LineSettings,
+				},
+				{
 					name: "Data Colors",
 					sectionName: "dataColorsConfig",
 					propertyName: "dataColorsSettings",
 					Component: () => DataColorsSettings,
 					icon: DataColorIcon
-				},
-				{
-					name: "Line Settings",
-					sectionName: "lineConfig",
-					propertyName: "lineSettings",
-					Component: () => LineSettings,
 				},
 				{
 					name: "Data Labels",
@@ -471,34 +471,6 @@ export class Visual extends Shadow {
 					sectionName: "brushAndZoomAreaConfig",
 					propertyName: "brushAndZoomAreaSettings",
 					Component: () => BrushAndZoomAreaSettings,
-				},
-				{
-					name: "Grid Lines",
-					sectionName: "gridLinesConfig",
-					propertyName: "gridLinesSettings",
-					Component: () => GridLinesSettings,
-					icon: GridIcon
-				},
-				{
-					name: "Ranking",
-					sectionName: "rankingConfig",
-					propertyName: "rankingSettings",
-					Component: () => RankingSettings,
-					icon: RankingIcon
-				},
-				{
-					name: "Sorting",
-					sectionName: "sortingConfig",
-					propertyName: "sorting",
-					Component: () => SortingSettings,
-					icon: SortIcon
-				},
-				{
-					name: "Patterns",
-					sectionName: "patternConfig",
-					propertyName: "patternSettings",
-					Component: () => PatternSettings,
-					icon: PatternIconSVG
 				},
 				{
 					name: "X Axis",
@@ -515,11 +487,39 @@ export class Visual extends Shadow {
 					icon: XYAxisIcon
 				},
 				{
+					name: "Patterns",
+					sectionName: "patternConfig",
+					propertyName: "patternSettings",
+					Component: () => PatternSettings,
+					icon: PatternIconSVG
+				},
+				{
+					name: "Ranking",
+					sectionName: "rankingConfig",
+					propertyName: "rankingSettings",
+					Component: () => RankingSettings,
+					icon: RankingIcon
+				},
+				{
+					name: "Sorting",
+					sectionName: "sortingConfig",
+					propertyName: "sorting",
+					Component: () => SortingSettings,
+					icon: SortIcon
+				},
+				{
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
 					Component: Components.ConditionalFormatting,
 					icon: ConditionalFormattingIcon
+				},
+				{
+					name: "Grid Lines",
+					sectionName: "gridLinesConfig",
+					propertyName: "gridLinesSettings",
+					Component: () => GridLinesSettings,
+					icon: GridIcon
 				},
 				{
 					name: "Show Condition",
@@ -1583,12 +1583,12 @@ export class Visual extends Shadow {
 					.attr("d", this.markerSettings.markerShapePath);
 			}
 
-			if (!this.isHasSubcategories) {
-				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
-			} else {
-				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), this.chartData);
-			}
-			this.behavior.renderSelection(this.interactivityService.hasSelection());
+			// if (!this.isHasSubcategories) {
+			// 	SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
+			// } else {
+			// 	SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), this.chartData);
+			// }
+			// this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
 		}
@@ -4161,8 +4161,8 @@ export class Visual extends Shadow {
 	setHorizontalLinesFormatting(linesSelection: any): void {
 		this.setLineStrokeColor();
 		linesSelection
-			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0) + 10)
-			.attr("x2", (d) => this.xScale(d.value1) + this.pie1Radius * 2)
+			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0) + (this.isHasMultiMeasure ? this.isLollipopTypePie ? 10 : 0 : 0))
+			.attr("x2", (d) => this.xScale(d.value1) + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie1Radius * 2 : this.circle1Size : 0))
 			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
@@ -4188,7 +4188,7 @@ export class Visual extends Shadow {
 			.attr("x1", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("x2", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y1", (d) => this.yScale(d.value1))
-			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - this.pie2Radius * 2 + 10)
+			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius * 2 - 10 : this.circle2Size : 0))
 			.attr("stroke", (d) => this.getColor(d.styles.line.color, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(

@@ -227,13 +227,13 @@ const MarkerSettings = (props) => {
 			handleChange(EMarkerTypes.SHAPE, EMarkerSettings.MarkerType, setConfigValues)
 		}
 
-		if (!configValues.marker1Style.size) {
-			handleMarkerStyleChange(shadow.circle1Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
-		}
+		// if (configValues.marker1Style.size === 0) {
+		// 	handleMarkerStyleChange(shadow.circle1Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
+		// }
 
-		if (!configValues.marker2Style.size) {
-			handleMarkerStyleChange(shadow.circle2Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
-		}
+		// if (configValues.marker2Style.size === 0) {
+		// 	handleMarkerStyleChange(shadow.circle2Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
+		// }
 	}, []);
 
 	return (
@@ -246,7 +246,7 @@ const MarkerSettings = (props) => {
 					</ConditionalWrapper>
 
 					<ConditionalWrapper visible={shadow.isHasSubcategories}>
-						<Row>
+						<Row disableTopPadding>
 							<Column>
 								<SwitchOption
 									label={"Marker Type"}
@@ -278,7 +278,7 @@ const MarkerSettings = (props) => {
 					<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
 						<Row>
 							<Column>
-								<RadioOption
+								<SwitchOption
 									label={'Select Measure'}
 									value={configValues.markerStyleType}
 									optionsList={MARKER_STYLE_TYPES}
