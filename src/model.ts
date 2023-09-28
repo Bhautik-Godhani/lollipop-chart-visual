@@ -14,20 +14,10 @@ export interface ILollipopChartRow {
 	tooltipFields?: TooltipData[];
 	sortId?: number;
 	subCategories: IChartSubCategory[];
-	styles: {
-		circle1: IChartCircleStyles;
-		circle2: IChartCircleStyles;
-		line: { color: string };
-	};
 	valueType?: DataValuesType;
 	defaultValue?: number;
 	pattern?: IPatternProps;
 	imageDataUrl?: string;
-}
-
-export interface IChartCircleStyles {
-	fillColor: string;
-	strokeColor: string;
 }
 
 export interface IChartSubCategory {
@@ -38,10 +28,6 @@ export interface IChartSubCategory {
 	selected: boolean;
 	isHighlight: boolean;
 	tooltipFields?: TooltipData[];
-	styles: {
-		pie1: { color: string };
-		pie2: { color: string };
-	};
 	valueType?: DataValuesType;
 	defaultValue?: number,
 	sliceWidth?: number,

@@ -78,8 +78,8 @@ import {
 	IBrushAndZoomAreaSettings,
 	IBrushConfig,
 	IChartSettings,
-	ICirclePropsSettings,
 	IConditionalFormattingProps,
+	IDataColorsProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IFooterSettings,
@@ -139,6 +139,7 @@ import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
 import { ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, GridIcon, RankingIcon, ShowConditionIcon, SortIcon, XYAxisIcon } from "./settings-pages/SettingsIcons";
 import { PatternIconSVG } from "@truviz/shadow/dist/Components/PatternPicker/PatternPicker";
+import chroma from "chroma-js";
 
 type Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -219,6 +220,10 @@ export class Visual extends Shadow {
 		legendItems: Selection<SVGElement>, legendWrapper: Selection<SVGElement>
 	};
 	conditionalFormattingConditions: IConditionalFormattingProps[] = [];
+	categoriesColorList: { name: string, marker1: string, marker2: string }[];
+	subCategoriesColorList: { name: string, marker1: string, marker2: string }[];
+	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
+	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -1012,6 +1017,17 @@ export class Visual extends Shadow {
 			}
 		}
 
+		// set colors for all pairs
+		this.categoricalDataPairs.forEach((data) => {
+			this.categoryColorPair[data.category] = { marker1Color: "", marker2Color: "" };
+		});
+
+		this.subCategoriesName.forEach((name) => {
+			this.subCategoryColorPair[name] = { marker1Color: "", marker2Color: "" };
+		});
+
+		this.setColorsByDataColorsSettings();
+
 		categoricalData.categories.forEach((d, i) => {
 			if (i === this.categoricalCategoriesLastIndex) {
 				d.values = this.categoricalDataPairs.map((pair) => pair.category);
@@ -1432,7 +1448,7 @@ export class Visual extends Shadow {
 			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
 			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
 
-			this.setColorsByDataColorsSettings();
+			// this.setColorsByDataColorsSettings();
 
 			if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 				this.setRemainingAsOthersDataColor();
@@ -1442,14 +1458,28 @@ export class Visual extends Shadow {
 				this.setConditionalFormattingColor();
 			}
 
-			if (this.chartData.length) {
-				this.subCategories = this.chartData[0].subCategories
-					.map((d) => ({
-						name: d.category,
-						color1: d.styles.pie1.color,
-						color2: d.styles.pie2.color
-					}));
+			this.categoriesColorList = this.chartData.map(d => ({
+				name: d.category,
+				marker1: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+				marker2: this.categoryColorPair[d.category].marker2Color ? this.categoryColorPair[d.category].marker2Color : this.colorPalette.getColor(d.category).value,
+			}));
+
+			if (this.chartData.length && this.isHasSubcategories) {
+				this.subCategoriesColorList = this.chartData[0].subCategories.map(d => ({
+					name: d.category,
+					marker1: this.subCategoryColorPair[d.category].marker1Color ? this.subCategoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+					marker2: this.subCategoryColorPair[d.category].marker2Color ? this.subCategoryColorPair[d.category].marker2Color : this.colorPalette.getColor(d.category).value,
+				}));
 			}
+
+			// if (this.chartData.length) {
+			// 	this.subCategories = this.chartData[0].subCategories
+			// 		.map((d) => ({
+			// 			name: d.category,
+			// 			color1: d.styles.marker1.color,
+			// 			color2: d.styles.marker2.color
+			// 		}));
+			// }
 
 			if (!this.legend1) {
 				this.createLegendContainer(LegendType.Legend1);
@@ -1570,19 +1600,6 @@ export class Visual extends Shadow {
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
 
-			if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-				const marker = this.markerSettings.markerShapeValue;
-
-				const filterDef = this.svg.append("defs");
-				const symbol = filterDef
-					.append("symbol")
-					.attr("id", marker.iconName + "_MARKER")
-					.attr("viewBox", `0 0 ${marker.icon[0]} ${marker.icon[1]}`);
-
-				symbol.append("path")
-					.attr("d", this.markerSettings.markerShapePath);
-			}
-
 			// if (!this.isHasSubcategories) {
 			// 	SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
 			// } else {
@@ -1600,12 +1617,12 @@ export class Visual extends Shadow {
 				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
 				if (conditionalFormattingResult.match) {
 					if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
-						d.styles.circle1.fillColor = conditionalFormattingResult.color;
+						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
 					} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
-						d.styles.circle2.fillColor = conditionalFormattingResult.color;
+						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
 					} else {
-						d.styles.circle1.fillColor = conditionalFormattingResult.color;
-						d.styles.circle2.fillColor = conditionalFormattingResult.color;
+						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
+						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
 					}
 				}
 			} else {
@@ -1613,12 +1630,12 @@ export class Visual extends Shadow {
 					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
 					if (conditionalFormattingResult.match) {
 						if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
-							s.styles.pie1.color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
 						} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
-							s.styles.pie2.color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
 						} else {
-							s.styles.pie1.color = conditionalFormattingResult.color;
-							s.styles.pie2.color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
 						}
 					}
 				});
@@ -1857,10 +1874,6 @@ export class Visual extends Shadow {
 					tooltipFields: subCategoryGroup
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
 						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
-					styles: {
-						pie1: { color: "" },
-						pie2: { color: "" },
-					},
 					selected: false,
 					isHighlight: !!subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).highlights[idx]
 				};
@@ -1894,11 +1907,9 @@ export class Visual extends Shadow {
 			tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 			subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
 			styles: {
-				circle1: { fillColor: "", strokeColor: "" },
-				circle2: { fillColor: "", strokeColor: "" },
+				marker1: { color: "" },
+				marker2: { color: "" },
 				line: { color: this.lineSettings.lineColor },
-				pie1: { color: "" },
-				pie2: { color: "" },
 			},
 		}));
 
@@ -1925,6 +1936,7 @@ export class Visual extends Shadow {
 
 		this.setSelectionIds(data, []);
 		this.chartData = data;
+
 		if (this.patternSettings.enabled) {
 			this.setVisualPatternData();
 		}
@@ -2030,10 +2042,10 @@ export class Visual extends Shadow {
 		//     DATA_COLORS.dataType = PieType.Pie1;
 		// }
 
-		if (this.isHasMultiMeasure) {
-			DATA_COLORS.circle1.fillType = ColorPaletteType.Single;
-			DATA_COLORS.circle2.fillType = ColorPaletteType.Single;
-		}
+		// if (this.isHasMultiMeasure) {
+		// 	DATA_COLORS.circle1.fillType = ColorPaletteType.Single;
+		// 	DATA_COLORS.circle2.fillType = ColorPaletteType.Single;
+		// }
 
 		const dataColorsConfig = JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]);
 		this.dataColorsSettings = {
@@ -2103,6 +2115,14 @@ export class Visual extends Shadow {
 
 		if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
 			this.yAxisSettings.isDisplayLabel = false;
+		}
+
+		if (!this.dataColorsSettings.marker1.reverse) {
+			this.dataColorsSettings.marker1.schemeColors = this.dataColorsSettings.marker1.schemeColors.reverse();
+		}
+
+		if (!this.dataColorsSettings.marker2.reverse) {
+			this.dataColorsSettings.marker2.schemeColors = this.dataColorsSettings.marker2.schemeColors.reverse();
 		}
 
 		// if (this.rankingSettings.isRankingEnabled) {
@@ -2247,10 +2267,7 @@ export class Visual extends Shadow {
 		if (this.isLollipopTypeCircle) {
 			this.setCircleColors();
 		} else {
-			this.setPieColors(PieType.Pie1);
-			if (this.isHasMultiMeasure) {
-				this.setPieColors(PieType.Pie2);
-			}
+			this.setPieColors();
 		}
 		this.setSubCategoriesColor(LegendType.Legend1);
 		if (this.isDisplayLegend2) {
@@ -2259,139 +2276,190 @@ export class Visual extends Shadow {
 	}
 
 	setCircleColors(): void {
-		const colorsSettings = this.dataColorsSettings.circle1;
-		if (this.isHasMultiMeasure) {
-			const circle1Colors = this.dataColorsSettings.circle1;
-			const circle2Colors = this.dataColorsSettings.circle2;
-			this.chartData.forEach((data) => {
-				data.styles.circle1.fillColor = circle1Colors.circleFillColor;
-				data.styles.circle1.strokeColor = circle1Colors.circleStrokeColor;
-				data.styles.circle2.fillColor = circle2Colors.circleFillColor;
-				data.styles.circle2.strokeColor = circle2Colors.circleStrokeColor;
-			});
-			return;
+		const marker1 = this.dataColorsSettings.marker1;
+		const marker2 = this.dataColorsSettings.marker2;
+
+		const keys = this.categoricalDataPairs.map(d => d.category);
+		const colorIdxRangeScale = d3.scaleLinear()
+			.domain([0, keys.length - 1])
+			.range([1, 0]);
+
+		const getMarkerSeqColorsArray = (marker: IDataColorsProps) => {
+			const markerInterval = Math.ceil(this.categoricalDataPairs.length / marker.schemeColors.length);
+			const markerRange = { index: 0, start: 0, end: markerInterval - 1 };
+			return this.categoricalDataPairs.reduce((acc: string[], cur, i: number) => {
+				if (i <= markerRange.end) {
+					acc = [...acc, marker.schemeColors[markerRange.index]];
+				} else {
+					markerRange.index++;
+					markerRange.start = markerRange.start + markerInterval;
+					markerRange.end = markerRange.end + markerInterval;
+					acc = [...acc, marker.schemeColors[markerRange.index]];
+				}
+				return acc;
+			}, []);
 		}
 
-		//.CIRCLE 1 Colors
-		switch (this.dataColorsSettings.circle1.fillType) {
-			case ColorPaletteType.Single: {
-				this.chartData.forEach((data) => {
-					data.styles.circle1.fillColor = colorsSettings.circleFillColor;
-					data.styles.circle1.strokeColor = colorsSettings.circleStrokeColor;
-				});
-				break;
-			}
-			case ColorPaletteType.PowerBi: {
-				this.chartData.forEach((data) => {
-					// let colorCode = this.colorPalette.getColor(data.category).value.split('#')[1];
-					// const circleFillColor = '#F2' + colorCode;
-					data.styles.circle1.fillColor = this.colorPalette.getColor(data.category).value;
-					data.styles.circle1.strokeColor = this.colorPalette.getColor(data.category).value;
-				});
-				break;
-			}
-			case ColorPaletteType.Gradient: {
-				const categoryDataLength = this.chartData.length;
-				const domain =
-					colorsSettings.midcolor && categoryDataLength > 2 ? [1, Math.round(categoryDataLength / 2), categoryDataLength] : [1, categoryDataLength];
-				const range: any =
-					colorsSettings.midcolor && categoryDataLength > 2
-						? [colorsSettings.fillmax, colorsSettings.fillmid, colorsSettings.fillmin]
-						: [colorsSettings.fillmax, colorsSettings.fillmin];
+		const marker1SeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings.marker1);
+		const marker2SeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings.marker2);
 
-				this.gradientColorScale.domain(domain).range(range);
-				this.chartData.forEach((data, i) => {
-					const color: string = this.gradientColorScale(i + 1) + "";
-					data.styles.circle1.fillColor = color;
-					data.styles.circle1.strokeColor = color;
-				});
-				break;
+		const setMarkerColor = (marker: IDataColorsProps, type: string, markerSeqColorsArray: any[]) => {
+			//.CIRCLE 1 Colors
+			switch (marker.fillType) {
+				case ColorPaletteType.Single: {
+					this.categoricalDataPairs.forEach((data) => {
+						this.categoryColorPair[data.category][type] = marker.singleColor;
+					});
+					break;
+				}
+				case ColorPaletteType.PowerBi: {
+					this.categoricalDataPairs.forEach((data) => {
+						const color = this.colorPalette.getColor(data.category).value;
+						this.categoryColorPair[data.category][type] = color;
+					});
+					break;
+				}
+				case ColorPaletteType.Gradient: {
+					const getMarkerColor = (i: number): string => {
+						const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
+						const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
+						return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
+					}
+
+					this.categoricalDataPairs.forEach((data, i) => {
+						this.categoryColorPair[data.category][type] = getMarkerColor(i);
+					});
+					break;
+				}
+				case ColorPaletteType.ByCategory: {
+					const categoryColors = marker.categoryColors.reduce((obj, cur, i) => {
+						obj[cur.name] = { marker1Color: cur.marker1, marker2Color: cur.marker2 };
+						return obj;
+					}, {});
+					this.categoricalDataPairs.forEach((data, i) => {
+						if (categoryColors[data.category]) {
+							this.categoryColorPair[data.category][type] = categoryColors[data.category][type];
+						}
+					});
+					break;
+				}
+				case ColorPaletteType.Sequential:
+				case ColorPaletteType.Diverging:
+				case ColorPaletteType.Qualitative: {
+					const getMarkerColor = (i: number) => {
+						const scaleColors = chroma.scale(marker.schemeColors);
+						if (marker.isGradient) {
+							return "rgb(" + scaleColors(colorIdxRangeScale((this.categoricalDataPairs.length - 1) - i)).rgb().join() + ")";
+						} else {
+							return markerSeqColorsArray[i];
+						}
+					}
+
+					this.categoricalDataPairs.forEach((d, i: number) => {
+						this.categoryColorPair[d.category][type] = getMarkerColor(i);
+					});
+				}
 			}
-			case ColorPaletteType.ByCategory: {
-				break;
-			}
-			case ColorPaletteType.Sequential: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setCircleSchemaColors(colorsSettings.schemeColors.reverse(), colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Diverging: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setCircleSchemaColors(colorsSettings.schemeColors, colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Qualitative: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setCircleSchemaColors(colorsSettings.schemeColors, colorsSettings.reverse, false);
-				break;
-			}
+		}
+
+		setMarkerColor(marker1, 'marker1Color', marker1SeqColorsArray);
+
+		if (this.isHasMultiMeasure) {
+			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
 	}
 
-	setPieColors(pieType: PieType): void {
-		const pieColors = this.dataColorsSettings[pieType];
-		switch (this.dataColorsSettings[pieType].fillType) {
-			case ColorPaletteType.Single: {
-				this.chartData.forEach((data) => {
-					// data.styles.circle1.fillColor = colorsSettings.circleFillColor;
-					// data.styles.circle1.strokeColor = colorsSettings.circleStrokeColor;
-					data.subCategories.forEach((d) => {
-						d.styles[pieType].color = pieColors.singleColor;
+	setPieColors(): void {
+		const marker1 = this.dataColorsSettings.marker1;
+		const marker2 = this.dataColorsSettings.marker2;
+
+		const keys = this.subCategoriesName.map(d => d);
+		const colorIdxRangeScale = d3.scaleLinear()
+			.domain([0, keys.length - 1])
+			.range([1, 0]);
+
+		const getMarkerSeqColorsArray = (marker: IDataColorsProps) => {
+			const markerInterval = Math.ceil(this.subCategoriesName.length / marker.schemeColors.length);
+			const markerRange = { index: 0, start: 0, end: markerInterval - 1 };
+			return this.subCategoriesName.reduce((acc: string[], cur, i: number) => {
+				if (i <= markerRange.end) {
+					acc = [...acc, marker.schemeColors[markerRange.index]];
+				} else {
+					markerRange.index++;
+					markerRange.start = markerRange.start + markerInterval;
+					markerRange.end = markerRange.end + markerInterval;
+					acc = [...acc, marker.schemeColors[markerRange.index]];
+				}
+				return acc;
+			}, []);
+		}
+
+		const marker1SeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings.marker1);
+		const marker2SeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings.marker2);
+
+		const setMarkerColor = (marker: IDataColorsProps, type: string, markerSeqColorsArray: any[]) => {
+			//.CIRCLE 1 Colors
+			switch (marker.fillType) {
+				case ColorPaletteType.Single: {
+					this.subCategoriesName.forEach((data) => {
+						this.subCategoryColorPair[data][type] = marker.singleColor;
 					});
-				});
-				break;
-			}
-			case ColorPaletteType.PowerBi: {
-				this.chartData.forEach((data) => {
-					data.subCategories.forEach((d) => {
-						d.styles[pieType].color = this.colorPalette.getColor(d.category).value;
+					break;
+				}
+				case ColorPaletteType.PowerBi: {
+					this.subCategoriesName.forEach((data) => {
+						const color = this.colorPalette.getColor(data).value;
+						this.subCategoryColorPair[data][type] = color;
 					});
-				});
-				break;
-			}
-			case ColorPaletteType.Gradient: {
-				this.chartData.forEach((data) => {
-					const subCategoryDataLength = data.subCategories.length;
-					const range: any =
-						pieColors.midcolor && subCategoryDataLength > 2
-							? [pieColors.fillmax, pieColors.fillmid, pieColors.fillmin]
-							: [pieColors.fillmax, pieColors.fillmin];
-					const domain =
-						pieColors.midcolor && subCategoryDataLength > 2
-							? [1, Math.round(subCategoryDataLength / 2), subCategoryDataLength]
-							: [1, subCategoryDataLength];
-					this.gradientColorScale.domain(domain).range(range);
-					data.subCategories.forEach((d, i) => {
-						const color: string = this.gradientColorScale(i + 1) + "";
-						d.styles[pieType].color = color;
+					break;
+				}
+				case ColorPaletteType.Gradient: {
+					const getMarkerColor = (i: number): string => {
+						const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
+						const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
+						return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
+					}
+
+					this.subCategoriesName.forEach((data, i) => {
+						this.subCategoryColorPair[data][type] = getMarkerColor(i);
 					});
-				});
-				break;
-			}
-			case ColorPaletteType.ByCategory: {
-				this.chartData.forEach((data) => {
-					data.subCategories.forEach((d) => {
-						const selectedCategoryName = pieColors.selectedCategoryName;
-						d.styles[pieType].color = d.category === selectedCategoryName ? pieColors.selectedCategoryColor : pieColors.defaultColor;
+					break;
+				}
+				case ColorPaletteType.ByCategory: {
+					const categoryColors = marker.categoryColors.reduce((obj, cur, i) => {
+						obj[cur.name] = { marker1Color: cur.marker1, marker2Color: cur.marker2 };
+						return obj;
+					}, {});
+					this.subCategoriesName.forEach((data, i) => {
+						if (categoryColors[data]) {
+							this.subCategoryColorPair[data][type] = categoryColors[data][type];
+						}
 					});
-				});
-				break;
+					break;
+				}
+				case ColorPaletteType.Sequential:
+				case ColorPaletteType.Diverging:
+				case ColorPaletteType.Qualitative: {
+					const getMarkerColor = (i: number) => {
+						const scaleColors = chroma.scale(marker.schemeColors);
+						if (marker.isGradient) {
+							return "rgb(" + scaleColors(colorIdxRangeScale((this.subCategoriesName.length - 1) - i)).rgb().join() + ")";
+						} else {
+							return markerSeqColorsArray[i];
+						}
+					}
+
+					this.subCategoriesName.forEach((d, i: number) => {
+						this.subCategoryColorPair[d][type] = getMarkerColor(i);
+					});
+				}
 			}
-			case ColorPaletteType.Sequential: {
-				const colorsSettings = this.dataColorsSettings[pieType];
-				this.setPieSchemaColors(pieType, colorsSettings.schemeColors.reverse(), colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Diverging: {
-				const colorsSettings = this.dataColorsSettings[pieType];
-				this.setPieSchemaColors(pieType, colorsSettings.schemeColors, colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Qualitative: {
-				const colorsSettings = this.dataColorsSettings[pieType];
-				this.setPieSchemaColors(pieType, colorsSettings.schemeColors, colorsSettings.reverse, false);
-				break;
-			}
+		}
+
+		setMarkerColor(marker1, 'marker1Color', marker1SeqColorsArray);
+
+		if (this.isHasMultiMeasure) {
+			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
 	}
 
@@ -2406,67 +2474,11 @@ export class Visual extends Shadow {
 					}
 				});
 			});
-			return subCategory ? subCategory.styles[isLegend2 ? PieType.Pie2 : PieType.Pie1].color : "#545454";
+			return subCategory ? this.subCategoryColorPair[subCategoryName][isLegend2 ? "marker2Color" : "marker1Color"] : "#545454";
 		};
 
 		this.subCategories.forEach((cat) => {
 			cat[isLegend2 ? "color2" : "color1"] = getSubCategoryColorByName(cat.name);
-		});
-	}
-
-	setCircleSchemaColors(schemeColors: string[] = [], isReverse: boolean, isGradient: boolean): void {
-		if (isReverse) {
-			schemeColors = schemeColors.reverse();
-		}
-
-		if (isGradient) {
-			const range: any = [schemeColors[0], schemeColors[schemeColors.length - 1]];
-			const domain = [1, this.chartData.length];
-			this.gradientColorScale.domain(domain).range(range);
-		}
-
-		let colorIdx = -1;
-		this.chartData.forEach((data, i) => {
-			colorIdx++;
-			if (colorIdx >= schemeColors.length) {
-				colorIdx = 0;
-			}
-			if (isGradient) {
-				const color = this.gradientColorScale(i + 1) + "";
-				data.styles.circle1.fillColor = color;
-				data.styles.circle1.strokeColor = color;
-			} else {
-				data.styles.circle1.fillColor = schemeColors[colorIdx];
-				data.styles.circle1.strokeColor = schemeColors[colorIdx];
-			}
-		});
-	}
-
-	setPieSchemaColors(pieType: PieType, schemeColors: string[] = [], isReverse: boolean, isGradient: boolean): void {
-		if (isReverse) {
-			schemeColors = schemeColors.reverse();
-		}
-		const range: any = [schemeColors[0], schemeColors[schemeColors.length - 1]];
-
-		this.chartData.forEach((data) => {
-			let colorIdx = -1;
-			if (isGradient) {
-				const domain = [1, data.subCategories.length];
-				this.gradientColorScale.domain(domain).range(range);
-			}
-
-			data.subCategories.forEach((d, i) => {
-				colorIdx++;
-				if (colorIdx >= schemeColors.length) {
-					colorIdx = 0;
-				}
-				if (isGradient) {
-					const color = this.gradientColorScale(i + 1) + "";
-					d.styles[pieType].color = color;
-				} else {
-					d.styles[pieType].color = schemeColors[colorIdx];
-				}
-			});
 		});
 	}
 
@@ -2585,8 +2597,6 @@ export class Visual extends Shadow {
 				this.sortSubcategoryData();
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
-
-				this.setColorsByDataColorsSettings();
 
 				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 					this.setRemainingAsOthersDataColor();
@@ -2761,8 +2771,6 @@ export class Visual extends Shadow {
 				this.sortSubcategoryData();
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
-
-				this.setColorsByDataColorsSettings();
 
 				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 					this.setRemainingAsOthersDataColor();
@@ -3501,7 +3509,7 @@ export class Visual extends Shadow {
 					value: isCircle1
 						? numberFormatter(value.value1, this.measureNumberFormatter[0])
 						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: value.styles.circle1.fillColor,
+					color: this.categoryColorPair[value.category].marker1Color,
 				},
 			];
 
@@ -3526,12 +3534,12 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: value.styles.circle1.fillColor,
+					color: this.categoryColorPair[value.category].marker1Color,
 				},
 				{
 					displayName: this.measure2DisplayName,
 					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: value.styles.circle2.fillColor,
+					color: this.categoryColorPair[value.category].marker2Color,
 				},
 			];
 
@@ -4276,13 +4284,13 @@ export class Visual extends Shadow {
 					this.imageMarkerFormatting(imageMarkerSelection);
 				} else {
 					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-						const symbol = lollipopG.append("defs")
+						const symbol1 = lollipopG.append("defs")
 							.append("symbol")
-							.attr("id", d => `${d.category}_${marker.value}_MARKER`)
-							.attr("class", "marker-symbol")
+							.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+							.attr("class", "marker1-symbol")
 							.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
 
-						const path1Selection = symbol.append("path")
+						const path1Selection = symbol1.append("path")
 							.datum(d => {
 								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 							})
@@ -4301,7 +4309,13 @@ export class Visual extends Shadow {
 						this.setCircle1Formatting(circle1Selection, marker);
 
 						if (this.isHasMultiMeasure) {
-							const path2Selection = symbol.append("path")
+							const symbol2 = lollipopG.append("defs")
+								.append("symbol")
+								.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
+								.attr("class", "marker2-symbol")
+								.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+							const path2Selection = symbol2.append("path")
 								.datum(d => {
 									return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 								})
@@ -4354,12 +4368,19 @@ export class Visual extends Shadow {
 			(update) => {
 				const lineSelection = update.select(this.lineClassSelector);
 
-				const markerSymbolSelection = update
-					.select(".marker-symbol");
+				const marker1SymbolSelection = update
+					.select(".marker1-symbol");
+
+				const marker2SymbolSelection = update
+					.select(".marker2-symbol");
 
 				if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-					markerSymbolSelection
-						.attr("id", d => `${d.category}_${marker.value}_MARKER`)
+					marker1SymbolSelection
+						.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+					marker2SymbolSelection
+						.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
 						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
 				}
 
@@ -4371,7 +4392,7 @@ export class Visual extends Shadow {
 					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 				});
 
-				const path2Selection = update.select(".marker1-path").datum(d => {
+				const path2Selection = update.select(".marker2-path").datum(d => {
 					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 				}).attr("d", this.isLollipopTypeCircle ? marker.paths[0].d : "");
 
@@ -4507,7 +4528,7 @@ export class Visual extends Shadow {
 	setPath1Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
-				const color = this.getColor(d.styles[CircleType.Circle1][CategoryDataColorProps.fillColor], EHighContrastColorType.Foreground);
+				const color = this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -4530,14 +4551,14 @@ export class Visual extends Shadow {
 			})
 			.attr("width", this.circle1Size)
 			.attr("height", this.circle1Size)
-			.attr("href", d => `#${d.category}_${marker.value}_MARKER`)
+			.attr("href", d => `#${d.category}_${marker.value}_MARKER1`)
 			.style("display", "block");
 	}
 
 	setPath2Formatting(circleSelection: any): void {
 		circleSelection
-			.style("fill", (d) => {
-				const color = this.getColor(d.styles[CircleType.Circle2][CategoryDataColorProps.fillColor], EHighContrastColorType.Foreground);
+			.style("fill", (d: ILollipopChartRow) => {
+				const color = this.getColor(this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -4561,7 +4582,7 @@ export class Visual extends Shadow {
 			})
 			.attr("width", this.circle2Size)
 			.attr("height", this.circle2Size)
-			.attr("href", d => `#${d.category}_${marker.value}_MARKER`)
+			.attr("href", d => `#${d.category}_${marker.value}_MARKER2`)
 			.style("display", (d) => (this.isHasMultiMeasure && d.value2 ? "block" : "none"));
 	}
 
@@ -4650,7 +4671,7 @@ export class Visual extends Shadow {
 		const id = this.chartData.findIndex((data) => data.category === category);
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
 		const getPieFill = (d: IChartSubCategory) => {
-			const color = d.styles[pieType].color;
+			const color = isPie2 ? this.subCategoryColorPair[d.category].marker2Color : this.subCategoryColorPair[d.category].marker1Color;
 			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 				return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 			} else {
@@ -4914,7 +4935,7 @@ export class Visual extends Shadow {
 						{
 							displayName: isPie2 ? this.measure2DisplayName : this.measure1DisplayName,
 							value: numberFormatter(pieData[valueKey], isPie2 ? this.measureNumberFormatter[1] : this.measureNumberFormatter[0]),
-							color: pieData.styles[pieType].color,
+							// color: pieData.styles[pieType].color,
 						},
 					];
 
@@ -4994,21 +5015,21 @@ export class Visual extends Shadow {
 		this.subCategories.sort((a, b) => a.name.localeCompare(b.name));
 
 		if (this.isLollipopTypeCircle) {
-			legend1DataPoints = [{
-				data: {
-					name: this.measure1DisplayName,
-					color: this.getColor(this.dataColorsSettings.circle1.circleFillColor, EHighContrastColorType.Foreground),
-					pattern: undefined
-				}
-			},
-			{
-				data: {
-					name: this.measure2DisplayName,
-					color: this.getColor(this.dataColorsSettings.circle2.circleFillColor, EHighContrastColorType.Foreground),
-					pattern: undefined
-				}
-			}
-			];
+			// legend1DataPoints = [{
+			// 	data: {
+			// 		name: this.measure1DisplayName,
+			// 		color: this.getColor(this.dataColorsSettings.circle1.circleFillColor, EHighContrastColorType.Foreground),
+			// 		pattern: undefined
+			// 	}
+			// },
+			// {
+			// 	data: {
+			// 		name: this.measure2DisplayName,
+			// 		color: this.getColor(this.dataColorsSettings.circle2.circleFillColor, EHighContrastColorType.Foreground),
+			// 		pattern: undefined
+			// 	}
+			// }
+			// ];
 		} else {
 			legend1DataPoints = this.subCategories.map((category) => ({
 				data: {
@@ -5360,71 +5381,6 @@ export class Visual extends Shadow {
 		});
 	}
 
-	setBrushLollipopCircleColors(chartData: IBrushLollipopChartData[]): void {
-		const colorsSettings = this.dataColorsSettings.circle1;
-		if (this.isHasMultiMeasure) {
-			const circle1Colors = this.dataColorsSettings.circle1;
-			const circle2Colors = this.dataColorsSettings.circle2;
-			chartData.forEach((data) => {
-				data.styles.circle1.fillColor = circle1Colors.circleFillColor;
-				data.styles.circle2.fillColor = circle2Colors.circleFillColor;
-			});
-			return;
-		}
-
-		//.CIRCLE 1 Colors
-		switch (this.dataColorsSettings.circle1.fillType) {
-			case ColorPaletteType.Single: {
-				chartData.forEach((data) => {
-					data.styles.circle1.fillColor = colorsSettings.circleFillColor;
-				});
-				break;
-			}
-			case ColorPaletteType.PowerBi: {
-				chartData.forEach((data) => {
-					// let colorCode = this.colorPalette.getColor(data.category).value.split('#')[1];
-					// const circleFillColor = '#F2' + colorCode;
-					data.styles.circle1.fillColor = this.colorPalette.getColor(data.category).value;
-				});
-				break;
-			}
-			case ColorPaletteType.Gradient: {
-				const categoryDataLength = chartData.length;
-				const domain =
-					colorsSettings.midcolor && categoryDataLength > 2 ? [1, Math.round(categoryDataLength / 2), categoryDataLength] : [1, categoryDataLength];
-				const range: any =
-					colorsSettings.midcolor && categoryDataLength > 2
-						? [colorsSettings.fillmax, colorsSettings.fillmid, colorsSettings.fillmin]
-						: [colorsSettings.fillmax, colorsSettings.fillmin];
-
-				this.gradientColorScale.domain(domain).range(range);
-				chartData.forEach((data, i) => {
-					const color: string = this.gradientColorScale(i + 1) + "";
-					data.styles.circle1.fillColor = color;
-				});
-				break;
-			}
-			case ColorPaletteType.ByCategory: {
-				break;
-			}
-			case ColorPaletteType.Sequential: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setBrushLollipopCircleSchemaColors(chartData, colorsSettings.schemeColors.reverse(), colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Diverging: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setBrushLollipopCircleSchemaColors(chartData, colorsSettings.schemeColors, colorsSettings.reverse, colorsSettings.isGradient);
-				break;
-			}
-			case ColorPaletteType.Qualitative: {
-				const colorsSettings = this.dataColorsSettings.circle1;
-				this.setBrushLollipopCircleSchemaColors(chartData, colorsSettings.schemeColors, colorsSettings.reverse, false);
-				break;
-			}
-		}
-	}
-
 	drawBrushLollipopChart(clonedCategoricalData: powerbi.DataViewCategorical): void {
 		const brushScaleBandwidth = this.brushScaleBand.bandwidth();
 		const measures = clonedCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
@@ -5436,7 +5392,6 @@ export class Visual extends Shadow {
 			arr = [...arr, obj];
 			return arr;
 		}, []);
-		this.setBrushLollipopCircleColors(data);
 
 		const setVerticalLinesFormatting = (linesSelection) => {
 			linesSelection

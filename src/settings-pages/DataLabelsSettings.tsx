@@ -1,7 +1,6 @@
 import * as React from "react";
 import { DATA_LABELS_SETTINGS } from "../constants";
 import { DataLabelsFontSizeType, DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
-import "../../style/range-slider.less";
 import { IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,

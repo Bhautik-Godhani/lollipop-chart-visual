@@ -238,28 +238,22 @@ export enum EPieSettings {
 }
 
 export enum EDataColorsSettings {
-	dataType = "dataType",
-	circleFillColor = "circleFillColor",
-	circleStrokeColor = "circleStrokeColor",
-	circle1 = "circle1",
-	circle2 = "circle2",
-	pie1 = "pie1",
-	pie2 = "pie2",
-	fillmin = "fillmin",
-	midcolor = "midcolor",
-	fillmid = "fillmid",
-	fillmax = "fillmax",
-	fillnull = "fillnull",
-	fillType = "fillType",
-	numberOfClasses = "numberOfClasses",
-	byCategoryColors = "byCategoryColors",
-	schemeColors = "schemeColors",
-	reverse = "reverse",
-	isGradient = "isGradient",
-	singleColor = "singleColor",
-	defaultColor = "defaultColor",
-	selectedCategoryName = "selectedCategoryName",
-	selectedCategoryColor = "selectedCategoryColor",
+	MarkerType = "markerType",
+	FillMin = "fillMin",
+	FillMid = "fillMid",
+	FillMax = "fillMax",
+	IsAddMidColor = "isAddMidColor",
+	FillType = "fillType",
+	SingleColor = "singleColor",
+	GradientColors = "gradientColors",
+	CategoryColors = "categoryColors",
+	NumberOfClasses = "numberOfClasses",
+	SchemeColors = "schemeColors",
+	ColorBlindSafe = "colorBlindSafe",
+	ColorScheme = "colorScheme",
+	Reverse = "reverse",
+	IsGradient = "isGradient",
+	Categories = "categories",
 }
 
 export enum ERankingSettings {
@@ -398,4 +392,9 @@ export enum EMarkerStyleProps {
 export enum EMarkerStyleTypes {
 	Marker1Style = "marker1Style",
 	Marker2Style = "marker2Style",
+}
+
+export enum EMarkerColorTypes {
+	Marker1 = "marker1",
+	Marker2 = "marker2",
 }

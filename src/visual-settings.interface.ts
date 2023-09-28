@@ -2,6 +2,7 @@ import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import {
 	CircleSize,
 	CircleType,
+	ColorPaletteType,
 	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
@@ -9,6 +10,7 @@ import {
 	EDataRolesName,
 	ELegendPosition,
 	EMarkerChartTypes,
+	EMarkerColorTypes,
 	EMarkerShapeTypes,
 	EMarkerStyleTypes,
 	EMarkerTypes,
@@ -177,11 +179,9 @@ export interface IDataLabelsSettings {
 }
 
 export interface IDataColorsSettings {
-	dataType: CircleType | PieType;
-	circle1: IDataColorsPropsSettings;
-	circle2: IDataColorsPropsSettings;
-	pie1: IDataColorsPropsSettings;
-	pie2: IDataColorsPropsSettings;
+	markerType: EMarkerColorTypes;
+	marker1: IDataColorsProps;
+	marker2: IDataColorsProps;
 }
 
 export interface ICategoryRankingProps {
@@ -206,24 +206,22 @@ export interface IRankingSettings {
 	subCategory: ISubCategoryRankingProps;
 }
 
-export interface IDataColorsPropsSettings {
-	fillmin: string;
-	midcolor: boolean;
-	fillmid: string;
-	fillmax: string;
-	fillnull: string;
-	fillType: string;
-	numberOfClasses: number;
-	byCategoryColors: { name: string; color: string }[];
-	schemeColors: string[];
-	reverse: boolean;
-	isGradient: boolean;
-	singleColor: string;
-	circleFillColor?: string;
-	circleStrokeColor?: string;
-	defaultColor?: string;
-	selectedCategoryName?: string;
-	selectedCategoryColor?: string;
+export interface IDataColorsProps {
+	fillMin: string;
+	fillMid: string;
+	fillMax: string;
+	isAddMidColor: boolean;
+	fillType: ColorPaletteType,
+	singleColor?: string,
+	gradientColors?: string[],
+	categoryColors?: { name: string, marker1: string, marker2: string }[],
+	numberOfClasses: number,
+	schemeColors: string[],
+	colorBlindSafe: boolean,
+	colorScheme: string,
+	reverse: boolean,
+	isGradient?: boolean,
+	categories?: any[],
 }
 
 export interface ILabelValuePair {

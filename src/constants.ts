@@ -7,6 +7,7 @@ import {
 	DataLabelsPlacement,
 	EAutoCustomTypes,
 	EMarkerChartTypes,
+	EMarkerColorTypes,
 	EMarkerDefaultShapes,
 	EMarkerShapeTypes,
 	EMarkerStyleTypes,
@@ -25,7 +26,7 @@ import {
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
-	IDataColorsPropsSettings,
+	IDataColorsProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IGridLinesSettings,
@@ -125,82 +126,29 @@ export const GRID_LINES_SETTINGS: IGridLinesSettings = {
 	yGridLines: Y_GRID_LINES_SETTINGS,
 };
 
-export const CIRCLE1_DATA_COLORS: IDataColorsPropsSettings = {
-	fillmin: "rgba(92,113,187,1)",
-	midcolor: false,
-	fillmid: "rgba(3,194,129,1)",
-	fillmax: "rgba(253,98,94,1)",
-	fillnull: "rgba(242,242,242,1)",
-	fillType: ColorPaletteType.Single,
-	numberOfClasses: 5,
-	byCategoryColors: [],
-	schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
-	reverse: false,
-	isGradient: false,
-	singleColor: "rgba(91,121,185,1)",
-	circleFillColor: "rgba(91,121,185,1)",
-	circleStrokeColor: "rgba(91,121,185,1)",
-};
-
-export const CIRCLE2_DATA_COLORS: IDataColorsPropsSettings = {
-	fillmin: "rgba(92,113,187,1)",
-	midcolor: false,
-	fillmid: "rgba(3,194,129,1)",
-	fillmax: "rgba(253,98,94,1)",
-	fillnull: "rgba(242,242,242,1)",
-	fillType: ColorPaletteType.Single,
-	numberOfClasses: 5,
-	byCategoryColors: [],
-	schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
-	reverse: false,
-	isGradient: false,
-	singleColor: "rgba(5,183,155,1)",
-	circleFillColor: "rgba(5,183,155,1)",
-	circleStrokeColor: "rgba(5,183,155,1)",
-};
-
-export const PIE1_DATA_COLORS: IDataColorsPropsSettings = {
-	fillmin: "rgba(92,113,187,1)",
-	midcolor: false,
-	fillmid: "rgba(3,194,129,1)",
-	fillmax: "rgba(253,98,94,1)",
-	fillnull: "rgba(242,242,242,1)",
+export const MARKER_DATA_COLORS: IDataColorsProps = {
+	fillMin: "rgba(186, 72, 239, 1)",
+	fillMid: "rgba(127, 88, 246, 1)",
+	fillMax: "rgba(75, 132, 244, 1)",
+	isAddMidColor: true,
 	fillType: ColorPaletteType.Gradient,
-	numberOfClasses: 5,
-	byCategoryColors: [],
-	schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
-	reverse: false,
-	isGradient: false,
 	singleColor: "rgba(92,113,187,1)",
-	defaultColor: "rgba(92,113,187,1)",
-	selectedCategoryName: null,
-	selectedCategoryColor: "rgba(5, 183, 155,1)",
-};
-
-export const PIE2_DATA_COLORS: IDataColorsPropsSettings = {
-	fillmin: "rgba(92,113,187,1)",
-	midcolor: false,
-	fillmid: "rgba(3,194,129,1)",
-	fillmax: "rgba(253,98,94,1)",
-	fillnull: "rgba(242,242,242,1)",
-	fillType: ColorPaletteType.Gradient,
+	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],
+	categoryColors: [],
 	numberOfClasses: 5,
-	byCategoryColors: [],
-	schemeColors: ["rgba(241,238,246,1)", "rgba(189,201,225,1)", "rgba(116,169,207,1)", "rgba(43,140,190,1)", "rgba(4,90,141,1)"],
+	schemeColors: [
+		'rgb(204,233,255)', 'rgb(160,214,255)', 'rgb(117,195,255)', 'rgb(68,176,255)', 'rgb(25,145,233)'
+	],
+	colorBlindSafe: false,
+	colorScheme: "Blue",
 	reverse: false,
-	isGradient: false,
-	singleColor: "rgba(92,113,187,1)",
-	defaultColor: "rgba(92,113,187,1)",
-	selectedCategoryName: null,
-	selectedCategoryColor: "rgba(5, 183, 155,1)",
+	isGradient: true,
 };
 
 export const DATA_COLORS: IDataColorsSettings = {
-	dataType: CircleType.Circle1,
-	circle1: CIRCLE1_DATA_COLORS,
-	circle2: CIRCLE2_DATA_COLORS,
-	pie1: PIE1_DATA_COLORS,
-	pie2: PIE2_DATA_COLORS,
+	markerType: EMarkerColorTypes.Marker1,
+	marker1: MARKER_DATA_COLORS,
+	marker2: MARKER_DATA_COLORS,
 };
 
 export const RANKING_SETTINGS: IRankingSettings = {
@@ -300,7 +248,7 @@ export const PATTERN_SETTINGS: IPatternSettings = {
 export const MARKER_SETTINGS: IMarkerSettings = {
 	markerType: EMarkerTypes.SHAPE,
 	markerShape: EMarkerShapeTypes.DEFAULT,
-	markerChart: EMarkerChartTypes.PIE,
+	markerChart: EMarkerChartTypes.DONUT,
 	markerShapeValue: undefined,
 	markerShapePath: "",
 	markerShapeBase64Url: "",
