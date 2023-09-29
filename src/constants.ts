@@ -86,7 +86,7 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 export const LINE_SETTINGS: ILineSettings = {
 	show: true,
 	lineType: LineType.Solid,
-	lineWidth: 8,
+	lineWidth: 6,
 	lineColor: "rgba(91,121,185,1)",
 };
 

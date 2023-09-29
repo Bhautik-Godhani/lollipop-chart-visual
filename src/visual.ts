@@ -4223,7 +4223,7 @@ export class Visual extends Shadow {
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
-					? `0, ${this.lineSettings.lineWidth * 2} `
+					? `${this.lineSettings.lineWidth}, ${this.lineSettings.lineWidth}`
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
 			.style("display", this.lineSettings.show ? "block" : "none");
@@ -4387,7 +4387,7 @@ export class Visual extends Shadow {
 				return lollipopG;
 			},
 			(update) => {
-				const lineSelection = update.select(this.lineClassSelector);
+				const lineSelection = update.select(this.lineClassSelector).attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
 				const marker1SymbolSelection = update
 					.select(".marker1-symbol");
