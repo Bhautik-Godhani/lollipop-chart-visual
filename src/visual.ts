@@ -48,6 +48,7 @@ import {
 	EMarkerShapeTypes,
 	EAutoCustomTypes,
 	EFontStyle,
+	EMarkerDefaultShapes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -260,7 +261,7 @@ export class Visual extends Shadow {
 	public isScrollBrushDisplayed: boolean;
 	public brushXAxisG: Selection<SVGElement>;
 	public brushXAxisTicksMaxHeight: number = 0;
-	public brushAndZoomAreaHeight: number = 60;
+	public brushAndZoomAreaHeight: number = 80;
 	public brushYAxisG: Selection<SVGElement>;
 	public brushYAxisTicksMaxWidth: number = 0;
 	public brushAndZoomAreaWidth: number = 150;
@@ -5414,37 +5415,70 @@ export class Visual extends Shadow {
 	drawBrushLollipopChart(clonedCategoricalData: powerbi.DataViewCategorical): void {
 		const brushScaleBandwidth = this.brushScaleBand.bandwidth();
 		const measures = clonedCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
-		const data = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce((arr, cur, i) => {
-			const obj = { category: cur, styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } } };
+
+		const getUID = (category: string) => {
+			return `${category}-
+			${this.isHasSubcategories}-
+			${this.isHasMultiMeasure}-
+			${this.isHasImagesData}-
+			${this.categoricalData.categories[0].values.length}-
+			${this.categoricalData.values.length}-
+			${this.markerSettings.markerType}-
+			${this.markerSettings.markerShape}-
+			${this.markerSettings.markerChart}-
+			${this.chartSettings.isShowImageMarker}`;
+		}
+
+		const data = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce((arr, cur: string, i) => {
+			const obj = { category: cur, uid: getUID(cur), styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } } };
 			measures.forEach((d, j) => {
 				obj[`value${j + 1}`] = +d.values[i];
 			})
 			arr = [...arr, obj];
 			return arr;
 		}, []);
+		let marker: IMarkerData;
+
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = this.markerSettings.markerShapeValue;
+			marker = {
+				label: this.markerSettings.markerShapeValue.iconName,
+				value: this.markerSettings.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: this.markerSettings.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker = CATEGORY_MARKERS.find(d => d.value === this.markerSettings.dropdownMarkerType);
+		}
+
+		if (this.markerSettings.markerType === EMarkerTypes.CHART || this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			marker = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
+		}
+
+		const setPath1Formatting = (circleSelection: any): void => {
+			circleSelection
+				.style("fill", (d: ILollipopChartRow) => {
+					let color = this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
+					color = color ? color : "rgba(92,113,187,1)";
+					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+					} else {
+						return color;
+					}
+				}
+				);
+		}
 
 		const setVerticalLinesFormatting = (linesSelection) => {
+			const size = (brushScaleBandwidth / 3) * 2;
 			linesSelection
 				.attr("x1", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
 				.attr("x2", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
 				.attr("y1", (d) => this.brushYScale(d.value1))
-				.attr("y2", (d) => this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) + brushScaleBandwidth / 3)
+				.attr("y2", (d) => this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? size / 2 : 0))
 				.attr("stroke", this.lineSettings.lineColor)
 				.attr("stroke-width", brushScaleBandwidth / 4);
-		}
-
-		const setVerticalCircleFormatting = (circleSelection: any, isCircle2: boolean = false) => {
-			circleSelection
-				.attr("cx", (d) => {
-					const cx = this.brushXScale(this.isHorizontalChart ? (isCircle2 ? d.value2 : d.value1) : d.category);
-					return cx + brushScaleBandwidth / 2;
-				})
-				.attr("cy", (d) => {
-					const cy = this.brushYScale(this.isHorizontalChart ? d.category : (isCircle2 ? d.value2 : d.value1));
-					return cy;
-				})
-				.attr("r", brushScaleBandwidth / 3)
-				.style("fill", (d: IBrushLollipopChartData) => isCircle2 ? d.styles.circle2.fillColor : d.styles.circle1.fillColor);
 		}
 
 		const setHorizontalLinesFormatting = (linesSelection) => {
@@ -5457,44 +5491,66 @@ export class Visual extends Shadow {
 				.attr("stroke-width", brushScaleBandwidth / 4);
 		}
 
-		const setHorizontalCircleFormatting = (circleSelection: any, isCircle2: boolean = false) => {
+		const setCircleFormatting = (circleSelection: any, isCircle2: boolean = false, marker: IMarkerData) => {
+			const size = (brushScaleBandwidth / 2.5) * 2;
 			circleSelection
-				.attr("cx", (d) => {
+				.attr("x", (d) => {
 					const cx = this.brushXScale(this.isHorizontalChart ? (isCircle2 ? d.value2 : d.value1) : d.category);
-					return cx;
+					return this.isHorizontalChart ? cx - size / 2 : cx + brushScaleBandwidth / 2 - size / 2;
 				})
-				.attr("cy", (d) => {
+				.attr("y", (d) => {
 					const cy = this.brushYScale(this.isHorizontalChart ? d.category : (isCircle2 ? d.value2 : d.value1));
-					return cy + brushScaleBandwidth / 2;
+					return this.isHorizontalChart ? cy + brushScaleBandwidth / 2 - size / 2 : cy - size / 2;
 				})
-				.attr("r", brushScaleBandwidth / 3)
-				.style("fill", (d: IBrushLollipopChartData) => isCircle2 ? d.styles.circle2.fillColor : d.styles.circle1.fillColor);
+				.attr("width", size)
+				.attr("height", size)
+				.attr("href", d => `#${d.category}_${marker.value}_MARKER1`);
 		}
 
-		const lollipopGSelection = this.brushLollipopG.selectAll(".brush-lollipop-group").data(data);
+		const lollipopGSelection = this.brushLollipopG.selectAll(".brush-lollipop-group").data(data, (d: any) => d.uid);
 		lollipopGSelection.join(
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "brush-lollipop-group");
 				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed("brush-lollipop-line", true);
-				const circle1Selection = lollipopG.append("circle").attr("class", "chart-circle1").classed(this.circleClass, true);
+
+				const symbol1 = lollipopG.append("defs")
+					.append("symbol")
+					.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+					.attr("class", "marker1-symbol")
+					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+				const path1Selection = symbol1.append("path")
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					})
+					.attr("d", marker.paths[0].d)
+					.attr("class", "marker1-path");
+
+				const circle1Selection = lollipopG.append("use")
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					})
+					.attr("id", CircleType.Circle1)
+					.classed(this.circleClass, true)
+					.classed("chart-circle1", true);
+
+				setPath1Formatting(path1Selection);
+				setCircleFormatting(circle1Selection, false, marker);
+
+				if (this.isHasMultiMeasure) {
+					const circle2Selection = lollipopG.append("use")
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+						})
+						.attr("id", CircleType.Circle2)
+						.classed(this.circleClass, true).classed("chart-circle2", true);
+
+					setCircleFormatting(circle2Selection, true, marker);
+				}
 
 				if (this.isHorizontalChart) {
-					setHorizontalCircleFormatting(circle1Selection);
-
-					if (this.isHasMultiMeasure) {
-						const circle2Selection = lollipopG.append("circle").attr("class", "chart-circle2").classed(this.circleClass, true);
-						setHorizontalCircleFormatting(circle2Selection, true);
-					}
-
 					setHorizontalLinesFormatting(lineSelection);
 				} else {
-					setVerticalCircleFormatting(circle1Selection);
-
-					if (this.isHasMultiMeasure) {
-						const circle2Selection = lollipopG.append("circle").attr("class", "chart-circle2").classed(this.circleClass, true);
-						setVerticalCircleFormatting(circle2Selection, true);
-					}
-
 					setVerticalLinesFormatting(lineSelection);
 				}
 
@@ -5505,25 +5561,28 @@ export class Visual extends Shadow {
 				const circle1Selection = update.select(".chart-circle1");
 				const circle2Selection = update.select(".chart-circle2");
 
+				update
+					.select(".marker1-symbol")
+					.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+				const path1Selection = update.select(".marker1-path")
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					})
+					.attr("d", marker.paths[0].d);
+
+				setPath1Formatting(path1Selection);
+				setCircleFormatting(circle1Selection, false, marker);
+
+				if (this.isHasMultiMeasure) {
+					setCircleFormatting(circle2Selection, true, marker);
+				}
+
 				if (this.isHorizontalChart) {
 					setHorizontalLinesFormatting(lineSelection);
-
-					setHorizontalCircleFormatting(circle1Selection);
-					if (this.isHasMultiMeasure) {
-						setHorizontalCircleFormatting(circle2Selection, true);
-					} else {
-						circle2Selection.remove();
-					}
 				} else {
 					setVerticalLinesFormatting(lineSelection);
-
-					setVerticalCircleFormatting(circle1Selection);
-					if (this.isHasMultiMeasure) {
-						setVerticalCircleFormatting(circle2Selection, true);
-					} else {
-						circle2Selection.remove();
-					}
-
 				}
 
 				return update;
