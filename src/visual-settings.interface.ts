@@ -8,6 +8,7 @@ import {
 	DisplayUnits,
 	EAutoCustomTypes,
 	EDataRolesName,
+	EFontStyle,
 	ELegendPosition,
 	EMarkerChartTypes,
 	EMarkerColorTypes,
@@ -173,7 +174,7 @@ export interface IDataLabelsSettings {
 	showBackground: boolean;
 	backgroundColor: string;
 	transparency: number;
-	fontStyle: string[];
+	fontStyle: EFontStyle[];
 	placement: DataLabelsPlacement;
 	fontSizeType: DataLabelsFontSizeType;
 }

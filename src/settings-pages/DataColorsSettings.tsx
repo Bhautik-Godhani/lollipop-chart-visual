@@ -178,9 +178,7 @@ const UIColorPaletteTypes = (
 						<ColorSchemePicker
 							colorSchemePickerProps={values}
 							onChange={(d) => {
-								console.log(d);
 								setConfigValues((t) => {
-									console.log(t)
 									return { ...t, [t.markerType]: d };
 								});
 							}}

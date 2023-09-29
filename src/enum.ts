@@ -398,3 +398,9 @@ export enum EMarkerColorTypes {
 	Marker1 = "marker1",
 	Marker2 = "marker2",
 }
+
+export enum EFontStyle {
+	Bold = "bold",
+	Italic = "italic",
+	UnderLine = "underline",
+}

@@ -47,6 +47,7 @@ import {
 	EMarkerTypes,
 	EMarkerShapeTypes,
 	EAutoCustomTypes,
+	EFontStyle,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -1558,6 +1559,11 @@ export class Visual extends Shadow {
 			}
 
 			this.drawLollipopChart();
+			this.drawData1Labels(this.chartData);
+			if (this.isHasMultiMeasure) {
+				this.drawData2Labels(this.chartData);
+			}
+
 			this.setSummaryTableConfig();
 			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 
@@ -2609,19 +2615,19 @@ export class Visual extends Shadow {
 				// this.lineSelection
 				// 	.attr("y1", (d) => this.yScale(d.category))
 				// 	.attr("y2", (d) => this.yScale(d.category))
-				// 	.attr("opacategory", (d) => {
+				// 	.attr("opacity", (d) => {
 				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
 				// this.circle1Selection
 				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.category : d.value1))
-				// 	.attr("opacategory", (d) => {
+				// 	.attr("opacity", (d) => {
 				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
 				// this.circle2Selection
 				// 	.attr("cy", (d) => this.yScale(this.isHorizontalChart ? d.category : d.value1))
-				// 	.attr("opacategory", (d) => {
+				// 	.attr("opacity", (d) => {
 				// 		return this.yScale(d.category) ? 1 : 0;
 				// 	});
 
@@ -2645,10 +2651,10 @@ export class Visual extends Shadow {
 
 				this.drawLollipopChart();
 
-				// this.drawData1Labels(this.circle1Settings.show ? this.chartData : []);
-				// if (this.isHasMultiMeasure) {
-				// 	this.drawData2Labels(this.circle2Settings.show ? this.chartData : []);
-				// }
+				this.drawData1Labels(this.dataLabelsSettings.show ? this.chartData : []);
+				if (this.isHasMultiMeasure) {
+					this.drawData2Labels(this.dataLabelsSettings.show ? this.chartData : []);
+				}
 
 				// this.updatePiePositionOnBrushMove();
 			} else {
@@ -2806,10 +2812,10 @@ export class Visual extends Shadow {
 				// }
 
 				// this.setXAxisTickStyle();
-				// this.drawData1Labels(this.chartData);
-				// if (this.isHasMultiMeasure) {
-				// 	this.drawData2Labels(this.chartData);
-				// }
+				this.drawData1Labels(this.chartData);
+				if (this.isHasMultiMeasure) {
+					this.drawData2Labels(this.chartData);
+				}
 				// this.updatePiePositionOnBrushMove();
 			} else {
 				this.isScrollBrushDisplayed = false;
@@ -2954,7 +2960,7 @@ export class Visual extends Shadow {
 					const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value1"]));
 					return pieY > 0 ? pieY - pie1ViewBoxRadius : pieY - pie1ViewBoxRadius / 2;
 				})
-				.attr("opacategory", (d) => {
+				.attr("opacity", (d) => {
 					if (this.isHorizontalChart) {
 						return this.yScale(d.category) ? 1 : 0;
 					} else {
@@ -2973,7 +2979,7 @@ export class Visual extends Shadow {
 						const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value2"]));
 						return pieY > 0 ? pieY - pie2ViewBoxRadius : pieY - pie2ViewBoxRadius / 2;
 					})
-					.attr("opacategory", (d) => {
+					.attr("opacity", (d) => {
 						if (this.isHorizontalChart) {
 							return this.yScale(d.category) ? 1 : 0;
 						} else {
@@ -3068,12 +3074,12 @@ export class Visual extends Shadow {
 	}
 
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
-		const circleRadius = isData2Label ? this.circle2Size : this.circle1Size;
+		const circleRadius = isData2Label ? this.circle2Size / 2 : this.circle1Size / 2;
 		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			return this.dataLabelsSettings.fontSize;
 		}
 		if (this.dataLabelsSettings.fontSizeType === DataLabelsFontSizeType.Auto) {
-			const fontSize = circleRadius / 1.4;
+			const fontSize = circleRadius * 0.7;
 			this.dataLabelsSettings.fontSize = fontSize;
 			return fontSize;
 		} else {
@@ -3084,12 +3090,13 @@ export class Visual extends Shadow {
 	setDataLabelsFormatting(labelSelection: any, textSelection: any, rectSelection: any, isData2Label: boolean = false): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
 		const key = isData2Label ? "value2" : "value1";
+		const THIS = this;
 
 		labelSelection
 			.attr("class", "dataLabelG")
 			.attr("display", "block")
-			.attr("opacategory", dataLabelsSettings.show ? "1" : "0")
-			.style("pointer-events", "none");
+			.attr("opacity", dataLabelsSettings.show ? "1" : "0")
+		// .style("pointer-events", "none");
 
 		textSelection
 			.classed("dataLabelText", true)
@@ -3098,8 +3105,9 @@ export class Visual extends Shadow {
 			.attr("dy", "0.02em")
 			.attr("font-size", this.getDataLabelsFontSize(isData2Label))
 			.style("font-family", dataLabelsSettings.fontFamily)
-			// .style('font-weight', dataLabelsSettings.fontStyle === FontStyle.Bold ? 'bold' : '')
-			// .style('font-style', dataLabelsSettings.fontStyle === FontStyle.Italic ? 'italic' : '')
+			.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d) => this.formatNumber(d[key], this.measureNumberFormatter[isData2Label ? 1 : 0]));
 
 		rectSelection
@@ -3117,10 +3125,10 @@ export class Visual extends Shadow {
 			.attr("rx", 4)
 			.attr("ry", 4)
 			.attr("fill", dataLabelsSettings.backgroundColor)
-			.attr("opacategory", "0");
+			.attr("opacity", "0");
 
 		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-			rectSelection.attr("fill-opacategory", `${100 - dataLabelsSettings.transparency}% `).attr("opacategory", dataLabelsSettings.showBackground ? "1" : "0");
+			rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
 		}
 
 		textSelection.attr("transform", function () {
@@ -3136,13 +3144,13 @@ export class Visual extends Shadow {
 
 		if (this.isHorizontalChart) {
 			if (this.isLollipopTypeCircle) {
-				x = this.getCircleCX(this.xScale(isPie2 ? d.value2 : d.value1));
-				y = this.getCircleCY(this.yScale(d.category));
+				x = this.xScale(isPie2 ? d.value2 : d.value1) + (isPie2 ? this.circle1Size : 0);
+				y = this.yScale(d.category) + this.scaleBandWidth / 2;
 			}
 		} else {
 			if (this.isLollipopTypeCircle) {
-				x = this.getCircleCX(this.xScale(d.category));
-				y = this.getCircleCY(this.yScale(isPie2 ? d.value2 : d.value1));
+				x = this.xScale(d.category) + this.scaleBandWidth / 2;
+				y = this.yScale(isPie2 ? d.value2 : d.value1) - (isPie2 ? this.circle2Size : 0);
 			}
 		}
 		return { x, y };
@@ -3259,7 +3267,7 @@ export class Visual extends Shadow {
 	}
 
 	transformData1LabelOutside(labelSelection: any): void {
-		const labelDistance = this.isLollipopTypeCircle ? this.circle1Size / 0.7 : this.pie1Radius / 0.7;
+		const labelDistance = this.isLollipopTypeCircle ? this.circle1Size / 0.8 : this.pie1Radius / 0.5;
 
 		if (this.isHorizontalChart) {
 			this.transformHorizontalData1LabelOutside(labelSelection, labelDistance);
@@ -3270,7 +3278,7 @@ export class Visual extends Shadow {
 
 	transformData2LabelOutside(labelSelection: any): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = this.isLollipopTypeCircle ? this.circle2Size / 0.7 : this.pie2Radius / 0.7;
+		const labelDistance = this.isLollipopTypeCircle ? this.circle2Size / 0.8 : this.pie2Radius / 0.5;
 
 		const fn = (d, bBox) => {
 			if (this.isHorizontalChart) {
@@ -3332,11 +3340,13 @@ export class Visual extends Shadow {
 
 	transformData1LabelInside(labelsSelection: any): void {
 		const fn = (d, labelBBox: any) => {
-			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value1 : d.category));
-			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.category : d.value1));
-			const transX = x - labelBBox.width / 2;
-			const transY = y - labelBBox.height / 2;
-			return `translate(${transX}, ${transY})`;
+			const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
+			const x = this.isHorizontalChart ? cx + this.circle1Size / 2 - labelBBox.width / 2 : cx + this.scaleBandWidth / 2 - labelBBox.width / 2;
+
+			const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
+			const y = this.isHorizontalChart ? cy + this.scaleBandWidth / 2 - labelBBox.height / 2 : cy - this.circle1Size / 2 - labelBBox.height / 2;
+
+			return `translate(${x}, ${y})`;
 		};
 
 		labelsSelection.attr("transform", function (d) {
@@ -3347,11 +3357,13 @@ export class Visual extends Shadow {
 
 	transformData2LabelInside(labelsSelection: any): void {
 		const fn = (d, labelBBox) => {
-			const x = this.getCircleCX(this.xScale(this.isHorizontalChart ? d.value2 : d.category));
-			const y = this.getCircleCY(this.yScale(this.isHorizontalChart ? d.category : d.value2));
-			const transX = x - labelBBox.width / 2;
-			const transY = y - labelBBox.height / 2;
-			return `translate(${transX}, ${transY})`;
+			const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
+			const x = this.isHorizontalChart ? cx + this.circle2Size / 2 - labelBBox.width / 2 : cx + this.scaleBandWidth / 2 - labelBBox.width / 2;
+
+			const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
+			const y = this.isHorizontalChart ? cy + this.scaleBandWidth / 2 - labelBBox.height / 2 : cy - this.circle2Size / 2 - labelBBox.height / 2;
+
+			return `translate(${x}, ${y})`;
 		};
 
 		labelsSelection.attr("transform", function (d) {
@@ -3361,11 +3373,14 @@ export class Visual extends Shadow {
 	}
 
 	drawData1Labels(data: ILollipopChartRow[]): void {
+		const THIS = this;
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			return this.isHorizontalChart ? this.yScale(data.category) : this.xScale(data.category);
+			const xScaleValue = this.xScale(data.category);
+			const yScaleValue = this.yScale(data.category);
+			return this.isHorizontalChart ? (yScaleValue >= 0 && yScaleValue !== null && yScaleValue !== undefined) : (xScaleValue >= 0 && xScaleValue !== null && xScaleValue !== undefined);
 		});
 
 		const dataLabelGSelection = this.dataLabels1G.selectAll(".dataLabelG").data(labelsData);
@@ -3418,14 +3433,33 @@ export class Visual extends Shadow {
 		);
 
 		this.dataLabels1G.selectAll(".dataLabelG").select("text").raise();
+
+		dataLabelGSelection
+			.each(function () {
+				const ele = d3.select(this);
+				const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
+
+				ele
+					.attr("opacity", (d: IBrushLollipopChartData) => {
+						if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							return (getBBox.width > THIS.circle1Size || getBBox.height > THIS.circle1Size) ? 0 : 1;
+						} else {
+							const space = THIS.height - THIS.yScale(d.value1);
+							return space < getBBox.width ? 0 : 1;
+						}
+					});
+			});
 	}
 
 	drawData2Labels(data: ILollipopChartRow[]): void {
+		const THIS = this;
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			return this.isHorizontalChart ? this.yScale(data.category) : this.xScale(data.category);
+			const xScaleValue = this.xScale(data.category);
+			const yScaleValue = this.yScale(data.category);
+			return this.isHorizontalChart ? (yScaleValue >= 0 && yScaleValue !== null && yScaleValue !== undefined) : (xScaleValue >= 0 && xScaleValue !== null && xScaleValue !== undefined);
 		});
 
 		const dataLabelGSelection = this.dataLabels2G.selectAll(".dataLabelG").data(labelsData);
@@ -3478,6 +3512,22 @@ export class Visual extends Shadow {
 		);
 
 		this.dataLabels2G.selectAll(".dataLabelG").select("text").raise();
+
+		dataLabelGSelection
+			.each(function () {
+				const ele = d3.select(this);
+				const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
+
+				ele
+					.attr("opacity", (d: IBrushLollipopChartData) => {
+						if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							return (getBBox.width > THIS.circle2Size || getBBox.height > THIS.circle2Size) ? 0 : 1;
+						} else {
+							const space = THIS.height - THIS.yScale(d.value2);
+							return space < getBBox.width ? 0 : 1;
+						}
+					});
+			});
 	}
 
 	drawTooltip(): void {
@@ -3936,7 +3986,7 @@ export class Visual extends Shadow {
 			.attr("y2", this.height)
 			.attr("stroke", this.xGridSettings.lineColor)
 			.attr("stroke-width", this.xGridSettings.lineWidth)
-			.attr("opacategory", 1)
+			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
 				this.xGridSettings.lineType === LineType.Dotted
@@ -3956,7 +4006,7 @@ export class Visual extends Shadow {
 			.attr("y2", (d) => this.yScale(d))
 			.attr("stroke", this.yGridSettings.lineColor)
 			.attr("stroke-width", this.yGridSettings.lineWidth)
-			.attr("opacategory", 1)
+			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
 				this.yGridSettings.lineType === LineType.Dotted
@@ -4845,7 +4895,7 @@ export class Visual extends Shadow {
 			.selectAll(foreignObjectId)
 			.selectAll("text")
 			.style("pointer-events", "none")
-			.style("opacategory", function () {
+			.style("opacity", function () {
 				return (this as SVGSVGElement).getBBox().width >= pieRadius * 2 ? "0" : "1";
 			});
 	}
