@@ -357,7 +357,6 @@ const DataLabelsSettings = (props) => {
 						label={"Show Data Labels"}
 						value={configValues.show}
 						handleChange={() => handleCheckbox(EDataLabelsSettings.show, setConfigValues)}
-						appearance="checkbox"
 					/>
 				</Column>
 			</Row>

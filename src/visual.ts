@@ -1559,10 +1559,6 @@ export class Visual extends Shadow {
 			}
 
 			this.drawLollipopChart();
-			this.drawData1Labels(this.chartData);
-			if (this.isHasMultiMeasure) {
-				this.drawData2Labels(this.chartData);
-			}
 
 			this.setSummaryTableConfig();
 			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
@@ -2650,12 +2646,6 @@ export class Visual extends Shadow {
 				CallExpandAllYScaleOnAxisGroup(this, this.width * 0.06);
 
 				this.drawLollipopChart();
-
-				this.drawData1Labels(this.dataLabelsSettings.show ? this.chartData : []);
-				if (this.isHasMultiMeasure) {
-					this.drawData2Labels(this.dataLabelsSettings.show ? this.chartData : []);
-				}
-
 				// this.updatePiePositionOnBrushMove();
 			} else {
 				this.isScrollBrushDisplayed = false;
@@ -2812,10 +2802,6 @@ export class Visual extends Shadow {
 				// }
 
 				// this.setXAxisTickStyle();
-				this.drawData1Labels(this.chartData);
-				if (this.isHasMultiMeasure) {
-					this.drawData2Labels(this.chartData);
-				}
 				// this.updatePiePositionOnBrushMove();
 			} else {
 				this.isScrollBrushDisplayed = false;
@@ -3002,21 +2988,6 @@ export class Visual extends Shadow {
 		return this.vizOptions.options.dataViews[0].categorical.categories.findIndex((data) => data.source.roles[key] === true);
 	}
 
-	// Number Format
-	getAutoUnitFormattedNumber(number: number): string {
-		// const numberSettings = this.numberSettings;
-		// if (number < 1.0e6) {
-		// 	return this.decimalSeparator(+(number / 1.0e3).toFixed(numberSettings.decimalPlaces)) + numberSettings.thousands;
-		// } else if (number >= 1.0e6 && number < 1.0e9) {
-		// 	return this.decimalSeparator(+(number / 1.0e6).toFixed(numberSettings.decimalPlaces)) + numberSettings.million;
-		// } else if (number >= 1.0e9 && number < 1.0e12) {
-		// 	return this.decimalSeparator(+(number / 1.0e9).toFixed(numberSettings.decimalPlaces)) + numberSettings.billion;
-		// } else if (number >= 1.0e12) {
-		// 	return this.decimalSeparator(+(number / 1.0e12).toFixed(numberSettings.decimalPlaces)) + numberSettings.trillion;
-		// }
-
-		return number.toString();
-	}
 
 	thousandsSeparator(number: number): string {
 		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, this.numberSettings.thousandsSeparator);
@@ -4510,6 +4481,9 @@ export class Visual extends Shadow {
 				return update;
 			}
 		) as any;
+
+		this.drawData1Labels(this.dataLabelsSettings.show && this.isLollipopTypeCircle ? this.chartData : []);
+		this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.chartData : []);
 	}
 
 	//.CIRCLE
@@ -4825,7 +4799,7 @@ export class Visual extends Shadow {
 					emphasis: {
 						scale: false,
 					},
-					data: this.getPieChartSeriesDataByCategory(category),
+					data: this.getPieChartSeriesDataByCategory(category, isPie2),
 				},
 			],
 		};
@@ -4844,15 +4818,21 @@ export class Visual extends Shadow {
 		// };
 
 		pieOption.series[0].label = {
-			show: false,
+			show: this.dataLabelsSettings.show,
 			color: this.dataLabelsSettings.color,
 			textBorderColor: this.dataLabelsSettings.borderColor,
 			textBorderWidth: this.dataLabelsSettings.borderWidth,
 			fontSize: this.getPieDataLabelsFontSize(isPie2),
 			fontFamily: this.dataLabelsSettings.fontFamily,
+			textDecoration: "underline",
+			textStyle: {
+				fontWeight: this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "",
+				fontStyle: this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "",
+				decoration: this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "", // Set text decoration to underline
+			},
 			position: "center",
 			formatter: () => {
-				return this.getAutoUnitFormattedNumber(categoryValue);
+				return this.formatNumber(categoryValue, this.measureNumberFormatter[isPie2 ? 1 : 0]);
 			},
 		};
 

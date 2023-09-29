@@ -94,7 +94,7 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	show: true,
 	color: "#fff",
 	borderColor: "rgba(255, 255, 255,1)",
-	borderWidth: 2,
+	borderWidth: 1,
 	orientation: Orientation.Horizontal,
 	fontSize: 12,
 	pieDataLabelFontSize: 12,
