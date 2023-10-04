@@ -4200,8 +4200,8 @@ export class Visual extends Shadow {
 		lineSelection
 			.attr("class", this.xGridSettings.lineType)
 			.classed("grid-line", true)
-			.attr("x1", (d) => this.xScale(d))
-			.attr("x2", (d) => this.xScale(d))
+			.attr("x1", (d) => this.xScale(d) + this.scaleBandWidth / 2)
+			.attr("x2", (d) => this.xScale(d) + this.scaleBandWidth / 2)
 			.attr("y1", this.margin.top)
 			.attr("y2", this.height)
 			.attr("stroke", this.xGridSettings.lineColor)
@@ -4424,8 +4424,8 @@ export class Visual extends Shadow {
 		// this.callXYScaleOnAxisGroup();
 		// this.setXAxisTickStyle();
 		// this.setYAxisTickStyle();
-		// this.drawXGridLines();
-		// this.drawYGridLines();
+		this.drawXGridLines();
+		this.drawYGridLines();
 	}
 
 	// Lines
