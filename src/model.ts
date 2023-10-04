@@ -18,6 +18,8 @@ export interface ILollipopChartRow {
 	defaultValue?: number;
 	pattern?: IPatternProps;
 	imageDataUrl?: string;
+	raceChartKey?: string;
+	raceChartDataLabel?: string;
 }
 
 export interface IChartSubCategory {

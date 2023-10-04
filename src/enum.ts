@@ -11,6 +11,7 @@ export enum EVisualConfig {
 	YAxisConfig = "yAxisConfig",
 	ShowBucketConfig = "showBucketConfig",
 	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig",
+	RaceChartConfig = "raceChartConfig",
 	PatternConfig = "patternConfig"
 }
 
@@ -32,6 +33,7 @@ export enum EVisualSettings {
 	ShowBucketFormatting = "showBucket",
 	Footer = "footer",
 	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings",
+	RaceChartSettings = "raceChartSettings",
 	PatternSettings = "patternSettings",
 }
 
@@ -156,6 +158,7 @@ export enum EDataRolesName {
 	Category = "category",
 	SubCategory = "subCategory",
 	Measure = "measure",
+	RaceChartData = "raceChartData",
 	Measure1 = "measure1",
 	Measure2 = "measure2",
 	Tooltip = "tooltip",
@@ -361,6 +364,19 @@ export enum EMarkerSettings {
 	MarkerStyleType = "markerStyleType"
 }
 
+export enum ERaceChartSettings {
+	AllowTransition = "allowTransition",
+	TransitionDuration = "transitionDuration",
+	DataChangeInterval = "dataChangeInterval",
+	LabelColor = "labelColor",
+	LabelFontSize = "labelFontSize",
+	IsLabelAutoFontSize = "isLabelAutoFontSize",
+	LabelFontFamily = "labelFontFamily",
+	TickerButtonRadius = "tickerButtonRadius",
+	IsTickerButtonAutoRadius = "isTickerButtonAutoRadius",
+	TickerButtonColor = "tickerButtonColor",
+}
+
 export enum EMarkerTypes {
 	SHAPE = "shape",
 	CHART = "chart"
@@ -403,4 +419,9 @@ export enum EFontStyle {
 	Bold = "bold",
 	Italic = "italic",
 	UnderLine = "underline",
+}
+
+export enum EPlayPauseButton {
+	Play = "play",
+	Pause = "pause",
 }

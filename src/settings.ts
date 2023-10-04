@@ -49,6 +49,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public editor = new Editor();
 	public brushAndZoomAreaConfig = new BrushAndZoomAreaConfig();
 	public patternConfig = new PatternConfig();
+	public raceChartConfig = new RaceChartConfig();
 }
 
 export class License {
@@ -139,4 +140,8 @@ export class BrushAndZoomAreaConfig {
 
 export class PatternConfig {
 	public patternSettings: string = "{}";
+}
+
+export class RaceChartConfig {
+	public raceChartSettings: string = "{}";
 }

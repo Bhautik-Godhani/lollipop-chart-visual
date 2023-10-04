@@ -20,6 +20,7 @@ const sectionKVPair = [
 	{ footer: "Footer" },
 	{ editor: "Editor" },
 	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
+	{ raceChartConfig: "Race Chart Configuration" },
 ];
 
 const formatTab = {
@@ -538,6 +539,15 @@ const formatTab = {
 		{
 			technicalName: "patternSettings",
 			displayName: "Pattern Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	raceChartConfig: [
+		{
+			technicalName: "raceChartSettings",
+			displayName: "Race Chart Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

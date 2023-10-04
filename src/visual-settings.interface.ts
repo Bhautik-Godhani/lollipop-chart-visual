@@ -337,3 +337,16 @@ export interface IConditionalFormattingProps {
 	sourceName: string,
 	staticValue: string
 }
+''
+export interface IRaceChartSettings {
+	allowTransition: boolean;
+	transitionDuration: number;
+	dataChangeInterval: number;
+	labelColor: string;
+	labelFontSize: number;
+	isLabelAutoFontSize: boolean;
+	labelFontFamily: string;
+	tickerButtonRadius: number;
+	isTickerButtonAutoRadius: boolean;
+	tickerButtonColor: string;
+}

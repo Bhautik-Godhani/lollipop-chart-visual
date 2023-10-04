@@ -24,6 +24,7 @@ export class Enumeration {
 			getFooterSelection(),
 			getEditorSelection(),
 			getPatternSelection(),
+			getRaceChartSelection(),
 		];
 	}
 }
@@ -412,6 +413,19 @@ function getPatternSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "patternSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getRaceChartSelection(): EnumerateSectionType {
+	return {
+		name: "raceChartConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "raceChartSettings",
 				isShow: true,
 			},
 		],

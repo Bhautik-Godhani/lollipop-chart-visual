@@ -16,6 +16,11 @@
 			"kind": "Measure"
 		},
 		{
+			"displayName": "Race Chart Data",
+			"name": "raceChartData",
+			"kind": "Grouping"
+		},
+		{
 			"displayName": "Tooltips",
 			"name": "tooltip",
 			"kind": "Measure"
@@ -61,9 +66,18 @@
 			],
 			"categorical": {
 				"categories": {
-					"for": {
-						"in": "category"
-					},
+					"select": [
+						{
+							"for": {
+								"in": "category"
+							}
+						},
+						{
+							"for": {
+								"in": "raceChartData"
+							}
+						}
+					],
 					"dataReductionAlgorithm": {
 						"top": {
 							"count": 30000
@@ -604,6 +618,18 @@
 			"properties": {
 				"brushAndZoomAreaSettings": {
 					"displayName": "Brush And Zoom Area",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
+		"raceChartConfig": {
+			"displayName": "Race Chart Configuration",
+			"properties": {
+				"raceChartSettings": {
+					"displayName": "Race Chart Settings",
 					"description": "",
 					"type": {
 						"text": true

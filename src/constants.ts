@@ -34,6 +34,7 @@ import {
 	IMarkerSettings,
 	IPatternSettings,
 	IPiePropsSettings,
+	IRaceChartSettings,
 	IRankingSettings,
 	IShowBucketSettings,
 	ISortingSettings,
@@ -87,7 +88,7 @@ export const LINE_SETTINGS: ILineSettings = {
 	show: true,
 	lineType: LineType.Solid,
 	lineWidth: 6,
-	lineColor: "rgba(91,121,185,1)",
+	lineColor: "rgba(128, 128, 128, 1)",
 };
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
@@ -256,4 +257,17 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: { sizeType: EAutoCustomTypes.Auto, size: 0 },
 	marker2Style: { sizeType: EAutoCustomTypes.Auto, size: 0 }
+};
+
+export const RACE_CHART_SETTINGS: IRaceChartSettings = {
+	allowTransition: true,
+	transitionDuration: 500,
+	dataChangeInterval: 500,
+	labelColor: "rgba(102,102,102,1)",
+	labelFontSize: 40,
+	isLabelAutoFontSize: true,
+	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	tickerButtonRadius: 30,
+	isTickerButtonAutoRadius: true,
+	tickerButtonColor: "rgba(102,102,102,1)",
 };
