@@ -1792,7 +1792,7 @@ export class Visual extends Shadow {
 			}
 
 			// this.displayBrush();
-			// this.drawTooltip();
+			this.drawTooltip();
 
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
@@ -3754,13 +3754,13 @@ export class Visual extends Shadow {
 
 	drawTooltip(): void {
 		this.tooltipServiceWrapper.addTooltip(
-			d3.selectAll(".chart-circle1"),
+			this.lollipopG.selectAll(this.circle1ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, true)),
 			(datapoint: any) => datapoint.selectionId
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
-			d3.selectAll(".chart-circle2"),
+			this.lollipopG.selectAll(this.circle2ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, false)),
 			(datapoint: any) => datapoint.selectionId
 		);

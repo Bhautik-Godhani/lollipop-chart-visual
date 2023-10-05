@@ -106,7 +106,7 @@ export class NumberFormatting {
 	public show: boolean = true;
 	public decimalSeparator: string = ".";
 	public thousandsSeparator: string = ",";
-	public decimalPlaces: number = 2;
+	public decimalPlaces: number = 0;
 	public scaling: string = "auto";
 	public prefix: string = "";
 	public suffix: string = "";
