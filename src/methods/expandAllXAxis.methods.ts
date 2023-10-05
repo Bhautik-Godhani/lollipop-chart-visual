@@ -18,7 +18,7 @@ export const RenderExpandAllXAxis = (self: Visual, categoricalData: powerbi.Data
 	});
 };
 
-export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number, height: number): void => {
+export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): void => {
 	const {labelFontFamily, labelFontSize} = self.xAxisSettings;
 	const expandAxisGHeight = getSVGTextSize("X-Axis", labelFontFamily, labelFontSize).height;
 	self.expandAllCategoriesName.forEach((category: string, i: number) => {

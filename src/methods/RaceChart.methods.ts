@@ -14,16 +14,7 @@ export const StartChartRace = (self: Visual) => {
             self.chartData = self.raceChartData.filter((d) => d.raceChartKey === self.raceChartKeyOnTick);
 
             if (self.chartData.length > 0) {
-                if (self.rankingSettings.category.enabled || self.rankingSettings.subCategory.enabled) {
-                    self.setRemainingAsOthersDataColor();
-                }
-
-                if (self.conditionalFormattingConditions.length) {
-                    self.setConditionalFormattingColor();
-                }
-
-                self.drawXYAxis();
-                self.drawLollipopChart();
+                self.initAndRenderLollipopChart(self.width);
             }
         };
 
