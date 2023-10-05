@@ -15,7 +15,10 @@ export const StartChartRace = (self: Visual) => {
 
             if (self.chartData.length > 0) {
                 self.initAndRenderLollipopChart(self.width);
-                self.drawBrushLollipopChart(self.clonedCategoricalData);
+
+                if (self.brushAndZoomAreaSettings.enabled) {
+                    self.drawBrushLollipopChart(self.clonedCategoricalData);
+                }
             }
         };
 

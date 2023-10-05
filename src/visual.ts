@@ -234,6 +234,7 @@ export class Visual extends Shadow {
 	subCategoriesColorList: { name: string, marker1: string, marker2: string }[];
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
+	isHasNegativeValue: boolean;
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -277,6 +278,9 @@ export class Visual extends Shadow {
 	public brushAndZoomAreaMinWidth: number = 100;
 	public brushAndZoomAreaMaxWidth: number = 200;
 	public brushAndZoomAreaWidth: number = 0;
+
+	// axis
+	public zeroSeparatorLine: D3Selection<SVGElement>;
 
 	// xAxis
 	public xAxisG: D3Selection<SVGElement>;
@@ -608,6 +612,8 @@ export class Visual extends Shadow {
 		this.brushLollipopG = this.brushG.append("g").attr("class", "brushLollipopG");
 
 		this.container = this.svg.append("g").classed("container", true);
+
+		this.zeroSeparatorLine = this.container.append("line").classed("zeroSeparatorLine", true);
 
 		this.xGridLinesG = this.container.append("g").classed("xGridLinesG", true);
 
@@ -4051,6 +4057,8 @@ export class Visual extends Shadow {
 		let max = d3.max(this.isHasMultiMeasure ? values.map((val) => val) : this.chartData.map((d) => d.value1));
 		max += max * 0.15;
 
+		this.isHasNegativeValue = min < 0 || max < 0;
+
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number";
 
 		if (this.isHorizontalChart) {
@@ -4719,6 +4727,33 @@ export class Visual extends Shadow {
 
 		this.drawData1Labels(this.dataLabelsSettings.show && this.isLollipopTypeCircle ? this.chartData : []);
 		this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.chartData : []);
+
+		if (this.isHasNegativeValue) {
+			this.drawZeroSeparatorLine();
+		} else {
+			this.zeroSeparatorLine.attr("display", "none");
+		}
+	}
+
+	drawZeroSeparatorLine(): void {
+		this.zeroSeparatorLine
+			.attr("stroke", "rgba(211,211,211,1)")
+			.attr("stroke-width", 1)
+			.attr("display", "block");
+
+		if (this.isHorizontalChart) {
+			this.zeroSeparatorLine
+				.attr("x1", this.xScale(0))
+				.attr("x2", this.xScale(0))
+				.attr("y1", this.height)
+				.attr("y2", 0);
+		} else {
+			this.zeroSeparatorLine
+				.attr("x1", 0)
+				.attr("x2", this.width)
+				.attr("y1", this.yScale(0))
+				.attr("y2", this.yScale(0));
+		}
 	}
 
 	//.CIRCLE
