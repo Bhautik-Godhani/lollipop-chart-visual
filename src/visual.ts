@@ -269,10 +269,14 @@ export class Visual extends Shadow {
 	public isScrollBrushDisplayed: boolean;
 	public brushXAxisG: D3Selection<SVGElement>;
 	public brushXAxisTicksMaxHeight: number = 0;
-	public brushAndZoomAreaHeight: number = 80;
+	public brushAndZoomAreaMinHeight: number = 70;
+	public brushAndZoomAreaMaxHeight: number = 140;
+	public brushAndZoomAreaHeight: number = 0;
 	public brushYAxisG: D3Selection<SVGElement>;
 	public brushYAxisTicksMaxWidth: number = 0;
-	public brushAndZoomAreaWidth: number = 150;
+	public brushAndZoomAreaMinWidth: number = 100;
+	public brushAndZoomAreaMaxWidth: number = 200;
+	public brushAndZoomAreaWidth: number = 0;
 
 	// xAxis
 	public xAxisG: D3Selection<SVGElement>;
@@ -326,6 +330,8 @@ export class Visual extends Shadow {
 	public circleClassSelector: string = ".lollipop-circle";
 	public minCircleSize: number = 20;
 	public maxCircleSize: number = 40;
+	public brushAndZoomAreaCircleMinSize: number = 10;
+	public brushAndZoomAreaCircleMaxSize: number = 40;
 	public brushAndZoomAreaCircleSize: number = 0;
 
 	// circle1
@@ -1455,6 +1461,30 @@ export class Visual extends Shadow {
 			this.width = vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width;
 			this.height = vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height;
 
+			if (this.brushAndZoomAreaSettings.enabled) {
+				if (this.isHorizontalChart) {
+					const brushAndZoomAreaWidth = this.width * 0.175;
+					if (brushAndZoomAreaWidth < this.brushAndZoomAreaMaxWidth && brushAndZoomAreaWidth > this.brushAndZoomAreaMinWidth) {
+						this.brushAndZoomAreaWidth = brushAndZoomAreaWidth;
+					} else if (brushAndZoomAreaWidth > this.brushAndZoomAreaMaxWidth) {
+						this.brushAndZoomAreaWidth = this.brushAndZoomAreaMaxWidth;
+					} else if (brushAndZoomAreaWidth < this.brushAndZoomAreaMinWidth) {
+						this.brushAndZoomAreaWidth = this.brushAndZoomAreaMinWidth;
+					}
+				} else {
+					const brushAndZoomAreaHeight = this.height * 0.25;
+					if (brushAndZoomAreaHeight < this.brushAndZoomAreaMaxHeight && brushAndZoomAreaHeight > this.brushAndZoomAreaMinHeight) {
+						this.brushAndZoomAreaHeight = brushAndZoomAreaHeight;
+					} else if (brushAndZoomAreaHeight > this.brushAndZoomAreaMaxHeight) {
+						this.brushAndZoomAreaHeight = this.brushAndZoomAreaMaxHeight;
+					} else if (brushAndZoomAreaHeight < this.brushAndZoomAreaMinHeight) {
+						this.brushAndZoomAreaHeight = this.brushAndZoomAreaMinHeight;
+					}
+				}
+			} else {
+				this.brushAndZoomAreaHeight = 0;
+			}
+
 			const clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
 			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 			this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
@@ -1725,21 +1755,21 @@ export class Visual extends Shadow {
 				const brushScaleBandwidth = this.brushScaleBand.bandwidth();
 
 				const circleSize = (brushScaleBandwidth / 3.5) * 2;
-				if (circleSize < this.maxCircleSize && circleSize > this.minCircleSize) {
+				if (circleSize < this.brushAndZoomAreaCircleMaxSize && circleSize > this.brushAndZoomAreaCircleMinSize) {
 					this.brushAndZoomAreaCircleSize = circleSize;
-				} else if (circleSize > this.maxCircleSize) {
-					this.brushAndZoomAreaCircleSize = this.maxCircleSize;
-				} else if (circleSize < this.minCircleSize) {
-					this.brushAndZoomAreaCircleSize = this.minCircleSize;
+				} else if (circleSize > this.brushAndZoomAreaCircleMaxSize) {
+					this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMaxSize;
+				} else if (circleSize < this.brushAndZoomAreaCircleMinSize) {
+					this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMinSize;
 				}
 
 				if (this.isHorizontalChart) {
-					this.brushXScale = d3.scaleLinear().range([this.brushAndZoomAreaCircleSize, this.brushAndZoomAreaWidth]).domain([min, max]);
+					this.brushXScale = d3.scaleLinear().range([this.brushAndZoomAreaCircleSize + 5, this.brushAndZoomAreaWidth - 5]).domain([min, max]);
 					this.brushYScale = this.brushScaleBand.copy(true);
 					this.drawBrushLollipopChart(clonedCategoricalData);
 				} else {
 					this.brushXScale = this.brushScaleBand.copy(true);
-					this.brushYScale = d3.scaleLinear().range([this.brushAndZoomAreaHeight, this.brushAndZoomAreaCircleSize]).domain([min, max]);
+					this.brushYScale = d3.scaleLinear().range([this.brushAndZoomAreaHeight - 5, this.brushAndZoomAreaCircleSize + 5]).domain([min, max]);
 					this.drawBrushLollipopChart(clonedCategoricalData);
 				}
 			} else {
@@ -5690,16 +5720,60 @@ export class Visual extends Shadow {
 			${this.chartSettings.isShowImageMarker}`;
 		}
 
-		const data = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce((arr, cur: string, i) => {
-			const obj = { category: cur, uid: getUID(cur), styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } } };
-			measures.forEach((d, j) => {
-				obj[`value${j + 1}`] = +d.values[i];
-			})
-			arr = [...arr, obj];
+		const categories = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)];
+
+		let idx = 0;
+		const initialData = categories.reduce((arr, cur: string) => {
+			(this.isChartIsRaceChart && this.raceChartKeyLabelList.length > 0 ? this.raceChartKeyLabelList : [{ key: "", label: "" }]).forEach(raceBarKeyLabel => {
+				const raceChartKey = raceBarKeyLabel.key;
+				const raceChartDataLabel = raceBarKeyLabel.label;
+
+				const obj = { category: cur, uid: getUID(cur), raceChartKey, raceChartDataLabel, styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } } };
+				measures.forEach((d, j) => {
+					obj[`value${j + 1}`] = +d.values[idx];
+				})
+				arr = [...arr, obj];
+				idx++;
+			});
 			return arr;
 		}, []);
-		let marker: IMarkerData;
 
+		let chartData = [];
+		if (this.isChartIsRaceChart) {
+			const raceData = categories.reduce((acc, category) => {
+				this.raceChartKeysList.forEach((key) => {
+					acc = [...acc, initialData.find((d) => d.category === category && d.raceChartKey === key)];
+				});
+				return acc;
+			}, []);
+
+			const setDataWithAllPositiveCategory = () => {
+				chartData = raceData.filter((d) => d.raceChartKey === this.raceChartKeysList[this.tickIndex]);
+			};
+
+			setDataWithAllPositiveCategory();
+		} else {
+			chartData = initialData;
+		}
+
+		const values = chartData.reduce((arr, d) => {
+			return [...arr, d.value1, d.value2];
+		}, []);
+
+		let min = +d3.min(this.isHasMultiMeasure ? values.map((val) => val) : chartData.map((d) => d.value1));
+		if (min > 0) {
+			min = 0;
+		}
+
+		const max = +d3.max(this.isHasMultiMeasure ? values.map((val) => val) : chartData.map((d) => d.value1));
+
+		if (this.isHorizontalChart) {
+			this.brushXScale.domain([min, max]);
+		} else {
+			this.brushYScale.domain([min, max]);
+		}
+
+		let marker: IMarkerData;
 		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
 			const markerShapeValue = this.markerSettings.markerShapeValue;
 			marker = {
@@ -5731,28 +5805,40 @@ export class Visual extends Shadow {
 				);
 		}
 
-		const setVerticalLinesFormatting = (linesSelection) => {
+		const setVerticalLinesFormatting = (linesSelection, isEnter: boolean) => {
 			linesSelection
+				.attr("stroke", this.lineSettings.lineColor)
+				.attr("stroke-width", this.lineSettings.lineWidth)
+				.transition()
+				.duration(isEnter ? 0 : this.tickDuration)
+				.ease(easeLinear)
 				.attr("x1", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
 				.attr("x2", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
 				.attr("y1", (d) => this.brushYScale(d.value1))
-				.attr("y2", (d) => this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize / 2 : 0))
-				.attr("stroke", this.lineSettings.lineColor)
-				.attr("stroke-width", this.lineSettings.lineWidth);
+				.attr("y2", (d) => this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize / 2 : 0));
 		}
 
-		const setHorizontalLinesFormatting = (linesSelection) => {
+		const setHorizontalLinesFormatting = (linesSelection, isEnter: boolean) => {
 			linesSelection
+				.attr("stroke", this.lineSettings.lineColor)
+				.attr("stroke-width", this.lineSettings.lineWidth)
+				.transition()
+				.duration(isEnter ? 0 : this.tickDuration)
+				.ease(easeLinear)
 				.attr("x1", (d) => this.brushXScale(this.isHasMultiMeasure ? d.value2 : 0) - brushScaleBandwidth / 3)
 				.attr("x2", (d) => this.brushXScale(d.value1))
 				.attr("y1", (d) => this.brushYScale(d.category) + brushScaleBandwidth / 2)
-				.attr("y2", (d) => this.brushYScale(d.category) + brushScaleBandwidth / 2)
-				.attr("stroke", this.lineSettings.lineColor)
-				.attr("stroke-width", this.lineSettings.lineWidth);
+				.attr("y2", (d) => this.brushYScale(d.category) + brushScaleBandwidth / 2);
 		}
 
-		const setCircleFormatting = (circleSelection: any, isCircle2: boolean = false, marker: IMarkerData) => {
+		const setCircleFormatting = (circleSelection: any, isCircle2: boolean = false, marker: IMarkerData, isEnter: boolean) => {
 			circleSelection
+				.attr("width", this.brushAndZoomAreaCircleSize)
+				.attr("height", this.brushAndZoomAreaCircleSize)
+				.attr("href", d => `#${d.category}_${marker.value}_MARKER1`)
+				.transition()
+				.duration(isEnter ? 0 : this.tickDuration)
+				.ease(easeLinear)
 				.attr("x", (d) => {
 					const cx = this.brushXScale(this.isHorizontalChart ? (isCircle2 ? d.value2 : d.value1) : d.category);
 					return this.isHorizontalChart ? cx - this.brushAndZoomAreaCircleSize : cx + brushScaleBandwidth / 2 - this.brushAndZoomAreaCircleSize / 2;
@@ -5760,13 +5846,10 @@ export class Visual extends Shadow {
 				.attr("y", (d) => {
 					const cy = this.brushYScale(this.isHorizontalChart ? d.category : (isCircle2 ? d.value2 : d.value1));
 					return this.isHorizontalChart ? cy + brushScaleBandwidth / 2 - this.brushAndZoomAreaCircleSize / 2 : cy - this.brushAndZoomAreaCircleSize;
-				})
-				.attr("width", this.brushAndZoomAreaCircleSize)
-				.attr("height", this.brushAndZoomAreaCircleSize)
-				.attr("href", d => `#${d.category}_${marker.value}_MARKER1`);
+				});
 		}
 
-		const lollipopGSelection = this.brushLollipopG.selectAll(".brush-lollipop-group").data(data, (d: any) => d.uid);
+		const lollipopGSelection = this.brushLollipopG.selectAll(".brush-lollipop-group").data(chartData, (d: any) => d.uid);
 		lollipopGSelection.join(
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "brush-lollipop-group");
@@ -5794,7 +5877,7 @@ export class Visual extends Shadow {
 					.classed("chart-circle1", true);
 
 				setPath1Formatting(path1Selection);
-				setCircleFormatting(circle1Selection, false, marker);
+				setCircleFormatting(circle1Selection, false, marker, true);
 
 				if (this.isHasMultiMeasure) {
 					const circle2Selection = lollipopG.append("use")
@@ -5804,13 +5887,13 @@ export class Visual extends Shadow {
 						.attr("id", CircleType.Circle2)
 						.classed(this.circleClass, true).classed("chart-circle2", true);
 
-					setCircleFormatting(circle2Selection, true, marker);
+					setCircleFormatting(circle2Selection, true, marker, true);
 				}
 
 				if (this.isHorizontalChart) {
-					setHorizontalLinesFormatting(lineSelection);
+					setHorizontalLinesFormatting(lineSelection, true);
 				} else {
-					setVerticalLinesFormatting(lineSelection);
+					setVerticalLinesFormatting(lineSelection, true);
 				}
 
 				return lollipopG;
@@ -5832,16 +5915,16 @@ export class Visual extends Shadow {
 					.attr("d", marker.paths[0].d);
 
 				setPath1Formatting(path1Selection);
-				setCircleFormatting(circle1Selection, false, marker);
+				setCircleFormatting(circle1Selection, false, marker, false);
 
 				if (this.isHasMultiMeasure) {
-					setCircleFormatting(circle2Selection, true, marker);
+					setCircleFormatting(circle2Selection, true, marker, false);
 				}
 
 				if (this.isHorizontalChart) {
-					setHorizontalLinesFormatting(lineSelection);
+					setHorizontalLinesFormatting(lineSelection, false);
 				} else {
-					setVerticalLinesFormatting(lineSelection);
+					setVerticalLinesFormatting(lineSelection, false);
 				}
 
 				return update;
