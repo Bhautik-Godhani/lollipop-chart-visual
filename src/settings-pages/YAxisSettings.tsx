@@ -169,16 +169,18 @@ const YAxisSettings = (props) => {
       </Row>
 
       <ConditionalWrapper visible={configValues.isDisplayLabel}>
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Show Labels Above Line"}
-              value={configValues.isShowLabelsAboveLine}
-              handleChange={() => handleCheckbox(EYAxisSettings.IsShowLabelsAboveLine)}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
+        <ConditionalWrapper visible={shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Show Labels Above Line"}
+                value={configValues.isShowLabelsAboveLine}
+                handleChange={() => handleCheckbox(EYAxisSettings.IsShowLabelsAboveLine)}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
         <Row>
           <Column>

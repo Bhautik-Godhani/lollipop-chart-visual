@@ -2091,6 +2091,7 @@ export class Visual extends Shadow {
 			${this.markerSettings.markerType}-
 			${this.markerSettings.markerShape}-
 			${this.markerSettings.markerChart}-
+			${this.yAxisSettings.isShowLabelsAboveLine}-
 			${this.chartSettings.isShowImageMarker}`;
 		}
 
@@ -4437,13 +4438,21 @@ export class Visual extends Shadow {
 	}
 
 	categoryLabelsFormatting(labelSelection: D3Selection<SVGElement>): void {
-		const maxCircleRadius = d3.max([this.circle1Size, this.circle2Size]);
+		const maxCircleRadius = d3.max([this.circle1Size, this.circle2Size]) / 2;
 		const maxPieRadius = d3.max([this.pie1Radius, this.pie2Radius]);
 
 		labelSelection
 			.attr("transform", d => {
-				const cx = this.xScale(this.isHasMultiMeasure ? d.value2 : 0);
-				const cy = this.yScale(d.category) + this.scaleBandWidth / 2 - (this.isHasSubcategories ? maxPieRadius : maxCircleRadius) - this.categoryLabelMargin / 2;
+				const min = d3.min([d.value1, d.value2]);
+				const cx = this.xScale(this.isHasMultiMeasure ? min : 0);
+				let cy = this.yScale(d.category) + this.scaleBandWidth / 2 - this.categoryLabelMargin / 2;
+
+				if (this.isHasMultiMeasure) {
+					cy -= (this.isLollipopTypePie ? maxPieRadius : maxCircleRadius);
+				} else {
+					cy -= this.lineSettings.lineWidth / 2;
+				}
+
 				return `translate(${cx}, ${cy})`;
 			})
 			.text((d: ILollipopChartRow) => {
