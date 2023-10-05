@@ -360,7 +360,6 @@ export class Visual extends Shadow {
 	yGridLinesSelection: any;
 
 	// pie
-	pieG: any;
 	pieEmphasizeScaleSize: number = 4;
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
@@ -621,8 +620,6 @@ export class Visual extends Shadow {
 		this.circle1G = this.container.append("g").classed("circle1G", true);
 
 		this.circle2G = this.container.append("g").classed("circle2G", true);
-
-		this.pieG = this.container.append("g").classed("pieG", true);
 
 		this.xAxisG = this.container.append("g").classed("xAxisG", true);
 
@@ -2872,8 +2869,6 @@ export class Visual extends Shadow {
 				this.setChartData(categoricalData2);
 
 				this.initAndRenderLollipopChart(this.width * 0.06)
-
-				// this.updatePiePositionOnBrushMove();
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
@@ -3033,7 +3028,6 @@ export class Visual extends Shadow {
 				// }
 
 				// this.setXAxisTickStyle();
-				// this.updatePiePositionOnBrushMove();
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
@@ -3161,50 +3155,6 @@ export class Visual extends Shadow {
 			.call(brush as any)
 			.call(brush.move as any, [0, widthByExpectedBar]);
 		d3.select(brushG).selectAll(".handle").remove();
-	}
-
-	updatePiePositionOnBrushMove(): void {
-		if (this.isLollipopTypePie) {
-			const pie1ViewBoxRadius = this.pie1Radius + (this.pie1Radius * (this.pieEmphasizeScaleSize * 2)) / 100;
-			const pie2ViewBoxRadius = this.pie2Radius + (this.pie2Radius * (this.pieEmphasizeScaleSize * 2)) / 100;
-			this.pieG
-				.selectAll("#pie1ForeignObject")
-				.attr("x", (d) => {
-					const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value1"] : d.category));
-					return pieX > 0 ? pieX - pie1ViewBoxRadius : pieX - pie1ViewBoxRadius / 2;
-				})
-				.attr("y", (d) => {
-					const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value1"]));
-					return pieY > 0 ? pieY - pie1ViewBoxRadius : pieY - pie1ViewBoxRadius / 2;
-				})
-				.attr("opacity", (d) => {
-					if (this.isHorizontalChart) {
-						return this.yScale(d.category) ? 1 : 0;
-					} else {
-						return this.xScale(d.category) ? 1 : 0;
-					}
-				});
-
-			if (this.isHasMultiMeasure) {
-				this.pieG
-					.selectAll("#pie2ForeignObject")
-					.attr("x", (d) => {
-						const pieX = this.getPieX(this.xScale(this.isHorizontalChart ? d["value2"] : d.category));
-						return pieX > 0 ? pieX - pie2ViewBoxRadius : pieX - pie2ViewBoxRadius / 2;
-					})
-					.attr("y", (d) => {
-						const pieY = this.getPieY(this.yScale(this.isHorizontalChart ? d.category : d["value2"]));
-						return pieY > 0 ? pieY - pie2ViewBoxRadius : pieY - pie2ViewBoxRadius / 2;
-					})
-					.attr("opacity", (d) => {
-						if (this.isHorizontalChart) {
-							return this.yScale(d.category) ? 1 : 0;
-						} else {
-							return this.xScale(d.category) ? 1 : 0;
-						}
-					});
-			}
-		}
 	}
 
 	getCategoricalValuesIndexByKey(key: string): number {
@@ -5192,7 +5142,7 @@ export class Visual extends Shadow {
 				ele.selectAll("path").each(function () {
 					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
 					d3.select(this).datum((d: any) => {
-						return { ...d, sliceWidth: bBox.width, sliceHeight: bBox.height }
+						return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
 					})
 				})
 
@@ -5219,17 +5169,17 @@ export class Visual extends Shadow {
 				// 	.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
 				// 	.attr("fill", "#fff");
 
-				// this.tooltipServiceWrapper.addTooltip(
-				// 	ele.selectAll("path"),
-				// 	(datapoint: IChartSubCategory) => getTooltipData(datapoint),
-				// 	(datapoint: IChartSubCategory) => datapoint.identity
-				// );
+				this.tooltipServiceWrapper.addTooltip(
+					ele.selectAll("path"),
+					(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
+					(datapoint: IChartSubCategory) => datapoint.identity
+				);
 
 				const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
 					return this.numberSettings.show ? formatNumber(value, this.numberSettings, numberFormatter) : powerBiNumberFormat(value, numberFormatter);
 				};
 
-				const getTooltipData = (pieData: IChartSubCategory): VisualTooltipDataItem[] => {
+				const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
 					const tooltipData: TooltipData[] = [
 						{
 							displayName: this.categoryDisplayName,
@@ -5237,9 +5187,9 @@ export class Visual extends Shadow {
 							color: "transparent",
 						},
 						{
-							displayName: isPie2 ? this.measure2DisplayName : this.measure1DisplayName,
+							displayName: pieData.valueType === DataValuesType.Value2 ? this.measure2DisplayName : this.measure1DisplayName,
 							value: numberFormatter(pieData[valueKey], isPie2 ? this.measureNumberFormatter[1] : this.measureNumberFormatter[0]),
-							// color: pieData.styles[pieType].color,
+							color: pieData.valueType === DataValuesType.Value2 ? this.subCategoryColorPair[pieData.category].marker2Color : this.subCategoryColorPair[pieData.category].marker1Color,
 						},
 					];
 
@@ -5277,9 +5227,9 @@ export class Visual extends Shadow {
 		// 	}
 		// });
 
-		this.pieG.on("mouseout", () => {
-			this.pieG.selectAll("foreignObject").sort((a, b) => d3.ascending(a.sortId, b.sortId));
-		});
+		// this.pieG.on("mouseout", () => {
+		// 	this.pieG.selectAll("foreignObject").sort((a, b) => d3.ascending(a.sortId, b.sortId));
+		// });
 	}
 
 	updatePieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
