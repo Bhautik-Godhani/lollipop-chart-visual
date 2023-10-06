@@ -595,7 +595,7 @@ export class Visual extends Shadow {
 		this.selectionManager = options.host.createSelectionManager();
 		this.interactivityService = interactivitySelectionService.createInteractivitySelectionService(this._host) as any;
 		this.behavior = new Behavior();
-		this.initChart();
+		// this.initChart();
 	}
 
 	public getEnumeration(): EnumerateSectionType[] {
@@ -1433,7 +1433,10 @@ export class Visual extends Shadow {
 			const isReturn = this.renderErrorMessages();
 
 			if (isReturn) {
+				this.isChartInit = false;
 				return;
+			} else {
+				d3.select(this.chartContainer).select(".validation-page-container").remove();
 			}
 
 			if (!this.isChartInit) {
@@ -1972,7 +1975,7 @@ export class Visual extends Shadow {
 			? !!this.categoricalData.categories.find((d) => d.source.roles[EDataRolesName.Category])
 			: false;
 		if (!categoricalCategoriesFields) {
-			// this.displayValidationPage("Add at least one dimension in the Category field");
+			this.displayValidationPage("Add at least one dimension in the Category field");
 			this._events.renderingFailed(this.vizOptions.options, "Add at least one dimension in the Category field");
 			return true;
 		}
@@ -1988,14 +1991,14 @@ export class Visual extends Shadow {
 			)
 			: [];
 		if (categoricalMeasureFields.length === 0) {
-			// this.displayValidationPage("Please enter measure data");
+			this.displayValidationPage("Please enter measure data");
 			this._events.renderingFailed(this.vizOptions.options, "Please enter measure data");
 			return true;
 		}
 
 		const categoricalCategoryFields = this.categoricalData.categories.filter((d) => d.source.roles[EDataRolesName.Category]);
 		if (!categoricalCategoryFields.some((d) => d.values.length > 1) && categoricalMeasureFields[0].values.length === 0) {
-			// this.displayValidationPage("Empty measure and category");
+			this.displayValidationPage("Empty measure and category");
 			this._events.renderingFailed(this.vizOptions.options, "Empty measure and category");
 			return true;
 		}
