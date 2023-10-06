@@ -302,6 +302,13 @@ export interface IHighContrastDetails {
 export interface IBrushAndZoomAreaSettings {
 	enabled: boolean;
 	isShowAxis: boolean;
+	trackBackgroundColor: string;
+	selectionTrackBackgroundColor: string;
+	selectionTrackBorderColor: string;
+	widthType: EAutoCustomTypes;
+	heightType: EAutoCustomTypes;
+	width: number;
+	height: number;
 }
 
 export interface IPatternProps {

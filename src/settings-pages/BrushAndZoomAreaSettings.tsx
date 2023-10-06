@@ -1,13 +1,43 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer, ConditionalWrapper } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper, ColorPicker, SelectInput, InputControl } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS } from "../constants";
-import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
-import { EBrushAndZoomAreaSettings } from "../enum";
+import { IBrushAndZoomAreaSettings, ILabelValuePair } from "../visual-settings.interface";
+import { EAutoCustomTypes, EBrushAndZoomAreaSettings } from "../enum";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { Visual } from "../visual";
+
+const AUTO_CUSTOM_TYPES: ILabelValuePair[] = [
+	{
+		label: "Auto",
+		value: EAutoCustomTypes.Auto,
+	},
+	{
+		label: "Custom",
+		value: EAutoCustomTypes.Custom,
+	},
+];
+
+const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[n]: rgb,
+	}));
+};
+
+const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[n]: val,
+	}));
+};
 
 const UIGeneralChartSettings = (
+	shadow: Visual,
+	vizOptions: ShadowUpdateOptions,
 	configValues: IBrushAndZoomAreaSettings,
-	handleChange: (v: any, key: EBrushAndZoomAreaSettings) => void
+	setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>
 ) => {
 	return (
 		<>
@@ -16,7 +46,7 @@ const UIGeneralChartSettings = (
 					<ToggleSwitch
 						label="Enabled"
 						value={configValues.enabled}
-						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled)}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled, setConfigValues)}
 					/>
 				</Column>
 			</Row>
@@ -27,10 +57,101 @@ const UIGeneralChartSettings = (
 						<ToggleSwitch
 							label="Show Axis"
 							value={configValues.isShowAxis}
-							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis)}
+							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis, setConfigValues)}
 						/>
 					</Column>
 				</Row>
+
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Track Color"
+							color={configValues.trackBackgroundColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.TrackBackgroundColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Selection Track Color"
+							color={configValues.selectionTrackBackgroundColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBackgroundColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Selection Track Border Color"
+							color={configValues.selectionTrackBorderColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBorderColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={shadow.isHorizontalChart}>
+					<Row>
+						<Column>
+							<SelectInput
+								label="Select Width"
+								value={configValues.widthType}
+								optionsList={AUTO_CUSTOM_TYPES}
+								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.WidthType, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={configValues.widthType === EAutoCustomTypes.Custom}>
+						<Row>
+							<Column>
+								<InputControl
+									min={1}
+									type="number"
+									label="Width"
+									value={configValues.width}
+									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={!shadow.isHorizontalChart}>
+					<Row>
+						<Column>
+							<SelectInput
+								label="Select Height"
+								value={configValues.heightType}
+								optionsList={AUTO_CUSTOM_TYPES}
+								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.HeightType, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={configValues.heightType === EAutoCustomTypes.Custom}>
+						<Row>
+							<Column>
+								<InputControl
+									min={shadow.brushAndZoomAreaMinHeight}
+									max={shadow.brushAndZoomAreaMaxHeight}
+									type="number"
+									label="Height"
+									value={configValues.height}
+									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 		</>
 	);
@@ -85,16 +206,19 @@ const BrushAndZoomAreaSettings = (props) => {
 
 	const [configValues, setConfigValues] = React.useState<IBrushAndZoomAreaSettings>(initialStates);
 
-	const handleChange = (val, n) => {
-		setConfigValues((d) => ({
-			...d,
-			[n]: val,
-		}));
-	};
+	React.useEffect(() => {
+		if (!configValues.width) {
+			handleChange(shadow.brushAndZoomAreaWidth, EBrushAndZoomAreaSettings.Width, setConfigValues)
+		}
+
+		if (!configValues.height) {
+			handleChange(shadow.brushAndZoomAreaHeight, EBrushAndZoomAreaSettings.Height, setConfigValues)
+		}
+	}, []);
 
 	return (
 		<>
-			{UIGeneralChartSettings(configValues, handleChange)}
+			{UIGeneralChartSettings(shadow, vizOptions, configValues, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

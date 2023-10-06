@@ -270,13 +270,13 @@ export class Visual extends Shadow {
 	public isScrollBrushDisplayed: boolean;
 	public brushXAxisG: D3Selection<SVGElement>;
 	public brushXAxisTicksMaxHeight: number = 0;
-	public brushAndZoomAreaMinHeight: number = 70;
-	public brushAndZoomAreaMaxHeight: number = 140;
+	public brushAndZoomAreaMinHeight: number = 40;
+	public brushAndZoomAreaMaxHeight: number = 80;
 	public brushAndZoomAreaHeight: number = 0;
 	public brushYAxisG: D3Selection<SVGElement>;
 	public brushYAxisTicksMaxWidth: number = 0;
-	public brushAndZoomAreaMinWidth: number = 100;
-	public brushAndZoomAreaMaxWidth: number = 200;
+	public brushAndZoomAreaMinWidth: number = 60;
+	public brushAndZoomAreaMaxWidth: number = 120;
 	public brushAndZoomAreaWidth: number = 0;
 
 	// axis
@@ -1466,25 +1466,34 @@ export class Visual extends Shadow {
 
 			if (this.brushAndZoomAreaSettings.enabled) {
 				if (this.isHorizontalChart) {
-					const brushAndZoomAreaWidth = this.width * 0.175;
-					if (brushAndZoomAreaWidth < this.brushAndZoomAreaMaxWidth && brushAndZoomAreaWidth > this.brushAndZoomAreaMinWidth) {
-						this.brushAndZoomAreaWidth = brushAndZoomAreaWidth;
-					} else if (brushAndZoomAreaWidth > this.brushAndZoomAreaMaxWidth) {
-						this.brushAndZoomAreaWidth = this.brushAndZoomAreaMaxWidth;
-					} else if (brushAndZoomAreaWidth < this.brushAndZoomAreaMinWidth) {
-						this.brushAndZoomAreaWidth = this.brushAndZoomAreaMinWidth;
+					if (this.brushAndZoomAreaSettings.widthType === EAutoCustomTypes.Auto) {
+						const brushAndZoomAreaWidth = this.width * 0.09;
+						if (brushAndZoomAreaWidth < this.brushAndZoomAreaMaxWidth && brushAndZoomAreaWidth > this.brushAndZoomAreaMinWidth) {
+							this.brushAndZoomAreaWidth = brushAndZoomAreaWidth;
+						} else if (brushAndZoomAreaWidth > this.brushAndZoomAreaMaxWidth) {
+							this.brushAndZoomAreaWidth = this.brushAndZoomAreaMaxWidth;
+						} else if (brushAndZoomAreaWidth < this.brushAndZoomAreaMinWidth) {
+							this.brushAndZoomAreaWidth = this.brushAndZoomAreaMinWidth;
+						}
+					} else {
+						this.brushAndZoomAreaWidth = this.brushAndZoomAreaSettings.width;
 					}
 				} else {
-					const brushAndZoomAreaHeight = this.height * 0.25;
-					if (brushAndZoomAreaHeight < this.brushAndZoomAreaMaxHeight && brushAndZoomAreaHeight > this.brushAndZoomAreaMinHeight) {
-						this.brushAndZoomAreaHeight = brushAndZoomAreaHeight;
-					} else if (brushAndZoomAreaHeight > this.brushAndZoomAreaMaxHeight) {
-						this.brushAndZoomAreaHeight = this.brushAndZoomAreaMaxHeight;
-					} else if (brushAndZoomAreaHeight < this.brushAndZoomAreaMinHeight) {
-						this.brushAndZoomAreaHeight = this.brushAndZoomAreaMinHeight;
+					if (this.brushAndZoomAreaSettings.heightType === EAutoCustomTypes.Auto) {
+						const brushAndZoomAreaHeight = this.height * 0.165;
+						if (brushAndZoomAreaHeight < this.brushAndZoomAreaMaxHeight && brushAndZoomAreaHeight > this.brushAndZoomAreaMinHeight) {
+							this.brushAndZoomAreaHeight = brushAndZoomAreaHeight;
+						} else if (brushAndZoomAreaHeight > this.brushAndZoomAreaMaxHeight) {
+							this.brushAndZoomAreaHeight = this.brushAndZoomAreaMaxHeight;
+						} else if (brushAndZoomAreaHeight < this.brushAndZoomAreaMinHeight) {
+							this.brushAndZoomAreaHeight = this.brushAndZoomAreaMinHeight;
+						}
+					} else {
+						this.brushAndZoomAreaHeight = this.brushAndZoomAreaSettings.height;
 					}
 				}
 			} else {
+				this.brushAndZoomAreaWidth = 0;
 				this.brushAndZoomAreaHeight = 0;
 			}
 
@@ -2915,8 +2924,13 @@ export class Visual extends Shadow {
 		}
 
 		this.brushG.select(".overlay")
+			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
 			.attr("cursor", this.brushAndZoomAreaSettings.enabled ? "crosshair" : "default")
 			.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
+
+		this.brushG.select(".selection")
+			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
+			.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 	}
 
 	initAndRenderLollipopChart(scaleWidth: number): void {
@@ -3071,9 +3085,13 @@ export class Visual extends Shadow {
 		}
 
 		d3.select(brushG).select(".overlay")
+			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
 			.attr("cursor", this.brushAndZoomAreaSettings.enabled ? "crosshair" : "default")
 			.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
 
+		d3.select(brushG).select(".selection")
+			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
+			.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 	}
 
 	initVerticalBrush(config: IBrushConfig): void {
@@ -5799,6 +5817,20 @@ export class Visual extends Shadow {
 				);
 		}
 
+		const setPath2Formatting = (circleSelection: any): void => {
+			circleSelection
+				.style("fill", (d: ILollipopChartRow) => {
+					let color = this.getColor(this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
+					color = color ? color : "rgba(92,113,187,1)";
+					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
+						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+					} else {
+						return color;
+					}
+				}
+				);
+		}
+
 		const setVerticalLinesFormatting = (linesSelection, isEnter: boolean) => {
 			linesSelection
 				.attr("stroke", this.lineSettings.lineColor)
@@ -5829,7 +5861,7 @@ export class Visual extends Shadow {
 			circleSelection
 				.attr("width", this.brushAndZoomAreaCircleSize)
 				.attr("height", this.brushAndZoomAreaCircleSize)
-				.attr("href", d => `#${d.category}_${marker.value}_MARKER1`)
+				.attr("href", d => isCircle2 ? `#${d.category}_${marker.value}_BRUSH_MARKER2` : `#${d.category}_${marker.value}_BRUSH_MARKER1`)
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)
 				.ease(easeLinear)
@@ -5851,7 +5883,7 @@ export class Visual extends Shadow {
 
 				const symbol1 = lollipopG.append("defs")
 					.append("symbol")
-					.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER1`)
 					.attr("class", "marker1-symbol")
 					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
 
@@ -5874,6 +5906,19 @@ export class Visual extends Shadow {
 				setCircleFormatting(circle1Selection, false, marker, true);
 
 				if (this.isHasMultiMeasure) {
+					const symbol2 = lollipopG.append("defs")
+						.append("symbol")
+						.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER2`)
+						.attr("class", "marker2-symbol")
+						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+					const path2Selection = symbol2.append("path")
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+						})
+						.attr("d", marker.paths[0].d)
+						.attr("class", "marker2-path");
+
 					const circle2Selection = lollipopG.append("use")
 						.datum(d => {
 							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
@@ -5881,6 +5926,7 @@ export class Visual extends Shadow {
 						.attr("id", CircleType.Circle2)
 						.classed(this.circleClass, true).classed("chart-circle2", true);
 
+					setPath2Formatting(path2Selection);
 					setCircleFormatting(circle2Selection, true, marker, true);
 				}
 
@@ -5899,7 +5945,12 @@ export class Visual extends Shadow {
 
 				update
 					.select(".marker1-symbol")
-					.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER1`)
+					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+				update
+					.select(".marker2-symbol")
+					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER2`)
 					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
 
 				const path1Selection = update.select(".marker1-path")
@@ -5908,10 +5959,17 @@ export class Visual extends Shadow {
 					})
 					.attr("d", marker.paths[0].d);
 
+				const path2Selection = update.select(".marker2-path")
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+					})
+					.attr("d", marker.paths[0].d);
+
 				setPath1Formatting(path1Selection);
 				setCircleFormatting(circle1Selection, false, marker, false);
 
 				if (this.isHasMultiMeasure) {
+					setPath2Formatting(path2Selection);
 					setCircleFormatting(circle2Selection, true, marker, false);
 				}
 

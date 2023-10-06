@@ -234,8 +234,15 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 };
 
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
-	enabled: false,
-	isShowAxis: false
+	enabled: true,
+	isShowAxis: false,
+	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
+	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.4)",
+	selectionTrackBorderColor: "rgba(225, 225, 225, 1)",
+	widthType: EAutoCustomTypes.Auto,
+	heightType: EAutoCustomTypes.Auto,
+	width: undefined,
+	height: undefined
 };
 
 export const PATTERN_SETTINGS: IPatternSettings = {

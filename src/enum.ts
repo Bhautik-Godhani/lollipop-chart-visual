@@ -303,7 +303,14 @@ export enum EShowBucketSettings {
 
 export enum EBrushAndZoomAreaSettings {
 	Enabled = "enabled",
-	IsShowAxis = "isShowAxis"
+	IsShowAxis = "isShowAxis",
+	TrackBackgroundColor = "trackBackgroundColor",
+	SelectionTrackBackgroundColor = "selectionTrackBackgroundColor",
+	SelectionTrackBorderColor = "selectionTrackBorderColor",
+	WidthType = "widthType",
+	HeightType = "heightType",
+	Width = "width",
+	Height = "height"
 }
 
 export enum DataValuesType {
