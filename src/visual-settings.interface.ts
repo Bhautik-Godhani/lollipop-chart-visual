@@ -3,7 +3,6 @@ import {
 	CircleSize,
 	CircleType,
 	ColorPaletteType,
-	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	DisplayUnits,
 	EAutoCustomTypes,
@@ -168,14 +167,13 @@ export interface IDataLabelsSettings {
 	borderWidth: number;
 	orientation: Orientation;
 	fontSize: number;
-	pieDataLabelFontSize: number;
 	fontFamily: string;
 	showBackground: boolean;
 	backgroundColor: string;
 	transparency: number;
 	fontStyle: EFontStyle[];
 	placement: DataLabelsPlacement;
-	fontSizeType: DataLabelsFontSizeType;
+	isAutoFontSize: boolean;
 }
 
 export interface IDataColorsSettings {
@@ -304,8 +302,8 @@ export interface IBrushAndZoomAreaSettings {
 	trackBackgroundColor: string;
 	selectionTrackBackgroundColor: string;
 	selectionTrackBorderColor: string;
-	widthType: EAutoCustomTypes;
-	heightType: EAutoCustomTypes;
+	isAutoWidth: boolean;
+	isAutoHeight: boolean;
 	width: number;
 	height: number;
 }

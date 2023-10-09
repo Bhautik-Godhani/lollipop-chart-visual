@@ -27,7 +27,6 @@ import {
 	CircleSize,
 	CircleType,
 	ColorPaletteType,
-	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	EDataRolesName,
 	EVisualConfig,
@@ -1468,7 +1467,7 @@ export class Visual extends Shadow {
 
 			if (this.brushAndZoomAreaSettings.enabled) {
 				if (this.isHorizontalChart) {
-					if (this.brushAndZoomAreaSettings.widthType === EAutoCustomTypes.Auto) {
+					if (this.brushAndZoomAreaSettings.isAutoWidth) {
 						const brushAndZoomAreaWidth = this.width * 0.09;
 						if (brushAndZoomAreaWidth < this.brushAndZoomAreaMaxWidth && brushAndZoomAreaWidth > this.brushAndZoomAreaMinWidth) {
 							this.brushAndZoomAreaWidth = brushAndZoomAreaWidth;
@@ -1481,7 +1480,7 @@ export class Visual extends Shadow {
 						this.brushAndZoomAreaWidth = this.brushAndZoomAreaSettings.width;
 					}
 				} else {
-					if (this.brushAndZoomAreaSettings.heightType === EAutoCustomTypes.Auto) {
+					if (this.brushAndZoomAreaSettings.isAutoHeight) {
 						const brushAndZoomAreaHeight = this.height * 0.165;
 						if (brushAndZoomAreaHeight < this.brushAndZoomAreaMaxHeight && brushAndZoomAreaHeight > this.brushAndZoomAreaMinHeight) {
 							this.brushAndZoomAreaHeight = brushAndZoomAreaHeight;
@@ -3257,7 +3256,7 @@ export class Visual extends Shadow {
 		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			return this.dataLabelsSettings.fontSize;
 		}
-		if (this.dataLabelsSettings.fontSizeType === DataLabelsFontSizeType.Auto) {
+		if (this.dataLabelsSettings.isAutoFontSize) {
 			const fontSize = circleRadius * 0.7;
 			this.dataLabelsSettings.fontSize = fontSize;
 			return fontSize;
@@ -5029,28 +5028,25 @@ export class Visual extends Shadow {
 
 	getPieDataLabelsFontSize(isPie2: boolean = false): number {
 		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		let autoFontSize = this.dataLabelsSettings.pieDataLabelFontSize;
+		let autoFontSize = this.dataLabelsSettings.fontSize;
 		switch (this.markerSettings.markerChart) {
 			case EMarkerChartTypes.PIE:
-				autoFontSize = pieRadius - pieRadius * (this.pieEmphasizeScaleSize / 100);
-				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize / 2);
+				autoFontSize = (pieRadius - pieRadius * (this.pieEmphasizeScaleSize / 100)) / 2;
 				break;
 
 			case EMarkerChartTypes.DONUT:
 				autoFontSize = pieRadius - pieRadius * ((45 + this.pieEmphasizeScaleSize) / 100);
-				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize);
 				break;
 
 			case EMarkerChartTypes.ROSE:
 				autoFontSize = pieRadius - pieRadius * ((70 + this.pieEmphasizeScaleSize) / 100);
-				DATA_LABELS_SETTINGS.pieDataLabelFontSize = Math.round(autoFontSize);
 				break;
 		}
 
-		if (this.dataLabelsSettings.pieDataLabelFontSize === 12) {
-			return DATA_LABELS_SETTINGS.pieDataLabelFontSize;
+		if (!this.dataLabelsSettings.isAutoFontSize) {
+			return this.dataLabelsSettings.fontSize;
 		} else {
-			return d3.min([autoFontSize, this.dataLabelsSettings.pieDataLabelFontSize]);
+			return d3.min([autoFontSize]);
 		}
 	}
 

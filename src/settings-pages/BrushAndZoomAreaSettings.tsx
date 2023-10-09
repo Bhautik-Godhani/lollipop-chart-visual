@@ -58,6 +58,7 @@ const UIGeneralChartSettings = (
 							label="Show Axis"
 							value={configValues.isShowAxis}
 							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis, setConfigValues)}
+							appearance="checkbox"
 						/>
 					</Column>
 				</Row>
@@ -101,16 +102,16 @@ const UIGeneralChartSettings = (
 				<ConditionalWrapper visible={shadow.isHorizontalChart}>
 					<Row>
 						<Column>
-							<SelectInput
-								label="Select Width"
-								value={configValues.widthType}
-								optionsList={AUTO_CUSTOM_TYPES}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.WidthType, setConfigValues)}
+							<ToggleSwitch
+								label="Auto Width"
+								value={configValues.isAutoWidth}
+								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
+								appearance="toggle"
 							/>
 						</Column>
 					</Row>
 
-					<ConditionalWrapper visible={configValues.widthType === EAutoCustomTypes.Custom}>
+					<ConditionalWrapper visible={!configValues.isAutoWidth}>
 						<Row>
 							<Column>
 								<InputControl
@@ -128,16 +129,16 @@ const UIGeneralChartSettings = (
 				<ConditionalWrapper visible={!shadow.isHorizontalChart}>
 					<Row>
 						<Column>
-							<SelectInput
-								label="Select Height"
-								value={configValues.heightType}
-								optionsList={AUTO_CUSTOM_TYPES}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.HeightType, setConfigValues)}
+							<ToggleSwitch
+								label="Auto Height"
+								value={configValues.isAutoHeight}
+								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
+								appearance="toggle"
 							/>
 						</Column>
 					</Row>
 
-					<ConditionalWrapper visible={configValues.heightType === EAutoCustomTypes.Custom}>
+					<ConditionalWrapper visible={!configValues.isAutoHeight}>
 						<Row>
 							<Column>
 								<InputControl

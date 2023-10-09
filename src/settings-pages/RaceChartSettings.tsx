@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { RACE_CHART_SETTINGS as RACE_CHART_SETTINGS_IMP } from "../constants";
 import {
@@ -73,48 +74,65 @@ const RaceChartSettings = (props) => {
       <Row>
         <Column>
           <ToggleButton
-            label={"Allow Transition"}
+            label={"Enable Transition"}
             value={configValues.allowTransition}
             handleChange={() => handleCheckbox(ERaceChartSettings.AllowTransition)}
-            appearance="checkbox"
+            appearance="toggle"
           />
         </Column>
       </Row>
 
-      <Row>
-        <Column >
-          <InputControl
-            min={0}
-            type="number"
-            label="Animation Duration"
-            value={configValues.transitionDuration.toString()}
-            handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
-          />
-        </Column>
+      <ConditionalWrapper visible={configValues.allowTransition}>
+        <Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label="Interval"
+              value={configValues.dataChangeInterval.toString()}
+              handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
+            />
+          </Column>
 
-        <Column>
-          <InputControl
-            min={0}
-            type="number"
-            label="Interval"
-            value={configValues.dataChangeInterval.toString()}
-            handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
-          />
-        </Column>
-      </Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label="Animation Duration"
+              value={configValues.transitionDuration.toString()}
+              handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={!configValues.allowTransition}>
+        <Row>
+          <Column>
+            <InputControl
+              min={0}
+              type="number"
+              label="Interval"
+              value={configValues.dataChangeInterval.toString()}
+              handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
+            />
+          </Column>
+          <Column></Column>
+        </Row>
+      </ConditionalWrapper>
 
       <Row>
         <Column>
           <ToggleButton
-            label={"Label Auto Text Size"}
+            label={"Auto Font Size"}
             value={configValues.isLabelAutoFontSize}
             handleChange={() => handleCheckbox(ERaceChartSettings.IsLabelAutoFontSize)}
-            appearance="checkbox"
+            appearance="toggle"
           />
         </Column>
       </Row>
 
-      <ConditionalWrapper visible={configValues.isLabelAutoFontSize}>
+      <ConditionalWrapper visible={!configValues.isLabelAutoFontSize}>
         <Row>
           <Column>
             <InputControl
@@ -125,20 +143,30 @@ const RaceChartSettings = (props) => {
               handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize)}
             />
           </Column>
+
+          <Column>
+            <ColorPicker
+              label={"Label Color"}
+              color={configValues.labelColor}
+              handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
         </Row>
       </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ColorPicker
-            label={"Label Color"}
-            color={configValues.labelColor}
-            handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
-            colorPalette={vizOptions.host.colorPalette}
-            size="sm"
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={configValues.isLabelAutoFontSize}>
+        <Row>
+          <Column>
+            <ColorPicker
+              label={"Label Color"}
+              color={configValues.labelColor}
+              handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <Row>
         <Column>
@@ -155,15 +183,15 @@ const RaceChartSettings = (props) => {
       <Row>
         <Column>
           <ToggleButton
-            label={"Ticker Button Auto Radius"}
+            label={"Auto Button Radius"}
             value={configValues.isTickerButtonAutoRadius}
             handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
-            appearance="checkbox"
+            appearance="toggle"
           />
         </Column>
       </Row>
 
-      <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
+      <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
         <Row>
           <Column>
             <InputControl
@@ -174,20 +202,30 @@ const RaceChartSettings = (props) => {
               handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
             />
           </Column>
+
+          <Column>
+            <ColorPicker
+              label={"Ticker Button Color"}
+              color={configValues.tickerButtonColor}
+              handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
         </Row>
       </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ColorPicker
-            label={"Ticker Button Color"}
-            color={configValues.tickerButtonColor}
-            handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-            colorPalette={vizOptions.host.colorPalette}
-            size="sm"
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
+        <Row>
+          <Column>
+            <ColorPicker
+              label={"Ticker Button Color"}
+              color={configValues.tickerButtonColor}
+              handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}

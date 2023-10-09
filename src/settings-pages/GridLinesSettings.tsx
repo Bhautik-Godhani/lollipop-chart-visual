@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GRID_LINES_SETTINGS as GRID_LINES_SETTINGS_IMP } from "../constants";
 import { EGridLinesSettings, LineType } from "../enum";
-import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
+import { Accordion, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { IGridLinesSettings } from "../visual-settings.interface";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
@@ -52,7 +52,7 @@ const UIXAxisGridLines = (
 			<Row>
 				<Column>
 					<ToggleButton
-						label={"X-axis Grid Lines"}
+						label={"Show Lines"}
 						value={configValues[EGridLinesSettings.xGridLines].show}
 						handleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.xGridLines, setConfigValues)}
 					/>
@@ -109,7 +109,7 @@ const UIYAxisGridLines = (
 			<Row>
 				<Column>
 					<ToggleButton
-						label={"Y-axis Grid Lines"}
+						label={"Show Lines"}
 						value={configValues.yGridLines.show}
 						handleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.yGridLines, setConfigValues)}
 					/>
@@ -206,8 +206,14 @@ const GridLinesSettings = (props) => {
 
 	return (
 		<>
-			{UIXAxisGridLines(vizOptions, configValues, setConfigValues)}
-			{UIYAxisGridLines(vizOptions, configValues, setConfigValues)}
+			<Accordion title="X Axis" childBottomPadding>
+				{UIXAxisGridLines(vizOptions, configValues, setConfigValues)}
+			</Accordion>
+
+			<Accordion title="Y Axis" childBottomPadding>
+				{UIYAxisGridLines(vizOptions, configValues, setConfigValues)}
+			</Accordion>
+
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

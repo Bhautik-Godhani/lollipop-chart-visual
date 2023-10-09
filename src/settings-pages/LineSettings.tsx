@@ -120,24 +120,21 @@ const LineSettings = (props) => {
 
 				<Row>
 					<Column>
-						<ColorPicker
-							label="Line Color"
-							color={configValues.lineColor}
-							handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
-							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
-						/>
-					</Column>
-				</Row>
-
-				<Row>
-					<Column>
 						<InputControl
 							min={1}
 							type="number"
 							label="Line Width"
 							value={configValues.lineWidth}
 							handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
+						/>
+					</Column>
+
+					<Column>
+						<ColorPicker
+							label="Line Color"
+							color={configValues.lineColor}
+							handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+							colorPalette={vizOptions.host.colorPalette}
 						/>
 					</Column>
 				</Row>

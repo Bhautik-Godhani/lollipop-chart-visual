@@ -3,7 +3,6 @@ import {
 	CircleSize,
 	CircleType,
 	ColorPaletteType,
-	DataLabelsFontSizeType,
 	DataLabelsPlacement,
 	EAutoCustomTypes,
 	EMarkerChartTypes,
@@ -59,7 +58,7 @@ export const CHART_SETTINGS: IChartSettings = {
 	lollipopInnerPadding: 30,
 	isHasSubCategories: false,
 	orientation: Orientation.Vertical,
-	isAutoLollipopWidth: false,
+	isAutoLollipopWidth: true,
 	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
 	isShowImageMarker: false
@@ -97,14 +96,13 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	borderWidth: 1,
 	orientation: Orientation.Horizontal,
 	fontSize: 12,
-	pieDataLabelFontSize: 12,
 	fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	showBackground: true,
 	backgroundColor: "rgba(0,0,0,1)",
 	transparency: 90,
 	fontStyle: [],
 	placement: DataLabelsPlacement.Inside,
-	fontSizeType: DataLabelsFontSizeType.Auto,
+	isAutoFontSize: true,
 };
 
 export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
@@ -238,8 +236,8 @@ export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
 	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.4)",
 	selectionTrackBorderColor: "rgba(225, 225, 225, 1)",
-	widthType: EAutoCustomTypes.Auto,
-	heightType: EAutoCustomTypes.Auto,
+	isAutoWidth: true,
+	isAutoHeight: true,
 	width: undefined,
 	height: undefined
 };

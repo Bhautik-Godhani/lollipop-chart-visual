@@ -1,6 +1,7 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsFontSizeType, DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
+import { DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
 import { IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
@@ -16,17 +17,6 @@ import {
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { Visual } from "../visual";
-
-const DATA_LABELS_FONT_SIZE_TYPES: ILabelValuePair[] = [
-	{
-		label: "Auto",
-		value: DataLabelsFontSizeType.Auto,
-	},
-	{
-		label: "Custom",
-		value: DataLabelsFontSizeType.Custom,
-	},
-];
 
 const LABEL_PLACEMENTS: ILabelValuePair[] = [
 	{
@@ -125,63 +115,7 @@ const UIDataLabelsFontSettings = (
 ) => {
 	return (
 		<>
-			<Row>
-				<Column>
-					<ColorPicker
-						label="Font Color"
-						color={configValues.color}
-						handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
-						colorPalette={vizOptions.host.colorPalette}
-						size="sm"
-					/>
-				</Column>
-			</Row>
-			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
-				<Row>
-					<Column>
-						<ColorPicker
-							label="Font Border Color"
-							color={configValues.borderColor}
-							handleChange={(value) => handleColor(value, EDataLabelsSettings.borderColor, setConfigValues)}
-							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
-						/>
-					</Column>
-				</Row>
-
-				<Row>
-					<Column>
-						<InputControl
-							min={1}
-							type="number"
-							label="Font Border Size"
-							value={configValues.borderWidth}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.borderWidth, setConfigValues)}
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
-			<ConditionalWrapper
-				visible={shadow.isLollipopTypeCircle && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside}
-			>
-				<Row>
-					<Column>
-						<SelectInput
-							label="Font Size Type"
-							value={configValues[EDataLabelsSettings.fontSizeType]}
-							optionsList={DATA_LABELS_FONT_SIZE_TYPES}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSizeType, setConfigValues)}
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
-			<ConditionalWrapper
-				visible={
-					shadow.isLollipopTypeCircle &&
-					(configValues[EDataLabelsSettings.fontSizeType] === DataLabelsFontSizeType.Custom ||
-						configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside)
-				}
-			>
+			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
 				<Row>
 					<Column>
 						<InputControl
@@ -192,21 +126,96 @@ const UIDataLabelsFontSettings = (
 							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, setConfigValues)}
 						/>
 					</Column>
+					<Column>
+						<ColorPicker
+							label="Font Color"
+							color={configValues.color}
+							handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+						/>
+					</Column>
 				</Row>
 			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={shadow.isLollipopTypeCircle || shadow.isLollipopTypePie}>
+				<ConditionalWrapper
+					visible={configValues.placement === DataLabelsPlacement.Inside || shadow.isLollipopTypePie}
+				>
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Auto Font Size"}
+								value={configValues.isAutoFontSize}
+								handleChange={(value) => handleChange(value, EDataLabelsSettings.isAutoFontSize, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper
+						visible={
+							(!configValues.isAutoFontSize)
+						}
+					>
+						<Row>
+							<Column>
+								<InputControl
+									min={1}
+									type="number"
+									label="Font Size"
+									value={configValues.fontSize}
+									handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, setConfigValues)}
+								/>
+							</Column>
+							<Column>
+								<ColorPicker
+									label="Font Color"
+									color={configValues.color}
+									handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+									colorPalette={vizOptions.host.colorPalette}
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+
+					<ConditionalWrapper visible={configValues.isAutoFontSize}>
+						<Row>
+							<Column>
+								<ColorPicker
+									label="Font Color"
+									color={configValues.color}
+									handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+									colorPalette={vizOptions.host.colorPalette}
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</ConditionalWrapper>
+			</ConditionalWrapper>
+
 			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<InputControl
 							min={1}
 							type="number"
-							label="Max Font Size"
-							value={configValues.pieDataLabelFontSize}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.pieDataLabelFontSize, setConfigValues)}
+							label="Border Size"
+							value={configValues.borderWidth}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.borderWidth, setConfigValues)}
+						/>
+					</Column>
+
+					<Column>
+						<ColorPicker
+							label="Border Color"
+							color={configValues.borderColor}
+							handleChange={(value) => handleColor(value, EDataLabelsSettings.borderColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
 						/>
 					</Column>
 				</Row>
 			</ConditionalWrapper>
+
 			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)}
 		</>
 	);
@@ -252,13 +261,13 @@ const UICircleLollipopLabelsSettings = (
 							label={"Show Background"}
 							value={configValues.showBackground}
 							handleChange={() => handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues)}
-							appearance="checkbox"
+							appearance="toggle"
 						/>
 					</Column>
 				</Row>
 
 				<ConditionalWrapper visible={configValues.showBackground}>
-					<Row>
+					<Row appearance="padded">
 						<Column>
 							<ColorPicker
 								label="Background Color"

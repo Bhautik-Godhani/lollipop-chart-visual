@@ -110,11 +110,6 @@ export enum EAutoCustomTypes {
 	Custom = "custom",
 }
 
-export enum DataLabelsFontSizeType {
-	Auto = "auto",
-	Custom = "custom",
-}
-
 export enum ERankingType {
 	TopN = "topN",
 	BottomN = "bottomN",
@@ -205,14 +200,13 @@ export enum EDataLabelsSettings {
 	valueDecimalPlaces = "valueDecimalPlaces",
 	orientation = "orientation",
 	fontSize = "fontSize",
-	pieDataLabelFontSize = "pieDataLabelFontSize",
 	fontFamily = "fontFamily",
 	showBackground = "showBackground",
 	backgroundColor = "backgroundColor",
 	transparency = "transparency",
 	fontStyle = "fontStyle",
 	placement = "placement",
-	fontSizeType = "fontSizeType",
+	isAutoFontSize = "isAutoFontSize",
 }
 
 export enum EGridLinesSettings {
@@ -302,8 +296,8 @@ export enum EBrushAndZoomAreaSettings {
 	TrackBackgroundColor = "trackBackgroundColor",
 	SelectionTrackBackgroundColor = "selectionTrackBackgroundColor",
 	SelectionTrackBorderColor = "selectionTrackBorderColor",
-	WidthType = "widthType",
-	HeightType = "heightType",
+	IsAutoWidth = "isAutoWidth",
+	IsAutoHeight = "isAutoHeight",
 	Width = "width",
 	Height = "height"
 }
