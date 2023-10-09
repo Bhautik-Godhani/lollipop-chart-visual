@@ -5502,8 +5502,8 @@ export class Visual extends Shadow {
 	setSummaryTableConfig(): void {
 		this.summaryTableConfig = {
 			excludeNegativeDataBy: this.isHasSubcategories ? "cell" : "row",
-			categoricalGroupedDatarole: "subCategory",
-			excludeDataRolesFromTable: ["showBucket"],
+			categoricalGroupedDatarole: EDataRolesName.SubCategory,
+			excludeDataRolesFromTable: [EDataRolesName.SubCategory, EDataRolesName.ImagesData],
 			dataView: this.vizOptions.options.dataViews as any,
 			gridView: "tabular",
 			gridConfig: {
