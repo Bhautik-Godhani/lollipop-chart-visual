@@ -42,7 +42,6 @@ import {
 	ERankingType,
 	ESortByTypes,
 	DataValuesType,
-	LollipopWidthType,
 	ELegendPosition,
 	EHighContrastColorType,
 	EMarkerChartTypes,
@@ -1218,7 +1217,7 @@ export class Visual extends Shadow {
 
 		if (
 			this.chartSettings.lollipopWidth > this.minScaleBandWidth &&
-			this.chartSettings.lollipopWidthType === LollipopWidthType.Custom
+			!this.chartSettings.isAutoLollipopWidth
 		) {
 			this.scaleBandWidth = this.chartSettings.lollipopWidth;
 			this.brushScaleBandBandwidth = this.chartSettings.lollipopWidth;
@@ -1253,7 +1252,7 @@ export class Visual extends Shadow {
 				this.brushYAxisTicksMaxWidth = 0;
 			}
 
-			if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+			if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
 				this.isScrollBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = false;
@@ -1286,7 +1285,7 @@ export class Visual extends Shadow {
 				this.brushYAxisTicksMaxWidth = 0;
 			}
 
-			if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+			if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
 				this.isScrollBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = false;
@@ -1314,7 +1313,7 @@ export class Visual extends Shadow {
 		}
 
 		// || this.height < expectedHeight
-		if (this.width < expectedWidth && (this.chartSettings.lollipopWidthType === LollipopWidthType.Auto ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+		if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
 			const startIndex = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 			const endIndex = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
@@ -3858,7 +3857,7 @@ export class Visual extends Shadow {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
-		if (this.chartSettings.lollipopWidthType === LollipopWidthType.Custom) {
+		if (!this.chartSettings.isAutoLollipopWidth) {
 			if (!this.chartSettings.lollipopWidth) {
 				this.chartSettings.lollipopWidth = this.scaleBandWidth;
 			}

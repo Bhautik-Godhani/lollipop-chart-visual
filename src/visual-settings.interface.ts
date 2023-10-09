@@ -17,7 +17,6 @@ import {
 	EMarkerTypes,
 	ERankingType,
 	ESortOrderTypes,
-	LollipopWidthType,
 	Orientation,
 	PieSize,
 	PieType,
@@ -138,7 +137,7 @@ export interface IChartSettings {
 	isHasSubCategories: boolean;
 	orientation: Orientation;
 	isLollipopDistanceChange: boolean;
-	lollipopWidthType: LollipopWidthType;
+	isAutoLollipopWidth: boolean;
 	lollipopWidth: number;
 	lollipopInnerPadding: number;
 	isShowImageMarker: boolean;

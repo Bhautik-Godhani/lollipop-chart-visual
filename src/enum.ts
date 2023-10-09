@@ -105,11 +105,6 @@ export enum Orientation {
 	Horizontal = "horizontal",
 }
 
-export enum LollipopWidthType {
-	Auto = "auto",
-	Custom = "custom",
-}
-
 export enum EAutoCustomTypes {
 	Auto = "auto",
 	Custom = "custom",
@@ -176,7 +171,7 @@ export enum FontStyle {
 export enum EChartSettings {
 	isHasSubCategories = "isHasSubCategories",
 	orientation = "orientation",
-	lollipopWidthType = "lollipopWidthType",
+	isAutoLollipopWidth = "isAutoLollipopWidth",
 	lollipopWidth = "lollipopWidth",
 	pieSettings = "pieSettings",
 	IsShowImageMarker = "isShowImageMarker"

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
-import { EChartSettings, EPieSettings, LollipopWidthType, Orientation, PieSize, PieType } from "../enum";
+import { EAutoCustomTypes, EChartSettings, EPieSettings, Orientation, PieSize, PieType } from "../enum";
 import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
@@ -15,17 +15,6 @@ const ORIENTATIONS: ILabelValuePair[] = [
 	{
 		label: "HORIZONTAL",
 		value: Orientation.Horizontal,
-	},
-];
-
-const LOLLIPOP_DISTANCE_TYPES: ILabelValuePair[] = [
-	{
-		label: "Auto",
-		value: LollipopWidthType.Auto,
-	},
-	{
-		label: "Custom",
-		value: LollipopWidthType.Custom,
 	},
 ];
 
@@ -108,22 +97,22 @@ const UIGeneralChartSettings = (
 
 			<Row>
 				<Column>
-					<SelectInput
-						label={"Lollipop Width Type"}
-						value={configValues.lollipopWidthType}
-						optionsList={LOLLIPOP_DISTANCE_TYPES}
-						handleChange={(value) => handleChange(value, EChartSettings.lollipopWidthType, setConfigValues)}
+					<ToggleButton
+						label={"Auto Lollipop Width"}
+						value={configValues.isAutoLollipopWidth}
+						handleChange={(value) => handleChange(value, EChartSettings.isAutoLollipopWidth, setConfigValues)}
+						appearance="toggle"
 					/>
 				</Column>
 			</Row>
 
-			<ConditionalWrapper visible={configValues.lollipopWidthType === LollipopWidthType.Custom}>
-				<Row>
+			<ConditionalWrapper visible={!configValues.isAutoLollipopWidth}>
+				<Row appearance="padded">
 					<Column>
 						<InputControl
 							min={shadow.minScaleBandWidth}
 							type="number"
-							label="Lollipop Width"
+							label="Width"
 							value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}
 							handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
 						/>

@@ -15,7 +15,6 @@ import {
 	ERankingType,
 	ESortOrderTypes,
 	LineType,
-	LollipopWidthType,
 	Orientation,
 	PieSize,
 	PieType,
@@ -60,7 +59,7 @@ export const CHART_SETTINGS: IChartSettings = {
 	lollipopInnerPadding: 30,
 	isHasSubCategories: false,
 	orientation: Orientation.Vertical,
-	lollipopWidthType: LollipopWidthType.Auto,
+	isAutoLollipopWidth: false,
 	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
 	isShowImageMarker: false
