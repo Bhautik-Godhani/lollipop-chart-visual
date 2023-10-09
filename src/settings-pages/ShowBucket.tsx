@@ -2,11 +2,11 @@ import * as React from "react";
 import ColorPicker from "@truviz/shadow/dist/Components/ColorPicker/ColorPicker";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
 import SelectInput from "@truviz/shadow/dist/Components/SelectInput/SelectInput";
-import {BoldIcon, ItalicIcon, UnderlineIcon} from "./SettingsIcons";
-import {InputControl, Row, Column, ConditionalWrapper, Quote, SwitchOption, Footer} from "@truviz/shadow/dist/Components";
-import {SHOW_BUCKET_SETTINGS} from "../constants";
-import {IShowBucketSettings} from "../visual-settings.interface";
-import {EShowBucketSettings} from "../enum";
+import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
+import { InputControl, Row, Column, ConditionalWrapper, Quote, SwitchOption, Footer } from "@truviz/shadow/dist/Components";
+import { SHOW_BUCKET_SETTINGS as SHOW_BUCKET_SETTINGS_IMP } from "../constants";
+import { IShowBucketSettings } from "../visual-settings.interface";
+import { EShowBucketSettings } from "../enum";
 
 const UIShowBucketSettings = (
 	shadow: any,
@@ -78,15 +78,15 @@ const UIShowBucketSettings = (
 								value={configValues.styling}
 								optionsList={[
 									{
-										label: <BoldIcon style={{fill: "currentColor"}} />,
+										label: <BoldIcon style={{ fill: "currentColor" }} />,
 										value: "bold",
 									},
 									{
-										label: <ItalicIcon style={{fill: "currentColor"}} />,
+										label: <ItalicIcon style={{ fill: "currentColor" }} />,
 										value: "italic",
 									},
 									{
-										label: <UnderlineIcon style={{fill: "currentColor"}} />,
+										label: <UnderlineIcon style={{ fill: "currentColor" }} />,
 										value: "underline",
 									},
 								]}
@@ -139,12 +139,13 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 const ShowCondition = (props) => {
 	const {
 		shadow,
-		compConfig: {sectionName, propertyName},
+		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
 
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
+	const SHOW_BUCKET_SETTINGS = JSON.parse(JSON.stringify(SHOW_BUCKET_SETTINGS_IMP))
 
 	try {
 		initialStates = JSON.parse(initialStates);
@@ -153,7 +154,7 @@ const ShowCondition = (props) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = {...SHOW_BUCKET_SETTINGS};
+		initialStates = { ...SHOW_BUCKET_SETTINGS };
 	}
 
 	const applyChanges = () => {
@@ -161,15 +162,25 @@ const ShowCondition = (props) => {
 		closeCurrentSettingHandler();
 	};
 
-	const resetChanges = () => {
-		setConfigValues({...SHOW_BUCKET_SETTINGS});
-	};
-
 	if (!shadow.isShowBucketChartFieldCheck) {
 		initialStates.enable = false;
 	}
 
 	const [configValues, setConfigValues] = React.useState<IShowBucketSettings>(initialStates);
+
+	const resetChanges = () => {
+		// handleChange([], EShowBucketSettings.Styling);
+		setConfigValues((d) => ({
+			...d,
+			...SHOW_BUCKET_SETTINGS
+		}));
+		// setConfigValues({ ...SHOW_BUCKET_SETTINGS });
+	};
+
+	React.useEffect(() => {
+		console.log(configValues);
+	}, [configValues]);
+
 
 	const handleChange = (val, n) => {
 		setConfigValues((d) => ({

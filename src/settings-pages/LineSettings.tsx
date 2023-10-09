@@ -1,5 +1,5 @@
 import * as React from "react";
-import { LINE_SETTINGS } from "../constants";
+import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
 import { ELineSettings, LineType } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
@@ -41,6 +41,8 @@ const LineSettings = (props) => {
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const LINE_SETTINGS = JSON.parse(JSON.stringify(LINE_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

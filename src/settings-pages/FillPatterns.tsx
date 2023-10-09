@@ -1,6 +1,6 @@
 import * as React from "react";
 import { IPatternData, InputControl, PatternPicker } from "@truviz/shadow/dist/Components";
-import { PATTERN_SETTINGS } from "../constants";
+import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
 import { EPatternSettings } from "../enum";
 import { IPatternProps, IPatternSettings } from "../visual-settings.interface";
@@ -61,6 +61,7 @@ const FillPatterns = (props) => {
 		closeCurrentSettingHandler,
 	} = props;
 
+	const PATTERN_SETTINGS = JSON.parse(JSON.stringify(PATTERN_SETTINGS_IMP));
 	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
 	const initialStates: typeof PATTERN_SETTINGS = parseObject(_initialStates, PATTERN_SETTINGS);
 	const clonedGroupingPatterns = shadow.categoryPatterns;

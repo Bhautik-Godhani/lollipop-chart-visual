@@ -1,5 +1,5 @@
 import * as React from "react";
-import { X_AXIS_SETTINGS } from "../constants";
+import { X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP } from "../constants";
 import { EXAxisSettings, Position } from "../enum";
 import {
   InputControl,
@@ -21,6 +21,8 @@ const XAxisSettings = (props) => {
     vizOptions,
     closeCurrentSettingHandler,
   } = props;
+
+  const X_AXIS_SETTINGS = JSON.parse(JSON.stringify(X_AXIS_SETTINGS_IMP));
   let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
   try {

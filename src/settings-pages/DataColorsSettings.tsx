@@ -1,7 +1,7 @@
 import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, SwitchOption } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import * as React from "react";
-import { DATA_COLORS } from "../constants";
+import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
 import { ColorPaletteType, EDataColorsSettings, EMarkerColorTypes } from "../enum";
 import { parseObject } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
@@ -212,6 +212,7 @@ const DataColors = (props) => {
 		closeCurrentSettingHandler,
 	} = props;
 
+	const DATA_COLORS = JSON.parse(JSON.stringify(DATA_COLORS_IMP));
 	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
 	const initialStates: typeof DATA_COLORS = parseObject(_initialStates, DATA_COLORS);
 

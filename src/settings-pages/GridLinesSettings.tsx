@@ -1,5 +1,5 @@
 import * as React from "react";
-import { GRID_LINES_SETTINGS } from "../constants";
+import { GRID_LINES_SETTINGS as GRID_LINES_SETTINGS_IMP } from "../constants";
 import { EGridLinesSettings, LineType } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
@@ -177,6 +177,8 @@ const GridLinesSettings = (props) => {
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const GRID_LINES_SETTINGS = JSON.parse(JSON.stringify(GRID_LINES_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

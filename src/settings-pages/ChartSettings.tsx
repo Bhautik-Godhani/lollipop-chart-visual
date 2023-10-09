@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CHART_SETTINGS } from "../constants";
+import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, EPieSettings, LollipopWidthType, Orientation, PieSize, PieType } from "../enum";
 import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
@@ -216,6 +216,8 @@ const ChartSettings = (props) => {
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const CHART_SETTINGS = JSON.parse(JSON.stringify(CHART_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

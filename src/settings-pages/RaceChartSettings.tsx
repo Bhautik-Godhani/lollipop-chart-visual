@@ -1,5 +1,5 @@
 import * as React from "react";
-import { RACE_CHART_SETTINGS } from "../constants";
+import { RACE_CHART_SETTINGS as RACE_CHART_SETTINGS_IMP } from "../constants";
 import {
   InputControl,
   Row,
@@ -20,6 +20,8 @@ const RaceChartSettings = (props) => {
     vizOptions,
     closeCurrentSettingHandler,
   } = props;
+
+  const RACE_CHART_SETTINGS = JSON.parse(JSON.stringify(RACE_CHART_SETTINGS_IMP));
   let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
   try {

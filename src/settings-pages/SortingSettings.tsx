@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { SORTING_SETTINGS } from "../constants";
+import { SORTING_SETTINGS as SORTING_SETTINGS_IMP } from "../constants";
 import { parseObject } from "../methods/methods";
 import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
 import { Accordion, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
@@ -231,6 +231,7 @@ const SortingSettings = (props) => {
 		closeCurrentSettingHandler,
 	} = props;
 
+	const SORTING_SETTINGS = JSON.parse(JSON.stringify(SORTING_SETTINGS_IMP));
 	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
 	const initialStates: ISortingSettings = parseObject(_initialStates, SORTING_SETTINGS);
 

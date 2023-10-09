@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DATA_LABELS_SETTINGS } from "../constants";
+import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
 import { DataLabelsFontSizeType, DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
 import { IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
@@ -296,6 +296,8 @@ const DataLabelsSettings = (props) => {
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const DATA_LABELS_SETTINGS = JSON.parse(JSON.stringify(DATA_LABELS_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

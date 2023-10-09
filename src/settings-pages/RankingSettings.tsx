@@ -1,5 +1,5 @@
 import * as React from "react";
-import {RANKING_SETTINGS} from "../constants";
+import { RANKING_SETTINGS as RANKING_SETTINGS_IMP } from "../constants";
 import {
 	Accordion,
 	// ColorPicker,
@@ -11,9 +11,9 @@ import {
 	SwitchOption,
 	ToggleButton,
 } from "@truviz/shadow/dist/Components";
-import {ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps} from "../visual-settings.interface";
-import {ERankingSettings, ERankingType} from "../enum";
-import {ShadowUpdateOptions} from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps } from "../visual-settings.interface";
+import { ERankingSettings, ERankingType } from "../enum";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const RANKING_TYPES: ILabelValuePair[] = [
 	{
@@ -65,7 +65,7 @@ const UIByCategoryRankingSettings = (
 						</Column>
 					</Row>
 
-					<Row style={{width: "50%"}}>
+					<Row style={{ width: "50%" }}>
 						<Column>
 							<InputControl
 								min={1}
@@ -137,7 +137,7 @@ const UIByGroupRankingSettings = (
 						</Column>
 					</Row>
 
-					<Row style={{width: "50%"}}>
+					<Row style={{ width: "50%" }}>
 						<Column>
 							<InputControl
 								min={1}
@@ -207,10 +207,12 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 const Ranking = (props) => {
 	const {
 		shadow,
-		compConfig: {sectionName, propertyName},
+		compConfig: { sectionName, propertyName },
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const RANKING_SETTINGS = JSON.parse(JSON.stringify(RANKING_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {
@@ -220,7 +222,7 @@ const Ranking = (props) => {
 			...initialStates,
 		};
 	} catch (e) {
-		initialStates = {...RANKING_SETTINGS};
+		initialStates = { ...RANKING_SETTINGS };
 	}
 
 	const applyChanges = () => {
@@ -229,7 +231,7 @@ const Ranking = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({...RANKING_SETTINGS});
+		setConfigValues({ ...RANKING_SETTINGS });
 	};
 
 	const [configValues, setConfigValues] = React.useState<IRankingSettings>({

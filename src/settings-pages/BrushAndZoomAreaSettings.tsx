@@ -2,7 +2,7 @@
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
 import { Row, Column, Footer, ConditionalWrapper, ColorPicker, SelectInput, InputControl } from "@truviz/shadow/dist/Components";
-import { BRUSH_AND_ZOOM_AREA_SETTINGS } from "../constants";
+import { BRUSH_AND_ZOOM_AREA_SETTINGS as BRUSH_AND_ZOOM_AREA_SETTINGS_IMP } from "../constants";
 import { IBrushAndZoomAreaSettings, ILabelValuePair } from "../visual-settings.interface";
 import { EAutoCustomTypes, EBrushAndZoomAreaSettings } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
@@ -179,6 +179,7 @@ const BrushAndZoomAreaSettings = (props) => {
 		closeCurrentSettingHandler,
 	} = props;
 
+	const BRUSH_AND_ZOOM_AREA_SETTINGS = JSON.parse(JSON.stringify(BRUSH_AND_ZOOM_AREA_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

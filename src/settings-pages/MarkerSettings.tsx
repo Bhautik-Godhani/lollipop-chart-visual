@@ -5,7 +5,7 @@ import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconP
 import { ILabelValuePair, IMarkerSettings } from "../visual-settings.interface";
 import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
-import { MARKER_SETTINGS } from "../constants";
+import { MARKER_SETTINGS as MARKER_SETTINGS_IMP } from "../constants";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { get } from "lodash";
 import { MarkerShape } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
@@ -173,6 +173,8 @@ const MarkerSettings = (props) => {
 		vizOptions,
 		closeCurrentSettingHandler,
 	} = props;
+
+	const MARKER_SETTINGS = JSON.parse(JSON.stringify(MARKER_SETTINGS_IMP));
 	let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
 	try {

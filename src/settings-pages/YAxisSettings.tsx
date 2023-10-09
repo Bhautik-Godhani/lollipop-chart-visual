@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Y_AXIS_SETTINGS } from "../constants";
+import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
   EVisualConfig,
   EVisualSettings,
@@ -28,6 +28,8 @@ const YAxisSettings = (props) => {
     closeCurrentSettingHandler,
     closeAdvancedSettingsHandler,
   } = props;
+
+  const Y_AXIS_SETTINGS = JSON.parse(JSON.stringify(Y_AXIS_SETTINGS_IMP));
   let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
   try {
