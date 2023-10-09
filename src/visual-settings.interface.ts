@@ -157,8 +157,8 @@ export interface IMarkerSettings {
 }
 
 export interface MarkerStyleProps {
-	sizeType: EAutoCustomTypes,
-	size: number
+	isAutoMarkerSize: boolean,
+	markerSize: number
 }
 
 export interface IDataLabelsSettings {

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { EAutoCustomTypes, EMarkerChartTypes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleProps, EMarkerStyleTypes, EMarkerTypes, PieType } from "../enum";
-import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, RadioOption, SelectInput, InputControl } from "@truviz/shadow/dist/Components";
+import { EAutoCustomTypes, EMarkerChartTypes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes, PieType } from "../enum";
+import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, RadioOption, SelectInput, InputControl, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IMarkerSettings } from "../visual-settings.interface";
 import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
@@ -9,6 +9,10 @@ import { MARKER_SETTINGS as MARKER_SETTINGS_IMP } from "../constants";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { get } from "lodash";
 import { MarkerShape } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
+
+import PieIcon from "../../assets/icons/PieIcon.svg";
+import DonutIcon from "../../assets/icons/donut-icon.svg";
+import RoseIcon from "../../assets/icons/rose-icon.svg";
 
 const AUTO_CUSTOM_TYPES: ILabelValuePair[] = [
 	{
@@ -36,19 +40,19 @@ const MARKER_TYPES: ILabelValuePair[] = [
 
 const MARKER_CHART_TYPES = [
 	{
-		image: "",
+		image: PieIcon,
 		value: EMarkerChartTypes.PIE,
 		key: "Pie",
 		label: "Pie"
 	},
 	{
-		image: "",
+		image: DonutIcon,
 		value: EMarkerChartTypes.DONUT,
 		key: "Donut",
 		label: "Donut"
 	},
 	{
-		image: "",
+		image: RoseIcon,
 		value: EMarkerChartTypes.ROSE,
 		key: "Rose",
 		label: "Rose"
@@ -102,7 +106,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 
 const UIMarkerShapeTypes = (configValues: IMarkerSettings, initialStates: IMarkerSettings, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
 	return (
-		<Row>
+		<Row disableTopPadding>
 			<Column>
 				<Tabs selected={configValues.markerShape} onChange={(value) => {
 					handleChange(value, EMarkerSettings.MarkerShape, setConfigValues)
@@ -150,7 +154,7 @@ const IconsTab = ({ configValues, setConfigValues, initialStates }) => (
 );
 
 const UploadTab = ({ configValues, setConfigValues }) => (
-	<Row style={{ width: "312px" }}>
+	<Row>
 		<Column>
 			<FileUploader
 				imageData={configValues[EMarkerSettings.MarkerShapeBase64Url]}
@@ -240,7 +244,7 @@ const MarkerSettings = (props) => {
 
 	return (
 		<>
-			<Row style={{ width: "312px" }}>
+			<Row>
 				<Column>
 
 					<ConditionalWrapper visible={!shadow.isHasSubcategories}>
@@ -292,32 +296,33 @@ const MarkerSettings = (props) => {
 
 					<Row>
 						<Column>
-							<SelectInput
-								label={"Size Type"}
-								value={configValues[configValues.markerStyleType].sizeType}
-								optionsList={AUTO_CUSTOM_TYPES}
-								handleChange={(value) => handleMarkerStyleChange(value, EMarkerStyleProps.SizeType, configValues.markerStyleType, setConfigValues)}
+							<ToggleButton
+								label={"Auto Marker Size"}
+								value={configValues[configValues.markerStyleType].isAutoMarkerSize}
+								handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsAutoMarkerSize, configValues.markerStyleType, setConfigValues)}
+								appearance="toggle"
 							/>
 						</Column>
 					</Row>
 
-					<ConditionalWrapper visible={configValues[configValues.markerStyleType].sizeType === EAutoCustomTypes.Custom}>
-						<Row>
+					<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isAutoMarkerSize}>
+						<Row appearance="padded">
 							<Column>
 								<InputControl
 									min={0}
 									type="number"
 									label={"Size"}
-									value={configValues[configValues.markerStyleType].size.toString()}
-									handleChange={(value) => handleMarkerStyleChange(value, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)}
+									value={configValues[configValues.markerStyleType].markerSize.toString()}
+									handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
 								/>
 							</Column>
+							<Column></Column>
 						</Row>
 					</ConditionalWrapper>
 
 					{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
-				</Column>
-			</Row>
+				</Column >
+			</Row >
 		</>
 	);
 };

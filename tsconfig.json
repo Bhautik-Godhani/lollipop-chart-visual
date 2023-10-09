@@ -15,5 +15,5 @@
 		"preserveSymlinks": true
 	},
 	"include": ["src/**/*.tsx", "src/**/*.ts", "src/**/*.json"],
-	"files": ["./src/visual.ts"]
+	"files": ["./src/visual.ts", "custom.d.ts"]
 }

@@ -117,83 +117,9 @@ const UIGeneralChartSettings = (
 							handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
 						/>
 					</Column>
+					<Column></Column>
 				</Row>
 			</ConditionalWrapper>
-		</>
-	);
-};
-
-const UIPieTypeSettings = (
-	configValues: IChartSettings,
-	pieConfigValues: IPieSettings,
-	isDumbbellChart: boolean,
-	setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>
-) => {
-	// const pieType = pieConfigValues.pieType;
-	// const PIE_TYPES: ILabelValuePair[] = [
-	// 	{
-	// 		label: `${configValues[EChartSettings.lollipopType]} 1`,
-	// 		value: PieType.Pie1,
-	// 	},
-	// 	{
-	// 		label: `${configValues[EChartSettings.lollipopType]} 2`,
-	// 		value: PieType.Pie2,
-	// 	},
-	// ];
-
-	return (
-		<>
-			{/* <ConditionalWrapper visible={isDumbbellChart}>
-				<Row>
-					<Column>
-						<RadioOption
-							label={`Select ${configValues[EChartSettings.lollipopType]}`}
-							value={pieConfigValues[EPieSettings.pieType]}
-							optionsList={PIE_TYPES}
-							handleChange={(value) => handlePieTypeChange(value, EPieSettings.pieType, setPieConfigValues)}
-						/>
-					</Column>
-				</Row>
-
-				<Row>
-					<Column>
-						<SelectInput
-							label={`${configValues[EChartSettings.lollipopType]} Size`}
-							value={pieConfigValues[pieConfigValues.pieType].pieSize}
-							optionsList={LOLLIPOP_DISTANCE_TYPES}
-							handleChange={(value) => handlePieChange(value, EPieSettings.pieSize, pieType, setPieConfigValues)}
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={pieConfigValues[pieConfigValues.pieType].pieSize === PieSize.Auto}>
-					<Row>
-						<Column>
-							<InputControl
-								min={0}
-								type="number"
-								label={`Max ${configValues[EChartSettings.lollipopType]} Radius`}
-								value={pieConfigValues[pieConfigValues.pieType].maxPieRadius.toString()}
-								handleChange={(value) => handlePieChange(value, EPieSettings.maxPieRadius, pieType, setPieConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
-
-				<ConditionalWrapper visible={pieConfigValues[pieConfigValues.pieType].pieSize === PieSize.Custom}>
-					<Row>
-						<Column>
-							<InputControl
-								min={0}
-								type="number"
-								label={`${configValues[EChartSettings.lollipopType]} Radius`}
-								value={pieConfigValues[pieConfigValues.pieType].pieRadius.toString()}
-								handleChange={(value) => handlePieChange(value, EPieSettings.pieRadius, pieType, setPieConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
-			</ConditionalWrapper> */}
 		</>
 	);
 };

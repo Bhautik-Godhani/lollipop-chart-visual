@@ -261,8 +261,8 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerShapeBase64Url: "",
 	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
-	marker1Style: { sizeType: EAutoCustomTypes.Auto, size: 0 },
-	marker2Style: { sizeType: EAutoCustomTypes.Auto, size: 0 }
+	marker1Style: { isAutoMarkerSize: true, markerSize: 0 },
+	marker2Style: { isAutoMarkerSize: true, markerSize: 0 }
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {

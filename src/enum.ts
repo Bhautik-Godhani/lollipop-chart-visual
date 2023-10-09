@@ -363,7 +363,9 @@ export enum EMarkerSettings {
 	DropdownMarkerType = "dropdownMarkerType",
 	Marker1Styles = "marker1Styles",
 	Marker2Styles = "marker2Styles",
-	MarkerStyleType = "markerStyleType"
+	MarkerStyleType = "markerStyleType",
+	IsAutoMarkerSize = "isAutoMarkerSize",
+	MarkerSize = "markerSize"
 }
 
 export enum ERaceChartSettings {
@@ -400,11 +402,6 @@ export enum EMarkerDefaultShapes {
 	CIRCLE = "circle",
 	SQUARE = "square",
 	TRIANGLE = "triangle"
-}
-
-export enum EMarkerStyleProps {
-	SizeType = "sizeType",
-	Size = "size"
 }
 
 export enum EMarkerStyleTypes {

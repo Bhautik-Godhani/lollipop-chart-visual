@@ -4779,7 +4779,7 @@ export class Visual extends Shadow {
 	//.CIRCLE
 	setCircle1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
-		if (marker1Style.sizeType === EAutoCustomTypes.Auto) {
+		if (marker1Style.isAutoMarkerSize) {
 			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]);
 			if (size < this.maxCircleSize && size > this.minCircleSize) {
 				this.circle1Size = size;
@@ -4789,13 +4789,13 @@ export class Visual extends Shadow {
 				this.circle1Size = this.minCircleSize;
 			}
 		} else {
-			this.circle1Size = marker1Style.size;
+			this.circle1Size = marker1Style.markerSize;
 		}
 	}
 
 	setCircle2Radius(): void {
 		const marker2Style = this.markerSettings.marker2Style;
-		if (marker2Style.sizeType === EAutoCustomTypes.Auto) {
+		if (marker2Style.isAutoMarkerSize) {
 			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]);
 			if (size < this.maxCircleSize && size > this.minCircleSize) {
 				this.circle2Size = size;
@@ -4805,7 +4805,7 @@ export class Visual extends Shadow {
 				this.circle2Size = this.minCircleSize;
 			}
 		} else {
-			this.circle2Size = marker2Style.size;
+			this.circle2Size = marker2Style.markerSize;
 		}
 	}
 
@@ -4909,7 +4909,7 @@ export class Visual extends Shadow {
 	// Pie
 	setPie1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
-		if (marker1Style.sizeType === EAutoCustomTypes.Auto) {
+		if (marker1Style.isAutoMarkerSize) {
 			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]) / 2;
 			if (size < this.maxPieSize && size > this.minPieSize) {
 				this.pie1Radius = size;
@@ -4919,13 +4919,13 @@ export class Visual extends Shadow {
 				this.pie1Radius = this.minPieSize;
 			}
 		} else {
-			this.pie1Radius = marker1Style.size;
+			this.pie1Radius = marker1Style.markerSize;
 		}
 	}
 
 	setPie2Radius(): void {
 		const marker2Style = this.markerSettings.marker2Style;
-		if (marker2Style.sizeType === EAutoCustomTypes.Auto) {
+		if (marker2Style.isAutoMarkerSize) {
 			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]) / 2;
 			if (size < this.maxPieSize && size > this.minPieSize) {
 				this.pie2Radius = size;
@@ -4935,7 +4935,7 @@ export class Visual extends Shadow {
 				this.pie2Radius = this.minPieSize;
 			}
 		} else {
-			this.pie2Radius = marker2Style.size;
+			this.pie2Radius = marker2Style.markerSize;
 		}
 	}
 
