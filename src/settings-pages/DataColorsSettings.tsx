@@ -173,7 +173,7 @@ const UIColorPaletteTypes = (
 					values.fillType as any
 				)}
 			>
-				<Row>
+				{/* <Row>
 					<Column>
 						<ColorSchemePicker
 							colorSchemePickerProps={values}
@@ -184,7 +184,7 @@ const UIColorPaletteTypes = (
 							}}
 						/>
 					</Column>
-				</Row>
+				</Row> */}
 			</ConditionalWrapper>
 		</>
 	);

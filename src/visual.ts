@@ -142,7 +142,7 @@ import RaceChartSettings from "./settings-pages/RaceChartSettings";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, GridIcon, RankingIcon, ShowConditionIcon, SortIcon, XYAxisIcon } from "./settings-pages/SettingsIcons";
+import { ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, MarkerSettingsIcon, RankingIcon, ShowConditionIcon, SortIcon, XYAxisIcon } from "./settings-pages/SettingsIcons";
 import { PatternIconSVG } from "@truviz/shadow/dist/Components/PatternPicker/PatternPicker";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
@@ -172,7 +172,6 @@ export class Visual extends Shadow {
 	public viewPortWidth: number;
 	public viewPortHeight: number;
 	public margin: { top: number; right: number; bottom: number; left: number };
-	public valuesTitle: string;
 	public chartData: ILollipopChartRow[];
 	public legends1Data: { data: { name: string, color: string, pattern: string } }[] = [];
 	public legends2Data: { data: { name: string, color: string, pattern: string } }[] = [];
@@ -247,7 +246,6 @@ export class Visual extends Shadow {
 	// svg
 	public svg: D3Selection<SVGElement>;
 	public container: any;
-	public categoryTitle: string;
 	public scaleBandWidth: number;
 	public computedTextEle: any;
 	public gradientColorScale = d3.scaleLinear();
@@ -492,6 +490,8 @@ export class Visual extends Shadow {
 					sectionName: "markerConfig",
 					propertyName: "markerSettings",
 					Component: () => MarkerSettings,
+					icon: MarkerSettingsIcon
+
 				},
 				{
 					name: "Line Settings",
@@ -541,11 +541,11 @@ export class Visual extends Shadow {
 					icon: XYAxisIcon
 				},
 				{
-					name: "Patterns",
+					name: "Fill Patterns",
 					sectionName: "patternConfig",
 					propertyName: "patternSettings",
 					Component: () => PatternSettings,
-					icon: PatternIconSVG
+					icon: FillPatternsIcon
 				},
 				{
 					name: "Ranking",
@@ -1622,7 +1622,7 @@ export class Visual extends Shadow {
 			this.isDisplayLegend2 = this.isHasMultiMeasure && this.isLollipopTypePie;
 
 			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
-			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.xAxisSettings;
+			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.yAxisSettings;
 
 			this.xAxisTitleSize = this.xAxisSettings.isDisplayTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
@@ -1764,6 +1764,7 @@ export class Visual extends Shadow {
 				this.isTickerButtonDrawn = false;
 			}
 
+			this.drawXYAxisTitle();
 			this.setSummaryTableConfig();
 			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 
@@ -3810,34 +3811,62 @@ export class Visual extends Shadow {
 
 	// XY Axis Title
 	drawXYAxisTitle(): void {
+		if (this.isHorizontalChart) {
+			if (this.xAxisSettings.isDisplayTitle) {
+				if (this.xAxisSettings.titleName.length === 0) {
+					this.xAxisSettings.titleName = this.measureNames.join(" and ");
+				}
+			}
+
+			if (this.yAxisSettings.isDisplayTitle) {
+				if (this.yAxisSettings.titleName.length === 0) {
+					this.yAxisSettings.titleName = this.categoryDisplayName;
+				}
+			}
+		} else {
+			if (this.xAxisSettings.isDisplayTitle) {
+				if (this.xAxisSettings.titleName.length === 0) {
+					this.xAxisSettings.titleName = this.categoryDisplayName;
+				}
+			}
+
+			if (this.yAxisSettings.isDisplayTitle) {
+				if (this.yAxisSettings.titleName.length === 0) {
+					this.yAxisSettings.titleName = this.measureNames.join(" and ");
+				}
+			}
+		}
+
 		const xAxisSettings = this.xAxisSettings;
 		const yAxisSettings = this.yAxisSettings;
+
+		const xAxisTitleProperties: TextProperties = {
+			text: xAxisSettings.titleName,
+			fontFamily: xAxisSettings.titleFontFamily,
+			fontSize: xAxisSettings.titleFontSize + "px",
+		};
+		const xAxisTitle = textMeasurementService.getTailoredTextOrDefault(xAxisTitleProperties, this.width);
+
+		const yAxisTitleProperties: TextProperties = {
+			text: yAxisSettings.titleName,
+			fontFamily: yAxisSettings.titleFontFamily,
+			fontSize: yAxisSettings.titleFontSize + "px",
+		};
+		const yAxisTitle = textMeasurementService.getTailoredTextOrDefault(yAxisTitleProperties, this.height);
 
 		this.xAxisTitleText
 			.attr("fill", xAxisSettings.titleColor)
 			.attr("font-size", xAxisSettings.titleFontSize)
 			.style("font-family", xAxisSettings.titleFontFamily)
-			.style("display", xAxisSettings.isDisplayTitle ? "block" : "none");
+			.style("display", xAxisSettings.isDisplayTitle ? "block" : "none")
+			.text(xAxisTitle);
 
 		this.yAxisTitleText
 			.attr("fill", yAxisSettings.titleColor)
 			.attr("font-size", yAxisSettings.titleFontSize)
 			.style("font-family", this.yAxisSettings.titleFontFamily)
-			.style("display", yAxisSettings.isDisplayTitle ? "block" : "none");
-
-		const xAxisTitle = this.isHorizontalChart ? this.valuesTitle : this.categoryTitle;
-		if (!xAxisSettings.titleName) {
-			xAxisSettings.titleName = xAxisTitle;
-			xAxisSettings.titleName = xAxisTitle;
-		}
-		this.xAxisTitleText.text(xAxisSettings.titleName ? xAxisSettings.titleName : xAxisTitle);
-
-		const yAxisTitle = this.isHorizontalChart ? this.categoryTitle : this.valuesTitle;
-		if (!yAxisSettings.titleName) {
-			yAxisSettings.titleName = yAxisTitle;
-			yAxisSettings.titleName = yAxisTitle;
-		}
-		this.yAxisTitleText.text(yAxisSettings.titleName ? yAxisSettings.titleName : yAxisTitle);
+			.style("display", yAxisSettings.isDisplayTitle ? "block" : "none")
+			.text(yAxisTitle);
 
 		if (xAxisSettings.position === Position.Bottom) {
 			this.xAxisTitleG.attr(

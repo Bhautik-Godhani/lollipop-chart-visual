@@ -100,6 +100,12 @@ export const FillPatternsIcon = (props: SVGProps<SVGSVGElement>) => (
 	</svg>
 );
 
+export const MarkerSettingsIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M4.5 1C2.567 1 1 2.567 1 4.5C1 6.26324 2.30385 7.72194 4 7.96456V8.97254C1.75002 8.72381 0 6.81628 0 4.5C0 2.01472 2.01472 0 4.5 0C6.81628 0 8.72381 1.75002 8.97254 4H7.96456C7.72194 2.30385 6.26324 1 4.5 1ZM7.5 5C6.11929 5 5 6.11929 5 7.5V11.5C5 12.8807 6.11929 14 7.5 14H11.5C12.8807 14 14 12.8807 14 11.5V7.5C14 6.11929 12.8807 5 11.5 5H7.5ZM6 7.5C6 6.67157 6.67157 6 7.5 6H11.5C12.3284 6 13 6.67157 13 7.5V11.5C13 12.3284 12.3284 13 11.5 13H7.5C6.67157 13 6 12.3284 6 11.5V7.5Z" fill="var(--activeSelected)" />
+	</svg>
+);
+
 export const DataLabelsIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="13" height="14" viewBox="0 0 13 14" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
 		<path

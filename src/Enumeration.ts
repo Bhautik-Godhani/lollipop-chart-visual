@@ -208,7 +208,7 @@ function getYAxisConfigSelection(): EnumerateSectionType {
 
 function getLegendSelection(): EnumerateSectionType {
 	return {
-		name: "legend",
+		name: "Legend",
 		isShow: true,
 		properties: [
 			{
@@ -245,7 +245,7 @@ function getLegendSelection(): EnumerateSectionType {
 
 function getNumberFormattingSelection(): EnumerateSectionType {
 	return {
-		name: "numberFormatting",
+		name: "Number Formatting",
 		isShow: true,
 		properties: [
 			{

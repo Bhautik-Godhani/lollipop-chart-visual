@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
@@ -86,6 +87,18 @@ const YAxisSettings = (props) => {
       value: Position.Right,
     },
   ];
+
+  React.useEffect(() => {
+    if (configValues.isDisplayTitle) {
+      if (configValues.titleName.length === 0) {
+        if (shadow.isHorizontalChart) {
+          handleChange(shadow.categoryDisplayName, EYAxisSettings.TitleName);
+        } else {
+          handleChange(shadow.measureNames.join(" and "), EYAxisSettings.TitleName);
+        }
+      }
+    }
+  }, []);
 
   return (
     <>

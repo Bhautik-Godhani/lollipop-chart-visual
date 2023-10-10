@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP } from "../constants";
 import { EXAxisSettings, Position } from "../enum";
@@ -79,6 +80,18 @@ const XAxisSettings = (props) => {
       value: Position.Bottom,
     }
   ];
+
+  React.useEffect(() => {
+    if (configValues.isDisplayTitle) {
+      if (configValues.titleName.length === 0) {
+        if (shadow.isHorizontalChart) {
+          handleChange(shadow.measureNames.join(" and "), EXAxisSettings.TitleName);
+        } else {
+          handleChange(shadow.categoryDisplayName, EXAxisSettings.TitleName);
+        }
+      }
+    }
+  }, []);
 
   return (
     <>

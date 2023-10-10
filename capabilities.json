@@ -13,7 +13,15 @@
 		{
 			"displayName": "Measure",
 			"name": "measure",
-			"kind": "Measure"
+			"kind": "Measure",
+			"requiredTypes": [
+				{
+					"numeric": true
+				},
+				{
+					"integer": true
+				}
+			]
 		},
 		{
 			"displayName": "Race Chart Data",
@@ -304,7 +312,7 @@
 			}
 		},
 		"legend": {
-			"displayName": "legend",
+			"displayName": "Legend",
 			"properties": {
 				"show": {
 					"displayName": "Show",
@@ -415,7 +423,7 @@
 			}
 		},
 		"numberFormatting": {
-			"displayName": "numberFormatting",
+			"displayName": "Number Formatting",
 			"properties": {
 				"show": {
 					"displayName": "Show",

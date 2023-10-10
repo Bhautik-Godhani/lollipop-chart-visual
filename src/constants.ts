@@ -168,7 +168,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 
 export const X_AXIS_SETTINGS: IXAxisSettings = {
 	position: Position.Bottom,
-	isDisplayTitle: false,
+	isDisplayTitle: true,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
@@ -184,7 +184,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	position: Position.Left,
-	isDisplayTitle: false,
+	isDisplayTitle: true,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
