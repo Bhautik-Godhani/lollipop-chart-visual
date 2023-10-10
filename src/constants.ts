@@ -61,7 +61,6 @@ export const CHART_SETTINGS: IChartSettings = {
 	isAutoLollipopWidth: true,
 	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
-	isShowImageMarker: false
 };
 
 export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
@@ -260,7 +259,8 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: { isAutoMarkerSize: true, markerSize: 0 },
-	marker2Style: { isAutoMarkerSize: true, markerSize: 0 }
+	marker2Style: { isAutoMarkerSize: true, markerSize: 0 },
+	isShowImageMarker: true
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {

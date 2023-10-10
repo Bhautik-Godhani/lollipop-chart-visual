@@ -13,6 +13,7 @@ import { MarkerShape } from "powerbi-visuals-utils-chartutils/lib/legend/legendI
 import PieIcon from "../../assets/icons/PieIcon.svg";
 import DonutIcon from "../../assets/icons/donut-icon.svg";
 import RoseIcon from "../../assets/icons/rose-icon.svg";
+import { Visual } from "../visual";
 
 const AUTO_CUSTOM_TYPES: ILabelValuePair[] = [
 	{
@@ -104,7 +105,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 	);
 };
 
-const UIMarkerShapeTypes = (configValues: IMarkerSettings, initialStates: IMarkerSettings, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+const UIMarkerShapeTypes = (shadow: Visual, configValues: IMarkerSettings, initialStates: IMarkerSettings, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
 	return (
 		<Row disableTopPadding>
 			<Column>
@@ -113,6 +114,7 @@ const UIMarkerShapeTypes = (configValues: IMarkerSettings, initialStates: IMarke
 				}}>
 					<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
 						<MarkerPicker
+							label="Select Marker"
 							marker={{ label: configValues.dropdownMarkerType, value: configValues.dropdownMarkerType }}
 							handleChange={(e: IMarkerData) => {
 								handleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, setConfigValues);
@@ -244,40 +246,55 @@ const MarkerSettings = (props) => {
 
 	return (
 		<>
-			<Row>
+			<Row disableTopPadding>
 				<Column>
 
-					<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-						{UIMarkerShapeTypes(configValues, initialStates, setConfigValues)}
-					</ConditionalWrapper>
-
-					<ConditionalWrapper visible={shadow.isHasSubcategories}>
-						<Row disableTopPadding>
+					<ConditionalWrapper visible={shadow.isHasImagesData && !shadow.isHasSubcategories}>
+						<Row enableBottomPadding>
 							<Column>
-								<SwitchOption
-									label={"Marker Type"}
-									value={configValues.markerType}
-									optionsList={MARKER_TYPES}
-									handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
+								<ToggleButton
+									label={"Show Image Marker"}
+									value={configValues.isShowImageMarker}
+									handleChange={() => handleCheckbox(EMarkerSettings.IsShowImageMarker, setConfigValues)}
+									appearance="checkbox"
 								/>
 							</Column>
 						</Row>
+					</ConditionalWrapper>
 
-						<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.SHAPE}>
-							{UIMarkerShapeTypes(configValues, initialStates, setConfigValues)}
+					<ConditionalWrapper visible={!shadow.isHasImagesData || shadow.isHasSubcategories || (shadow.isHasImagesData && !configValues.isShowImageMarker)}>
+						<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+							{UIMarkerShapeTypes(shadow, configValues, initialStates, setConfigValues)}
 						</ConditionalWrapper>
 
-						<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.CHART}>
+						<ConditionalWrapper visible={shadow.isHasSubcategories}>
 							<Row>
 								<Column>
-									<ImageOption
-										isShowImageTooltip={true}
-										value={configValues.markerChart}
-										images={MARKER_CHART_TYPES}
-										handleChange={(value) => handleChange(value, EMarkerSettings.MarkerChart, setConfigValues)}
+									<SwitchOption
+										label={"Marker Type"}
+										value={configValues.markerType}
+										optionsList={MARKER_TYPES}
+										handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
 									/>
 								</Column>
 							</Row>
+
+							<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.SHAPE}>
+								{UIMarkerShapeTypes(shadow, configValues, initialStates, setConfigValues)}
+							</ConditionalWrapper>
+
+							<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.CHART}>
+								<Row>
+									<Column>
+										<ImageOption
+											isShowImageTooltip={true}
+											value={configValues.markerChart}
+											images={MARKER_CHART_TYPES}
+											handleChange={(value) => handleChange(value, EMarkerSettings.MarkerChart, setConfigValues)}
+										/>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
 						</ConditionalWrapper>
 					</ConditionalWrapper>
 

@@ -396,6 +396,7 @@ export class Visual extends Shadow {
 	subCategoryPatterns: IPatternProps[];
 
 	// image marker
+	isShowImageMarker: boolean;
 	imageMarkerClass: string = "image-marker";
 	imageMarkerClassSelector: string = ".image-marker";
 
@@ -1578,6 +1579,10 @@ export class Visual extends Shadow {
 				vizOptions.options.viewport.height
 			);
 
+			this.isShowImageMarker = !this.isHasSubcategories
+				&& this.markerSettings.isShowImageMarker
+				&& this.isHasImagesData;
+
 			this.conditionalFormattingConditions
 				.forEach((cf: IConditionalFormattingProps) => {
 					if (cf.applyTo === "measure") {
@@ -2108,7 +2113,7 @@ export class Visual extends Shadow {
 			${this.markerSettings.markerShape}-
 			${this.markerSettings.markerChart}-
 			${this.yAxisSettings.isShowLabelsAboveLine}-
-			${this.chartSettings.isShowImageMarker}`;
+			${this.isShowImageMarker}`;
 		}
 
 		let idx = 0;
@@ -4491,31 +4496,32 @@ export class Visual extends Shadow {
 			.attr("display", "block");
 	}
 
-	imageMarkerFormatting(markerSelection: D3Selection<SVGImageElement>): void {
-		const maxCircleRadius = d3.max([this.circle1Size, this.circle2Size]);
-		const width = maxCircleRadius * 2;
-		const height = maxCircleRadius * 2;
-		const maxPieRadius = d3.max([this.pie1Radius, this.pie2Radius]);
+	imageMarkerFormatting(markerSelection: D3Selection<SVGImageElement>, isImage2: boolean, isEnter: boolean): void {
+		const width = isImage2 ? this.circle2Size : this.circle1Size;
+		const height = isImage2 ? this.circle2Size : this.circle1Size;
 
 		markerSelection
-			.attr("x", d => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
-				return this.isHorizontalChart ? this.getCircleCX(cx) : cx + this.scaleBandWidth / 2 - width / 2;
-			})
-			.attr("y", d => {
-				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
-				return cy - maxCircleRadius * 2;
-			})
 			.attr("width", width)
 			.attr("height", height)
 			.attr("xlink:href", (d) => {
-				if (this.isHasImagesData && this.chartSettings.isShowImageMarker && d.imageDataUrl) {
+				if (this.isHasImagesData && this.isShowImageMarker && d.imageDataUrl) {
 					return d.imageDataUrl;
 				}
 
 				if (this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url) {
 					return this.markerSettings.markerShapeBase64Url;
 				}
+			})
+			.transition()
+			.duration(isEnter ? 0 : this.tickDuration)
+			.ease(easeLinear)
+			.attr("x", d => {
+				const cx = this.xScale(this.isHorizontalChart ? (isImage2 ? d.value2 : d.value1) : d.category);
+				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - width / 2;
+			})
+			.attr("y", d => {
+				const cy = this.yScale(this.isHorizontalChart ? d.category : (isImage2 ? d.value2 : d.value1));
+				return !this.isHorizontalChart ? cy - width : cy + this.scaleBandWidth / 2 - width / 2;
 			});
 	}
 
@@ -4541,11 +4547,20 @@ export class Visual extends Shadow {
 				const lollipopG = enter.append("g").attr("class", "lollipop-group");
 				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
-				if (((this.isHasImagesData && this.chartSettings.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
-					const imageMarkerSelection: D3Selection<any> = lollipopG.append("svg:image")
-						.classed(this.imageMarkerClass, true);
+				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+					const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
+						.classed(this.imageMarkerClass, true)
+						.classed("image-marker1", true);
 
-					this.imageMarkerFormatting(imageMarkerSelection);
+					this.imageMarkerFormatting(imageMarker1Selection, false, true);
+
+					if (this.isHasMultiMeasure) {
+						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
+							.classed(this.imageMarkerClass, true)
+							.classed("image-marker2", true);
+
+						this.imageMarkerFormatting(imageMarker2Selection, true, true);
+					}
 				} else {
 					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 						const symbol1 = lollipopG.append("defs")
@@ -4666,7 +4681,8 @@ export class Visual extends Shadow {
 				const pie2Selection = update.select("#pie2ForeignObject");
 
 				const categoryLabelSelection: D3Selection<SVGElement> = update.select(".category-label");
-				const imageMarkerSelection: D3Selection<any> = update.select(this.imageMarkerClassSelector);
+				const imageMarker1Selection: D3Selection<any> = update.select(".image-marker1");
+				const imageMarker2Selection: D3Selection<any> = update.select(".image-marker2");
 
 				if (this.isHorizontalChart) {
 					this.setHorizontalLinesFormatting(lineSelection, false);
@@ -4674,8 +4690,12 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection, false);
 				}
 
-				if (((this.isHasImagesData && this.chartSettings.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
-					this.imageMarkerFormatting(imageMarkerSelection);
+				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+					this.imageMarkerFormatting(imageMarker1Selection, false, false);
+
+					if (this.isHasMultiMeasure) {
+						this.imageMarkerFormatting(imageMarker2Selection, true, false);
+					}
 				} else {
 					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 						pie1Selection.remove();
@@ -5727,7 +5747,7 @@ export class Visual extends Shadow {
 			${this.markerSettings.markerType}-
 			${this.markerSettings.markerShape}-
 			${this.markerSettings.markerChart}-
-			${this.chartSettings.isShowImageMarker}`;
+			${this.isShowImageMarker}`;
 		}
 
 		const categories = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)];
@@ -5805,7 +5825,7 @@ export class Visual extends Shadow {
 			circleSelection
 				.style("fill", (d: ILollipopChartRow) => {
 					let color = this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
-					color = color ? color : "rgba(92,113,187,1)";
+					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
 					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 					} else {
@@ -5819,7 +5839,7 @@ export class Visual extends Shadow {
 			circleSelection
 				.style("fill", (d: ILollipopChartRow) => {
 					let color = this.getColor(this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
-					color = color ? color : "rgba(92,113,187,1)";
+					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
 					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 					} else {

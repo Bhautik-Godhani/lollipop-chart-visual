@@ -139,7 +139,6 @@ export interface IChartSettings {
 	isAutoLollipopWidth: boolean;
 	lollipopWidth: number;
 	lollipopInnerPadding: number;
-	isShowImageMarker: boolean;
 }
 
 export interface IMarkerSettings {
@@ -153,6 +152,7 @@ export interface IMarkerSettings {
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: MarkerStyleProps;
 	marker2Style: MarkerStyleProps;
+	isShowImageMarker: boolean;
 }
 
 export interface MarkerStyleProps {

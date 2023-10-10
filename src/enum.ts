@@ -169,7 +169,6 @@ export enum EChartSettings {
 	isAutoLollipopWidth = "isAutoLollipopWidth",
 	lollipopWidth = "lollipopWidth",
 	pieSettings = "pieSettings",
-	IsShowImageMarker = "isShowImageMarker"
 }
 
 export enum ECircleSettings {
@@ -359,7 +358,8 @@ export enum EMarkerSettings {
 	Marker2Styles = "marker2Styles",
 	MarkerStyleType = "markerStyleType",
 	IsAutoMarkerSize = "isAutoMarkerSize",
-	MarkerSize = "markerSize"
+	MarkerSize = "markerSize",
+	IsShowImageMarker = "isShowImageMarker"
 }
 
 export enum ERaceChartSettings {

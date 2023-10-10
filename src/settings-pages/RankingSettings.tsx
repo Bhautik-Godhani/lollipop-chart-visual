@@ -260,8 +260,8 @@ const Ranking = (props) => {
 				</ConditionalWrapper>
 			</Accordion>
 
-			<ConditionalWrapper visible={shadow.isGroupingPresent}>
-				<Accordion title="By Legend" childBottomPadding>
+			<ConditionalWrapper visible={shadow.isHasSubcategories}>
+				<Accordion title="By Sub-category" childBottomPadding>
 					<Row>
 						<Column>
 							<ToggleButton

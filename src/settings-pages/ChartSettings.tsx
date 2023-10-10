@@ -71,19 +71,6 @@ const UIGeneralChartSettings = (
 ) => {
 	return (
 		<>
-			<ConditionalWrapper visible={shadow.isHasImagesData}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Show Images Marker"}
-							value={configValues.isShowImageMarker}
-							handleChange={() => handleCheckbox(EChartSettings.IsShowImageMarker, setConfigValues)}
-							appearance="checkbox"
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
-
 			<Row>
 				<Column>
 					<SwitchOption
