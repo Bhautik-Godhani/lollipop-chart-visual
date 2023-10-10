@@ -1438,13 +1438,14 @@ export class Visual extends Shadow {
 				d3.select(this.chartContainer).select(".validation-page-container").remove();
 			}
 
+			this.handleShowBucket();
+
 			if (!this.isChartInit) {
 				this.initChart();
 			}
 
 			this.renderContextMenu();
 			this.setHighContrastDetails();
-			this.handleShowBucket();
 			this.formatNumber = (value, numberFormatter) => formatNumber(value, this.numberSettings, numberFormatter);
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab);
 
@@ -5432,6 +5433,7 @@ export class Visual extends Shadow {
 					message: message,
 					showIcon: showIcon,
 				});
+				this.isChartInit = false;
 				return;
 			} else {
 				this.removeShowConditionPage();
