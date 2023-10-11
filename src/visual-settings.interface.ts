@@ -298,6 +298,7 @@ export interface IHighContrastDetails {
 
 export interface IBrushAndZoomAreaSettings {
 	enabled: boolean;
+	minLollipopCount: number;
 	isShowAxis: boolean;
 	trackBackgroundColor: string;
 	selectionTrackBackgroundColor: string;

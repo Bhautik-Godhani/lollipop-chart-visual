@@ -168,7 +168,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 
 export const X_AXIS_SETTINGS: IXAxisSettings = {
 	position: Position.Bottom,
-	isDisplayTitle: true,
+	isDisplayTitle: false,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
@@ -184,7 +184,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	position: Position.Left,
-	isDisplayTitle: true,
+	isDisplayTitle: false,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
@@ -231,6 +231,7 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	enabled: true,
+	minLollipopCount: 20,
 	isShowAxis: false,
 	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
 	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.4)",

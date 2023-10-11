@@ -328,7 +328,7 @@ const MarkerSettings = (props) => {
 								<InputControl
 									min={0}
 									type="number"
-									label={"Size"}
+									label={`Size ${configValues.markerType === EMarkerTypes.CHART ? '(Radius)' : ''}`}
 									value={configValues[configValues.markerStyleType].markerSize.toString()}
 									handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
 								/>

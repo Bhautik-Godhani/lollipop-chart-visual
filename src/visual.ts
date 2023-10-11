@@ -142,7 +142,7 @@ import RaceChartSettings from "./settings-pages/RaceChartSettings";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, MarkerSettingsIcon, RankingIcon, ShowConditionIcon, SortIcon, XYAxisIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, XYAxisIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import { PatternIconSVG } from "@truviz/shadow/dist/Components/PatternPicker/PatternPicker";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
@@ -232,6 +232,7 @@ export class Visual extends Shadow {
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 	isHasNegativeValue: boolean;
+	markerMaxSize: number = 0;
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -262,7 +263,7 @@ export class Visual extends Shadow {
 	public brushWidth: number = 0;
 	public isHorizontalBrushDisplayed: boolean;
 	public isVerticalBrushDisplayed: boolean;
-	public minScaleBandWidth: number = 40;
+	public minScaleBandWidth: number = 0;
 	public isScrollBrushDisplayed: boolean;
 	public brushXAxisG: D3Selection<SVGElement>;
 	public brushXAxisTicksMaxHeight: number = 0;
@@ -330,7 +331,7 @@ export class Visual extends Shadow {
 	public circleClassSelector: string = ".lollipop-circle";
 	public minCircleSize: number = 20;
 	public maxCircleSize: number = 40;
-	public brushAndZoomAreaCircleMinSize: number = 10;
+	public brushAndZoomAreaCircleMinSize: number = 15;
 	public brushAndZoomAreaCircleMaxSize: number = 40;
 	public brushAndZoomAreaCircleSize: number = 0;
 
@@ -363,8 +364,8 @@ export class Visual extends Shadow {
 	pieEmphasizeScaleSize: number = 4;
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
-	public minPieSize: number = 15;
-	public maxPieSize: number = 30;
+	public minPieSize: number = 25;
+	public maxPieSize: number = 40;
 
 	// pie1
 	ePie1ChartOptions: EChartsOption;
@@ -479,25 +480,25 @@ export class Visual extends Shadow {
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
 			components: [
 				{
-					name: "Chart Settings",
+					name: "Chart",
 					sectionName: "chartConfig",
 					propertyName: "chartSettings",
 					Component: () => ChartSettings,
 					icon: ChartSettingsIcon
 				},
 				{
-					name: "Marker Settings",
+					name: "Marker",
 					sectionName: "markerConfig",
 					propertyName: "markerSettings",
 					Component: () => MarkerSettings,
 					icon: MarkerSettingsIcon
-
 				},
 				{
-					name: "Line Settings",
+					name: "Line",
 					sectionName: "lineConfig",
 					propertyName: "lineSettings",
 					Component: () => LineSettings,
+					icon: LineSettingsIcon
 				},
 				{
 					name: "Data Colors",
@@ -518,27 +519,28 @@ export class Visual extends Shadow {
 					sectionName: "brushAndZoomAreaConfig",
 					propertyName: "brushAndZoomAreaSettings",
 					Component: () => BrushAndZoomAreaSettings,
+					icon: BrushAndZoomAreaSettingsIcon
 				},
 				{
 					name: "Race Chart",
 					sectionName: EVisualConfig.RaceChartConfig,
 					propertyName: EVisualSettings.RaceChartSettings,
 					Component: () => RaceChartSettings,
-					icon: ChartRaceIcon
+					icon: RaceChartSettingsIcon
 				},
 				{
 					name: "X Axis",
 					sectionName: EVisualConfig.XAxisConfig,
 					propertyName: EVisualSettings.XAxisSettings,
 					Component: () => XAxisSettings,
-					icon: XYAxisIcon
+					icon: XAxisSettingsIcon
 				},
 				{
 					name: "Y Axis",
 					sectionName: EVisualConfig.YAxisConfig,
 					propertyName: EVisualSettings.YAxisSettings,
 					Component: () => YAxisSettings,
-					icon: XYAxisIcon
+					icon: YAxisSettingsIcon
 				},
 				{
 					name: "Fill Patterns",
@@ -948,6 +950,12 @@ export class Visual extends Shadow {
 		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
 		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
 
+		if (this.isLollipopTypeCircle) {
+			this.minScaleBandWidth = 40;
+		} else {
+			this.minScaleBandWidth = 60;
+		}
+
 		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields);
 
 		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
@@ -1232,13 +1240,33 @@ export class Visual extends Shadow {
 		this.categoryLabelHeight = getSVGTextSize("Label", this.yAxisSettings.labelFontFamily, this.yAxisSettings.labelFontSize).height;
 		const maxCirclerRadius = d3.max([this.circle1Size, this.circle2Size]);
 
-		if (this.brushScaleBandBandwidth < maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin) {
-			this.brushScaleBandBandwidth += maxCirclerRadius + this.categoryLabelHeight + this.categoryLabelMargin;
+		// if (this.brushScaleBandBandwidth < this.markerMaxSize + this.markerMaxSize * 0.2) {
+		// 	this.brushScaleBandBandwidth = this.markerMaxSize + this.markerMaxSize * 0.2;
+		// }
+
+		if (!this.markerSettings.marker1Style.isAutoMarkerSize || (this.isHasMultiMeasure && !this.markerSettings.marker2Style.isAutoMarkerSize)) {
+			if (this.isLollipopTypeCircle) {
+				const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize : 0)]);
+				if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+					this.brushScaleBandBandwidth = maxMarkerSize + 5;
+				}
+			} else {
+				const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize * 2, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize * 2 : 0)]);
+				if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+					this.brushScaleBandBandwidth = maxMarkerSize + 10;
+				}
+			}
 		}
 
 		this.totalLollipopCount = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
 
 		this.xScale = this.brushScaleBand;
+
+		if (this.brushAndZoomAreaSettings.enabled) {
+			if (this.categoricalDataPairs.length < this.brushAndZoomAreaSettings.minLollipopCount) {
+				this.brushAndZoomAreaSettings.enabled = false;
+			}
+		}
 
 		const expectedWidth = (this.brushScaleBandBandwidth * width) / this.brushScaleBand.bandwidth();
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
@@ -1571,6 +1599,8 @@ export class Visual extends Shadow {
 			this.setCircle2Radius();
 			this.setPie1Radius();
 			this.setPie2Radius();
+
+			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
 
 			this.categoricalData = this.setInitialChartData(
 				clonedCategoricalData,
@@ -3888,24 +3918,24 @@ export class Visual extends Shadow {
 	}
 
 	setScaleBandwidth(): void {
-		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
-		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
+		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
-		if (!this.chartSettings.isAutoLollipopWidth) {
-			if (!this.chartSettings.lollipopWidth) {
-				this.chartSettings.lollipopWidth = this.scaleBandWidth;
-			}
+		// if (!this.chartSettings.isAutoLollipopWidth) {
+		// 	if (!this.chartSettings.lollipopWidth) {
+		// 		this.chartSettings.lollipopWidth = this.scaleBandWidth;
+		// 	}
 
-			if (this.chartSettings.lollipopWidth < this.minScaleBandWidth) {
-				this.chartSettings.lollipopWidth = this.minScaleBandWidth;
-			}
+		// 	if (this.chartSettings.lollipopWidth < this.minScaleBandWidth) {
+		// 		this.chartSettings.lollipopWidth = this.minScaleBandWidth;
+		// 	}
 
-			if (this.chartSettings.lollipopWidth < clonedXScale.padding(0).bandwidth()) {
-				this.chartSettings.lollipopWidth = clonedXScale.padding(0).bandwidth();
-			}
+		// 	if (this.chartSettings.lollipopWidth < clonedXScale.padding(0).bandwidth()) {
+		// 		this.chartSettings.lollipopWidth = clonedXScale.padding(0).bandwidth();
+		// 	}
 
-			this.chartSettings.lollipopWidth = +Math.round(this.chartSettings.lollipopWidth).toFixed(0);
-		}
+		// 	this.chartSettings.lollipopWidth = +Math.round(this.chartSettings.lollipopWidth).toFixed(0);
+		// }
 
 		// if (!this.chartSettings.islollipopCategoryWidthChange || this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Auto) {
 		// 	const maxRadius = d3.max([this.circle1Settings.circleRadius, this.circle2Settings.circleRadius]);
@@ -3937,7 +3967,10 @@ export class Visual extends Shadow {
 				};
 				return GetWordsSplitByWidth(text, textProperties, this.scaleBandWidth, 3);
 			});
-			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 || this.isHorizontalBrushDisplayed;
+
+			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
+				(this.markerMaxSize > this.scaleBandWidth);
+
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
 				const textProperties: TextProperties = {
 					text: d + "ab",
@@ -3993,49 +4026,18 @@ export class Visual extends Shadow {
 							ele
 								.append("tspan")
 								.attr("x", 0)
-								.attr("dy", i * xAxisTickHeight)
+								.attr("dy", (i > 1 ? 1 : i) * xAxisTickHeight)
 								.text(d);
 						});
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
-						ele.attr("transform", `rotate( ${THIS.isHorizontalBrushDisplayed || THIS.isExpandAllApplied ? -90 : -35})`);
+						ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35})`);
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
 					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
 				}
 			});
-	}
-
-	getXAxisLabelTilt(): number {
-		let labelTilt = 30;
-		if (this.xAxisSettings.isLabelAutoTilt) {
-			if (this.viewPortWidth < 186) {
-				labelTilt = 90;
-			} else if (this.viewPortWidth > 378 && this.viewPortWidth < 576) {
-				labelTilt = 60;
-			} else if (this.viewPortWidth > 576 && this.viewPortWidth < 768) {
-				labelTilt = 40;
-			} else if (this.viewPortWidth > 768 && this.viewPortWidth < 992) {
-				labelTilt = 25;
-			} else if (this.viewPortWidth > 992 && this.viewPortWidth < 1200) {
-				if (this.isHorizontalBrushDisplayed) {
-					labelTilt = 25;
-				} else {
-					labelTilt = 0;
-				}
-			} else if (this.viewPortWidth > 1200) {
-				if (this.isHorizontalBrushDisplayed) {
-					labelTilt = 25;
-				} else {
-					labelTilt = 0;
-				}
-			}
-		} else {
-			labelTilt = this.xAxisSettings.labelTilt;
-		}
-		this.xAxisSettings.labelTilt = labelTilt;
-		return labelTilt;
 	}
 
 	setYAxisTickStyle(): void {
@@ -4151,7 +4153,7 @@ export class Visual extends Shadow {
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - 5, 0] : [0, yScaleHeight]);
+			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - 5, 0] : [5, yScaleHeight]);
 		}
 	}
 
@@ -4493,7 +4495,7 @@ export class Visual extends Shadow {
 			.attr(
 				"stroke-dasharray",
 				this.lineSettings.lineType === LineType.Dotted
-					? `${this.lineSettings.lineWidth}, ${this.lineSettings.lineWidth}`
+					? `0, ${this.lineSettings.lineWidth * 2}`
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
 			.style("display", this.lineSettings.show ? "block" : "none");

@@ -291,6 +291,7 @@ export enum EShowBucketSettings {
 
 export enum EBrushAndZoomAreaSettings {
 	Enabled = "enabled",
+	MinLollipopCount = "minLollipopCount",
 	IsShowAxis = "isShowAxis",
 	TrackBackgroundColor = "trackBackgroundColor",
 	SelectionTrackBackgroundColor = "selectionTrackBackgroundColor",

@@ -54,6 +54,19 @@ const UIGeneralChartSettings = (
 			<ConditionalWrapper visible={configValues.enabled}>
 				<Row>
 					<Column>
+						<InputControl
+							min={5}
+							max={shadow.rankingSettings.category.count}
+							type="number"
+							label="Minimum Lollipop Count"
+							value={configValues.minLollipopCount}
+							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.MinLollipopCount, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
 						<ToggleSwitch
 							label="Show Axis"
 							value={configValues.isShowAxis}

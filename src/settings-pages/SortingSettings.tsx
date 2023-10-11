@@ -352,7 +352,7 @@ const SortingSettings = (props) => {
 					{UICategorySortingSettings(categorySettings, CATEGORY_SORT_ON, setConfigValues)}
 				</Accordion>
 
-				<Accordion title="By Legend" childBottomPadding>
+				<Accordion title="By Sub-category" childBottomPadding>
 					{UIGroupBySortingSettings(groupBySettings, GROUP_BY_SORT_ON, setConfigValues)}
 				</Accordion>
 			</ConditionalWrapper>
