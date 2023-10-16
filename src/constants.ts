@@ -113,14 +113,14 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 };
 
 export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
-	show: true,
+	show: false,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
 	lineColor: "rgba(151,151,151,1)",
 };
 
 export const Y_GRID_LINES_SETTINGS: IYGridLinesSettings = {
-	show: true,
+	show: false,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
 	lineColor: "rgba(151,151,151,1)",

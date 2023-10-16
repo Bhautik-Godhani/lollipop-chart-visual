@@ -3386,13 +3386,15 @@ export class Visual extends Shadow {
 
 		if (this.isHorizontalChart) {
 			if (this.isLollipopTypeCircle) {
-				x = this.xScale(isPie2 ? d.value2 : d.value1) + (isPie2 ? this.circle1Size : 0);
+				x = this.xScale(isPie2 ? d.value2 : d.value1);
+				x = x + (isPie2 ? this.circle2Size / 2 : -this.circle2Size / 2) + this.getCircleXScaleDiff(x, isPie2);
 				y = this.yScale(d.category) + this.scaleBandWidth / 2;
 			}
 		} else {
 			if (this.isLollipopTypeCircle) {
 				x = this.xScale(d.category) + this.scaleBandWidth / 2;
-				y = this.yScale(isPie2 ? d.value2 : d.value1) - (isPie2 ? this.circle2Size : 0);
+				y = this.yScale(isPie2 ? d.value2 : d.value1)
+				y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
 			}
 		}
 		return { x, y };
@@ -3592,34 +3594,25 @@ export class Visual extends Shadow {
 			});
 	}
 
-	transformData1LabelInside(labelsSelection: any, isEnter: boolean): void {
+	transformDataLabelInside(labelsSelection: any, isEnter: boolean, isData2Label: boolean): void {
 		const fn = (d, labelBBox: any) => {
-			const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
-			const x = this.isHorizontalChart ? cx + this.circle1Size / 2 - labelBBox.width / 2 : cx + this.scaleBandWidth / 2 - labelBBox.width / 2;
+			const cx = this.xScale(this.isHorizontalChart ? (isData2Label ? d.value2 : d.value1) : d.category);
+			let x;
 
-			const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
-			const y = this.isHorizontalChart ? cy + this.scaleBandWidth / 2 - labelBBox.height / 2 : cy - this.circle1Size / 2 - labelBBox.height / 2;
+			if (!this.isLeftYAxis) {
+				x = (this.isHorizontalChart ? cx - this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2) - labelBBox.width / 2;
+			} else {
+				x = (this.isHorizontalChart ? cx + this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2) - labelBBox.width / 2;
+			}
 
-			return `translate(${x}, ${y})`;
-		};
+			const cy = this.yScale(this.isHorizontalChart ? d.category : (isData2Label ? d.value2 : d.value1));
+			let y;
 
-		labelsSelection
-			.transition()
-			.duration(isEnter ? 0 : this.tickDuration)
-			.ease(easeLinear)
-			.attr("transform", function (d) {
-				const labelBBox = this.getBBox();
-				return fn(d, labelBBox);
-			});
-	}
-
-	transformData2LabelInside(labelsSelection: any, isEnter: boolean): void {
-		const fn = (d, labelBBox) => {
-			const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
-			const x = this.isHorizontalChart ? cx + this.circle2Size / 2 - labelBBox.width / 2 : cx + this.scaleBandWidth / 2 - labelBBox.width / 2;
-
-			const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
-			const y = this.isHorizontalChart ? cy + this.scaleBandWidth / 2 - labelBBox.height / 2 : cy - this.circle2Size / 2 - labelBBox.height / 2;
+			if (this.isBottomXAxis) {
+				y = (!this.isHorizontalChart ? cy - this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height / 2;
+			} else {
+				y = (!this.isHorizontalChart ? cy + this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height / 2;
+			}
 
 			return `translate(${x}, ${y})`;
 		};
@@ -3659,7 +3652,7 @@ export class Visual extends Shadow {
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
-					this.transformData1LabelInside(dataLabelGSelection, true);
+					this.transformDataLabelInside(dataLabelGSelection, true, false);
 				}
 
 				const fn = (ele: any) => {
@@ -3681,7 +3674,7 @@ export class Visual extends Shadow {
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
-					this.transformData1LabelInside(dataLabelGSelection, false);
+					this.transformDataLabelInside(dataLabelGSelection, false, false);
 				}
 
 				const fn = (ele: any) => {
@@ -3696,21 +3689,21 @@ export class Visual extends Shadow {
 
 		this.dataLabels1G.selectAll(".dataLabelG").select("text").raise();
 
-		dataLabelGSelection
-			.each(function () {
-				const ele = d3.select(this);
-				const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
+		// dataLabelGSelection
+		// 	.each(function () {
+		// 		const ele = d3.select(this);
+		// 		const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
 
-				ele
-					.attr("opacity", (d: IBrushLollipopChartData) => {
-						if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-							return (getBBox.width > THIS.circle1Size || getBBox.height > THIS.circle1Size) ? 0 : 1;
-						} else {
-							const space = THIS.height - THIS.yScale(d.value1);
-							return space < getBBox.width ? 0 : 1;
-						}
-					});
-			});
+		// 		ele
+		// 			.attr("opacity", (d: IBrushLollipopChartData) => {
+		// 				if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+		// 					return (getBBox.width > THIS.circle1Size || getBBox.height > THIS.circle1Size) ? 0 : 1;
+		// 				} else {
+		// 					const space = THIS.height - THIS.yScale(d.value1);
+		// 					return space < getBBox.width ? 0 : 1;
+		// 				}
+		// 			});
+		// 	});
 	}
 
 	drawData2Labels(data: ILollipopChartRow[]): void {
@@ -3738,7 +3731,7 @@ export class Visual extends Shadow {
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData2LabelOutside(dataLabelGSelection, true);
 				} else {
-					this.transformData2LabelInside(dataLabelGSelection, true);
+					this.transformDataLabelInside(dataLabelGSelection, true, true);
 				}
 
 				const fn = (ele: any) => {
@@ -3760,7 +3753,7 @@ export class Visual extends Shadow {
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
-					this.transformData2LabelInside(dataLabelGSelection, false);
+					this.transformDataLabelInside(dataLabelGSelection, false, true);
 				}
 
 				const fn = (ele: any) => {
@@ -3775,21 +3768,21 @@ export class Visual extends Shadow {
 
 		this.dataLabels2G.selectAll(".dataLabelG").select("text").raise();
 
-		dataLabelGSelection
-			.each(function () {
-				const ele = d3.select(this);
-				const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
+		// dataLabelGSelection
+		// 	.each(function () {
+		// 		const ele = d3.select(this);
+		// 		const getBBox = (d3.select(this).select("text").node() as SVGSVGElement).getBBox();
 
-				ele
-					.attr("opacity", (d: IBrushLollipopChartData) => {
-						if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-							return (getBBox.width > THIS.circle2Size || getBBox.height > THIS.circle2Size) ? 0 : 1;
-						} else {
-							const space = THIS.height - THIS.yScale(d.value2);
-							return space < getBBox.width ? 0 : 1;
-						}
-					});
-			});
+		// 		ele
+		// 			.attr("opacity", (d: IBrushLollipopChartData) => {
+		// 				if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+		// 					return (getBBox.width > THIS.circle2Size || getBBox.height > THIS.circle2Size) ? 0 : 1;
+		// 				} else {
+		// 					const space = THIS.height - THIS.yScale(d.value2);
+		// 					return space < getBBox.width ? 0 : 1;
+		// 				}
+		// 			});
+		// 	});
 	}
 
 	drawTooltip(): void {
