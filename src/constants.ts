@@ -5,6 +5,8 @@ import {
 	ColorPaletteType,
 	DataLabelsPlacement,
 	EAutoCustomTypes,
+	EBeforeAfterPosition,
+	ELCRPosition,
 	EMarkerChartTypes,
 	EMarkerColorTypes,
 	EMarkerDefaultShapes,
@@ -12,8 +14,12 @@ import {
 	EMarkerStyleTypes,
 	EMarkerTypes,
 	ERankingType,
+	EReferenceLineComputation,
+	EReferenceLinesType,
 	ESortOrderTypes,
-	LineType,
+	EStartEndPosition,
+	EXYAxisNames,
+	ELineType,
 	Orientation,
 	PieSize,
 	PieType,
@@ -34,6 +40,7 @@ import {
 	IPiePropsSettings,
 	IRaceChartSettings,
 	IRankingSettings,
+	IReferenceLinesSettings,
 	IShowBucketSettings,
 	ISortingSettings,
 	IXAxisSettings,
@@ -83,7 +90,7 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 
 export const LINE_SETTINGS: ILineSettings = {
 	show: true,
-	lineType: LineType.Solid,
+	lineType: ELineType.Solid,
 	lineWidth: 6,
 	lineColor: "rgba(128, 128, 128, 1)",
 };
@@ -102,18 +109,19 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	fontStyle: [],
 	placement: DataLabelsPlacement.Inside,
 	isAutoFontSize: true,
+	showLabelsBelowReferenceLine: false
 };
 
 export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
 	show: true,
-	lineType: LineType.Dotted,
+	lineType: ELineType.Dotted,
 	lineWidth: 1,
 	lineColor: "rgba(151,151,151,1)",
 };
 
 export const Y_GRID_LINES_SETTINGS: IYGridLinesSettings = {
 	show: true,
-	lineType: LineType.Dotted,
+	lineType: ELineType.Dotted,
 	lineWidth: 1,
 	lineColor: "rgba(151,151,151,1)",
 };
@@ -275,4 +283,37 @@ export const RACE_CHART_SETTINGS: IRaceChartSettings = {
 	tickerButtonRadius: 30,
 	isTickerButtonAutoRadius: true,
 	tickerButtonColor: "rgba(102,102,102,1)",
+};
+
+export const REFERENCE_LINES_SETTINGS: IReferenceLinesSettings = {
+	axis: EXYAxisNames.X,
+	type: EReferenceLinesType.Value,
+	value: undefined,
+	measureName: undefined,
+	computation: EReferenceLineComputation.Fixed,
+	rankOrder: Position.Start,
+	rank: "1",
+	label: "Reference Line",
+	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	labelColor: "rgba(0,0,0,1)",
+	labelBackgroundColor: "rgba(255,255,255,0)",
+	autoFontSize: true,
+	labelFontSize: "16",
+	labelPosition: EBeforeAfterPosition.Before,
+	labelAlignment: ELCRPosition.Centre,
+	lineStyle: ELineType.Dashed,
+	lineColor: "rgba(74, 74, 74, 1)",
+	autoLineWidth: true,
+	lineWidth: "3",
+	styling: [],
+	isHighlightBarArea: true,
+	barAreaPositionToHighlight: Position.Bottom,
+	linePositionOnBar: Position.Right,
+	shadeColor: "rgba(255,255,255,0.6)",
+	transparency: 60,
+	labelBorder: true,
+	labelBorderRadius: "SHARP" as "SHARP" | "ROUNDED" | "CUSTOM",
+	labelBorderRadiusCustom: 5,
+	labelBorderWidth: 1,
+	labelBorderColor: "rgba(204,204,204,1)",
 };

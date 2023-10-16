@@ -50,6 +50,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public brushAndZoomAreaConfig = new BrushAndZoomAreaConfig();
 	public patternConfig = new PatternConfig();
 	public raceChartConfig = new RaceChartConfig();
+	public referenceLinesConfig = new ReferenceLinesConfig();
 }
 
 export class License {
@@ -144,4 +145,8 @@ export class PatternConfig {
 
 export class RaceChartConfig {
 	public raceChartSettings: string = "{}";
+}
+
+export class ReferenceLinesConfig {
+	public referenceLinesSettings: string = "{}";
 }

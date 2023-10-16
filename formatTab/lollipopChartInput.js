@@ -21,6 +21,7 @@ const sectionKVPair = [
 	{ editor: "Editor" },
 	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
 	{ raceChartConfig: "Race Chart Configuration" },
+	{ referenceLinesConfig: "Reference Lines Configuration" },
 ];
 
 const formatTab = {
@@ -548,6 +549,15 @@ const formatTab = {
 		{
 			technicalName: "raceChartSettings",
 			displayName: "Race Chart Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	referenceLinesConfig: [
+		{
+			technicalName: "referenceLinesSettings",
+			displayName: "Reference Lines Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

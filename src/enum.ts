@@ -12,7 +12,8 @@ export enum EVisualConfig {
 	ShowBucketConfig = "showBucketConfig",
 	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig",
 	RaceChartConfig = "raceChartConfig",
-	PatternConfig = "patternConfig"
+	PatternConfig = "patternConfig",
+	ReferenceLinesConfig = "referenceLinesConfig",
 }
 
 export enum EVisualSettings {
@@ -35,9 +36,10 @@ export enum EVisualSettings {
 	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings",
 	RaceChartSettings = "raceChartSettings",
 	PatternSettings = "patternSettings",
+	ReferenceLinesSettings = "referenceLinesSettings",
 }
 
-export enum LineType {
+export enum ELineType {
 	Dotted = "dotted",
 	Dashed = "dashed",
 	Solid = "solid",
@@ -83,6 +85,8 @@ export enum Position {
 	Bottom = "bottom",
 	Left = "left",
 	Right = "right",
+	Start = "start",
+	End = "end",
 }
 
 export enum ELegendPosition {
@@ -206,6 +210,7 @@ export enum EDataLabelsSettings {
 	fontStyle = "fontStyle",
 	placement = "placement",
 	isAutoFontSize = "isAutoFontSize",
+	showLabelsBelowReferenceLine = "showLabelsBelowReferenceLine",
 }
 
 export enum EGridLinesSettings {
@@ -418,4 +423,38 @@ export enum EFontStyle {
 export enum EPlayPauseButton {
 	Play = "play",
 	Pause = "pause",
+}
+
+export enum EReferenceLinesType {
+	Value = "value",
+	Ranking = "ranking",
+}
+
+export enum EReferenceLineComputation {
+	Min = "min",
+	Max = "max",
+	Average = "average",
+	Median = "median",
+	Fixed = "fixed",
+}
+
+export enum EXYAxisNames {
+	X = "X",
+	Y = "Y",
+}
+
+export enum EStartEndPosition {
+	Start = "start",
+	End = "end",
+}
+
+export enum EBeforeAfterPosition {
+	Before = "before",
+	After = "after",
+}
+
+export enum ELCRPosition {
+	Left = "left",
+	Centre = "center",
+	Right = "right",
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { GRID_LINES_SETTINGS as GRID_LINES_SETTINGS_IMP } from "../constants";
-import { EGridLinesSettings, LineType } from "../enum";
+import { EGridLinesSettings, ELineType } from "../enum";
 import { Accordion, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { IGridLinesSettings } from "../visual-settings.interface";
@@ -9,15 +9,15 @@ import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptio
 const LINE_TYPES = [
 	{
 		label: <SolidLineIcon fill="currentColor" />,
-		value: LineType.Solid,
+		value: ELineType.Solid,
 	},
 	{
 		label: <DashedLineIcon fill="currentColor" />,
-		value: LineType.Dashed,
+		value: ELineType.Dashed,
 	},
 	{
 		label: <DottedLineIcon fill="currentColor" />,
-		value: LineType.Dotted,
+		value: ELineType.Dotted,
 	},
 ];
 

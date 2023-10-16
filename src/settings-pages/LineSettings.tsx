@@ -1,6 +1,6 @@
 import * as React from "react";
 import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
-import { ELineSettings, LineType } from "../enum";
+import { ELineSettings, ELineType } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
@@ -8,15 +8,15 @@ import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 const LINE_TYPES = [
 	{
 		label: <SolidLineIcon fill="currentColor" />,
-		value: LineType.Solid,
+		value: ELineType.Solid,
 	},
 	{
 		label: <DashedLineIcon fill="currentColor" />,
-		value: LineType.Dashed,
+		value: ELineType.Dashed,
 	},
 	{
 		label: <DottedLineIcon fill="currentColor" />,
-		value: LineType.Dotted,
+		value: ELineType.Dotted,
 	},
 ];
 

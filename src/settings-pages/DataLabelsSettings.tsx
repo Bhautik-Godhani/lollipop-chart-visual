@@ -254,6 +254,19 @@ const UICircleLollipopLabelsSettings = (
 				</Row>
 			</ConditionalWrapper>
 
+			<ConditionalWrapper visible={shadow.referenceLinesData.length > 0}>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Show Labels Below Reference Line"}
+							value={configValues.showLabelsBelowReferenceLine}
+							handleChange={() => handleCheckbox(EDataLabelsSettings.showLabelsBelowReferenceLine, setConfigValues)}
+							appearance="checkbox"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
 			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
 				<Row>
 					<Column>

@@ -32,7 +32,7 @@ import {
 	EVisualConfig,
 	EVisualSettings,
 	LegendType,
-	LineType,
+	ELineType,
 	Orientation,
 	PieSize,
 	PieType,
@@ -99,6 +99,7 @@ import {
 	IPieSettings,
 	IRaceChartSettings,
 	IRankingSettings,
+	IReferenceLinesSettings,
 	IShowBucketSettings,
 	ISortingProps,
 	ISortingSettings,
@@ -138,14 +139,16 @@ import PatternSettings from "./settings-pages/FillPatterns";
 import XAxisSettings from "./settings-pages/XAxisSettings";
 import YAxisSettings from "./settings-pages/YAxisSettings";
 import RaceChartSettings from "./settings-pages/RaceChartSettings";
+import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, XYAxisIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartRaceIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, XYAxisIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import { PatternIconSVG } from "@truviz/shadow/dist/Components/PatternPicker/PatternPicker";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
+import { HideDataLabelsBelowReferenceLines, RenderReferenceLines, GetReferenceLinesData, RenderReferenceLineLayers } from './methods/ReferenceLines.methods';
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -197,6 +200,7 @@ export class Visual extends Shadow {
 	public categoricalMeasure2Field: powerbi.DataViewValueColumn;
 	public categoricalTooltipFields: powerbi.DataViewValueColumn[];
 	public categoricalSortFields: powerbi.DataViewValueColumn[];
+	public categoricalReferenceLinesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalImagesDataField: powerbi.DataViewValueColumn;
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
@@ -423,6 +427,12 @@ export class Visual extends Shadow {
 	isRaceChartDataLabelDrawn: boolean = false;
 	formatRaceChartDataLabel = d3.timeFormat("%d %b %y");
 
+	// reference lines
+	referenceLinesData: IReferenceLinesSettings[] = [];
+	categoricalReferenceLinesNames: string[] = [];
+	referenceLinesContainerG: D3Selection<SVGElement>;
+	referenceLineLayersG: D3Selection<SVGElement>;
+
 	// settings
 	isHorizontalChart: boolean = false;
 	chartSettings: IChartSettings;
@@ -445,6 +455,7 @@ export class Visual extends Shadow {
 	brushAndZoomAreaSettings: IBrushAndZoomAreaSettings;
 	patternSettings: IPatternSettings;
 	raceChartSettings: IRaceChartSettings;
+	referenceLinesSettings: IReferenceLinesSettings[] = [];
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -529,6 +540,13 @@ export class Visual extends Shadow {
 					propertyName: EVisualSettings.RaceChartSettings,
 					Component: () => RaceChartSettings,
 					icon: RaceChartSettingsIcon
+				},
+				{
+					name: "Reference Lines",
+					sectionName: "referenceLinesConfig",
+					propertyName: "referenceLinesSettings",
+					Component: () => ReferenceLinesSettings,
+					icon: ReferenceLinesIcon,
 				},
 				{
 					name: "X Axis",
@@ -655,6 +673,10 @@ export class Visual extends Shadow {
 		this.dataLabels2G = this.container.append("g").classed("dataLabels2G", true);
 
 		this.computedTextEle = this.container.append("g").append("text");
+
+		this.referenceLineLayersG = this.container.append("g").classed("referenceLineLayersG", true);
+
+		this.referenceLinesContainerG = this.container.append("g").classed("referenceLinesContainerG", true);
 
 		this.tickerButtonG = this.svg.append("g").classed("tickerButtonG", true);
 
@@ -1391,6 +1413,7 @@ export class Visual extends Shadow {
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = !!this.categoricalImagesDataField;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
+		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
 
 		if (this.isChartIsRaceChart) {
 			this.raceChartKeyLabelList =
@@ -2404,6 +2427,11 @@ export class Visual extends Shadow {
 			...RACE_CHART_SETTINGS,
 			...raceChartConfig,
 		};
+
+		const referenceLinesConfig = JSON.parse(
+			formatTab[EVisualConfig.ReferenceLinesConfig][EVisualSettings.ReferenceLinesSettings]
+		);
+		this.referenceLinesSettings = Object.keys(referenceLinesConfig).length > 0 ? referenceLinesConfig : [];
 
 		this.changeVisualSettings();
 
@@ -4255,7 +4283,7 @@ export class Visual extends Shadow {
 			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
-				this.xGridSettings.lineType === LineType.Dotted
+				this.xGridSettings.lineType === ELineType.Dotted
 					? `0, ${this.xGridSettings.lineWidth * 8} `
 					: `${this.xGridSettings.lineWidth * 10}, ${this.xGridSettings.lineWidth * 10}`
 			)
@@ -4275,7 +4303,7 @@ export class Visual extends Shadow {
 			.attr("opacity", 1)
 			.attr(
 				"stroke-dasharray",
-				this.yGridSettings.lineType === LineType.Dotted
+				this.yGridSettings.lineType === ELineType.Dotted
 					? `0, ${this.yGridSettings.lineWidth * 8} `
 					: `${this.yGridSettings.lineWidth * 10}, ${this.yGridSettings.lineWidth * 10} `
 			)
@@ -4557,7 +4585,7 @@ export class Visual extends Shadow {
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
 				"stroke-dasharray",
-				this.lineSettings.lineType === LineType.Dotted
+				this.lineSettings.lineType === ELineType.Dotted
 					? `0, ${this.lineSettings.lineWidth * 2} `
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
@@ -4578,7 +4606,7 @@ export class Visual extends Shadow {
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
 				"stroke-dasharray",
-				this.lineSettings.lineType === LineType.Dotted
+				this.lineSettings.lineType === ELineType.Dotted
 					? `0, ${this.lineSettings.lineWidth * 2}`
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
@@ -4965,6 +4993,12 @@ export class Visual extends Shadow {
 		} else {
 			this.zeroSeparatorLine.attr("display", "none");
 		}
+
+		this.referenceLinesData = GetReferenceLinesData(this);
+		const filteredReferenceLinesData = this.referenceLinesData.filter((d) => d.isHighlightBarArea);
+		RenderReferenceLineLayers(this, filteredReferenceLinesData as any);
+		RenderReferenceLines(this, this.referenceLinesData as IReferenceLinesSettings[]);
+		HideDataLabelsBelowReferenceLines(this);
 	}
 
 	drawZeroSeparatorLine(): void {

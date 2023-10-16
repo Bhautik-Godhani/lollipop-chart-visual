@@ -6,16 +6,22 @@ import {
 	DataLabelsPlacement,
 	DisplayUnits,
 	EAutoCustomTypes,
+	EBeforeAfterPosition,
 	EDataRolesName,
 	EFontStyle,
+	ELCRPosition,
 	ELegendPosition,
+	ELineType,
 	EMarkerChartTypes,
 	EMarkerColorTypes,
 	EMarkerShapeTypes,
 	EMarkerStyleTypes,
 	EMarkerTypes,
 	ERankingType,
+	EReferenceLineComputation,
+	EReferenceLinesType,
 	ESortOrderTypes,
+	EXYAxisNames,
 	Orientation,
 	PieSize,
 	PieType,
@@ -174,6 +180,7 @@ export interface IDataLabelsSettings {
 	fontStyle: EFontStyle[];
 	placement: DataLabelsPlacement;
 	isAutoFontSize: boolean;
+	showLabelsBelowReferenceLine: boolean;
 }
 
 export interface IDataColorsSettings {
@@ -354,4 +361,45 @@ export interface IRaceChartSettings {
 	tickerButtonRadius: number;
 	isTickerButtonAutoRadius: boolean;
 	tickerButtonColor: string;
+}
+
+export interface IReferenceLinesSettings {
+	x1?: number;
+	x2?: number;
+	y1?: number;
+	y2?: number;
+	textX1?: number;
+	textY1?: number;
+	textAnchor?: string;
+	textAlignment?: string;
+	axis: EXYAxisNames;
+	type: EReferenceLinesType;
+	measureName: string;
+	value: string;
+	rankOrder: Position;
+	computation: EReferenceLineComputation;
+	rank: string;
+	label: string;
+	labelFontFamily: string;
+	labelColor: string;
+	labelBackgroundColor: string;
+	autoFontSize: boolean;
+	labelFontSize: string;
+	labelPosition: EBeforeAfterPosition;
+	labelAlignment: ELCRPosition;
+	lineStyle: ELineType;
+	lineColor: string;
+	autoLineWidth: boolean;
+	lineWidth: string;
+	styling: any[];
+	isHighlightBarArea: boolean;
+	barAreaPositionToHighlight: Position;
+	linePositionOnBar: Position;
+	shadeColor: string;
+	transparency: number;
+	labelBorder: boolean;
+	labelBorderRadius: string;
+	labelBorderRadiusCustom: number;
+	labelBorderWidth: number;
+	labelBorderColor: string;
 }

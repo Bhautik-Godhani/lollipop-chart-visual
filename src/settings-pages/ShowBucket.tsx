@@ -177,11 +177,6 @@ const ShowCondition = (props) => {
 		// setConfigValues({ ...SHOW_BUCKET_SETTINGS });
 	};
 
-	React.useEffect(() => {
-		console.log(configValues);
-	}, [configValues]);
-
-
 	const handleChange = (val, n) => {
 		setConfigValues((d) => ({
 			...d,
