@@ -186,6 +186,7 @@ export class Visual extends Shadow {
 	public isChartIsRaceChart: boolean;
 
 	// CATEGORICAL DATA
+	public originalCategoricalData: powerbi.DataViewCategorical;
 	public clonedCategoricalData: powerbi.DataViewCategorical;
 	public categoricalData: powerbi.DataViewCategorical;
 	public categoricalMetadata: any;
@@ -291,7 +292,7 @@ export class Visual extends Shadow {
 	public xScaleWidth: number;
 	public xScalePaddingOuter: number = 0.25;
 	public isBottomXAxis: boolean;
-	public xAxisStartMargin: number = 5;
+	public xAxisStartMargin: number = 10;
 
 	// yAxis
 	public yAxisG: D3Selection<SVGElement>;
@@ -306,6 +307,7 @@ export class Visual extends Shadow {
 	public isLeftYAxis: boolean;
 	public categoryLabelHeight: number;
 	public categoryLabelMargin: number = 10;
+	public yAxisStartMargin: number = 10;
 
 	// EXPAND ALL
 	public expandAllXAxisG: D3Selection<SVGElement>;
@@ -612,6 +614,10 @@ export class Visual extends Shadow {
 
 		this.brushLollipopG = this.brushG.append("g").attr("class", "brushLollipopG");
 
+		this.brushXAxisG = this.svg.append("g").classed("brushXAxisG", true);
+
+		this.brushYAxisG = this.svg.append("g").classed("brushYAxisG", true);
+
 		this.container = this.svg.append("g").classed("container", true);
 
 		this.zeroSeparatorLine = this.container.append("line").classed("zeroSeparatorLine", true);
@@ -629,10 +635,6 @@ export class Visual extends Shadow {
 		this.circle2G = this.container.append("g").classed("circle2G", true);
 
 		this.xAxisG = this.container.append("g").classed("xAxisG", true);
-
-		this.brushXAxisG = this.container.append("g").classed("brushXAxisG", true);
-
-		this.brushYAxisG = this.container.append("g").classed("brushYAxisG", true);
 
 		this.expandAllXAxisG = this.container.append("g").classed("expandAllXAxisG", true);
 
@@ -938,10 +940,10 @@ export class Visual extends Shadow {
 
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
-		this.isHasMultiMeasure = categoricalMeasureFields.length > 1;
 		this.isHasSubcategories = !!categoricalSubCategoryField;
 		this.isHasImagesData = !!categoricalImageDataFields;
 		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))] as any;
+		this.isHasMultiMeasure = this.measureNames.length > 1;
 
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
 			this.markerSettings.markerType = EMarkerTypes.SHAPE;
@@ -1227,13 +1229,10 @@ export class Visual extends Shadow {
 			this.chartSettings.lollipopWidth > this.minScaleBandWidth &&
 			!this.chartSettings.isAutoLollipopWidth
 		) {
-			this.scaleBandWidth = this.chartSettings.lollipopWidth;
 			this.brushScaleBandBandwidth = this.chartSettings.lollipopWidth;
 		} else if (this.brushScaleBand.bandwidth() > this.minScaleBandWidth) {
-			this.scaleBandWidth = this.brushScaleBand.bandwidth();
 			this.brushScaleBandBandwidth = this.brushScaleBand.bandwidth();
 		} else {
-			this.scaleBandWidth = this.minScaleBandWidth;
 			this.brushScaleBandBandwidth = this.minScaleBandWidth;
 		}
 
@@ -1244,19 +1243,21 @@ export class Visual extends Shadow {
 		// 	this.brushScaleBandBandwidth = this.markerMaxSize + this.markerMaxSize * 0.2;
 		// }
 
-		if (!this.markerSettings.marker1Style.isAutoMarkerSize || (this.isHasMultiMeasure && !this.markerSettings.marker2Style.isAutoMarkerSize)) {
-			if (this.isLollipopTypeCircle) {
-				const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize : 0)]);
-				if (this.brushScaleBandBandwidth <= maxMarkerSize) {
-					this.brushScaleBandBandwidth = maxMarkerSize + 5;
-				}
-			} else {
-				const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize * 2, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize * 2 : 0)]);
-				if (this.brushScaleBandBandwidth <= maxMarkerSize) {
-					this.brushScaleBandBandwidth = maxMarkerSize + 10;
-				}
-			}
-		}
+		// if (!this.markerSettings.marker1Style.isAutoMarkerSize || (this.isHasMultiMeasure && !this.markerSettings.marker2Style.isAutoMarkerSize)) {
+		// 	if (this.isLollipopTypeCircle) {
+		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize : 0)]);
+		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+		// 			this.brushScaleBandBandwidth = maxMarkerSize + 5;
+		// 		}
+		// 	} else {
+		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize * 2, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize * 2 : 0)]);
+		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+		// 			this.brushScaleBandBandwidth = maxMarkerSize + 10;
+		// 		}
+		// 	}
+		// }
+
+		this.scaleBandWidth = this.brushScaleBandBandwidth;
 
 		this.totalLollipopCount = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
 
@@ -1448,6 +1449,7 @@ export class Visual extends Shadow {
 		this._events.renderingStarted(vizOptions.options);
 
 		try {
+			this.originalCategoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
 			this.categoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.categoricalMetadata = this.vizOptions.options.dataViews[0].metadata;
@@ -2120,9 +2122,9 @@ export class Visual extends Shadow {
 					value1: <number>(
 						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx]
 					),
-					value2: <number>(
+					value2: this.isHasMultiMeasure ? <number>(
 						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure2DisplayName).values[idx]
-					),
+					) : 0,
 					tooltipFields: subCategoryGroup
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
 						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
@@ -2182,7 +2184,10 @@ export class Visual extends Shadow {
 			data.forEach((d) => {
 				if (d.subCategories.length) {
 					d.value1 = d3.sum(d.subCategories, (cat) => cat.value1);
-					d.value2 = d3.sum(d.subCategories, (cat) => cat.value2);
+
+					if (this.isHasMultiMeasure) {
+						d.value2 = d3.sum(d.subCategories, (cat) => cat.value2);
+					}
 				}
 			});
 		}
@@ -2448,6 +2453,9 @@ export class Visual extends Shadow {
 		if (!this.dataColorsSettings.marker2.reverse) {
 			this.dataColorsSettings.marker2.schemeColors = this.dataColorsSettings.marker2.schemeColors.reverse();
 		}
+
+		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
+		this.isLeftYAxis = this.yAxisSettings.position === Position.Left;
 
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
@@ -2818,9 +2826,16 @@ export class Visual extends Shadow {
 	displayBrush(): void {
 		if (this.isHorizontalChart) {
 			const newHeight = (this.brushScaleBandBandwidth * this.height) / this.brushScaleBand.bandwidth();
-			if (this.height < newHeight) {
+			if (this.height < newHeight || this.brushAndZoomAreaSettings.enabled) {
+				this.isScrollBrushDisplayed = true;
+				this.isHorizontalBrushDisplayed = false;
+				this.isVerticalBrushDisplayed = true;
+
 				this.drawVerticalBrush(this.categoricalData, this.brushScaleBandBandwidth, this.totalLollipopCount);
 			} else {
+				this.isScrollBrushDisplayed = false;
+				this.isHorizontalBrushDisplayed = false;
+				this.isVerticalBrushDisplayed = false;
 				this.brushG.selectAll("*").remove();
 			}
 		} else {
@@ -2867,7 +2882,6 @@ export class Visual extends Shadow {
 				this[`${d.source.displayName}ScaleDomain`] = d.values;
 			}
 		});
-
 		const brushed = ({ selection }) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
@@ -2898,7 +2912,7 @@ export class Visual extends Shadow {
 
 			this.newScaleDomainByBrush = newYScaleDomain;
 
-			if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied) {
+			if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
 				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
@@ -3072,21 +3086,6 @@ export class Visual extends Shadow {
 				this.setChartData(categoricalData2);
 
 				this.initAndRenderLollipopChart(scaleWidth);
-
-				// if (this.xAxisSettings.position === Position.Bottom) {
-				// 	this.xAxisG
-				// 		.attr("transform", "translate(0," + this.height + ")")
-				// 		.call(d3.axisBottom(this.xScale))
-				// 		.selectAll("text");
-				// } else if (this.xAxisSettings.position === Position.Top) {
-				// 	this.xAxisG
-				// 		.attr("transform", "translate(0," + 0 + ")")
-				// 		.call(d3.axisTop(this.xScale))
-				// 		.selectAll("text")
-				// 		.attr("transform", `translate(-10, -10)rotate(${this.xAxisSettings.labelTilt})`);
-				// }
-
-				// this.setXAxisTickStyle();
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
@@ -3918,8 +3917,8 @@ export class Visual extends Shadow {
 	}
 
 	setScaleBandwidth(): void {
-		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
-		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
+		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		// if (!this.chartSettings.isAutoLollipopWidth) {
 		// 	if (!this.chartSettings.lollipopWidth) {
@@ -3956,6 +3955,7 @@ export class Visual extends Shadow {
 		let isApplyTilt: boolean;
 		let xAxisMaxHeight: number = 0;
 		let xAxisTickHeight: number = 0;
+		let xAxisMaxWordHeight: number = 1;
 
 		if (!this.isHorizontalChart) {
 			const xAxisDomain: string[] = this.xScale.domain();
@@ -3970,7 +3970,6 @@ export class Visual extends Shadow {
 
 			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
 				(this.markerMaxSize > this.scaleBandWidth);
-
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
 				const textProperties: TextProperties = {
 					text: d + "ab",
@@ -3988,18 +3987,32 @@ export class Visual extends Shadow {
 				fontSize: xAxisSettings.labelFontSize + "px",
 			};
 			xAxisTickHeight = textMeasurementService.measureSvgTextHeight(textProperties);
+			xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length);
 		}
 
 		this.xAxisG
 			.selectAll("text")
 			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", isApplyTilt ? "-0.5em" : "0.32em")
+			.attr("y", () => {
+				if (this.isHorizontalChart) {
+					return this.isBottomXAxis ? 9 : -9;
+				} else {
+					return this.isBottomXAxis ? 9 : 9;
+				}
+			})
 			// .attr("dy", isApplyTilt ? "0" : "0.32em")
 			.attr("fill", this.getColor(xAxisSettings.labelColor, EHighContrastColorType.Foreground))
 			.style("font-family", xAxisSettings.labelFontFamily)
 			.attr("font-size", xAxisSettings.labelFontSize)
 			.attr("display", xAxisSettings.isDisplayLabel ? "block" : "none")
-			.attr("text-anchor", isApplyTilt ? "end" : "middle")
+			.attr("text-anchor", () => {
+				if (this.isBottomXAxis) {
+					return isApplyTilt ? "end" : "middle";
+				} else {
+					return isApplyTilt ? "end" : "middle";
+				}
+			})
 			// .attr("transform", () => {
 			// 	if (xAxisSettings.position === Position.Bottom) {
 			// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, 10)rotate(-${this.getXAxisLabelTilt()})`;
@@ -4021,6 +4034,18 @@ export class Visual extends Shadow {
 				if (!THIS.isHorizontalChart) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
+						if (!THIS.isBottomXAxis) {
+							ele.attr("y", () => {
+								if (xAxisMaxWordHeight === 1) {
+									return 0;
+								} else if (xAxisMaxWordHeight === 2) {
+									return -16
+								} else if (xAxisMaxWordHeight === 3) {
+									return -32;
+								}
+							});
+						}
+
 						const words: string[] = GetWordsSplitByWidth(text, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
 						words.forEach((d, i) => {
 							ele
@@ -4031,7 +4056,11 @@ export class Visual extends Shadow {
 						});
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
-						ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35})`);
+						if (THIS.isBottomXAxis) {
+							ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35})`);
+						} else {
+							ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35})`);
+						}
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
@@ -4147,13 +4176,13 @@ export class Visual extends Shadow {
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		if (this.isHorizontalChart) {
-			this.xScale.range(this.yAxisSettings.position === Position.Left ? [5, xScaleWidth] : [xScaleWidth, 0]);
+			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 			this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - 5, 0] : [5, yScaleHeight]);
+			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, 0] : [this.yAxisStartMargin, yScaleHeight]);
 		}
 	}
 
@@ -4454,13 +4483,74 @@ export class Visual extends Shadow {
 	}
 
 	setHorizontalLinesFormatting(linesSelection: any, isEnter: boolean): void {
+		const THIS = this;
 		this.setLineStrokeColor();
 		linesSelection
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
-			.attr("x1", (d) => this.xScale(this.isHasMultiMeasure ? d.value2 : 0) + (this.isHasMultiMeasure ? this.isLollipopTypePie ? 10 : 0 : 0))
-			.attr("x2", (d) => this.xScale(d.value1) + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie1Radius * 2 : this.circle1Size : 0))
+			.attr("x1", (d: ILollipopChartRow) => {
+				if (!this.isLeftYAxis) {
+					if (d.value1 > d.value2) {
+						return this.xScale(d.value1) + THIS.markerMaxSize / 2;
+					} else {
+						return this.xScale(d.value2) + THIS.markerMaxSize / 2;
+					}
+				} else {
+					if (d.value1 > d.value2) {
+						const Y1 = this.xScale(d.value2);
+						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
+						const Y2 = this.xScale(d.value1) - THIS.markerMaxSize / 2;
+
+						if (newY1 < Y2) {
+							return newY1;
+						} else {
+							return Y2;
+						}
+					} else {
+						const Y1 = this.xScale(d.value1);
+						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
+						const Y2 = this.xScale(d.value2) - THIS.markerMaxSize / 2;
+
+						if (newY1 < Y2) {
+							return newY1;
+						} else {
+							return Y2;
+						}
+					}
+				}
+			})
+			.attr("x2", (d: ILollipopChartRow) => {
+				if (!this.isLeftYAxis) {
+					if (d.value1 > d.value2) {
+						const Y1 = THIS.xScale(d.value1) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.xScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0);
+						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
+
+						if (newY2 > Y1) {
+							return newY2;
+						} else {
+							return Y1;
+						}
+					} else {
+						const Y1 = THIS.xScale(d.value2) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.xScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value1 : 0) : 0);
+						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
+
+						if (newY2 > Y1) {
+							return newY2;
+						} else {
+							return Y1;
+						}
+					}
+				} else {
+					if (d.value1 > d.value2) {
+						return this.xScale(d.value1) - THIS.markerMaxSize / 2;
+					} else {
+						return this.xScale(d.value2) - THIS.markerMaxSize / 2;
+					}
+				}
+			})
 			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("stroke", (d) => this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground))
@@ -4481,16 +4571,10 @@ export class Visual extends Shadow {
 	}
 
 	setVerticalLinesFormatting(linesSelection: D3Selection<any>, isEnter: boolean): void {
+		const THIS = this;
 		this.setLineStrokeColor();
 		linesSelection
-			.transition()
-			.duration(isEnter ? 0 : this.tickDuration)
-			.ease(easeLinear)
-			.attr("x1", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
-			.attr("x2", (d) => this.xScale(d.category) + this.scaleBandWidth / 2)
-			.attr("y1", (d) => this.yScale(d.value1))
-			.attr("y2", (d) => this.yScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius * 2 - 10 : this.circle2Size : 0))
-			.attr("stroke", (d) => this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground))
+			.attr("stroke", this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
 				"stroke-dasharray",
@@ -4498,7 +4582,74 @@ export class Visual extends Shadow {
 					? `0, ${this.lineSettings.lineWidth * 2}`
 					: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
 			)
-			.style("display", this.lineSettings.show ? "block" : "none");
+			.style("display", this.lineSettings.show ? "block" : "none")
+			.transition()
+			.duration(isEnter ? 0 : this.tickDuration)
+			.ease(easeLinear)
+			.attr("x1", d => this.xScale(d.category) + THIS.scaleBandWidth / 2)
+			.attr("x2", d => this.xScale(d.category) + THIS.scaleBandWidth / 2)
+			.attr("y1", (d: ILollipopChartRow) => {
+				if (this.isBottomXAxis) {
+					if (d.value1 > d.value2) {
+						return this.yScale(d.value1) + THIS.markerMaxSize / 2;
+					} else {
+						return this.yScale(d.value2) + THIS.markerMaxSize / 2;
+					}
+				} else {
+					if (d.value1 > d.value2) {
+						const Y1 = this.yScale(d.value2);
+						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
+						const Y2 = this.yScale(d.value1) - THIS.markerMaxSize / 2;
+
+						if (newY1 < Y2) {
+							return newY1;
+						} else {
+							return Y2;
+						}
+					} else {
+						const Y1 = this.yScale(d.value1);
+						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
+						const Y2 = this.yScale(d.value2) - THIS.markerMaxSize / 2;
+
+						if (newY1 < Y2) {
+							return newY1;
+						} else {
+							return Y2;
+						}
+					}
+				}
+			})
+			.attr("y2", (d: ILollipopChartRow) => {
+				if (this.isBottomXAxis) {
+					if (d.value1 > d.value2) {
+						const Y1 = THIS.yScale(d.value1) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.yScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0);
+						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
+
+						if (newY2 > Y1) {
+							return newY2;
+						} else {
+							return Y1;
+						}
+					} else {
+						const Y1 = THIS.yScale(d.value2) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.yScale(THIS.isHasMultiMeasure ? (d.value1 ? d.value1 : 0) : 0);
+						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
+
+						if (newY2 > Y1) {
+							return newY2;
+						} else {
+							return Y1;
+						}
+					}
+				} else {
+					if (d.value1 > d.value2) {
+						return this.yScale(d.value1) - THIS.markerMaxSize / 2;
+					} else {
+						return this.yScale(d.value2) - THIS.markerMaxSize / 2;
+					}
+				}
+			});
 	}
 
 	categoryLabelsFormatting(labelSelection: D3Selection<SVGElement>): void {
@@ -4558,6 +4709,16 @@ export class Visual extends Shadow {
 	}
 
 	drawLollipopChart(): void {
+		if (this.isLollipopTypeCircle) {
+			this.setCircle1Radius();
+			this.setCircle2Radius();
+		} else {
+			this.setPie1Radius();
+			this.setPie2Radius();
+		}
+
+		this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
 		let marker: IMarkerData;
 
@@ -4880,16 +5041,6 @@ export class Visual extends Shadow {
 		return diff;
 	}
 
-	getCircleCX(x: number): number {
-		const diff = this.getOverflowCircleCXDiff(x);
-		return x ? (this.yAxisSettings.position === Position.Left ? x + diff : x - diff) : this.circle1Size;
-	}
-
-	getCircleCY(y: number): number {
-		const diff = this.getOverflowCircleCYDiff(y);
-		return y ? (this.xAxisSettings.position === Position.Bottom ? y - diff : y + diff) : this.circle1Size;
-	}
-
 	setPath1Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
@@ -4901,6 +5052,42 @@ export class Visual extends Shadow {
 				}
 			}
 			);
+	}
+
+	getCircleXScaleDiff(cx: number, isCircle2: boolean): number {
+		if (!this.isLeftYAxis) {
+			const isLessSpace = (this.width - this.xAxisStartMargin - cx) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+			if (isLessSpace) {
+				return Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+			} else {
+				return 0;
+			}
+		} else {
+			const isLessSpace = (cx - this.xAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+			if (isLessSpace) {
+				return Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+			} else {
+				return 0;
+			}
+		}
+	}
+
+	getCircleYScaleDiff(cy: number, isCircle2: boolean): number {
+		if (this.isBottomXAxis) {
+			const isLessSpace = (this.height - this.yAxisStartMargin - cy) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+			if (isLessSpace) {
+				return Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+			} else {
+				return 0;
+			}
+		} else {
+			const isLessSpace = (cy - this.yAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+			if (isLessSpace) {
+				return Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+			} else {
+				return 0;
+			}
+		}
 	}
 
 	setCircle1Formatting(circleSelection: D3Selection<any>, marker: IMarkerData, isEnter: boolean): void {
@@ -4915,11 +5102,19 @@ export class Visual extends Shadow {
 			.ease(easeLinear)
 			.attr("x", (d) => {
 				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
-				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				if (!this.isLeftYAxis) {
+					return this.isHorizontalChart ? cx - this.circle1Size / 2 - this.getCircleXScaleDiff(cx, false) : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				} else {
+					return this.isHorizontalChart ? cx - this.circle1Size / 2 + this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				}
 			})
 			.attr("y", (d) => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
-				return !this.isHorizontalChart ? cy - this.circle1Size : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				if (this.isBottomXAxis) {
+					return !this.isHorizontalChart ? cy - this.circle1Size / 2 - this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				} else {
+					return !this.isHorizontalChart ? cy - this.circle1Size / 2 + this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				}
 			});
 	}
 
@@ -4949,11 +5144,19 @@ export class Visual extends Shadow {
 			.ease(easeLinear)
 			.attr("x", (d) => {
 				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
-				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+				if (!this.isLeftYAxis) {
+					return this.isHorizontalChart ? cx - this.circle2Size / 2 - this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+				} else {
+					return this.isHorizontalChart ? cx - this.circle2Size / 2 + this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+				}
 			})
 			.attr("y", (d) => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
-				return !this.isHorizontalChart ? cy - this.circle2Size : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				if (this.isBottomXAxis) {
+					return !this.isHorizontalChart ? cy - this.circle2Size / 2 - this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				} else {
+					return !this.isHorizontalChart ? cy - this.circle2Size / 2 + this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				}
 			});
 	}
 
@@ -4988,46 +5191,6 @@ export class Visual extends Shadow {
 		} else {
 			this.pie2Radius = marker2Style.markerSize;
 		}
-	}
-
-	getOverflowPieXDiff(x: number, isPie2: boolean = false): number {
-		// let diff = 0;
-		// const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		// if (this.yAxisSettings.position === Position.Left) {
-		// 	diff = x <= radius ? radius - x : 0;
-		// } else {
-		// 	diff = this.width - x <= radius ? radius - (this.width - x) : 0;
-		// }
-		// return diff;
-		return 0;
-	}
-
-	getOverflowPieYDiff(y: number, isPie2: boolean = false): number {
-		// let diff = 0;
-		// const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		// if (this.xAxisSettings.position === Position.Bottom) {
-		// 	diff = this.height - y <= radius ? radius - (this.height - y) : 0;
-		// } else {
-		// 	diff = y <= radius ? radius - y : 0;
-		// }
-		// return diff;
-		return 0;
-	}
-
-	getPieX(x: number, isPie2: boolean = false): number {
-		// const diff = this.getOverflowPieXDiff(x);
-		const diff = 0;
-		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		const pieViewBoxRadius = radius * 2;
-		return x ? (this.yAxisSettings.position === Position.Left ? x + diff : x - diff) : pieViewBoxRadius / 2;
-	}
-
-	getPieY(y: number, isPie2: boolean = false): number {
-		// const diff = this.getOverflowPieYDiff(y);
-		const diff = 0;
-		const radius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		const pieViewBoxRadius = radius * 2;
-		return y ? (this.xAxisSettings.position === Position.Bottom ? y - diff : y + diff) : pieViewBoxRadius / 2;
 	}
 
 	setPie1ChartFormatting(): void {
@@ -5224,6 +5387,42 @@ export class Visual extends Shadow {
 			});
 	}
 
+	getPieXScaleDiff(x: number, isPie2: boolean): number {
+		if (this.isLeftYAxis) {
+			const isLessSpace = (x - this.xAxisStartMargin) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
+			if (isLessSpace) {
+				return Math.abs((x - this.xAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+			} else {
+				return 0;
+			}
+		} else {
+			const isLessSpace = (this.width - this.xAxisStartMargin - x) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
+			if (isLessSpace) {
+				return Math.abs((this.width - this.xAxisStartMargin - x) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+			} else {
+				return 0;
+			}
+		}
+	}
+
+	getPieYScaleDiff(y: number, isPie2: boolean): number {
+		if (this.isBottomXAxis) {
+			const isLessSpace = (this.height - this.yAxisStartMargin - y) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
+			if (isLessSpace) {
+				return Math.abs((this.height - this.yAxisStartMargin - y) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+			} else {
+				return 0;
+			}
+		} else {
+			const isLessSpace = (y - this.yAxisStartMargin) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
+			if (isLessSpace) {
+				return Math.abs((y - this.yAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+			} else {
+				return 0;
+			}
+		}
+	}
+
 	enterPieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
 		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
@@ -5326,11 +5525,19 @@ export class Visual extends Shadow {
 			.ease(easeLinear)
 			.attr("x", (d) => {
 				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
-				return this.isHorizontalChart ? pieX : pieX + this.scaleBandWidth / 2 - pieRadius;
+				if (this.isLeftYAxis) {
+					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+				} else {
+					return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+				}
 			})
 			.attr("y", (d) => {
 				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
-				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2 - pieRadius;
+				if (this.isBottomXAxis) {
+					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+				} else {
+					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+				}
 			})
 
 		// this.pieG.on("mouseover", (e) => {
@@ -5384,12 +5591,20 @@ export class Visual extends Shadow {
 			.ease(easeLinear)
 			.attr("x", (d) => {
 				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
-				return this.isHorizontalChart ? pieX : pieX + this.scaleBandWidth / 2 - pieRadius;
+				if (this.isLeftYAxis) {
+					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+				} else {
+					return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+				}
 			})
 			.attr("y", (d) => {
 				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
-				return !this.isHorizontalChart ? pieY - pieRadius * 2 : pieY + this.scaleBandWidth / 2 - pieRadius;
-			});
+				if (this.isBottomXAxis) {
+					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+				} else {
+					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+				}
+			})
 	}
 
 	// Legend
@@ -5714,7 +5929,7 @@ export class Visual extends Shadow {
 	}
 
 	drawBrushYAxis(): void {
-		const xPos = this.width + this.brushAndZoomAreaWidth;
+		const xPos = this.viewPortWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth;
 		this.brushYAxisG.attr("transform", `translate(${xPos},0)`)
 			.call(
 				d3
@@ -5769,6 +5984,7 @@ export class Visual extends Shadow {
 	drawBrushLollipopChart(clonedCategoricalData: powerbi.DataViewCategorical): void {
 		const brushScaleBandwidth = this.brushScaleBand.bandwidth();
 		const measures = clonedCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
+		const subCategoriesGroup = d3.group(clonedCategoricalData.values, (d: any) => d.source.groupName);
 
 		const getUID = (category: string) => {
 			return `${category}-
@@ -5790,11 +6006,26 @@ export class Visual extends Shadow {
 			(this.isChartIsRaceChart && this.raceChartKeyLabelList.length > 0 ? this.raceChartKeyLabelList : [{ key: "", label: "" }]).forEach(raceBarKeyLabel => {
 				const raceChartKey = raceBarKeyLabel.key;
 				const raceChartDataLabel = raceBarKeyLabel.label;
+				const obj = { category: cur, uid: getUID(cur), raceChartKey, raceChartDataLabel, styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } }, value1: 0, value2: 0 };
 
-				const obj = { category: cur, uid: getUID(cur), raceChartKey, raceChartDataLabel, styles: { circle1: { fillColor: "" }, circle2: { fillColor: "" } } };
-				measures.forEach((d, j) => {
-					obj[`value${j + 1}`] = +d.values[idx];
-				})
+				if (this.isHasSubcategories) {
+					this.subCategoriesName.forEach(name => {
+						const subCategoryGroup = subCategoriesGroup.get(name);
+						const measures = subCategoryGroup.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
+						measures.forEach((d, j) => {
+							if (!obj[`value${j + 1}`]) {
+								obj[`value${j + 1}`] = +d.values[idx];
+							} else {
+								obj[`value${j + 1}`] += +d.values[idx];
+							}
+						})
+					})
+				} else {
+					measures.forEach((d, j) => {
+						obj[`value${j + 1}`] = +d.values[idx];
+					})
+				}
+
 				arr = [...arr, obj];
 				idx++;
 			});
@@ -5891,8 +6122,34 @@ export class Visual extends Shadow {
 				.ease(easeLinear)
 				.attr("x1", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
 				.attr("x2", (d) => this.brushScaleBand(d.category) + brushScaleBandwidth / 2)
-				.attr("y1", (d) => this.brushYScale(d.value1))
-				.attr("y2", (d) => this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize / 2 : 0));
+				.attr("y1", (d) => {
+					if (d.value1 > d.value2) {
+						return this.brushYScale(d.value1);
+					} else {
+						return this.brushYScale(d.value2);
+					}
+				})
+				.attr("y2", (d) => {
+					if (d.value1 > d.value2) {
+						const Y1 = this.brushYScale(d.value1);
+						const Y2 = this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+
+						if (Y2 > Y1) {
+							return Y2;
+						} else {
+							return Y1;
+						}
+					} else {
+						const Y1 = this.brushYScale(d.value2);
+						const Y2 = this.brushYScale(this.isHasMultiMeasure ? (d.value1 ? d.value1 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+
+						if (Y2 > Y1) {
+							return Y2;
+						} else {
+							return Y1;
+						}
+					}
+				});
 		}
 
 		const setHorizontalLinesFormatting = (linesSelection, isEnter: boolean) => {
@@ -5902,8 +6159,34 @@ export class Visual extends Shadow {
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)
 				.ease(easeLinear)
-				.attr("x1", (d) => this.brushXScale(this.isHasMultiMeasure ? d.value2 : 0) - brushScaleBandwidth / 3)
-				.attr("x2", (d) => this.brushXScale(d.value1))
+				.attr("x1", (d) => {
+					if (d.value1 > d.value2) {
+						const X1 = this.brushXScale(d.value2) - (!this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+						const X2 = this.brushXScale(d.value1) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+
+						if (X1 < X2) {
+							return X1;
+						} else {
+							return X2;
+						}
+					} else {
+						const X1 = this.brushXScale(d.value1) - (!this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+						const X2 = this.brushXScale(d.value2) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+
+						if (X1 < X2) {
+							return X1;
+						} else {
+							return X2;
+						}
+					}
+				})
+				.attr("x2", (d) => {
+					if (d.value1 > d.value2) {
+						return this.brushXScale(d.value1) - (this.brushAndZoomAreaCircleSize);
+					} else {
+						return this.brushXScale(d.value2) - (this.brushAndZoomAreaCircleSize);
+					}
+				})
 				.attr("y1", (d) => this.brushYScale(d.category) + brushScaleBandwidth / 2)
 				.attr("y2", (d) => this.brushYScale(d.category) + brushScaleBandwidth / 2);
 		}

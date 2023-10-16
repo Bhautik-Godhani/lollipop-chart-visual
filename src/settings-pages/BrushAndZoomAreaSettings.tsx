@@ -56,7 +56,6 @@ const UIGeneralChartSettings = (
 					<Column>
 						<InputControl
 							min={5}
-							max={shadow.rankingSettings.category.count}
 							type="number"
 							label="Minimum Lollipop Count"
 							value={configValues.minLollipopCount}
@@ -155,8 +154,7 @@ const UIGeneralChartSettings = (
 						<Row>
 							<Column>
 								<InputControl
-									min={shadow.brushAndZoomAreaMinHeight}
-									max={shadow.brushAndZoomAreaMaxHeight}
+									min={0}
 									type="number"
 									label="Height"
 									value={configValues.height}
