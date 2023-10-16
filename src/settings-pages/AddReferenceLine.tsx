@@ -694,7 +694,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onDelete, onUpdate, index, 
               handleChange={value => handleChange(value, "labelAlignment")}
             />
           </Column>
-          <Column>
+          {/* <Column>
             {configValues.axis === "X" && (
               <SwitchOption
                 label="Orientation"
@@ -703,7 +703,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onDelete, onUpdate, index, 
                 handleChange={value => handleChange(value, "labelOrientation")}
               />
             )}
-          </Column>
+          </Column> */}
         </Row>
       </Accordion>
 
