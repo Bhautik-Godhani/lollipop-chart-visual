@@ -5755,6 +5755,8 @@ export class Visual extends Shadow {
 				font-family: ${footerSettings.fontFamily}; 
 				background-color: ${this.highContrastDetails.isHighContrast ? this.highContrastDetails.backgroundColor : footerBackgroundColor};
 				border-radius: 4px;
+				padding: 4px 5px;
+				line-height: 1;
 				margin-top: ${footerSettings.isShowDivider ? 3 : 0}px`;
 
 			footer.setAttribute("style", styles);
