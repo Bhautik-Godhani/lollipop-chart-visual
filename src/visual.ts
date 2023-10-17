@@ -4204,7 +4204,7 @@ export class Visual extends Shadow {
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, 0] : [this.yAxisStartMargin, yScaleHeight]);
+			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25]);
 		}
 	}
 
