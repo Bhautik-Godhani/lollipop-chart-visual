@@ -157,6 +157,12 @@ const ChartSettings = (props) => {
 
 	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
+	React.useEffect(() => {
+		if (!configValues.lollipopWidth) {
+			handleChange(Math.ceil(shadow.scaleBandWidth), EChartSettings.lollipopWidth, setConfigValues)
+		}
+	}, []);
+
 	return (
 		<>
 			{UIGeneralChartSettings(shadow, configValues, isHasSubCategories, setConfigValues)}
