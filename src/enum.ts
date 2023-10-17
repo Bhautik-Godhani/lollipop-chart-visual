@@ -206,7 +206,6 @@ export enum EDataLabelsSettings {
 	fontFamily = "fontFamily",
 	showBackground = "showBackground",
 	backgroundColor = "backgroundColor",
-	transparency = "transparency",
 	fontStyle = "fontStyle",
 	placement = "placement",
 	isAutoFontSize = "isAutoFontSize",

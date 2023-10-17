@@ -1736,7 +1736,7 @@ export class Visual extends Shadow {
 				this.setLegendsData();
 				this.legendSettings.legendColor = this.getColor(this.legendSettings.legendColor, EHighContrastColorType.Foreground);
 
-				// this.renderLegends()
+				// this.renderLegends()				
 
 				this.legends = renderLegends(
 					this,
@@ -3368,11 +3368,11 @@ export class Visual extends Shadow {
 			.attr("rx", 4)
 			.attr("ry", 4)
 			.attr("fill", dataLabelsSettings.backgroundColor)
-			.attr("opacity", "0");
+			.attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
 
-		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-			rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
-		}
+		// if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+		// 	rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
+		// }
 
 		textSelection.attr("transform", function () {
 			const bBox = (d3.select(this.parentNode).select("rect").node() as SVGSVGElement).getBBox();

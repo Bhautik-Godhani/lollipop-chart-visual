@@ -176,7 +176,6 @@ export interface IDataLabelsSettings {
 	fontFamily: string;
 	showBackground: boolean;
 	backgroundColor: string;
-	transparency: number;
 	fontStyle: EFontStyle[];
 	placement: DataLabelsPlacement;
 	isAutoFontSize: boolean;

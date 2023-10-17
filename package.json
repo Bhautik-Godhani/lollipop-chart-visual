@@ -17,7 +17,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@fortawesome/react-fontawesome": "^0.1.18",
-    "@truviz/shadow": "^1.0.30",
+    "@truviz/shadow": "^1.0.33",
     "@truviz/viz-annotations": "^1.0.9",
     "@types/d3": "^6.7.0",
     "@types/react-dom": "^18.0.11",
