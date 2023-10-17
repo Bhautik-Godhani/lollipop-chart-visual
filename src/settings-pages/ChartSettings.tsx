@@ -97,7 +97,7 @@ const UIGeneralChartSettings = (
 				<Row appearance="padded">
 					<Column>
 						<InputControl
-							min={shadow.minScaleBandWidth}
+							min={shadow.scaleBandWidth}
 							type="number"
 							label="Width"
 							value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IPatternData, InputControl, PatternPicker } from "@truviz/shadow/dist/Components";
+import { IPatternData, InputControl, PatternPicker, Quote } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
 import { EPatternSettings } from "../enum";
@@ -91,78 +91,90 @@ const FillPatterns = (props) => {
 
 	return (
 		<>
-			<Row>
-				<Column>
-					<ToggleButton
-						label={"Enabled"}
-						value={configValues.enabled}
-						handleChange={() => handleCheckbox(EPatternSettings.Enabled, setConfigValues)}
-						appearance="toggle"
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={!configValues.enabled}>
-				<div className="section section-preview-image">
-					<PreviewPatterns />
-				</div>
+			<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+				<Row>
+					<Column>
+						<Quote>
+							<strong>Note: </strong>Fill patterns are only supported in case of Sub-category.
+						</Quote>
+					</Column>
+				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={configValues.enabled}>
-				<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-					{configValues.categoryPatterns.map((category, index) => (
-						<PatternPicker
-							label={category.name}
-							pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
-							handleChange={(e: IPatternData) => {
-								const patterns = [...configValues.categoryPatterns];
-								patterns[index].patternIdentifier = e.value;
-
-								if (e.value === "image") {
-									patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
-								}
-
-								setConfigValues((d) => ({
-									...d,
-									[EPatternSettings.CategoryPatterns]: patterns,
-								}));
-							}}
+			<ConditionalWrapper visible={shadow.isHasSubcategories}>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Enabled"}
+							value={configValues.enabled}
+							handleChange={() => handleCheckbox(EPatternSettings.Enabled, setConfigValues)}
+							appearance="toggle"
 						/>
-					))}
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={!configValues.enabled}>
+					<div className="section section-preview-image">
+						<PreviewPatterns />
+					</div>
 				</ConditionalWrapper>
 
-				<ConditionalWrapper visible={shadow.isHasSubcategories}>
-					{configValues.subCategoryPatterns?.map((category, index) => (
-						<PatternPicker
-							label={category.name}
-							pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
-							handleChange={(e: IPatternData) => {
-								const patterns = [...configValues.subCategoryPatterns];
-								patterns[index].patternIdentifier = e.value;
+				<ConditionalWrapper visible={configValues.enabled}>
+					<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+						{configValues.categoryPatterns.map((category, index) => (
+							<PatternPicker
+								label={category.name}
+								pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
+								handleChange={(e: IPatternData) => {
+									const patterns = [...configValues.categoryPatterns];
+									patterns[index].patternIdentifier = e.value;
 
-								if (e.value === "image") {
-									patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
-								}
+									if (e.value === "image") {
+										patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+									}
 
-								setConfigValues((d) => ({
-									...d,
-									[EPatternSettings.SubcategoryPatterns]: patterns,
-								}));
-							}}
-						/>
-					))}
+									setConfigValues((d) => ({
+										...d,
+										[EPatternSettings.CategoryPatterns]: patterns,
+									}));
+								}}
+							/>
+						))}
+					</ConditionalWrapper>
+
+					<ConditionalWrapper visible={shadow.isHasSubcategories}>
+						{configValues.subCategoryPatterns?.map((category, index) => (
+							<PatternPicker
+								label={category.name}
+								pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
+								handleChange={(e: IPatternData) => {
+									const patterns = [...configValues.subCategoryPatterns];
+									patterns[index].patternIdentifier = e.value;
+
+									if (e.value === "image") {
+										patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+									}
+
+									setConfigValues((d) => ({
+										...d,
+										[EPatternSettings.SubcategoryPatterns]: patterns,
+									}));
+								}}
+							/>
+						))}
+					</ConditionalWrapper>
+
+					{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 				</ConditionalWrapper>
 
-				{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
+				{configValues.enabled && (
+					<div className="section">
+						<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
+							<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
+						</p>
+					</div>
+				)}
 			</ConditionalWrapper>
-
-			{configValues.enabled && (
-				<div className="section">
-					<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
-						<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
-					</p>
-				</div>
-			)}
 
 			<Footer
 				cancelButtonHandler={closeCurrentSettingHandler}
