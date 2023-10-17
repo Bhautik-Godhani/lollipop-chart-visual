@@ -128,7 +128,7 @@ export class ShowBucketConfig {
 }
 
 export class Footer {
-	public show: boolean = false; public text: string = ""; public webURL: string = ""; public color: string = "#404040"; public fontSize: string = "16"; public fontFamily: string = "Segoe UI"; public isShowDivider: boolean = false; public dividerColor: string = "#404040"; public dividerThickness: number = 1; public backgroundColor: string = "#ffffff"; public backgroundTransparency: number = 0; public alignment: string = "center";
+	public show: boolean = false; public text: string = "For more info visit Powerviz website"; public webURL: string = "https://www.powerviz.ai"; public color: string = "#404040"; public fontSize: string = "16"; public fontFamily: string = "Segoe UI"; public isShowDivider: boolean = false; public dividerColor: string = "#404040"; public dividerThickness: number = 1; public backgroundColor: string = "#ffffff"; public backgroundTransparency: number = 0; public alignment: string = "center";
 }
 
 export class Editor {
