@@ -2875,7 +2875,7 @@ export class Visual extends Shadow {
 				this.isVerticalBrushDisplayed = false;
 
 				const brushXPos = this.margin.left ? this.margin.left : 0;
-				const brushYPos = this.viewPortHeight - this.brushHeight - this.settingsBtnHeight - this.legendViewPort.height;
+				const brushYPos = this.viewPortHeight - this.brushHeight - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
 
 				const config: IBrushConfig = {
 					brushG: this.brushG.node(),
@@ -5928,8 +5928,8 @@ export class Visual extends Shadow {
 	}
 
 	drawBrushXAxis(): void {
-		const yPos = this.viewPortHeight - this.settingsBtnHeight - this.legendViewPort.height - this.brushXAxisTicksMaxHeight;
-		this.brushXAxisG.attr("transform", "translate(0," + (yPos) + ")")
+		const yPos = this.viewPortHeight - this.settingsBtnHeight - this.legendViewPort.height - this.brushXAxisTicksMaxHeight - this.footerHeight;
+		this.brushXAxisG.attr("transform", `translate(${this.margin.left},${yPos})`)
 			.call(
 				d3
 					.axisBottom(this.brushScaleBand)
@@ -5960,7 +5960,7 @@ export class Visual extends Shadow {
 
 	drawBrushYAxis(): void {
 		const xPos = this.viewPortWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth;
-		this.brushYAxisG.attr("transform", `translate(${xPos},0)`)
+		this.brushYAxisG.attr("transform", `translate(${xPos},${this.margin.top})`)
 			.call(
 				d3
 					.axisRight(this.brushScaleBand)
