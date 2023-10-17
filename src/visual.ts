@@ -312,6 +312,7 @@ export class Visual extends Shadow {
 	public categoryLabelHeight: number;
 	public categoryLabelMargin: number = 10;
 	public yAxisStartMargin: number = 10;
+	public yAxisTicksMaxWidthRatio: number = 0.2;
 
 	// EXPAND ALL
 	public expandAllXAxisG: D3Selection<SVGElement>;
@@ -1452,7 +1453,7 @@ export class Visual extends Shadow {
 				});
 			} else {
 				this.expandAllXScaleGHeight = 0;
-				this.expandAllYScaleGWidth = this.width * 0.06 * this.expandAllCategoriesName.length;
+				this.expandAllYScaleGWidth = this.width * this.yAxisTicksMaxWidthRatio * this.expandAllCategoriesName.length;
 				this.expandAllCategoriesName.forEach((d) => {
 					this[d + "Scale"] = undefined;
 					this[d + "ScaleG"] = this.expandAllYAxisG
@@ -1794,7 +1795,7 @@ export class Visual extends Shadow {
 					} else {
 						this.expandAllYAxisG.style("transform", "translate(" + (this.height + this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
 					}
-					CallExpandAllYScaleOnAxisGroup(this, this.width * 0.06);
+					CallExpandAllYScaleOnAxisGroup(this, this.width * this.yAxisTicksMaxWidthRatio);
 				}
 			}
 
@@ -2964,7 +2965,7 @@ export class Visual extends Shadow {
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
-				this.initAndRenderLollipopChart(this.width * 0.06)
+				this.initAndRenderLollipopChart(this.width * this.yAxisTicksMaxWidthRatio)
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
@@ -4120,7 +4121,7 @@ export class Visual extends Shadow {
 				if (!THIS.isHorizontalChart) {
 					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
 				} else {
-					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * 0.06);
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);
 				}
 			});
@@ -4397,7 +4398,7 @@ export class Visual extends Shadow {
 			this.yScaleGWidth = d3.max(yAxisTicksWidth);
 		} else {
 			const yAxisTicks = yAxisDomain.map((text) => {
-				return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * 0.06);
+				return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * this.yAxisTicksMaxWidthRatio);
 			});
 			const yAxisTicksWidth = yAxisTicks.map((d) => {
 				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
