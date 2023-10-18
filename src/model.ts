@@ -24,6 +24,7 @@ export interface ILollipopChartRow {
 
 export interface IChartSubCategory {
 	category: string;
+	parentCategory: string;
 	value1: number;
 	value2: number;
 	identity?: ISelectionId;

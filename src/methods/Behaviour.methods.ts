@@ -128,7 +128,7 @@ export class Behavior implements IInteractiveBehavior {
 
 		const handleOpacity = (dataPoint: ILollipopChartRow, i: number) => {
 			const selected = dataPoint.selected;
-			const isHighlight = isHasSubcategories ? subDataPoints[i].isHighlight : dataPoints[i].isHighlight;
+			const isHighlight = isHasSubcategories ? subDataPoints[i]?.isHighlight : dataPoints[i]?.isHighlight;
 			let opacity = 1;
 			if (isHasHighlights) {
 				opacity = isHighlight ? 1 : 0.4;

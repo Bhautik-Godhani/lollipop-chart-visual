@@ -217,7 +217,6 @@ export class Visual extends Shadow {
 	subCategoriesName: string[] = [];
 	measure1DisplayName: string;
 	measure2DisplayName: string;
-	subCategories: { name: string; color1: string; color2: string }[] = [];
 	isDisplayLegend2: boolean;
 	isHasMultiMeasure: boolean;
 	isHasSubcategories: boolean;
@@ -1126,7 +1125,7 @@ export class Visual extends Shadow {
 
 		const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
 
-		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
 		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
 		if (!this.isHasSubcategories) {
@@ -1714,15 +1713,6 @@ export class Visual extends Shadow {
 				}));
 			}
 
-			// if (this.chartData.length) {
-			// 	this.subCategories = this.chartData[0].subCategories
-			// 		.map((d) => ({
-			// 			name: d.category,
-			// 			color1: d.styles.marker1.color,
-			// 			color2: d.styles.marker2.color
-			// 		}));
-			// }
-
 			if (!this.legend1) {
 				this.createLegendContainer(LegendType.Legend1);
 			}
@@ -1736,7 +1726,7 @@ export class Visual extends Shadow {
 				this.setLegendsData();
 				this.legendSettings.legendColor = this.getColor(this.legendSettings.legendColor, EHighContrastColorType.Foreground);
 
-				// this.renderLegends()				
+				// this.renderLegends()	
 
 				this.legends = renderLegends(
 					this,
@@ -1755,6 +1745,9 @@ export class Visual extends Shadow {
 				this.legendViewPort.height = 0;
 				this.legendViewPortWidth = 0;
 				this.legendViewPortHeight = 0;
+
+				this.svg.style("top", 0 + "px");
+				this.svg.style("left", 0 + "px");
 			}
 
 			this.setMargins();
@@ -1822,7 +1815,6 @@ export class Visual extends Shadow {
 
 			this.drawXYAxisTitle();
 			this.setSummaryTableConfig();
-			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 
 			if (this.brushAndZoomAreaSettings.enabled) {
 				this.brushLollipopG = this.brushG.append("g").lower().attr("class", "brushLollipopG");
@@ -1873,12 +1865,13 @@ export class Visual extends Shadow {
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
 
-			// if (!this.isHasSubcategories) {
-			// 	SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
-			// } else {
-			// 	SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), this.chartData);
-			// }
-			// this.behavior.renderSelection(this.interactivityService.hasSelection());
+			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+			if (!this.isLollipopTypePie) {
+				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), this.chartData);
+			} else {
+				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), this.chartData);
+			}
+			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
 		}
@@ -2135,7 +2128,7 @@ export class Visual extends Shadow {
 		const measureGroup = d3.group(this.categoricalMeasureFields, (d) => d.source.displayName);
 		const subCategoriesGroup = d3.group(categoricalData.values, (d: any) => d.source.groupName);
 
-		const getSubCategoryData = (idx: number): IChartSubCategory[] => {
+		const getSubCategoryData = (idx: number, parentCategory: string): IChartSubCategory[] => {
 			const data = this.subCategoriesName.reduce((arr, cur, i) => {
 				const subCategoryGroup = subCategoriesGroup.get(cur);
 				const measure1 = subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName);
@@ -2143,6 +2136,7 @@ export class Visual extends Shadow {
 
 				const obj: IChartSubCategory = {
 					category: cur,
+					parentCategory,
 					value1: <number>(
 						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx]
 					),
@@ -2196,7 +2190,7 @@ export class Visual extends Shadow {
 					selected: false,
 					isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
 					tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
-					subCategories: this.isHasSubcategories ? getSubCategoryData(idx) : [],
+					subCategories: this.isHasSubcategories ? getSubCategoryData(idx, <string>cat) : [],
 				}
 				arr = [...arr, obj];
 				idx++;
@@ -2538,19 +2532,6 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// }
-		// if (this.rankingSettings.isRankingEnabled) {
-		// 	const subCategories = [];
-		// 	this.subCategories = [];
-		// 	this.chartData.forEach((data) => {
-		// 		data.subCategories.forEach((sub) => {
-		// 			const isAlreadyHasCategory = this.subCategories.some((d) => d.name === sub.category);
-		// 			if (!isAlreadyHasCategory) {
-		// 				subCategories.push({name: sub.category, color1: "", color2: ""});
-		// 			}
-		// 		});
-		// 	});
-		// 	this.subCategories = subCategories;
-		// }
 	}
 
 	setRemainingAsOthersDataColor(): void {
@@ -2618,10 +2599,6 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// }
-		// this.setSubCategoriesColor(LegendType.Legend1);
-		// if (this.isDisplayLegend2) {
-		// 	this.setSubCategoriesColor(LegendType.Legend2);
-		// }
 	}
 
 	setColorsByDataColorsSettings(): void {
@@ -2629,10 +2606,6 @@ export class Visual extends Shadow {
 			this.setCircleColors();
 		} else {
 			this.setPieColors();
-		}
-		this.setSubCategoriesColor(LegendType.Legend1);
-		if (this.isDisplayLegend2) {
-			this.setSubCategoriesColor(LegendType.Legend2);
 		}
 	}
 
@@ -2822,25 +2795,6 @@ export class Visual extends Shadow {
 		if (this.isHasMultiMeasure) {
 			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
-	}
-
-	setSubCategoriesColor(legendType: LegendType): void {
-		const isLegend2 = legendType === LegendType.Legend2;
-		const getSubCategoryColorByName = (subCategoryName: string): string => {
-			let subCategory: IChartSubCategory;
-			this.chartData.forEach((data) => {
-				data.subCategories.find((d) => {
-					if (d.category === subCategoryName) {
-						subCategory = d;
-					}
-				});
-			});
-			return subCategory ? this.subCategoryColorPair[subCategoryName][isLegend2 ? "marker2Color" : "marker1Color"] : "#545454";
-		};
-
-		this.subCategories.forEach((cat) => {
-			cat[isLegend2 ? "color2" : "color1"] = getSubCategoryColorByName(cat.name);
-		});
 	}
 
 	setChartWidthHeight(): void {
@@ -3368,7 +3322,7 @@ export class Visual extends Shadow {
 			.attr("rx", 4)
 			.attr("ry", 4)
 			.attr("fill", dataLabelsSettings.backgroundColor)
-			.attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
+			.attr("opacity", dataLabelsSettings.placement === DataLabelsPlacement.Outside && dataLabelsSettings.showBackground ? "1" : "0");
 
 		// if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 		// 	rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
@@ -4162,7 +4116,12 @@ export class Visual extends Shadow {
 		}
 
 		let max = d3.max(this.isHasMultiMeasure ? values.map((val) => val) : this.chartData.map((d) => d.value1));
-		max += max * 0.15;
+
+		if (max >= 0) {
+			max += max * 0.15;
+		} else {
+			max -= max * 0.15;
+		}
 
 		this.isHasNegativeValue = min < 0 || max < 0;
 
@@ -4727,6 +4686,11 @@ export class Visual extends Shadow {
 			.attr("y", d => {
 				const cy = this.yScale(this.isHorizontalChart ? d.category : (isImage2 ? d.value2 : d.value1));
 				return !this.isHorizontalChart ? cy - width : cy + this.scaleBandWidth / 2 - width / 2;
+			})
+			.on("end", (node, index) => {
+				if (index === this.chartData.length - 1) {
+					this.updateAnnotationNodeElements();
+				}
 			});
 	}
 
@@ -4764,15 +4728,27 @@ export class Visual extends Shadow {
 
 				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
 					const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
+						.classed(this.circleClass, true)
 						.classed(this.imageMarkerClass, true)
 						.classed("image-marker1", true);
+
+					imageMarker1Selection
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+						});
 
 					this.imageMarkerFormatting(imageMarker1Selection, false, true);
 
 					if (this.isHasMultiMeasure) {
 						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
+							.classed(this.circleClass, true)
 							.classed(this.imageMarkerClass, true)
 							.classed("image-marker2", true);
+
+						imageMarker2Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+							});
 
 						this.imageMarkerFormatting(imageMarker2Selection, true, true);
 					}
@@ -4796,6 +4772,16 @@ export class Visual extends Shadow {
 						this.setPath1Formatting(path1Selection);
 						this.setCircle1Formatting(circle1Selection, marker, true);
 
+						circle1Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							});
+
+						path1Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							});
+
 						if (this.isHasMultiMeasure) {
 							const symbol2 = lollipopG.append("defs")
 								.append("symbol")
@@ -4813,11 +4799,6 @@ export class Visual extends Shadow {
 
 							this.setPath2Formatting(path2Selection);
 							this.setCircle2Formatting(circle2Selection, marker, true);
-
-							path1Selection
-								.datum(d => {
-									return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-								});
 
 							path2Selection
 								.datum(d => {
@@ -4975,6 +4956,16 @@ export class Visual extends Shadow {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 					});
 
+				imageMarker1Selection
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+					});
+
+				imageMarker2Selection
+					.datum(d => {
+						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+					});
+
 				return update;
 			}
 		) as any;
@@ -5118,6 +5109,11 @@ export class Visual extends Shadow {
 		}
 	}
 
+	updateAnnotationNodeElements(): void {
+		this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
+		this.visualAnnotations.renderAnnotations();
+	}
+
 	setCircle1Formatting(circleSelection: D3Selection<any>, marker: IMarkerData, isEnter: boolean): void {
 		this.setCircle1Radius();
 		circleSelection
@@ -5142,6 +5138,11 @@ export class Visual extends Shadow {
 					return !this.isHorizontalChart ? cy - this.circle1Size / 2 - this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 				} else {
 					return !this.isHorizontalChart ? cy - this.circle1Size / 2 + this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				}
+			})
+			.on("end", (node, index) => {
+				if (index === this.chartData.length - 1) {
+					this.updateAnnotationNodeElements();
 				}
 			});
 	}
@@ -5184,6 +5185,11 @@ export class Visual extends Shadow {
 					return !this.isHorizontalChart ? cy - this.circle2Size / 2 - this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 				} else {
 					return !this.isHorizontalChart ? cy - this.circle2Size / 2 + this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+				}
+			})
+			.on("end", (node, index) => {
+				if (index === this.chartData.length - 1) {
+					this.updateAnnotationNodeElements();
 				}
 			});
 	}
@@ -5567,6 +5573,11 @@ export class Visual extends Shadow {
 					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
 				}
 			})
+			.on("end", (node, index) => {
+				if (index === this.chartData.length - 1) {
+					this.updateAnnotationNodeElements();
+				}
+			});
 
 		// this.pieG.on("mouseover", (e) => {
 		// 	if (e.path.length && e.path[5]) {
@@ -5633,43 +5644,47 @@ export class Visual extends Shadow {
 					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
 				}
 			})
+			.on("end", (node, index) => {
+				if (index === this.chartData.length - 1) {
+					this.updateAnnotationNodeElements();
+				}
+			});
 	}
 
 	// Legend
 	setLegendsData(): void {
 		let legend1DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
 		let legend2DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
-		this.subCategories.sort((a, b) => a.name.localeCompare(b.name));
 
 		if (this.isLollipopTypeCircle) {
-			// legend1DataPoints = [{
-			// 	data: {
-			// 		name: this.measure1DisplayName,
-			// 		color: this.getColor(this.dataColorsSettings.circle1.circleFillColor, EHighContrastColorType.Foreground),
-			// 		pattern: undefined
-			// 	}
-			// },
-			// {
-			// 	data: {
-			// 		name: this.measure2DisplayName,
-			// 		color: this.getColor(this.dataColorsSettings.circle2.circleFillColor, EHighContrastColorType.Foreground),
-			// 		pattern: undefined
-			// 	}
-			// }
-			// ];
-		} else {
-			legend1DataPoints = this.subCategories.map((category) => ({
+			legend1DataPoints = [{
 				data: {
-					name: category.name,
-					color: this.getColor(category.color1, EHighContrastColorType.Foreground),
+					name: this.measure1DisplayName,
+					color: "",
+					pattern: undefined
+				}
+			},
+			{
+				data: {
+					name: this.measure2DisplayName,
+					color: "",
+					pattern: undefined
+				}
+			}
+			];
+		} else {
+			legend1DataPoints = this.subCategoriesName.map((name) => ({
+				data: {
+					name: name,
+					color: this.getColor(this.subCategoryColorPair[name].marker1Color, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			}));
 
-			legend2DataPoints = this.subCategories.map((category) => ({
+			legend2DataPoints = this.subCategoriesName.map((name) => ({
 				data: {
-					name: category.name,
-					color: this.getColor(category.color2, EHighContrastColorType.Foreground),
+					name: name,
+					color: this.getColor(this.subCategoryColorPair[name].marker1Color, EHighContrastColorType.Foreground),
 					pattern: undefined
 				}
 			}));
@@ -6263,7 +6278,6 @@ export class Visual extends Shadow {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					})
 					.attr("id", CircleType.Circle1)
-					.classed(this.circleClass, true)
 					.classed("chart-circle1", true);
 
 				setPath1Formatting(path1Selection);
@@ -6288,7 +6302,7 @@ export class Visual extends Shadow {
 							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 						})
 						.attr("id", CircleType.Circle2)
-						.classed(this.circleClass, true).classed("chart-circle2", true);
+						.classed("chart-circle2", true);
 
 					setPath2Formatting(path2Selection);
 					setCircleFormatting(circle2Selection, true, marker, true);

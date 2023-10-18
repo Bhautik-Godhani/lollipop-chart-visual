@@ -6,7 +6,7 @@ import { DataValuesType } from '../enum';
 export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: Visual, d: any) => any): void => {
     self.visualAnnotations = new VisualAnnotations({
         rootElement: self.svg,
-        nodeElements: self.isHasSubcategories ? selectAll(".pie-slice") : selectAll(".lollipop-circle"),
+        nodeElements: self.isLollipopTypePie ? selectAll(".pie-slice") : selectAll(".lollipop-circle"),
         arcMethod: null,
         shadow: self as any,
         annotationSettings: { object: "editor", key: "annotations" },
@@ -25,11 +25,11 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
 
 export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
     const dataPoint = {
-        name: d.category,
-        width: self.isHasSubcategories ? d.sliceWidth : self.circle1Size * 2,
-        height: self.isHasSubcategories ? d.sliceHeight : self.circle2Size * 2,
+        name: d.category + "-" + d.parentCategory + "-" + d.valueType,
+        width: self.isLollipopTypePie ? d.sliceWidth : self.circle1Size,
+        height: self.isLollipopTypePie ? d.sliceHeight : self.circle2Size,
         originalValue: d.defaultValue,
-        value: self.formatNumber(d.defaultValue, self.measureNumberFormatter[d.valueType === DataValuesType.Value1 ? 0 : 1]),
+        value: self.formatNumber(d.defaultValue, self.measureNumberFormatter[d.valueType === DataValuesType.Value1 ? 0 : 1])
     };
 
     dataPoint[self.measure1DisplayName] = self.formatNumber(d.value1, self.measureNumberFormatter[0]);
