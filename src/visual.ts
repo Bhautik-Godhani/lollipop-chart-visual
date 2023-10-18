@@ -2210,8 +2210,6 @@ export class Visual extends Shadow {
 			});
 		}
 
-		console.log(data);
-
 		// const category = this.categoricalData.categories[0];
 		// data.forEach((d, i) => {
 		// 	const selectionId: ISelectionId = this.vizOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
