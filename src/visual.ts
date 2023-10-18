@@ -2147,7 +2147,7 @@ export class Visual extends Shadow {
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
 						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 					selected: false,
-					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? measure1Highlights[idx] : false
+					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false
 				};
 				return [...arr, obj];
 			}, []);
@@ -2209,6 +2209,8 @@ export class Visual extends Shadow {
 				}
 			});
 		}
+
+		console.log(data);
 
 		// const category = this.categoricalData.categories[0];
 		// data.forEach((d, i) => {
@@ -5609,7 +5611,14 @@ export class Visual extends Shadow {
 				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 				ePieChart.resize();
 
-				// ele.selectAll("path").data(d.subCategories);
+				ele.selectAll("path").data(d.subCategories);
+				ele.selectAll("path").each(function () {
+					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
+					d3.select(this).datum((d: any) => {
+						return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+					})
+				})
+
 				// ele
 				// 	.selectAll("path")
 				// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.category, pieData.category))

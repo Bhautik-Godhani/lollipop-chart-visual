@@ -112,24 +112,24 @@ export class Behavior implements IInteractiveBehavior {
 		//     });
 		// }
 
-		// clearCatcher.on("click", () => {
-		//     selectionHandler.handleClearSelection();
-		//     this.renderSelection(false);
-		// });
+		clearCatcher.on("click", () => {
+			selectionHandler.handleClearSelection();
+			this.renderSelection(false);
+		});
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager } = this.options;
-		const subDataPoints = dataPoints.reduce((arr, cur) => {
-			arr = [...arr, ...cur.subCategories];
-			return arr;
-		}, []);
-		const isHasHighlights = (isHasSubcategories ? subDataPoints : dataPoints).some((d) => d.isHighlight);
+		const { lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager, interactivityService } = this.options;
+
+		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
 		const handleOpacity = (dataPoint: ILollipopChartRow, i: number) => {
+			interactivityService.applySelectionStateToData([dataPoint] as any);
+
 			const selected = dataPoint.selected;
-			const isHighlight = isHasSubcategories ? subDataPoints[i]?.isHighlight : dataPoints[i]?.isHighlight;
+			const isHighlight = dataPoint.isHighlight;
 			let opacity = 1;
+
 			if (isHasHighlights) {
 				opacity = isHighlight ? 1 : 0.4;
 			} else {
@@ -170,7 +170,7 @@ export const SetAndBindChartBehaviorOptions = (
 			lineSelection: lineSelection,
 			// legendItems: self.legends ? self.legends.legendItems : undefined,
 			legendItems: undefined,
-			dataPoints: dataPoints,
+			dataPoints: nodeData,
 			clearCatcher: self.svg,
 			interactivityService: self.interactivityService,
 			selectionManager: self.selectionManager,
