@@ -175,14 +175,14 @@ const UIColorPaletteTypes = (
 			>
 				<Row>
 					<Column>
-						{/* <ColorSchemePicker
+						<ColorSchemePicker
 							colorSchemePickerProps={values}
 							onChange={(d) => {
 								setConfigValues((t) => {
 									return { ...t, [t.markerType]: d };
 								});
 							}}
-						/> */}
+						/>
 					</Column>
 				</Row>
 			</ConditionalWrapper>
