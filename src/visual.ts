@@ -311,7 +311,7 @@ export class Visual extends Shadow {
 	public categoryLabelHeight: number;
 	public categoryLabelMargin: number = 10;
 	public yAxisStartMargin: number = 10;
-	public yAxisTicksMaxWidthRatio: number = 0.2;
+	public yAxisTicksMaxWidthRatio: number = 0.1;
 
 	// EXPAND ALL
 	public expandAllXAxisG: D3Selection<SVGElement>;
@@ -321,6 +321,8 @@ export class Visual extends Shadow {
 	public expandAllCategoriesName: string[] = [];
 	public isIdToCategoryAdded: boolean = false;
 	public isExpandAllApplied: boolean = false;
+	public expandAllYAxisMaxCharsLength: number = 8;
+	public expandAllYScaleWidth: { [displayName: string]: number } = {};
 
 	// lollipop
 	public lollipopSelection: D3Selection<SVGElement>;
@@ -1439,8 +1441,8 @@ export class Visual extends Shadow {
 
 	expandAllCode(): void {
 		if (this.isExpandAllApplied) {
-			const { labelFontFamily, labelFontSize } = this.xAxisSettings;
 			if (!this.isHorizontalChart) {
+				const { labelFontFamily, labelFontSize } = this.xAxisSettings;
 				this.expandAllYScaleGWidth = 0;
 				this.expandAllXScaleGHeight = getSVGTextSize("XAxis", labelFontFamily, labelFontSize).height * this.expandAllCategoriesName.length;
 				this.expandAllCategoriesName.forEach((d) => {
@@ -1451,9 +1453,28 @@ export class Visual extends Shadow {
 						.classed("expandAllXAxisG", true);
 				});
 			} else {
+				const { labelFontFamily, labelFontSize } = this.xAxisSettings;
 				this.expandAllXScaleGHeight = 0;
-				this.expandAllYScaleGWidth = this.width * this.yAxisTicksMaxWidthRatio * this.expandAllCategoriesName.length;
+
+				const text = new Array(this.expandAllYAxisMaxCharsLength).fill("A").join("");
+				const textWidth = getSVGTextSize(text, labelFontFamily, labelFontSize).width;
+				const expandAllYScaleGWidth = this.width * this.yAxisTicksMaxWidthRatio;
+
+				if (expandAllYScaleGWidth > 25 && expandAllYScaleGWidth < textWidth) {
+					this.expandAllYScaleGWidth = expandAllYScaleGWidth * this.expandAllCategoriesName.length;
+				} else if (expandAllYScaleGWidth < 25) {
+					this.expandAllYScaleGWidth = 25 * this.expandAllCategoriesName.length;
+				} else if (expandAllYScaleGWidth > textWidth) {
+					this.expandAllYScaleGWidth = textWidth * this.expandAllCategoriesName.length;
+				}
+
 				this.expandAllCategoriesName.forEach((d) => {
+					// const expandAxisMaxCharsLength = d3.max(categoricalCategoriesFields.find(c => c.source.displayName === d).values, (v: any) => v.length);
+					// const text = new Array(expandAxisMaxCharsLength < this.expandAllYAxisMaxCharsLength ? expandAxisMaxCharsLength : this.expandAllYAxisMaxCharsLength).fill("a").join("");
+					// const textWidth = getSVGTextSize(text, labelFontFamily, labelFontSize).width;
+					// this.expandAllYScaleGWidth += textWidth;
+					// this.expandAllYScaleWidth[d] = textWidth;
+
 					this[d + "Scale"] = undefined;
 					this[d + "ScaleG"] = this.expandAllYAxisG
 						.append("g")
@@ -1481,6 +1502,9 @@ export class Visual extends Shadow {
 			this.brushWidth = 0;
 			this.brushHeight = 0;
 			this.isChartIsRaceChart = false;
+			this.categoricalCategoriesLastIndex = 0;
+			this.expandAllXScaleGHeight = 0;
+			this.expandAllYScaleGWidth = 0;
 
 			const isReturn = this.renderErrorMessages();
 
@@ -1760,6 +1784,15 @@ export class Visual extends Shadow {
 
 			if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
 				this.drawXYAxis();
+
+				if (this.categoricalCategoriesLastIndex > 0) {
+					if (!this.isHorizontalChart) {
+						RenderExpandAllXAxis(this, this.categoricalData);
+					} else {
+						RenderExpandAllYAxis(this, this.categoricalData);
+					}
+				}
+
 				this.displayBrush();
 			} else {
 				this.drawXYAxis();
@@ -1778,17 +1811,17 @@ export class Visual extends Shadow {
 					if (this.isBottomXAxis) {
 						this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (this.height + this.xScaleGHeight) + "px" + ")");
 					} else {
-						this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-this.xScaleGHeight - this.expandAllXScaleGHeight) + "px" + ")");
+						this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-this.xScaleGHeight) + "px" + ")");
 					}
 
 					CallExpandAllXScaleOnAxisGroup(this, this.scaleBandWidth);
 				} else {
 					if (this.isLeftYAxis) {
-						this.expandAllYAxisG.style("transform", "translate(" + -this.expandAllYScaleGWidth + "px" + "," + 0 + "px" + ")");
+						this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
 					} else {
-						this.expandAllYAxisG.style("transform", "translate(" + (this.height + this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
+						this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
 					}
-					CallExpandAllYScaleOnAxisGroup(this, this.width * this.yAxisTicksMaxWidthRatio);
+					CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
 				}
 			}
 
@@ -2983,11 +3016,19 @@ export class Visual extends Shadow {
 
 		if (this.isExpandAllApplied) {
 			this.expandAllCategoriesName.forEach((d, i) => {
-				self[`${d}Scale`].domain(self[`${d}ScaleNewDomain`]);
+				this[`${d}Scale`].domain(this[`${d}ScaleNewDomain`]);
 			});
 		}
 
-		CallExpandAllXScaleOnAxisGroup(this, scaleWidth);
+		if (this.isExpandAllApplied) {
+			if (!this.isHorizontalChart) {
+				CallExpandAllXScaleOnAxisGroup(this, scaleWidth);
+			}
+
+			if (this.isHorizontalChart) {
+				CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
+			}
+		}
 
 		this.drawLollipopChart();
 	}
@@ -3989,7 +4030,7 @@ export class Visual extends Shadow {
 		this.xAxisG
 			.selectAll("text")
 			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
-			.attr("dy", isApplyTilt ? "-0.5em" : "0.32em")
+			.attr("dy", isApplyTilt ? "-0.5em" : "0.35em")
 			.attr("y", () => {
 				if (this.isHorizontalChart) {
 					return this.isBottomXAxis ? 9 : -9;
@@ -3997,7 +4038,7 @@ export class Visual extends Shadow {
 					return this.isBottomXAxis ? 9 : 9;
 				}
 			})
-			// .attr("dy", isApplyTilt ? "0" : "0.32em")
+			// .attr("dy", isApplyTilt ? "0" : "0.35em")
 			.attr("fill", this.getColor(xAxisSettings.labelColor, EHighContrastColorType.Foreground))
 			.style("font-family", xAxisSettings.labelFontFamily)
 			.attr("font-size", xAxisSettings.labelFontSize)
