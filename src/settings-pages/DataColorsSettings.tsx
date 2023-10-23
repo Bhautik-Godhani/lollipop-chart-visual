@@ -51,10 +51,10 @@ const handleColorChange = (rgb, n, markerType: EMarkerColorTypes, setConfigValue
 	}));
 };
 
-const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const handleCheckbox = (n, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[n]: !d[n],
+		[markerType]: { ...d[markerType], [n]: !d[markerType][n], },
 	}));
 };
 
@@ -105,7 +105,7 @@ const UIGradientColorPalette = (
 						handleMidColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMid, configValues.markerType, setConfigValues)}
 						handleMaxColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMax, configValues.markerType, setConfigValues)}
 						enableMidColor={values.isAddMidColor}
-						toggleEnableMidColor={() => handleCheckbox(EDataColorsSettings.IsAddMidColor, setConfigValues)}
+						toggleEnableMidColor={() => handleCheckbox(EDataColorsSettings.IsAddMidColor, configValues.markerType, setConfigValues)}
 						colorPalette={vizOptions.host.colorPalette}
 						label=""
 					/>
