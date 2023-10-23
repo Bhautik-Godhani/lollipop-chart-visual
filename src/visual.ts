@@ -214,6 +214,7 @@ export class Visual extends Shadow {
 	subCategoryDisplayName: string;
 	categoriesName: string[] = [];
 	measureNames: string[] = [];
+	imagesDataFieldsName: string[] = [];
 	subCategoriesName: string[] = [];
 	measure1DisplayName: string;
 	measure2DisplayName: string;
@@ -490,7 +491,7 @@ export class Visual extends Shadow {
 				sectionName: "visualGeneralSettings",
 				propertyName: "summaryTableToggle",
 			},
-			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip],
+			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
 			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
 			components: [
@@ -1416,6 +1417,7 @@ export class Visual extends Shadow {
 		this.isHasImagesData = !!this.categoricalImagesDataField;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
+		this.imagesDataFieldsName = [this.categoricalImagesDataField.source.displayName] as any;
 
 		if (this.isChartIsRaceChart) {
 			this.raceChartKeyLabelList =
@@ -5884,7 +5886,7 @@ export class Visual extends Shadow {
 		this.summaryTableConfig = {
 			excludeNegativeDataBy: this.isHasSubcategories ? "cell" : "row",
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
-			excludeDataRolesFromTable: [EDataRolesName.SubCategory, EDataRolesName.ImagesData],
+			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
 			dataView: this.vizOptions.options.dataViews as any,
 			gridView: "tabular",
 			gridConfig: {
@@ -5894,6 +5896,10 @@ export class Visual extends Shadow {
 			numberFormatter: (value, field) => {
 				if (this.isHasSubcategories) {
 					field = field.split("_").splice(3).join("_");
+				}
+
+				if (this.imagesDataFieldsName.includes(field)) {
+					return value;
 				}
 
 				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
