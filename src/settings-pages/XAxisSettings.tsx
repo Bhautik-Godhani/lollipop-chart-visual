@@ -84,14 +84,14 @@ const XAxisSettings = (props) => {
   React.useEffect(() => {
     if (configValues.isDisplayTitle) {
       if (configValues.titleName.length === 0) {
-        if (shadow.isHorizontalChart) {
+        if (shadow.isHasMultiMeasure) {
           handleChange(shadow.measureNames.join(" and "), EXAxisSettings.TitleName);
         } else {
           handleChange(shadow.categoryDisplayName, EXAxisSettings.TitleName);
         }
       }
     }
-  }, []);
+  }, [configValues.isDisplayTitle]);
 
   return (
     <>

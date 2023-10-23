@@ -1417,7 +1417,10 @@ export class Visual extends Shadow {
 		this.isHasImagesData = !!this.categoricalImagesDataField;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
-		this.imagesDataFieldsName = [this.categoricalImagesDataField.source.displayName] as any;
+
+		if (this.isHasImagesData) {
+			this.imagesDataFieldsName = [this.categoricalImagesDataField.source.displayName] as any;
+		}
 
 		if (this.isChartIsRaceChart) {
 			this.raceChartKeyLabelList =
@@ -5884,7 +5887,6 @@ export class Visual extends Shadow {
 
 	setSummaryTableConfig(): void {
 		this.summaryTableConfig = {
-			excludeNegativeDataBy: this.isHasSubcategories ? "cell" : "row",
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
 			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
 			dataView: this.vizOptions.options.dataViews as any,

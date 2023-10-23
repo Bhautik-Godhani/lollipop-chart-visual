@@ -91,14 +91,14 @@ const YAxisSettings = (props) => {
   React.useEffect(() => {
     if (configValues.isDisplayTitle) {
       if (configValues.titleName.length === 0) {
-        if (shadow.isHorizontalChart) {
+        if (shadow.isHasMultiMeasure) {
           handleChange(shadow.categoryDisplayName, EYAxisSettings.TitleName);
         } else {
           handleChange(shadow.measureNames.join(" and "), EYAxisSettings.TitleName);
         }
       }
     }
-  }, []);
+  }, [configValues.isDisplayTitle]);
 
   return (
     <>
