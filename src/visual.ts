@@ -5889,6 +5889,7 @@ export class Visual extends Shadow {
 		this.summaryTableConfig = {
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
 			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
+			excludeNegativeDataBy: "cell",
 			dataView: this.vizOptions.options.dataViews as any,
 			gridView: "tabular",
 			gridConfig: {
