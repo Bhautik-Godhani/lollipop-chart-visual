@@ -25,6 +25,8 @@ export class Enumeration {
 			getEditorSelection(),
 			getPatternSelection(),
 			getRaceChartSelection(),
+			getReferenceLinesSelection(),
+			getBrushAndZoomAreaConfigSelection()
 		];
 	}
 }
@@ -78,7 +80,7 @@ function getVisualGeneralSettingsSelection(): EnumerateSectionType {
 function getChartConfigSelection(): EnumerateSectionType {
 	return {
 		name: "chartConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "chartSettings",
@@ -91,7 +93,7 @@ function getChartConfigSelection(): EnumerateSectionType {
 function getMarkerConfigSelection(): EnumerateSectionType {
 	return {
 		name: "markerConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "markerSettings",
@@ -105,7 +107,7 @@ function getMarkerConfigSelection(): EnumerateSectionType {
 function getDataColorsConfigSelection(): EnumerateSectionType {
 	return {
 		name: "dataColorsConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "dataColorsSettings",
@@ -118,7 +120,7 @@ function getDataColorsConfigSelection(): EnumerateSectionType {
 function getLineConfigSelection(): EnumerateSectionType {
 	return {
 		name: "lineConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "lineSettings",
@@ -131,7 +133,7 @@ function getLineConfigSelection(): EnumerateSectionType {
 function getDataLabelsConfigSelection(): EnumerateSectionType {
 	return {
 		name: "dataLabelsConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "dataLabelsSettings",
@@ -144,7 +146,7 @@ function getDataLabelsConfigSelection(): EnumerateSectionType {
 function getGridLinesConfigSelection(): EnumerateSectionType {
 	return {
 		name: "gridLinesConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "gridLinesSettings",
@@ -157,7 +159,7 @@ function getGridLinesConfigSelection(): EnumerateSectionType {
 function getRankingConfigSelection(): EnumerateSectionType {
 	return {
 		name: "rankingConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "rankingSettings",
@@ -170,7 +172,7 @@ function getRankingConfigSelection(): EnumerateSectionType {
 function getSortingConfigSelection(): EnumerateSectionType {
 	return {
 		name: "sortingConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "sorting",
@@ -183,7 +185,7 @@ function getSortingConfigSelection(): EnumerateSectionType {
 function getXAxisConfigSelection(): EnumerateSectionType {
 	return {
 		name: "xAxisConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "xAxisSettings",
@@ -196,7 +198,7 @@ function getXAxisConfigSelection(): EnumerateSectionType {
 function getYAxisConfigSelection(): EnumerateSectionType {
 	return {
 		name: "yAxisConfig",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "yAxisSettings",
@@ -389,6 +391,7 @@ function getFooterSelection(): EnumerateSectionType {
 		]
 	}
 }
+
 function getEditorSelection(): EnumerateSectionType {
 	return {
 		name: 'editor',
@@ -426,6 +429,32 @@ function getRaceChartSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "raceChartSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getReferenceLinesSelection(): EnumerateSectionType {
+	return {
+		name: "referenceLinesConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "referenceLinesSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getBrushAndZoomAreaConfigSelection(): EnumerateSectionType {
+	return {
+		name: "brushAndZoomAreaConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "brushAndZoomAreaSettings",
 				isShow: true,
 			},
 		],
