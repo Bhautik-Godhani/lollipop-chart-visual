@@ -1,7 +1,7 @@
 import { Visual } from "../visual";
-import { select as d3Select, Selection } from "d3-selection";
+import { select as d3Select, select, Selection } from "d3-selection";
 import { min as d3Min, max as d3Max, mean, median } from "d3-array";
-import { EBeforeAfterPosition, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLinesType, EXYAxisNames, Position } from "../enum";
+import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLinesType, EXYAxisNames, Position } from "../enum";
 import { scaleLinear } from "d3";
 import { IReferenceLinesSettings } from "../visual-settings.interface";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
@@ -121,12 +121,21 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
         .attr("opacity", (d) => {
             return d.x1 !== undefined && d.x2 !== undefined && d.y1 !== undefined && d.y2 !== undefined ? "1" : "0";
         });
+
+    const clonedTitle = select(textSelection as any).node().clone(true);
+    clonedTitle
+        .lower()
+        .attr("class", "title-shadow")
+        .attr("stroke", d => self.getColor(d.labelBackgroundColor, EHighContrastColorType.Background))
+        .attr("stroke-width", 5)
+        .attr("stroke-linejoin", "round")
+        .attr("opacity", d => d.isShowLabelBackground ? "1" : "0");
 }
 
 export const RenderReferenceLineLayers = (self: Visual, referenceLinesData: IReferenceLinesSettings[]): void => {
     const referenceLineLayersSelection = self.referenceLineLayersG
         .selectAll(".referenceLineLayer")
-        .data(referenceLinesData ?? [], (d, i) => Math.random());
+        .data(referenceLinesData ? referenceLinesData : [], (d, i) => Math.random());
 
     referenceLineLayersSelection.join(
         (enter) => {

@@ -6430,7 +6430,7 @@ export class Visual extends Shadow {
 		) as any;
 	}
 
-	private getColor(color: string, highContrastColorType: EHighContrastColorType): string {
+	public getColor(color: string, highContrastColorType: EHighContrastColorType): string {
 		if (this._host.colorPalette.isHighContrast) {
 			if (highContrastColorType == EHighContrastColorType.Foreground) {
 				return this._host.colorPalette.foreground.value;

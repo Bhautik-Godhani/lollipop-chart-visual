@@ -600,15 +600,28 @@ const AddReferenceLines = ({ shadow, details, onAdd, onDelete, onUpdate, index, 
 
         <Row>
           <Column>
-            <ColorPicker
-              label={"Background"}
-              color={configValues.labelBackgroundColor}
-              handleChange={value => handleChange(value, "labelBackgroundColor")}
-              colorPalette={vizOptions.host.colorPalette}
-              size="sm"
+            <ToggleButton
+              label="Show Background"
+              value={configValues.isShowLabelBackground}
+              handleChange={() => handleCheckbox("isShowLabelBackground")}
+              appearance="toggle"
             />
           </Column>
         </Row>
+
+        <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+          <Row>
+            <Column>
+              <ColorPicker
+                label={"Background"}
+                color={configValues.labelBackgroundColor}
+                handleChange={value => handleChange(value, "labelBackgroundColor")}
+                colorPalette={vizOptions.host.colorPalette}
+                size="sm"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
         <Row>
           <Column>

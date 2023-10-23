@@ -381,6 +381,7 @@ export interface IReferenceLinesSettings {
 	label: string;
 	labelFontFamily: string;
 	labelColor: string;
+	isShowLabelBackground: boolean;
 	labelBackgroundColor: string;
 	autoFontSize: boolean;
 	labelFontSize: string;
