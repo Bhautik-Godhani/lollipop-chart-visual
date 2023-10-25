@@ -145,18 +145,21 @@ const ReferenceLines = (props) => {
 
   const onAdd = (details) => {
     initialStates.push(details);
+    setInitialStates([...initialStates]);
     applyChanges(initialStates);
     closeAddEdit();
   };
 
   const onDelete = (index) => {
     initialStates.splice(index, 1);
+    setInitialStates([...initialStates]);
     applyChanges(initialStates);
     closeAddEdit();
   };
 
   const onUpdate = (index, details) => {
     initialStates[index] = details;
+    setInitialStates([...initialStates]);
     applyChanges(initialStates);
     closeAddEdit();
   };
