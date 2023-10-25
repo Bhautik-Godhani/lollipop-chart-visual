@@ -4604,7 +4604,7 @@ export class Visual extends Shadow {
 				if (!this.isLeftYAxis) {
 					if (d.value1 > d.value2) {
 						const Y1 = THIS.xScale(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.xScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0);
+						const Y2 = THIS.xScale(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4614,7 +4614,7 @@ export class Visual extends Shadow {
 						}
 					} else {
 						const Y1 = THIS.xScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.xScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value1 : 0) : 0);
+						const Y2 = THIS.xScale(d.value1);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4703,7 +4703,7 @@ export class Visual extends Shadow {
 				if (this.isBottomXAxis) {
 					if (d.value1 > d.value2) {
 						const Y1 = THIS.yScale(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.yScale(THIS.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0);
+						const Y2 = THIS.yScale(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4713,7 +4713,7 @@ export class Visual extends Shadow {
 						}
 					} else {
 						const Y1 = THIS.yScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.yScale(THIS.isHasMultiMeasure ? (d.value1 ? d.value1 : 0) : 0);
+						const Y2 = THIS.yScale(d.value1);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4794,6 +4794,12 @@ export class Visual extends Shadow {
 	}
 
 	drawLollipopChart(): void {
+		this.chartData.forEach(d => {
+			if (!this.isHasMultiMeasure) {
+				d.value2 = this.yScale.domain()[0];
+			}
+		});
+
 		if (this.isLollipopTypeCircle) {
 			this.setCircle1Radius();
 			this.setCircle2Radius();
@@ -6287,7 +6293,7 @@ export class Visual extends Shadow {
 				.attr("y2", (d) => {
 					if (d.value1 > d.value2) {
 						const Y1 = this.brushYScale(d.value1);
-						const Y2 = this.brushYScale(this.isHasMultiMeasure ? (d.value2 ? d.value2 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+						const Y2 = this.brushYScale(d.value2) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
 
 						if (Y2 > Y1) {
 							return Y2;
@@ -6296,7 +6302,7 @@ export class Visual extends Shadow {
 						}
 					} else {
 						const Y1 = this.brushYScale(d.value2);
-						const Y2 = this.brushYScale(this.isHasMultiMeasure ? (d.value1 ? d.value1 : 0) : 0) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
+						const Y2 = this.brushYScale(d.value1) - (this.isHasMultiMeasure ? this.brushAndZoomAreaCircleSize : 0);
 
 						if (Y2 > Y1) {
 							return Y2;
