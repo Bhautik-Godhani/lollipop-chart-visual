@@ -1,7 +1,7 @@
 {
 	"visual": {
-		"name": "lollipopChart",
-		"displayName": "LollipopChart",
+		"name": "Lollipop Chart",
+		"displayName": "Lollipop Chart by Powerviz",
 		"guid": "lollipopChart50393786178B4137A75F3257CB590B96",
 		"visualClassName": "Visual",
 		"version": "1.0.0",
