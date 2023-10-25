@@ -5,6 +5,7 @@ import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
 import { ColorPaletteType, EDataColorsSettings, EMarkerColorTypes } from "../enum";
 import { parseObject } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 
 const colorPaletteDropdownList = [
 	{
@@ -124,11 +125,18 @@ const UIByCategoryColorPalette = (
 	return (
 		<ConditionalWrapper visible={values.fillType === ColorPaletteType.ByCategory}>
 			{values.categoryColors.map((categoryColor, ci) => {
+				const categoryNameProperties = {
+					text: categoryColor.name,
+					fontFamily: "sans-serif",
+					fontSize: 11.5 + "px",
+				};
+				const categoryName = textMeasurementService.getTailoredTextOrDefault(categoryNameProperties, 170);
+
 				return (
 					<Row>
 						<Column>
 							<ColorPicker
-								label={categoryColor.name}
+								label={categoryName}
 								color={categoryColor[configValues.markerType]}
 								handleChange={(value) => handleCategoryChange(value, ci, configValues.markerType, setConfigValues)}
 								colorPalette={vizOptions.host.colorPalette}
