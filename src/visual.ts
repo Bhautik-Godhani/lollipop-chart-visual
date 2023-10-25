@@ -389,6 +389,7 @@ export class Visual extends Shadow {
 	legend2MarginLeft: number = 0;
 	legendViewPortWidth: number = 0;
 	legendViewPortHeight: number = 0;
+	isShowLegendBasedOnMarkerType: boolean;
 
 	// show bucket
 	isValidShowBucket = true;
@@ -1779,6 +1780,10 @@ export class Visual extends Shadow {
 				this.svg.style("left", 0 + "px");
 			}
 
+			const isShowLegendBasedOnMarkerType = this.isHasSubcategories;
+			this.toggleLegendBasedOnMarkerType(isShowLegendBasedOnMarkerType);
+			this.isShowLegendBasedOnMarkerType = isShowLegendBasedOnMarkerType;
+
 			this.setMargins();
 
 			this.svg
@@ -1912,6 +1917,34 @@ export class Visual extends Shadow {
 			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
+		}
+	}
+
+	private toggleLegendBasedOnMarkerType(isShowLegend: boolean): void {
+		if (isShowLegend !== this.isShowLegendBasedOnMarkerType) {
+			if (isShowLegend && !this.legendSettings.show) {
+				this._host.persistProperties({
+					merge: [
+						{
+							objectName: EVisualSettings.Legend,
+							properties: { show: true },
+							selector: null,
+						},
+					],
+				});
+			}
+
+			// else if (!isGroupingPresent && this.legendSettings.show) { 
+			// 	this._host.persistProperties({
+			// 		merge: [
+			// 			{
+			// 				objectName: EVisualSettings.Legend,
+			// 				properties: { show: false },
+			// 				selector: null,
+			// 			},
+			// 		],
+			// 	});
+			// }
 		}
 	}
 
