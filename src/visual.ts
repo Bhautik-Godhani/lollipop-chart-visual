@@ -3791,7 +3791,7 @@ export class Visual extends Shadow {
 
 				const rectSelection = dataLabelGSelection.select(".dataLabelRect");
 
-				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection, false);
+				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection, true);
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
