@@ -176,8 +176,8 @@ export class Visual extends Shadow {
 	public viewPortHeight: number;
 	public margin: { top: number; right: number; bottom: number; left: number };
 	public chartData: ILollipopChartRow[];
-	public legends1Data: { data: { name: string, color: string, pattern: string } }[] = [];
-	public legends2Data: { data: { name: string, color: string, pattern: string } }[] = [];
+	public legends1Data: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
+	public legends2Data: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
 	public legendViewPort: { width: number; height: number } = { width: 0, height: 0 };
 	public isInFocusMode: boolean = false;
 	public isVisualResized: boolean = false;
@@ -5765,8 +5765,8 @@ export class Visual extends Shadow {
 
 	// Legend
 	setLegendsData(): void {
-		let legend1DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
-		let legend2DataPoints: { data: { name: string, color: string, pattern: string } }[] = [];
+		let legend1DataPoints: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
+		let legend2DataPoints: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
 
 		if (this.isLollipopTypeCircle) {
 			legend1DataPoints = [{
@@ -5789,7 +5789,7 @@ export class Visual extends Shadow {
 				data: {
 					name: name,
 					color: this.getColor(this.subCategoryColorPair[name].marker1Color, EHighContrastColorType.Foreground),
-					pattern: undefined
+					pattern: this.subCategoryPatterns.find(d => d.name === name)
 				}
 			}));
 
@@ -5797,7 +5797,7 @@ export class Visual extends Shadow {
 				data: {
 					name: name,
 					color: this.getColor(this.subCategoryColorPair[name].marker1Color, EHighContrastColorType.Foreground),
-					pattern: undefined
+					pattern: this.subCategoryPatterns.find(d => d.name === name)
 				}
 			}));
 		}

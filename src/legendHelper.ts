@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as d3 from "d3";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import { generatePattern } from "./methods/methods";
