@@ -2783,6 +2783,13 @@ export class Visual extends Shadow {
 		if (this.isHasMultiMeasure) {
 			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
+
+		if (this.rankingSettings.category.enabled) {
+			if (this.rankingSettings.category.showRemainingAsOthers) {
+				this.categoryColorPair[this.othersBarText].marker1Color = this.rankingSettings.category.othersColor;
+				this.categoryColorPair[this.othersBarText].marker2Color = this.rankingSettings.category.othersColor;
+			}
+		}
 	}
 
 	setPieColors(): void {
@@ -5353,7 +5360,13 @@ export class Visual extends Shadow {
 		const id = this.chartData.findIndex((data) => data.category === category);
 		const pieType = isPie2 ? PieType.Pie2 : PieType.Pie1;
 		const getPieFill = (d: IChartSubCategory) => {
-			const color = isPie2 ? this.subCategoryColorPair[d.category].marker2Color : this.subCategoryColorPair[d.category].marker1Color;
+			let color;
+			if (d.parentCategory === this.othersBarText) {
+				color = this.rankingSettings.category.othersColor;
+			} else {
+				color = isPie2 ? this.subCategoryColorPair[d.category].marker2Color : this.subCategoryColorPair[d.category].marker1Color;
+			}
+
 			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 				return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 			} else {

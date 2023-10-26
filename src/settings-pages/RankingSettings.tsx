@@ -2,6 +2,7 @@ import * as React from "react";
 import { RANKING_SETTINGS as RANKING_SETTINGS_IMP } from "../constants";
 import {
 	Accordion,
+	ColorPicker,
 	// ColorPicker,
 	Column,
 	ConditionalWrapper,
@@ -46,6 +47,13 @@ const handleCheckbox = (n, key, setConfigValues: React.Dispatch<React.SetStateAc
 	}));
 };
 
+const handleColorChange = (rgb, n, key, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[key]: { ...d[key], [n]: rgb },
+	}));
+};
+
 const UIByCategoryRankingSettings = (
 	vizOptions: ShadowUpdateOptions,
 	categoryRanking: ICategoryRankingProps,
@@ -79,44 +87,44 @@ const UIByCategoryRankingSettings = (
 				</Column>
 			</Row>
 
-			{/* {UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)} */}
+			{UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)}
 		</>
 	);
 };
 
-// const UIByCategoryRankingOthersSettings = (
-// 	vizOptions: ShadowUpdateOptions,
-// 	categoryRanking: IRankingProps,
-// 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
-// ) => {
-// 	return (
-// 		<>
-// 			<Row>
-// 				<Column>
-// 					<ToggleButton
-// 						label={"Show remaining as 'Others'"}
-// 						value={categoryRanking.showRemainingAsOthers}
-// 						handleChange={() => handleCheckbox(ERankingSettings.ShowRemainingAsOthers, ERankingSettings.Category, setConfigValues)}
-// 						appearance="toggle"
-// 					/>
-// 				</Column>
-// 			</Row>
+const UIByCategoryRankingOthersSettings = (
+	vizOptions: ShadowUpdateOptions,
+	categoryRanking: ICategoryRankingProps,
+	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+) => {
+	return (
+		<>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Show remaining as 'Others'"}
+						value={categoryRanking.showRemainingAsOthers}
+						handleChange={() => handleCheckbox(ERankingSettings.ShowRemainingAsOthers, ERankingSettings.Category, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
 
-// 			<ConditionalWrapper visible={categoryRanking.showRemainingAsOthers}>
-// 				<Row>
-// 					<Column>
-// 						<ColorPicker
-// 							label={"'Others' Bar Color"}
-// 							color={categoryRanking.othersColor}
-// 							handleChange={(value) => handleColorChange(value, ERankingSettings.OthersColor, ERankingSettings.Category, setConfigValues)}
-// 							colorPalette={vizOptions.host.colorPalette}
-// 						/>
-// 					</Column>
-// 				</Row>
-// 			</ConditionalWrapper>
-// 		</>
-// 	);
-// };
+			<ConditionalWrapper visible={categoryRanking.showRemainingAsOthers}>
+				<Row>
+					<Column>
+						<ColorPicker
+							label={"'Others' Bar Color"}
+							color={categoryRanking.othersColor}
+							handleChange={(value) => handleColorChange(value, ERankingSettings.OthersColor, ERankingSettings.Category, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+		</>
+	);
+};
 
 const UIByGroupRankingSettings = (
 	vizOptions: ShadowUpdateOptions,
