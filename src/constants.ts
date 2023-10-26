@@ -268,7 +268,7 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: { isAutoMarkerSize: true, markerSize: 0 },
 	marker2Style: { isAutoMarkerSize: true, markerSize: 0 },
-	isShowImageMarker: true
+	selectedImageDataField: undefined
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {

@@ -364,7 +364,7 @@ export enum EMarkerSettings {
 	MarkerStyleType = "markerStyleType",
 	IsAutoMarkerSize = "isAutoMarkerSize",
 	MarkerSize = "markerSize",
-	IsShowImageMarker = "isShowImageMarker"
+	SelectedImageDataField = "selectedImageDataField"
 }
 
 export enum ERaceChartSettings {
@@ -387,6 +387,7 @@ export enum EMarkerTypes {
 
 export enum EMarkerShapeTypes {
 	DEFAULT = "default",
+	IMAGES = "images",
 	ICONS_LIST = "icons-list",
 	UPLOAD_ICON = "upload-icon"
 }

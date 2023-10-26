@@ -158,7 +158,7 @@ export interface IMarkerSettings {
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: MarkerStyleProps;
 	marker2Style: MarkerStyleProps;
-	isShowImageMarker: boolean;
+	selectedImageDataField: string;
 }
 
 export interface MarkerStyleProps {

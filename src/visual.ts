@@ -201,7 +201,7 @@ export class Visual extends Shadow {
 	public categoricalTooltipFields: powerbi.DataViewValueColumn[];
 	public categoricalSortFields: powerbi.DataViewValueColumn[];
 	public categoricalReferenceLinesDataFields: powerbi.DataViewValueColumn[] = [];
-	public categoricalImagesDataField: powerbi.DataViewValueColumn;
+	public categoricalImagesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
@@ -1402,7 +1402,7 @@ export class Visual extends Shadow {
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		this.categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
 		this.categoricalSortFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Sort]);
-		this.categoricalImagesDataField = categoricalData.values.find((d) => !!d.source.roles[EDataRolesName.ImagesData]);
+		this.categoricalImagesDataFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ImagesData]);
 
 		if (this.measureNames.length > 1) {
 			this.categoricalMeasure1Field = this.categoricalMeasureFields[0];
@@ -1415,12 +1415,12 @@ export class Visual extends Shadow {
 
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
-		this.isHasImagesData = !!this.categoricalImagesDataField;
+		this.isHasImagesData = this.categoricalImagesDataFields.length > 0;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
 
 		if (this.isHasImagesData) {
-			this.imagesDataFieldsName = [this.categoricalImagesDataField.source.displayName] as any;
+			this.imagesDataFieldsName = [...new Set(this.categoricalImagesDataFields.map(d => d.source.displayName))];
 		}
 
 		if (this.isChartIsRaceChart) {
@@ -1433,6 +1433,14 @@ export class Visual extends Shadow {
 					return arr;
 				}, [])
 					.filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
+		}
+
+		if (this.isHasImagesData && (!this.markerSettings.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.selectedImageDataField))) {
+			this.markerSettings.selectedImageDataField = this.imagesDataFieldsName[0];
+		}
+
+		if (!this.isHasImagesData && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES) {
+			this.markerSettings.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
 		// if (!this.isHasSubcategories) {
@@ -1665,9 +1673,8 @@ export class Visual extends Shadow {
 				vizOptions.options.viewport.height
 			);
 
-			this.isShowImageMarker = !this.isHasSubcategories
-				&& this.markerSettings.isShowImageMarker
-				&& this.isHasImagesData;
+			this.isShowImageMarker = this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES
+				&& this.isHasImagesData && !!this.markerSettings.selectedImageDataField;
 
 			this.conditionalFormattingConditions
 				.forEach((cf: IConditionalFormattingProps) => {
@@ -2249,6 +2256,8 @@ export class Visual extends Shadow {
 					this.raceChartKeysList.push(raceChartKey);
 				}
 
+				const selectedImageDataFieldIndex = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.selectedImageDataField);
+
 				const obj: ILollipopChartRow = {
 					uid: getUID(cat),
 					category: <string>cat,
@@ -2256,7 +2265,7 @@ export class Visual extends Shadow {
 					raceChartDataLabel,
 					value1: !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0,
 					value2: this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0,
-					imageDataUrl: this.isHasImagesData ? <string>this.categoricalImagesDataField.values[idx] : null,
+					imageDataUrl: this.isHasImagesData && this.isShowImageMarker ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex].values[idx] : null,
 					identity: undefined,
 					selected: false,
 					isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
