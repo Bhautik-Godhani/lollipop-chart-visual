@@ -154,7 +154,8 @@ const UIGeneralChartSettings = (
 						<Row>
 							<Column>
 								<InputControl
-									min={0}
+									min={shadow.brushAndZoomAreaMinHeight}
+									max={shadow.height / 2}
 									type="number"
 									label="Height"
 									value={configValues.height}
