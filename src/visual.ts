@@ -4111,7 +4111,7 @@ export class Visual extends Shadow {
 			// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, -10)rotate(${this.getXAxisLabelTilt()})`;
 			// 	}
 			// })
-			.each(function () {
+			.each(function (d, i) {
 				const ele = d3.select(this);
 				const text = ele.text();
 				ele.text("");
@@ -4548,6 +4548,32 @@ export class Visual extends Shadow {
 
 		this.xAxisG.selectAll(".tick").style("display", this.xAxisSettings.isDisplayLabel ? "block" : "none");
 		this.yAxisG.selectAll(".tick").style("display", this.yAxisSettings.isDisplayLabel ? "block" : "none");
+
+		// Truncate the ticks which are overlaps with the Y axis
+		const THIS = this;
+		this.xAxisG
+			.selectAll(".tick")
+			.selectAll("text")
+			.each(function () {
+				const ele = d3.select(this);
+				const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
+
+				if (bBox.x < 0) {
+					const textProperties: TextProperties = {
+						text: ele.text(),
+						fontFamily: THIS.xAxisSettings.labelFontFamily,
+						fontSize: THIS.xAxisSettings.labelFontSize + "px",
+					};
+
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + bBox.x);
+					ele.text(truncatedText);
+				}
+			});
+
+		// if (i === 0) {
+		// 	xAxisMaxHeight = d3.min([xAxisMaxHeight, THIS.scaleBandWidth / 2 + THIS.yScaleGWidth]);
+		// 	console.log(xAxisMaxHeight);
+		// }
 
 		// if (this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Custom) {
 		// 	if (this.width > this.xScaleWidth && this.height > this.yScaleHeight) {
