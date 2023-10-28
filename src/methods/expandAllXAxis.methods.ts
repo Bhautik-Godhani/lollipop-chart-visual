@@ -97,7 +97,7 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 						.tickFormat((d: string) => d.split("-")[0]) as any
 				);
 
-			SetExpandAllYAxisTickStyle(self, expandAllScaleWidth);
+			SetExpandAllYAxisTickStyle(self);
 			// SetExpandAllYAxisLineStyle(selFf, expandAllScaleWidth);	
 			// HideExpandAllYAxisRedundantTicks(self);
 		} else if (self.yAxisSettings.position === Position.Right) {
@@ -109,7 +109,7 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 						.tickFormat((d: string) => d.split("-")[0]) as any
 				);
 
-			SetExpandAllYAxisTickStyle(self, expandAllScaleWidth);
+			SetExpandAllYAxisTickStyle(self);
 
 			// SetExpandAllYAxisLineStyle(self, expandAllScaleWidth);
 			// HideExpandAllYAxisRedundantTicks(self);
@@ -117,9 +117,9 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 	});
 };
 
-export const SetExpandAllYAxisTickStyle = (self: Visual, expandAllScaleWidth: number): void => {
+export const SetExpandAllYAxisTickStyle = (self: Visual): void => {
 	const { isDisplayLabel, labelColor, labelFontFamily, labelFontSize } = self.yAxisSettings;
-	self.expandAllCategoriesName.forEach((category: string, i: number) => {
+	self.expandAllCategoriesName.forEach((category: string) => {
 		select(`.${category}ScaleG`)
 			.selectAll(".tick")
 			.selectAll("text")

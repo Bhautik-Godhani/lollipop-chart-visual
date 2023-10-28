@@ -1,10 +1,8 @@
 import {
 	CircleFillOption,
 	CircleSize,
-	CircleType,
 	ColorPaletteType,
 	DataLabelsPlacement,
-	EAutoCustomTypes,
 	EBeforeAfterPosition,
 	ELCRPosition,
 	EMarkerChartTypes,
@@ -17,12 +15,10 @@ import {
 	EReferenceLineComputation,
 	EReferenceLinesType,
 	ESortOrderTypes,
-	EStartEndPosition,
 	EXYAxisNames,
 	ELineType,
 	Orientation,
 	PieSize,
-	PieType,
 	Position,
 	RankingDataValuesType,
 } from "./enum";

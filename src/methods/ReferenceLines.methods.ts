@@ -4,7 +4,12 @@ import { min as d3Min, max as d3Max, mean, median } from "d3-array";
 import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLinesType, EXYAxisNames, Position } from "../enum";
 import { scaleLinear } from "d3";
 import { IReferenceLinesSettings } from "../visual-settings.interface";
+import crypto from "crypto";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
+
+export const generateSecureRandomBytes = (length) => {
+    return crypto.randomBytes(length);
+}
 
 export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenceLinesSettings[]): void => {
     const data = referenceLinesData.filter(
@@ -12,7 +17,7 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
     );
     const referenceLinesGSelection = self.referenceLinesContainerG
         .selectAll(".referenceLinesG")
-        .data(data && data.length > 0 ? data : [], (d, i) => Math.random());
+        .data(data && data.length > 0 ? data : [], () => generateSecureRandomBytes(16).toString("hex"));
 
     referenceLinesGSelection.join(
         (enter) => {
@@ -135,7 +140,7 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
 export const RenderReferenceLineLayers = (self: Visual, referenceLinesData: IReferenceLinesSettings[]): void => {
     const referenceLineLayersSelection = self.referenceLineLayersG
         .selectAll(".referenceLineLayer")
-        .data(referenceLinesData ? referenceLinesData : [], (d, i) => Math.random());
+        .data(referenceLinesData ? referenceLinesData : [], () => generateSecureRandomBytes(16).toString("hex"));
 
     referenceLineLayersSelection.join(
         (enter) => {
@@ -201,13 +206,185 @@ export const FormatReferenceLineLayers = (self: Visual, layerSelection: D3Select
         .style("pointer-events", "none");
 }
 
+const getTextX1Y1ForHorizontalLine = (self: Visual, rLine: IReferenceLinesSettings, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    const textY1 =
+        rLine.labelAlignment === ELCRPosition.Centre
+            ? self.height / 2
+            : rLine.labelAlignment === ELCRPosition.Left
+                ? self.height - 20
+                : 20;
+    const textX1 = x1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
+    const textAnchor =
+        rLine.labelAlignment === ELCRPosition.Centre
+            ? "middle"
+            : rLine.labelAlignment === ELCRPosition.Left
+                ? "start"
+                : "end";
+    const textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
+
+    return { textX1, textY1, textAnchor, textAlignment };
+};
+
+const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLinesSettings, y1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    const textY1 = y1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
+    const textX1 =
+        rLine.labelAlignment === ELCRPosition.Centre
+            ? self.width / 2
+            : rLine.labelAlignment === ELCRPosition.Left
+                ? 20
+                : self.width - 20;
+    const textAnchor =
+        rLine.labelAlignment === ELCRPosition.Centre
+            ? "middle"
+            : rLine.labelAlignment === ELCRPosition.Left
+                ? "start"
+                : "end";
+    const textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
+
+    return { textX1, textY1, textAnchor, textAlignment };
+};
+
+const getTextXYForHorizontalLine = (self: Visual, rLine: IReferenceLinesSettings, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+    const x1 = 0;
+    const y1 =
+        self.yScale(value) +
+        (rLine.linePositionOnBar === Position.Top
+            ? -(+rLine.lineWidth / 2)
+            : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+    const x2 = self.width;
+    const y2 =
+        self.yScale(value) +
+        (rLine.linePositionOnBar === Position.Top
+            ? -(+rLine.lineWidth / 2)
+            : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+
+    return { x1, y1, x2, y2 };
+};
+
+const getTextXYForVerticalLine = (self: Visual, rLine: IReferenceLinesSettings, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+    const x1 =
+        self.xScale(value) +
+        (rLine.linePositionOnBar === Position.Left
+            ? -(+rLine.lineWidth / 2)
+            : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+    const y1 = 0;
+    const x2 =
+        self.xScale(value) +
+        (rLine.linePositionOnBar === Position.Left
+            ? -(+rLine.lineWidth / 2)
+            : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+    const y2 = self.height;
+
+    return { x1, y1, x2, y2 };
+};
+
+const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string, x1: number, y1: number): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
+
+    if (rLine.type === EReferenceLinesType.Ranking) {
+        const domain: string = self.isHorizontalChart ? self.yScale.domain().reverse() : self.xScale.domain();
+        if (rLine.rankOrder === Position.Start || rLine.rankOrder === Position.Bottom) {
+            value = domain[parseInt(rLine.rank) - 1];
+        } else {
+            value = domain[domain.length - (parseInt(rLine.rank) - 1) - 1];
+        }
+    } else {
+        value = rLine.value;
+    }
+
+    if (value === undefined || value === null) {
+        return;
+    }
+
+    if (self.isHorizontalChart) {
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, rLine, value);
+        newX1 = x1;
+        newX2 = x2;
+        newY1 = y1;
+        newY2 = y2;
+    } else {
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, rLine, value);
+        newX1 = x1;
+        newX2 = x2;
+        newY1 = y1;
+        newY2 = y2;
+    }
+
+    if (self.isHorizontalChart) {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, y1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    } else {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, x1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    }
+
+    return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
+}
+
+const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string, x1: number, y1: number): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
+
+    if (rLine.type === EReferenceLinesType.Ranking) {
+        const domain: string = self.isHorizontalChart
+            ? self.xScale.ticks(self.width / 90)
+            : self.yScale.ticks(self.height / 70);
+        if (rLine.rankOrder === Position.Start || rLine.rankOrder === Position.Bottom) {
+            value = domain[parseInt(rLine.rank) - 1];
+        } else {
+            value = domain[domain.length - (parseInt(rLine.rank) - 1) - 1];
+        }
+    } else {
+        value = rLine.value;
+    }
+
+    if (value === undefined || value === null) {
+        return;
+    }
+
+    if (self.isHorizontalChart) {
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, rLine, value);
+        newX1 = x1;
+        newX2 = x2;
+        newY1 = y1;
+        newY2 = y2;
+    } else {
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, rLine, value);
+        newX1 = x1;
+        newX2 = x2;
+        newY1 = y1;
+        newY2 = y2;
+    }
+
+    if (self.isHorizontalChart) {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, x1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    } else {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, y1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    }
+
+    return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
+}
+
 export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] => {
     return self.referenceLinesSettings.reduce(
         (arr: IReferenceLinesSettings[], rLine: IReferenceLinesSettings) => {
             let x1: number,
                 y1: number,
                 x2: number,
-                y2: number = 0;
+                y2: number;
             let textX1: number, textY1: number, textAnchor: string, textAlignment: string;
 
             if (rLine.type === EReferenceLinesType.Value && rLine.axis === EXYAxisNames.Y) {
@@ -239,7 +416,6 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] =
                         rLine.value = median(values, (d) => d) + "";
                         break;
                     case EReferenceLineComputation.Fixed:
-                        rLine.value = rLine.value;
                         break;
                 }
             }
@@ -247,127 +423,27 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] =
             SetAutoBarAreaPositionToHighlight(self, rLine);
             SetAutoLinePositionOnBar(self, rLine);
 
-            const getTextX1Y1ForHorizontalLine = () => {
-                textY1 =
-                    rLine.labelAlignment === ELCRPosition.Centre
-                        ? self.height / 2
-                        : rLine.labelAlignment === ELCRPosition.Left
-                            ? self.height - 20
-                            : 20;
-                textX1 = x1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
-                textAnchor =
-                    rLine.labelAlignment === ELCRPosition.Centre
-                        ? "middle"
-                        : rLine.labelAlignment === ELCRPosition.Left
-                            ? "start"
-                            : "end";
-                textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
-            };
-
-            const getTextX1Y1ForVerticalLine = () => {
-                textY1 = y1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
-                textX1 =
-                    rLine.labelAlignment === ELCRPosition.Centre
-                        ? self.width / 2
-                        : rLine.labelAlignment === ELCRPosition.Left
-                            ? 20
-                            : self.width - 20;
-                textAnchor =
-                    rLine.labelAlignment === ELCRPosition.Centre
-                        ? "middle"
-                        : rLine.labelAlignment === ELCRPosition.Left
-                            ? "start"
-                            : "end";
-                textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
-            };
-
-            const getTextXYForHorizontalLine = (value: number | string) => {
-                x1 = 0;
-                y1 =
-                    self.yScale(value) +
-                    (rLine.linePositionOnBar === Position.Top
-                        ? -(+rLine.lineWidth / 2)
-                        : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
-                x2 = self.width;
-                y2 =
-                    self.yScale(value) +
-                    (rLine.linePositionOnBar === Position.Top
-                        ? -(+rLine.lineWidth / 2)
-                        : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
-            };
-
-            const getTextXYForVerticalLine = (value: number | string) => {
-                x1 =
-                    self.xScale(value) +
-                    (rLine.linePositionOnBar === Position.Left
-                        ? -(+rLine.lineWidth / 2)
-                        : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
-                y1 = 0;
-                x2 =
-                    self.xScale(value) +
-                    (rLine.linePositionOnBar === Position.Left
-                        ? -(+rLine.lineWidth / 2)
-                        : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
-                y2 = self.height;
-            };
-
             let value: string;
             if (rLine.axis === EXYAxisNames.X) {
-                if (rLine.type === EReferenceLinesType.Ranking) {
-                    const domain: string = self.isHorizontalChart ? self.yScale.domain()?.reverse() : self.xScale.domain();
-                    if (rLine.rankOrder === Position.Start || rLine.rankOrder === Position.Bottom) {
-                        value = domain[parseInt(rLine.rank) - 1];
-                    } else {
-                        value = domain[domain.length - (parseInt(rLine.rank) - 1) - 1];
-                    }
-                } else {
-                    value = rLine.value;
-                }
-
-                if (value === undefined || value === null) {
-                    return;
-                }
-
-                if (self.isHorizontalChart) {
-                    getTextXYForHorizontalLine(value);
-                } else {
-                    getTextXYForVerticalLine(value);
-                }
-
-                if (self.isHorizontalChart) {
-                    getTextX1Y1ForVerticalLine();
-                } else {
-                    getTextX1Y1ForHorizontalLine();
-                }
+                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForXAxisRefLine(self, rLine, value, x1, y1);
+                x1 = newX1;
+                x2 = newX2;
+                y1 = newY1;
+                y2 = newY2;
+                textX1 = newTextX1;
+                textY1 = newTextY1;
+                textAnchor = newTextAnchor;
+                textAlignment = newTextAlignment;
             } else if (rLine.axis === EXYAxisNames.Y) {
-                if (rLine.type === EReferenceLinesType.Ranking) {
-                    const domain: string = self.isHorizontalChart
-                        ? self.xScale.ticks(self.width / 90)
-                        : self.yScale.ticks(self.height / 70);
-                    if (rLine.rankOrder === Position.Start || rLine.rankOrder === Position.Bottom) {
-                        value = domain[parseInt(rLine.rank) - 1];
-                    } else {
-                        value = domain[domain.length - (parseInt(rLine.rank) - 1) - 1];
-                    }
-                } else {
-                    value = rLine.value;
-                }
-
-                if (value === undefined || value === null) {
-                    return;
-                }
-
-                if (self.isHorizontalChart) {
-                    getTextXYForVerticalLine(value);
-                } else {
-                    getTextXYForHorizontalLine(value);
-                }
-
-                if (self.isHorizontalChart) {
-                    getTextX1Y1ForHorizontalLine();
-                } else {
-                    getTextX1Y1ForVerticalLine();
-                }
+                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLine, value, x1, y1);
+                x1 = newX1;
+                x2 = newX2;
+                y1 = newY1;
+                y2 = newY2;
+                textX1 = newTextX1;
+                textY1 = newTextY1;
+                textAnchor = newTextAnchor;
+                textAlignment = newTextAlignment;
             }
 
             const referenceLinesData = {
@@ -438,7 +514,7 @@ export const HideDataLabelsBelowReferenceLines = (self: Visual): void => {
                 const y = bBox.y - self.margin.top - self.settingsBtnHeight;
 
                 if (!self.isHorizontalChart) {
-                    self.chartData.forEach((d) => {
+                    self.chartData.forEach(() => {
                         if (rLine.barAreaPositionToHighlight === Position.Left) {
                             if (rLine.axis === EXYAxisNames.X) {
                                 if (x < rLine.x1) {
@@ -464,7 +540,7 @@ export const HideDataLabelsBelowReferenceLines = (self: Visual): void => {
                         }
                     });
                 } else {
-                    self.chartData.forEach((d) => {
+                    self.chartData.forEach(() => {
                         if (rLine.barAreaPositionToHighlight === Position.Left) {
                             if (rLine.axis === EXYAxisNames.Y) {
                                 if (x < rLine.x1) {

@@ -3,9 +3,10 @@ import { IPatternData, InputControl, PatternPicker, Quote } from "@truviz/shadow
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
 import { EPatternSettings } from "../enum";
-import { IPatternProps, IPatternSettings } from "../visual-settings.interface";
+import { IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
 import { parseObject } from "../methods/methods";
+import { Visual } from "../visual";
 
 const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
 	setConfigValues((d) => ({
@@ -19,6 +20,20 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 		...d,
 		[n]: val,
 	}));
+};
+
+const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+	return (
+		<Footer
+			cancelButtonHandler={closeCurrentSettingHandler}
+			saveButtonConfig={{
+				isDisabled: false,
+				text: "APPLY",
+				handler: applyChanges,
+			}}
+			resetButtonHandler={resetChanges}
+		/>
+	);
 };
 
 const UIPatternBorderSettings = (
@@ -51,6 +66,54 @@ const UIPatternBorderSettings = (
 			</Row>
 		</ConditionalWrapper>
 	</>
+}
+
+const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
+	return <ConditionalWrapper visible={!shadow.isHasSubcategories}>
+		{configValues.categoryPatterns.map((category, index) => (
+			<PatternPicker
+				label={category.name}
+				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
+				handleChange={(e: IPatternData) => {
+					const patterns = [...configValues.categoryPatterns];
+					patterns[index].patternIdentifier = e.value;
+
+					if (e.value === "image") {
+						patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+					}
+
+					setConfigValues((d) => ({
+						...d,
+						[EPatternSettings.CategoryPatterns]: patterns,
+					}));
+				}}
+			/>
+		))}
+	</ConditionalWrapper>
+}
+
+const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
+	return <ConditionalWrapper visible={shadow.isHasSubcategories}>
+		{configValues.subCategoryPatterns.map((category, index) => (
+			<PatternPicker
+				label={category.name}
+				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
+				handleChange={(e: IPatternData) => {
+					const patterns = [...configValues.subCategoryPatterns];
+					patterns[index].patternIdentifier = e.value;
+
+					if (e.value === "image") {
+						patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+					}
+
+					setConfigValues((d) => ({
+						...d,
+						[EPatternSettings.SubcategoryPatterns]: patterns,
+					}));
+				}}
+			/>
+		))}
+	</ConditionalWrapper>
 }
 
 const FillPatterns = (props) => {
@@ -120,50 +183,8 @@ const FillPatterns = (props) => {
 				</ConditionalWrapper>
 
 				<ConditionalWrapper visible={configValues.enabled}>
-					<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-						{configValues.categoryPatterns.map((category, index) => (
-							<PatternPicker
-								label={category.name}
-								pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
-								handleChange={(e: IPatternData) => {
-									const patterns = [...configValues.categoryPatterns];
-									patterns[index].patternIdentifier = e.value;
-
-									if (e.value === "image") {
-										patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
-									}
-
-									setConfigValues((d) => ({
-										...d,
-										[EPatternSettings.CategoryPatterns]: patterns,
-									}));
-								}}
-							/>
-						))}
-					</ConditionalWrapper>
-
-					<ConditionalWrapper visible={shadow.isHasSubcategories}>
-						{configValues.subCategoryPatterns?.map((category, index) => (
-							<PatternPicker
-								label={category.name}
-								pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
-								handleChange={(e: IPatternData) => {
-									const patterns = [...configValues.subCategoryPatterns];
-									patterns[index].patternIdentifier = e.value;
-
-									if (e.value === "image") {
-										patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
-									}
-
-									setConfigValues((d) => ({
-										...d,
-										[EPatternSettings.SubcategoryPatterns]: patterns,
-									}));
-								}}
-							/>
-						))}
-					</ConditionalWrapper>
-
+					{UICategoryPatterns(shadow, configValues, setConfigValues)}
+					{UISubCategoryPatterns(shadow, configValues, setConfigValues)}
 					{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 				</ConditionalWrapper>
 
@@ -176,11 +197,7 @@ const FillPatterns = (props) => {
 				)}
 			</ConditionalWrapper>
 
-			<Footer
-				cancelButtonHandler={closeCurrentSettingHandler}
-				saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
-				resetButtonHandler={resetChanges}
-			/>
+			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
 };

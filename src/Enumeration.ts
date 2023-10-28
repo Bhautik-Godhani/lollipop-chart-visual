@@ -1,5 +1,3 @@
-import powerbi from "powerbi-visuals-api";
-import VisualObjectInstance = powerbi.VisualObjectInstance;
 import { VisualSettings } from "./settings";
 import { EnumerateSectionType } from "@truviz/shadow/dist/types/EnumerateSectionType";
 

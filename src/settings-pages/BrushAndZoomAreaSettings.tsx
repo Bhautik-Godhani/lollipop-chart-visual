@@ -1,23 +1,11 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer, ConditionalWrapper, ColorPicker, SelectInput, InputControl } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS as BRUSH_AND_ZOOM_AREA_SETTINGS_IMP } from "../constants";
-import { IBrushAndZoomAreaSettings, ILabelValuePair } from "../visual-settings.interface";
-import { EAutoCustomTypes, EBrushAndZoomAreaSettings } from "../enum";
+import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
+import { EBrushAndZoomAreaSettings } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { Visual } from "../visual";
-
-const AUTO_CUSTOM_TYPES: ILabelValuePair[] = [
-	{
-		label: "Auto",
-		value: EAutoCustomTypes.Auto,
-	},
-	{
-		label: "Custom",
-		value: EAutoCustomTypes.Custom,
-	},
-];
 
 const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	setConfigValues((d) => ({
@@ -32,6 +20,65 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 		[n]: val,
 	}));
 };
+
+const UIWidthSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
+	return <ConditionalWrapper visible={shadow.isHorizontalChart}>
+		<Row>
+			<Column>
+				<ToggleSwitch
+					label="Auto Width"
+					value={configValues.isAutoWidth}
+					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
+					appearance="toggle"
+				/>
+			</Column>
+		</Row>
+
+		<ConditionalWrapper visible={!configValues.isAutoWidth}>
+			<Row>
+				<Column>
+					<InputControl
+						min={1}
+						type="number"
+						label="Width"
+						value={configValues.width}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+		</ConditionalWrapper>
+	</ConditionalWrapper>
+}
+
+const UIHeightSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
+	return <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+		<Row>
+			<Column>
+				<ToggleSwitch
+					label="Auto Height"
+					value={configValues.isAutoHeight}
+					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
+					appearance="toggle"
+				/>
+			</Column>
+		</Row>
+
+		<ConditionalWrapper visible={!configValues.isAutoHeight}>
+			<Row>
+				<Column>
+					<InputControl
+						min={shadow.brushAndZoomAreaMinHeight}
+						max={shadow.height / 2}
+						type="number"
+						label="Height"
+						value={configValues.height}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+		</ConditionalWrapper>
+	</ConditionalWrapper>
+}
 
 const UIGeneralChartSettings = (
 	shadow: Visual,
@@ -111,60 +158,9 @@ const UIGeneralChartSettings = (
 					</Column>
 				</Row>
 
-				<ConditionalWrapper visible={shadow.isHorizontalChart}>
-					<Row>
-						<Column>
-							<ToggleSwitch
-								label="Auto Width"
-								value={configValues.isAutoWidth}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
+				{UIWidthSettings(shadow, configValues, setConfigValues)}
+				{UIHeightSettings(shadow, configValues, setConfigValues)}
 
-					<ConditionalWrapper visible={!configValues.isAutoWidth}>
-						<Row>
-							<Column>
-								<InputControl
-									min={1}
-									type="number"
-									label="Width"
-									value={configValues.width}
-									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
-								/>
-							</Column>
-						</Row>
-					</ConditionalWrapper>
-				</ConditionalWrapper>
-
-				<ConditionalWrapper visible={!shadow.isHorizontalChart}>
-					<Row>
-						<Column>
-							<ToggleSwitch
-								label="Auto Height"
-								value={configValues.isAutoHeight}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
-
-					<ConditionalWrapper visible={!configValues.isAutoHeight}>
-						<Row>
-							<Column>
-								<InputControl
-									min={shadow.brushAndZoomAreaMinHeight}
-									max={shadow.height / 2}
-									type="number"
-									label="Height"
-									value={configValues.height}
-									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
-								/>
-							</Column>
-						</Row>
-					</ConditionalWrapper>
-				</ConditionalWrapper>
 			</ConditionalWrapper>
 		</>
 	);

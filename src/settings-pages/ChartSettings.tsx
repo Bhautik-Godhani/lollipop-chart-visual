@@ -1,11 +1,9 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
-import { EAutoCustomTypes, EChartSettings, EPieSettings, Orientation, PieSize, PieType } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, SelectInput, RadioOption, ToggleButton } from "@truviz/shadow/dist/Components";
-import { IChartSettings, ILabelValuePair, IPieSettings } from "../visual-settings.interface";
+import { EChartSettings, Orientation } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton } from "@truviz/shadow/dist/Components";
+import { IChartSettings, ILabelValuePair } from "../visual-settings.interface";
 import { Visual } from "../visual";
-import { IMarkerData, MarkerPicker } from "./markerSelector";
-import { CATEGORY_MARKERS } from "./markers";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -22,30 +20,6 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 	setConfigValues((d) => ({
 		...d,
 		[n]: val,
-	}));
-};
-
-const handlePieChange = (val, n, pieType: PieType, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
-	setPieConfigValues((d) => ({
-		...d,
-		[pieType]: { ...d[pieType], [n]: val },
-	}));
-};
-
-const handlePieTypeChange = (val, n, setPieConfigValues: React.Dispatch<React.SetStateAction<IPieSettings>>): void => {
-	setPieConfigValues((d) => ({
-		...d,
-		[n]: val,
-	}));
-};
-
-const handleCheckbox = (
-	key: string,
-	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
-): void => {
-	setConfigValues((d: any) => ({
-		...d,
-		[key]: !d[key]
 	}));
 };
 
@@ -133,11 +107,7 @@ const ChartSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		const configProps = {
-			...configValues,
-			[EChartSettings.pieSettings]: pieConfigValues,
-		};
-		shadow.persistProperties(sectionName, propertyName, configProps);
+		shadow.persistProperties(sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 
@@ -149,13 +119,7 @@ const ChartSettings = (props) => {
 		...initialStates,
 	});
 
-	const [pieConfigValues, setPieConfigValues] = React.useState<IPieSettings>({
-		...initialStates[EChartSettings.pieSettings],
-	});
-
 	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);
-
-	const isDumbbellChart = !!vizOptions.options.dataViews[0].categorical.values[1];
 
 	React.useEffect(() => {
 		if (!configValues.lollipopWidth) {

@@ -35,7 +35,7 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, legendItems, dataPoints, clearCatcher, isHasSubcategories, interactivityService } = options;
+		const { lollipopSelection, lineSelection, clearCatcher } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
@@ -119,11 +119,11 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, lineSelection, dataPoints, legendItems, isHasSubcategories, selectionManager, interactivityService } = this.options;
+		const { lollipopSelection, dataPoints, interactivityService } = this.options;
 
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
-		const handleOpacity = (dataPoint: ILollipopChartRow, i: number) => {
+		const handleOpacity = (dataPoint: ILollipopChartRow) => {
 			interactivityService.applySelectionStateToData([dataPoint] as any);
 
 			const selected = dataPoint.selected;
@@ -146,7 +146,7 @@ export class Behavior implements IInteractiveBehavior {
 			return opacity;
 		};
 
-		lollipopSelection.attr("opacity", (dataPoint: ILollipopChartRow, i) => handleOpacity(dataPoint, i));
+		lollipopSelection.attr("opacity", (dataPoint: ILollipopChartRow) => handleOpacity(dataPoint));
 	}
 }
 
@@ -154,7 +154,6 @@ export const SetAndBindChartBehaviorOptions = (
 	self: Visual,
 	lollipopSelection: D3Selection<SVGElement>,
 	lineSelection: D3Selection<SVGElement>,
-	dataPoints: ILollipopChartRow[]
 ): void => {
 	if (self.interactivityService) {
 		const nodeData = [];

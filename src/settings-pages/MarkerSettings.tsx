@@ -1,30 +1,18 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { EAutoCustomTypes, EMarkerChartTypes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes, PieType } from "../enum";
-import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, RadioOption, SelectInput, InputControl, ToggleButton } from "@truviz/shadow/dist/Components";
+import { EMarkerChartTypes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes } from "../enum";
+import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IMarkerSettings } from "../visual-settings.interface";
 import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
 import { MARKER_SETTINGS as MARKER_SETTINGS_IMP } from "../constants";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { get } from "lodash";
-import { MarkerShape } from "powerbi-visuals-utils-chartutils/lib/legend/legendInterfaces";
 
 import PieIcon from "../../assets/icons/PieIcon.svg";
 import DonutIcon from "../../assets/icons/donut-icon.svg";
 import RoseIcon from "../../assets/icons/rose-icon.svg";
 import { Visual } from "../visual";
-
-const AUTO_CUSTOM_TYPES: ILabelValuePair[] = [
-	{
-		label: "Auto",
-		value: EAutoCustomTypes.Auto,
-	},
-	{
-		label: "Custom",
-		value: EAutoCustomTypes.Custom,
-	},
-];
 
 let MARKERS_LIST: IMarkerData[] = [];
 
@@ -71,23 +59,6 @@ const handleMarkerStyleChange = (val, n, markerType: EMarkerStyleTypes, setConfi
 	setConfigValues((d) => ({
 		...d,
 		[markerType]: { ...d[markerType], [n]: val },
-	}));
-};
-
-const handlePieTypeChange = (val, n, setPieConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>): void => {
-	setPieConfigValues((d) => ({
-		...d,
-		[n]: val,
-	}));
-};
-
-const handleCheckbox = (
-	key: string,
-	setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>
-): void => {
-	setConfigValues((d: any) => ({
-		...d,
-		[key]: !d[key]
 	}));
 };
 
@@ -256,8 +227,6 @@ const MarkerSettings = (props) => {
 	const [configValues, setConfigValues] = React.useState<IMarkerSettings>({
 		...initialStates,
 	});
-
-	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);
 
 	MARKERS_LIST = [];
 	CATEGORY_MARKERS.map((marker) => {

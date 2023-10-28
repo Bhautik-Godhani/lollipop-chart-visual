@@ -2,8 +2,6 @@
 import * as React from "react";
 import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
-  EVisualConfig,
-  EVisualSettings,
   EYAxisSettings,
   Position,
 } from "../enum";
@@ -18,16 +16,14 @@ import {
   SelectInput,
   ColorPicker,
 } from "@truviz/shadow/dist/Components";
-import { IChartSettings, ILabelValuePair, IYAxisSettings } from "../visual-settings.interface";
+import { ILabelValuePair, IYAxisSettings } from "../visual-settings.interface";
 
 const YAxisSettings = (props) => {
   const {
     shadow,
     compConfig: { sectionName, propertyName },
-    config,
     vizOptions,
     closeCurrentSettingHandler,
-    closeAdvancedSettingsHandler,
   } = props;
 
   const Y_AXIS_SETTINGS = JSON.parse(JSON.stringify(Y_AXIS_SETTINGS_IMP));

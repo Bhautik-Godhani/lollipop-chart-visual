@@ -1,11 +1,9 @@
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import {
 	CircleSize,
-	CircleType,
 	ColorPaletteType,
 	DataLabelsPlacement,
 	DisplayUnits,
-	EAutoCustomTypes,
 	EBeforeAfterPosition,
 	EDataRolesName,
 	EFontStyle,

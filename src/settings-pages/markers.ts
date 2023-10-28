@@ -1,4 +1,4 @@
-import { EMarkerChartTypes, EMarkerDefaultShapes } from "../enum";
+import { EMarkerDefaultShapes } from "../enum";
 import { IMarkerData } from "./markerSelector";
 
 export const CATEGORY_MARKERS: IMarkerData[] = [
