@@ -96,31 +96,39 @@ const UIShowBucketSettings = (
 						</Column>
 					</Row>
 
-					<Row>
-						<Column>
-							<InputControl
-								min={1}
-								type="number"
-								label="Text Size"
-								value={configValues.fontSize.toString()}
-								handleChange={(value) => handleChange(+value, EShowBucketSettings.FontSize)}
-							/>
-						</Column>
-
-						<Column>
-							<ColorPicker
-								label="Color"
-								color={configValues.color}
-								handleChange={(color) => handleChange(color, EShowBucketSettings.Color)}
-								colorPalette={vizOptions.host.colorPalette}
-							/>
-						</Column>
-					</Row>
+					{UIShowBucketSettings1(vizOptions, configValues, handleChange)}
 				</Column>
 			</Row>
 		</>
 	);
 };
+
+const UIShowBucketSettings1 = (
+	vizOptions: any,
+	configValues: IShowBucketSettings,
+	handleChange: (v: any, key: EShowBucketSettings) => void
+) => {
+	return <Row>
+		<Column>
+			<InputControl
+				min={1}
+				type="number"
+				label="Text Size"
+				value={configValues.fontSize.toString()}
+				handleChange={(value) => handleChange(+value, EShowBucketSettings.FontSize)}
+			/>
+		</Column>
+
+		<Column>
+			<ColorPicker
+				label="Color"
+				color={configValues.color}
+				handleChange={(color) => handleChange(color, EShowBucketSettings.Color)}
+				colorPalette={vizOptions.host.colorPalette}
+			/>
+		</Column>
+	</Row>
+}
 
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (

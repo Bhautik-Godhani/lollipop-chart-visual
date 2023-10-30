@@ -278,7 +278,7 @@ const getTextXYForVerticalLine = (self: Visual, rLine: IReferenceLinesSettings, 
     return { x1, y1, x2, y2 };
 };
 
-const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string, x1: number, y1: number): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLine.type === EReferenceLinesType.Ranking) {
@@ -311,13 +311,13 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, v
     }
 
     if (self.isHorizontalChart) {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, y1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, newY1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
         newTextAlignment = textAlignment;
     } else {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, x1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, newX1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
@@ -327,7 +327,7 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, v
     return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
 }
 
-const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string, x1: number, y1: number): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLine.type === EReferenceLinesType.Ranking) {
@@ -362,13 +362,13 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, v
     }
 
     if (self.isHorizontalChart) {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, x1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, newX1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
         newTextAlignment = textAlignment;
     } else {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, y1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, newY1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
@@ -425,7 +425,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] =
 
             let value: string;
             if (rLine.axis === EXYAxisNames.X) {
-                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForXAxisRefLine(self, rLine, value, x1, y1);
+                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForXAxisRefLine(self, rLine, value);
                 x1 = newX1;
                 x2 = newX2;
                 y1 = newY1;
@@ -435,7 +435,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] =
                 textAnchor = newTextAnchor;
                 textAlignment = newTextAlignment;
             } else if (rLine.axis === EXYAxisNames.Y) {
-                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLine, value, x1, y1);
+                const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLine, value);
                 x1 = newX1;
                 x2 = newX2;
                 y1 = newY1;

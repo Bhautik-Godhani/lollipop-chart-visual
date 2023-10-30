@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IPatternData, InputControl, PatternPicker, Quote } from "@truviz/shadow/dist/Components";
+import { IPatternData, PatternPicker, Quote } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
 import { EPatternSettings } from "../enum";
@@ -12,13 +12,6 @@ const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<
 	setConfigValues((d) => ({
 		...d,
 		[n]: !d[n],
-	}));
-};
-
-const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
-	setConfigValues((d) => ({
-		...d,
-		[n]: val,
 	}));
 };
 
@@ -35,38 +28,6 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 		/>
 	);
 };
-
-const UIPatternBorderSettings = (
-	configValues: IPatternSettings,
-	setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>
-) => {
-	return <>
-		<Row>
-			<Column>
-				<ToggleButton
-					id="pattern-options-comp-enable-pattern-border"
-					label={"Enable Patterns Border"}
-					value={configValues.isPatternBorderEnabled}
-					handleChange={(value) => handleChange(value, EPatternSettings.IsPatternBorderEnabled, setConfigValues)}
-				/>
-			</Column>
-		</Row>
-
-		<ConditionalWrapper visible={configValues.isPatternBorderEnabled}>
-			<Row appearance="padded">
-				<Column>
-					<InputControl
-						type="number"
-						label={"Border width"}
-						value={configValues.patternBorderWidth.toString()}
-						handleChange={(value) => handleChange(+value, EPatternSettings.PatternBorderWidth, setConfigValues)}
-					/>
-				</Column>
-				<Column></Column>
-			</Row>
-		</ConditionalWrapper>
-	</>
-}
 
 const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
 	return <ConditionalWrapper visible={!shadow.isHasSubcategories}>
