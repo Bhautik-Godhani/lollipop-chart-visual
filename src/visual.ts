@@ -186,13 +186,13 @@ export class Visual extends Shadow {
 	public clonedCategoricalData: powerbi.DataViewCategorical;
 	public categoricalData: powerbi.DataViewCategorical;
 	public categoricalMetadata: any;
-	public categoricalCategoriesFields: powerbi.DataViewCategoryColumn[];
-	public categoricalRaceChartDataFields: powerbi.DataViewCategoryColumn[];
-	public categoricalMeasureFields: powerbi.DataViewValueColumn[];
+	public categoricalCategoriesFields: powerbi.DataViewCategoryColumn[] = [];
+	public categoricalRaceChartDataFields: powerbi.DataViewCategoryColumn[] = [];
+	public categoricalMeasureFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalMeasure1Field: powerbi.DataViewValueColumn;
 	public categoricalMeasure2Field: powerbi.DataViewValueColumn;
-	public categoricalTooltipFields: powerbi.DataViewValueColumn[];
-	public categoricalSortFields: powerbi.DataViewValueColumn[];
+	public categoricalTooltipFields: powerbi.DataViewValueColumn[] = [];
+	public categoricalSortFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalReferenceLinesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalImagesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalSubCategoryField: any;
@@ -217,7 +217,7 @@ export class Visual extends Shadow {
 	isHasCategories: boolean;
 	isHasImagesData: boolean;
 	isSortDataFieldsAdded: boolean;
-	sortFieldsDisplayName: ILabelValuePair[];
+	sortFieldsDisplayName: ILabelValuePair[] = [];
 	blankText: string = "(Blank)";
 	othersBarText = "Others";
 	totalLollipopCount: number = 0;
@@ -225,8 +225,8 @@ export class Visual extends Shadow {
 		legendItems: D3Selection<SVGElement>, legendWrapper: D3Selection<SVGElement>
 	};
 	conditionalFormattingConditions: IConditionalFormattingProps[] = [];
-	categoriesColorList: { name: string, marker1: string, marker2: string }[];
-	subCategoriesColorList: { name: string, marker1: string, marker2: string }[];
+	categoriesColorList: { name: string, marker1: string, marker2: string }[] = [];
+	subCategoriesColorList: { name: string, marker1: string, marker2: string }[] = [];
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 	isHasNegativeValue: boolean;
@@ -237,9 +237,9 @@ export class Visual extends Shadow {
 	selectionIdBySubCategories: { [subcategory: string]: ISelectionId } = {};
 
 	// number formatter
-	public measureNumberFormatter: IValueFormatter[];
-	public tooltipNumberFormatter: IValueFormatter[];
-	public sortValuesNumberFormatter: IValueFormatter[];
+	public measureNumberFormatter: IValueFormatter[] = [];
+	public tooltipNumberFormatter: IValueFormatter[] = [];
+	public sortValuesNumberFormatter: IValueFormatter[] = [];
 	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
 
 	// svg
@@ -253,7 +253,7 @@ export class Visual extends Shadow {
 	public brushScaleBand: any;
 	public brushXScale: any;
 	public brushYScale: any;
-	public newScaleDomainByBrush: string[];
+	public newScaleDomainByBrush: string[] = [];
 	public brushScaleBandBandwidth: number = 0;
 	public brushG: D3Selection<SVGElement>;
 	public brushLollipopG: D3Selection<SVGElement>;
@@ -394,8 +394,8 @@ export class Visual extends Shadow {
 	visualAnnotations: VisualAnnotations;
 
 	// patterns
-	categoryPatterns: IPatternProps[];
-	subCategoryPatterns: IPatternProps[];
+	categoryPatterns: IPatternProps[] = [];
+	subCategoryPatterns: IPatternProps[] = [];
 
 	// image marker
 	isShowImageMarker: boolean;
