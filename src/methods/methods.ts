@@ -12,6 +12,59 @@ import { TooltipData } from "../model";
 import { EDataRolesName } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 
+export const invertColorByBrightness = (hex: string, isReturnBlackWhiteColor: boolean, isReverse: boolean = false): string => {
+	if (hex.indexOf('#') === 0) {
+		hex = hex.slice(1);
+	}
+
+	// convert 3-digit hex to 6-digits.
+	if (hex.length === 3) {
+		hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+	}
+	if (hex.length !== 6) {
+		throw new Error('Invalid HEX color.');
+	}
+
+	const r = parseInt(hex.slice(0, 2), 16);
+	const g = parseInt(hex.slice(2, 4), 16);
+	const b = parseInt(hex.slice(4, 6), 16);
+
+	if (isReturnBlackWhiteColor) {
+		return (r * 0.299 + g * 0.587 + b * 0.114) > 186
+			? isReverse ? '#FFFFFF' : '#5D5D5D'
+			: isReverse ? '#5D5D5D' : '#FFFFFF';
+	}
+
+	// invert color components
+	const r1 = (255 - r).toString(16);
+	const g1 = (255 - g).toString(16);
+	const b1 = (255 - b).toString(16);
+
+	// pad each with zeros and return
+	return "#" + padZero(r1) + padZero(g1) + padZero(b1);
+}
+
+export const padZero = (str: string, len = 2): string => {
+	const zeros = new Array(len).join('0');
+	return (zeros + str).slice(-len);
+}
+
+export const rgbaToHex = (color: string): string => {
+	const values = color
+		.replace(/rgba?\(/, '')
+		.replace(/\)/, '')
+		.replace(/[\s+]/g, '')
+		.split(',');
+	const a = parseFloat(values[3] || '1');
+	const r = Math.floor(a * parseInt(values[0]) + (1 - a) * 255);
+	const g = Math.floor(a * parseInt(values[1]) + (1 - a) * 255);
+	const b = Math.floor(a * parseInt(values[2]) + (1 - a) * 255);
+	return "#" +
+		("0" + r.toString(16)).slice(-2) +
+		("0" + g.toString(16)).slice(-2) +
+		("0" + b.toString(16)).slice(-2);
+}
+
 export const getSVGTextSize = (
 	text: string,
 	fontFamily: string,

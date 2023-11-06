@@ -21,8 +21,10 @@ import {
 	PieSize,
 	Position,
 	RankingDataValuesType,
+	EDataLabelsBGApplyFor,
 } from "./enum";
 import {
+	EInsideTextColorTypes,
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
@@ -100,11 +102,15 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	fontSize: 12,
 	fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	showBackground: true,
-	backgroundColor: "rgba(0,0,0,0.2)",
+	backgroundColor: "rgba(93, 93, 93, 1)",
 	fontStyle: [],
 	placement: DataLabelsPlacement.Inside,
 	isAutoFontSize: true,
-	showLabelsBelowReferenceLine: false
+	showLabelsBelowReferenceLine: false,
+	isColorChanged: false,
+	textColorTypes: EInsideTextColorTypes.FIXED,
+	applyFor: EDataLabelsBGApplyFor.ONLY_PATTERNS,
+	isShowBGChangedWhenPatternApplied: false
 };
 
 export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {

@@ -73,6 +73,7 @@ import {
 	RACE_CHART_SETTINGS
 } from "./constants";
 import {
+	EInsideTextColorTypes,
 	IBrushAndZoomAreaSettings,
 	IBrushConfig,
 	IChartSettings,
@@ -105,7 +106,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat } from "./methods/methods";
+import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -175,7 +176,7 @@ export class Visual extends Shadow {
 	public isVisualResized: boolean = false;
 	public footerHeight: number = 0;
 	private highContrastDetails: IHighContrastDetails = { isHighContrast: false };
-	private isPatternApplied: boolean;
+	public isPatternApplied: boolean;
 	public isLollipopTypeCircle: boolean;
 	public isLollipopTypePie: boolean;
 	public isChartIsRaceChart: boolean;
@@ -3321,9 +3322,12 @@ export class Visual extends Shadow {
 		}
 	}
 
-	setDataLabelsFormatting(labelSelection: any, textSelection: any, rectSelection: any, isData2Label: boolean = false): void {
+	setDataLabelsFormatting(labelSelection: any, textSelection: any, isData2Label: boolean = false): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
 		const key = isData2Label ? "value2" : "value1";
+
+		const isAutoFontColor = this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.AUTO || this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
+		const isAutoBGColor = this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
 
 		labelSelection
 			.attr("class", "dataLabelG")
@@ -3333,9 +3337,8 @@ export class Visual extends Shadow {
 
 		textSelection
 			.classed("dataLabelText", true)
-			.attr("fill", dataLabelsSettings.color)
 			.attr("text-anchor", "middle")
-			.attr("dy", "0.02em")
+			.attr("dy", "0.25em")
 			.attr("font-size", this.getDataLabelsFontSize(isData2Label))
 			.style("font-family", dataLabelsSettings.fontFamily)
 			.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
@@ -3343,32 +3346,35 @@ export class Visual extends Shadow {
 			.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d) => this.formatNumber(d[key], this.measureNumberFormatter[isData2Label ? 1 : 0]));
 
-		rectSelection
-			.classed("dataLabelRect", true)
-			.attr("width", 0)
-			.attr("width", function () {
-				const getBBox = (d3.select(this.parentNode).select("text").node() as SVGSVGElement).getBBox();
-				return getBBox.width + dataLabelsSettings.fontSize;
-			})
-			.attr("height", 0)
-			.attr("height", function () {
-				const getBBox = (d3.select(this.parentNode).select("text").node() as SVGSVGElement).getBBox();
-				return getBBox.height + dataLabelsSettings.fontSize * 0.4;
-			})
-			.attr("rx", 4)
-			.attr("ry", 4)
-			.attr("fill", dataLabelsSettings.backgroundColor)
-			.attr("opacity", dataLabelsSettings.placement === DataLabelsPlacement.Outside && dataLabelsSettings.showBackground ? "1" : "0");
+		if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+			textSelection
+				.attr("fill", d => this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : this.dataLabelsSettings.color, EHighContrastColorType.Foreground));
+		} else {
+			textSelection
+				.attr("fill", dataLabelsSettings.color);
+		}
 
-		// if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-		// 	rectSelection.attr("fill-opacity", `${100 - dataLabelsSettings.transparency}% `).attr("opacity", dataLabelsSettings.showBackground ? "1" : "0");
-		// }
+		labelSelection.select(".dataLabelTextShadow").remove();
+		if (dataLabelsSettings.placement === DataLabelsPlacement.Inside && dataLabelsSettings.showBackground) {
+			const clonedTitle = textSelection.clone(true);
+			clonedTitle
+				.attr("class", "dataLabelTextShadow")
+				.attr("stroke", d =>
+					this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+				.attr("stroke-width", 4)
+				.attr("stroke-linejoin", "round")
+				.style("text-anchor", "middle");
+		}
 
-		textSelection.attr("transform", function () {
-			const bBox = (d3.select(this.parentNode).select("rect").node() as SVGSVGElement).getBBox();
-			return `translate(${bBox.width / 2},
-	            ${bBox.height - 1.5 - dataLabelsSettings.fontSize * 0.4})`;
-		});
+		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside && dataLabelsSettings.showBackground) {
+			const clonedTitle = textSelection.clone(true);
+			clonedTitle
+				.attr("class", "dataLabelTextShadow")
+				.attr("stroke", this.getColor(this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+				.attr("stroke-width", 4)
+				.attr("stroke-linejoin", "round")
+				.style("text-anchor", "middle");
+		}
 	}
 
 	getDataLabelXY(d: ILollipopChartRow, isPie2: boolean = false): { x: number; y: number } {
@@ -3426,7 +3432,7 @@ export class Visual extends Shadow {
 
 	transformData1LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = this.isLollipopTypeCircle ? this.circle2Size / 0.8 : this.pie2Radius / 0.5;
+		const labelDistance = 15;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
 			if (this.isHorizontalChart) {
@@ -3437,24 +3443,25 @@ export class Visual extends Shadow {
 					(this.yAxisSettings.position === Position.Left && d.value1 > d.value2) ||
 					(this.yAxisSettings.position === Position.Right && d.value1 < d.value2)
 				) {
+
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x + labelDistance;
-						const yPos = y - bBox.height / 2;
+						const xPos = x + bBox.width + this.circle1Size / 2 + labelDistance;
+						const yPos = y;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x + labelDistance;
-						const yPos = y + bBox.width / 2;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x;
+						// const yPos = y;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width - labelDistance;
-						const yPos = y - bBox.height / 2;
+						const xPos = x - bBox.width - this.circle1Size / 2 - labelDistance;
+						const yPos = y;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.width - labelDistance;
-						const yPos = y + bBox.width / 2;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x - bBox.width - labelDistance;
+						// const yPos = y + bBox.width / 2;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				}
 			} else {
@@ -3466,23 +3473,23 @@ export class Visual extends Shadow {
 					(this.xAxisSettings.position === Position.Top && d.value1 < d.value2)
 				) {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width / 2;
-						const yPos = y - labelDistance - bBox.height;
+						const xPos = x;
+						const yPos = y - bBox.height - this.circle1Size / 2 - labelDistance;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.height / 2;
-						const yPos = y - labelDistance;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x;
+						// const yPos = y;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width / 2;
-						const yPos = y + labelDistance;
+						const xPos = x;
+						const yPos = y + bBox.height + this.circle1Size / 2 + labelDistance;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.height / 2;
-						const yPos = y + labelDistance + bBox.width;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x - bBox.height / 2;
+						// const yPos = y + labelDistance + bBox.width;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				}
 			}
@@ -3504,7 +3511,7 @@ export class Visual extends Shadow {
 
 	transformData2LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = this.isLollipopTypeCircle ? this.circle2Size / 0.8 : this.pie2Radius / 0.5;
+		const labelDistance = 15;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
 			if (this.isHorizontalChart) {
@@ -3516,23 +3523,23 @@ export class Visual extends Shadow {
 					(this.yAxisSettings.position === Position.Right && d.value1 > d.value2)
 				) {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x + labelDistance;
-						const yPos = y - bBox.height / 2;
+						const xPos = x + bBox.width + this.circle1Size / 2 + labelDistance;
+						const yPos = y;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x + labelDistance;
-						const yPos = y + bBox.width / 2;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x + labelDistance;
+						// const yPos = y + bBox.width / 2;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width - labelDistance;
-						const yPos = y - bBox.height / 2;
+						const xPos = x - bBox.width - this.circle1Size / 2 - labelDistance;
+						const yPos = y;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.width - labelDistance;
-						const yPos = y + bBox.width / 2;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x - bBox.width - labelDistance;
+						// const yPos = y + bBox.width / 2;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				}
 			} else {
@@ -3544,23 +3551,23 @@ export class Visual extends Shadow {
 					(this.xAxisSettings.position === Position.Top && d.value1 > d.value2)
 				) {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width / 2;
-						const yPos = y - labelDistance - bBox.height;
+						const xPos = x;
+						const yPos = y - bBox.height - this.circle1Size / 2 - labelDistance;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.height / 2;
-						const yPos = y - labelDistance;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x - bBox.height / 2;
+						// const yPos = y - labelDistance;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width / 2;
-						const yPos = y + labelDistance;
+						const xPos = x;
+						const yPos = y + bBox.height + this.circle1Size / 2 + labelDistance;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
-						const xPos = x - bBox.height / 2;
-						const yPos = y + labelDistance + bBox.width;
-						return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
+						// const xPos = x - bBox.height / 2;
+						// const yPos = y + labelDistance + bBox.width;
+						// return { translate: `translate(${xPos}, ${yPos}), rotate(${270})`, x: xPos, y: yPos };
 					}
 				}
 			}
@@ -3586,18 +3593,18 @@ export class Visual extends Shadow {
 			let x;
 
 			if (!this.isLeftYAxis) {
-				x = (this.isHorizontalChart ? cx - this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2) - labelBBox.width / 2;
+				x = (this.isHorizontalChart ? cx - this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2);
 			} else {
-				x = (this.isHorizontalChart ? cx + this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2) - labelBBox.width / 2;
+				x = (this.isHorizontalChart ? cx + this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2);
 			}
 
 			const cy = this.yScale(this.isHorizontalChart ? d.category : (isData2Label ? d.value2 : d.value1));
 			let y;
 
 			if (this.isBottomXAxis) {
-				y = (!this.isHorizontalChart ? cy - this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height / 2;
+				y = (!this.isHorizontalChart ? cy - this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height + (isData2Label ? this.circle2Size / 2 : this.circle1Size / 2);
 			} else {
-				y = (!this.isHorizontalChart ? cy + this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height / 2;
+				y = (!this.isHorizontalChart ? cy + this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2) - labelBBox.height + (isData2Label ? this.circle2Size / 2 : this.circle1Size / 2);
 			}
 
 			return `translate(${x}, ${y})`;
@@ -3632,9 +3639,7 @@ export class Visual extends Shadow {
 
 				const textSelection = dataLabelGSelection.append("text");
 
-				const rectSelection = dataLabelGSelection.append("rect");
-
-				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection);
+				this.setDataLabelsFormatting(dataLabelGSelection, textSelection);
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
@@ -3646,9 +3651,7 @@ export class Visual extends Shadow {
 
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				const rectSelection = dataLabelGSelection.select(".dataLabelRect");
-
-				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection);
+				this.setDataLabelsFormatting(dataLabelGSelection, textSelection);
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData1LabelOutside(dataLabelGSelection, false);
 				} else {
@@ -3706,9 +3709,7 @@ export class Visual extends Shadow {
 
 				const textSelection = dataLabelGSelection.append("text");
 
-				const rectSelection = dataLabelGSelection.append("rect");
-
-				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection, true);
+				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true);
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData2LabelOutside(dataLabelGSelection, true);
 				} else {
@@ -3720,9 +3721,7 @@ export class Visual extends Shadow {
 
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				const rectSelection = dataLabelGSelection.select(".dataLabelRect");
-
-				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, rectSelection, true);
+				this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true);
 				if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
@@ -4745,7 +4744,11 @@ export class Visual extends Shadow {
 	drawLollipopChart(): void {
 		this.chartData.forEach(d => {
 			if (!this.isHasMultiMeasure) {
-				d.value2 = this.yScale.domain()[0];
+				if (!this.isHorizontalChart) {
+					d.value2 = this.yScale.domain()[0];
+				} else {
+					d.value2 = this.xScale.domain()[0];
+				}
 			}
 		});
 

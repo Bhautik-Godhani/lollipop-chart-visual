@@ -5,6 +5,7 @@ import {
 	DataLabelsPlacement,
 	DisplayUnits,
 	EBeforeAfterPosition,
+	EDataLabelsBGApplyFor,
 	EDataRolesName,
 	EFontStyle,
 	ELCRPosition,
@@ -164,6 +165,12 @@ export interface MarkerStyleProps {
 	markerSize: number
 }
 
+export enum EInsideTextColorTypes {
+	AUTO = "auto",
+	CONTRAST = "contrast",
+	FIXED = "fixed"
+}
+
 export interface IDataLabelsSettings {
 	show: boolean;
 	color: string;
@@ -178,6 +185,10 @@ export interface IDataLabelsSettings {
 	placement: DataLabelsPlacement;
 	isAutoFontSize: boolean;
 	showLabelsBelowReferenceLine: boolean;
+	isColorChanged: boolean;
+	textColorTypes: EInsideTextColorTypes;
+	applyFor: EDataLabelsBGApplyFor,
+	isShowBGChangedWhenPatternApplied: boolean;
 }
 
 export interface IDataColorsSettings {

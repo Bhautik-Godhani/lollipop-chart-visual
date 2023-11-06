@@ -210,6 +210,10 @@ export enum EDataLabelsSettings {
 	placement = "placement",
 	isAutoFontSize = "isAutoFontSize",
 	showLabelsBelowReferenceLine = "showLabelsBelowReferenceLine",
+	isColorChanged = "isColorChanged",
+	textColorTypes = "textColorTypes",
+	applyFor = "applyFor",
+	isShowBGChangedWhenPatternApplied = "isShowBGChangedWhenPatternApplied"
 }
 
 export enum EGridLinesSettings {
@@ -457,4 +461,9 @@ export enum ELCRPosition {
 	Left = "left",
 	Centre = "center",
 	Right = "right",
+}
+
+export enum EDataLabelsBGApplyFor {
+	All = "all",
+	ONLY_PATTERNS = "only patterns",
 }

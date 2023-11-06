@@ -1,8 +1,8 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsPlacement, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
-import { IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
+import { EInsideTextColorTypes, IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
 	Column,
@@ -37,6 +37,32 @@ const LABEL_ORIENTATIONS: ILabelValuePair[] = [
 	{
 		label: "Vertical",
 		value: Orientation.Vertical,
+	},
+];
+
+const INSIDE_TEXT_COLOR_TYPES: ILabelValuePair[] = [
+	{
+		value: EInsideTextColorTypes.AUTO,
+		label: "Auto",
+	},
+	{
+		value: EInsideTextColorTypes.CONTRAST,
+		label: "Contrast",
+	},
+	{
+		value: EInsideTextColorTypes.FIXED,
+		label: "Fixed",
+	},
+];
+
+const APPLY_FOR_OPTIONS: ILabelValuePair[] = [
+	{
+		value: EDataLabelsBGApplyFor.All,
+		label: "All Categories",
+	},
+	{
+		value: EDataLabelsBGApplyFor.ONLY_PATTERNS,
+		label: "Categories with Pattern Only",
 	},
 ];
 
@@ -126,6 +152,7 @@ const UIDataLabelsFontSettings = (
 							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, setConfigValues)}
 						/>
 					</Column>
+
 					<Column>
 						<ColorPicker
 							label="Font Color"
@@ -168,17 +195,19 @@ const UIDataLabelsFontSettings = (
 								/>
 							</Column>
 							<Column>
-								<ColorPicker
-									label="Font Color"
-									color={configValues.color}
-									handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-								/>
+								<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+									<ColorPicker
+										label="Font Color"
+										color={configValues.color}
+										handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+									/>
+								</ConditionalWrapper>
 							</Column>
 						</Row>
 					</ConditionalWrapper>
 
-					<ConditionalWrapper visible={configValues.isAutoFontSize}>
+					<ConditionalWrapper visible={shadow.isLollipopTypePie && configValues.isAutoFontSize}>
 						<Row>
 							<Column>
 								<ColorPicker
@@ -217,6 +246,10 @@ const UIDataLabelsFontSettings = (
 			</ConditionalWrapper>
 
 			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)}
+
+			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside && shadow.isLollipopTypeCircle}>
+				{UIInsideLabelsTextColorSettings(shadow, vizOptions, configValues, setConfigValues)}
+			</ConditionalWrapper>
 		</>
 	);
 };
@@ -230,17 +263,6 @@ const UICircleLollipopLabelsSettings = (
 ) => {
 	return (
 		<ConditionalWrapper visible={shadow.isLollipopTypeCircle}>
-			<Row>
-				<Column>
-					<SelectInput
-						label={"Placement"}
-						value={configValues.placement}
-						optionsList={LABEL_PLACEMENTS}
-						handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, setConfigValues)}
-					/>
-				</Column>
-			</Row>
-
 			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
 				<Row>
 					<Column>
@@ -296,6 +318,108 @@ const UICircleLollipopLabelsSettings = (
 		</ConditionalWrapper>
 	);
 };
+
+const UIInsideLabelsTextColorSettings = (
+	shadow: Visual,
+	vizOptions: ShadowUpdateOptions,
+	insideDataLabels: IDataLabelsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
+) => {
+	return <>
+		<Row>
+			<Column>
+				<SwitchOption
+					label="Font Color"
+					value={insideDataLabels.textColorTypes}
+					optionsList={INSIDE_TEXT_COLOR_TYPES}
+					handleChange={(value) => handleChange(value, EDataLabelsSettings.textColorTypes, setConfigValues)}
+				/>
+			</Column>
+		</Row>
+
+		<ConditionalWrapper visible={insideDataLabels.textColorTypes === EInsideTextColorTypes.FIXED}>
+			<Row>
+				<Column>
+					<ColorPicker
+						label={"Color"}
+						color={insideDataLabels.color}
+						handleChange={(value) => {
+							handleColor(value, EDataLabelsSettings.color, setConfigValues);
+							handleChange(true, EDataLabelsSettings.isColorChanged, setConfigValues);
+						}}
+						colorPalette={vizOptions.host.colorPalette}
+						size="sm"
+					/>
+				</Column>
+			</Row>
+		</ConditionalWrapper>
+
+		<ConditionalWrapper visible={insideDataLabels.textColorTypes !== EInsideTextColorTypes.CONTRAST}>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Enable Background"}
+						value={insideDataLabels.showBackground}
+						handleChange={() => {
+							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues)
+
+							if (shadow.isPatternApplied) {
+								handleChange(true, EDataLabelsSettings.isShowBGChangedWhenPatternApplied, setConfigValues)
+							}
+						}}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={insideDataLabels.showBackground && (insideDataLabels.textColorTypes === EInsideTextColorTypes.FIXED || insideDataLabels.textColorTypes === EInsideTextColorTypes.AUTO)}>
+				<ConditionalWrapper visible={shadow.isPatternApplied && shadow.isHasSubcategories}>
+					<Row appearance="padded">
+						<Column>
+							<Row disableTopPadding>
+								<Column>
+									<SelectInput
+										label={"Apply For"}
+										value={insideDataLabels.applyFor}
+										optionsList={APPLY_FOR_OPTIONS}
+										width={"full"}
+										handleChange={(value) => handleChange(value, EDataLabelsSettings.applyFor, setConfigValues)}
+									/>
+								</Column>
+							</Row>
+
+							<Row>
+								<Column>
+									<ColorPicker
+										label={"Color"}
+										color={insideDataLabels.backgroundColor}
+										handleChange={(value) => handleColor(value, EDataLabelsSettings.applyFor, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={(!shadow.isPatternApplied || !shadow.isHasSubcategories)}>
+					<Row appearance="padded">
+						<Column>
+							<ColorPicker
+								label={"Color"}
+								color={insideDataLabels.backgroundColor}
+								handleChange={(value) => handleColor(value, EDataLabelsSettings.backgroundColor, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+			</ConditionalWrapper>
+		</ConditionalWrapper>
+	</>
+}
 
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
@@ -373,6 +497,12 @@ const DataLabelsSettings = (props) => {
 		}
 	}
 
+	React.useEffect(() => {
+		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !dataLabelsSettings.showBackground) {
+			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		}
+	}, []);
+
 	return (
 		<>
 			<Row>
@@ -386,6 +516,17 @@ const DataLabelsSettings = (props) => {
 			</Row>
 
 			<ConditionalWrapper visible={configValues.show}>
+				<Row>
+					<Column>
+						<SelectInput
+							label={"Placement"}
+							value={configValues.placement}
+							optionsList={LABEL_PLACEMENTS}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
 				{UIDataLabelsFontSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
 				{UICircleLollipopLabelsSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
 			</ConditionalWrapper>
