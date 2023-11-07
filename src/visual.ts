@@ -227,6 +227,8 @@ export class Visual extends Shadow {
 	conditionalFormattingConditions: IConditionalFormattingProps[] = [];
 	categoriesColorList: { name: string, marker1: string, marker2: string }[] = [];
 	subCategoriesColorList: { name: string, marker1: string, marker2: string }[] = [];
+	categoryColorPairWithIndex: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
+	subCategoryColorPairWithIndex: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 	isHasNegativeValue: boolean;
@@ -888,7 +890,7 @@ export class Visual extends Shadow {
 	defaultSortCategoryDataPairs(data: { category: string }[], measureKeys: string[], categoricalMeasureFields: powerbi.DataViewValueColumn[]): void {
 		const sortByMeasure = (measureValues: powerbi.DataViewValueColumn[]) => {
 			const index = measureValues[0].source.index;
-			const measureIndex = `${EDataRolesName.Measure1}${index}`;
+			const measureIndex = `${EDataRolesName.Measure}${index}`;
 
 			if (this.isHorizontalChart) {
 				data.sort((a, b) => b[measureIndex] - a[measureIndex]);
@@ -911,7 +913,7 @@ export class Visual extends Shadow {
 			}
 		};
 
-		if (this.isHasMultiMeasure) {
+		if (this.isHasMultiMeasure || this.isHasSubcategories) {
 			sortByMultiMeasure(measureKeys);
 		} else {
 			sortByMeasure(categoricalMeasureFields);
@@ -1120,16 +1122,25 @@ export class Visual extends Shadow {
 
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
 
-		const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
+		const measureKeys = categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
 
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
 		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
-		if (!this.isHasSubcategories) {
-			this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
-		}
+		this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
 
 		this.setCategoricalDataPairsByRanking();
+
+		// set colors for all pairs
+		this.categoricalDataPairs.forEach((data, i) => {
+			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: "", marker2Color: "" };
+		});
+
+		this.subCategoriesName.forEach((name, i) => {
+			this.subCategoryColorPairWithIndex[`${i}-${name}`] = { marker1Color: "", marker2Color: "" };
+		});
+
+		this.setColorsByDataColorsSettings();
 
 		if (this.sortingSettings.category.enabled) {
 			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
@@ -1197,17 +1208,6 @@ export class Visual extends Shadow {
 				}
 			});
 		}
-
-		// set colors for all pairs
-		this.categoricalDataPairs.forEach((data) => {
-			this.categoryColorPair[data.category] = { marker1Color: "", marker2Color: "" };
-		});
-
-		this.subCategoriesName.forEach((name) => {
-			this.subCategoryColorPair[name] = { marker1Color: "", marker2Color: "" };
-		});
-
-		this.setColorsByDataColorsSettings();
 
 		if (this.isExpandAllApplied) {
 			clonedCategoricalData.categories
@@ -1734,7 +1734,7 @@ export class Visual extends Shadow {
 				marker2: this.categoryColorPair[d.category].marker2Color ? this.categoryColorPair[d.category].marker2Color : this.colorPalette.getColor(d.category).value,
 			}));
 
-			if (this.chartData.length && this.isHasSubcategories) {
+			if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
 				this.subCategoriesColorList = this.chartData[0].subCategories.map(d => ({
 					name: d.category,
 					marker1: this.subCategoryColorPair[d.category].marker1Color ? this.subCategoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
@@ -2713,15 +2713,15 @@ export class Visual extends Shadow {
 			//.CIRCLE 1 Colors
 			switch (marker.fillType) {
 				case ColorPaletteType.Single: {
-					this.categoricalDataPairs.forEach((data) => {
-						this.categoryColorPair[data.category][type] = marker.singleColor;
+					this.categoricalDataPairs.forEach((data, i) => {
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = marker.singleColor;
 					});
 					break;
 				}
 				case ColorPaletteType.PowerBi: {
-					this.categoricalDataPairs.forEach((data) => {
+					this.categoricalDataPairs.forEach((data, i) => {
 						const color = this.colorPalette.getColor(data.category).value;
-						this.categoryColorPair[data.category][type] = color;
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = color;
 					});
 					break;
 				}
@@ -2733,7 +2733,7 @@ export class Visual extends Shadow {
 					}
 
 					this.categoricalDataPairs.forEach((data, i) => {
-						this.categoryColorPair[data.category][type] = getMarkerColor(i);
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = getMarkerColor(i);
 					});
 					break;
 				}
@@ -2742,9 +2742,9 @@ export class Visual extends Shadow {
 						obj[cur.name] = { marker1Color: cur.marker1, marker2Color: cur.marker2 };
 						return obj;
 					}, {});
-					this.categoricalDataPairs.forEach((data) => {
+					this.categoricalDataPairs.forEach((data, i) => {
 						if (categoryColors[data.category]) {
-							this.categoryColorPair[data.category][type] = categoryColors[data.category][type];
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = categoryColors[data.category][type];
 						}
 					});
 					break;
@@ -2761,8 +2761,8 @@ export class Visual extends Shadow {
 						}
 					}
 
-					this.categoricalDataPairs.forEach((d, i: number) => {
-						this.categoryColorPair[d.category][type] = getMarkerColor(i);
+					this.categoricalDataPairs.forEach((data, i: number) => {
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = getMarkerColor(i);
 					});
 				}
 			}
@@ -2773,6 +2773,10 @@ export class Visual extends Shadow {
 		if (this.isHasMultiMeasure) {
 			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
+
+		this.categoricalDataPairs.forEach((d, i) => {
+			this.categoryColorPair[d.category] = this.categoryColorPairWithIndex[`${i}-${d.category}`];
+		});
 
 		if (this.rankingSettings.category.enabled) {
 			if (this.rankingSettings.category.showRemainingAsOthers) {
@@ -2814,15 +2818,15 @@ export class Visual extends Shadow {
 			//.CIRCLE 1 Colors
 			switch (marker.fillType) {
 				case ColorPaletteType.Single: {
-					this.subCategoriesName.forEach((data) => {
-						this.subCategoryColorPair[data][type] = marker.singleColor;
+					this.subCategoriesName.forEach((data, i) => {
+						this.subCategoryColorPairWithIndex[`${i}-${data}`][type] = marker.singleColor;
 					});
 					break;
 				}
 				case ColorPaletteType.PowerBi: {
-					this.subCategoriesName.forEach((data) => {
+					this.subCategoriesName.forEach((data, i) => {
 						const color = this.colorPalette.getColor(data).value;
-						this.subCategoryColorPair[data][type] = color;
+						this.subCategoryColorPairWithIndex[`${i}-${data}`][type] = color;
 					});
 					break;
 				}
@@ -2834,7 +2838,7 @@ export class Visual extends Shadow {
 					}
 
 					this.subCategoriesName.forEach((data, i) => {
-						this.subCategoryColorPair[data][type] = getMarkerColor(i);
+						this.subCategoryColorPairWithIndex[`${i}-${data}`][type] = getMarkerColor(i);
 					});
 					break;
 				}
@@ -2843,9 +2847,9 @@ export class Visual extends Shadow {
 						obj[cur.name] = { marker1Color: cur.marker1, marker2Color: cur.marker2 };
 						return obj;
 					}, {});
-					this.subCategoriesName.forEach((data) => {
+					this.subCategoriesName.forEach((data, i) => {
 						if (categoryColors[data]) {
-							this.subCategoryColorPair[data][type] = categoryColors[data][type];
+							this.subCategoryColorPairWithIndex[`${i}-${data}`][type] = categoryColors[data][type];
 						}
 					});
 					break;
@@ -2862,8 +2866,8 @@ export class Visual extends Shadow {
 						}
 					}
 
-					this.subCategoriesName.forEach((d, i: number) => {
-						this.subCategoryColorPair[d][type] = getMarkerColor(i);
+					this.subCategoriesName.forEach((data, i: number) => {
+						this.subCategoryColorPairWithIndex[`${i}-${data}`][type] = getMarkerColor(i);
 					});
 				}
 			}
@@ -2874,6 +2878,10 @@ export class Visual extends Shadow {
 		if (this.isHasMultiMeasure) {
 			setMarkerColor(marker2, 'marker2Color', marker2SeqColorsArray);
 		}
+
+		this.subCategoriesName.forEach((d, i) => {
+			this.subCategoryColorPair[d] = this.subCategoryColorPairWithIndex[`${i}-${d}`];
+		});
 	}
 
 	setChartWidthHeight(): void {
