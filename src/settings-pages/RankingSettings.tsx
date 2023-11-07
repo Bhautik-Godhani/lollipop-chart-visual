@@ -87,7 +87,7 @@ const UIByCategoryRankingSettings = (
 				</Column>
 			</Row>
 
-			{UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)}
+			{/* {UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)} */}
 		</>
 	);
 };
