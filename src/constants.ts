@@ -104,7 +104,7 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	showBackground: true,
 	backgroundColor: "rgba(93, 93, 93, 1)",
 	fontStyle: [],
-	placement: DataLabelsPlacement.Inside,
+	placement: DataLabelsPlacement.Outside,
 	isAutoFontSize: true,
 	showLabelsBelowReferenceLine: false,
 	isColorChanged: false,
