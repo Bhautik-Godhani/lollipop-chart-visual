@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsSettings, EVisualConfig, EVisualSettings, Orientation } from "../enum";
+import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { EInsideTextColorTypes, IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
@@ -29,16 +29,16 @@ const LABEL_PLACEMENTS: ILabelValuePair[] = [
 	},
 ];
 
-const LABEL_ORIENTATIONS: ILabelValuePair[] = [
-	{
-		label: "Horizontal",
-		value: Orientation.Horizontal,
-	},
-	{
-		label: "Vertical",
-		value: Orientation.Vertical,
-	},
-];
+// const LABEL_ORIENTATIONS: ILabelValuePair[] = [
+// 	{
+// 		label: "Horizontal",
+// 		value: Orientation.Horizontal,
+// 	},
+// 	{
+// 		label: "Vertical",
+// 		value: Orientation.Vertical,
+// 	},
+// ];
 
 const INSIDE_TEXT_COLOR_TYPES: ILabelValuePair[] = [
 	{
@@ -263,7 +263,7 @@ const UICircleLollipopLabelsSettings = (
 ) => {
 	return (
 		<ConditionalWrapper visible={shadow.isLollipopTypeCircle}>
-			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
+			{/* <ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
 				<Row>
 					<Column>
 						<SelectInput
@@ -274,7 +274,7 @@ const UICircleLollipopLabelsSettings = (
 						/>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
+			</ConditionalWrapper> */}
 
 			<ConditionalWrapper visible={shadow.referenceLinesData.length > 0}>
 				<Row>
