@@ -79,8 +79,8 @@ const UIByCategoryRankingSettings = (
 								min={1}
 								type="number"
 								label="Count"
-								value={categoryRanking.count.toString()}
-								handleChange={(value) => handleChange(+value, ERankingSettings.Count, ERankingSettings.Category, setConfigValues)}
+								value={categoryRanking.count}
+								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.Category, setConfigValues)}
 							/>
 						</Column>
 					</Row>
@@ -151,8 +151,8 @@ const UIByGroupRankingSettings = (
 								min={1}
 								type="number"
 								label="Count"
-								value={groupByRanking.count.toString()}
-								handleChange={(value) => handleChange(+value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
+								value={groupByRanking.count}
+								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
 							/>
 						</Column>
 					</Row>
