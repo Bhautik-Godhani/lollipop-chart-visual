@@ -2352,7 +2352,7 @@ export class Visual extends Shadow {
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
 				name: d.category,
-				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "" : "",
+				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
 				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 			}));
@@ -2361,7 +2361,7 @@ export class Visual extends Shadow {
 			this.subCategoryPatterns = this.chartData[0].subCategories
 				.map((d) => ({
 					name: d.category,
-					patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "" : "",
+					patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
 					isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
