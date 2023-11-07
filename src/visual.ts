@@ -1655,7 +1655,11 @@ export class Visual extends Shadow {
 			this.setPie1Radius();
 			this.setPie2Radius();
 
-			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+			if (this.isHasMultiMeasure) {
+				this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+			} else {
+				this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
+			}
 
 			this.categoricalData = this.setInitialChartData(
 				clonedCategoricalData,
@@ -4770,7 +4774,11 @@ export class Visual extends Shadow {
 			this.setPie2Radius();
 		}
 
-		this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+		if (this.isHasMultiMeasure) {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+		} else {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
+		}
 
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
 		let marker: IMarkerData;
