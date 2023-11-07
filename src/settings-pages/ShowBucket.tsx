@@ -7,6 +7,7 @@ import { InputControl, Row, Column, ConditionalWrapper, Quote, SwitchOption, Foo
 import { SHOW_BUCKET_SETTINGS as SHOW_BUCKET_SETTINGS_IMP } from "../constants";
 import { IShowBucketSettings } from "../visual-settings.interface";
 import { EShowBucketSettings } from "../enum";
+import { Visual } from "../visual";
 
 const UIShowBucketSettings = (
 	shadow: any,
@@ -130,12 +131,12 @@ const UIShowBucketSettings1 = (
 	</Row>
 }
 
-const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+const UIFooter = (self: Visual, closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
 			cancelButtonHandler={closeCurrentSettingHandler}
 			saveButtonConfig={{
-				isDisabled: false,
+				isDisabled: !self.isShowBucketChartFieldCheck,
 				text: "APPLY",
 				handler: applyChanges,
 			}}
@@ -215,7 +216,7 @@ const ShowCondition = (props) => {
 
 			{shadow.isShowBucketChartFieldCheck && configValues.enable && UIShowBucketSettings(shadow, vizOptions, configValues, handleChange)}
 
-			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+			{UIFooter(shadow, closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
 };
