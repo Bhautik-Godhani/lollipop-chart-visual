@@ -447,7 +447,7 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 				result.color = color;
 				break;
 			case "<>":
-				result.match = value >= v && value <= +v2;
+				result.match = value > 0 ? value >= v && value <= +v2 : value <= v && value >= +v2;
 				result.color = color;
 				break;
 		}

@@ -3440,7 +3440,7 @@ export class Visual extends Shadow {
 
 	transformData1LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = 15;
+		const labelDistance = 20;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
 			if (this.isHorizontalChart) {
@@ -3519,7 +3519,7 @@ export class Visual extends Shadow {
 
 	transformData2LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const dataLabelsSettings = this.dataLabelsSettings;
-		const labelDistance = 15;
+		const labelDistance = 20;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
 			if (this.isHorizontalChart) {
