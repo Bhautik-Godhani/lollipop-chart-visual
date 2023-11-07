@@ -1728,11 +1728,13 @@ export class Visual extends Shadow {
 				this.setConditionalFormattingColor();
 			}
 
-			this.categoriesColorList = this.chartData.map(d => ({
-				name: d.category,
-				marker1: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
-				marker2: this.categoryColorPair[d.category].marker2Color ? this.categoryColorPair[d.category].marker2Color : this.colorPalette.getColor(d.category).value,
-			}));
+			if (this.isLollipopTypeCircle) {
+				this.categoriesColorList = this.chartData.map(d => ({
+					name: d.category,
+					marker1: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+					marker2: this.categoryColorPair[d.category].marker2Color ? this.categoryColorPair[d.category].marker2Color : this.colorPalette.getColor(d.category).value,
+				}));
+			}
 
 			if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
 				this.subCategoriesColorList = this.chartData[0].subCategories.map(d => ({
