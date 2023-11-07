@@ -23,4 +23,11 @@ export const CATEGORY_MARKERS: IMarkerData[] = [
         w: 16,
         h: 16,
     },
+    {
+        label: "DIAMOND",
+        value: EMarkerDefaultShapes.DIAMOND,
+        paths: [{ d: "M8,0 L16,8 L8,16 L0,8 Z", fill: "var(--activeSelected)", stroke: undefined }],
+        w: 16,
+        h: 16,
+    }
 ];
