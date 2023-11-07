@@ -5597,6 +5597,11 @@ export class Visual extends Shadow {
 					const tooltipData: TooltipData[] = [
 						{
 							displayName: this.categoryDisplayName,
+							value: pieData.parentCategory,
+							color: "transparent",
+						},
+						{
+							displayName: this.subCategoryDisplayName,
 							value: pieData.category,
 							color: "transparent",
 						},
