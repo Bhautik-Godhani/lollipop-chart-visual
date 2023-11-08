@@ -2257,7 +2257,7 @@ export class Visual extends Shadow {
 
 				const obj: ILollipopChartRow = {
 					uid: getUID(cat),
-					category: <string>cat,
+					category: <string>cat.toString(),
 					raceChartKey,
 					raceChartDataLabel,
 					value1: !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0,
@@ -4033,7 +4033,7 @@ export class Visual extends Shadow {
 			// })
 			.each(function () {
 				const ele = d3.select(this);
-				const text = ele.text();
+				const text = ele.text().toString();
 				ele.text("");
 
 				const textProperties: TextProperties = {
