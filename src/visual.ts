@@ -281,6 +281,7 @@ export class Visual extends Shadow {
 
 	// xAxis
 	public xAxisG: D3Selection<SVGElement>;
+	public xAxisLineG: D3Selection<SVGElement>;
 	public xScale: any;
 	public xScale2: any;
 	public xAxisTitleMargin: number = 0;
@@ -295,6 +296,7 @@ export class Visual extends Shadow {
 
 	// yAxis
 	public yAxisG: D3Selection<SVGElement>;
+	public yAxisLineG: D3Selection<SVGElement>;
 	public yScale: any;
 	public yScale2: any;
 	public yAxisTitleText: any;
@@ -653,9 +655,13 @@ export class Visual extends Shadow {
 
 		this.xAxisG = this.container.append("g").classed("xAxisG", true);
 
+		this.xAxisLineG = this.container.append("g").classed("xAxisLineG", true);
+
 		this.expandAllXAxisG = this.container.append("g").classed("expandAllXAxisG", true);
 
 		this.yAxisG = this.container.append("g").classed("yAxisG", true);
+
+		this.yAxisLineG = this.container.append("g").classed("yAxisLineG", true);
 
 		this.expandAllYAxisG = this.container.append("g").classed("expandAllYAxisG", true);
 
@@ -1909,6 +1915,18 @@ export class Visual extends Shadow {
 
 			// this.displayBrush();
 			this.drawTooltip();
+
+			if (this.xAxisSettings.isShowAxisLine) {
+				this.drawXAxisLine();
+			} else {
+				this.xAxisLineG.select(".xAxisLine").remove();
+			}
+
+			if (this.yAxisSettings.isShowAxisLine) {
+				this.drawYAxisLine();
+			} else {
+				this.yAxisLineG.select(".yAxisLine").remove();
+			}
 
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
@@ -4193,13 +4211,53 @@ export class Visual extends Shadow {
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		if (this.isHorizontalChart) {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
-			this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
+			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
+			// this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 		} else {
-			this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
+			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25]);
 		}
+	}
+
+	drawXAxisLine(): void {
+		if (this.isBottomXAxis) {
+			this.xAxisLineG.attr("transform", "translate(0," + this.height + ")");
+		} else {
+			this.xAxisLineG.attr("transform", "translate(0," + 0 + ")");
+		}
+
+		this.xAxisLineG.select(".xAxisLine").remove();
+		this.xAxisLineG
+			.append("line")
+			.attr("class", "xAxisLine")
+			.attr("x1", this.xScale.range()[0])
+			.attr("x2", this.xScale.range()[1])
+			.attr("y1", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
+			.attr("y2", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
+			.attr("fill", "rgba(84, 84, 84, 1)")
+			.attr("stroke", "rgba(84, 84, 84, 1)")
+			.attr("stroke-width", "1px");
+	}
+
+	drawYAxisLine(): void {
+		if (this.isLeftYAxis) {
+			this.yAxisLineG.attr("transform", `translate(0, 0)`);
+		} else {
+			this.yAxisLineG.attr("transform", `translate(${this.width}, 0)`);
+		}
+
+		this.yAxisLineG.select(".yAxisLine").remove();
+		this.yAxisLineG
+			.append("line")
+			.attr("class", "yAxisLine")
+			.attr("x1", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
+			.attr("x2", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
+			.attr("y1", this.yScale.range()[0])
+			.attr("y2", this.yScale.range()[1])
+			.attr("fill", "rgba(84, 84, 84, 1)")
+			.attr("stroke", "rgba(84, 84, 84, 1)")
+			.attr("stroke-width", "1px");
 	}
 
 	callXYScaleOnAxisGroup(): void {

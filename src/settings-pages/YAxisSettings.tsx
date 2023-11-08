@@ -112,6 +112,17 @@ const YAxisSettings = (props) => {
       <Row>
         <Column>
           <ToggleButton
+            label={"Axis Line"}
+            value={configValues.isShowAxisLine}
+            handleChange={() => handleCheckbox(EYAxisSettings.IsShowAxisLine)}
+            appearance="toggle"
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <ToggleButton
             label={"Show Title"}
             value={configValues.isDisplayTitle}
             handleChange={() => handleCheckbox(EYAxisSettings.IsDisplayTitle)}

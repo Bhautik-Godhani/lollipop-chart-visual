@@ -208,6 +208,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	isLabelAutoTilt: true,
 	labelTilt: 30,
 	labelCharLimit: 10,
+	isShowAxisLine: false
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -222,7 +223,8 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
 	labelCharLimit: 10,
-	isShowLabelsAboveLine: false
+	isShowLabelsAboveLine: false,
+	isShowAxisLine: false
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {

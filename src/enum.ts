@@ -339,6 +339,7 @@ export enum EXAxisSettings {
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
+	IsShowAxisLine = "isShowAxisLine"
 }
 
 export enum EYAxisSettings {
@@ -352,7 +353,8 @@ export enum EYAxisSettings {
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
-	IsShowLabelsAboveLine = "isShowLabelsAboveLine"
+	IsShowLabelsAboveLine = "isShowLabelsAboveLine",
+	IsShowAxisLine = "isShowAxisLine"
 }
 
 export enum EMarkerSettings {

@@ -109,6 +109,17 @@ const XAxisSettings = (props) => {
       <Row>
         <Column>
           <ToggleButton
+            label={"Axis Line"}
+            value={configValues.isShowAxisLine}
+            handleChange={() => handleCheckbox(EXAxisSettings.IsShowAxisLine)}
+            appearance="toggle"
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <ToggleButton
             label={"Show Title"}
             value={configValues.isDisplayTitle}
             handleChange={() => handleCheckbox(EXAxisSettings.IsDisplayTitle)}
