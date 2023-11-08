@@ -333,11 +333,11 @@ export class Visual extends Shadow {
 	// circle
 	public circleClass: string = "lollipop-circle";
 	public circleClassSelector: string = ".lollipop-circle";
-	public minCircleSize: number = 20;
+	public minCircleSize: number = 15;
 	public maxCircleSize: number = 40;
-	public brushAndZoomAreaCircleMinSize: number = 15;
+	public brushAndZoomAreaCircleMinSize: number = 10;
 	public brushAndZoomAreaCircleMaxSize: number = 40;
-	public brushAndZoomAreaCircleSize: number = 0;
+	public brushAndZoomAreaCircleSize: number = 12;
 
 	// circle1
 	public circle1G: any;
@@ -974,9 +974,9 @@ export class Visual extends Shadow {
 		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
 
 		if (this.isLollipopTypeCircle) {
-			this.minScaleBandWidth = 40;
+			this.minScaleBandWidth = 25;
 		} else {
-			this.minScaleBandWidth = 60;
+			this.minScaleBandWidth = 50;
 		}
 
 		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields);
@@ -1870,14 +1870,14 @@ export class Visual extends Shadow {
 				const max = d3.max(clonedCategoricalData.values, (d: any) => d3.max(d.values, v => +v));
 				const brushScaleBandwidth = this.brushScaleBand.bandwidth();
 
-				const circleSize = (brushScaleBandwidth / 3.5) * 2;
-				if (circleSize < this.brushAndZoomAreaCircleMaxSize && circleSize > this.brushAndZoomAreaCircleMinSize) {
-					this.brushAndZoomAreaCircleSize = circleSize;
-				} else if (circleSize > this.brushAndZoomAreaCircleMaxSize) {
-					this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMaxSize;
-				} else if (circleSize < this.brushAndZoomAreaCircleMinSize) {
-					this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMinSize;
-				}
+				// const circleSize = (brushScaleBandwidth / 3.5) * 2;
+				// if (circleSize < this.brushAndZoomAreaCircleMaxSize && circleSize > this.brushAndZoomAreaCircleMinSize) {
+				// this.brushAndZoomAreaCircleSize = circleSize;
+				// } else if (circleSize > this.brushAndZoomAreaCircleMaxSize) {
+				// 	this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMaxSize;
+				// } else if (circleSize < this.brushAndZoomAreaCircleMinSize) {
+				// 	this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMinSize;
+				// }
 
 				if (this.isHorizontalChart) {
 					this.brushXScale = d3.scaleLinear().range([this.brushAndZoomAreaCircleSize + 5, this.brushAndZoomAreaWidth - 5]).domain([min, max]);

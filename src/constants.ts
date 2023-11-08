@@ -89,7 +89,7 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 export const LINE_SETTINGS: ILineSettings = {
 	show: true,
 	lineType: ELineType.Solid,
-	lineWidth: 6,
+	lineWidth: 4,
 	lineColor: "rgba(128, 128, 128, 1)",
 };
 
@@ -268,8 +268,8 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerShapeBase64Url: "",
 	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
-	marker1Style: { isAutoMarkerSize: true, markerSize: 0 },
-	marker2Style: { isAutoMarkerSize: true, markerSize: 0 },
+	marker1Style: { isAutoMarkerSize: false, markerSize: 20 },
+	marker2Style: { isAutoMarkerSize: false, markerSize: 20 },
 	selectedImageDataField: undefined
 };
 
