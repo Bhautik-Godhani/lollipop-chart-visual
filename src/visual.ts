@@ -3998,7 +3998,7 @@ export class Visual extends Shadow {
 			});
 
 			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
-				(this.markerMaxSize > this.scaleBandWidth);
+				(this.markerMaxSize > this.scaleBandWidth) || !xAxisSettings.isLabelAutoTilt;
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
 				const textProperties: TextProperties = {
 					text: d + "ab",
@@ -4086,9 +4086,23 @@ export class Visual extends Shadow {
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
 						if (THIS.isBottomXAxis) {
-							ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35})`);
+							let rotateDegree = 0;
+							if (xAxisSettings.isLabelAutoTilt) {
+								rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
+							} else {
+								rotateDegree = -xAxisSettings.labelTilt;
+							}
+
+							ele.attr("transform", `rotate( ${rotateDegree})`);
 						} else {
-							ele.attr("transform", `rotate( ${(THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35})`);
+							let rotateDegree = 0;
+							if (xAxisSettings.isLabelAutoTilt) {
+								rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
+							} else {
+								rotateDegree = xAxisSettings.labelTilt;
+							}
+
+							ele.attr("transform", `rotate( ${rotateDegree})`);
 						}
 						ele.append("tspan").text(truncatedText);
 					}

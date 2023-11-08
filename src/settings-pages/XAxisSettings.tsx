@@ -222,6 +222,33 @@ const XAxisSettings = (props) => {
             />
           </Column>
         </Row>
+
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Label Auto Tilt"}
+              value={configValues.isLabelAutoTilt}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoTilt)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={!configValues.isLabelAutoTilt}>
+          <Row>
+            <Column>
+              <InputControl
+                min={30}
+                max={90}
+                label="Tilt Angle"
+                type="number"
+                value={configValues.labelTilt.toString()}
+                handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelTilt)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
       </ConditionalWrapper>
 
       <Footer

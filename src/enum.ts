@@ -339,7 +339,9 @@ export enum EXAxisSettings {
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
-	IsShowAxisLine = "isShowAxisLine"
+	IsShowAxisLine = "isShowAxisLine",
+	LabelTilt = "labelTilt",
+	IsLabelAutoTilt = "isLabelAutoTilt"
 }
 
 export enum EYAxisSettings {
