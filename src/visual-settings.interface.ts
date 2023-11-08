@@ -40,8 +40,9 @@ export interface IXAxisSettings {
 	labelFontFamily: string;
 	labelFontSize: number;
 	labelTilt: number;
-	labelCharLimit: number;
 	isLabelAutoTilt: boolean;
+	labelCharLimit: number;
+	isLabelAutoCharLimit: boolean;
 	isShowAxisLine: boolean;
 }
 
@@ -59,6 +60,7 @@ export interface IYAxisSettings {
 	labelCharLimit: number;
 	isShowLabelsAboveLine: boolean;
 	isShowAxisLine: boolean;
+	isLabelAutoCharLimit: boolean;
 }
 
 export interface ICirclePropsSettings {

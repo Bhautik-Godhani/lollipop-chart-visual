@@ -341,7 +341,9 @@ export enum EXAxisSettings {
 	LabelFontSize = "labelFontSize",
 	IsShowAxisLine = "isShowAxisLine",
 	LabelTilt = "labelTilt",
-	IsLabelAutoTilt = "isLabelAutoTilt"
+	IsLabelAutoTilt = "isLabelAutoTilt",
+	LabelCharLimit = "labelCharLimit",
+	IsLabelAutoCharLimit = "isLabelAutoCharLimit"
 }
 
 export enum EYAxisSettings {
@@ -356,7 +358,9 @@ export enum EYAxisSettings {
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
 	IsShowLabelsAboveLine = "isShowLabelsAboveLine",
-	IsShowAxisLine = "isShowAxisLine"
+	IsShowAxisLine = "isShowAxisLine",
+	LabelCharLimit = "labelCharLimit",
+	IsLabelAutoCharLimit = "isLabelAutoCharLimit"
 }
 
 export enum EMarkerSettings {

@@ -238,6 +238,33 @@ const YAxisSettings = (props) => {
             />
           </Column>
         </Row>
+
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Label Auto Char Limit"}
+              value={configValues.isLabelAutoCharLimit}
+              handleChange={() => handleCheckbox(EYAxisSettings.IsLabelAutoCharLimit)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
+          <Row>
+            <Column>
+              <InputControl
+                min={2}
+                max={50}
+                label="Char Limit"
+                type="number"
+                value={configValues.labelCharLimit.toString()}
+                handleChange={(value: any) => handleChange(value, EYAxisSettings.LabelCharLimit)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
       </ConditionalWrapper>
 
       <Footer

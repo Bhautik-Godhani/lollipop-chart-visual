@@ -3989,12 +3989,13 @@ export class Visual extends Shadow {
 		if (!this.isHorizontalChart) {
 			const xAxisDomain: string[] = this.xScale.domain();
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
+				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
 				const textProperties: TextProperties = {
-					text: text,
+					text: newText,
 					fontFamily: xAxisSettings.labelFontFamily,
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
-				return GetWordsSplitByWidth(text, textProperties, this.scaleBandWidth, 3);
+				return GetWordsSplitByWidth(newText, textProperties, this.scaleBandWidth, 3);
 			});
 
 			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
@@ -4052,10 +4053,11 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				const text = ele.text().toString();
+				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
 				ele.text("");
 
 				const textProperties: TextProperties = {
-					text: text,
+					text: newText,
 					fontFamily: xAxisSettings.labelFontFamily,
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
@@ -4075,7 +4077,7 @@ export class Visual extends Shadow {
 							});
 						}
 
-						const words: string[] = GetWordsSplitByWidth(text, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
+						const words: string[] = GetWordsSplitByWidth(newText, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
 						words.forEach((d, i) => {
 							ele
 								.append("tspan")
@@ -4107,7 +4109,7 @@ export class Visual extends Shadow {
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
-					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
+					ele.append("tspan").text(formatNumber(parseFloat(newText), THIS.numberSettings));
 				}
 			});
 	}
@@ -4134,13 +4136,13 @@ export class Visual extends Shadow {
 				ele.text("");
 
 				const textProperties: TextProperties = {
-					text: text,
+					text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
 					fontFamily: yAxisSettings.labelFontFamily,
 					fontSize: yAxisSettings.labelFontSize + "px",
 				};
 
 				if (!THIS.isHorizontalChart) {
-					ele.append("tspan").text(formatNumber(parseFloat(text), THIS.numberSettings));
+					ele.append("tspan").text(formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);

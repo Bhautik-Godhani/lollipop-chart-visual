@@ -223,27 +223,55 @@ const XAxisSettings = (props) => {
           </Column>
         </Row>
 
+        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Label Auto Tilt"}
+                value={configValues.isLabelAutoTilt}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoTilt)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={!configValues.isLabelAutoTilt}>
+            <Row>
+              <Column>
+                <InputControl
+                  min={30}
+                  max={90}
+                  label="Tilt Angle"
+                  type="number"
+                  value={configValues.labelTilt.toString()}
+                  handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelTilt)}
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+        </ConditionalWrapper>
+
         <Row>
           <Column>
             <ToggleButton
-              label={"Label Auto Tilt"}
-              value={configValues.isLabelAutoTilt}
-              handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoTilt)}
+              label={"Label Auto Char Limit"}
+              value={configValues.isLabelAutoCharLimit}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoCharLimit)}
               appearance="toggle"
             />
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={!configValues.isLabelAutoTilt}>
+        <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
           <Row>
             <Column>
               <InputControl
-                min={30}
-                max={90}
-                label="Tilt Angle"
+                min={2}
+                max={50}
+                label="Char Limit"
                 type="number"
-                value={configValues.labelTilt.toString()}
-                handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelTilt)}
+                value={configValues.labelCharLimit.toString()}
+                handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelCharLimit)}
               />
             </Column>
           </Row>

@@ -207,8 +207,9 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	labelFontSize: 12,
 	isLabelAutoTilt: true,
 	labelTilt: 30,
-	labelCharLimit: 10,
-	isShowAxisLine: false
+	labelCharLimit: 12,
+	isShowAxisLine: false,
+	isLabelAutoCharLimit: true
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -222,9 +223,10 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	labelColor: "rgba(84, 84, 84, 1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
-	labelCharLimit: 10,
+	labelCharLimit: 12,
 	isShowLabelsAboveLine: false,
-	isShowAxisLine: false
+	isShowAxisLine: false,
+	isLabelAutoCharLimit: true
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {
