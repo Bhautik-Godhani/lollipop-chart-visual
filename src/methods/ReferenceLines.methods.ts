@@ -244,35 +244,23 @@ const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLinesSettings
     return { textX1, textY1, textAnchor, textAlignment };
 };
 
-const getTextXYForHorizontalLine = (self: Visual, rLine: IReferenceLinesSettings, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 = 0;
     const y1 =
-        self.yScale(value) +
-        (rLine.linePositionOnBar === Position.Top
-            ? -(+rLine.lineWidth / 2)
-            : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+        self.yScale(value) + self.scaleBandWidth / 2;
     const x2 = self.width;
     const y2 =
-        self.yScale(value) +
-        (rLine.linePositionOnBar === Position.Top
-            ? -(+rLine.lineWidth / 2)
-            : ((self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+        self.yScale(value) + self.scaleBandWidth / 2;
 
     return { x1, y1, x2, y2 };
 };
 
-const getTextXYForVerticalLine = (self: Visual, rLine: IReferenceLinesSettings, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 =
-        self.xScale(value) +
-        (rLine.linePositionOnBar === Position.Left
-            ? -(+rLine.lineWidth / 2)
-            : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+        self.xScale(value) + self.scaleBandWidth / 2;
     const y1 = 0;
     const x2 =
-        self.xScale(value) +
-        (rLine.linePositionOnBar === Position.Left
-            ? -(+rLine.lineWidth / 2)
-            : ((!self.isHorizontalChart ? self.scaleBandWidth : 0) + +rLine.lineWidth / 2));
+        self.xScale(value) + self.scaleBandWidth / 2;
     const y2 = self.height;
 
     return { x1, y1, x2, y2 };
@@ -297,13 +285,13 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, v
     }
 
     if (self.isHorizontalChart) {
-        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, rLine, value);
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
         newY2 = y2;
     } else {
-        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, rLine, value);
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
@@ -348,13 +336,13 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLinesSettings, v
     }
 
     if (self.isHorizontalChart) {
-        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, rLine, value);
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
         newY2 = y2;
     } else {
-        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, rLine, value);
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
@@ -421,7 +409,6 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLinesSettings[] =
             }
 
             SetAutoBarAreaPositionToHighlight(self, rLine);
-            SetAutoLinePositionOnBar(self, rLine);
 
             let value: string;
             if (rLine.axis === EXYAxisNames.X) {
@@ -479,24 +466,6 @@ const SetAutoBarAreaPositionToHighlight = (self: Visual, rLine: IReferenceLinesS
         (rLine.barAreaPositionToHighlight === Position.Left || rLine.barAreaPositionToHighlight === Position.Right)
     ) {
         rLine.barAreaPositionToHighlight = Position.Bottom;
-    }
-}
-
-const SetAutoLinePositionOnBar = (self: Visual, rLine: IReferenceLinesSettings): void => {
-    if (
-        rLine.axis == EXYAxisNames.X &&
-        !self.isHorizontalChart &&
-        (rLine.linePositionOnBar === Position.Bottom || rLine.linePositionOnBar === Position.Top)
-    ) {
-        rLine.linePositionOnBar = Position.Left;
-    }
-
-    if (
-        rLine.axis == EXYAxisNames.X &&
-        self.isHorizontalChart &&
-        (rLine.linePositionOnBar === Position.Left || rLine.linePositionOnBar === Position.Right)
-    ) {
-        rLine.linePositionOnBar = Position.Top;
     }
 }
 

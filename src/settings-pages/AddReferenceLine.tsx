@@ -216,35 +216,6 @@ const getBarAreaPositionToHighlightList = (shadow: Visual, configValues: IRefere
   return BarAreaPositionToHighlightList;
 }
 
-const getLinePositionOnBarList = (shadow: Visual) => {
-  const LinePositionOnBarList: ILabelValuePair[] = [];
-  if (!shadow.isHorizontalChart) {
-    LinePositionOnBarList.push({
-      label: "LEFT",
-      value: Position.Left,
-    });
-
-    LinePositionOnBarList.push({
-      label: "RIGHT",
-      value: Position.Right,
-    });
-  }
-
-  if (shadow.isHorizontalChart) {
-    LinePositionOnBarList.push({
-      label: "TOP",
-      value: Position.Top,
-    });
-
-    LinePositionOnBarList.push({
-      label: "BOTTOM",
-      value: Position.Bottom,
-    });
-  }
-
-  return LinePositionOnBarList;
-}
-
 const setManualConfigValues = (shadow: Visual, configValues: IReferenceLinesSettings) => {
   if (
     configValues.axis == EXYAxisNames.X &&
@@ -698,7 +669,6 @@ const UIBorderStyles = (vizOptions: ShadowUpdateOptions, configValues: IReferenc
 
 const UIHighlightBar = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLinesSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any, handleColor: (...args: any) => any) => {
   const BarAreaPositionToHighlightList: ILabelValuePair[] = getBarAreaPositionToHighlightList(shadow, configValues);
-  const LinePositionOnBarList: ILabelValuePair[] = getLinePositionOnBarList(shadow);
 
   return <Accordion title="Highlight Bar" childBottomPadding>
     <Row>
@@ -723,19 +693,6 @@ const UIHighlightBar = (vizOptions: ShadowUpdateOptions, shadow: Visual, configV
           />
         </Column>
       </Row>
-
-      <ConditionalWrapper visible={!shadow.isHorizontalChart && configValues.axis === EXYAxisNames.X || shadow.isHorizontalChart && configValues.axis === EXYAxisNames.X}>
-        <Row>
-          <Column>
-            <SwitchOption
-              label="Line Position On Bar"
-              value={configValues.linePositionOnBar}
-              optionsList={LinePositionOnBarList}
-              handleChange={value => handleChange(value, "linePositionOnBar")}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
 
       <Row>
         <Column>

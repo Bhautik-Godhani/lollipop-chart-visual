@@ -405,7 +405,6 @@ export interface IReferenceLinesSettings {
 	styling: any[];
 	isHighlightBarArea: boolean;
 	barAreaPositionToHighlight: Position;
-	linePositionOnBar: Position;
 	shadeColor: string;
 	transparency: number;
 	labelBorder: boolean;

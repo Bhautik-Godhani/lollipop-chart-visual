@@ -331,7 +331,6 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLinesSettings = {
 	styling: [],
 	isHighlightBarArea: true,
 	barAreaPositionToHighlight: Position.Bottom,
-	linePositionOnBar: Position.Right,
 	shadeColor: "rgba(255,255,255,0.6)",
 	transparency: 60,
 	labelBorder: true,
