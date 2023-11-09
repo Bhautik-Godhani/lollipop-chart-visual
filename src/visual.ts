@@ -4624,7 +4624,7 @@ export class Visual extends Shadow {
 					if (d.value1 > d.value2) {
 						return this.xScale(d.value1) + THIS.markerMaxSize / 2;
 					} else {
-						return this.xScale(d.value2) + THIS.markerMaxSize / 2;
+						return this.xScale(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 > d.value2) {
@@ -4638,7 +4638,7 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.xScale(d.value1);
+						const Y1 = this.xScale(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
 						const Y2 = this.xScale(d.value2) - THIS.markerMaxSize / 2;
 
@@ -4664,7 +4664,7 @@ export class Visual extends Shadow {
 						}
 					} else {
 						const Y1 = THIS.xScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.xScale(d.value1);
+						const Y2 = THIS.xScale(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4677,7 +4677,7 @@ export class Visual extends Shadow {
 					if (d.value1 > d.value2) {
 						return this.xScale(d.value1) - THIS.markerMaxSize / 2;
 					} else {
-						return this.xScale(d.value2) - THIS.markerMaxSize / 2;
+						return this.xScale(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				}
 			})
@@ -4723,7 +4723,7 @@ export class Visual extends Shadow {
 					if (d.value1 > d.value2) {
 						return this.yScale(d.value1) + THIS.markerMaxSize / 2;
 					} else {
-						return this.yScale(d.value2) + THIS.markerMaxSize / 2;
+						return this.yScale(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 > d.value2) {
@@ -4737,7 +4737,7 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.yScale(d.value1);
+						const Y1 = this.yScale(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
 						const Y2 = this.yScale(d.value2) - THIS.markerMaxSize / 2;
 
@@ -4763,7 +4763,7 @@ export class Visual extends Shadow {
 						}
 					} else {
 						const Y1 = THIS.yScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.yScale(d.value1);
+						const Y2 = THIS.yScale(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -4776,7 +4776,7 @@ export class Visual extends Shadow {
 					if (d.value1 > d.value2) {
 						return this.yScale(d.value1) - THIS.markerMaxSize / 2;
 					} else {
-						return this.yScale(d.value2) - THIS.markerMaxSize / 2;
+						return this.yScale(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				}
 			});
@@ -4847,9 +4847,9 @@ export class Visual extends Shadow {
 		this.chartData.forEach(d => {
 			if (!this.isHasMultiMeasure) {
 				if (!this.isHorizontalChart) {
-					d.value2 = this.yScale.domain()[0];
+					d.value2 = 0;
 				} else {
-					d.value2 = this.xScale.domain()[0];
+					d.value2 = 0;
 				}
 			}
 		});
