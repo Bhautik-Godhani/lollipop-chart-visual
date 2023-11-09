@@ -149,6 +149,8 @@ export const MARKER1_DATA_COLORS: IDataColorsProps = {
 	colorScheme: "Blue",
 	reverse: false,
 	isGradient: true,
+	negativeColor: "rgba(208, 2, 27, 1)",
+	positiveColor: "rgba(23, 177, 105, 1)"
 };
 
 export const MARKER2_DATA_COLORS: IDataColorsProps = {
@@ -168,6 +170,8 @@ export const MARKER2_DATA_COLORS: IDataColorsProps = {
 	colorScheme: "Blue",
 	reverse: false,
 	isGradient: true,
+	negativeColor: "rgba(208, 2, 27, 1)",
+	positiveColor: "rgba(23, 177, 105, 1)"
 };
 
 export const DATA_COLORS: IDataColorsSettings = {

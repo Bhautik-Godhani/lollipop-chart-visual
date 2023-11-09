@@ -36,6 +36,10 @@ const colorPaletteDropdownList = [
 		label: "Qualitative",
 		value: ColorPaletteType.Qualitative,
 	},
+	{
+		label: "Positive/Negative",
+		value: ColorPaletteType.PositiveNegative,
+	}
 ];
 
 const handleChange = (v, n, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
@@ -190,6 +194,30 @@ const UIColorPaletteTypes = (
 									return { ...t, [t.markerType]: d };
 								});
 							}}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={values.fillType === ColorPaletteType.PositiveNegative}>
+				<Row>
+					<Column>
+						<ColorPicker
+							label={"Positive Color"}
+							color={values.positiveColor}
+							handleChange={(value) => handleColorChange(value, EDataColorsSettings.PositiveColor, configValues.markerType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+
+					<Column>
+						<ColorPicker
+							label={"Negative Color"}
+							color={values.negativeColor}
+							handleChange={(value) => handleColorChange(value, EDataColorsSettings.NegativeColor, configValues.markerType, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
 						/>
 					</Column>
 				</Row>

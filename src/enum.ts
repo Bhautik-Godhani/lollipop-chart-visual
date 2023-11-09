@@ -63,6 +63,7 @@ export enum ColorPaletteType {
 	Sequential = "sequential",
 	Diverging = "diverging",
 	Qualitative = "qualitative",
+	PositiveNegative = "positiveNegative"
 }
 
 export enum CategoryDataColorProps {
@@ -253,6 +254,8 @@ export enum EDataColorsSettings {
 	Reverse = "reverse",
 	IsGradient = "isGradient",
 	Categories = "categories",
+	PositiveColor = "positiveColor",
+	NegativeColor = "negativeColor"
 }
 
 export enum ERankingSettings {

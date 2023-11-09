@@ -239,6 +239,8 @@ export interface IDataColorsProps {
 	reverse: boolean,
 	isGradient?: boolean,
 	categories?: any[],
+	positiveColor: string,
+	negativeColor: string
 }
 
 export interface ILabelValuePair {

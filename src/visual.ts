@@ -233,6 +233,7 @@ export class Visual extends Shadow {
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
 	isHasNegativeValue: boolean;
 	markerMaxSize: number = 0;
+	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -1439,6 +1440,18 @@ export class Visual extends Shadow {
 
 		if (!this.isHasImagesData && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES) {
 			this.markerSettings.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
+		if (!this.isHasSubcategories) {
+			this.categoricalMeasureFields.forEach(d => {
+				this.minMaxValuesByMeasures[d.source.displayName] = { min: d3.min(d.values, d => +d), max: d3.max(d.values, d => +d) };
+			});
+		} else {
+			const measuresGroup = d3.group(this.categoricalMeasureFields, d => d.source.displayName);
+			[...measuresGroup.keys()].forEach(d => {
+				const measureFields = measuresGroup.get(d);
+				this.minMaxValuesByMeasures[d.toString()] = { min: d3.min(measureFields, d => d3.min(d.values, v => +v)), max: d3.max(measureFields, d => d3.max(d.values, v => +v)) };
+			})
 		}
 
 		// if (!this.isHasSubcategories) {
@@ -2788,6 +2801,7 @@ export class Visual extends Shadow {
 					this.categoricalDataPairs.forEach((data, i: number) => {
 						this.categoryColorPairWithIndex[`${i}-${data.category}`][type] = getMarkerColor(i);
 					});
+					break;
 				}
 			}
 		}
@@ -5212,7 +5226,9 @@ export class Visual extends Shadow {
 	setPath1Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
-				const color = this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
+				const isPosNegColorScheme = this.dataColorsSettings.marker1.fillType === ColorPaletteType.PositiveNegative;
+				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.marker1.positiveColor : this.dataColorsSettings.marker1.negativeColor;
+				const color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -5299,7 +5315,9 @@ export class Visual extends Shadow {
 	setPath2Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
-				const color = this.getColor(this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
+				const isPosNegColorScheme = this.dataColorsSettings.marker2.fillType === ColorPaletteType.PositiveNegative;
+				const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.marker2.positiveColor : this.dataColorsSettings.marker2.negativeColor;
+				const color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
 				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
 				} else {
@@ -5386,12 +5404,22 @@ export class Visual extends Shadow {
 
 	getPieChartSeriesDataByCategory(category: string, isPie2: boolean = false) {
 		const id = this.chartData.findIndex((data) => data.category === category);
-		const getPieFill = (d: IChartSubCategory) => {
+		const getPieFill = (d: IChartSubCategory, parent: ILollipopChartRow) => {
 			let color;
+			const markerType = isPie2 ? "marker2" : "marker1";
+			const valueType = isPie2 ? "value2" : "value1";
+
 			if (d.parentCategory === this.othersBarText) {
 				color = this.rankingSettings.category.othersColor;
 			} else {
-				color = isPie2 ? this.subCategoryColorPair[d.category].marker2Color : this.subCategoryColorPair[d.category].marker1Color;
+				const isPosNegColorScheme = this.dataColorsSettings[markerType].fillType === ColorPaletteType.PositiveNegative;
+				const posNegColor = parent[valueType] >= 0 ? this.dataColorsSettings[markerType].positiveColor : this.dataColorsSettings[markerType].negativeColor;
+
+				if (isPosNegColorScheme) {
+					color = posNegColor;
+				} else {
+					color = isPie2 ? this.subCategoryColorPair[d.category].marker2Color : this.subCategoryColorPair[d.category].marker1Color;
+				}
 			}
 
 			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -5404,7 +5432,7 @@ export class Visual extends Shadow {
 		return this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
-			itemStyle: { color: this.getColor(getPieFill(data), EHighContrastColorType.Foreground), className: "pie-slice" },
+			itemStyle: { color: this.getColor(getPieFill(data, this.chartData[id]), EHighContrastColorType.Foreground), className: "pie-slice" },
 		}));
 	}
 
@@ -6301,7 +6329,9 @@ export class Visual extends Shadow {
 		const setPath1Formatting = (circleSelection: any): void => {
 			circleSelection
 				.style("fill", (d: ILollipopChartRow) => {
-					let color = this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
+					const isPosNegColorScheme = this.dataColorsSettings.marker1.fillType === ColorPaletteType.PositiveNegative;
+					const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.marker1.positiveColor : this.dataColorsSettings.marker1.negativeColor;
+					let color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
 					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
@@ -6315,7 +6345,9 @@ export class Visual extends Shadow {
 		const setPath2Formatting = (circleSelection: any): void => {
 			circleSelection
 				.style("fill", (d: ILollipopChartRow) => {
-					let color = this.getColor(this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
+					const isPosNegColorScheme = this.dataColorsSettings.marker2.fillType === ColorPaletteType.PositiveNegative;
+					const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.marker2.positiveColor : this.dataColorsSettings.marker2.negativeColor;
+					let color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
 					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
