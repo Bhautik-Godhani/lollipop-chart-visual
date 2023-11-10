@@ -479,23 +479,23 @@ const DataLabelsSettings = (props) => {
 	// 	chartSettings.lollipopType = LollipopType.CIRCLE;
 	// }
 
-	if (
-		(!Object.keys(dataLabelsSettings).length && shadow.isLollipopTypePie) ||
-		(dataLabelsSettings.placement === DataLabelsPlacement.Inside && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside)
-	) {
-		configValues[EDataLabelsSettings.fontSize] = 12;
-		const color = configValues[EDataLabelsSettings.color];
-		if (color === "#fff" || color === "rgba(255, 255, 255, 1)") {
-			configValues[EDataLabelsSettings.color] = "rgb(102,102,102)";
-		}
-	}
+	// if (
+	// 	(!Object.keys(dataLabelsSettings).length && shadow.isLollipopTypePie) ||
+	// 	(dataLabelsSettings.placement === DataLabelsPlacement.Inside && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside)
+	// ) {
+	// 	configValues[EDataLabelsSettings.fontSize] = 12;
+	// 	const color = configValues[EDataLabelsSettings.color];
+	// 	if (color === "#fff" || color === "rgba(255, 255, 255, 1)") {
+	// 		configValues[EDataLabelsSettings.color] = "rgb(102,102,102)";
+	// 	}
+	// }
 
-	if (dataLabelsSettings.placement === DataLabelsPlacement.Outside && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside) {
-		const color = configValues[EDataLabelsSettings.color];
-		if (color === "rgb(102,102,102)" || color === "rgba(102,102,102, 1)") {
-			configValues[EDataLabelsSettings.color] = "#fff";
-		}
-	}
+	// if (dataLabelsSettings.placement === DataLabelsPlacement.Outside && configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside) {
+	// 	const color = configValues[EDataLabelsSettings.color];
+	// 	if (color === "rgb(102,102,102)" || color === "rgba(102,102,102, 1)") {
+	// 		configValues[EDataLabelsSettings.color] = "#fff";
+	// 	}
+	// }
 
 	React.useEffect(() => {
 		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !dataLabelsSettings.showBackground) {
@@ -516,6 +516,16 @@ const DataLabelsSettings = (props) => {
 			</Row>
 
 			<ConditionalWrapper visible={configValues.show}>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Best Fit Labels"}
+							value={configValues.isShowBestFitLabels}
+							handleChange={() => handleCheckbox(EDataLabelsSettings.isShowBestFitLabels, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
 				<Row>
 					<Column>
 						<SelectInput

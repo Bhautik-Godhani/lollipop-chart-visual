@@ -193,6 +193,7 @@ export interface IDataLabelsSettings {
 	textColorTypes: EInsideTextColorTypes;
 	applyFor: EDataLabelsBGApplyFor,
 	isShowBGChangedWhenPatternApplied: boolean;
+	isShowBestFitLabels: boolean;
 }
 
 export interface IDataColorsSettings {

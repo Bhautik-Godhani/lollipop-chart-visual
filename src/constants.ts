@@ -110,7 +110,8 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	isColorChanged: false,
 	textColorTypes: EInsideTextColorTypes.FIXED,
 	applyFor: EDataLabelsBGApplyFor.ONLY_PATTERNS,
-	isShowBGChangedWhenPatternApplied: false
+	isShowBGChangedWhenPatternApplied: false,
+	isShowBestFitLabels: true
 };
 
 export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
