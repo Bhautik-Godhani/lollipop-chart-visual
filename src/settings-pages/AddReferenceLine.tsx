@@ -568,7 +568,6 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
     </Accordion>
     {UILabelStyles(vizOptions, shadow, configValues.labelStyle, handleChange, handleCheckbox)}
-    {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
   </>
 }
 
