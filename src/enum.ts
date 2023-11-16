@@ -396,6 +396,55 @@ export enum ERaceChartSettings {
 	TickerButtonColor = "tickerButtonColor",
 }
 
+export enum EReferenceLinesSettings {
+	ReferenceType = "referenceType",
+	LineValue1 = "lineValue1",
+	LineValue2 = "lineValue2",
+	LineStyle = "lineStyle",
+	LabelStyle = "labelStyle",
+	BandStyle = "bandStyle",
+	Line1Coord = "line1Coord",
+	Line2Coord = "line2Coord",
+	LabelCoord = "labelCoord"
+}
+
+export enum EReferenceLineValueProps {
+	MeasureName = "measureName",
+	Axis = "axis",
+	Value = "value",
+	RankOrder = "rankOrder",
+	Computation = "computation",
+	Rank = "rank",
+	Type = "type"
+}
+
+export enum EReferenceLineStyleProps {
+	LineStyle = "lineStyle",
+	LineColor = "lineColor",
+	AutoLineWidth = "autoLineWidth",
+	LineWidth = "lineWidth",
+	Styling = "styling"
+}
+
+export enum EReferenceLineLabelStyleProps {
+	TextAnchor = "textAnchor",
+	TextAlignment = "textAlignment",
+	Label = "label",
+	LabelFontFamily = "labelFontFamily",
+	LabelColor = "labelColor",
+	IsShowLabelBackground = "isShowLabelBackground",
+	LabelBackgroundColor = "labelBackgroundColor",
+	AutoFontSize = "autoFontSize",
+	LabelFontSize = "labelFontSize",
+	LabelPosition = "labelPosition",
+	LabelAlignment = "labelAlignment"
+}
+
+export enum EReferenceType {
+	REFERENCE_LINE = "referenceLine",
+	REFERENCE_BAND = "referenceBand"
+}
+
 export enum EMarkerTypes {
 	SHAPE = "shape",
 	CHART = "chart"

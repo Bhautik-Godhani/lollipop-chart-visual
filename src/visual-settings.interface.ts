@@ -19,6 +19,7 @@ import {
 	ERankingType,
 	EReferenceLineComputation,
 	EReferenceLinesType,
+	EReferenceType,
 	ESortOrderTypes,
 	EXYAxisNames,
 	Orientation,
@@ -378,22 +379,26 @@ export interface IRaceChartSettings {
 	tickerButtonColor: string;
 }
 
-export interface IReferenceLinesSettings {
-	x1?: number;
-	x2?: number;
-	y1?: number;
-	y2?: number;
-	textX1?: number;
-	textY1?: number;
-	textAnchor?: string;
-	textAlignment?: string;
-	axis: EXYAxisNames;
-	type: EReferenceLinesType;
+export interface IReferenceLineValueProps {
 	measureName: string;
+	axis: EXYAxisNames;
 	value: string;
 	rankOrder: Position;
 	computation: EReferenceLineComputation;
 	rank: string;
+	type: EReferenceLinesType;
+}
+
+export interface IReferenceLineStyleProps {
+	lineStyle: ELineType;
+	lineColor: string;
+	autoLineWidth: boolean;
+	lineWidth: string;
+}
+
+export interface IReferenceLineLabelStyleProps {
+	textAnchor?: string;
+	textAlignment?: string;
 	label: string;
 	labelFontFamily: string;
 	labelColor: string;
@@ -403,18 +408,35 @@ export interface IReferenceLinesSettings {
 	labelFontSize: string;
 	labelPosition: EBeforeAfterPosition;
 	labelAlignment: ELCRPosition;
-	lineStyle: ELineType;
-	lineColor: string;
-	autoLineWidth: boolean;
-	lineWidth: string;
-	styling: any[];
-	isHighlightBarArea: boolean;
-	barAreaPositionToHighlight: Position;
-	shadeColor: string;
-	transparency: number;
-	labelBorder: boolean;
-	labelBorderRadius: string;
-	labelBorderRadiusCustom: number;
-	labelBorderWidth: number;
-	labelBorderColor: string;
+	styling: string[];
+}
+
+export interface IReferenceBandStyleProps {
+	color: string;
+}
+
+export interface IReferenceLineCoord {
+	x1: number;
+	x2: number;
+	y1: number;
+	y2: number;
+	textX1?: number;
+	textY1?: number;
+}
+
+export interface IReferenceLabelCoord {
+	textX1: number;
+	textY1: number;
+}
+
+export interface IReferenceLineSettings {
+	referenceType: EReferenceType;
+	lineValue1: IReferenceLineValueProps;
+	lineValue2: IReferenceLineValueProps;
+	lineStyle: IReferenceLineStyleProps;
+	labelStyle: IReferenceLineLabelStyleProps;
+	bandStyle: IReferenceBandStyleProps;
+	line1Coord: IReferenceLineCoord;
+	line2Coord: IReferenceLineCoord;
+	labelCoord: IReferenceLabelCoord;
 }

@@ -93,7 +93,7 @@ import {
 	IPieSettings,
 	IRaceChartSettings,
 	IRankingSettings,
-	IReferenceLinesSettings,
+	IReferenceLineSettings,
 	IShowBucketSettings,
 	ISortingProps,
 	ISortingSettings,
@@ -141,7 +141,7 @@ import { IMarkerData } from "./settings-pages/markerSelector";
 import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
-import { HideDataLabelsBelowReferenceLines, RenderReferenceLines, GetReferenceLinesData, RenderReferenceLineLayers } from './methods/ReferenceLines.methods';
+import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -430,7 +430,7 @@ export class Visual extends Shadow {
 	formatRaceChartDataLabel = d3.timeFormat("%d %b %y");
 
 	// reference lines
-	referenceLinesData: IReferenceLinesSettings[] = [];
+	referenceLinesData: IReferenceLineSettings[] = [];
 	categoricalReferenceLinesNames: string[] = [];
 	referenceLinesContainerG: D3Selection<SVGElement>;
 	referenceLineLayersG: D3Selection<SVGElement>;
@@ -457,7 +457,7 @@ export class Visual extends Shadow {
 	brushAndZoomAreaSettings: IBrushAndZoomAreaSettings;
 	patternSettings: IPatternSettings;
 	raceChartSettings: IRaceChartSettings;
-	referenceLinesSettings: IReferenceLinesSettings[] = [];
+	referenceLinesSettings: IReferenceLineSettings[] = [];
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -4721,7 +4721,6 @@ export class Visual extends Shadow {
 
 		// if (i === 0) {
 		// 	xAxisMaxHeight = d3.min([xAxisMaxHeight, THIS.scaleBandWidth / 2 + THIS.yScaleGWidth]);
-		// 	console.log(xAxisMaxHeight);
 		// }
 
 		// if (this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Custom) {
@@ -5284,10 +5283,7 @@ export class Visual extends Shadow {
 		}
 
 		this.referenceLinesData = GetReferenceLinesData(this);
-		const filteredReferenceLinesData = this.referenceLinesData.filter((d) => d.isHighlightBarArea);
-		RenderReferenceLineLayers(this, filteredReferenceLinesData as any);
-		RenderReferenceLines(this, this.referenceLinesData as IReferenceLinesSettings[]);
-		HideDataLabelsBelowReferenceLines(this);
+		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 	}
 
 	drawZeroSeparatorLine(): void {

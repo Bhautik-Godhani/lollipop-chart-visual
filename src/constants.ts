@@ -22,6 +22,7 @@ import {
 	Position,
 	RankingDataValuesType,
 	EDataLabelsBGApplyFor,
+	EReferenceType,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -38,7 +39,7 @@ import {
 	IPiePropsSettings,
 	IRaceChartSettings,
 	IRankingSettings,
-	IReferenceLinesSettings,
+	IReferenceLineSettings,
 	IShowBucketSettings,
 	ISortingSettings,
 	IXAxisSettings,
@@ -314,35 +315,55 @@ export const RACE_CHART_SETTINGS: IRaceChartSettings = {
 	tickerButtonColor: "rgba(102,102,102,1)",
 };
 
-export const REFERENCE_LINES_SETTINGS: IReferenceLinesSettings = {
-	axis: EXYAxisNames.X,
-	type: EReferenceLinesType.Value,
-	value: undefined,
-	measureName: undefined,
-	computation: EReferenceLineComputation.Fixed,
-	rankOrder: Position.Start,
-	rank: "1",
-	label: "Reference Line",
-	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
-	labelColor: "rgba(0,0,0,1)",
-	isShowLabelBackground: true,
-	labelBackgroundColor: "rgba(0,0,0,0.2)",
-	autoFontSize: true,
-	labelFontSize: "16",
-	labelPosition: EBeforeAfterPosition.Before,
-	labelAlignment: ELCRPosition.Centre,
-	lineStyle: ELineType.Dashed,
-	lineColor: "rgba(74, 74, 74, 1)",
-	autoLineWidth: true,
-	lineWidth: "3",
-	styling: [],
-	isHighlightBarArea: true,
-	barAreaPositionToHighlight: Position.Bottom,
-	shadeColor: "rgba(255,255,255,0.6)",
-	transparency: 60,
-	labelBorder: true,
-	labelBorderRadius: "SHARP" as "SHARP" | "ROUNDED" | "CUSTOM",
-	labelBorderRadiusCustom: 5,
-	labelBorderWidth: 1,
-	labelBorderColor: "rgba(204,204,204,1)",
+export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
+	referenceType: EReferenceType.REFERENCE_LINE,
+	lineValue1: {
+		axis: EXYAxisNames.X,
+		type: EReferenceLinesType.Value,
+		value: undefined,
+		measureName: undefined,
+		computation: EReferenceLineComputation.Fixed,
+		rankOrder: Position.Start,
+		rank: "1",
+	},
+	lineValue2: {
+		axis: EXYAxisNames.X,
+		type: EReferenceLinesType.Value,
+		value: undefined,
+		measureName: undefined,
+		computation: EReferenceLineComputation.Fixed,
+		rankOrder: Position.Start,
+		rank: "1",
+	},
+	lineStyle: {
+		lineStyle: ELineType.Dashed,
+		lineColor: "rgba(74, 74, 74, 1)",
+		autoLineWidth: true,
+		lineWidth: "3",
+	},
+	labelStyle: {
+		label: "Reference Line",
+		labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+		labelColor: "rgba(0,0,0,1)",
+		isShowLabelBackground: true,
+		labelBackgroundColor: "rgba(0,0,0,0.2)",
+		autoFontSize: true,
+		labelFontSize: "16",
+		labelPosition: EBeforeAfterPosition.Before,
+		labelAlignment: ELCRPosition.Centre,
+		styling: []
+	},
+	line1Coord: {
+		x1: 0, x2: 0, y1: 0, y2: 0
+	},
+	line2Coord: {
+		x1: 0, x2: 0, y1: 0, y2: 0
+	},
+	labelCoord: {
+		textX1: 0,
+		textY1: 0
+	},
+	bandStyle: {
+		color: "rgba(0,0,0,0.2)"
+	}
 };

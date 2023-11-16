@@ -9,24 +9,25 @@ import {
   Separator,
   DraggableRows,
 } from "@truviz/shadow/dist/Components";
-import { IReferenceLinesSettings } from "../visual-settings.interface";
 import { EditIcon, PlusIcon, ReferenceLinePlaceholderIcon, TrashIcon } from "./SettingsIcons";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { IReferenceLineSettings } from "../visual-settings.interface";
+import { EReferenceType } from "../enum";
 
 const UIReferenceLines = (
   shadow: Visual,
   vizOptions: ShadowUpdateOptions,
   id: number,
   isDetailsOpen: boolean,
-  initialStates: IReferenceLinesSettings[],
+  initialStates: IReferenceLineSettings[],
   mappedInitialState: any[],
   initAdd: (...args: any) => any,
   onAdd: (...args: any) => any,
   onUpdate: (...args: any) => any,
   closeAddEdit: (...args: any) => any,
   closeCurrentSettingHandler: (...args: any) => any,
-  setInitialStates: React.Dispatch<React.SetStateAction<IReferenceLinesSettings>>
+  setInitialStates: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>
 ) => {
   return <>
     {
@@ -169,8 +170,14 @@ const ReferenceLines = (props) => {
   };
 
   const mappedInitialState = React.useMemo(() => {
-    return (initialStates || []).map((row, rowIndex) => {
-      const text = `Line on ${row.axis} ${row.type === "ranking" ? `at ranking ${row.rank}` : `at value ${row.value}`}`;
+    return (initialStates || []).map((row: IReferenceLineSettings, rowIndex) => {
+      let text;
+      if (row.referenceType === EReferenceType.REFERENCE_BAND) {
+        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} to ${row.lineValue2.rank}` : `at value from ${row.lineValue1.value} to ${row.lineValue2.value}`}`;
+      } else {
+        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${row.lineValue1.value}`}`;
+      }
+
       return {
         name: rowIndex.toString(),
         displayContent: text,
