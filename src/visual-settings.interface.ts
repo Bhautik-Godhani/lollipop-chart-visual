@@ -412,7 +412,8 @@ export interface IReferenceLineLabelStyleProps {
 }
 
 export interface IReferenceBandStyleProps {
-	color: string;
+	isShowBackgroundColor: boolean,
+	backgroundColor: string;
 }
 
 export interface IReferenceLineCoord {

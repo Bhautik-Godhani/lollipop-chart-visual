@@ -364,6 +364,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		textY1: 0
 	},
 	bandStyle: {
-		color: "rgba(0,0,0,0.2)"
+		isShowBackgroundColor: true,
+		backgroundColor: "rgba(0,0,0,0.2)"
 	}
 };

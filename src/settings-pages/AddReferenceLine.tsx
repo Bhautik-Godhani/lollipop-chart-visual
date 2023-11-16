@@ -484,15 +484,28 @@ const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVal
   return <Accordion title="Band Styles" childBottomPadding>
     <Row>
       <Column>
-        <ColorPicker
-          label={"Color"}
-          color={configValues.color}
-          handleChange={value => handleChange(value, "color", EReferenceLinesSettings.BandStyle)}
-          colorPalette={vizOptions.host.colorPalette}
-          size="sm"
+        <ToggleButton
+          label="Show Background"
+          value={configValues.isShowBackgroundColor}
+          handleChange={() => handleCheckbox("isShowBackgroundColor", EReferenceLinesSettings.BandStyle)}
+          appearance="toggle"
         />
       </Column>
     </Row>
+
+    <ConditionalWrapper visible={configValues.isShowBackgroundColor}>
+      <Row>
+        <Column>
+          <ColorPicker
+            label={"Background Color"}
+            color={configValues.backgroundColor}
+            handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle)}
+            colorPalette={vizOptions.host.colorPalette}
+            size="sm"
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
   </Accordion>
 }
 

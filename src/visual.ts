@@ -544,7 +544,7 @@ export class Visual extends Shadow {
 					icon: RaceChartSettingsIcon
 				},
 				{
-					name: "Reference Lines",
+					name: "Reference Line/Band",
 					sectionName: "referenceLinesConfig",
 					propertyName: "referenceLinesSettings",
 					Component: () => ReferenceLinesSettings,

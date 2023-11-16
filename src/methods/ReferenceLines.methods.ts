@@ -33,7 +33,7 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
             const texts = referenceLinesG.append("text").attr("class", "referenceLineText");
             FormattingReferenceLineText(self, texts);
 
-            if (d && d.referenceType === EReferenceType.REFERENCE_BAND) {
+            if (d && d.referenceType === EReferenceType.REFERENCE_BAND && d.bandStyle.isShowBackgroundColor) {
                 const bandRect = referenceLinesG.append("rect").attr("class", "referenceBand");
                 FormattingReferenceLineLayers(self, bandRect);
             }
@@ -182,7 +182,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
                 return d.line1Coord.y1 + +d.lineStyle.lineWidth / 2;
             }
         })
-        .attr("fill", (d: IReferenceLineSettings) => d.bandStyle.color)
+        .attr("fill", (d: IReferenceLineSettings) => d.bandStyle.backgroundColor)
         .style("pointer-events", "none");
 }
 
