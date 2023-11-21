@@ -55,7 +55,7 @@ export const MarkerPicker: React.FC<IMarkerPickerProps> = ({ marker, handleChang
                 classNames={["color-palettes-scrollable-wrapper"]}
                 style={{ width: "244px", maxHeight: "280px" }}
             >
-                <div className="pattern-wrapper">
+                <div className="pattern-wrapper marker-selector">
                     <SelectInput
                         width={"auto"}
                         label={label}

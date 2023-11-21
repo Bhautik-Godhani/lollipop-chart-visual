@@ -51,6 +51,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public patternConfig = new PatternConfig();
 	public raceChartConfig = new RaceChartConfig();
 	public referenceLinesConfig = new ReferenceLinesConfig();
+	public errorBarsConfig = new ErrorBarsConfig();
 }
 
 export class License {
@@ -149,4 +150,8 @@ export class RaceChartConfig {
 
 export class ReferenceLinesConfig {
 	public referenceLinesSettings: string = "{}";
+}
+
+export class ErrorBarsConfig {
+	public errorBarsSettings: string = "{}";
 }

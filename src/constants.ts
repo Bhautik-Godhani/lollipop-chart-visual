@@ -23,6 +23,11 @@ import {
 	RankingDataValuesType,
 	EDataLabelsBGApplyFor,
 	EReferenceType,
+	ERelationshipToMeasure,
+	EErrorBarsMarkerShape,
+	EErrorBarsCalcTypes,
+	EErrorBandFillTypes,
+	EErrorBarsLabelFormat,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -32,6 +37,7 @@ import {
 	IDataColorsProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
+	IErrorBarsSettings,
 	IGridLinesSettings,
 	ILineSettings,
 	IMarkerSettings,
@@ -366,5 +372,51 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 	bandStyle: {
 		isShowBackgroundColor: true,
 		backgroundColor: "rgba(0,0,0,0.2)"
+	}
+};
+
+export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
+	isEnabled: true,
+	measurement: {
+		applySettingsToMeasure: undefined,
+		calcType: EErrorBarsCalcTypes.ByField,
+		relationshipToMeasure: ERelationshipToMeasure.Absolute,
+		makeSymmetrical: false,
+		upperBoundMeasure: undefined,
+		lowerBoundMeasure: undefined,
+		upperBoundPercentage: 10,
+		lowerBoundPercentage: 10,
+		standardDeviation: 1
+	},
+	errorBars: {
+		isEnabled: true,
+		isMatchSeriesColor: false,
+		barColor: "rgba(108, 105, 102, 1)",
+		barWidth: 1,
+		markerShape: EErrorBarsMarkerShape.Dash,
+		markerSize: 8,
+		borderColor: "rgba(255, 255, 255, 1)",
+		borderSize: 1
+	},
+	errorBand: {
+		isEnabled: true,
+		isMatchSeriesColor: false,
+		fillType: EErrorBandFillTypes.Fill,
+		fillColor: "rgba(155, 155, 155, 0.4)",
+		lineStyle: ELineType.Solid
+	},
+	errorLabels: {
+		isEnabled: true,
+		fontSize: 12,
+		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+		color: "rgba(102,102,102,1)",
+		showBackground: false,
+		backgroundColor: "rgba(0,0,0,0.2)",
+		fontStyle: [],
+		labelFormat: EErrorBarsLabelFormat.Absolute
+	},
+	tooltip: {
+		isEnabled: true,
+		labelFormat: EErrorBarsLabelFormat.Absolute
 	}
 };

@@ -7,6 +7,10 @@ import {
 	EBeforeAfterPosition,
 	EDataLabelsBGApplyFor,
 	EDataRolesName,
+	EErrorBandFillTypes,
+	EErrorBarsCalcTypes,
+	EErrorBarsLabelFormat,
+	EErrorBarsMarkerShape,
 	EFontStyle,
 	ELCRPosition,
 	ELegendPosition,
@@ -20,6 +24,7 @@ import {
 	EReferenceLineComputation,
 	EReferenceLinesType,
 	EReferenceType,
+	ERelationshipToMeasure,
 	ESortOrderTypes,
 	EXYAxisNames,
 	Orientation,
@@ -440,4 +445,58 @@ export interface IReferenceLineSettings {
 	line1Coord: IReferenceLineCoord;
 	line2Coord: IReferenceLineCoord;
 	labelCoord: IReferenceLabelCoord;
+}
+
+export interface IErrorBarsSettings {
+	isEnabled: boolean;
+	measurement: {
+		applySettingsToMeasure: string;
+		calcType: EErrorBarsCalcTypes;
+		relationshipToMeasure: ERelationshipToMeasure;
+		makeSymmetrical: boolean;
+		upperBoundMeasure: string;
+		lowerBoundMeasure: string;
+		upperBoundPercentage: number;
+		lowerBoundPercentage: number;
+		standardDeviation: number;
+	},
+	errorBars: {
+		isEnabled: boolean;
+		isMatchSeriesColor: boolean;
+		barColor: string;
+		barWidth: number;
+		markerShape: EErrorBarsMarkerShape;
+		markerSize: number;
+		borderColor: string;
+		borderSize: number;
+	},
+	errorBand: {
+		isEnabled: boolean;
+		isMatchSeriesColor: boolean;
+		fillType: EErrorBandFillTypes;
+		fillColor: string;
+		lineStyle: ELineType;
+	},
+	errorLabels: {
+		isEnabled: boolean;
+		fontSize: number;
+		fontFamily: string;
+		color: string;
+		showBackground: boolean;
+		backgroundColor: string;
+		fontStyle: EFontStyle[];
+		labelFormat: EErrorBarsLabelFormat;
+	},
+	tooltip: {
+		isEnabled: boolean;
+		labelFormat: EErrorBarsLabelFormat;
+	}
+}
+
+export interface IErrorBarsMarker {
+	shape: string;
+	path: string;
+	viewBox: string;
+	w: number;
+	h: number;
 }

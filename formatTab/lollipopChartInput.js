@@ -22,6 +22,7 @@ const sectionKVPair = [
 	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
 	{ raceChartConfig: "Race Chart Configuration" },
 	{ referenceLinesConfig: "Reference Lines Configuration" },
+	{ errorBarsConfig: "Error Bars Configuration" },
 ];
 
 const formatTab = {
@@ -558,6 +559,15 @@ const formatTab = {
 		{
 			technicalName: "referenceLinesSettings",
 			displayName: "Reference Lines Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	errorBarsConfig: [
+		{
+			technicalName: "errorBarsSettings",
+			displayName: "Error Bars Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

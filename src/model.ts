@@ -20,7 +20,12 @@ export interface ILollipopChartRow {
 	imageDataUrl?: string;
 	raceChartKey?: string;
 	raceChartDataLabel?: string;
-	positions: { dataLabel1X: number, dataLabel1Y: number, dataLabel2X: number, dataLabel2Y: number }
+	positions: { dataLabel1X: number, dataLabel1Y: number, dataLabel2X: number, dataLabel2Y: number };
+	upperBoundValue?: number;
+	lowerBoundValue?: number;
+	boundsTotal?: number;
+	tooltipUpperBoundValue?: string;
+	tooltipLowerBoundValue?: string;
 }
 
 export interface IChartSubCategory {

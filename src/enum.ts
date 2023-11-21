@@ -14,6 +14,7 @@ export enum EVisualConfig {
 	RaceChartConfig = "raceChartConfig",
 	PatternConfig = "patternConfig",
 	ReferenceLinesConfig = "referenceLinesConfig",
+	ErrorBarsConfig = "errorBarsConfig",
 }
 
 export enum EVisualSettings {
@@ -37,6 +38,7 @@ export enum EVisualSettings {
 	RaceChartSettings = "raceChartSettings",
 	PatternSettings = "patternSettings",
 	ReferenceLinesSettings = "referenceLinesSettings",
+	ErrorBarsSettings = "errorBarsSettings",
 }
 
 export enum ELineType {
@@ -160,6 +162,8 @@ export enum EDataRolesName {
 	Sort = "sort",
 	ImagesData = "imagesData",
 	ShowBucket = "showBucket",
+	UpperBound = "upperBound",
+	LowerBound = "lowerBound"
 }
 
 export enum FontStyle {
@@ -529,4 +533,79 @@ export enum ELCRPosition {
 export enum EDataLabelsBGApplyFor {
 	All = "all",
 	ONLY_PATTERNS = "only patterns",
+}
+
+export enum ERelationshipToMeasure {
+	Absolute = "absolute",
+	Relative = "relative",
+}
+
+export enum EErrorBarsTooltipLabelFormat {
+	Absolute = "absolute",
+	RelativeNumeric = "relativeNumeric",
+	RelativePercentage = "relativePercentage",
+}
+
+export enum EErrorBarsLabelFormat {
+	Absolute = "absolute",
+	RelativeNumeric = "relativeNumeric",
+	RelativePercentage = "relativePercentage",
+	Range = "range"
+}
+
+export enum EErrorBarsMarkerShape {
+	Circle = "circle",
+	Square = "square",
+	Close = "close",
+	Dash = "dash",
+	Minus = "minus",
+	Plus = "plus",
+}
+
+export enum EErrorBarsSettings {
+	IsEnabled = "isEnabled",
+	Measurement = "measurement",
+	ApplySettingsToMeasure = "applySettingsToMeasure",
+	CalcType = "calcType",
+	RelationshipToMeasure = "relationshipToMeasure",
+	MakeSymmetrical = "makeSymmetrical",
+	UpperBoundMeasure = "upperBoundMeasure",
+	LowerBoundMeasure = "lowerBoundMeasure",
+	UpperBoundPercentage = "upperBoundPercentage",
+	LowerBoundPercentage = "lowerBoundPercentage",
+	StandardDeviation = "standardDeviation",
+	ErrorBars = "errorBars",
+	IsMatchSeriesColor = "isMatchSeriesColor",
+	BarColor = "barColor",
+	BarWidth = "barWidth",
+	MarkerShape = "markerShape",
+	MarkerSize = "markerSize",
+	BorderColor = "borderColor",
+	BorderSize = "borderSize",
+	ErrorBand = "errorBand",
+	FillType = "fillType",
+	FillColor = "fillColor",
+	LineStyle = "lineStyle",
+	ErrorLabels = "errorLabels",
+	FontSize = "fontSize",
+	FontFamily = "fontFamily",
+	Color = "color",
+	ShowBackground = "showBackground",
+	BackgroundColor = "backgroundColor",
+	FontStyle = "fontStyle",
+	LabelFormat = "labelFormat",
+	Tooltip = "tooltip"
+}
+
+export enum EErrorBarsCalcTypes {
+	ByField = "byField",
+	ByPercentage = "byPercentage",
+	ByPercentile = "byPercentile",
+	ByStandardDeviation = "byStandardDeviation"
+}
+
+export enum EErrorBandFillTypes {
+	Fill = "fill",
+	Line = "line",
+	FillAndLine = "fillLine"
 }

@@ -24,7 +24,8 @@ export class Enumeration {
 			getPatternSelection(),
 			getRaceChartSelection(),
 			getReferenceLinesSelection(),
-			getBrushAndZoomAreaConfigSelection()
+			getBrushAndZoomAreaConfigSelection(),
+			getErrorBarsSelection(),
 		];
 	}
 }
@@ -453,6 +454,19 @@ function getBrushAndZoomAreaConfigSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "brushAndZoomAreaSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getErrorBarsSelection(): EnumerateSectionType {
+	return {
+		name: "errorBarsConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "errorBarsSettings",
 				isShow: true,
 			},
 		],

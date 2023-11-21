@@ -29,6 +29,32 @@
 			"kind": "Grouping"
 		},
 		{
+			"displayName": "Upper Bound",
+			"name": "upperBound",
+			"kind": "Measure",
+			"requiredTypes": [
+				{
+					"numeric": true
+				},
+				{
+					"integer": true
+				}
+			]
+		},
+		{
+			"displayName": "Lower Bound",
+			"name": "lowerBound",
+			"kind": "Measure",
+			"requiredTypes": [
+				{
+					"numeric": true
+				},
+				{
+					"integer": true
+				}
+			]
+		},
+		{
 			"displayName": "Tooltips",
 			"name": "tooltip",
 			"kind": "Measure"
@@ -99,6 +125,16 @@
 							{
 								"bind": {
 									"to": "measure"
+								}
+							},
+							{
+								"bind": {
+									"to": "upperBound"
+								}
+							},
+							{
+								"bind": {
+									"to": "lowerBound"
 								}
 							},
 							{
@@ -565,6 +601,18 @@
 			"properties": {
 				"raceChartSettings": {
 					"displayName": "Race Chart Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
+		"errorBarsConfig": {
+			"displayName": "Error Bars Configuration",
+			"properties": {
+				"errorBarsSettings": {
+					"displayName": "Error Bars Settings",
 					"description": "",
 					"type": {
 						"text": true
