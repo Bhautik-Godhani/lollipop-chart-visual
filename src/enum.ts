@@ -15,6 +15,8 @@ export enum EVisualConfig {
 	PatternConfig = "patternConfig",
 	ReferenceLinesConfig = "referenceLinesConfig",
 	ErrorBarsConfig = "errorBarsConfig",
+	IBCSConfig = "IBCSConfig",
+	Editor = "editor"
 }
 
 export enum EVisualSettings {
@@ -39,6 +41,8 @@ export enum EVisualSettings {
 	PatternSettings = "patternSettings",
 	ReferenceLinesSettings = "referenceLinesSettings",
 	ErrorBarsSettings = "errorBarsSettings",
+	IBCSSettings = "IBCSSettings",
+	BeforeIBCSSettings = "beforeIBCSSettings"
 }
 
 export enum ELineType {
@@ -146,9 +150,9 @@ export enum DisplayUnits {
 	Auto = "auto",
 	None = "none",
 	Thousands = "thousands",
-	Millions = "millions",
-	Billions = "billions",
-	Trillions = "trillions",
+	Millions = "million",
+	Billions = "billion",
+	Trillions = "trillion",
 }
 
 export enum EDataRolesName {
@@ -178,6 +182,9 @@ export enum EChartSettings {
 	isAutoLollipopWidth = "isAutoLollipopWidth",
 	lollipopWidth = "lollipopWidth",
 	pieSettings = "pieSettings",
+	isShowZeroBaseLine = "isShowZeroBaseLine",
+	zeroBaseLineColor = "zeroBaseLineColor",
+	zeroBaseLineSize = "zeroBaseLineSize"
 }
 
 export enum ECircleSettings {
@@ -337,6 +344,7 @@ export enum EHighContrastColorType {
 }
 
 export enum EXAxisSettings {
+	Show = "show",
 	Position = "position",
 	IsDisplayTitle = "isDisplayTitle",
 	TitleName = "titleName",
@@ -355,6 +363,7 @@ export enum EXAxisSettings {
 }
 
 export enum EYAxisSettings {
+	Show = "show",
 	Position = "position",
 	IsDisplayTitle = "isDisplayTitle",
 	TitleName = "titleName",
@@ -608,4 +617,50 @@ export enum EErrorBandFillTypes {
 	Fill = "fill",
 	Line = "line",
 	FillAndLine = "fillLine"
+}
+
+export enum EIBCSSettings {
+	IsIBCSEnabled = "isIBCSEnabled",
+	Theme = "theme",
+	PrevTheme = "prevTheme"
+}
+
+export enum EIBCSThemes {
+	DefaultVertical = "defaultVertical",
+	DefaultHorizontal = "defaultHorizontal",
+	Diverging1Vertical = "diverging1Vertical",
+	Diverging1Horizontal = "diverging1Horizontal",
+	Diverging2Vertical = "diverging2Vertical",
+	Diverging2Horizontal = "diverging2Horizontal",
+}
+
+export enum SemanticNegativeNumberFormats {
+	X = "X",
+	MinusX = "MinusX",
+	XMinus = "XMinus",
+	XInBrackets = "XInBrackets",
+}
+
+export enum SemanticPositiveNumberFormats {
+	X = "X",
+	PlusX = "PlusX",
+	XPlus = "XPlus",
+}
+
+export enum ENumberFormatting {
+	show = "show",
+	DecimalSeparator = "decimalSeparator",
+	ThousandsSeparator = "thousandsSeparator",
+	DecimalPlaces = "decimalPlaces",
+	Scaling = "scaling",
+	Prefix = "prefix",
+	Suffix = "suffix",
+	ScalingLabel = "scalingLabel",
+	ThousandScalingLabel = "thousandScalingLabel",
+	MillionScalingLabel = "millionScalingLabel",
+	BillionScalingLabel = "billionScalingLabel",
+	TrillionScalingLabel = "trillionScalingLabel",
+	SemanticFormatting = "semanticFormatting",
+	NegativeFormat = "negativeFormat",
+	PositiveFormat = "positiveFormat"
 }

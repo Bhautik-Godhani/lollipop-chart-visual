@@ -45,9 +45,9 @@ import {
 	EFontStyle,
 	EMarkerDefaultShapes,
 	ERelationshipToMeasure,
-	EErrorBarsTooltipLabelFormat,
 	EErrorBarsLabelFormat,
 	EErrorBarsCalcTypes,
+	EIBCSThemes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -75,10 +75,12 @@ import {
 	BRUSH_AND_ZOOM_AREA_SETTINGS,
 	PATTERN_SETTINGS,
 	RACE_CHART_SETTINGS,
-	ERROR_BARS_SETTINGS
+	ERROR_BARS_SETTINGS,
+	IBCS_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
+	IBCSSettings,
 	IBrushAndZoomAreaSettings,
 	IBrushConfig,
 	IChartSettings,
@@ -113,7 +115,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, formatNumber, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -152,6 +154,9 @@ import { RenderReferenceLines, GetReferenceLinesData } from './methods/Reference
 import ErrorBarsSettings from "./settings-pages/ErrorBarsSettings";
 import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
 import { ErrorBarsMarkers } from "./error-bars-markers";
+import IBCSSettingsComponent from "./settings-pages/IBCSSettings";
+import { ApplyIBCSTheme } from "./methods/IBCS.methods";
+import { GetFormattedNumber } from "./methods/NumberFormat.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -165,10 +170,11 @@ export class Visual extends Shadow {
 	public legend2: ILegend;
 	public colorPalette: IColorPalette;
 	public _events: IVisualEventService;
-	private _host: IVisualHost;
-	public formatNumber: (value: number | string, numberFormatter: IValueFormatter) => string;
+	public _host: IVisualHost;
+	public formatNumber: (value: number | string, numberSettings: NumberFormatting, numberFormatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean) => string;
 	public interactivityService: interactivityBaseService.IInteractivityService<any>;
 	public behavior: Behavior;
+	public visualHost: IVisualHost;
 
 	// props
 	public width: number;
@@ -464,6 +470,11 @@ export class Visual extends Shadow {
 	errorBarsMarker: D3Selection<SVGElement>;
 	errorBarsMarkerPath: D3Selection<SVGElement>;
 
+	// IBCS
+	selectedIBCSTheme: EIBCSThemes;
+	isIBCSEnabled: boolean = false;
+	beforeIBCSSettings: { [settingsName: string]: { configName: EVisualConfig, settingName: EVisualSettings, configValues: any } };
+
 	// settings
 	isHorizontalChart: boolean = false;
 	chartSettings: IChartSettings;
@@ -488,6 +499,7 @@ export class Visual extends Shadow {
 	raceChartSettings: IRaceChartSettings;
 	referenceLinesSettings: IReferenceLineSettings[] = [];
 	errorBarsSettings: IErrorBarsSettings;
+	IBCSSettings: IBCSSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -586,6 +598,12 @@ export class Visual extends Shadow {
 					propertyName: "errorBarsSettings",
 					Component: () => ErrorBarsSettings,
 					icon: ErrorBarsIcon
+				},
+				{
+					name: "IBCS Themes",
+					sectionName: EVisualConfig.IBCSConfig,
+					propertyName: EVisualSettings.IBCSSettings,
+					Component: () => IBCSSettingsComponent,
 				},
 				{
 					name: "X Axis",
@@ -1639,7 +1657,7 @@ export class Visual extends Shadow {
 
 			this.renderContextMenu();
 			this.setHighContrastDetails();
-			this.formatNumber = (value, numberFormatter) => formatNumber(value, this.numberSettings, numberFormatter);
+			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab);
 
 			if (!this.isValidShowBucket) {
@@ -1651,6 +1669,16 @@ export class Visual extends Shadow {
 			this.brushG.selectAll(".brushLollipopG").remove();
 
 			this.setVisualSettings();
+
+			const selectedIBCSTheme = this.IBCSSettings.theme;
+			const isIBCSEnabled = this.IBCSSettings.isIBCSEnabled;
+
+			if (this.IBCSSettings.theme && (!this.IBCSSettings.isIBCSEnabled || (this.IBCSSettings.prevTheme !== this.IBCSSettings.theme)) && ((this.IBCSSettings.prevTheme !== this.IBCSSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
+				ApplyIBCSTheme(this);
+			}
+
+			this.selectedIBCSTheme = selectedIBCSTheme;
+			this.isIBCSEnabled = isIBCSEnabled;
 
 			this.isVisualResized =
 				this.viewPortWidth &&
@@ -2451,7 +2479,7 @@ export class Visual extends Shadow {
 				}
 				return bound
 					? this.errorBarsSettings.tooltip.labelFormat !== EErrorBarsLabelFormat.RelativePercentage
-						? formatNumber(bound, this.numberSettings, undefined)
+						? this.formatNumber(bound, this.numberSettings, undefined, true, true)
 						: bound.toFixed(2) + "%"
 					: undefined;
 			};
@@ -2615,8 +2643,6 @@ export class Visual extends Shadow {
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
 		}
-
-		console.log(this.chartData);
 	}
 
 	setSelectionIds(data: ILollipopChartRow[]): void {
@@ -2757,6 +2783,14 @@ export class Visual extends Shadow {
 			...errorBarsConfig,
 		};
 
+		const IBCSConfig: IBCSSettings = JSON.parse(formatTab[EVisualConfig.IBCSConfig][EVisualSettings.IBCSSettings]);
+		this.IBCSSettings = {
+			...IBCS_SETTINGS,
+			...IBCSConfig,
+		};
+
+		this.beforeIBCSSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeIBCSSettings]);
+
 		this.changeVisualSettings();
 
 		// if (!this.isHasSubcategories) {
@@ -2790,6 +2824,16 @@ export class Visual extends Shadow {
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
 		this.isPatternApplied = this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
+		if (!this.xAxisSettings.show) {
+			this.xAxisSettings.isDisplayLabel = false;
+			this.xAxisSettings.isDisplayTitle = false;
+		}
+
+		if (!this.yAxisSettings.show) {
+			this.yAxisSettings.isDisplayLabel = false;
+			this.yAxisSettings.isDisplayTitle = false;
+		}
 
 		// SET TRANSITION DURATION
 		this.tickDuration = this.raceChartSettings.allowTransition ? this.raceChartSettings.transitionDuration : 0;
@@ -3610,7 +3654,7 @@ export class Visual extends Shadow {
 			.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 			.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
 			.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-			.text((d) => this.formatNumber(d[key], this.measureNumberFormatter[isData2Label ? 1 : 0]));
+			.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true));
 
 		if (labelPlacement === DataLabelsPlacement.Inside) {
 			textSelection
@@ -3622,7 +3666,7 @@ export class Visual extends Shadow {
 				.attr("fill", dataLabelsSettings.color);
 		}
 
-		if (labelPlacement === DataLabelsPlacement.Inside && dataLabelsSettings.showBackground) {
+		if (labelPlacement === DataLabelsPlacement.Inside) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
 			if (!textShadow.node()) {
 				textShadow = textSelection.clone(true);
@@ -3630,6 +3674,7 @@ export class Visual extends Shadow {
 			}
 
 			textShadow
+				.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.25em")
@@ -3642,10 +3687,11 @@ export class Visual extends Shadow {
 					this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
 				.attr("stroke-width", 4)
 				.attr("stroke-linejoin", "round")
-				.style("text-anchor", "middle");
+				.style("text-anchor", "middle")
+				.style("display", dataLabelsSettings.showBackground ? "block" : "none");
 		}
 
-		if (labelPlacement === DataLabelsPlacement.Outside && dataLabelsSettings.showBackground) {
+		if (labelPlacement === DataLabelsPlacement.Outside) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
 			if (!textShadow.node()) {
 				textShadow = textSelection.clone(true);
@@ -3653,6 +3699,7 @@ export class Visual extends Shadow {
 			}
 
 			textShadow
+				.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.25em")
@@ -3664,7 +3711,8 @@ export class Visual extends Shadow {
 				.attr("stroke", this.getColor(this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
 				.attr("stroke-width", 4)
 				.attr("stroke-linejoin", "round")
-				.style("text-anchor", "middle");
+				.style("text-anchor", "middle")
+				.style("display", dataLabelsSettings.showBackground ? "block" : "none");
 		}
 	}
 
@@ -4182,7 +4230,7 @@ export class Visual extends Shadow {
 		);
 
 		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-			return this.numberSettings.show ? formatNumber(value, this.numberSettings, numberFormatter) : powerBiNumberFormat(value, numberFormatter);
+			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
 		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean): VisualTooltipDataItem[] => {
@@ -4502,7 +4550,7 @@ export class Visual extends Shadow {
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
-					ele.append("tspan").text(formatNumber(parseFloat(newText), THIS.numberSettings));
+					ele.append("tspan").text(THIS.formatNumber(parseFloat(newText), THIS.numberSettings, undefined, false, false));
 				}
 			});
 	}
@@ -4535,7 +4583,7 @@ export class Visual extends Shadow {
 				};
 
 				if (!THIS.isHorizontalChart) {
-					ele.append("tspan").text(formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings));
+					ele.append("tspan").text(THIS.formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);
@@ -4851,7 +4899,7 @@ export class Visual extends Shadow {
 			const yAxisTicks: string[] = this.yScale.ticks(this.height / 70);
 			const yAxisTicksWidth = yAxisTicks.map((d) => {
 				const textProperties: TextProperties = {
-					text: !this.isHorizontalChart && typeof d === "number" ? formatNumber(d, this.numberSettings, undefined) : d,
+					text: !this.isHorizontalChart && typeof d === "number" ? this.formatNumber(d, this.numberSettings, undefined, false, false) : d,
 					fontFamily: this.yAxisSettings.labelFontFamily,
 					fontSize: this.yAxisSettings.labelFontSize + "px",
 				};
@@ -4984,16 +5032,9 @@ export class Visual extends Shadow {
 	}
 
 	// Lines
-	setLineStrokeColor(): void {
-		const lineColor = this.lineSettings.lineColor;
-		if (this.isHasMultiMeasure && (lineColor === "rgb(91,121,185)" || lineColor === "rgba(91,121,185,1)")) {
-			this.lineSettings.lineColor = "rgb(150,150,150,60)";
-		}
-	}
 
 	setHorizontalLinesFormatting(linesSelection: any, isEnter: boolean): void {
 		const THIS = this;
-		this.setLineStrokeColor();
 		linesSelection
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
@@ -5062,7 +5103,7 @@ export class Visual extends Shadow {
 			})
 			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
 			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
-			.attr("stroke", () => this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground))
+			.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
 				"stroke-dasharray",
@@ -5079,11 +5120,32 @@ export class Visual extends Shadow {
 		return widthByScale < this.lineSettings.lineWidth ? widthByScale : this.lineSettings.lineWidth;
 	}
 
+	getLineStroke(d: ILollipopChartRow): string {
+		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical) {
+			if (!this.isHasMultiMeasure) {
+				if (d.value1 >= 0) {
+					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+				} else {
+					return this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground);
+				}
+			} else {
+				if (d.value1 >= 0 && d.value2 >= 0) {
+					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+				} else if (d.value1 <= 0 && d.value2 <= 0) {
+					return this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground);
+				} else {
+					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+				}
+			}
+		} else {
+			return this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+		}
+	}
+
 	setVerticalLinesFormatting(linesSelection: D3Selection<any>, isEnter: boolean): void {
 		const THIS = this;
-		this.setLineStrokeColor();
 		linesSelection
-			.attr("stroke", this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground))
+			.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
 				"stroke-dasharray",
@@ -5529,9 +5591,9 @@ export class Visual extends Shadow {
 
 	drawZeroSeparatorLine(): void {
 		this.zeroSeparatorLine
-			.attr("stroke", "rgba(211,211,211,1)")
-			.attr("stroke-width", 1)
-			.attr("display", "block");
+			.attr("stroke", this.chartSettings.zeroBaseLineColor)
+			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
+			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
 
 		if (this.isHorizontalChart) {
 			this.zeroSeparatorLine
@@ -5933,7 +5995,7 @@ export class Visual extends Shadow {
 			},
 			position: "center",
 			formatter: () => {
-				return this.formatNumber(categoryValue, this.measureNumberFormatter[isPie2 ? 1 : 0]);
+				return this.formatNumber(categoryValue, this.numberSettings, this.measureNumberFormatter[isPie2 ? 1 : 0], true, true);
 			},
 		};
 
@@ -6080,7 +6142,7 @@ export class Visual extends Shadow {
 				);
 
 				const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-					return this.numberSettings.show ? formatNumber(value, this.numberSettings, numberFormatter) : powerBiNumberFormat(value, numberFormatter);
+					return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
 				};
 
 				const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
@@ -6404,7 +6466,7 @@ export class Visual extends Shadow {
 
 				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
 					return this.numberSettings.show
-						? formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter)
+						? this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter, true, true)
 						: powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
 				} else {
 					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
@@ -6738,7 +6800,7 @@ export class Visual extends Shadow {
 
 		const setVerticalLinesFormatting = (linesSelection, isEnter: boolean) => {
 			linesSelection
-				.attr("stroke", this.lineSettings.lineColor)
+				.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 				.attr("stroke-width", this.lineSettings.lineWidth)
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)
@@ -6777,7 +6839,7 @@ export class Visual extends Shadow {
 
 		const setHorizontalLinesFormatting = (linesSelection, isEnter: boolean) => {
 			linesSelection
-				.attr("stroke", this.lineSettings.lineColor)
+				.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 				.attr("stroke-width", this.lineSettings.lineWidth)
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)

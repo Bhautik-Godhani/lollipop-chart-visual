@@ -1,9 +1,11 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, Orientation } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton } from "@truviz/shadow/dist/Components";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair } from "../visual-settings.interface";
 import { Visual } from "../visual";
+import { persistProperties } from "../methods/methods";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -23,6 +25,13 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 	}));
 };
 
+const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[n]: rgb,
+	}));
+};
+
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
@@ -39,6 +48,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 
 const UIGeneralChartSettings = (
 	shadow: Visual,
+	vizOptions: ShadowUpdateOptions,
 	configValues: IChartSettings,
 	isHasSubCategories: boolean,
 	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
@@ -81,6 +91,39 @@ const UIGeneralChartSettings = (
 					<Column></Column>
 				</Row>
 			</ConditionalWrapper>
+
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Show Zero Base Line"}
+						value={configValues.isShowZeroBaseLine}
+						handleChange={(value) => handleChange(value, EChartSettings.isShowZeroBaseLine, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues.isShowZeroBaseLine}>
+				<Row>
+					<Column>
+						<InputControl
+							min={1}
+							type="number"
+							label="Line Size"
+							value={configValues.zeroBaseLineSize}
+							handleChange={(value) => handleChange(value, EChartSettings.zeroBaseLineSize, setConfigValues)}
+						/>
+					</Column>
+					<Column>
+						<ColorPicker
+							label="Line Color"
+							color={configValues.zeroBaseLineColor}
+							handleChange={(value) => handleColor(value, EChartSettings.zeroBaseLineColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper >
 		</>
 	);
 };
@@ -107,7 +150,7 @@ const ChartSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 
@@ -129,7 +172,7 @@ const ChartSettings = (props) => {
 
 	return (
 		<>
-			{UIGeneralChartSettings(shadow, configValues, isHasSubCategories, setConfigValues)}
+			{UIGeneralChartSettings(shadow, vizOptions, configValues, isHasSubCategories, setConfigValues)}
 
 			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
 				{/* {UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)} */}

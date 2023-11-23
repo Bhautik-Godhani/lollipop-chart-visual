@@ -14,6 +14,7 @@ import {
   ColorPicker,
 } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IXAxisSettings } from "../visual-settings.interface";
+import { persistProperties } from "../methods/methods";
 
 const XAxisSettings = (props) => {
   const {
@@ -37,7 +38,7 @@ const XAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
+    persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
 
@@ -97,186 +98,198 @@ const XAxisSettings = (props) => {
     <>
       <Row>
         <Column>
-          <SwitchOption
-            label="Position"
-            value={configValues.position}
-            optionsList={AXIS_POSITION}
-            handleChange={value => handleChange(value, EXAxisSettings.Position)}
-          />
-        </Column>
-      </Row>
-
-      <Row>
-        <Column>
           <ToggleButton
-            label={"Axis Line"}
-            value={configValues.isShowAxisLine}
-            handleChange={() => handleCheckbox(EXAxisSettings.IsShowAxisLine)}
+            label={"Show X Axis"}
+            value={configValues.show}
+            handleChange={() => handleCheckbox(EXAxisSettings.Show)}
             appearance="toggle"
           />
         </Column>
       </Row>
 
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Show Title"}
-            value={configValues.isDisplayTitle}
-            handleChange={() => handleCheckbox(EXAxisSettings.IsDisplayTitle)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.isDisplayTitle}>
+      <ConditionalWrapper visible={configValues.show}>
         <Row>
           <Column>
-            <InputControl
-              label="Title Name"
-              type="text"
-              value={configValues.titleName}
-              handleChange={(value: any) => handleChange(value, EXAxisSettings.TitleName)}
+            <SwitchOption
+              label="Position"
+              value={configValues.position}
+              optionsList={AXIS_POSITION}
+              handleChange={value => handleChange(value, EXAxisSettings.Position)}
             />
           </Column>
         </Row>
-
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={configValues.titleColor}
-              handleChange={value => handleColor(value, EXAxisSettings.TitleColor)}
-              colorPalette={vizOptions.host.colorPalette}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <InputControl
-              label="Text Size"
-              type="number"
-              value={configValues.titleFontSize.toString()}
-              handleChange={(value: any) => handleChange(+value, EXAxisSettings.TitleFontSize)}
-              min={1}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Font Family"}
-              value={configValues.titleFontFamily}
-              isFontSelector={true}
-              optionsList={[]}
-              handleChange={value => handleChange(value, EXAxisSettings.TitleFontFamily)}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Show Label"}
-            value={configValues.isDisplayLabel}
-            handleChange={() => handleCheckbox(EXAxisSettings.IsDisplayLabel)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.isDisplayLabel}>
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={configValues.labelColor}
-              handleChange={value => handleColor(value, EXAxisSettings.LabelColor)}
-              colorPalette={vizOptions.host.colorPalette}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <SelectInput
-              label="Font Family"
-              value={configValues.labelFontFamily}
-              isFontSelector={true}
-              optionsList={[]}
-              handleChange={value => handleChange(value, EXAxisSettings.LabelFontFamily)}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <InputControl
-              label="Text Size"
-              type="number"
-              value={configValues.labelFontSize.toString()}
-              handleChange={(value: any) => handleChange(+value, EXAxisSettings.LabelFontSize)}
-              min={1}
-            />
-          </Column>
-        </Row>
-
-        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Label Auto Tilt"}
-                value={configValues.isLabelAutoTilt}
-                handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoTilt)}
-                appearance="toggle"
-              />
-            </Column>
-          </Row>
-
-          <ConditionalWrapper visible={!configValues.isLabelAutoTilt}>
-            <Row>
-              <Column>
-                <InputControl
-                  min={30}
-                  max={90}
-                  label="Tilt Angle"
-                  type="number"
-                  value={configValues.labelTilt.toString()}
-                  handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelTilt)}
-                />
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-        </ConditionalWrapper>
 
         <Row>
           <Column>
             <ToggleButton
-              label={"Label Auto Char Limit"}
-              value={configValues.isLabelAutoCharLimit}
-              handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoCharLimit)}
+              label={"Axis Line"}
+              value={configValues.isShowAxisLine}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsShowAxisLine)}
               appearance="toggle"
             />
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Show Title"}
+              value={configValues.isDisplayTitle}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsDisplayTitle)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={configValues.isDisplayTitle}>
           <Row>
             <Column>
               <InputControl
-                min={2}
-                max={50}
-                label="Char Limit"
+                label="Title Name"
+                type="text"
+                value={configValues.titleName}
+                handleChange={(value: any) => handleChange(value, EXAxisSettings.TitleName)}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.titleColor}
+                handleChange={value => handleColor(value, EXAxisSettings.TitleColor)}
+                colorPalette={vizOptions.host.colorPalette}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <InputControl
+                label="Text Size"
                 type="number"
-                value={configValues.labelCharLimit.toString()}
-                handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelCharLimit)}
+                value={configValues.titleFontSize.toString()}
+                handleChange={(value: any) => handleChange(+value, EXAxisSettings.TitleFontSize)}
+                min={1}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Font Family"}
+                value={configValues.titleFontFamily}
+                isFontSelector={true}
+                optionsList={[]}
+                handleChange={value => handleChange(value, EXAxisSettings.TitleFontFamily)}
               />
             </Column>
           </Row>
         </ConditionalWrapper>
 
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Show Label"}
+              value={configValues.isDisplayLabel}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsDisplayLabel)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={configValues.isDisplayLabel}>
+          <Row>
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.labelColor}
+                handleChange={value => handleColor(value, EXAxisSettings.LabelColor)}
+                colorPalette={vizOptions.host.colorPalette}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <SelectInput
+                label="Font Family"
+                value={configValues.labelFontFamily}
+                isFontSelector={true}
+                optionsList={[]}
+                handleChange={value => handleChange(value, EXAxisSettings.LabelFontFamily)}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <InputControl
+                label="Text Size"
+                type="number"
+                value={configValues.labelFontSize.toString()}
+                handleChange={(value: any) => handleChange(+value, EXAxisSettings.LabelFontSize)}
+                min={1}
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Label Auto Tilt"}
+                  value={configValues.isLabelAutoTilt}
+                  handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoTilt)}
+                  appearance="toggle"
+                />
+              </Column>
+            </Row>
+
+            <ConditionalWrapper visible={!configValues.isLabelAutoTilt}>
+              <Row>
+                <Column>
+                  <InputControl
+                    min={30}
+                    max={90}
+                    label="Tilt Angle"
+                    type="number"
+                    value={configValues.labelTilt.toString()}
+                    handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelTilt)}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Label Auto Char Limit"}
+                value={configValues.isLabelAutoCharLimit}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsLabelAutoCharLimit)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
+            <Row>
+              <Column>
+                <InputControl
+                  min={2}
+                  max={50}
+                  label="Char Limit"
+                  type="number"
+                  value={configValues.labelCharLimit.toString()}
+                  handleChange={(value: any) => handleChange(value, EXAxisSettings.LabelCharLimit)}
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+        </ConditionalWrapper>
       </ConditionalWrapper>
 
       <Footer

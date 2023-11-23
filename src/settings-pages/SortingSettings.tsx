@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { SORTING_SETTINGS as SORTING_SETTINGS_IMP } from "../constants";
-import { parseObject } from "../methods/methods";
+import { parseObject, persistProperties } from "../methods/methods";
 import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
 import { Accordion, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, ISortingProps, ISortingSettings } from "../visual-settings.interface";
@@ -236,7 +236,7 @@ const SortingSettings = (props) => {
 	const initialStates: ISortingSettings = parseObject(_initialStates, SORTING_SETTINGS);
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

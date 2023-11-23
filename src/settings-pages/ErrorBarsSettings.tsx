@@ -28,6 +28,7 @@ import { Visual } from "../visual";
 import { IMarkerData } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
+import { persistProperties } from "../methods/methods";
 
 let MARKERS_LIST: IMarkerData[] = [];
 
@@ -51,7 +52,7 @@ const ErrorBarsSettings = (props) => {
   }
 
   const applyChanges = () => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
+    persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
 

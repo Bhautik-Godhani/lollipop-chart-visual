@@ -13,6 +13,7 @@ import {
 } from "@truviz/shadow/dist/Components";
 import { IRaceChartSettings } from "../visual-settings.interface";
 import { ERaceChartSettings } from "../enum";
+import { persistProperties } from "../methods/methods";
 
 const RaceChartSettings = (props) => {
   const {
@@ -36,7 +37,7 @@ const RaceChartSettings = (props) => {
   }
 
   const applyChanges = () => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
+    persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
 

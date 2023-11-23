@@ -6,6 +6,7 @@ import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
 import { EBrushAndZoomAreaSettings } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { Visual } from "../visual";
+import { persistProperties } from "../methods/methods";
 
 const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	setConfigValues((d) => ({
@@ -202,7 +203,7 @@ const BrushAndZoomAreaSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

@@ -569,6 +569,57 @@
 					"type": {
 						"text": true
 					}
+				},
+				"semanticFormatting": {
+					"displayName": "Semantic Formatting",
+					"description": "Set the semantic number formatting",
+					"type": {
+						"bool": true
+					}
+				},
+				"negativeFormat": {
+					"displayName": "Negative Format",
+					"description": "Set the negative value format",
+					"type": {
+						"enumeration": [
+							{
+								"displayName": "X",
+								"value": "X"
+							},
+							{
+								"displayName": "-X",
+								"value": "MinusX"
+							},
+							{
+								"displayName": "X-",
+								"value": "XMinus"
+							},
+							{
+								"displayName": "(X)",
+								"value": "XInBrackets"
+							}
+						]
+					}
+				},
+				"positiveFormat": {
+					"displayName": "Positive Format",
+					"description": "Set the positive value format",
+					"type": {
+						"enumeration": [
+							{
+								"displayName": "X",
+								"value": "X"
+							},
+							{
+								"displayName": "+X",
+								"value": "PlusX"
+							},
+							{
+								"displayName": "X+",
+								"value": "XPlus"
+							}
+						]
+					}
 				}
 			}
 		},
@@ -613,6 +664,18 @@
 			"properties": {
 				"errorBarsSettings": {
 					"displayName": "Error Bars Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
+		"IBCSConfig": {
+			"displayName": "IBCS Configuration",
+			"properties": {
+				"IBCSSettings": {
+					"displayName": "IBCS Settings",
 					"description": "",
 					"type": {
 						"text": true
@@ -774,6 +837,13 @@
 				},
 				"annotations": {
 					"displayName": "Annotations",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				},
+				"beforeIBCSSettings": {
+					"displayName": "Before IBCS Settings",
 					"description": "",
 					"type": {
 						"text": true

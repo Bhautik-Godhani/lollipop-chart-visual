@@ -8,6 +8,7 @@ import { SHOW_BUCKET_SETTINGS as SHOW_BUCKET_SETTINGS_IMP } from "../constants";
 import { IShowBucketSettings } from "../visual-settings.interface";
 import { EShowBucketSettings } from "../enum";
 import { Visual } from "../visual";
+import { persistProperties } from "../methods/methods";
 
 const UIShowBucketSettings = (
 	shadow: any,
@@ -167,7 +168,7 @@ const ShowCondition = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

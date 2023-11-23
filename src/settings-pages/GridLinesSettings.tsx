@@ -5,6 +5,7 @@ import { Accordion, ColorPicker, Column, ConditionalWrapper, Footer, InputContro
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { IGridLinesSettings } from "../visual-settings.interface";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { persistProperties } from "../methods/methods";
 
 const LINE_TYPES = [
 	{
@@ -192,7 +193,7 @@ const GridLinesSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

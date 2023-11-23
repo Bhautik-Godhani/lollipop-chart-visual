@@ -29,18 +29,18 @@ export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
         width: self.isLollipopTypePie ? d.sliceWidth : self.circle1Size,
         height: self.isLollipopTypePie ? d.sliceHeight : self.circle2Size,
         originalValue: d.defaultValue,
-        value: self.formatNumber(d.defaultValue, self.measureNumberFormatter[d.valueType === DataValuesType.Value1 ? 0 : 1])
+        value: self.formatNumber(d.defaultValue, self.numberSettings, self.measureNumberFormatter[d.valueType === DataValuesType.Value1 ? 0 : 1], true, true)
     };
 
-    dataPoint[self.measure1DisplayName] = self.formatNumber(d.value1, self.measureNumberFormatter[0]);
+    dataPoint[self.measure1DisplayName] = self.formatNumber(d.value1, self.numberSettings, self.measureNumberFormatter[0], true, true);
 
     if (self.isHasMultiMeasure) {
-        dataPoint[self.measure2DisplayName] = self.formatNumber(d.value2, self.measureNumberFormatter[1]);
+        dataPoint[self.measure2DisplayName] = self.formatNumber(d.value2, self.numberSettings, self.measureNumberFormatter[1], true, true);
     }
 
     if (d.tooltipFields && d.tooltipFields.length) {
         d.tooltipFields.forEach((d, i) => {
-            dataPoint[d.displayName] = self.formatNumber(d.value, self.tooltipNumberFormatter[i]);
+            dataPoint[d.displayName] = self.formatNumber(d.value, self.numberSettings, self.tooltipNumberFormatter[i], true, true);
         });
     }
 

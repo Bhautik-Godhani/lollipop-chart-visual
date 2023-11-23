@@ -31,6 +31,7 @@ import {
 } from "./enum";
 import {
 	EInsideTextColorTypes,
+	IBCSSettings,
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
@@ -73,6 +74,9 @@ export const CHART_SETTINGS: IChartSettings = {
 	isAutoLollipopWidth: true,
 	lollipopWidth: undefined,
 	isLollipopDistanceChange: false,
+	isShowZeroBaseLine: true,
+	zeroBaseLineColor: "rgba(211, 211, 211, 1)",
+	zeroBaseLineSize: 1
 };
 
 export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
@@ -207,6 +211,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 };
 
 export const X_AXIS_SETTINGS: IXAxisSettings = {
+	show: true,
 	position: Position.Bottom,
 	isDisplayTitle: false,
 	titleName: "",
@@ -225,6 +230,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
+	show: true,
 	position: Position.Left,
 	isDisplayTitle: false,
 	titleName: "",
@@ -420,3 +426,9 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		labelFormat: EErrorBarsLabelFormat.Absolute
 	}
 };
+
+export const IBCS_SETTINGS: IBCSSettings = {
+	isIBCSEnabled: false,
+	theme: undefined,
+	prevTheme: undefined
+}

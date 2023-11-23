@@ -15,6 +15,7 @@ import {
 import { ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps } from "../visual-settings.interface";
 import { ERankingSettings, ERankingType } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { persistProperties } from "../methods/methods";
 
 const RANKING_TYPES: ILabelValuePair[] = [
 	{
@@ -234,7 +235,7 @@ const Ranking = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

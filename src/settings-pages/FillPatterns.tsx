@@ -5,7 +5,7 @@ import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/s
 import { EPatternSettings } from "../enum";
 import { IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
-import { parseObject } from "../methods/methods";
+import { parseObject, persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
 
 const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
@@ -91,7 +91,7 @@ const FillPatterns = (props) => {
 	const clonedGroupingPatterns = shadow.categoryPatterns;
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

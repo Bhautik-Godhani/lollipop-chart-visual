@@ -3,7 +3,7 @@ import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptio
 import * as React from "react";
 import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
 import { ColorPaletteType, EDataColorsSettings, EMarkerColorTypes } from "../enum";
-import { parseObject } from "../methods/methods";
+import { parseObject, persistProperties } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 
@@ -264,7 +264,7 @@ const DataColors = (props) => {
 	];
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

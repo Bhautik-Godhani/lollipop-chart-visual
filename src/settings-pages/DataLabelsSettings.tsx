@@ -17,6 +17,7 @@ import {
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { Visual } from "../visual";
+import { persistProperties } from "../methods/methods";
 
 const LABEL_PLACEMENTS: ILabelValuePair[] = [
 	{
@@ -457,7 +458,7 @@ const DataLabelsSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

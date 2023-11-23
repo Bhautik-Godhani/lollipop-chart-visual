@@ -4,6 +4,7 @@ import { ELineSettings, ELineType } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
+import { persistProperties } from "../methods/methods";
 
 const LINE_TYPES = [
 	{
@@ -56,7 +57,7 @@ const LineSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

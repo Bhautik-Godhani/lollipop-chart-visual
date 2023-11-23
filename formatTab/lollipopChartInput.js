@@ -23,6 +23,7 @@ const sectionKVPair = [
 	{ raceChartConfig: "Race Chart Configuration" },
 	{ referenceLinesConfig: "Reference Lines Configuration" },
 	{ errorBarsConfig: "Error Bars Configuration" },
+	{ IBCSConfig: "IBCS Configuration" },
 ];
 
 const formatTab = {
@@ -350,29 +351,22 @@ const formatTab = {
 			defaultValue: "-x",
 			options: [
 				{
-					value: "x",
 					key: "X",
+					value: "X"
 				},
 				{
-					value: "x-",
-					key: "X-",
-				},
-				{
-					value: "-x",
 					key: "-X",
+					value: "MinusX"
 				},
 				{
-					value: "(x)",
+					key: "X-",
+					value: "XMinus"
+				},
+				{
 					key: "(X)",
+					value: "XInBrackets"
 				},
 			],
-		},
-		{
-			technicalName: "negativeColor",
-			displayName: "Negative Color",
-			description: "",
-			type: "color",
-			defaultValue: "#ff0000",
 		},
 		{
 			technicalName: "positiveFormat",
@@ -382,25 +376,18 @@ const formatTab = {
 			defaultValue: "x",
 			options: [
 				{
-					value: "x",
 					key: "X",
+					value: "X"
 				},
 				{
-					value: "x+",
-					key: "X+",
-				},
-				{
-					value: "+x",
 					key: "+X",
+					value: "PlusX"
 				},
+				{
+					key: "X+",
+					value: "XPlus"
+				}
 			],
-		},
-		{
-			technicalName: "positiveColor",
-			displayName: "Positive Color",
-			description: "",
-			type: "color",
-			defaultValue: "#00ff00",
 		},
 	],
 	showBucketConfig: [
@@ -527,6 +514,13 @@ const formatTab = {
 			description: "",
 			defaultValue: "[]",
 		},
+		{
+			technicalName: "Before IBCS Settings",
+			displayName: "beforeIBCSSettings",
+			type: "text",
+			description: "",
+			defaultValue: "{}",
+		},
 	],
 	brushAndZoomAreaConfig: [
 		{
@@ -568,6 +562,15 @@ const formatTab = {
 		{
 			technicalName: "errorBarsSettings",
 			displayName: "Error Bars Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	IBCSConfig: [
+		{
+			technicalName: "IBCSSettings",
+			displayName: "IBCS Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

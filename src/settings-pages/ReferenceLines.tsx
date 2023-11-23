@@ -14,6 +14,7 @@ import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { IReferenceLineSettings } from "../visual-settings.interface";
 import { EReferenceType } from "../enum";
+import { persistProperties } from "../methods/methods";
 
 const UIReferenceLines = (
   shadow: Visual,
@@ -127,7 +128,7 @@ const ReferenceLines = (props) => {
   const [initialStates, setInitialStates] = React.useState(_initialStates);
 
   const applyChanges = (configValues) => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
+    persistProperties(shadow, sectionName, propertyName, configValues);
     // closeCurrentSettingHandler();
   };
 

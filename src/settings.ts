@@ -28,6 +28,7 @@
 
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
+import { DisplayUnits, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "./enum";
 
 export class VisualSettings extends DataViewObjectsParser {
 	public license = new License();
@@ -52,6 +53,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public raceChartConfig = new RaceChartConfig();
 	public referenceLinesConfig = new ReferenceLinesConfig();
 	public errorBarsConfig = new ErrorBarsConfig();
+	public IBCSConfig = new IBCSConfig();
 }
 
 export class License {
@@ -104,12 +106,13 @@ export class Legend {
 	public fontSize: string = "8";
 	public fontFamily: string = "Segoe UI";
 }
+
 export class NumberFormatting {
 	public show: boolean = true;
 	public decimalSeparator: string = ".";
 	public thousandsSeparator: string = ",";
 	public decimalPlaces: number = 0;
-	public scaling: string = "auto";
+	public scaling: DisplayUnits = DisplayUnits.Auto;
 	public prefix: string = "";
 	public suffix: string = "";
 	public scalingLabel: boolean = false;
@@ -118,10 +121,8 @@ export class NumberFormatting {
 	public billionScalingLabel: string = "B";
 	public trillionScalingLabel: string = "T";
 	public semanticFormatting: boolean = false;
-	public negativeFormat: string = "-x";
-	public negativeColor: string = "#ff0000";
-	public positiveFormat: string = "x";
-	public positiveColor: string = "#00ff00";
+	public negativeFormat: string = SemanticNegativeNumberFormats.MinusX;
+	public positiveFormat: string = SemanticPositiveNumberFormats.X;
 }
 
 export class ShowBucketConfig {
@@ -133,7 +134,9 @@ export class Footer {
 }
 
 export class Editor {
-	public conditionalFormatting: string = ""; public annotations: string = "[]";
+	public conditionalFormatting: string = "";
+	public annotations: string = "[]";
+	public beforeIBCSSettings: string = "{}";
 }
 
 export class BrushAndZoomAreaConfig {
@@ -154,4 +157,8 @@ export class ReferenceLinesConfig {
 
 export class ErrorBarsConfig {
 	public errorBarsSettings: string = "{}";
+}
+
+export class IBCSConfig {
+	public IBCSSettings: string = "{}";
 }

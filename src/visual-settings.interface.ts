@@ -12,6 +12,7 @@ import {
 	EErrorBarsLabelFormat,
 	EErrorBarsMarkerShape,
 	EFontStyle,
+	EIBCSThemes,
 	ELCRPosition,
 	ELegendPosition,
 	ELineType,
@@ -35,6 +36,7 @@ import {
 } from "./enum";
 
 export interface IXAxisSettings {
+	show: boolean,
 	position: Position;
 	isDisplayTitle: boolean;
 	titleName: string;
@@ -53,6 +55,7 @@ export interface IXAxisSettings {
 }
 
 export interface IYAxisSettings {
+	show: boolean,
 	position: Position;
 	isDisplayTitle: boolean;
 	titleName: string;
@@ -123,20 +126,6 @@ export interface IYGridLinesSettings {
 	lineColor: string;
 }
 
-export interface INumberSettings {
-	show: boolean;
-	decimalSeparator: string;
-	thousandsSeparator: string;
-	decimalPlaces: number;
-	displayUnits: DisplayUnits;
-	prefix: string;
-	suffix: string;
-	thousands: string;
-	million: string;
-	billion: string;
-	trillion: string;
-}
-
 export interface ILegendSettings {
 	show: boolean;
 	legendPosition: ELegendPosition;
@@ -154,6 +143,9 @@ export interface IChartSettings {
 	isAutoLollipopWidth: boolean;
 	lollipopWidth: number;
 	lollipopInnerPadding: number;
+	isShowZeroBaseLine: boolean;
+	zeroBaseLineColor: string;
+	zeroBaseLineSize: number;
 }
 
 export interface IMarkerSettings {
@@ -370,7 +362,7 @@ export interface IConditionalFormattingProps {
 	sourceName: string,
 	staticValue: string
 }
-''
+
 export interface IRaceChartSettings {
 	allowTransition: boolean;
 	transitionDuration: number;
@@ -499,4 +491,10 @@ export interface IErrorBarsMarker {
 	viewBox: string;
 	w: number;
 	h: number;
+}
+
+export interface IBCSSettings {
+	isIBCSEnabled: boolean;
+	theme: EIBCSThemes;
+	prevTheme: EIBCSThemes;
 }

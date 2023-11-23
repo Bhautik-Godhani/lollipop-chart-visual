@@ -9,8 +9,43 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { TooltipData } from "../model";
-import { EDataRolesName } from "../enum";
+import { EDataRolesName, EIBCSSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
+import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
+
+export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
+	if (shadow.IBCSSettings.isIBCSEnabled) {
+		ApplyBeforeIBCSAppliedSettingsBack(shadow);
+	}
+
+	const merge = {
+		merge: [
+			{
+				objectName: configName,
+				displayName: settingName,
+				properties: {
+					[settingName]: JSON.stringify(configValues),
+				},
+				selector: null,
+			},
+			{
+				objectName: EVisualConfig.IBCSConfig,
+				displayName: EVisualSettings.IBCSSettings,
+				properties: {
+					[EVisualSettings.IBCSSettings]: JSON.stringify({
+						...shadow.IBCSSettings,
+						[EIBCSSettings.IsIBCSEnabled]: false,
+						[EIBCSSettings.Theme]: undefined,
+						[EIBCSSettings.PrevTheme]: undefined,
+					}),
+				},
+				selector: null,
+			}
+		],
+	};
+
+	shadow._host.persistProperties(merge);
+}
 
 export const invertColorByBrightness = (hex: string, isReturnBlackWhiteColor: boolean, isReverse: boolean = false): string => {
 	if (hex.indexOf('#') === 0) {

@@ -13,6 +13,7 @@ import PieIcon from "../../assets/icons/PieIcon.svg";
 import DonutIcon from "../../assets/icons/donut-icon.svg";
 import RoseIcon from "../../assets/icons/rose-icon.svg";
 import { Visual } from "../visual";
+import { persistProperties } from "../methods/methods";
 
 let MARKERS_LIST: IMarkerData[] = [];
 
@@ -216,7 +217,7 @@ const MarkerSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
+		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

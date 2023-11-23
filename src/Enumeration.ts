@@ -26,6 +26,7 @@ export class Enumeration {
 			getReferenceLinesSelection(),
 			getBrushAndZoomAreaConfigSelection(),
 			getErrorBarsSelection(),
+			getIBCSSelection()
 		];
 	}
 }
@@ -246,56 +247,56 @@ function getLegendSelection(): EnumerateSectionType {
 
 function getNumberFormattingSelection(): EnumerateSectionType {
 	return {
-		name: "Number Formatting",
+		name: 'numberFormatting',
 		isShow: true,
 		properties: [
 			{
-				name: "show",
-				isShow: true,
+				name: 'show',
+				isShow: true
 			},
 			{
-				name: "decimalSeparator",
-				isShow: true,
+				name: 'decimalSeparator',
+				isShow: true
 			},
 			{
-				name: "thousandsSeparator",
-				isShow: true,
+				name: 'thousandsSeparator',
+				isShow: true
 			},
 			{
-				name: "decimalPlaces",
-				isShow: true,
+				name: 'decimalPlaces',
+				isShow: true
 			},
 			{
-				name: "scaling",
-				isShow: true,
+				name: 'scaling',
+				isShow: true
 			},
 			{
-				name: "prefix",
-				isShow: true,
+				name: 'prefix',
+				isShow: true
 			},
 			{
-				name: "suffix",
-				isShow: true,
+				name: 'suffix',
+				isShow: true
 			},
 			{
-				name: "scalingLabel",
-				isShow: true,
+				name: 'scalingLabel',
+				isShow: true
 			},
 			{
-				name: "thousandScalingLabel",
-				isShow: true,
+				name: 'thousandScalingLabel',
+				isShow: (settings: VisualSettings) => settings.numberFormatting.scalingLabel,
 			},
 			{
-				name: "millionScalingLabel",
-				isShow: true,
+				name: 'millionScalingLabel',
+				isShow: (settings: VisualSettings) => settings.numberFormatting.scalingLabel,
 			},
 			{
-				name: "billionScalingLabel",
-				isShow: true,
+				name: 'billionScalingLabel',
+				isShow: (settings: VisualSettings) => settings.numberFormatting.scalingLabel,
 			},
 			{
-				name: "trillionScalingLabel",
-				isShow: true,
+				name: 'trillionScalingLabel',
+				isShow: (settings: VisualSettings) => settings.numberFormatting.scalingLabel,
 			},
 			{
 				name: "semanticFormatting",
@@ -303,22 +304,14 @@ function getNumberFormattingSelection(): EnumerateSectionType {
 			},
 			{
 				name: "negativeFormat",
-				isShow: true,
-			},
-			{
-				name: "negativeColor",
-				isShow: true,
+				isShow: (settings: VisualSettings) => settings.numberFormatting.semanticFormatting,
 			},
 			{
 				name: "positiveFormat",
-				isShow: true,
+				isShow: (settings: VisualSettings) => settings.numberFormatting.semanticFormatting,
 			},
-			{
-				name: "positiveColor",
-				isShow: true,
-			},
-		],
-	};
+		]
+	}
 }
 
 function getShowBucketConfigSelection(): EnumerateSectionType {
@@ -404,6 +397,10 @@ function getEditorSelection(): EnumerateSectionType {
 				name: 'annotations',
 				isShow: true
 			},
+			{
+				name: 'beforeIBCSSettings',
+				isShow: false
+			},
 		]
 	}
 }
@@ -467,6 +464,19 @@ function getErrorBarsSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "errorBarsSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getIBCSSelection(): EnumerateSectionType {
+	return {
+		name: "IBCSConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "IBCSSettings",
 				isShow: true,
 			},
 		],

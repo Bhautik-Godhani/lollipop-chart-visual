@@ -17,6 +17,7 @@ import {
   ColorPicker,
 } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IYAxisSettings } from "../visual-settings.interface";
+import { persistProperties } from "../methods/methods";
 
 const YAxisSettings = (props) => {
   const {
@@ -40,7 +41,7 @@ const YAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    shadow.persistProperties(sectionName, propertyName, configValues);
+    persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
 
@@ -100,141 +101,23 @@ const YAxisSettings = (props) => {
     <>
       <Row>
         <Column>
-          <SwitchOption
-            label="Position"
-            value={configValues.position}
-            optionsList={AXIS_POSITION}
-            handleChange={value => handleChange(value, EYAxisSettings.Position)}
-          />
-        </Column>
-      </Row>
-
-      <Row>
-        <Column>
           <ToggleButton
-            label={"Axis Line"}
-            value={configValues.isShowAxisLine}
-            handleChange={() => handleCheckbox(EYAxisSettings.IsShowAxisLine)}
+            label={"Show Y Axis"}
+            value={configValues.show}
+            handleChange={() => handleCheckbox(EYAxisSettings.Show)}
             appearance="toggle"
           />
         </Column>
       </Row>
 
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Show Title"}
-            value={configValues.isDisplayTitle}
-            handleChange={() => handleCheckbox(EYAxisSettings.IsDisplayTitle)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.isDisplayTitle}>
+      <ConditionalWrapper visible={configValues.show}>
         <Row>
           <Column>
-            <InputControl
-              label="Title Name"
-              type="text"
-              value={configValues.titleName}
-              handleChange={(value: any) => handleChange(value, EYAxisSettings.TitleName)}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={configValues.titleColor}
-              handleChange={value => handleColor(value, EYAxisSettings.TitleColor)}
-              colorPalette={vizOptions.host.colorPalette}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <InputControl
-              label="Text Size"
-              type="number"
-              value={configValues.titleFontSize.toString()}
-              handleChange={(value: any) => handleChange(+value, EYAxisSettings.TitleFontSize)}
-              min={1}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Font Family"}
-              value={configValues.titleFontFamily}
-              isFontSelector={true}
-              optionsList={[]}
-              handleChange={value => handleChange(value, EYAxisSettings.TitleFontFamily)}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Show Label"}
-            value={configValues.isDisplayLabel}
-            handleChange={() => handleCheckbox(EYAxisSettings.IsDisplayLabel)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.isDisplayLabel}>
-        <ConditionalWrapper visible={shadow.isHorizontalChart}>
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Labels Above Line"}
-                value={configValues.isShowLabelsAboveLine}
-                handleChange={() => handleCheckbox(EYAxisSettings.IsShowLabelsAboveLine)}
-                appearance="checkbox"
-              />
-            </Column>
-          </Row>
-        </ConditionalWrapper>
-
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={configValues.labelColor}
-              handleChange={value => handleColor(value, EYAxisSettings.LabelColor)}
-              colorPalette={vizOptions.host.colorPalette}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <SelectInput
-              label="Font Family"
-              value={configValues.labelFontFamily}
-              isFontSelector={true}
-              optionsList={[]}
-              handleChange={value => handleChange(value, EYAxisSettings.LabelFontFamily)}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <InputControl
-              label="Text Size"
-              type="number"
-              value={configValues.labelFontSize.toString()}
-              handleChange={(value: any) => handleChange(+value, EYAxisSettings.LabelFontSize)}
-              min={1}
+            <SwitchOption
+              label="Position"
+              value={configValues.position}
+              optionsList={AXIS_POSITION}
+              handleChange={value => handleChange(value, EYAxisSettings.Position)}
             />
           </Column>
         </Row>
@@ -242,29 +125,159 @@ const YAxisSettings = (props) => {
         <Row>
           <Column>
             <ToggleButton
-              label={"Label Auto Char Limit"}
-              value={configValues.isLabelAutoCharLimit}
-              handleChange={() => handleCheckbox(EYAxisSettings.IsLabelAutoCharLimit)}
+              label={"Axis Line"}
+              value={configValues.isShowAxisLine}
+              handleChange={() => handleCheckbox(EYAxisSettings.IsShowAxisLine)}
               appearance="toggle"
             />
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Show Title"}
+              value={configValues.isDisplayTitle}
+              handleChange={() => handleCheckbox(EYAxisSettings.IsDisplayTitle)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={configValues.isDisplayTitle}>
           <Row>
             <Column>
               <InputControl
-                min={2}
-                max={50}
-                label="Char Limit"
+                label="Title Name"
+                type="text"
+                value={configValues.titleName}
+                handleChange={(value: any) => handleChange(value, EYAxisSettings.TitleName)}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.titleColor}
+                handleChange={value => handleColor(value, EYAxisSettings.TitleColor)}
+                colorPalette={vizOptions.host.colorPalette}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <InputControl
+                label="Text Size"
                 type="number"
-                value={configValues.labelCharLimit.toString()}
-                handleChange={(value: any) => handleChange(value, EYAxisSettings.LabelCharLimit)}
+                value={configValues.titleFontSize.toString()}
+                handleChange={(value: any) => handleChange(+value, EYAxisSettings.TitleFontSize)}
+                min={1}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Font Family"}
+                value={configValues.titleFontFamily}
+                isFontSelector={true}
+                optionsList={[]}
+                handleChange={value => handleChange(value, EYAxisSettings.TitleFontFamily)}
               />
             </Column>
           </Row>
         </ConditionalWrapper>
 
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Show Label"}
+              value={configValues.isDisplayLabel}
+              handleChange={() => handleCheckbox(EYAxisSettings.IsDisplayLabel)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={configValues.isDisplayLabel}>
+          <ConditionalWrapper visible={shadow.isHorizontalChart}>
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Show Labels Above Line"}
+                  value={configValues.isShowLabelsAboveLine}
+                  handleChange={() => handleCheckbox(EYAxisSettings.IsShowLabelsAboveLine)}
+                  appearance="checkbox"
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.labelColor}
+                handleChange={value => handleColor(value, EYAxisSettings.LabelColor)}
+                colorPalette={vizOptions.host.colorPalette}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <SelectInput
+                label="Font Family"
+                value={configValues.labelFontFamily}
+                isFontSelector={true}
+                optionsList={[]}
+                handleChange={value => handleChange(value, EYAxisSettings.LabelFontFamily)}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <InputControl
+                label="Text Size"
+                type="number"
+                value={configValues.labelFontSize.toString()}
+                handleChange={(value: any) => handleChange(+value, EYAxisSettings.LabelFontSize)}
+                min={1}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Label Auto Char Limit"}
+                value={configValues.isLabelAutoCharLimit}
+                handleChange={() => handleCheckbox(EYAxisSettings.IsLabelAutoCharLimit)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={!configValues.isLabelAutoCharLimit}>
+            <Row>
+              <Column>
+                <InputControl
+                  min={2}
+                  max={50}
+                  label="Char Limit"
+                  type="number"
+                  value={configValues.labelCharLimit.toString()}
+                  handleChange={(value: any) => handleChange(value, EYAxisSettings.LabelCharLimit)}
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+        </ConditionalWrapper>
       </ConditionalWrapper>
 
       <Footer
