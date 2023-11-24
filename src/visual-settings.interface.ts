@@ -468,6 +468,7 @@ export interface IErrorBarsSettings {
 		fillType: EErrorBandFillTypes;
 		fillColor: string;
 		lineStyle: ELineType;
+		lineColor: string;
 	},
 	errorLabels: {
 		isEnabled: boolean;

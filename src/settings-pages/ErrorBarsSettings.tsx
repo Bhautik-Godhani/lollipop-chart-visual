@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { ERROR_BARS_SETTINGS } from "../constants";
 import {
@@ -227,7 +228,7 @@ const ErrorBarsSettings = (props) => {
 
   React.useEffect(() => {
     if (!configValues.measurement.applySettingsToMeasure) {
-      handleChange(MEASURES_LIST[0].value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement);;
+      handleChange(MEASURES_LIST[0].value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement);
     }
 
     if (!configValues.measurement.upperBoundMeasure && UPPER_BOUND_LIST.length > 0) {
@@ -501,7 +502,7 @@ const ErrorBarsSettings = (props) => {
               </Column>
             </Row>
 
-            <Row>
+            {/* <Row>
               <Column>
                 <ToggleButton
                   label={"Match Series Color"}
@@ -509,15 +510,29 @@ const ErrorBarsSettings = (props) => {
                   handleChange={(value) => handleChange(value, EErrorBarsSettings.IsMatchSeriesColor, EErrorBarsSettings.ErrorBand)}
                 />
               </Column>
-            </Row>
+            </Row> */}
 
-            <ConditionalWrapper visible={!configValues.errorBand.isMatchSeriesColor}>
+            <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Line}>
               <Row>
                 <Column>
                   <ColorPicker
                     label={"Fill Color"}
                     color={configValues.errorBand.fillColor}
                     handleChange={value => handleChange(value, EErrorBarsSettings.FillColor, EErrorBarsSettings.ErrorBand)}
+                    colorPalette={vizOptions.host.colorPalette}
+                    size="sm"
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Fill}>
+              <Row>
+                <Column>
+                  <ColorPicker
+                    label={"Line Color"}
+                    color={configValues.errorBand.lineColor}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.LineColor, EErrorBarsSettings.ErrorBand)}
                     colorPalette={vizOptions.host.colorPalette}
                     size="sm"
                   />
@@ -538,7 +553,7 @@ const ErrorBarsSettings = (props) => {
               </Row>
             </ConditionalWrapper>
           </ConditionalWrapper>
-        </Accordion>
+        </Accordion >
 
         {/* <Accordion title="Error Labels" childBottomPadding open={false}>
           <Row>
@@ -649,7 +664,7 @@ const ErrorBarsSettings = (props) => {
           </ConditionalWrapper>
         </Accordion> */}
 
-        <Accordion title="Tooltip" childBottomPadding open={false}>
+        < Accordion title="Tooltip" childBottomPadding open={false} >
           <Row>
             <Column>
               <ToggleButton
@@ -673,8 +688,8 @@ const ErrorBarsSettings = (props) => {
               </Column>
             </Row>
           </ConditionalWrapper>
-        </Accordion>
-      </ConditionalWrapper>
+        </Accordion >
+      </ConditionalWrapper >
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}

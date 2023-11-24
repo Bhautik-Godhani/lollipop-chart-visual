@@ -1,37 +1,11 @@
 import * as React from "react";
 import { IBCS_SETTINGS } from "../constants";
 import { EIBCSSettings, EIBCSThemes } from "../enum";
-import { Column, Footer, Row, SelectInput } from "@truviz/shadow/dist/Components";
-import { IBCSSettings, ILabelValuePair } from "../visual-settings.interface";
+import { Column, Footer, Label, Row } from "@truviz/shadow/dist/Components";
+import { IBCSSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
-
-const IBCS_THEMES: ILabelValuePair[] = [
-	{
-		label: "Default Vertical",
-		value: EIBCSThemes.DefaultVertical
-	},
-	{
-		label: "Default Horizontal",
-		value: EIBCSThemes.DefaultHorizontal
-	},
-	{
-		label: "Diverging 1 Vertical",
-		value: EIBCSThemes.Diverging1Vertical
-	},
-	{
-		label: "Diverging 1 Horizontal",
-		value: EIBCSThemes.Diverging1Horizontal
-	},
-	{
-		label: "Diverging 2 Vertical",
-		value: EIBCSThemes.Diverging2Vertical
-	},
-	{
-		label: "Diverging 2 Horizontal",
-		value: EIBCSThemes.Diverging2Horizontal
-	}
-];
+import { IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon } from "./SettingsIcons";
 
 const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IBCSSettings>>): void => {
 	setConfigValues((d) => ({
@@ -63,12 +37,64 @@ const UIThemeSettings = (
 		<>
 			<Row>
 				<Column>
-					<SelectInput
-						label={"Select Theme"}
-						value={configValues.theme}
-						optionsList={IBCS_THEMES}
-						handleChange={value => handleChange(value, EIBCSSettings.Theme, setConfigValues)}
-					/>
+					<Label text="Default"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.DefaultVertical, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDefaultVIcon />
+					</div>
+				</Column>
+				<Column>
+					<Label text="Default"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.DefaultHorizontal, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDefaultHIcon />
+					</div>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<Label text="Diverging 1"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.Diverging1Vertical, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDiverging1VIcon />
+					</div>
+				</Column>
+				<Column>
+					<Label text="Diverging 1"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.Diverging1Horizontal, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDiverging1HIcon />
+					</div>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<Label text="Diverging 2"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.Diverging2Vertical, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDiverging2VIcon />
+					</div>
+				</Column>
+				<Column>
+					<Label text="Diverging 2"></Label>
+					<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
+						onClick={
+							() => handleChange(EIBCSThemes.Diverging2Horizontal, EIBCSSettings.Theme, setConfigValues)
+						}>
+						<IBCSDiverging2HIcon />
+					</div>
 				</Column>
 			</Row>
 		</>

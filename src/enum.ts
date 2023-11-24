@@ -603,7 +603,8 @@ export enum EErrorBarsSettings {
 	BackgroundColor = "backgroundColor",
 	FontStyle = "fontStyle",
 	LabelFormat = "labelFormat",
-	Tooltip = "tooltip"
+	Tooltip = "tooltip",
+	LineColor = "lineColor"
 }
 
 export enum EErrorBarsCalcTypes {
@@ -616,7 +617,7 @@ export enum EErrorBarsCalcTypes {
 export enum EErrorBandFillTypes {
 	Fill = "fill",
 	Line = "line",
-	FillAndLine = "fillLine"
+	FillAndLine = "fillLine",
 }
 
 export enum EIBCSSettings {

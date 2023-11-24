@@ -409,7 +409,8 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		isMatchSeriesColor: false,
 		fillType: EErrorBandFillTypes.Fill,
 		fillColor: "rgba(155, 155, 155, 0.4)",
-		lineStyle: ELineType.Solid
+		lineStyle: ELineType.Solid,
+		lineColor: "rgba(155, 155, 155, 1)",
 	},
 	errorLabels: {
 		isEnabled: true,
