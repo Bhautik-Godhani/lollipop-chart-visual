@@ -27,7 +27,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .each(function (d) {
-                    const isValue2 = self.errorBarsSettings.measurement.applySettingsToMeasure === self.measure2DisplayName;
+                    const isValue2 = self.isHasMultiMeasure && self.errorBarsSettings.measurement.applySettingsToMeasure === self.measure2DisplayName;
                     let height = 0;
                     let value1 = 0;
                     let value2 = 0;
@@ -44,7 +44,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                         value2 = d.lowerBoundValue;
                     } else {
                         value2 = d.lowerBoundValue;
-                    };
+                    }
 
                     if (!self.isHorizontalChart) {
                         height = Math.abs(self.yScale(value1) - self.yScale(value2));
@@ -53,8 +53,8 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     select(this).datum({ ...d, height: height, errorBarValue1: value1, errorBarValue2: value2, });
                 })
                 .attr("transform", (d: any) => {
-                    let value1 = d.errorBarValue1;
-                    let value2 = d.errorBarValue2;
+                    const value1 = d.errorBarValue1;
+                    const value2 = d.errorBarValue2;
 
                     if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
                         if (value1 > 0) {
@@ -71,7 +71,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     }
                 });
 
-            const errorBar = errorBarG
+            errorBarG
                 .append("path")
                 .attr("class", "errorBarLine")
                 .attr("d", function (d: any) {
@@ -111,8 +111,8 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
                 "d",
                 area()
                     .y((d: any) => self.yScale(d.category) + self.scaleBandWidth / 2)
-                    .x0((d: any) => self.xScale(d.lowerBoundValue ?? d.value))
-                    .x1((d: any) => self.xScale(d.upperBoundValue ?? d.value))
+                    .x0((d: any) => self.xScale(d.lowerBoundValue ? d.lowerBoundValue : d.value))
+                    .x1((d: any) => self.xScale(d.upperBoundValue ? d.upperBoundValue : d.value))
             );
     } else {
         self.errorBarsAreaPath
@@ -120,8 +120,8 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
                 "d",
                 area()
                     .x((d: any) => self.xScale(d.category) + self.scaleBandWidth / 2)
-                    .y0((d: any) => self.yScale(d.lowerBoundValue ?? d.value))
-                    .y1((d: any) => self.yScale(d.upperBoundValue ?? d.value))
+                    .y0((d: any) => self.yScale(d.lowerBoundValue ? d.lowerBoundValue : d.value))
+                    .y1((d: any) => self.yScale(d.upperBoundValue ? d.upperBoundValue : d.value))
             );
     }
 }

@@ -1053,7 +1053,7 @@ export class Visual extends Shadow {
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.isHasErrorLowerBounds = categoricalLowerBoundFields.length > 0;
 		this.isHasErrorUpperBounds = categoricalUpperBoundFields.length > 0;
-		this.isShowErrorBars = this.isHasErrorLowerBounds || this.isHasErrorUpperBounds;
+		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 
 		if (!this.upperBoundMeasureNames.includes(this.errorBarsSettings.measurement.upperBoundMeasure)) {
@@ -1121,8 +1121,8 @@ export class Visual extends Shadow {
 					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
 				: [];
 
-		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : "";
-		this.measure2DisplayName = categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : "";
+		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : undefined;
+		this.measure2DisplayName = this.isHasMultiMeasure && categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : undefined;
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
@@ -2422,14 +2422,14 @@ export class Visual extends Shadow {
 			switch (this.errorBarsSettings.measurement.calcType) {
 				case EErrorBarsCalcTypes.ByField:
 					if (this.isHasErrorUpperBounds && this.errorBarsSettings.measurement.upperBoundMeasure) {
-						const categoricalUpperBoundFields = this.categoricalUpperBoundFields.find(d => d.source.displayName === this.errorBarsSettings.measurement.upperBoundMeasure);
-						ub = <number>categoricalUpperBoundFields.values[idx];
+						const categoricalUpperBoundFields = this.categoricalUpperBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.upperBoundMeasure);
+						ub = this.isHasSubcategories ? d3.sum(categoricalUpperBoundFields, d => <number>d.values[idx]) : <number>categoricalUpperBoundFields[0].values[idx];
 						upperBoundValue = isErrorBarsAbsoluteRelation && !this.errorBarsSettings.measurement.makeSymmetrical ? ub : ub + value;
 					}
 
 					if (this.isHasErrorLowerBounds && this.errorBarsSettings.measurement.lowerBoundMeasure && !this.errorBarsSettings.measurement.makeSymmetrical) {
-						const categoricalLowerBoundFields = this.categoricalLowerBoundFields.find(d => d.source.displayName === this.errorBarsSettings.measurement.lowerBoundMeasure);
-						lb = <number>categoricalLowerBoundFields.values[idx];
+						const categoricalLowerBoundFields = this.categoricalLowerBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.lowerBoundMeasure);
+						lb = this.isHasSubcategories ? d3.sum(categoricalLowerBoundFields, d => <number>d.values[idx]) : <number>categoricalLowerBoundFields[0].values[idx];
 						lowerBoundValue = isErrorBarsAbsoluteRelation ? lb : lb + value;
 					}
 
@@ -2532,21 +2532,6 @@ export class Visual extends Shadow {
 			return arr;
 		}, []);
 
-
-		data.forEach((d, i) => {
-			const isValue2 = this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? d.value2 : d.value1, data);
-
-			if (this.errorBarsSettings.isEnabled) {
-				d.upperBoundValue = upperBoundValue;
-				d.tooltipUpperBoundValue = tooltipUpperBoundValue;
-				d.lowerBoundValue = lowerBoundValue;
-				d.tooltipLowerBoundValue = tooltipLowerBoundValue;
-				d.boundsTotal = lowerBoundValue + upperBoundValue;
-			}
-		});
-
-
 		if (this.isHasSubcategories) {
 			data.forEach((d) => {
 				if (d.subCategories.length) {
@@ -2558,6 +2543,19 @@ export class Visual extends Shadow {
 				}
 			});
 		}
+
+		data.forEach((d, i) => {
+			const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? d.value2 : d.value1, data);
+
+			if (this.errorBarsSettings.isEnabled) {
+				d.upperBoundValue = upperBoundValue;
+				d.tooltipUpperBoundValue = tooltipUpperBoundValue;
+				d.lowerBoundValue = lowerBoundValue;
+				d.tooltipLowerBoundValue = tooltipLowerBoundValue;
+				d.boundsTotal = lowerBoundValue + upperBoundValue;
+			}
+		});
 
 		// const category = this.categoricalData.categories[0];
 		// data.forEach((d, i) => {
@@ -5576,8 +5574,13 @@ export class Visual extends Shadow {
 
 		this.drawData1Labels(this.dataLabelsSettings.show && this.isLollipopTypeCircle ? this.chartData : []);
 		this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.chartData : []);
-		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : []);
-		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : []);
+		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
+		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
+
+		if (this.errorBarsSettings.measurement.calcType === EErrorBarsCalcTypes.ByField && !this.isHasErrorLowerBounds && !this.isHasErrorUpperBounds) {
+			RenderErrorBars(this, []);
+			RenderErrorBand(this, []);
+		}
 
 		if (this.isHasNegativeValue) {
 			this.drawZeroSeparatorLine();
