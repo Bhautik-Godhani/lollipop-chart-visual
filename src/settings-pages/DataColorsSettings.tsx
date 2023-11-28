@@ -6,85 +6,91 @@ import { ColorPaletteType, EDataColorsSettings, EMarkerColorTypes } from "../enu
 import { parseObject, persistProperties } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
+import { Visual } from "../visual";
 
-const colorPaletteDropdownList = [
-	{
-		label: "Single",
-		value: ColorPaletteType.Single,
-	},
-	{
-		label: "Power BI Theme",
-		value: ColorPaletteType.PowerBi,
-	},
-	{
-		label: "By Category",
-		value: ColorPaletteType.ByCategory,
-	},
-	{
-		label: "Gradient",
-		value: ColorPaletteType.Gradient,
-	},
-	{
-		label: "Sequential",
-		value: ColorPaletteType.Sequential,
-	},
-	{
-		label: "Diverging",
-		value: ColorPaletteType.Diverging,
-	},
-	{
-		label: "Qualitative",
-		value: ColorPaletteType.Qualitative,
-	},
-	{
-		label: "Positive/Negative",
-		value: ColorPaletteType.PositiveNegative,
-	}
-];
-
-const handleChange = (v, n, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const handleChange = (v, n, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[markerType]: { ...d[markerType], [n]: v },
+		[n]: v,
 	}));
 };
 
-const handleColorChange = (rgb, n, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const handleColorChange = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[markerType]: { ...d[markerType], [n]: rgb },
+		[n]: rgb,
 	}));
 };
 
-const handleCheckbox = (n, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[markerType]: { ...d[markerType], [n]: !d[markerType][n], },
+		[n]: !d[n],
 	}));
 };
 
-const handleCategoryChange = (rgb, i, markerType: EMarkerColorTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const handleCategoryChange = (rgb, i, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => {
-		const byCategory = [...d[d.markerType].categoryColors];
-		byCategory[i][markerType] = rgb;
+		const byCategory = [...d.categoryColors];
+		byCategory[i].marker = rgb;
 		const newState = {
 			...d,
-			[markerType]: { ...d[markerType], [EDataColorsSettings.CategoryColors]: byCategory },
+			[EDataColorsSettings.CategoryColors]: byCategory,
 		};
 		return newState;
 	});
 };
 
-const UIColorPalette = (configValues: IDataColorsSettings, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+	const colorPaletteDropdownList = [
+		{
+			label: "Single",
+			value: ColorPaletteType.Single,
+		},
+		{
+			label: "Power BI Theme",
+			value: ColorPaletteType.PowerBi,
+		},
+		{
+			label: "Gradient",
+			value: ColorPaletteType.Gradient,
+		},
+		{
+			label: "Sequential",
+			value: ColorPaletteType.Sequential,
+		},
+		{
+			label: "Diverging",
+			value: ColorPaletteType.Diverging,
+		},
+		{
+			label: "Qualitative",
+			value: ColorPaletteType.Qualitative,
+		},
+		{
+			label: "Positive/Negative",
+			value: ColorPaletteType.PositiveNegative,
+		}
+	];
+
+	if (!shadow.isHasMultiMeasure && shadow.isLollipopTypeCircle) {
+		colorPaletteDropdownList.push(
+			{
+				label: "By Category",
+				value: ColorPaletteType.ByCategory,
+			},
+		)
+	}
+
 	return (
 		<>
 			<Row>
 				<Column>
 					<SelectInput
 						label={"Color Palette"}
-						value={configValues[configValues.markerType].fillType}
+						value={configValues.fillType}
 						optionsList={colorPaletteDropdownList}
-						handleChange={(newValue) => handleChange(newValue, EDataColorsSettings.FillType, configValues.markerType, setConfigValues)}
+						handleChange={(newValue) => handleChange(newValue, EDataColorsSettings.FillType, setConfigValues)}
 					/>
 				</Column>
 			</Row>
@@ -93,41 +99,74 @@ const UIColorPalette = (configValues: IDataColorsSettings, setConfigValues: Reac
 };
 
 const UIGradientColorPalette = (
+	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
 	configValues: IDataColorsSettings,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
 ) => {
-	const values = configValues[configValues.markerType];
+	const values = configValues;
+	const MARKER_TYPES: ILabelValuePair[] = [
+		{
+			label: shadow.measure1DisplayName,
+			value: EMarkerColorTypes.Marker1,
+		},
+		{
+			label: shadow.measure2DisplayName,
+			value: EMarkerColorTypes.Marker2,
+		},
+	];
+
 	return (
-		<ConditionalWrapper visible={values.fillType === ColorPaletteType.Gradient}>
-			<Row>
-				<Column>
-					<GradientPicker
-						minColor={values.fillMin}
-						midColor={values.fillMid}
-						maxColor={values.fillMax}
-						handleMinColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMin, configValues.markerType, setConfigValues)}
-						handleMidColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMid, configValues.markerType, setConfigValues)}
-						handleMaxColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMax, configValues.markerType, setConfigValues)}
-						enableMidColor={values.isAddMidColor}
-						toggleEnableMidColor={() => handleCheckbox(EDataColorsSettings.IsAddMidColor, configValues.markerType, setConfigValues)}
-						colorPalette={vizOptions.host.colorPalette}
-						label=""
-					/>
-				</Column>
-			</Row>
-		</ConditionalWrapper>
+		<>
+			< ConditionalWrapper visible={values.fillType === ColorPaletteType.Gradient && shadow.isLollipopTypePie && shadow.isHasSubcategories && shadow.isHasMultiMeasure} >
+				<Row>
+					<Column>
+						<SwitchOption
+							label={"Select Measure"}
+							value={configValues.gradientAppliedToMeasure}
+							optionsList={MARKER_TYPES}
+							handleChange={(value) => {
+								setConfigValues((d) => ({
+									...d,
+									[EDataColorsSettings.GradientAppliedToMeasure]: value,
+								}));
+							}}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={values.fillType === ColorPaletteType.Gradient}>
+				<Row>
+					<Column>
+						<GradientPicker
+							minColor={values.fillMin}
+							midColor={values.fillMid}
+							maxColor={values.fillMax}
+							handleMinColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMin, setConfigValues)}
+							handleMidColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMid, setConfigValues)}
+							handleMaxColorChange={(value) => handleColorChange(value, EDataColorsSettings.FillMax, setConfigValues)}
+							enableMidColor={values.isAddMidColor}
+							toggleEnableMidColor={() => handleCheckbox(EDataColorsSettings.IsAddMidColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							label=""
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+		</>
 	);
 };
 
 const UIByCategoryColorPalette = (
+	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
 	configValues: IDataColorsSettings,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
 ) => {
-	const values = configValues[configValues.markerType];
+	const values = configValues;
 	return (
-		<ConditionalWrapper visible={values.fillType === ColorPaletteType.ByCategory}>
+		<ConditionalWrapper visible={!shadow.isHasMultiMeasure && shadow.isLollipopTypeCircle && values.fillType === ColorPaletteType.ByCategory}>
 			{values.categoryColors.map((categoryColor, ci) => {
 				const categoryNameProperties = {
 					text: categoryColor.name,
@@ -141,8 +180,10 @@ const UIByCategoryColorPalette = (
 						<Column>
 							<ColorPicker
 								label={categoryName}
-								color={categoryColor[configValues.markerType]}
-								handleChange={(value) => handleCategoryChange(value, ci, configValues.markerType, setConfigValues)}
+								color={categoryColor.marker}
+								handleChange={(value) => {
+									return handleCategoryChange(value, ci, setConfigValues)
+								}}
 								colorPalette={vizOptions.host.colorPalette}
 								size="sm"
 							/>
@@ -155,30 +196,59 @@ const UIByCategoryColorPalette = (
 };
 
 const UIColorPaletteTypes = (
+	shadow: Visual,
 	configValues: IDataColorsSettings,
 	vizOptions: any,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
 ) => {
-	const values = configValues[configValues.markerType];
+	const values = configValues;
 
 	return (
 		<>
 			<ConditionalWrapper visible={values.fillType === ColorPaletteType.Single}>
-				<Row>
-					<Column>
-						<ColorPicker
-							label={"Color"}
-							color={values.singleColor}
-							handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor, configValues.markerType, setConfigValues)}
-							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
-						/>
-					</Column>
-				</Row>
+				<ConditionalWrapper visible={!shadow.isHasMultiMeasure}>
+					<Row>
+						<Column>
+							<ColorPicker
+								label={"Color"}
+								color={values.singleColor1}
+								handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor1, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+					<Row>
+						<Column>
+							<ColorPicker
+								label={shadow.measure1DisplayName}
+								color={values.singleColor1}
+								handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor1, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+
+					<Row>
+						<Column>
+							<ColorPicker
+								label={shadow.measure2DisplayName}
+								color={values.singleColor2}
+								handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor2, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 
-			{UIByCategoryColorPalette(vizOptions, configValues, setConfigValues)}
-			{UIGradientColorPalette(vizOptions, configValues, setConfigValues)}
+			{UIByCategoryColorPalette(shadow, vizOptions, configValues, setConfigValues)}
+			{UIGradientColorPalette(shadow, vizOptions, configValues, setConfigValues)}
 
 			<ConditionalWrapper
 				visible={[ColorPaletteType.Diverging, ColorPaletteType.Qualitative, ColorPaletteType.Sequential].includes(
@@ -190,8 +260,8 @@ const UIColorPaletteTypes = (
 						<ColorSchemePicker
 							colorSchemePickerProps={values}
 							onChange={(d) => {
-								setConfigValues((t) => {
-									return { ...t, [t.markerType]: d };
+								setConfigValues(() => {
+									return { ...d };
 								});
 							}}
 						/>
@@ -205,7 +275,7 @@ const UIColorPaletteTypes = (
 						<ColorPicker
 							label={"Positive Color"}
 							color={values.positiveColor}
-							handleChange={(value) => handleColorChange(value, EDataColorsSettings.PositiveColor, configValues.markerType, setConfigValues)}
+							handleChange={(value) => handleColorChange(value, EDataColorsSettings.PositiveColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
 							size="sm"
 						/>
@@ -215,7 +285,7 @@ const UIColorPaletteTypes = (
 						<ColorPicker
 							label={"Negative Color"}
 							color={values.negativeColor}
-							handleChange={(value) => handleColorChange(value, EDataColorsSettings.NegativeColor, configValues.markerType, setConfigValues)}
+							handleChange={(value) => handleColorChange(value, EDataColorsSettings.NegativeColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
 							size="sm"
 						/>
@@ -273,10 +343,24 @@ const DataColors = (props) => {
 	});
 
 	React.useEffect(() => {
-		if (!shadow.isHasMultiMeasure && configValues.markerType === EMarkerColorTypes.Marker2) {
+		if ((shadow.isHasMultiMeasure || shadow.isLollipopTypePie) && configValues.fillType === ColorPaletteType.ByCategory) {
 			setConfigValues((d) => ({
 				...d,
-				[EDataColorsSettings.MarkerType]: EMarkerColorTypes.Marker1,
+				[EDataColorsSettings.FillType]: ColorPaletteType.Single,
+			}));
+		}
+
+		// if (configValues.fillType === ColorPaletteType.Gradient && shadow.isLollipopTypePie && shadow.isHasSubcategories && shadow.isHasMultiMeasure) {
+		// 	setConfigValues((d) => ({
+		// 		...d,
+		// 		[EDataColorsSettings.GradientAppliedToMeasure]: EMarkerColorTypes.Marker1,
+		// 	}));
+		// }
+
+		if (!shadow.isHasMultiMeasure && configValues.gradientAppliedToMeasure === EMarkerColorTypes.Marker2) {
+			setConfigValues((d) => ({
+				...d,
+				[EDataColorsSettings.GradientAppliedToMeasure]: EMarkerColorTypes.Marker1,
 			}));
 		}
 	}, []);
@@ -285,55 +369,25 @@ const DataColors = (props) => {
 		setConfigValues({ ...DATA_COLORS });
 	};
 
-	const fillTypes = JSON.parse(JSON.stringify(colorPaletteDropdownList));
-
-	if (shadow.isGroupingPresent) {
-		fillTypes.push({
-			label: "Category",
-			value: ColorPaletteType.ByCategory,
-		});
-	}
-
 	React.useEffect(() => {
-		if (configValues[configValues.markerType].fillType === ColorPaletteType.ByCategory)
+		if (configValues.fillType === ColorPaletteType.ByCategory)
 			setConfigValues((d) => {
 				return {
 					...d,
-					[configValues.markerType]: {
-						...d[configValues.markerType],
-						[EDataColorsSettings.CategoryColors]: !shadow.isHasSubcategories
-							? [...shadow.categoriesColorList]
-							: [...shadow.subCategoriesColorList],
-					}
+					[EDataColorsSettings.CategoryColors]: shadow.isLollipopTypeCircle
+						? [...shadow.categoriesColorList]
+						: [...shadow.subCategoriesColorList],
 				};
 			});
-	}, [configValues[configValues.markerType].fillType]);
+	}, [configValues.fillType]);
 
 	return (
 		<>
 			<ConditionalWrapper visible={!shadow.isHasMultiMeasure}>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
-				<Row>
-					<Column>
-						<SwitchOption
-							label={"Select Measure"}
-							value={configValues.markerType}
-							optionsList={MARKER_TYPES}
-							handleChange={(value) => {
-								setConfigValues((d) => ({
-									...d,
-									[EDataColorsSettings.MarkerType]: value,
-								}));
-							}}
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
-
-			{UIColorPalette(configValues, setConfigValues)}
-			{UIColorPaletteTypes(configValues, vizOptions, setConfigValues)}
+			{UIColorPalette(shadow, configValues, setConfigValues)}
+			{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

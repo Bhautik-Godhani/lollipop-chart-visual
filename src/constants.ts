@@ -35,7 +35,6 @@ import {
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
-	IDataColorsProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IErrorBarsSettings,
@@ -144,52 +143,27 @@ export const GRID_LINES_SETTINGS: IGridLinesSettings = {
 	yGridLines: Y_GRID_LINES_SETTINGS,
 };
 
-export const MARKER1_DATA_COLORS: IDataColorsProps = {
-	fillMin: "rgba(186, 72, 239, 1)",
-	fillMid: "rgba(127, 88, 246, 1)",
-	fillMax: "rgba(75, 132, 244, 1)",
-	isAddMidColor: true,
-	fillType: ColorPaletteType.Single,
-	singleColor: "rgba(0, 99, 178, 1)",
-	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],
-	categoryColors: [],
-	numberOfClasses: 5,
-	schemeColors: [
-		'rgb(204,233,255)', 'rgb(160,214,255)', 'rgb(117,195,255)', 'rgb(68,176,255)', 'rgb(25,145,233)'
-	],
-	colorBlindSafe: false,
-	colorScheme: "Blue",
-	reverse: false,
-	isGradient: true,
-	negativeColor: "rgba(208, 2, 27, 1)",
-	positiveColor: "rgba(23, 177, 105, 1)"
-};
-
-export const MARKER2_DATA_COLORS: IDataColorsProps = {
-	fillMin: "rgba(186, 72, 239, 1)",
-	fillMid: "rgba(127, 88, 246, 1)",
-	fillMax: "rgba(75, 132, 244, 1)",
-	isAddMidColor: true,
-	fillType: ColorPaletteType.Single,
-	singleColor: "rgba(156, 195, 213, 1)",
-	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],
-	categoryColors: [],
-	numberOfClasses: 5,
-	schemeColors: [
-		'rgb(204,233,255)', 'rgb(160,214,255)', 'rgb(117,195,255)', 'rgb(68,176,255)', 'rgb(25,145,233)'
-	],
-	colorBlindSafe: false,
-	colorScheme: "Blue",
-	reverse: false,
-	isGradient: true,
-	negativeColor: "rgba(208, 2, 27, 1)",
-	positiveColor: "rgba(23, 177, 105, 1)"
-};
-
 export const DATA_COLORS: IDataColorsSettings = {
-	markerType: EMarkerColorTypes.Marker1,
-	marker1: MARKER1_DATA_COLORS,
-	marker2: MARKER2_DATA_COLORS,
+	fillMin: "rgba(186, 72, 239, 1)",
+	fillMid: "rgba(127, 88, 246, 1)",
+	fillMax: "rgba(75, 132, 244, 1)",
+	isAddMidColor: true,
+	fillType: ColorPaletteType.Single,
+	singleColor1: "rgba(0, 99, 178, 1)",
+	singleColor2: "rgba(156, 195, 213, 1)",
+	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],
+	categoryColors: [],
+	numberOfClasses: 5,
+	schemeColors: [
+		'rgb(204,233,255)', 'rgb(160,214,255)', 'rgb(117,195,255)', 'rgb(68,176,255)', 'rgb(25,145,233)'
+	],
+	colorBlindSafe: false,
+	colorScheme: "Blue",
+	reverse: false,
+	isGradient: true,
+	negativeColor: "rgba(208, 2, 27, 1)",
+	positiveColor: "rgba(23, 177, 105, 1)",
+	gradientAppliedToMeasure: EMarkerColorTypes.Marker1
 };
 
 export const RANKING_SETTINGS: IRankingSettings = {

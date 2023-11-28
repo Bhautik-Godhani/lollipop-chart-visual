@@ -57,8 +57,7 @@ export enum CircleType {
 }
 
 export enum LegendType {
-	Legend1 = "legend1",
-	Legend2 = "legend2",
+	Legend = "legend",
 }
 
 export enum ColorPaletteType {
@@ -250,13 +249,13 @@ export enum EPieSettings {
 }
 
 export enum EDataColorsSettings {
-	MarkerType = "markerType",
 	FillMin = "fillMin",
 	FillMid = "fillMid",
 	FillMax = "fillMax",
 	IsAddMidColor = "isAddMidColor",
 	FillType = "fillType",
-	SingleColor = "singleColor",
+	SingleColor1 = "singleColor1",
+	SingleColor2 = "singleColor2",
 	GradientColors = "gradientColors",
 	CategoryColors = "categoryColors",
 	NumberOfClasses = "numberOfClasses",
@@ -267,7 +266,8 @@ export enum EDataColorsSettings {
 	IsGradient = "isGradient",
 	Categories = "categories",
 	PositiveColor = "positiveColor",
-	NegativeColor = "negativeColor"
+	NegativeColor = "negativeColor",
+	GradientAppliedToMeasure = "gradientAppliedToMeasure"
 }
 
 export enum ERankingSettings {
@@ -490,8 +490,8 @@ export enum EMarkerStyleTypes {
 }
 
 export enum EMarkerColorTypes {
-	Marker1 = "marker1",
-	Marker2 = "marker2",
+	Marker1 = "marker1Color",
+	Marker2 = "marker2Color",
 }
 
 export enum EFontStyle {

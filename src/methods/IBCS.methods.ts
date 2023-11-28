@@ -183,12 +183,8 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.DataColorsSettings]: JSON.stringify({
                         ...self.dataColorsSettings,
-                        [self.dataColorsSettings.markerType]: {
-                            ...self.dataColorsSettings[self.dataColorsSettings.markerType],
-                            [EDataColorsSettings.FillType]: ((self.IBCSSettings.theme === EIBCSThemes.Diverging2Horizontal || self.IBCSSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
-                            [EDataColorsSettings.SingleColor]: "rgba(64, 64, 64, 1)",
-
-                        },
+                        [EDataColorsSettings.FillType]: ((self.IBCSSettings.theme === EIBCSThemes.Diverging2Horizontal || self.IBCSSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
+                        [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
                     }),
                 },
                 selector: null,

@@ -195,9 +195,25 @@ export interface IDataLabelsSettings {
 }
 
 export interface IDataColorsSettings {
-	markerType: EMarkerColorTypes;
-	marker1: IDataColorsProps;
-	marker2: IDataColorsProps;
+	fillMin: string;
+	fillMid: string;
+	fillMax: string;
+	isAddMidColor: boolean;
+	fillType: ColorPaletteType,
+	singleColor1?: string,
+	singleColor2?: string,
+	gradientColors?: string[],
+	categoryColors?: { name: string, marker: string }[],
+	numberOfClasses: number,
+	schemeColors: string[],
+	colorBlindSafe: boolean,
+	colorScheme: string,
+	reverse: boolean,
+	isGradient?: boolean,
+	categories?: any[],
+	positiveColor: string,
+	negativeColor: string,
+	gradientAppliedToMeasure: EMarkerColorTypes
 }
 
 export interface ICategoryRankingProps {
@@ -220,26 +236,6 @@ export interface ISubCategoryRankingProps {
 export interface IRankingSettings {
 	category: ICategoryRankingProps;
 	subCategory: ISubCategoryRankingProps;
-}
-
-export interface IDataColorsProps {
-	fillMin: string;
-	fillMid: string;
-	fillMax: string;
-	isAddMidColor: boolean;
-	fillType: ColorPaletteType,
-	singleColor?: string,
-	gradientColors?: string[],
-	categoryColors?: { name: string, marker1: string, marker2: string }[],
-	numberOfClasses: number,
-	schemeColors: string[],
-	colorBlindSafe: boolean,
-	colorScheme: string,
-	reverse: boolean,
-	isGradient?: boolean,
-	categories?: any[],
-	positiveColor: string,
-	negativeColor: string
 }
 
 export interface ILabelValuePair {
