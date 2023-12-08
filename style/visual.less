@@ -1,3 +1,5 @@
+@import "./small-multiples-layout.scss";
+
 .visual-container {
 	display: flex;
 	flex-direction: column;
@@ -9,7 +11,10 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
+	}
 
+	.lollipopChart,
+	.small-multiple-chart {
 		.xAxisG,
 		.yAxisG,
 		.expandAllXAxisG,
@@ -63,6 +68,10 @@
 		}
 
 		.referenceLinesContainerG {
+			pointer-events: none;
+		}
+
+		.errorBarsContainer {
 			pointer-events: none;
 		}
 	}

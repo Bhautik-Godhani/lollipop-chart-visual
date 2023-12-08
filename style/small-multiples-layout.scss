@@ -1,0 +1,96 @@
+#smallMultiplesPaginationPanel {
+	display: flex;
+	justify-content: end;
+	align-items: center;
+	margin-right: 1rem;
+	margin: 5px 0;
+
+	.pagination-panel-content {
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+		color: #666666;
+		font-size: 12px;
+
+		.pagination-button {
+			background-color: #ffffff;
+			border: none;
+			outline: none;
+			padding: 0 0.5em;
+			margin: 0 0.25em;
+			cursor: pointer;
+
+			&:focus,
+			&:hover {
+				outline: none;
+			}
+
+			&.disabled {
+				cursor: not-allowed;
+			}
+		}
+	}
+}
+
+#smallMultiplesContainerSVG {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-content: flex-start;
+
+	#smallMultiplesContainerFO,
+	#hyperListMainContainer {
+		width: 100%;
+		height: 100%;
+	}
+
+	#hyperListMainContainer {
+		overflow-x: hidden;
+		overflow-y: auto;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.small-multiple-col {
+		box-sizing: border-box;
+		border: 1px solid;
+
+		.small-multiple-chart {
+			width: 100%;
+		}
+	}
+
+	.small-multiple-row {
+		display: flex;
+	}
+
+	#uniformAxisContainer {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	#uniformBottomXAxis,
+	#uniformLeftYAxis,
+	#uniformRightYAxis,
+	.x-axis-col-svg,
+	.y-axis-col-svg {
+		position: absolute;
+	}
+
+	.small-multiple-axis {
+		display: block !important;
+	}
+
+	.xAxisG,
+	.yAxisG,
+	.brushXAxisG,
+	.brushYAxisG {
+		.domain {
+			display: none;
+		}
+		.tick {
+			line {
+				display: none;
+			}
+		}
+	}
+}

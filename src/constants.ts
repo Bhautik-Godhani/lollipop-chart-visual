@@ -1,3 +1,4 @@
+import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import {
 	CircleFillOption,
 	CircleSize,
@@ -254,7 +255,7 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 };
 
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
-	enabled: true,
+	enabled: false,
 	minLollipopCount: 20,
 	isShowAxis: false,
 	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
@@ -407,3 +408,59 @@ export const IBCS_SETTINGS: IBCSSettings = {
 	theme: undefined,
 	prevTheme: undefined
 }
+
+export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
+	hostContainerId: "",
+	categories: [],
+	containerWidth: 0,
+	containerHeight: 0,
+	smallMultiplesLayoutScrollbarWidth: 10,
+	layoutType: ESmallMultiplesLayoutType.Grid,
+	displayType: ESmallMultiplesDisplayType.Fixed,
+	viewType: ESmallMultiplesViewType.Scroll,
+	rows: 2,
+	columns: 2,
+	gridDataItemsTotals: [],
+	outerSpacing: 10,
+	innerSpacing: 10,
+	xAxisType: ESmallMultiplesAxisType.Individual,
+	yAxisType: ESmallMultiplesAxisType.Individual,
+	xAxisPosition: ESmallMultiplesXAxisPosition.FrozenBottomColumn,
+	yAxisPosition: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
+	header: {
+		displayType: ESmallMultiplesHeaderDisplayType.TitleAndTotalValue,
+		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+		fontSize: 12,
+		fontColor: "rgba(102,102,102,1)",
+		fontStyles: [],
+		alignment: ESmallMultiplesHeaderAlignment.Left,
+		position: ESmallMultiplesHeaderPosition.Top,
+		isTextWrapEnabled: true
+	},
+	background: {
+		type: ESmallMultiplesBackgroundType.All,
+		panelColor: "rgba(255,255,255,1)",
+		alternateColor: "rgba(255,255,255,1)",
+		transparency: 100
+	},
+	border: {
+		isShowBorder: false,
+		style: ELineType.Solid,
+		width: 1,
+		radius: 0,
+		color: "rgba(0, 0, 0, 1)"
+	},
+	shadow: {
+		type: ESmallMultiplesShadowType.Simple,
+		verticalOffset: 3,
+		horizontalOffset: 3,
+		blur: 7,
+		spread: 0,
+		color: "rgba(0, 0, 0, 10)",
+		inset: false
+	},
+	onCellRendered: undefined,
+	getUniformXAxisAndBrushNode: undefined,
+	getXYAxisNodeElementAndMeasures: undefined,
+	onRenderingFinished: undefined
+};

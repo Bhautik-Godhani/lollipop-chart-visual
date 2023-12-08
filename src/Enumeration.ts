@@ -26,7 +26,8 @@ export class Enumeration {
 			getReferenceLinesSelection(),
 			getBrushAndZoomAreaConfigSelection(),
 			getErrorBarsSelection(),
-			getIBCSSelection()
+			getIBCSSelection(),
+			getSmallMultiplesSelection(),
 		];
 	}
 }
@@ -477,6 +478,19 @@ function getIBCSSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "IBCSSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getSmallMultiplesSelection(): EnumerateSectionType {
+	return {
+		name: "smallMultiplesConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "smallMultiplesSettings",
 				isShow: true,
 			},
 		],

@@ -1,4 +1,6 @@
 /* eslint-disable max-lines-per-function */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-this-alias */
 "use strict";
 
@@ -74,7 +76,8 @@ import {
 	PATTERN_SETTINGS,
 	RACE_CHART_SETTINGS,
 	ERROR_BARS_SETTINGS,
-	IBCS_SETTINGS
+	IBCS_SETTINGS,
+	SMALL_MULTIPLES_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -144,16 +147,19 @@ import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
 import ErrorBarsSettings from "./settings-pages/ErrorBarsSettings";
-import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
 import { ErrorBarsMarkers } from "./error-bars-markers";
 import IBCSSettingsComponent from "./settings-pages/IBCSSettings";
 import { ApplyIBCSTheme } from "./methods/IBCS.methods";
 import { GetFormattedNumber } from "./methods/NumberFormat.methods";
+import { DrawSmallMultiplesGridLayout, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
+import SmallMultiplesSettings from "./settings-pages/smallMultiplesLayout";
+import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
+import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -188,6 +194,7 @@ export class Visual extends Shadow {
 	public isLollipopTypeCircle: boolean;
 	public isLollipopTypePie: boolean;
 	public isChartIsRaceChart: boolean;
+	public isHasSmallMultiplesData: boolean;
 
 	// CATEGORICAL DATA
 	public originalCategoricalData: powerbi.DataViewCategorical;
@@ -208,6 +215,7 @@ export class Visual extends Shadow {
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
+	public categoricalSmallMultiplesDataField: powerbi.DataViewValueColumn;
 
 	// data
 	isChartInit: boolean = false;
@@ -339,7 +347,6 @@ export class Visual extends Shadow {
 
 	// line
 	public lineSelection: any;
-	public lineG: any;
 	public lineClass: string = "lollipop-line";
 	public lineClassSelector: string = ".lollipop-line";
 
@@ -353,14 +360,12 @@ export class Visual extends Shadow {
 	public brushAndZoomAreaCircleSize: number = 12;
 
 	// circle1
-	public circle1G: any;
 	public circle1Selection: any;
 	public circle1Size: any;
 	public circle1Class: string = "lollipop-circle1";
 	public circle1ClassSelector: string = ".lollipop-circle1";
 
 	// circle2
-	public circle2G: any;
 	public circle2Selection: any;
 	public circle2Size: number;
 	public circle2Class: string = "lollipop-circle2";
@@ -469,6 +474,29 @@ export class Visual extends Shadow {
 	};
 	legendPosition: { top: boolean, bottom: boolean, left: boolean, right: boolean } = { top: false, bottom: false, left: false, right: false };
 
+	// small multiples
+	smallMultiplesGridContainer: D3Selection<HTMLElement>;
+	smallMultiplesGridItemId: string;
+	hyperListMainContainerId: string;
+	categoriesDataFields: powerbi.DataViewCategoryColumn[];
+	smallMultiplesCategoricalDataSourceName: string;
+	smallMultiplesCategories: string[] = [];
+	isSmallMultiplesEnabled: boolean = true;
+	smallMultiplesDataPairs: any[] = [];
+	smallMultiplesGridItemContent: { [index: string]: ISmallMultiplesGridItemContent } = {};
+	currentSmallMultipleIndex: number = 0;
+	isSMUniformXAxis: boolean;
+	smallMultiplesLayoutScrollbarWidth: number = 10;
+
+	// PAGINATION
+	SMPaginationPanel: HTMLDivElement;
+	SMCurrentPage: number = 1;
+	SMTotalItems: number = 0;
+	SMItemsPerPage: number = 0;
+	SMTotalPages: number = 0;
+	SMFirstItemIndexOnCurrentPage: number = 0;
+	SMPaginationPanelHeight: number = 0;
+
 	// settings
 	isHorizontalChart: boolean = false;
 	chartSettings: IChartSettings;
@@ -494,6 +522,7 @@ export class Visual extends Shadow {
 	referenceLinesSettings: IReferenceLineSettings[] = [];
 	errorBarsSettings: IErrorBarsSettings;
 	IBCSSettings: IBCSSettings;
+	smallMultiplesSettings: ISmallMultiplesGridLayoutSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -564,6 +593,13 @@ export class Visual extends Shadow {
 					propertyName: "dataLabelsSettings",
 					Component: () => DataLabelsSettings,
 					icon: DataLabelsIcon
+				},
+				{
+					name: "Small Multiples",
+					sectionName: EVisualConfig.SmallMultiplesConfig,
+					propertyName: EVisualSettings.SmallMultiplesSettings,
+					Component: () => SmallMultiplesSettings,
+					icon: SmallMultipleIcon
 				},
 				{
 					name: "Brush And Zoom Area",
@@ -677,6 +713,8 @@ export class Visual extends Shadow {
 	public initChart(): void {
 		this.margin = { top: 10, right: 30, bottom: this.xAxisTitleMargin, left: this.yAxisTitleMargin };
 
+		this.smallMultiplesGridContainer = d3.select(this.chartContainer).append("div").attr("id", "smallMultipleHostContainer");
+
 		this.svg = d3.select(this.chartContainer).append("svg").classed("lollipopChart", true);
 
 		this.brushG = this.svg.append("g").attr("class", "brush");
@@ -696,12 +734,6 @@ export class Visual extends Shadow {
 		this.yGridLinesG = this.container.append("g").classed("yGridLinesG", true);
 
 		this.lollipopG = this.container.append("g").classed("lollipopG", true);
-
-		this.lineG = this.container.append("g").classed("lineG", true);
-
-		this.circle1G = this.container.append("g").classed("circle1G", true);
-
-		this.circle2G = this.container.append("g").classed("circle2G", true);
 
 		this.xAxisG = this.container.append("g").classed("xAxisG", true);
 
@@ -1029,6 +1061,7 @@ export class Visual extends Shadow {
 	): powerbi.DataViewCategorical {
 		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 		const categoricalRaceBarValues = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
+		const categoricalSmallMultiplesField = categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		const categoricalSubCategoryField = categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		const categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		const categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
@@ -1209,9 +1242,15 @@ export class Visual extends Shadow {
 					hasNegative: false,
 					hasZero: false,
 				};
+
+				if (categoricalSmallMultiplesField) {
+					obj['smallMultipleCategory'] = categoricalSmallMultiplesField.values[index];
+				}
+
 				this.expandAllCategoriesName.forEach((d, i) => {
 					obj[d] = categoricalData.categories[i].values[index];
 				});
+
 				categoricalData.values.forEach((d) => {
 					const roles = Object.keys(d.source.roles);
 					roles.forEach((role) => {
@@ -1298,6 +1337,10 @@ export class Visual extends Shadow {
 					const index = +key.split("-")[1];
 					categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
 
+					if (categoricalSmallMultiplesField) {
+						categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+					}
+
 					if (this.isChartIsRaceChart) {
 						categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
 							categoricalRaceBarValue.values[iterator] = clonedCategoricalRaceBarValues[i].values[index];
@@ -1317,10 +1360,16 @@ export class Visual extends Shadow {
 			});
 		} else {
 			categoricalData.categories.forEach((d, i) => {
-				if (i === this.categoricalCategoriesLastIndex) {
-					d.values = this.categoricalDataPairs.map((pair) => pair.category);
-				} else {
-					d.values = this.categoricalDataPairs.map((pair) => pair[d.source.displayName]);
+				if (d.source.roles[EDataRolesName.Category]) {
+					if (i === this.categoricalCategoriesLastIndex) {
+						d.values = this.categoricalDataPairs.map((pair) => pair.category);
+					} else {
+						d.values = this.categoricalDataPairs.map((pair) => pair[d.source.displayName]);
+					}
+				}
+
+				if (d.source.roles[EDataRolesName.SmallMultiples]) {
+					d.values = this.categoricalDataPairs.map((pair) => pair.smallMultipleCategory);
 				}
 			});
 
@@ -1371,7 +1420,7 @@ export class Visual extends Shadow {
 				});
 		}
 
-		this.setBrushScaleBandDomain(clonedCategoricalData);
+		this.setBrushScaleBandDomain(categoricalData);
 		this.setBrushScaleBandRange(width, height);
 
 		if (
@@ -1407,7 +1456,7 @@ export class Visual extends Shadow {
 
 		this.scaleBandWidth = this.brushScaleBandBandwidth;
 
-		this.totalLollipopCount = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
+		this.totalLollipopCount = [...new Set(categoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
 
 		this.xScale = this.brushScaleBand;
 
@@ -1442,8 +1491,11 @@ export class Visual extends Shadow {
 					totalBarsCount: this.totalLollipopCount,
 					scaleWidth: width,
 					scaleHeight: height,
-					smallMultiplesGridItemId: null,
+					smallMultiplesGridItemId: this.smallMultiplesGridItemId,
 					categoricalData: categoricalData,
+					isShowXAxis: true,
+					isShowYAxis: true,
+					isShowHorizontalBrush: true
 				};
 
 				this.initVerticalBrush(config);
@@ -1478,6 +1530,9 @@ export class Visual extends Shadow {
 					scaleHeight: height,
 					smallMultiplesGridItemId: null,
 					categoricalData: categoricalData,
+					isShowXAxis: true,
+					isShowYAxis: true,
+					isShowHorizontalBrush: true
 				};
 
 				this.initHorizontalBrush(config);
@@ -1520,6 +1575,7 @@ export class Visual extends Shadow {
 	public setCategoricalDataFields(categoricalData: powerbi.DataViewCategorical): void {
 		this.categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 		this.categoricalRaceChartDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
+		this.categoricalSmallMultiplesDataField = categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		this.categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		this.categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
@@ -1527,6 +1583,74 @@ export class Visual extends Shadow {
 		this.categoricalImagesDataFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ImagesData]);
 		this.categoricalUpperBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.UpperBound]);
 		this.categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
+
+		this.categoricalCategoriesLastIndex = this.categoricalCategoriesFields.length - 1;
+		this.isHasSubcategories = !!this.categoricalSubCategoryField;
+		this.isHasImagesData = !!this.categoricalImagesDataFields;
+		this.measureNames = [...new Set(this.categoricalMeasureFields.map((d) => d.source.displayName))] as any;
+		this.isHasMultiMeasure = this.measureNames.length > 1;
+
+		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
+			this.markerSettings.markerType = EMarkerTypes.SHAPE;
+		}
+
+		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
+		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
+
+		if (this.isLollipopTypeCircle) {
+			this.minScaleBandWidth = 40;
+		} else {
+			this.minScaleBandWidth = 60;
+		}
+
+		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields);
+
+		this.categoryDisplayName = this.categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
+		this.subCategoryDisplayName = this.categoricalSubCategoryField ? this.categoricalSubCategoryField.displayName : "";
+
+		this.subCategoriesName = this.categoricalMeasureFields
+			.map((d) => d.source.groupName)
+			.filter((d) => d && d !== null && d !== undefined && d !== "")
+			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
+
+		this.isSortDataFieldsAdded = this.categoricalSortFields.length > 0;
+		this.sortFieldsDisplayName =
+			this.categoricalSortFields.length > 0
+				? this.categoricalSortFields
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
+
+		this.measure1DisplayName = this.categoricalMeasureFields.length > 0 ? this.categoricalMeasureFields[0].source.displayName : "";
+		this.measure2DisplayName = this.categoricalMeasureFields.length > 1 ? this.categoricalMeasureFields[1].source.displayName : "";
+
+		if (
+			this.sortingSettings.category.isSortByExtraSortField &&
+			!this.sortFieldsDisplayName.find((d) => d.label === this.sortingSettings.category.sortBy)
+		) {
+			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
+			this.sortingSettings.category.isSortByCategory = false;
+			this.sortingSettings.category.isSortByMeasure = true;
+			this.sortingSettings.category.isSortByMultiMeasure = false;
+			this.sortingSettings.category.isSortByExtraSortField = false;
+		}
+
+		if (
+			!this.sortingSettings.category.sortBy ||
+			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure)
+		) {
+			this.sortingSettings.category.sortBy = this.measure1DisplayName;
+		}
+
+		if (!this.sortingSettings.subCategory.sortBy) {
+			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+		}
 
 		if (this.measureNames.length > 1) {
 			this.categoricalMeasure1Field = this.categoricalMeasureFields[0];
@@ -1540,11 +1664,17 @@ export class Visual extends Shadow {
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = this.categoricalImagesDataFields.length > 0;
-		this.isHasMultiMeasure = this.measureNames.length > 1;
+		this.isHasSmallMultiplesData = !!this.categoricalSmallMultiplesDataField;
+		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
+		// this.isSmallMultiplesEnabled = true;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
 
 		if (this.isHasImagesData) {
 			this.imagesDataFieldsName = [...new Set(this.categoricalImagesDataFields.map(d => d.source.displayName))];
+		}
+
+		if (this.isHasSmallMultiplesData && this.smallMultiplesCategories.length === 0) {
+			this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
 		}
 
 		if (this.isChartIsRaceChart) {
@@ -1655,6 +1785,9 @@ export class Visual extends Shadow {
 			this.categoricalCategoriesLastIndex = 0;
 			this.expandAllXScaleGHeight = 0;
 			this.expandAllYScaleGWidth = 0;
+
+			this.viewPortWidth = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.width));
+			this.viewPortHeight = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.height));
 
 			const isReturn = this.renderErrorMessages();
 
@@ -1769,42 +1902,6 @@ export class Visual extends Shadow {
 			const { height: footerHeight } = this.createFooter(this.footerSettings, this.chartContainer);
 			this.footerHeight = this.footerSettings.show ? footerHeight : 0;
 
-			const isHasSubcategories = !!this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
-
-			if (!isHasSubcategories) {
-				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
-					const selectionId = this.vizOptions.host
-						.createSelectionIdBuilder()
-						.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
-						.createSelectionId();
-					this.selectionIdByCategories[category] = selectionId;
-				});
-			} else {
-				const categoricalData = this.vizOptions.options.dataViews[0];
-				const series: any[] = categoricalData.categorical.values.grouped();
-				this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
-					const selectionId = this.vizOptions.host
-						.createSelectionIdBuilder()
-						.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
-						.createSelectionId();
-
-					this.selectionIdByCategories[category] = selectionId;
-
-					series.forEach((ser: any) => {
-						ser.values.forEach((s) => {
-							const seriesSelectionId = this.vizOptions.host
-								.createSelectionIdBuilder()
-								.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
-								.withSeries(categoricalData.categorical.values, ser)
-								.withMeasure(s.source.queryName)
-								.createSelectionId();
-
-							this.selectionIdBySubCategories[`${category}-${ser.name}`] = seriesSelectionId as any;
-						});
-					});
-				});
-			}
-
 			this.setCircle1Radius();
 			this.setCircle2Radius();
 			this.setPie1Radius();
@@ -1816,45 +1913,8 @@ export class Visual extends Shadow {
 				this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
 			}
 
-			this.categoricalData = this.setInitialChartData(
-				clonedCategoricalData,
-				clonedCategoricalData,
-				JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].metadata)),
-				vizOptions.options.viewport.width,
-				vizOptions.options.viewport.height
-			);
-
 			this.isShowImageMarker = this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES
 				&& this.isHasImagesData && !!this.markerSettings.selectedImageDataField;
-
-			this.conditionalFormattingConditions
-				.forEach((cf: IConditionalFormattingProps) => {
-					if (cf.applyTo === "measure") {
-						const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
-						cf.measureType = {
-							measure: roles[EDataRolesName.Measure],
-							measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
-							measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
-							tooltip: roles[EDataRolesName.Tooltip]
-						};
-					} else if (cf.applyTo === "category") {
-						cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
-					}
-				});
-
-			if (this.isHorizontalBrushDisplayed) {
-				this.brushHeight = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaHeight : 10;
-			}
-
-			if (this.isVerticalBrushDisplayed) {
-				this.brushWidth = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaWidth : 10;
-			}
-
-			if (!this.isScrollBrushDisplayed) {
-				this.sortSubcategoryData();
-				this.setCategoricalDataFields(this.categoricalData);
-				this.setChartData(this.categoricalData);
-			}
 
 			const popupOptions = document.querySelector(".popup-options");
 			const popupOptionsHeader = document.querySelector(".popup-options-header");
@@ -1876,176 +1936,303 @@ export class Visual extends Shadow {
 			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
 			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
 
-			// this.setColorsByDataColorsSettings();
+			this.setCategoricalDataFields(this.categoricalData);
 
-			if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
-				this.setRemainingAsOthersDataColor();
-			}
+			// SMALL MULTIPLE VISUAL
+			if (this.isSmallMultiplesEnabled) {
+				this.setMargins();
 
-			if (this.conditionalFormattingConditions.length) {
-				this.setConditionalFormattingColor();
-			}
+				this.svg
+					.attr("opacity", "0")
+					.attr("width", vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width)
+					.attr("height", vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight)
+					.attr("pointer-events", "none");
 
-			if (this.isLollipopTypeCircle) {
-				this.categoriesColorList = this.chartData.map(d => ({
-					name: d.category,
-					marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
-				}));
-			}
+				this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-			if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
-				this.subCategoriesColorList = this.chartData[0].subCategories.map(d => ({
-					name: d.category,
-					marker: this.subCategoryColorPair[d.category].marker1Color ? this.subCategoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
-				}));
-			}
+				this.smallMultiplesCategoricalDataSourceName = this.categoricalSmallMultiplesDataField.source.displayName;
 
-			this.configLegend();
+				this.smallMultiplesDataPairs = GetSmallMultiplesDataPairsByItem(this);
 
-			this.setMargins();
+				const settings: ISmallMultiplesGridLayoutSettings = {
+					...this.smallMultiplesSettings,
+					hostContainerId: "smallMultipleHostContainer",
+					containerWidth: vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width,
+					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
+					categories: this.smallMultiplesCategories,
+					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
+					onCellRendered: (category, index, ele) => {
+						DrawSmallMultipleBarChart(this, settings, this.smallMultiplesCategories.findIndex(d => d === category), ele);
+					},
+					getXYAxisNodeElementAndMeasures: (width, height) => {
+						this.viewPortWidth = width;
+						this.viewPortHeight = height;
+						this.width = width;
+						this.height = height;
+						this.settingsBtnWidth = 0;
+						this.settingsBtnHeight = 0;
 
-			this.svg
-				.attr("width", vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width)
-				.attr("height", vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight);
+						this.categoricalData = this.clonedCategoricalData;
+						this.setCategoricalDataFields(this.categoricalData);
+						this.setChartData(this.categoricalData);
 
-			this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+						const { xAxisG, yAxisG } = this.drawXYAxis(true, true);
+						return { xAxisNode: xAxisG.node(), yAxisNode: yAxisG.node(), xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
+					},
+					getUniformXAxisAndBrushNode: (xAxisNode, brushNode) => {
+						this.xAxisG = d3.select(xAxisNode);
+						this.brushG = d3.select(brushNode);
 
-			if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
-				this.drawXYAxis();
+						const config: IBrushConfig = {
+							brushG: brushNode,
+							brushXPos: 0,
+							brushYPos: 0,
+							barDistance: this.brushScaleBandBandwidth,
+							totalBarsCount: this.totalLollipopCount,
+							scaleWidth: this.width,
+							scaleHeight: this.height,
+							smallMultiplesGridItemId: this.smallMultiplesGridItemId,
+							categoricalData: this.categoricalData,
+							isShowXAxis: true,
+							isShowYAxis: true,
+							isShowHorizontalBrush: true
+						};
 
-				if (this.categoricalCategoriesLastIndex > 0) {
+						this.drawHorizontalBrush(this, config);
+
+						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
+					},
+					onRenderingFinished: () => {
+						if (!this.isLollipopTypePie) {
+							SetAndBindChartBehaviorOptions(this, d3.selectAll(".lollipop-group"), d3.selectAll(".lollipop-line"));
+						} else {
+							SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"));
+						}
+						this.behavior.renderSelection(this.interactivityService.hasSelection());
+
+						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+						this.drawTooltip();
+					}
+				};
+
+				DrawSmallMultiplesGridLayout(settings);
+			} else {
+
+				// NORMAL CHART
+				this.categoricalData = this.setInitialChartData(
+					clonedCategoricalData,
+					clonedCategoricalData,
+					JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].metadata)),
+					vizOptions.options.viewport.width,
+					vizOptions.options.viewport.height
+				);
+
+				if (this.isHorizontalBrushDisplayed) {
+					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaHeight : 10;
+				}
+
+				if (this.isVerticalBrushDisplayed) {
+					this.brushWidth = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaWidth : 10;
+				}
+
+				this.conditionalFormattingConditions
+					.forEach((cf: IConditionalFormattingProps) => {
+						if (cf.applyTo === "measure") {
+							const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
+							cf.measureType = {
+								measure: roles[EDataRolesName.Measure],
+								measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
+								measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
+								tooltip: roles[EDataRolesName.Tooltip]
+							};
+						} else if (cf.applyTo === "category") {
+							cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
+						}
+					});
+
+				if (!this.isScrollBrushDisplayed) {
+					this.sortSubcategoryData();
+					this.setCategoricalDataFields(this.categoricalData);
+					this.setChartData(this.categoricalData);
+				}
+
+				// this.setColorsByDataColorsSettings();
+
+				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
+					this.setRemainingAsOthersDataColor();
+				}
+
+				if (this.conditionalFormattingConditions.length) {
+					this.setConditionalFormattingColor();
+				}
+
+				if (this.isLollipopTypeCircle) {
+					this.categoriesColorList = this.chartData.map(d => ({
+						name: d.category,
+						marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+					}));
+				}
+
+				if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
+					this.subCategoriesColorList = this.chartData[0].subCategories.map(d => ({
+						name: d.category,
+						marker: this.subCategoryColorPair[d.category].marker1Color ? this.subCategoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+					}));
+				}
+
+				this.configLegend();
+				this.setMargins();
+
+				this.smallMultiplesGridContainer.selectAll("*").remove();
+				this.svg = d3.select(this.chartContainer).select(".lollipopChart");
+				this.container = d3.select(this.chartContainer).select(".container");
+				this.xAxisG = d3.select(this.chartContainer).select(".xAxisG");
+				this.yAxisG = d3.select(this.chartContainer).select(".yAxisG");
+				this.container = d3.select(this.chartContainer).select(".container");
+				this.lollipopG = d3.select(this.chartContainer).select(".lollipopG");
+
+				this.svg
+					.attr("opacity", "1")
+					.attr("width", vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width)
+					.attr("height", vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight)
+					.attr("pointer-events", "default");
+
+				this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+
+				if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
+					this.drawXYAxis(true, true);
+
+					if (this.categoricalCategoriesLastIndex > 0) {
+						if (!this.isHorizontalChart) {
+							RenderExpandAllXAxis(this, this.categoricalData);
+						} else {
+							RenderExpandAllYAxis(this, this.categoricalData);
+						}
+					}
+
+					this.displayBrush(true, true, true, true);
+				} else {
+					this.drawXYAxis(true, true);
+
+					if (this.categoricalCategoriesLastIndex > 0) {
+						if (!this.isHorizontalChart) {
+							RenderExpandAllXAxis(this, this.categoricalData);
+						} else {
+							RenderExpandAllYAxis(this, this.categoricalData);
+						}
+					}
+				}
+
+				if (this.isExpandAllApplied) {
 					if (!this.isHorizontalChart) {
-						RenderExpandAllXAxis(this, this.categoricalData);
+						if (this.isBottomXAxis) {
+							this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (this.height + this.xScaleGHeight) + "px" + ")");
+						} else {
+							this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-this.xScaleGHeight) + "px" + ")");
+						}
+
+						CallExpandAllXScaleOnAxisGroup(this, this.scaleBandWidth);
 					} else {
-						RenderExpandAllYAxis(this, this.categoricalData);
+						if (this.isLeftYAxis) {
+							this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
+						} else {
+							this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
+						}
+						CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
 					}
 				}
 
-				this.displayBrush();
-			} else {
-				this.drawXYAxis();
+				this.drawLollipopChart();
 
-				if (this.categoricalCategoriesLastIndex > 0) {
-					if (!this.isHorizontalChart) {
-						RenderExpandAllXAxis(this, this.categoricalData);
+				if (this.isChartIsRaceChart) {
+					RenderRaceChartDataLabel(this);
+					if (!this.isTickerButtonDrawn) {
+						RenderRaceTickerButton(this);
 					} else {
-						RenderExpandAllYAxis(this, this.categoricalData);
+						UpdateTickerButton(this);
 					}
-				}
-			}
-
-			if (this.isExpandAllApplied) {
-				if (!this.isHorizontalChart) {
-					if (this.isBottomXAxis) {
-						this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (this.height + this.xScaleGHeight) + "px" + ")");
-					} else {
-						this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-this.xScaleGHeight) + "px" + ")");
-					}
-
-					CallExpandAllXScaleOnAxisGroup(this, this.scaleBandWidth);
 				} else {
-					if (this.isLeftYAxis) {
-						this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
+					if (this.tickerButtonG) {
+						this.tickerButtonG.selectAll("*").remove();
+					}
+
+					if (this.raceChartDataLabelText) {
+						this.raceChartDataLabelText.text("");
+					}
+
+					this.isTickerButtonDrawn = false;
+				}
+
+				this.drawXYAxisTitle();
+				this.setSummaryTableConfig();
+
+				if (this.brushAndZoomAreaSettings.enabled) {
+					this.brushLollipopG = this.brushG.append("g").lower().attr("class", "brushLollipopG");
+					const min = d3.min(clonedCategoricalData.values, (d: any) => d3.min(d.values, v => +v));
+					const max = d3.max(clonedCategoricalData.values, (d: any) => d3.max(d.values, v => +v));
+
+					if (this.isHorizontalChart) {
+						this.brushXScale = d3.scaleLinear().range([this.brushAndZoomAreaCircleSize + 5, this.brushAndZoomAreaWidth - 5]).domain([min, max]);
+						this.brushYScale = this.brushScaleBand.copy(true);
+						this.drawBrushLollipopChart(clonedCategoricalData);
 					} else {
-						this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
+						this.brushXScale = this.brushScaleBand.copy(true);
+						this.brushYScale = d3.scaleLinear().range([this.brushAndZoomAreaHeight - 5, this.brushAndZoomAreaCircleSize + 5]).domain([min, max]);
+						this.drawBrushLollipopChart(clonedCategoricalData);
 					}
-					CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
-				}
-			}
-
-			this.drawLollipopChart();
-
-			if (this.isChartIsRaceChart) {
-				RenderRaceChartDataLabel(this);
-				if (!this.isTickerButtonDrawn) {
-					RenderRaceTickerButton(this);
 				} else {
-					UpdateTickerButton(this);
-				}
-			} else {
-				if (this.tickerButtonG) {
-					this.tickerButtonG.selectAll("*").remove();
+					this.brushLollipopG.selectAll("*").remove();
 				}
 
-				if (this.raceChartDataLabelText) {
-					this.raceChartDataLabelText.text("");
-				}
-
-				this.isTickerButtonDrawn = false;
-			}
-
-			this.drawXYAxisTitle();
-			this.setSummaryTableConfig();
-
-			if (this.brushAndZoomAreaSettings.enabled) {
-				this.brushLollipopG = this.brushG.append("g").lower().attr("class", "brushLollipopG");
-				const min = d3.min(clonedCategoricalData.values, (d: any) => d3.min(d.values, v => +v));
-				const max = d3.max(clonedCategoricalData.values, (d: any) => d3.max(d.values, v => +v));
-				const brushScaleBandwidth = this.brushScaleBand.bandwidth();
-
-				// const circleSize = (brushScaleBandwidth / 3.5) * 2;
-				// if (circleSize < this.brushAndZoomAreaCircleMaxSize && circleSize > this.brushAndZoomAreaCircleMinSize) {
-				// this.brushAndZoomAreaCircleSize = circleSize;
-				// } else if (circleSize > this.brushAndZoomAreaCircleMaxSize) {
-				// 	this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMaxSize;
-				// } else if (circleSize < this.brushAndZoomAreaCircleMinSize) {
-				// 	this.brushAndZoomAreaCircleSize = this.brushAndZoomAreaCircleMinSize;
-				// }
-
-				if (this.isHorizontalChart) {
-					this.brushXScale = d3.scaleLinear().range([this.brushAndZoomAreaCircleSize + 5, this.brushAndZoomAreaWidth - 5]).domain([min, max]);
-					this.brushYScale = this.brushScaleBand.copy(true);
-					this.drawBrushLollipopChart(clonedCategoricalData);
-				} else {
-					this.brushXScale = this.brushScaleBand.copy(true);
-					this.brushYScale = d3.scaleLinear().range([this.brushAndZoomAreaHeight - 5, this.brushAndZoomAreaCircleSize + 5]).domain([min, max]);
-					this.drawBrushLollipopChart(clonedCategoricalData);
-				}
-			} else {
-				this.brushLollipopG.selectAll("*").remove();
-			}
-
-			if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-				if (this.isScrollBrushDisplayed) {
-					if (this.isHorizontalBrushDisplayed) {
-						this.drawBrushXAxis();
-						this.brushYAxisG.selectAll("*").remove();
-					} else if (this.isVerticalBrushDisplayed) {
-						this.drawBrushYAxis();
-						this.brushXAxisG.selectAll("*").remove();
+				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+					if (this.isScrollBrushDisplayed) {
+						if (this.isHorizontalBrushDisplayed) {
+							this.drawBrushXAxis();
+							this.brushYAxisG.selectAll("*").remove();
+						} else if (this.isVerticalBrushDisplayed) {
+							this.drawBrushYAxis();
+							this.brushXAxisG.selectAll("*").remove();
+						}
 					}
+				} else {
+					this.brushXAxisG.selectAll("*").remove();
+					this.brushYAxisG.selectAll("*").remove();
 				}
-			} else {
-				this.brushXAxisG.selectAll("*").remove();
-				this.brushYAxisG.selectAll("*").remove();
-			}
 
-			// this.displayBrush();
-			this.drawTooltip();
+				// this.displayBrush();
+				this.drawTooltip();
 
-			if (this.xAxisSettings.isShowAxisLine) {
-				this.drawXAxisLine();
-			} else {
-				this.xAxisLineG.select(".xAxisLine").remove();
-			}
+				if (this.xAxisSettings.isShowAxisLine) {
+					this.drawXAxisLine();
+				} else {
+					this.xAxisLineG.select(".xAxisLine").remove();
+				}
 
-			if (this.yAxisSettings.isShowAxisLine) {
-				this.drawYAxisLine();
-			} else {
-				this.yAxisLineG.select(".yAxisLine").remove();
+				if (this.yAxisSettings.isShowAxisLine) {
+					this.drawYAxisLine();
+				} else {
+					this.yAxisLineG.select(".yAxisLine").remove();
+				}
+
+				// createPatternsDefs(this, this.svg);
+				// createMarkerDefs(this, this.svg);
+				// this.createErrorBarsMarkerDefs();
+
+				if (!this.isLollipopTypePie) {
+					SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"));
+				} else {
+					SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"));
+				}
+				this.behavior.renderSelection(this.interactivityService.hasSelection());
 			}
 
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
 			this.createErrorBarsMarkerDefs();
 
-			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
-			if (!this.isLollipopTypePie) {
-				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"));
-			} else {
-				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"));
+			if (!this.isSmallMultiplesEnabled) {
+				RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 			}
-			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
 			console.error("Error", error);
 		}
@@ -2505,6 +2692,44 @@ export class Visual extends Shadow {
 			});
 		}
 
+		if (!this.isHasSubcategories) {
+			this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
+				const selectionId = this.vizOptions.host
+					.createSelectionIdBuilder()
+					.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
+					// .withCategory(this.categoricalData.categories[1] as any, this.currentSmallMultipleIndex)
+					.createSelectionId();
+
+				if (this.smallMultiplesGridItemId) {
+					this.selectionIdByCategories[category] = selectionId;
+				}
+			});
+		} else {
+			const categoricalData = this.vizOptions.options.dataViews[0];
+			const series: any[] = categoricalData.categorical.values.grouped();
+			this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
+				const selectionId = this.vizOptions.host
+					.createSelectionIdBuilder()
+					.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
+					.createSelectionId();
+
+				this.selectionIdByCategories[category] = selectionId;
+
+				series.forEach((ser: any) => {
+					ser.values.forEach((s) => {
+						const seriesSelectionId = this.vizOptions.host
+							.createSelectionIdBuilder()
+							.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
+							.withSeries(categoricalData.categorical.values, ser)
+							.withMeasure(s.source.queryName)
+							.createSelectionId();
+
+						this.selectionIdBySubCategories[`${category}-${ser.name}`] = seriesSelectionId as any;
+					});
+				});
+			});
+		}
+
 		this.setSelectionIds(data);
 
 		if (this.isChartIsRaceChart) {
@@ -2832,6 +3057,12 @@ export class Visual extends Shadow {
 		this.dataLabelsSettings = {
 			...DATA_LABELS_SETTINGS,
 			...dataLabelsConfig,
+		};
+
+		const SMConfig = JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]);
+		this.smallMultiplesSettings = {
+			...SMALL_MULTIPLES_SETTINGS,
+			...SMConfig,
 		};
 
 		this.legendSettings = formatTab[EVisualSettings.Legend];
@@ -3368,15 +3599,15 @@ export class Visual extends Shadow {
 	}
 
 	setChartWidthHeight(): void {
-		const options = this.vizOptions;
-		this.viewPortWidth = options.options.viewport.width;
-		this.viewPortHeight = options.options.viewport.height;
+		// const options = this.vizOptions;
+		// this.viewPortWidth = options.options.viewport.width;
+		// this.viewPortHeight = options.options.viewport.height;
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
 		this.height =
 			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
 	}
 
-	displayBrush(): void {
+	displayBrush(isShowXAxis: boolean, isShowYAxis: boolean, isShowHorizontalBrush: boolean, isShowVerticalBrush: boolean): void {
 		if (this.isHorizontalChart) {
 			const newHeight = (this.brushScaleBandBandwidth * this.height) / this.brushScaleBand.bandwidth();
 			if (this.height < newHeight || this.brushAndZoomAreaSettings.enabled) {
@@ -3409,8 +3640,11 @@ export class Visual extends Shadow {
 					totalBarsCount: this.totalLollipopCount,
 					scaleWidth: this.width,
 					scaleHeight: this.height,
-					smallMultiplesGridItemId: null,
+					smallMultiplesGridItemId: this.smallMultiplesGridItemId,
 					categoricalData: this.categoricalData,
+					isShowXAxis,
+					isShowYAxis,
+					isShowHorizontalBrush
 				};
 
 				this.drawHorizontalBrush(this, config);
@@ -3489,13 +3723,13 @@ export class Visual extends Shadow {
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
-				this.initAndRenderLollipopChart(this.width * this.yAxisTicksMaxWidthRatio)
+				this.initAndRenderLollipopChart(this.width * this.yAxisTicksMaxWidthRatio, true, true);
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
 				this.brushWidth = 0;
-				this.drawXYAxis();
+				this.drawXYAxis(true, true);
 			}
 		};
 
@@ -3538,7 +3772,7 @@ export class Visual extends Shadow {
 			.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 	}
 
-	initAndRenderLollipopChart(scaleWidth: number): void {
+	initAndRenderLollipopChart(scaleWidth: number, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 			this.setRemainingAsOthersDataColor();
 		}
@@ -3547,7 +3781,7 @@ export class Visual extends Shadow {
 			this.setConditionalFormattingColor();
 		}
 
-		this.drawXYAxis();
+		this.drawXYAxis(isShowXAxis, isShowYAxis);
 
 		if (this.isExpandAllApplied) {
 			this.expandAllCategoriesName.forEach((d) => {
@@ -3569,14 +3803,16 @@ export class Visual extends Shadow {
 	}
 
 	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
-		const brushG: SVGElement = config.brushG;
+		const smallMultiplesGridItemId = config.smallMultiplesGridItemId;
 		const brushYPos: number = config.brushYPos;
 		const barDistance: number = config.barDistance;
 		const totalBarsCount: number = config.totalBarsCount;
 		const scaleWidth: number = config.scaleWidth;
 		const categoricalData: any = JSON.parse(JSON.stringify(config.categoricalData));
 
-		// const newWidth = (this.chartSettings.lollipopCategoryWidth * this.width / this.scaleBandWidth);
+		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[smallMultiplesGridItemId];
+		const brushG: SVGElement = config.brushG;
+
 		const xScaleDomain = this.brushScaleBand.domain();
 		this.brushScaleBand.range(this.xScale.range());
 
@@ -3588,7 +3824,6 @@ export class Visual extends Shadow {
 			}
 		});
 
-		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
 		const brushed = ({ selection }) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
@@ -3597,6 +3832,8 @@ export class Visual extends Shadow {
 					}
 				});
 			}
+
+			const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 
 			const newXScaleDomain = [];
 			let brushArea = selection;
@@ -3643,13 +3880,19 @@ export class Visual extends Shadow {
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
-				this.initAndRenderLollipopChart(scaleWidth);
+				if (smallMultiplesGridItemContent) {
+					this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+					this.lollipopG = d3.select(smallMultiplesGridItemContent.lollipopG);
+					this.initAndRenderLollipopChart(scaleWidth, config.isShowXAxis, config.isShowYAxis);
+				} else {
+					this.initAndRenderLollipopChart(scaleWidth, config.isShowXAxis, config.isShowYAxis);
+				}
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.brushHeight = 0;
-				this.drawXYAxis();
+				this.drawXYAxis(true, true);
 			}
 		};
 
@@ -3669,24 +3912,27 @@ export class Visual extends Shadow {
 
 		d3.select(brushG)
 			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos - this.brushXAxisTicksMaxHeight})`)
+			.attr("display", config.isShowHorizontalBrush ? "block" : "none")
 			.call(brush as any)
 			.call(brush.move as any, [0, widthByExpectedBar]);
 
-		if (this.brushAndZoomAreaSettings.enabled) {
-			d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 0).attr("ry", 0);
-		} else {
-			d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 4).attr("ry", 4).attr("cursor", "default");
-			d3.select(brushG).selectAll(".handle").remove();
+		if (config.isShowHorizontalBrush) {
+			if (this.brushAndZoomAreaSettings.enabled) {
+				d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 0).attr("ry", 0);
+			} else {
+				d3.select(brushG).selectAll("rect").attr("height", self.brushHeight).attr("rx", 4).attr("ry", 4).attr("cursor", "default");
+				d3.select(brushG).selectAll(".handle").remove();
+			}
+
+			d3.select(brushG).select(".overlay")
+				.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
+				.attr("cursor", this.brushAndZoomAreaSettings.enabled ? "crosshair" : "default")
+				.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
+
+			d3.select(brushG).select(".selection")
+				.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
+				.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 		}
-
-		d3.select(brushG).select(".overlay")
-			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
-			.attr("cursor", this.brushAndZoomAreaSettings.enabled ? "crosshair" : "default")
-			.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
-
-		d3.select(brushG).select(".selection")
-			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
-			.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 	}
 
 	initVerticalBrush(config: IBrushConfig): void {
@@ -4399,13 +4645,13 @@ export class Visual extends Shadow {
 
 	drawTooltip(): void {
 		this.tooltipServiceWrapper.addTooltip(
-			this.lollipopG.selectAll(this.circle1ClassSelector),
+			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, true)),
 			(datapoint: any) => datapoint.selectionId
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
-			this.lollipopG.selectAll(this.circle2ClassSelector),
+			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, false)),
 			(datapoint: any) => datapoint.selectionId
 		);
@@ -4731,7 +4977,7 @@ export class Visual extends Shadow {
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
-					ele.append("tspan").text(THIS.formatNumber(parseFloat(newText), THIS.numberSettings, undefined, false, false));
+					ele.append("tspan").text(THIS.formatNumber(parseFloat(newText), THIS.numberSettings, undefined, false, true));
 				}
 			});
 	}
@@ -4764,7 +5010,7 @@ export class Visual extends Shadow {
 				};
 
 				if (!THIS.isHorizontalChart) {
-					ele.append("tspan").text(THIS.formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false));
+					ele.append("tspan").text(THIS.formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);
@@ -4835,7 +5081,8 @@ export class Visual extends Shadow {
 		} else {
 			this.xScale = d3.scaleBand();
 			// this.xScale2 = d3.scaleBand();
-			this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
+			this.yScale = d3.scaleLinear().nice();
+			// this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
 
 			this.xScale.domain(this.chartData.map((d) => d.category));
 			// this.xScale2.domain(this.chartData.map((d) => d.category));
@@ -4853,7 +5100,11 @@ export class Visual extends Shadow {
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
 			// this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 		} else {
-			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+			if (this.isSmallMultiplesEnabled) {
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
+			} else {
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+			}
 			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25]);
 		}
@@ -4899,60 +5150,64 @@ export class Visual extends Shadow {
 			.attr("stroke-width", "1px");
 	}
 
-	callXYScaleOnAxisGroup(): void {
-		if (this.xAxisSettings.position === Position.Bottom) {
-			this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
-				d3
-					.axisBottom(this.xScale)
-					.ticks(this.width / 90)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-			// .selectAll('text')
-			// .attr('dy', '0.35em')
-			// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
-		} else if (this.xAxisSettings.position === Position.Top) {
-			this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
-				d3
-					.axisTop(this.xScale)
-					.ticks(this.width / 90)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-			// .selectAll('text')
-			// .attr('dy', '0.35em')
-			// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
+	callXYScaleOnAxisGroup(isShowXAxis: boolean, isShowYAxis: boolean): void {
+		if (isShowXAxis) {
+			if (this.xAxisSettings.position === Position.Bottom) {
+				this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
+					d3
+						.axisBottom(this.xScale)
+						.ticks(this.width / 90)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+				// .selectAll('text')
+				// .attr('dy', '0.35em')
+				// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
+			} else if (this.xAxisSettings.position === Position.Top) {
+				this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
+					d3
+						.axisTop(this.xScale)
+						.ticks(this.width / 90)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+				// .selectAll('text')
+				// .attr('dy', '0.35em')
+				// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
+			}
+
+			this.xAxisG
+				.selectAll("text")
+				.attr("display", this.xAxisSettings.isDisplayLabel ? "block" : "none");
 		}
 
-		if (this.yAxisSettings.position === Position.Left) {
-			this.yAxisG.attr("transform", `translate(0, 0)`).call(
-				d3
-					.axisLeft(this.yScale)
-					.ticks(this.height / 70)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-		} else if (this.yAxisSettings.position === Position.Right) {
-			this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
-				d3
-					.axisRight(this.yScale)
-					.ticks(this.height / 70)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
+		if (isShowYAxis) {
+			if (this.yAxisSettings.position === Position.Left) {
+				this.yAxisG.attr("transform", `translate(0, 0)`).call(
+					d3
+						.axisLeft(this.yScale)
+						.ticks(this.height / 70)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+			} else if (this.yAxisSettings.position === Position.Right) {
+				this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
+					d3
+						.axisRight(this.yScale)
+						.ticks(this.height / 70)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+			}
+
+			this.yAxisG
+				.selectAll("text")
+				.attr("display", this.yAxisSettings.isDisplayLabel ? "block" : "none");
 		}
-
-		this.xAxisG
-			.selectAll("text")
-			.attr("display", this.xAxisSettings.isDisplayLabel ? "block" : "none");
-
-		this.yAxisG
-			.selectAll("text")
-			.attr("display", this.yAxisSettings.isDisplayLabel ? "block" : "none");
 	}
 
 	xGridLinesFormatting(lineSelection: any): void {
@@ -5080,7 +5335,7 @@ export class Visual extends Shadow {
 			const yAxisTicks: string[] = this.yScale.ticks(this.height / 70);
 			const yAxisTicksWidth = yAxisTicks.map((d) => {
 				const textProperties: TextProperties = {
-					text: !this.isHorizontalChart && typeof d === "number" ? this.formatNumber(d, this.numberSettings, undefined, false, false) : d,
+					text: !this.isHorizontalChart && typeof d === "number" ? this.formatNumber(d, this.numberSettings, undefined, false, true) : d,
 					fontFamily: this.yAxisSettings.labelFontFamily,
 					fontSize: this.yAxisSettings.labelFontSize + "px",
 				};
@@ -5099,48 +5354,69 @@ export class Visual extends Shadow {
 		}
 	}
 
-	drawXYAxis(): void {
+	drawXYAxis(isShowXAxis: boolean, isShowYAxis: boolean): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
 		this.setXYAxisDomain();
 		this.setXYAxisRange(this.width, this.height);
 
+		if (isNaN(this.width) || isNaN(this.height)) {
+			return;
+		}
+
 		// // // SET X-AXIS TICKS MAX HEIGHT
-		this.setXScaleGHeight();
+		if (isShowXAxis) {
+			this.setXScaleGHeight();
+		}
 
 		// // // SET Y-AXIS TICKS MAX HEIGHT
-		this.setYScaleGWidth();
+		if (isShowYAxis) {
+			this.setYScaleGWidth();
+		}
 
 		this.setMargins();
 
 		this.setXYAxisRange(this.width, this.height);
 
+		if (isNaN(this.width) || isNaN(this.height)) {
+			return;
+		}
+
 		// // // SET X-AXIS TICKS MAX HEIGHT
-		this.setXScaleGHeight();
+		if (isShowXAxis) {
+			this.setXScaleGHeight();
+		}
 
 		// // // SET Y-AXIS TICKS MAX HEIGHT
-		this.setYScaleGWidth();
+		if (isShowYAxis) {
+			this.setYScaleGWidth();
+		}
 
 		this.setMargins();
 
 		this.setXYAxisRange(this.width, this.height);
+
+		if (isNaN(this.width) || isNaN(this.height)) {
+			return;
+		}
+
 		this.setScaleBandwidth();
-		this.callXYScaleOnAxisGroup();
+		this.callXYScaleOnAxisGroup(isShowXAxis, isShowYAxis);
 
-		if (this.xAxisSettings.isDisplayLabel) {
+		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
 			this.setXAxisTickStyle();
 		}
 
-		if (this.yAxisSettings.isDisplayLabel) {
+		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
 			this.setYAxisTickStyle();
 		}
 
-		if (this.xAxisSettings.isDisplayLabel) {
+		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
 			const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
 			this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
 		} else {
 			this.xScaleGHeight = 0;
 		}
 
-		if (this.yAxisSettings.isDisplayLabel) {
+		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
 			const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
 			this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
 		} else {
@@ -5151,13 +5427,13 @@ export class Visual extends Shadow {
 
 		this.setXYAxisRange(this.width, this.height);
 		this.setScaleBandwidth();
-		this.callXYScaleOnAxisGroup();
+		this.callXYScaleOnAxisGroup(isShowXAxis, isShowYAxis);
 
-		if (this.xAxisSettings.isDisplayLabel) {
+		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
 			this.setXAxisTickStyle();
 		}
 
-		if (this.yAxisSettings.isDisplayLabel) {
+		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
 			this.setYAxisTickStyle();
 		}
 
@@ -5210,6 +5486,8 @@ export class Visual extends Shadow {
 		// this.setYAxisTickStyle();
 		this.drawXGridLines();
 		this.drawYGridLines();
+
+		return { xAxisG: this.xAxisG, yAxisG: this.yAxisG };
 	}
 
 	// Lines
@@ -5757,6 +6035,7 @@ export class Visual extends Shadow {
 
 		this.drawData1Labels(this.dataLabelsSettings.show && this.isLollipopTypeCircle ? this.chartData : []);
 		this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.chartData : []);
+
 		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
 		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
 

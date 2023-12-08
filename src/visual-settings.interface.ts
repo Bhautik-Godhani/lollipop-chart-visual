@@ -276,6 +276,9 @@ export interface IBrushConfig {
 	categoricalData: any;
 	XAxisG?: SVGElement | null;
 	brushNumber?: number;
+	isShowXAxis: boolean;
+	isShowYAxis: boolean;
+	isShowHorizontalBrush: boolean;
 }
 
 export interface IShowBucketSettings {

@@ -8,3 +8,5 @@ test.webpack.config.js
 capJsonSettingsGen.js
 funnelChartInput.js
 *.js
+SmallMultiplesSettings.tsx
+SmallMultiples.methods.ts

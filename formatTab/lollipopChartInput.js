@@ -24,6 +24,7 @@ const sectionKVPair = [
 	{ referenceLinesConfig: "Reference Lines Configuration" },
 	{ errorBarsConfig: "Error Bars Configuration" },
 	{ IBCSConfig: "IBCS Configuration" },
+	{ smallMultiplesConfig: "Small Multiples Configuration" },
 ];
 
 const formatTab = {
@@ -571,6 +572,15 @@ const formatTab = {
 		{
 			technicalName: "IBCSSettings",
 			displayName: "IBCS Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	smallMultiplesConfig: [
+		{
+			technicalName: "smallMultiplesSettings",
+			displayName: "Small Multiples Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

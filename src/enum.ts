@@ -16,7 +16,8 @@ export enum EVisualConfig {
 	ReferenceLinesConfig = "referenceLinesConfig",
 	ErrorBarsConfig = "errorBarsConfig",
 	IBCSConfig = "IBCSConfig",
-	Editor = "editor"
+	Editor = "editor",
+	SmallMultiplesConfig = "smallMultiplesConfig",
 }
 
 export enum EVisualSettings {
@@ -42,7 +43,8 @@ export enum EVisualSettings {
 	ReferenceLinesSettings = "referenceLinesSettings",
 	ErrorBarsSettings = "errorBarsSettings",
 	IBCSSettings = "IBCSSettings",
-	BeforeIBCSSettings = "beforeIBCSSettings"
+	BeforeIBCSSettings = "beforeIBCSSettings",
+	SmallMultiplesSettings = "smallMultiplesSettings",
 }
 
 export enum ELineType {
@@ -166,7 +168,8 @@ export enum EDataRolesName {
 	ImagesData = "imagesData",
 	ShowBucket = "showBucket",
 	UpperBound = "upperBound",
-	LowerBound = "lowerBound"
+	LowerBound = "lowerBound",
+	SmallMultiples = "smallMultiples",
 }
 
 export enum FontStyle {
@@ -299,6 +302,7 @@ export enum ESortingSettings {
 	IsSortByCategory = "isSortByCategory",
 	IsSortByMeasure = "isSortByMeasure",
 	IsSortByExtraSortField = "isSortByExtraSortField",
+	SmallMultiples = "smallMultiples",
 }
 
 export enum EShowBucketSettings {
@@ -664,4 +668,53 @@ export enum ENumberFormatting {
 	SemanticFormatting = "semanticFormatting",
 	NegativeFormat = "negativeFormat",
 	PositiveFormat = "positiveFormat"
+}
+
+export enum ESmallMultiplesSettings {
+	IsSmallMultiplesEnabled = "isSmallMultiplesEnabled",
+	LayoutPane = "layoutPane",
+	StylePane = "stylePane",
+	ViewPane = "viewPane",
+	AxisPane = "axisPane",
+	HeaderPane = "headerPane",
+	BackgroundPane = "backgroundPane",
+	BorderPane = "borderPane",
+	ShadowPane = "shadowPane",
+	LayoutType = "layoutType",
+	DisplayType = "displayType",
+	ViewType = "viewType",
+	Rows = "rows",
+	Columns = "columns",
+	xAxisType = "xAxisType",
+	yAxisType = "yAxisType",
+	xAxisPosition = "xAxisPosition",
+	yAxisPosition = "yAxisPosition",
+	InnerSpacing = "innerSpacing",
+	OuterSpacing = "outerSpacing",
+	Header = "header",
+	FontFamily = "fontFamily",
+	FontSize = "fontSize",
+	FontColor = "fontColor",
+	FontStyles = "fontStyles",
+	Alignment = "alignment",
+	Position = "position",
+	IsTextWrapEnabled = "isTextWrapEnabled",
+	Background = "background",
+	BackgroundType = "type",
+	Type = "type",
+	PanelColor = "panelColor",
+	AlternateColor = "alternateColor",
+	Transparency = "transparency",
+	Border = "border",
+	IsShowBorder = "isShowBorder",
+	Style = "style",
+	Width = "width",
+	Radius = "radius",
+	Color = "color",
+	Shadow = "shadow",
+	VerticalOffset = "verticalOffset",
+	HorizontalOffset = "horizontalOffset",
+	Blur = "blur",
+	Spread = "spread",
+	Inset = "inset"
 }
