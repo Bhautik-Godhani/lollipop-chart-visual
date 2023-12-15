@@ -26,7 +26,8 @@ export class Enumeration {
 			getReferenceLinesSelection(),
 			getBrushAndZoomAreaConfigSelection(),
 			getErrorBarsSelection(),
-			getIBCSSelection()
+			getIBCSSelection(),
+			dynamicDeviationSelection(),
 		];
 	}
 }
@@ -477,6 +478,19 @@ function getIBCSSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "IBCSSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function dynamicDeviationSelection(): EnumerateSectionType {
+	return {
+		name: "dynamicDeviationConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "dynamicDeviationSettings",
 				isShow: true,
 			},
 		],

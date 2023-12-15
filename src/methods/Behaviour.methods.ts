@@ -22,6 +22,7 @@ export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
 	interactivityService: IInteractivityService<SelectableDataPoint>;
 	selectionManager: ISelectionManager;
 	isHasSubcategories: boolean;
+	onLollipopClick: (...any) => any;
 }
 
 export class Behavior implements IInteractiveBehavior {
@@ -35,7 +36,7 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
@@ -49,6 +50,8 @@ export class Behavior implements IInteractiveBehavior {
 		};
 
 		lollipopSelection.on("click", function (e) {
+			onLollipopClick(d3Select(this));
+
 			const clickedElement = e.target;
 
 			if (clickedElement.id === CircleType.Circle1) {
@@ -154,6 +157,7 @@ export const SetAndBindChartBehaviorOptions = (
 	self: Visual,
 	lollipopSelection: D3Selection<SVGElement>,
 	lineSelection: D3Selection<SVGElement>,
+	onLollipopClick: (...any) => any
 ): void => {
 	if (self.interactivityService) {
 		const nodeData = [];
@@ -175,6 +179,7 @@ export const SetAndBindChartBehaviorOptions = (
 			selectionManager: self.selectionManager,
 			behavior: self.behavior,
 			isHasSubcategories: self.isHasSubcategories,
+			onLollipopClick
 		};
 		self.interactivityService.bind(behaviorOptions);
 	}

@@ -54,6 +54,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public referenceLinesConfig = new ReferenceLinesConfig();
 	public errorBarsConfig = new ErrorBarsConfig();
 	public IBCSConfig = new IBCSConfig();
+	public dynamicDeviationConfig = new DynamicDeviationConfig();
 }
 
 export class License {
@@ -161,4 +162,8 @@ export class ErrorBarsConfig {
 
 export class IBCSConfig {
 	public IBCSSettings: string = "{}";
+}
+
+export class DynamicDeviationConfig {
+	public dynamicDeviationSettings: string = "{}";
 }

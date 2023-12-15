@@ -548,3 +548,55 @@ export const IBCSDiverging2VIcon = (props) => (
 		<path d="M44.7688 64.1023V42.7257H41.1586V64.1023L44.7688 64.1023Z" fill="#E53327" />
 	</svg>
 );
+
+export const DynamicDeviationArrowIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="25" height="10" viewBox="0 0 25 10" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path
+			fill-rule="evenodd"
+			clip-rule="evenodd"
+			d="M0.333496 5C0.333496 4.49165 0.723441 4.07955 1.20446 4.07955H21.3598L19.4596 2.07131C19.1194 1.71185 19.1194 1.12905 19.4596 0.769595C19.7997 0.410135 20.3512 0.410135 20.6913 0.769596L24.0784 4.34914C24.4185 4.7086 24.4185 5.2914 24.0784 5.65086L20.6913 9.2304C20.3512 9.58986 19.7997 9.58986 19.4596 9.2304C19.1194 8.87094 19.1194 8.28815 19.4596 7.92869L21.3598 5.92045H1.20446C0.723442 5.92045 0.333496 5.50835 0.333496 5Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+	</svg>
+);
+
+export const DynamicDeviationDotsIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="34" height="4" viewBox="0 0 34 4" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M4 2C4 3.10457 3.10457 4 2 4C0.89543 4 0 3.10457 0 2C0 0.89543 0.89543 0 2 0C3.10457 0 4 0.89543 4 2Z" fill={props.fill || "var(--activeSelected)"} />
+		<path fill-rule="evenodd" clip-rule="evenodd" d="M15 3H8V1H15V3Z" fill={props.fill || "var(--activeSelected)"} />
+		<path fill-rule="evenodd" clip-rule="evenodd" d="M26 3H19V1H26V3Z" fill={props.fill || "var(--activeSelected)"} />
+		<path
+			d="M34 2C34 3.10457 33.1046 4 32 4C30.8954 4 30 3.10457 30 2C30 0.89543 30.8954 0 32 0C33.1046 0 34 0.89543 34 2Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+	</svg>
+);
+
+export const DynamicDeviationBarIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="29" height="2" viewBox="0 0 29 2" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path fill-rule="evenodd" clip-rule="evenodd" d="M28.6665 2H0.666504V0H28.6665V2Z" fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const DynamicDeviationIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="14" height="12" viewBox="0 0 14 12" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path
+			d="M7.25 12C8.2165 12 9 11.287 9 10.4074V8.13229C9 7.25273 8.2165 6.5397 7.25 6.5397C6.2835 6.5397 5.5 7.25273 5.5 8.13229V10.4074C5.5 11.287 6.2835 12 7.25 12ZM8.125 10.4074C8.125 10.8472 7.73325 11.2037 7.25 11.2037C6.76675 11.2037 6.375 10.8472 6.375 10.4074V8.13229C6.375 7.69251 6.76675 7.336 7.25 7.336C7.73325 7.336 8.125 7.69251 8.125 8.13229V10.4074ZM1.75 12C2.7165 12 3.5 11.287 3.5 10.4074L3.5 3.59259C3.5 2.71303 2.7165 2 1.75 2C0.783503 2 3.36332e-07 2.71303 2.97885e-07 3.59259L0 10.4074C-3.84468e-08 11.287 0.783503 12 1.75 12ZM2.625 10.4074C2.625 10.8472 2.23325 11.2037 1.75 11.2037C1.26675 11.2037 0.875001 10.8472 0.875001 10.4074L0.875001 3.59259C0.875001 3.15281 1.26675 2.79629 1.75 2.79629C2.23325 2.79629 2.625 3.15281 2.625 3.59259L2.625 10.4074Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+		<path
+			fill-rule="evenodd"
+			clip-rule="evenodd"
+			d="M13.3188 3.5H14L12.9999 5.13225L12 3.5H12.6811V1.5C13.3188 1.5 13.3188 1.5 13.3188 1.5V3.5Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+		<path
+			d="M2.86621 1.5C2.69336 1.79883 2.37012 2 2 2C1.44775 2 1 1.55273 1 1C1 0.447266 1.44775 0 2 0C2.18115 0 2.35107 0.0478516 2.49756 0.131836C2.65039 0.219727 2.77783 0.347656 2.86621 0.5H13.3188V1.5H2.86621Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+		<path
+			d="M8.91741 6.13225C8.74456 6.43108 8.42131 6.63225 8.0512 6.63225C7.49895 6.63225 7.0512 6.18499 7.0512 5.63225C7.0512 5.07952 7.49895 4.63225 8.0512 4.63225C8.23235 4.63225 8.40227 4.68011 8.54876 4.76409C8.70159 4.85198 8.82903 4.97991 8.91741 5.13225H12.9999V6.13225H8.91741Z"
+			fill={props.fill || "var(--activeSelected)"}
+		/>
+	</svg>
+);

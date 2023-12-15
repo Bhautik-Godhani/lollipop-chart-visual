@@ -48,6 +48,8 @@ import {
 	EErrorBarsCalcTypes,
 	EIBCSThemes,
 	EMarkerColorTypes,
+	ECFApplyOnCategories,
+	EDynamicDeviationDisplayTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -74,17 +76,20 @@ import {
 	PATTERN_SETTINGS,
 	RACE_CHART_SETTINGS,
 	ERROR_BARS_SETTINGS,
-	IBCS_SETTINGS
+	IBCS_SETTINGS,
+	DYNAMIC_DEVIATION_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
 	IBCSSettings,
 	IBrushAndZoomAreaSettings,
 	IBrushConfig,
+	ICategoryValuePair,
 	IChartSettings,
 	IConditionalFormattingProps,
 	IDataColorsSettings,
 	IDataLabelsSettings,
+	IDynamicDeviationSettings,
 	IErrorBarsMarker,
 	IErrorBarsSettings,
 	IFooterSettings,
@@ -144,7 +149,7 @@ import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -154,6 +159,8 @@ import { ErrorBarsMarkers } from "./error-bars-markers";
 import IBCSSettingsComponent from "./settings-pages/IBCSSettings";
 import { ApplyIBCSTheme } from "./methods/IBCS.methods";
 import { GetFormattedNumber } from "./methods/NumberFormat.methods";
+import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings";
+import { RemoveDynamicDeviation, RenderDynamicDeviation, RenderDynamicDeviationIcon, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -469,6 +476,18 @@ export class Visual extends Shadow {
 	};
 	legendPosition: { top: boolean, bottom: boolean, left: boolean, right: boolean } = { top: false, bottom: false, left: false, right: false };
 
+	// dynamic deviation
+	dynamicDeviationG: any;
+	isDynamicDeviationButtonSelected: boolean;
+	isDeviationCreatedAfterButtonClicked: boolean;
+	firstCategoryValueDataPair: ICategoryValuePair;
+	lastCategoryValueDataPair: ICategoryValuePair;
+	minCategoryValueDataPair: ICategoryValuePair;
+	maxCategoryValueDataPair: ICategoryValuePair;
+	fromCategoryValueDataPair: ICategoryValuePair;
+	toCategoryValueDataPair: ICategoryValuePair;
+	DDConnectorFill: string;
+
 	// settings
 	isHorizontalChart: boolean = false;
 	chartSettings: IChartSettings;
@@ -494,6 +513,8 @@ export class Visual extends Shadow {
 	referenceLinesSettings: IReferenceLineSettings[] = [];
 	errorBarsSettings: IErrorBarsSettings;
 	IBCSSettings: IBCSSettings;
+	dynamicDeviationSettings: IDynamicDeviationSettings;
+	lastDynamicDeviationSettings: IDynamicDeviationSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -528,6 +549,13 @@ export class Visual extends Shadow {
 			},
 			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
 			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
+			CFConfig: {
+				isSupportApplyOn: true, applyOnCategories: [
+					{ label: "Marker", value: ECFApplyOnCategories.Marker },
+					{ label: "Line", value: ECFApplyOnCategories.Line },
+					{ label: "Labels", value: ECFApplyOnCategories.Labels },
+				]
+			},
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
 			components: [
 				{
@@ -592,6 +620,13 @@ export class Visual extends Shadow {
 					propertyName: "errorBarsSettings",
 					Component: () => ErrorBarsSettings,
 					icon: ErrorBarsIcon
+				},
+				{
+					name: "Dynamic Deviation",
+					sectionName: "dynamicDeviationConfig",
+					propertyName: "dynamicDeviationSettings",
+					Component: () => DynamicDeviationSettings,
+					icon: DynamicDeviationIcon
 				},
 				{
 					name: "IBCS Themes",
@@ -664,6 +699,7 @@ export class Visual extends Shadow {
 		this.tooltipServiceWrapper = createTooltipServiceWrapper(options.host.tooltipService, options.element);
 		this._events = options.host.eventService;
 		this._host = options.host;
+		this.visualHost = options.host;
 		this.selectionManager = options.host.createSelectionManager();
 		this.interactivityService = interactivitySelectionService.createInteractivitySelectionService(this._host) as any;
 		this.behavior = new Behavior();
@@ -752,6 +788,8 @@ export class Visual extends Shadow {
 		this.referenceLineLayersG = this.container.append("g").classed("referenceLineLayersG", true);
 
 		this.referenceLinesContainerG = this.container.append("g").classed("referenceLinesContainerG", true);
+
+		this.dynamicDeviationG = this.container.append("g").classed("dynamicDeviationG", true);
 
 		this.tickerButtonG = this.svg.append("g").classed("tickerButtonG", true);
 
@@ -1371,6 +1409,8 @@ export class Visual extends Shadow {
 				});
 		}
 
+		const dataLength = categoricalData.categories[this.categoricalCategoriesLastIndex].values.length;
+
 		this.setBrushScaleBandDomain(clonedCategoricalData);
 		this.setBrushScaleBandRange(width, height);
 
@@ -1410,6 +1450,19 @@ export class Visual extends Shadow {
 		this.totalLollipopCount = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
 
 		this.xScale = this.brushScaleBand;
+
+		// const minIndex = d3.minIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
+		// const maxIndex = d3.maxIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
+
+		this.firstCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[0],
+			value: <number>categoricalData.values[0].values[0],
+		};
+
+		this.lastCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[dataLength - 1],
+			value: <number>categoricalData.values[0].values[dataLength - 1],
+		};
 
 		if (this.brushAndZoomAreaSettings.enabled) {
 			if (this.categoricalDataPairs.length < this.brushAndZoomAreaSettings.minLollipopCount) {
@@ -2039,11 +2092,48 @@ export class Visual extends Shadow {
 			createMarkerDefs(this, this.svg);
 			this.createErrorBarsMarkerDefs();
 
+			d3.select(".dynamic-deviation-button").style(
+				"display",
+				this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn ? "flex" : "none"
+			);
+
+			// if (this.dynamicDeviationSettings.isEnabled && this.isLollipopTypeCircle) {
+			// 	SetDynamicDeviationDataAndDrawLines(this);
+			// } else {
+			// 	RemoveDynamicDeviation(this);
+			// }
+
+			// this.visualHost.persistProperties({
+			// 	merge: [
+			// 		{
+			// 			objectName: EVisualConfig.DynamicDeviationConfig,
+			// 			displayName: EVisualSettings.DynamicDeviationSettings,
+			// 			properties: {
+			// 				[EVisualSettings.DynamicDeviationSettings]: JSON.stringify({
+			// 					...this.dynamicDeviationSettings,
+			// 					SHOW_IN_LEFT_MENU: this.isLollipopTypeCircle ? true : false,
+			// 				}),
+			// 			},
+			// 			selector: null,
+			// 		}
+			// 	],
+			// });
+
+			if (this.dynamicDeviationSettings.isEnabled && this.isLollipopTypeCircle && !this.isHasMultiMeasure && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) {
+				RenderDynamicDeviationIcon(this);
+			} else {
+				d3.select(".dynamic-deviation-button").remove();
+			}
+
+			const onLollipopClick = (ele: D3Selection<SVGElement>) => {
+				this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
+			}
+
 			RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 			if (!this.isLollipopTypePie) {
-				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"));
+				SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), onLollipopClick);
 			} else {
-				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"));
+				SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
 			}
 			this.behavior.renderSelection(this.interactivityService.hasSelection());
 		} catch (error) {
@@ -2534,6 +2624,19 @@ export class Visual extends Shadow {
 			this.setVisualPatternData();
 		}
 
+		const minIndex = d3.minIndex(this.chartData, (d) => d.value1);
+		const maxIndex = d3.maxIndex(this.chartData, (d) => d.value1);
+
+		this.minCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[minIndex],
+			value: <number>categoricalData.values[0].values[minIndex],
+		};
+
+		this.maxCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[maxIndex],
+			value: <number>categoricalData.values[0].values[maxIndex],
+		};
+
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
 				name: d.category,
@@ -2927,6 +3030,16 @@ export class Visual extends Shadow {
 		};
 
 		this.beforeIBCSSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeIBCSSettings]);
+
+		this.lastDynamicDeviationSettings = this.dynamicDeviationSettings;
+
+		const dynamicDeviationConfig = JSON.parse(
+			formatTab[EVisualConfig.DynamicDeviationConfig][EVisualSettings.DynamicDeviationSettings]
+		);
+		this.dynamicDeviationSettings = {
+			...DYNAMIC_DEVIATION_SETTINGS,
+			...dynamicDeviationConfig,
+		};
 
 		this.changeVisualSettings();
 
@@ -5465,6 +5578,53 @@ export class Visual extends Shadow {
 			});
 	}
 
+	handleCreateOwnDynamicDeviationOnBarClick(barElement: SVGElement): void {
+		const THIS = this;
+		const isCreateOwnDynamicDeviation: boolean =
+			this.dynamicDeviationSettings.isEnabled && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn;
+
+		if (isCreateOwnDynamicDeviation || THIS.isDynamicDeviationButtonSelected) {
+			const data: any = d3.select(barElement).datum();
+			if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
+				THIS.toCategoryValueDataPair = { category: data.category, value: data.value1 };
+				RenderDynamicDeviation(this, THIS.fromCategoryValueDataPair, THIS.toCategoryValueDataPair);
+				d3.select(".dynamic-deviation-button").classed("selected", false);
+				THIS.isDynamicDeviationButtonSelected = false;
+				THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "auto");
+
+				if (!THIS.isDeviationCreatedAfterButtonClicked && THIS.dynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) {
+					THIS.isDeviationCreatedAfterButtonClicked = true;
+					THIS.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.CreateYourOwn;
+
+					THIS.visualHost.persistProperties({
+						merge: [
+							{
+								objectName: "dynamicDeviationConfig",
+								displayName: "dynamicDeviationSettings",
+								properties: {
+									dynamicDeviationSettings: JSON.stringify({
+										...THIS.dynamicDeviationSettings,
+										displayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
+										lastDisplayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
+									}),
+								},
+								selector: null,
+							},
+						],
+					});
+				}
+			}
+
+			if (!THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
+				THIS.fromCategoryValueDataPair = { category: data.category, value: data.value1 };
+			}
+		}
+
+		if (!isCreateOwnDynamicDeviation && !THIS.isDynamicDeviationButtonSelected) {
+			// HighlightActiveBar(d3.select(barElement), THIS.normalBarG.selectAll("foreignObject"));
+		}
+	}
+
 	drawLollipopChart(): void {
 		this.chartData.forEach(d => {
 			if (!this.isHasMultiMeasure) {
@@ -5509,6 +5669,11 @@ export class Visual extends Shadow {
 		this.lollipopSelection = lollipopSelection.join(
 			(enter) => {
 				const lollipopG = enter.append("g").attr("class", "lollipop-group");
+
+				lollipopG.on("click", () => {
+					this.handleCreateOwnDynamicDeviationOnBarClick(lollipopG.node());
+				});
+
 				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
 				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
@@ -5773,6 +5938,27 @@ export class Visual extends Shadow {
 
 		this.referenceLinesData = GetReferenceLinesData(this);
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
+
+		const THIS = this;
+		const isCreateOwnDynamicDeviation: boolean =
+			this.dynamicDeviationSettings.isEnabled && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn;
+		this.lollipopG.selectAll(".lollipop-group")
+			.on("mouseover", function () {
+				if (isCreateOwnDynamicDeviation || THIS.isDynamicDeviationButtonSelected) {
+					if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
+						const data: any = d3.select(this).datum();
+						const toCategoryValueDataPair = { category: data.category, value: data.value1 };
+						RenderDynamicDeviation(THIS, THIS.fromCategoryValueDataPair, toCategoryValueDataPair);
+						THIS.toCategoryValueDataPair = undefined!;
+					}
+				}
+			});
+
+		if (this.dynamicDeviationSettings.isEnabled && this.isLollipopTypeCircle && !this.isHasMultiMeasure) {
+			SetDynamicDeviationDataAndDrawLines(this);
+		} else {
+			RemoveDynamicDeviation(this);
+		}
 	}
 
 	drawZeroSeparatorLine(): void {

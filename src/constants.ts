@@ -28,6 +28,9 @@ import {
 	EErrorBarsCalcTypes,
 	EErrorBandFillTypes,
 	EErrorBarsLabelFormat,
+	EDynamicDeviationDisplayTypes,
+	EDynamicDeviationLabelDisplayTypes,
+	EDynamicDeviationConnectingLineTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -37,6 +40,7 @@ import {
 	ICirclePropsSettings,
 	IDataColorsSettings,
 	IDataLabelsSettings,
+	IDynamicDeviationSettings,
 	IErrorBarsSettings,
 	IGridLinesSettings,
 	ILineSettings,
@@ -407,3 +411,33 @@ export const IBCS_SETTINGS: IBCSSettings = {
 	theme: undefined,
 	prevTheme: undefined
 }
+
+export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
+	isEnabled: false,
+	displayType: EDynamicDeviationDisplayTypes.FirstToLast,
+	lastDisplayType: EDynamicDeviationDisplayTypes.FirstToLast,
+	fromIndex: 1,
+	toIndex: 2,
+	position: Position.Right,
+	labelDisplayType: EDynamicDeviationLabelDisplayTypes.Value,
+	labelFontSize: 12,
+	labelFontColor: "rgba(102,102,102,1)",
+	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	isShowLabelBorder: false,
+	borderWidth: 2,
+	borderColor: "rgba(0, 0, 0, 1)",
+	isShowLabelBackground: true,
+	backgroundColor: "rgba(0, 0, 0, 1)",
+	backgroundColorTransparency: 90,
+	connectorType: EDynamicDeviationConnectingLineTypes.Arrow,
+	isAutoConnectorColor: true,
+	connectorPositiveColor: "rgba(142, 185, 0, 1)",
+	connectorNegativeColor: "rgba(255, 0, 10, 1)",
+	connectorWidth: 5,
+	connectingLineColor: "rgba(0, 0, 0, 1)",
+	connectingLineWidth: 3,
+	isShowStartIndicator: true,
+	isBarBorderEnabled: true,
+	connectingLineType: ELineType.Solid,
+	labelPosition: Position.Right
+};

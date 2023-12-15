@@ -5,8 +5,12 @@ import {
 	DataLabelsPlacement,
 	DisplayUnits,
 	EBeforeAfterPosition,
+	ECFApplyOnCategories,
 	EDataLabelsBGApplyFor,
 	EDataRolesName,
+	EDynamicDeviationConnectingLineTypes,
+	EDynamicDeviationDisplayTypes,
+	EDynamicDeviationLabelDisplayTypes,
 	EErrorBandFillTypes,
 	EErrorBarsCalcTypes,
 	EErrorBarsLabelFormat,
@@ -356,7 +360,8 @@ export interface IConditionalFormattingProps {
 	operator: string,
 	secondaryStaticValue: number | string,
 	sourceName: string,
-	staticValue: string
+	staticValue: string,
+	applyOnCategories: ECFApplyOnCategories[]
 }
 
 export interface IRaceChartSettings {
@@ -494,4 +499,39 @@ export interface IBCSSettings {
 	isIBCSEnabled: boolean;
 	theme: EIBCSThemes;
 	prevTheme: EIBCSThemes;
+}
+
+export interface IDynamicDeviationSettings {
+	isEnabled: boolean;
+	displayType: EDynamicDeviationDisplayTypes;
+	lastDisplayType: EDynamicDeviationDisplayTypes;
+	fromIndex: number;
+	toIndex: number;
+	position: Position;
+	labelDisplayType: EDynamicDeviationLabelDisplayTypes;
+	labelFontSize: number;
+	labelFontColor: string;
+	labelFontFamily: string;
+	isShowLabelBorder: boolean;
+	borderWidth: number;
+	borderColor: string;
+	isShowLabelBackground: boolean;
+	backgroundColor: string;
+	backgroundColorTransparency: number;
+	connectorType: EDynamicDeviationConnectingLineTypes;
+	isAutoConnectorColor: boolean;
+	connectorPositiveColor: string;
+	connectorNegativeColor: string;
+	connectorWidth: number;
+	connectingLineType: ELineType;
+	connectingLineColor: string;
+	connectingLineWidth: number;
+	isShowStartIndicator: boolean;
+	isBarBorderEnabled: boolean;
+	labelPosition: Position;
+}
+
+export interface ICategoryValuePair {
+	category: string;
+	value: number;
 }

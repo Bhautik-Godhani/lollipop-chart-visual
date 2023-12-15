@@ -647,6 +647,18 @@
 				}
 			}
 		},
+		"dynamicDeviationConfig": {
+			"displayName": "Dynamic Deviation Configuration",
+			"properties": {
+				"dynamicDeviationSettings": {
+					"displayName": "Dynamic Deviation Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"raceChartConfig": {
 			"displayName": "Race Chart Configuration",
 			"properties": {

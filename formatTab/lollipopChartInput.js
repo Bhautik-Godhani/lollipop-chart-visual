@@ -24,6 +24,7 @@ const sectionKVPair = [
 	{ referenceLinesConfig: "Reference Lines Configuration" },
 	{ errorBarsConfig: "Error Bars Configuration" },
 	{ IBCSConfig: "IBCS Configuration" },
+	{ dynamicDeviationConfig: "Dynamic Deviation Configuration" },
 ];
 
 const formatTab = {
@@ -571,6 +572,15 @@ const formatTab = {
 		{
 			technicalName: "IBCSSettings",
 			displayName: "IBCS Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	dynamicDeviationConfig: [
+		{
+			technicalName: "dynamicDeviationSettings",
+			displayName: "Dynamic Deviation Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

@@ -16,7 +16,8 @@ export enum EVisualConfig {
 	ReferenceLinesConfig = "referenceLinesConfig",
 	ErrorBarsConfig = "errorBarsConfig",
 	IBCSConfig = "IBCSConfig",
-	Editor = "editor"
+	Editor = "editor",
+	DynamicDeviationConfig = "dynamicDeviationConfig",
 }
 
 export enum EVisualSettings {
@@ -42,7 +43,8 @@ export enum EVisualSettings {
 	ReferenceLinesSettings = "referenceLinesSettings",
 	ErrorBarsSettings = "errorBarsSettings",
 	IBCSSettings = "IBCSSettings",
-	BeforeIBCSSettings = "beforeIBCSSettings"
+	BeforeIBCSSettings = "beforeIBCSSettings",
+	DynamicDeviationSettings = "dynamicDeviationSettings",
 }
 
 export enum ELineType {
@@ -664,4 +666,63 @@ export enum ENumberFormatting {
 	SemanticFormatting = "semanticFormatting",
 	NegativeFormat = "negativeFormat",
 	PositiveFormat = "positiveFormat"
+}
+
+export enum ECFApplyOnCategories {
+	Marker = "marker",
+	Line = "line",
+	Labels = "labels"
+}
+
+export enum EDynamicDeviationSettings {
+	IsEnabled = "isEnabled",
+	DisplayType = "displayType",
+	FromIndex = "fromIndex",
+	ToIndex = "toIndex",
+	Position = "position",
+	LabelDisplayType = "labelDisplayType",
+	LabelFontSize = "labelFontSize",
+	LabelFontColor = "labelFontColor",
+	LabelFontFamily = "labelFontFamily",
+	IsShowLabelBorder = "isShowLabelBorder",
+	BorderWidth = "borderWidth",
+	BorderColor = "borderColor",
+	IsShowLabelBackground = "isShowLabelBackground",
+	BackgroundColor = "backgroundColor",
+	BackgroundColorTransparency = "backgroundColorTransparency",
+	ConnectorType = "connectorType",
+	IsAutoConnectorColor = "isAutoConnectorColor",
+	ConnectingLineColor = "connectingLineColor",
+	ConnectorWidth = "connectorWidth",
+	ConnectorPositiveColor = "connectorPositiveColor",
+	ConnectorNegativeColor = "connectorNegativeColor",
+	connectingLineWidth = "connectingLineWidth",
+	IsShowStartIndicator = "isShowStartIndicator",
+	IsBarBorderEnabled = "isBarBorderEnabled",
+	ConnectingLineType = "connectingLineType",
+	LabelPosition = "labelPosition"
+}
+
+export enum EDynamicDeviationDisplayTypes {
+	Auto = "auto",
+	CreateYourOwn = "create-your-own",
+	CustomRange = "custom-range",
+	FirstToLast = "first-to-last",
+	LastToFirst = "last-to-first",
+	FirstToLastActual = "first-to-last-actual",
+	LastToFirstActual = "last-to-first-actual",
+	MinToMax = "min-to-max",
+	PenultimateToLast = "penultimate-to-last",
+}
+
+export enum EDynamicDeviationLabelDisplayTypes {
+	Value = "value",
+	Percentage = "percentage",
+	Both = "both",
+}
+
+export enum EDynamicDeviationConnectingLineTypes {
+	Arrow = "arrow",
+	Bar = "bar",
+	Dots = "dots",
 }
