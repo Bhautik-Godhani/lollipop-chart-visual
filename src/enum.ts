@@ -185,7 +185,11 @@ export enum EChartSettings {
 	pieSettings = "pieSettings",
 	isShowZeroBaseLine = "isShowZeroBaseLine",
 	zeroBaseLineColor = "zeroBaseLineColor",
-	zeroBaseLineSize = "zeroBaseLineSize"
+	zeroBaseLineSize = "zeroBaseLineSize",
+	showConnectingLine = "showConnectingLine",
+	connectingLineColor = "connectingLineColor",
+	connectingLineWidth = "connectingLineWidth",
+	connectingLineStyle = "connectingLineStyle"
 }
 
 export enum ECircleSettings {

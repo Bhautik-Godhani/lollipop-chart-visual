@@ -161,6 +161,7 @@ import { ApplyIBCSTheme } from "./methods/IBCS.methods";
 import { GetFormattedNumber } from "./methods/NumberFormat.methods";
 import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings";
 import { RemoveDynamicDeviation, RenderDynamicDeviation, RenderDynamicDeviationIcon, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
+import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -390,6 +391,9 @@ export class Visual extends Shadow {
 	isRankingSettingsChanged: boolean = false;
 	public minPieSize: number = 25;
 	public maxPieSize: number = 40;
+
+	// connecting line
+	public connectingLineG: D3Selection<SVGElement>;
 
 	// pie1
 	ePie1ChartOptions: EChartsOption;
@@ -730,6 +734,8 @@ export class Visual extends Shadow {
 		this.xGridLinesG = this.container.append("g").classed("xGridLinesG", true);
 
 		this.yGridLinesG = this.container.append("g").classed("yGridLinesG", true);
+
+		this.connectingLineG = this.container.append("g").classed("connectingLineG", true);
 
 		this.lollipopG = this.container.append("g").classed("lollipopG", true);
 
@@ -5958,6 +5964,17 @@ export class Visual extends Shadow {
 			SetDynamicDeviationDataAndDrawLines(this);
 		} else {
 			RemoveDynamicDeviation(this);
+		}
+
+		if (this.chartSettings.showConnectingLine) {
+			this.connectingLineG.selectAll("*").remove();
+
+			RenderConnectingLine(this, this.chartData, false);
+			if (this.isHasMultiMeasure) {
+				RenderConnectingLine(this, this.chartData, true);
+			}
+		} else {
+			this.connectingLineG.selectAll("*").remove();
 		}
 	}
 

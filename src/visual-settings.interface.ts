@@ -150,6 +150,10 @@ export interface IChartSettings {
 	isShowZeroBaseLine: boolean;
 	zeroBaseLineColor: string;
 	zeroBaseLineSize: number;
+	showConnectingLine: boolean;
+	connectingLineColor: string;
+	connectingLineWidth: number;
+	connectingLineStyle: ELineType;
 }
 
 export interface IMarkerSettings {
