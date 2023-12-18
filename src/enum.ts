@@ -12,6 +12,7 @@ export enum EVisualConfig {
 	ShowBucketConfig = "showBucketConfig",
 	BrushAndZoomAreaConfig = "brushAndZoomAreaConfig",
 	RaceChartConfig = "raceChartConfig",
+	TrendLinesConfig = "trendLinesConfig",
 	PatternConfig = "patternConfig",
 	ReferenceLinesConfig = "referenceLinesConfig",
 	ErrorBarsConfig = "errorBarsConfig",
@@ -39,6 +40,7 @@ export enum EVisualSettings {
 	Footer = "footer",
 	BrushAndZoomAreaSettings = "brushAndZoomAreaSettings",
 	RaceChartSettings = "raceChartSettings",
+	TrendLinesSettings = "trendLinesSettings",
 	PatternSettings = "patternSettings",
 	ReferenceLinesSettings = "referenceLinesSettings",
 	ErrorBarsSettings = "errorBarsSettings",
@@ -729,4 +731,34 @@ export enum EDynamicDeviationConnectingLineTypes {
 	Arrow = "arrow",
 	Bar = "bar",
 	Dots = "dots",
+}
+
+export enum ETrendLinesTypes {
+	Exponential = "exponential",
+	Linear = "linear",
+	Logarithmic = "logarithmic",
+	Polynomial = "polynomial",
+	Power = "power",
+	MovingAverage = "movingAverage",
+	Pareto = "pareto",
+	RunningTotal = "runningTotal"
+}
+
+export enum ETrendLineSettings {
+	IsEnabled = "isEnabled",
+	MeasureName = "measureName",
+	LineType = "lineType",
+	LineStyle = "lineStyle",
+	LineColor = "lineColor",
+	LineWidth = "lineWidth",
+	IsShowLabel = "isShowLabel",
+	IsShowIntercept = "isShowIntercept",
+	IsDisplayEquation = "isDisplayEquation",
+	IsDisplayR2Value = "isDisplayR2Value",
+	LabelFontFamily = "labelFontFamily",
+	LabelFontStyling = "labelFontStyling",
+	LabelFontColor = "labelFontColor",
+	LabelFontSize = "labelFontSize",
+	LabelOffsetX = "labelOffsetX",
+	LabelOffsetY = "labelOffsetY"
 }

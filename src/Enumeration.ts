@@ -28,6 +28,7 @@ export class Enumeration {
 			getErrorBarsSelection(),
 			getIBCSSelection(),
 			dynamicDeviationSelection(),
+			getTrendLinesSelection()
 		];
 	}
 }
@@ -426,6 +427,19 @@ function getRaceChartSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "raceChartSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getTrendLinesSelection(): EnumerateSectionType {
+	return {
+		name: "trendLinesConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "trendLinesSettings",
 				isShow: true,
 			},
 		],

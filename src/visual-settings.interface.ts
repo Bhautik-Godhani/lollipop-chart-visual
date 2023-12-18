@@ -31,7 +31,9 @@ import {
 	EReferenceType,
 	ERelationshipToMeasure,
 	ESortOrderTypes,
+	ETrendLinesTypes,
 	EXYAxisNames,
+	FontStyle,
 	Orientation,
 	PieSize,
 	PieType,
@@ -538,4 +540,23 @@ export interface IDynamicDeviationSettings {
 export interface ICategoryValuePair {
 	category: string;
 	value: number;
+}
+
+export interface ITrendLinesSettings {
+	isEnabled: boolean;
+	measureName: string;
+	lineType: ETrendLinesTypes;
+	lineStyle: ELineType;
+	lineColor: string;
+	lineWidth: number;
+	isShowLabel: boolean;
+	isShowIntercept: boolean;
+	isDisplayEquation: boolean;
+	isDisplayR2Value: boolean;
+	labelFontFamily: string;
+	labelFontStyling: FontStyle[];
+	labelFontColor: string;
+	labelFontSize: number;
+	labelOffsetX: number;
+	labelOffsetY: number;
 }

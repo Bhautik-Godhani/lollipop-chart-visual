@@ -51,6 +51,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public brushAndZoomAreaConfig = new BrushAndZoomAreaConfig();
 	public patternConfig = new PatternConfig();
 	public raceChartConfig = new RaceChartConfig();
+	public trendLinesConfig = new TrendLinesConfig();
 	public referenceLinesConfig = new ReferenceLinesConfig();
 	public errorBarsConfig = new ErrorBarsConfig();
 	public IBCSConfig = new IBCSConfig();
@@ -150,6 +151,10 @@ export class PatternConfig {
 
 export class RaceChartConfig {
 	public raceChartSettings: string = "{}";
+}
+
+export class TrendLinesConfig {
+	public trendLinesSettings: string = "{}";
 }
 
 export class ReferenceLinesConfig {

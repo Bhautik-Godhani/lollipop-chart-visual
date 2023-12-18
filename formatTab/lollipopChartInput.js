@@ -21,6 +21,7 @@ const sectionKVPair = [
 	{ editor: "Editor" },
 	{ brushAndZoomAreaConfig: "Brush And Zoom Area" },
 	{ raceChartConfig: "Race Chart Configuration" },
+	{ trendLinesConfig: "Trend Lines Configuration" },
 	{ referenceLinesConfig: "Reference Lines Configuration" },
 	{ errorBarsConfig: "Error Bars Configuration" },
 	{ IBCSConfig: "IBCS Configuration" },
@@ -545,6 +546,15 @@ const formatTab = {
 		{
 			technicalName: "raceChartSettings",
 			displayName: "Race Chart Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	trendLinesConfig: [
+		{
+			technicalName: "trendLinesSettings",
+			displayName: "Trend Lines Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

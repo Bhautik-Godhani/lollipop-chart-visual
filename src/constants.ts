@@ -31,6 +31,7 @@ import {
 	EDynamicDeviationDisplayTypes,
 	EDynamicDeviationLabelDisplayTypes,
 	EDynamicDeviationConnectingLineTypes,
+	ETrendLinesTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -52,6 +53,7 @@ import {
 	IReferenceLineSettings,
 	IShowBucketSettings,
 	ISortingSettings,
+	ITrendLinesSettings,
 	IXAxisSettings,
 	IXGridLinesSettings,
 	IYAxisSettings,
@@ -444,4 +446,23 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	isBarBorderEnabled: true,
 	connectingLineType: ELineType.Solid,
 	labelPosition: Position.Right
+};
+
+export const TREND_LINES_SETTINGS: ITrendLinesSettings = {
+	isEnabled: true,
+	measureName: undefined,
+	lineType: ETrendLinesTypes.Linear,
+	lineStyle: ELineType.Solid,
+	lineColor: "rgba(102,102,102,1)",
+	lineWidth: 1,
+	isShowLabel: true,
+	isShowIntercept: true,
+	isDisplayEquation: true,
+	isDisplayR2Value: true,
+	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	labelFontStyling: [],
+	labelFontColor: "rgba(102,102,102,1)",
+	labelFontSize: 12,
+	labelOffsetX: undefined,
+	labelOffsetY: undefined
 };

@@ -671,6 +671,18 @@
 				}
 			}
 		},
+		"trendLinesConfig": {
+			"displayName": "Trend Lines Configuration",
+			"properties": {
+				"trendLinesSettings": {
+					"displayName": "Trend Lines Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"errorBarsConfig": {
 			"displayName": "Error Bars Configuration",
 			"properties": {

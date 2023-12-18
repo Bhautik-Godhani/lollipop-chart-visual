@@ -162,6 +162,7 @@ import { GetFormattedNumber } from "./methods/NumberFormat.methods";
 import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings";
 import { RemoveDynamicDeviation, RenderDynamicDeviation, RenderDynamicDeviationIcon, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
 import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
+import TrendLinesSettings from "./settings-pages/TrendLinesSettings";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -631,6 +632,12 @@ export class Visual extends Shadow {
 					propertyName: "dynamicDeviationSettings",
 					Component: () => DynamicDeviationSettings,
 					icon: DynamicDeviationIcon
+				},
+				{
+					name: "Trend Lines",
+					sectionName: EVisualConfig.TrendLinesConfig,
+					propertyName: EVisualSettings.TrendLinesSettings,
+					Component: () => TrendLinesSettings,
 				},
 				{
 					name: "IBCS Themes",
