@@ -199,3 +199,17 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
 
     return numberSettings.prefix + " " + formattedNumber + " " + numberSettings.suffix;
 }
+
+export const extractDigitsFromString = (str) => {
+    // Use a regular expression to match all digits
+    const digitMatches = str.match(/\d/g);
+
+    // Check if there are any matches
+    if (digitMatches) {
+        // Join the matched digits into a single string or convert to an array if needed
+        const digits = digitMatches.join('');
+        return parseFloat(digits);
+    } else {
+        return undefined;
+    }
+}

@@ -659,6 +659,18 @@
 				}
 			}
 		},
+		"cutAndClipAxisConfig": {
+			"displayName": "Cut And Clip Axis Configuration",
+			"properties": {
+				"cutAndClipAxisSettings": {
+					"displayName": "Cut And Clip Axis Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"raceChartConfig": {
 			"displayName": "Race Chart Configuration",
 			"properties": {

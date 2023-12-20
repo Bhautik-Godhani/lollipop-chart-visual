@@ -39,6 +39,7 @@ import {
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
+	ICutAndClipAxisSettings,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IDynamicDeviationSettings,
@@ -465,4 +466,12 @@ export const TREND_LINES_SETTINGS: ITrendLinesSettings = {
 	labelFontSize: 12,
 	labelOffsetX: undefined,
 	labelOffsetY: undefined
+};
+
+export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
+	isEnabled: false,
+	breakStart: 0,
+	breakEnd: 0,
+	markerStrokeColor: "rgba(102,102,102,1)",
+	markerBackgroundColor: "rgba(255, 255, 255, 1)",
 };

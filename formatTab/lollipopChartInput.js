@@ -26,6 +26,7 @@ const sectionKVPair = [
 	{ errorBarsConfig: "Error Bars Configuration" },
 	{ IBCSConfig: "IBCS Configuration" },
 	{ dynamicDeviationConfig: "Dynamic Deviation Configuration" },
+	{ cutAndClipAxisConfig: "Cut And Clip Axis Configuration" },
 ];
 
 const formatTab = {
@@ -591,6 +592,15 @@ const formatTab = {
 		{
 			technicalName: "dynamicDeviationSettings",
 			displayName: "Dynamic Deviation Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	cutAndClipAxisConfig: [
+		{
+			technicalName: "cutAndClipAxisSettings",
+			displayName: "Cut And Clip Axis Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",

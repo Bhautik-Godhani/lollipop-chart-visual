@@ -19,6 +19,7 @@ export enum EVisualConfig {
 	IBCSConfig = "IBCSConfig",
 	Editor = "editor",
 	DynamicDeviationConfig = "dynamicDeviationConfig",
+	CutAndClipAxisConfig = "cutAndClipAxisConfig",
 }
 
 export enum EVisualSettings {
@@ -47,6 +48,7 @@ export enum EVisualSettings {
 	IBCSSettings = "IBCSSettings",
 	BeforeIBCSSettings = "beforeIBCSSettings",
 	DynamicDeviationSettings = "dynamicDeviationSettings",
+	CutAndClipAxisSettings = "cutAndClipAxisSettings",
 }
 
 export enum ELineType {
@@ -761,4 +763,12 @@ export enum ETrendLineSettings {
 	LabelFontSize = "labelFontSize",
 	LabelOffsetX = "labelOffsetX",
 	LabelOffsetY = "labelOffsetY"
+}
+
+export enum ECutAndClipAxisSettings {
+	IsEnabled = "isEnabled",
+	BreakStart = "breakStart",
+	BreakEnd = "breakEnd",
+	MarkerStrokeColor = "markerStrokeColor",
+	MarkerBackgroundColor = "markerBackgroundColor",
 }

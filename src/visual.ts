@@ -77,7 +77,8 @@ import {
 	RACE_CHART_SETTINGS,
 	ERROR_BARS_SETTINGS,
 	IBCS_SETTINGS,
-	DYNAMIC_DEVIATION_SETTINGS
+	DYNAMIC_DEVIATION_SETTINGS,
+	CUT_AND_CLIP_AXIS_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -87,6 +88,7 @@ import {
 	ICategoryValuePair,
 	IChartSettings,
 	IConditionalFormattingProps,
+	ICutAndClipAxisSettings,
 	IDataColorsSettings,
 	IDataLabelsSettings,
 	IDynamicDeviationSettings,
@@ -149,7 +151,7 @@ import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -158,11 +160,15 @@ import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
 import { ErrorBarsMarkers } from "./error-bars-markers";
 import IBCSSettingsComponent from "./settings-pages/IBCSSettings";
 import { ApplyIBCSTheme } from "./methods/IBCS.methods";
-import { GetFormattedNumber } from "./methods/NumberFormat.methods";
+import { GetFormattedNumber, extractDigitsFromString } from "./methods/NumberFormat.methods";
 import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings";
 import { RemoveDynamicDeviation, RenderDynamicDeviation, RenderDynamicDeviationIcon, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
 import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
 import TrendLinesSettings from "./settings-pages/TrendLinesSettings";
+import CutAndClipAxisSettings from "./settings-pages/CutAndClipAxisSettings";
+import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClipMarkerOnAxis } from "./methods/CutAndClipMarker.methods";
+import { CallLinearCutScaleOnAxisGroup, GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis, SetLinearCutAxisRange } from "./methods/CutAndClip.methods";
+import { GetAxisDomainMinMax } from "./methods/Axis.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -303,7 +309,6 @@ export class Visual extends Shadow {
 	public xAxisG: D3Selection<SVGElement>;
 	public xAxisLineG: D3Selection<SVGElement>;
 	public xScale: any;
-	public xScale2: any;
 	public xAxisTitleMargin: number = 0;
 	public xAxisTitleG: D3Selection<SVGElement>;
 	public xAxisTitleText: any;
@@ -493,6 +498,28 @@ export class Visual extends Shadow {
 	toCategoryValueDataPair: ICategoryValuePair;
 	DDConnectorFill: string;
 
+	// Cut & Clip
+	isLastChartTypeIsHorizontal: boolean;
+	isShowRegularXAxis: boolean;
+	isShowRegularYAxis: boolean;
+	isCutAndClipAxisEnabled: boolean;
+	isCutAndClipAxisEnabledLastValue: boolean;
+	beforeCutLinearXAxisG: any;
+	afterCutLinearXAxisG: any;
+	beforeCutLinearYAxisG: any;
+	afterCutLinearYAxisG: any;
+	beforeCutLinearScale: any;
+	afterCutLinearScale: any;
+	beforeCutLinearScaleArea: number;
+	afterCutLinearScaleArea: number;
+	barCutAndClipMarkersG: any;
+	axisCutAndClipMarkerG: any;
+	barCutAndClipMarkerLinesGap: number = 6;
+	cutAndClipMarkerTilt: number = 15;
+	cutAndClipMarkerWidth: number = 6;
+	cutAndClipMarkerHeight: number = 6;
+	cutAndClipMarkerDiff: number = 8;
+
 	// settings
 	isHorizontalChart: boolean = false;
 	chartSettings: IChartSettings;
@@ -520,6 +547,7 @@ export class Visual extends Shadow {
 	IBCSSettings: IBCSSettings;
 	dynamicDeviationSettings: IDynamicDeviationSettings;
 	lastDynamicDeviationSettings: IDynamicDeviationSettings;
+	cutAndClipAxisSettings: ICutAndClipAxisSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -638,6 +666,13 @@ export class Visual extends Shadow {
 					sectionName: EVisualConfig.TrendLinesConfig,
 					propertyName: EVisualSettings.TrendLinesSettings,
 					Component: () => TrendLinesSettings,
+				},
+				{
+					name: "Cut/Clip Axis",
+					sectionName: "cutAndClipAxisConfig",
+					propertyName: "cutAndClipAxisSettings",
+					Component: () => CutAndClipAxisSettings,
+					icon: CutAndClipAxisIcon
 				},
 				{
 					name: "IBCS Themes",
@@ -797,6 +832,10 @@ export class Visual extends Shadow {
 		this.errorBarsMarkerPath = this.errorBarsMarker.append("path").attr("class", "errorBarsMarkerPath");
 
 		this.computedTextEle = this.container.append("g").append("text");
+
+		this.barCutAndClipMarkersG = this.container.append("g").classed("barCutAndClipMarkersG", true);
+
+		this.axisCutAndClipMarkerG = this.container.append("g").classed("axisCutAndClipMarkerG", true);
 
 		this.referenceLineLayersG = this.container.append("g").classed("referenceLineLayersG", true);
 
@@ -1737,6 +1776,15 @@ export class Visual extends Shadow {
 				this.initChart();
 			}
 
+			this.xAxisG.selectAll("*").remove();
+			this.yAxisG.selectAll("*").remove();
+
+			this.beforeCutLinearXAxisG = this.xAxisG.append("g").classed("beforeCutLinearXAxisG", true);
+			this.afterCutLinearXAxisG = this.xAxisG.append("g").classed("afterCutLinearXAxisG", true);
+
+			this.beforeCutLinearYAxisG = this.yAxisG.append("g").classed("beforeCutLinearYAxisG", true);
+			this.afterCutLinearYAxisG = this.yAxisG.append("g").classed("afterCutLinearYAxisG", true);
+
 			this.renderContextMenu();
 			this.setHighContrastDetails();
 			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
@@ -1922,6 +1970,8 @@ export class Visual extends Shadow {
 				this.setChartData(this.categoricalData);
 			}
 
+			this.isCutAndClipAxisEnabled = GetIsCutAndClipAxisEnabled(this);
+
 			const popupOptions = document.querySelector(".popup-options");
 			const popupOptionsHeader = document.querySelector(".popup-options-header");
 			this.settingsPopupOptionsWidth = popupOptions ? (popupOptions.clientWidth ? popupOptions.clientWidth : 0) : 0;
@@ -2017,6 +2067,58 @@ export class Visual extends Shadow {
 					}
 					CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
 				}
+			}
+
+			this.isShowRegularXAxis =
+				(!this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
+				(this.isCutAndClipAxisEnabled && !this.isHorizontalChart) ||
+				!this.isCutAndClipAxisEnabled;
+
+			this.isShowRegularYAxis =
+				(!this.isCutAndClipAxisEnabled && !this.isHorizontalChart) ||
+				(this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
+				!this.isCutAndClipAxisEnabled;
+
+			if (this.isCutAndClipAxisEnabled) {
+				RenderLinearCutAxis(this);
+
+				if (this.isHorizontalChart) {
+					this.xAxisG.classed("cut-clip-axis", true);
+					this.yAxisG.classed("cut-clip-axis", false);
+				} else {
+					this.xAxisG.classed("cut-clip-axis", false);
+					this.yAxisG.classed("cut-clip-axis", true);
+				}
+
+				if (!this.isHorizontalChart) {
+					this.yScale = GetCutAndClipYScale.bind(this);
+
+					this.setYAxisTickStyle();
+
+					const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+					this.yScaleGWidth = (yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth);
+
+					this.setMargins();
+				} else {
+					this.xScale = GetCutAndClipXScale.bind(this);
+
+					this.setXAxisTickStyle();
+
+					const xScaleGHeight = this.xAxisG.node().getBoundingClientRect().height;
+					this.xScaleGHeight = (xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight);
+
+					this.setMargins();
+				}
+			} else {
+				this.xAxisG.classed("cut-clip-axis", false);
+				this.yAxisG.classed("cut-clip-axis", false);
+				this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
+			}
+
+			if (this.isCutAndClipAxisEnabled) {
+				RenderCutAndClipMarkerOnAxis(this);
+			} else {
+				this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 			}
 
 			this.drawLollipopChart();
@@ -3052,6 +3154,14 @@ export class Visual extends Shadow {
 		this.dynamicDeviationSettings = {
 			...DYNAMIC_DEVIATION_SETTINGS,
 			...dynamicDeviationConfig,
+		};
+
+		const cutAndClipAxisConfig = JSON.parse(
+			formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]
+		);
+		this.cutAndClipAxisSettings = {
+			...CUT_AND_CLIP_AXIS_SETTINGS,
+			...cutAndClipAxisConfig,
 		};
 
 		this.changeVisualSettings();
@@ -4857,7 +4967,17 @@ export class Visual extends Shadow {
 						ele.append("tspan").text(truncatedText);
 					}
 				} else {
-					ele.append("tspan").text(THIS.formatNumber(parseFloat(newText), THIS.numberSettings, undefined, false, false));
+					let text = newText;
+					const firstChar = text.charAt(0);
+					const unicodeValue = firstChar.charCodeAt(0);
+					const isNegativeNumber = unicodeValue === 8722;
+
+					if (isNegativeNumber) {
+						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
+					}
+
+					const truncatedText = THIS.formatNumber(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
+					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				}
 			});
 	}
@@ -4880,7 +5000,15 @@ export class Visual extends Shadow {
 			// })
 			.each(function () {
 				const ele = d3.select(this);
-				const text = ele.text();
+				let text = ele.text();
+				const firstChar = text.charAt(0);
+				const unicodeValue = firstChar.charCodeAt(0);
+				const isNegativeNumber = unicodeValue === 8722;
+
+				if (isNegativeNumber) {
+					text = (extractDigitsFromString(text.substring(1)) * -1).toString();
+				}
+
 				ele.text("");
 
 				const textProperties: TextProperties = {
@@ -4890,7 +5018,8 @@ export class Visual extends Shadow {
 				};
 
 				if (!THIS.isHorizontalChart) {
-					ele.append("tspan").text(THIS.formatNumber(parseFloat(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false));
+					const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
+					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);
@@ -4921,28 +5050,7 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisDomain(): void {
-		const values = this.chartData.reduce((arr, d) => {
-			return this.errorBarsSettings.isEnabled ? [...arr, d.value1, d.value2, d.upperBoundValue, d.lowerBoundValue] : [...arr, d.value1, d.value2];
-		}, []);
-
-		let min = d3.min(this.isHasMultiMeasure ? values.map((val) => val) :
-			this.errorBarsSettings.isEnabled ? [...this.chartData.map((d) => d.value1), ...this.chartData.map((d) => d.upperBoundValue), ...this.chartData.map((d) => d.lowerBoundValue)] : this.chartData.map((d) => d.value1));
-
-		if (min > 0) {
-			min = 0;
-		}
-
-		let max = d3.max(this.isHasMultiMeasure ? values.map((val) => val) :
-			this.errorBarsSettings.isEnabled ? [...this.chartData.map((d) => d.value1), ...this.chartData.map((d) => d.upperBoundValue), ...this.chartData.map((d) => d.lowerBoundValue)] : this.chartData.map((d) => d.value1));
-
-		if (max >= 0) {
-			max += max * 0.15;
-		} else {
-			max -= max * 0.15;
-		}
-
-		this.isHasNegativeValue = min < 0 || max < 0;
-
+		const { min, max } = GetAxisDomainMinMax(this);
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number";
 
 		if (this.isHorizontalChart) {
@@ -4960,11 +5068,9 @@ export class Visual extends Shadow {
 			this.yScale2.domain(this.chartData.map((d) => d.category));
 		} else {
 			this.xScale = d3.scaleBand();
-			// this.xScale2 = d3.scaleBand();
 			this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
 
 			this.xScale.domain(this.chartData.map((d) => d.category));
-			// this.xScale2.domain(this.chartData.map((d) => d.category));
 			if (isLinearScale) {
 				this.yScale.domain([min, max]);
 			} else {
@@ -4977,10 +5083,8 @@ export class Visual extends Shadow {
 		if (this.isHorizontalChart) {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
-			// this.yScale2.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight, 0] : [0, yScaleHeight]);
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
-			// this.xScale2.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25]);
 		}
 	}
@@ -5026,50 +5130,54 @@ export class Visual extends Shadow {
 	}
 
 	callXYScaleOnAxisGroup(): void {
-		if (this.xAxisSettings.position === Position.Bottom) {
-			this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
-				d3
-					.axisBottom(this.xScale)
-					.ticks(this.width / 90)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-			// .selectAll('text')
-			// .attr('dy', '0.35em')
-			// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
-		} else if (this.xAxisSettings.position === Position.Top) {
-			this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
-				d3
-					.axisTop(this.xScale)
-					.ticks(this.width / 90)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-			// .selectAll('text')
-			// .attr('dy', '0.35em')
-			// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
+		if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+			if (this.xAxisSettings.position === Position.Bottom) {
+				this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
+					d3
+						.axisBottom(this.xScale)
+						.ticks(this.width / 90)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+				// .selectAll('text')
+				// .attr('dy', '0.35em')
+				// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
+			} else if (this.xAxisSettings.position === Position.Top) {
+				this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
+					d3
+						.axisTop(this.xScale)
+						.ticks(this.width / 90)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+				// .selectAll('text')
+				// .attr('dy', '0.35em')
+				// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
+			}
 		}
 
-		if (this.yAxisSettings.position === Position.Left) {
-			this.yAxisG.attr("transform", `translate(0, 0)`).call(
-				d3
-					.axisLeft(this.yScale)
-					.ticks(this.height / 70)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
-		} else if (this.yAxisSettings.position === Position.Right) {
-			this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
-				d3
-					.axisRight(this.yScale)
-					.ticks(this.height / 70)
-					.tickFormat((d) => {
-						return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-					}) as any
-			);
+		if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+			if (this.yAxisSettings.position === Position.Left) {
+				this.yAxisG.attr("transform", `translate(0, 0)`).call(
+					d3
+						.axisLeft(this.yScale)
+						.ticks(this.height / 70)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+			} else if (this.yAxisSettings.position === Position.Right) {
+				this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
+					d3
+						.axisRight(this.yScale)
+						.ticks(this.height / 70)
+						.tickFormat((d) => {
+							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						}) as any
+				);
+			}
 		}
 
 		this.xAxisG
@@ -5251,24 +5359,28 @@ export class Visual extends Shadow {
 		this.setScaleBandwidth();
 		this.callXYScaleOnAxisGroup();
 
-		if (this.xAxisSettings.isDisplayLabel) {
+		if (this.xAxisSettings.isDisplayLabel && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart))) {
 			this.setXAxisTickStyle();
 		}
 
-		if (this.yAxisSettings.isDisplayLabel) {
+		if (this.yAxisSettings.isDisplayLabel && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart))) {
 			this.setYAxisTickStyle();
 		}
 
 		if (this.xAxisSettings.isDisplayLabel) {
-			const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
-			this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+				const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
+				this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+			}
 		} else {
 			this.xScaleGHeight = 0;
 		}
 
 		if (this.yAxisSettings.isDisplayLabel) {
-			const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
-			this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+				const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+				this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+			}
 		} else {
 			this.yScaleGWidth = 0;
 		}
@@ -5279,11 +5391,11 @@ export class Visual extends Shadow {
 		this.setScaleBandwidth();
 		this.callXYScaleOnAxisGroup();
 
-		if (this.xAxisSettings.isDisplayLabel) {
+		if (this.xAxisSettings.isDisplayLabel && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart))) {
 			this.setXAxisTickStyle();
 		}
 
-		if (this.yAxisSettings.isDisplayLabel) {
+		if (this.yAxisSettings.isDisplayLabel && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart))) {
 			this.setYAxisTickStyle();
 		}
 
@@ -5983,6 +6095,8 @@ export class Visual extends Shadow {
 		} else {
 			this.connectingLineG.selectAll("*").remove();
 		}
+
+		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled ? this.chartData : []);
 	}
 
 	drawZeroSeparatorLine(): void {

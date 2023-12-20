@@ -560,3 +560,11 @@ export interface ITrendLinesSettings {
 	labelOffsetX: number;
 	labelOffsetY: number;
 }
+
+export interface ICutAndClipAxisSettings {
+	isEnabled: boolean;
+	breakStart: number;
+	breakEnd: number;
+	markerStrokeColor: string;
+	markerBackgroundColor: string;
+}

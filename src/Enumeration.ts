@@ -28,7 +28,8 @@ export class Enumeration {
 			getErrorBarsSelection(),
 			getIBCSSelection(),
 			dynamicDeviationSelection(),
-			getTrendLinesSelection()
+			getTrendLinesSelection(),
+			cutAndClipAxisSelection(),
 		];
 	}
 }
@@ -505,6 +506,19 @@ function dynamicDeviationSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "dynamicDeviationSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function cutAndClipAxisSelection(): EnumerateSectionType {
+	return {
+		name: "cutAndClipAxisConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "cutAndClipAxisSettings",
 				isShow: true,
 			},
 		],
