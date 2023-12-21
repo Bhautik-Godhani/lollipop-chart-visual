@@ -198,6 +198,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 export const X_AXIS_SETTINGS: IXAxisSettings = {
 	show: true,
 	position: Position.Bottom,
+	isLogarithmScale: false,
 	isDisplayTitle: false,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",
@@ -217,6 +218,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	show: true,
 	position: Position.Left,
+	isLogarithmScale: false,
 	isDisplayTitle: false,
 	titleName: "",
 	titleColor: "rgba(84, 84, 84, 1)",

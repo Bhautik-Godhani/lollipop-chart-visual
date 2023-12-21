@@ -44,6 +44,7 @@ import {
 export interface IXAxisSettings {
 	show: boolean,
 	position: Position;
+	isLogarithmScale: boolean;
 	isDisplayTitle: boolean;
 	titleName: string;
 	titleColor: string;
@@ -63,6 +64,7 @@ export interface IXAxisSettings {
 export interface IYAxisSettings {
 	show: boolean,
 	position: Position;
+	isLogarithmScale: boolean;
 	isDisplayTitle: boolean;
 	titleName: string;
 	titleColor: string;

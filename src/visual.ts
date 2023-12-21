@@ -169,6 +169,8 @@ import CutAndClipAxisSettings from "./settings-pages/CutAndClipAxisSettings";
 import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClipMarkerOnAxis } from "./methods/CutAndClipMarker.methods";
 import { CallLinearCutScaleOnAxisGroup, GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis, SetLinearCutAxisRange } from "./methods/CutAndClip.methods";
 import { GetAxisDomainMinMax } from "./methods/Axis.methods";
+import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
+import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -304,6 +306,7 @@ export class Visual extends Shadow {
 
 	// axis
 	public zeroSeparatorLine: D3Selection<SVGElement>;
+	public axisByBarOrientation: Partial<IXAxisSettings | IYAxisSettings>;
 
 	// xAxis
 	public xAxisG: D3Selection<SVGElement>;
@@ -519,6 +522,25 @@ export class Visual extends Shadow {
 	cutAndClipMarkerWidth: number = 6;
 	cutAndClipMarkerHeight: number = 6;
 	cutAndClipMarkerDiff: number = 8;
+
+	// LOG SCALE
+	positiveLogXAxisG: any;
+	negativeLogXAxisG: any;
+	positiveLogYAxisG: any;
+	negativeLogYAxisG: any;
+	positiveLogScale: any;
+	negativeLogScale: any;
+	positiveLogScaleWidth: any;
+	negativeLogScaleWidth: any;
+	positiveLogScaleHeight: any;
+	negativeLogScaleHeight: any;
+	isLogarithmScale: boolean;
+	isShowPositiveNegativeLogScale: boolean;
+	isLinearScale: boolean;
+	axisDomainMinValue: number = 0;
+	axisDomainMaxValue: number = 0;
+	positiveLogScaleTicks: number[] = [];
+	negativeLogScaleTicks: number[] = [];
 
 	// settings
 	isHorizontalChart: boolean = false;
@@ -1779,6 +1801,12 @@ export class Visual extends Shadow {
 			this.xAxisG.selectAll("*").remove();
 			this.yAxisG.selectAll("*").remove();
 
+			this.positiveLogXAxisG = this.xAxisG.append("g").classed("positiveLogAxisG", true);
+			this.negativeLogXAxisG = this.xAxisG.append("g").classed("negativeLogAxisG", true);
+
+			this.positiveLogYAxisG = this.yAxisG.append("g").classed("positiveLogAxisG", true);
+			this.negativeLogYAxisG = this.yAxisG.append("g").classed("negativeLogAxisG", true);
+
 			this.beforeCutLinearXAxisG = this.xAxisG.append("g").classed("beforeCutLinearXAxisG", true);
 			this.afterCutLinearXAxisG = this.xAxisG.append("g").classed("afterCutLinearXAxisG", true);
 
@@ -1800,6 +1828,10 @@ export class Visual extends Shadow {
 
 			this.setVisualSettings();
 			this.setLegendPosition();
+
+			this.axisByBarOrientation =
+				this.chartSettings.orientation === Orientation.Horizontal ? this.xAxisSettings : this.yAxisSettings;
+			this.isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
 			const selectedIBCSTheme = this.IBCSSettings.theme;
 			const isIBCSEnabled = this.IBCSSettings.isIBCSEnabled;
@@ -2114,6 +2146,17 @@ export class Visual extends Shadow {
 				this.yAxisG.classed("cut-clip-axis", false);
 				this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
 			}
+
+			if (this.isLogarithmScale && this.isShowPositiveNegativeLogScale) {
+				if (this.isHorizontalChart) {
+					this.xScale = GetPositiveNegativeLogXScale.bind(this);
+				} else {
+					this.yScale = GetPositiveNegativeLogYScale.bind(this);
+				}
+			}
+
+			this.drawXGridLines();
+			this.drawYGridLines();
 
 			if (this.isCutAndClipAxisEnabled) {
 				RenderCutAndClipMarkerOnAxis(this);
@@ -3801,6 +3844,17 @@ export class Visual extends Shadow {
 			}
 		}
 
+		if (this.isLogarithmScale && this.isShowPositiveNegativeLogScale) {
+			if (this.isHorizontalChart) {
+				this.xScale = GetPositiveNegativeLogXScale.bind(this);
+			} else {
+				this.yScale = GetPositiveNegativeLogYScale.bind(this);
+			}
+		}
+
+		this.drawXGridLines();
+		this.drawYGridLines();
+
 		this.drawLollipopChart();
 	}
 
@@ -4970,7 +5024,7 @@ export class Visual extends Shadow {
 					let text = newText;
 					const firstChar = text.charAt(0);
 					const unicodeValue = firstChar.charCodeAt(0);
-					const isNegativeNumber = unicodeValue === 8722;
+					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
 
 					if (isNegativeNumber) {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
@@ -5003,7 +5057,7 @@ export class Visual extends Shadow {
 				let text = ele.text();
 				const firstChar = text.charAt(0);
 				const unicodeValue = firstChar.charCodeAt(0);
-				const isNegativeNumber = unicodeValue === 8722;
+				const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
 
 				if (isNegativeNumber) {
 					text = (extractDigitsFromString(text.substring(1)) * -1).toString();
@@ -5051,15 +5105,44 @@ export class Visual extends Shadow {
 
 	setXYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
-		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number";
+		this.axisDomainMinValue = min;
+		this.axisDomainMaxValue = max;
+
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale;
+		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
+		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
 		if (this.isHorizontalChart) {
-			this.xScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
+			if (isLinearScale) {
+				this.xScale = d3.scaleLinear().nice();
+			} else if (isLogarithmScale) {
+				if (this.isShowPositiveNegativeLogScale) {
+					this.positiveLogScale = d3.scaleLog().base(10).nice();
+					this.negativeLogScale = d3.scaleLog().base(10).nice();
+				} else {
+					this.xScale = d3.scaleLog().nice();
+				}
+			} else {
+				this.xScale = d3.scaleBand();
+			}
+
 			this.yScale = d3.scaleBand();
 			this.yScale2 = d3.scaleBand();
 
 			if (isLinearScale) {
 				this.xScale.domain([min, max]);
+			} else if (isLogarithmScale) {
+				if (this.isShowPositiveNegativeLogScale) {
+					if (this.isBottomXAxis) {
+						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
+						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					} else {
+						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
+						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					}
+				} else {
+					this.xScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
+				}
 			} else {
 				this.xScale.domain(this.chartData.map((d) => d.value1));
 			}
@@ -5070,9 +5153,35 @@ export class Visual extends Shadow {
 			this.xScale = d3.scaleBand();
 			this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
 
+			if (isLinearScale) {
+				this.yScale = d3.scaleLinear().nice();
+			} else if (isLogarithmScale) {
+				if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
+					this.positiveLogScale = d3.scaleLog().base(10).nice();
+					this.negativeLogScale = d3.scaleLog().base(10).nice();
+				} else {
+					this.yScale = d3.scaleLog().base(10).nice();
+				}
+			} else {
+				this.yScale = d3.scaleBand();
+			}
+
 			this.xScale.domain(this.chartData.map((d) => d.category));
+
 			if (isLinearScale) {
 				this.yScale.domain([min, max]);
+			} else if (isLogarithmScale) {
+				if (this.isShowPositiveNegativeLogScale) {
+					if (this.isBottomXAxis) {
+						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
+						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					} else {
+						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
+						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					}
+				} else {
+					this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
+				}
 			} else {
 				this.yScale.domain(this.chartData.map((d) => d.value1));
 			}
@@ -5081,11 +5190,36 @@ export class Visual extends Shadow {
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		if (this.isHorizontalChart) {
-			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
+			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0];
+
+			if (this.isShowPositiveNegativeLogScale) {
+				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
+
+				this.positiveLogScaleWidth = width;
+				this.negativeLogScaleWidth = this.width - width;
+
+				this.positiveLogScale.range([0, this.positiveLogScaleWidth]);
+				this.negativeLogScale.range([0, this.negativeLogScaleWidth]);
+			} else {
+				this.xScale.range(xAxisRange);
+			}
+
 			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
 		} else {
 			this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25]);
+
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25];
+			if (this.isShowPositiveNegativeLogScale) {
+				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
+
+				this.positiveLogScaleHeight = height;
+				this.negativeLogScaleHeight = this.height - height;
+
+				this.positiveLogScale.range([this.positiveLogScaleHeight, 0]);
+				this.negativeLogScale.range([this.negativeLogScaleHeight, 0]);
+			} else {
+				this.yScale.range(yAxisRange);
+			}
 		}
 	}
 
@@ -5130,55 +5264,58 @@ export class Visual extends Shadow {
 	}
 
 	callXYScaleOnAxisGroup(): void {
-		if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
-			if (this.xAxisSettings.position === Position.Bottom) {
-				this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
-					d3
-						.axisBottom(this.xScale)
-						.ticks(this.width / 90)
-						.tickFormat((d) => {
-							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-						}) as any
-				);
-				// .selectAll('text')
-				// .attr('dy', '0.35em')
-				// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
-			} else if (this.xAxisSettings.position === Position.Top) {
-				this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
-					d3
-						.axisTop(this.xScale)
-						.ticks(this.width / 90)
-						.tickFormat((d) => {
-							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-						}) as any
-				);
-				// .selectAll('text')
-				// .attr('dy', '0.35em')
-				// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
-			}
-		}
+		// if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+		// 	if (this.xAxisSettings.position === Position.Bottom) {
+		// 		this.xAxisG.attr("transform", "translate(0," + this.height + ")").call(
+		// 			d3
+		// 				.axisBottom(this.xScale)
+		// 				.ticks(this.width / 90)
+		// 				.tickFormat((d) => {
+		// 					return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+		// 				}) as any
+		// 		);
+		// 		// .selectAll('text')
+		// 		// .attr('dy', '0.35em')
+		// 		// .attr('transform', `translate(-10, 10)rotate(-${this.visualSettings.xAxis.labelTilt})`)
+		// 	} else if (this.xAxisSettings.position === Position.Top) {
+		// 		this.xAxisG.attr("transform", "translate(0," + 0 + ")").call(
+		// 			d3
+		// 				.axisTop(this.xScale)
+		// 				.ticks(this.width / 90)
+		// 				.tickFormat((d) => {
+		// 					return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+		// 				}) as any
+		// 		);
+		// 		// .selectAll('text')
+		// 		// .attr('dy', '0.35em')
+		// 		// .attr('transform', `translate(-10, -10)rotate(${this.visualSettings.xAxis.labelTilt})`)
+		// 	}
+		// }
 
-		if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
-			if (this.yAxisSettings.position === Position.Left) {
-				this.yAxisG.attr("transform", `translate(0, 0)`).call(
-					d3
-						.axisLeft(this.yScale)
-						.ticks(this.height / 70)
-						.tickFormat((d) => {
-							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-						}) as any
-				);
-			} else if (this.yAxisSettings.position === Position.Right) {
-				this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
-					d3
-						.axisRight(this.yScale)
-						.ticks(this.height / 70)
-						.tickFormat((d) => {
-							return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
-						}) as any
-				);
-			}
-		}
+		// if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+		// 	if (this.yAxisSettings.position === Position.Left) {
+		// 		this.yAxisG.attr("transform", `translate(0, 0)`).call(
+		// 			d3
+		// 				.axisLeft(this.yScale)
+		// 				.ticks(this.height / 70)
+		// 				.tickFormat((d) => {
+		// 					return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+		// 				}) as any
+		// 		);
+		// 	} else if (this.yAxisSettings.position === Position.Right) {
+		// 		this.yAxisG.attr("transform", `translate(${this.width}, 0)`).call(
+		// 			d3
+		// 				.axisRight(this.yScale)
+		// 				.ticks(this.height / 70)
+		// 				.tickFormat((d) => {
+		// 					return (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+		// 				}) as any
+		// 		);
+		// 	}
+		// }
+
+		CallXScaleOnAxisGroup(this, this.width, this.height, this.xAxisG.node());
+		CallYScaleOnAxisGroup(this, this.width, this.height, this.yAxisG.node());
 
 		this.xAxisG
 			.selectAll("text")
@@ -5230,8 +5367,27 @@ export class Visual extends Shadow {
 	}
 
 	drawXGridLines(): void {
-		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number";
-		const xScaleTicks = this.isHorizontalChart && isLinearScale ? this.xScale.ticks(this.width / 90) : this.xScale.domain();
+		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
+
+		let xScaleTicks;
+		if (this.isHorizontalChart) {
+			if (this.isCutAndClipAxisEnabled) {
+				xScaleTicks = [
+					...this.afterCutLinearScale.ticks(this.afterCutLinearScaleArea / 90),
+					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 90),
+				];
+			} else if (this.isLogarithmScale) {
+				xScaleTicks = [
+					...this.positiveLogScaleTicks,
+					...this.negativeLogScaleTicks,
+				];
+			} else {
+				xScaleTicks = isLinearScale ? this.xScale.ticks(this.width / 90) : this.xScale.domain();
+			}
+		} else {
+			xScaleTicks = this.xScale.domain();
+		}
+
 		const gridLinesSelection = this.xGridLinesG.selectAll("line").data(xScaleTicks);
 		this.xGridLinesSelection = gridLinesSelection.join(
 			(enter) => {
@@ -5247,7 +5403,25 @@ export class Visual extends Shadow {
 	}
 
 	drawYGridLines(): void {
-		const yScaleTicks = this.isHorizontalChart ? this.yScale.domain() : this.yScale.ticks(this.height / 70);
+		let yScaleTicks;
+		if (!this.isHorizontalChart) {
+			if (this.isCutAndClipAxisEnabled) {
+				yScaleTicks = [
+					...this.afterCutLinearScale.ticks(this.afterCutLinearScaleArea / 70),
+					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 70),
+				];
+			} else if (this.axisByBarOrientation.isLogarithmScale) {
+				yScaleTicks = [
+					...this.positiveLogScaleTicks,
+					...this.negativeLogScaleTicks,
+				];
+			} else {
+				yScaleTicks = this.yScale.ticks(this.height / 70);
+			}
+		} else {
+			yScaleTicks = this.yScale.domain();
+		}
+
 		const gridLinesSelection = this.yGridLinesG.selectAll("line").data(yScaleTicks);
 		this.yGridLinesSelection = gridLinesSelection.join(
 			(enter) => {
@@ -5263,74 +5437,74 @@ export class Visual extends Shadow {
 	}
 
 	setXScaleGHeight(): void {
-		const xAxisSettings = this.xAxisSettings;
-		const xAxisDomain: string[] = this.xScale.domain();
-		const textProperties: TextProperties = {
-			text: "X-Axis",
-			fontFamily: xAxisSettings.labelFontFamily,
-			fontSize: xAxisSettings.labelFontSize + "px",
-		};
+		// const xAxisSettings = this.xAxisSettings;
+		// const xAxisDomain: string[] = this.xScale.domain();
+		// const textProperties: TextProperties = {
+		// 	text: "X-Axis",
+		// 	fontFamily: xAxisSettings.labelFontFamily,
+		// 	fontSize: xAxisSettings.labelFontSize + "px",
+		// };
 
-		if (!this.isHorizontalChart) {
-			const xAxisTicksWidth = xAxisDomain.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
-			});
-			const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
-			const xAxisMaxHeight = d3.min([this.height * 0.4, xAxisTicksMaxWidth], (d) => d);
+		// if (!this.isHorizontalChart) {
+		// 	const xAxisTicksWidth = xAxisDomain.map((d) => {
+		// 		return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+		// 	});
+		// 	const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
+		// 	const xAxisMaxHeight = d3.min([this.height * 0.4, xAxisTicksMaxWidth], (d) => d);
 
-			if (!this.isHorizontalBrushDisplayed) {
-				const xAxisTickHeight = textMeasurementService.measureSvgTextHeight(textProperties);
-				const xAxisTicks: string[][] = xAxisDomain.map((text) => {
-					return GetWordsSplitByWidth(text, { ...textProperties, text: text }, this.xScale.bandwidth(), 3);
-				});
-				const isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3;
-				const xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length) * xAxisTickHeight;
-				this.xScaleGHeight = isApplyTilt ? xAxisMaxHeight : xAxisMaxWordHeight;
-			} else {
-				const xAxisTicks = xAxisDomain.map((text) => {
-					return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, xAxisMaxHeight);
-				});
-				const xAxisTicksWidth = xAxisTicks.map((d) => {
-					return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
-				});
-				const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
-				this.xScaleGHeight = xAxisTicksMaxWidth;
-			}
-		} else {
-			this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({ ...textProperties });
-		}
+		// 	if (!this.isHorizontalBrushDisplayed) {
+		// 		const xAxisTickHeight = textMeasurementService.measureSvgTextHeight(textProperties);
+		// 		const xAxisTicks: string[][] = xAxisDomain.map((text) => {
+		// 			return GetWordsSplitByWidth(text, { ...textProperties, text: text }, this.xScale.bandwidth(), 3);
+		// 		});
+		// 		const isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3;
+		// 		const xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length) * xAxisTickHeight;
+		// 		this.xScaleGHeight = isApplyTilt ? xAxisMaxHeight : xAxisMaxWordHeight;
+		// 	} else {
+		// 		const xAxisTicks = xAxisDomain.map((text) => {
+		// 			return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, xAxisMaxHeight);
+		// 		});
+		// 		const xAxisTicksWidth = xAxisTicks.map((d) => {
+		// 			return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+		// 		});
+		// 		const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth, (d) => d);
+		// 		this.xScaleGHeight = xAxisTicksMaxWidth;
+		// 	}
+		// } else {
+		// 	this.xScaleGHeight = textMeasurementService.measureSvgTextHeight({ ...textProperties });
+		// }
 	}
 
 	setYScaleGWidth(): void {
-		const yAxisSettings = this.yAxisSettings;
-		const yAxisDomain: string[] = this.yScale.domain();
-		const textProperties: TextProperties = {
-			text: "X-Axis",
-			fontFamily: yAxisSettings.labelFontFamily,
-			fontSize: yAxisSettings.labelFontSize + "px",
-		};
+		// const yAxisSettings = this.yAxisSettings;
+		// const yAxisDomain: string[] = this.yScale.domain();
+		// const textProperties: TextProperties = {
+		// 	text: "X-Axis",
+		// 	fontFamily: yAxisSettings.labelFontFamily,
+		// 	fontSize: yAxisSettings.labelFontSize + "px",
+		// };
 
-		if (!this.isHorizontalChart) {
-			const yAxisTicks: string[] = this.yScale.ticks(this.height / 70);
-			const yAxisTicksWidth = yAxisTicks.map((d) => {
-				const textProperties: TextProperties = {
-					text: !this.isHorizontalChart && typeof d === "number" ? this.formatNumber(d, this.numberSettings, undefined, false, false) : d,
-					fontFamily: this.yAxisSettings.labelFontFamily,
-					fontSize: this.yAxisSettings.labelFontSize + "px",
-				};
-				return textMeasurementService.measureSvgTextWidth(textProperties);
-			});
-			this.yScaleGWidth = d3.max(yAxisTicksWidth);
-		} else {
-			const yAxisTicks = yAxisDomain.map((text) => {
-				return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * this.yAxisTicksMaxWidthRatio);
-			});
-			const yAxisTicksWidth = yAxisTicks.map((d) => {
-				return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
-			});
-			const yAxisTicksMaxWidth = d3.max(yAxisTicksWidth, (d) => d);
-			this.yScaleGWidth = yAxisTicksMaxWidth;
-		}
+		// if (!this.isHorizontalChart) {
+		// 	const yAxisTicks: string[] = this.yScale.ticks(this.height / 70);
+		// 	const yAxisTicksWidth = yAxisTicks.map((d) => {
+		// 		const textProperties: TextProperties = {
+		// 			text: !this.isHorizontalChart && typeof d === "number" ? this.formatNumber(d, this.numberSettings, undefined, false, false) : d,
+		// 			fontFamily: this.yAxisSettings.labelFontFamily,
+		// 			fontSize: this.yAxisSettings.labelFontSize + "px",
+		// 		};
+		// 		return textMeasurementService.measureSvgTextWidth(textProperties);
+		// 	});
+		// 	this.yScaleGWidth = d3.max(yAxisTicksWidth);
+		// } else {
+		// 	const yAxisTicks = yAxisDomain.map((text) => {
+		// 		return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, this.width * this.yAxisTicksMaxWidthRatio);
+		// 	});
+		// 	const yAxisTicksWidth = yAxisTicks.map((d) => {
+		// 		return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
+		// 	});
+		// 	const yAxisTicksMaxWidth = d3.max(yAxisTicksWidth, (d) => d);
+		// 	this.yScaleGWidth = yAxisTicksMaxWidth;
+		// }
 	}
 
 	drawXYAxis(): void {
@@ -5443,11 +5617,11 @@ export class Visual extends Shadow {
 
 		// this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
+		console.log(this.positiveLogScale.ticks());
+
 		// this.callXYScaleOnAxisGroup();
 		// this.setXAxisTickStyle();
 		// this.setYAxisTickStyle();
-		this.drawXGridLines();
-		this.drawYGridLines();
 	}
 
 	// Lines

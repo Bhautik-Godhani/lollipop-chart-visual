@@ -356,6 +356,7 @@ export enum EHighContrastColorType {
 export enum EXAxisSettings {
 	Show = "show",
 	Position = "position",
+	IsLogarithmScale = "isLogarithmScale",
 	IsDisplayTitle = "isDisplayTitle",
 	TitleName = "titleName",
 	TitleColor = "titleColor",
@@ -375,6 +376,7 @@ export enum EXAxisSettings {
 export enum EYAxisSettings {
 	Show = "show",
 	Position = "position",
+	IsLogarithmScale = "isLogarithmScale",
 	IsDisplayTitle = "isDisplayTitle",
 	TitleName = "titleName",
 	TitleColor = "titleColor",

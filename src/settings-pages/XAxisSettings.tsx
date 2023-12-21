@@ -119,6 +119,19 @@ const XAxisSettings = (props) => {
           </Column>
         </Row>
 
+        <ConditionalWrapper visible={shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Logarithm Scale"}
+                value={configValues.isLogarithmScale}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsLogarithmScale)}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
         <Row>
           <Column>
             <ToggleButton
