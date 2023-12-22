@@ -47,7 +47,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     }
 
                     if (!self.isHorizontalChart) {
-                        height = Math.abs(self.yScale(value1) - self.yScale(value2));
+                        height = Math.abs(self.getYPosition(value1) - self.getYPosition(value2));
                     }
 
                     select(this).datum({ ...d, height: height, errorBarValue1: value1, errorBarValue2: value2, });
@@ -58,15 +58,15 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
                     if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
                         if (value1 > 0) {
-                            return `translate(${self.xScale(d.category) + self.scaleBandWidth / 2}, ${self.yScale(value1)})`;
+                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1)})`;
                         } else {
-                            return `translate(${self.xScale(d.category) + self.scaleBandWidth / 2}, ${self.yScale(value1) - d.height})`;
+                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1) - d.height})`;
                         }
                     } else {
                         if (value1 > 0) {
-                            return `translate(${self.xScale(d.category) + self.scaleBandWidth / 2}, ${self.yScale(value2)})`;
+                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2)})`;
                         } else {
-                            return `translate(${self.xScale(d.category) + self.scaleBandWidth / 2}, ${self.yScale(value2) - d.height})`;
+                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2) - d.height})`;
                         }
                     }
                 });
@@ -110,18 +110,18 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
             .attr(
                 "d",
                 area()
-                    .y((d: any) => self.yScale(d.category) + self.scaleBandWidth / 2)
-                    .x0((d: any) => self.xScale(d.lowerBoundValue ? d.lowerBoundValue : d.value))
-                    .x1((d: any) => self.xScale(d.upperBoundValue ? d.upperBoundValue : d.value))
+                    .y((d: any) => self.getYPosition(d.category) + self.scaleBandWidth / 2)
+                    .x0((d: any) => self.getXPosition(d.lowerBoundValue ? d.lowerBoundValue : d.value))
+                    .x1((d: any) => self.getXPosition(d.upperBoundValue ? d.upperBoundValue : d.value))
             );
     } else {
         self.errorBarsAreaPath
             .attr(
                 "d",
                 area()
-                    .x((d: any) => self.xScale(d.category) + self.scaleBandWidth / 2)
-                    .y0((d: any) => self.yScale(d.lowerBoundValue ? d.lowerBoundValue : d.value))
-                    .y1((d: any) => self.yScale(d.upperBoundValue ? d.upperBoundValue : d.value))
+                    .x((d: any) => self.getXPosition(d.category) + self.scaleBandWidth / 2)
+                    .y0((d: any) => self.getYPosition(d.lowerBoundValue ? d.lowerBoundValue : d.value))
+                    .y1((d: any) => self.getYPosition(d.upperBoundValue ? d.upperBoundValue : d.value))
             );
     }
 }

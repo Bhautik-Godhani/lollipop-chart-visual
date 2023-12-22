@@ -227,20 +227,20 @@ const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyl
 const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 = 0;
     const y1 =
-        self.yScale(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value) + self.scaleBandWidth / 2;
     const x2 = self.width;
     const y2 =
-        self.yScale(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value) + self.scaleBandWidth / 2;
 
     return { x1, y1, x2, y2 };
 };
 
 const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 =
-        self.xScale(value) + self.scaleBandWidth / 2;
+        self.getXPosition(value) + self.scaleBandWidth / 2;
     const y1 = 0;
     const x2 =
-        self.xScale(value) + self.scaleBandWidth / 2;
+        self.getXPosition(value) + self.scaleBandWidth / 2;
     const y2 = self.height;
 
     return { x1, y1, x2, y2 };

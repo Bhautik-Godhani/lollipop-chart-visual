@@ -32,6 +32,7 @@ import {
 	EDynamicDeviationLabelDisplayTypes,
 	EDynamicDeviationConnectingLineTypes,
 	ETrendLinesTypes,
+	AxisCategoryType,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -212,7 +213,13 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	labelTilt: 30,
 	labelCharLimit: 12,
 	isShowAxisLine: false,
-	isLabelAutoCharLimit: true
+	isLabelAutoCharLimit: true,
+	categoryType: AxisCategoryType.Categorical,
+	isMaximumRangeEnabled: false,
+	maximumRange: 0,
+	isMinimumRangeEnabled: false,
+	minimumRange: 0,
+	isInvertRange: false
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -231,7 +238,13 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	labelCharLimit: 12,
 	isShowLabelsAboveLine: false,
 	isShowAxisLine: false,
-	isLabelAutoCharLimit: true
+	isLabelAutoCharLimit: true,
+	categoryType: AxisCategoryType.Categorical,
+	isMaximumRangeEnabled: false,
+	maximumRange: 0,
+	isMinimumRangeEnabled: false,
+	minimumRange: 0,
+	isInvertRange: false
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {

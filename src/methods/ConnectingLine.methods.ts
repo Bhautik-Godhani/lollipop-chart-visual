@@ -24,16 +24,16 @@ export const RenderConnectingLine = (self: Visual, chartData: ILollipopChartRow[
             .attr(
                 "d",
                 line()
-                    .y((d: any) => self.yScale(d.category) + self.scaleBandWidth / 2)
-                    .x((d: any) => self.xScale(isValue2 ? d.value2 : d.value1))
+                    .y((d: any) => self.getYPosition(d.category) + self.scaleBandWidth / 2)
+                    .x((d: any) => self.getXPosition(isValue2 ? d.value2 : d.value1))
             );
     } else {
         connectingLine
             .attr(
                 "d",
                 line()
-                    .x((d: any) => self.xScale(d.category) + self.scaleBandWidth / 2)
-                    .y((d: any) => self.yScale(isValue2 ? d.value2 : d.value1))
+                    .x((d: any) => self.getXPosition(d.category) + self.scaleBandWidth / 2)
+                    .y((d: any) => self.getYPosition(isValue2 ? d.value2 : d.value1))
             );
     }
 }

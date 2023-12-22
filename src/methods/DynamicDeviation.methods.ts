@@ -84,17 +84,17 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
 
     dataLabelG.attr(
         "transform",
-        `translate(${(self.xScale(from.value) + self.xScale(to.value)) / 2 - dataLabelBBox.width / 2}, ${0})`
+        `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${0})`
     );
 
     self.dynamicDeviationG
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-1", true)
-        .attr("x1", self.xScale(from.value))
-        .attr("x2", self.xScale(from.value))
+        .attr("x1", self.getXPosition(from.value))
+        .attr("x2", self.getXPosition(from.value))
         .attr("y1", start)
-        .attr("y2", (self.yScale(from.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("y2", (self.getYPosition(from.category) ?? 0) + self.scaleBandWidth / 2)
         .attr("stroke", self.dynamicDeviationSettings.connectingLineColor)
         .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
         .attr(
@@ -108,10 +108,10 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-2", true)
-        .attr("x1", self.xScale(to.value))
-        .attr("x2", self.xScale(to.value))
+        .attr("x1", self.getXPosition(to.value))
+        .attr("x2", self.getXPosition(to.value))
         .attr("y1", start)
-        .attr("y2", (self.yScale(to.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("y2", (self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
         .attr("stroke", self.dynamicDeviationSettings.connectingLineColor)
         .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
         .attr(
@@ -126,21 +126,21 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .append("circle")
             .attr("class", "connecting-circle-1")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.xScale(from.value) ?? 0}, ${(self.yScale(from.category) ?? 0) + self.scaleBandWidth / 2})`)
+            .attr("transform", `translate(${self.getXPosition(from.value) ?? 0}, ${(self.getYPosition(from.category) ?? 0) + self.scaleBandWidth / 2})`)
             .attr("fill", dynamicDeviationSettings.connectingLineColor)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px")
-            .attr("opacity", self.xScale(from.value) && self.yScale(from.category) ? 1 : 0);
+            .attr("opacity", self.getXPosition(from.value) && self.getYPosition(from.category) ? 1 : 0);
 
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.xScale(to.value) ?? 0}, ${(self.yScale(to.category) ?? 0) + self.scaleBandWidth / 2})`)
+            .attr("transform", `translate(${self.getXPosition(to.value) ?? 0}, ${(self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2})`)
             .attr("fill", dynamicDeviationSettings.connectingLineColor)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px")
-            .attr("opacity", self.xScale(to.value) && self.yScale(to.category) ? 1 : 0);
+            .attr("opacity", self.getXPosition(to.value) && self.getYPosition(to.category) ? 1 : 0);
     }
 
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
@@ -155,12 +155,12 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
 
     if (isPositiveDeviation) {
         connectorLine
-            .attr("x1", self.xScale(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
-            .attr("x2", self.xScale(to.value) + dynamicDeviationSettings.connectingLineWidth / 2);
+            .attr("x1", self.getXPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
+            .attr("x2", self.getXPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2);
     } else {
         connectorLine
-            .attr("x1", self.xScale(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
-            .attr("x2", self.xScale(to.value) - dynamicDeviationSettings.connectingLineWidth / 2);
+            .attr("x1", self.getXPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
+            .attr("x2", self.getXPosition(to.value) - dynamicDeviationSettings.connectingLineWidth / 2);
     }
 
     if (dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Arrow) {
@@ -170,11 +170,11 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .append("polygon")
                 .attr("class", "arrow-down")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${self.xScale(to.value) - w}, ${start + (w * 3) / 2}) rotate(270)`)
+                .attr("transform", `translate(${self.getXPosition(to.value) - w}, ${start + (w * 3) / 2}) rotate(270)`)
                 .attr("fill", self.DDConnectorFill);
             connectorLine
-                .attr("x1", self.xScale(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
-                .attr("x2", self.xScale(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 + w);
+                .attr("x1", self.getXPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
+                .attr("x2", self.getXPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 + w);
         };
 
         const drawRightArrow = () => {
@@ -183,11 +183,11 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .append("polygon")
                 .attr("class", "arrow-up")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${self.xScale(to.value) + w}, ${start - (w * 3) / 2}) rotate(90)`)
+                .attr("transform", `translate(${self.getXPosition(to.value) + w}, ${start - (w * 3) / 2}) rotate(90)`)
                 .attr("fill", self.DDConnectorFill);
             connectorLine
-                .attr("x1", self.xScale(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
-                .attr("x2", self.xScale(to.value) - w);
+                .attr("x1", self.getXPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
+                .attr("x2", self.getXPosition(to.value) - w);
         };
 
         if ((isPositiveDeviation && self.isLeftYAxis) || (!isPositiveDeviation && !self.isLeftYAxis)) {
@@ -202,7 +202,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .append("circle")
             .attr("class", "circle-1")
             .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
-            .attr("transform", `translate(${self.xScale(from.value)}, ${start})`)
+            .attr("transform", `translate(${self.getXPosition(from.value)}, ${start})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", dynamicDeviationSettings.connectingLineWidth + "px");
@@ -211,7 +211,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .append("circle")
             .attr("class", "circle-2")
             .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
-            .attr("transform", `translate(${self.xScale(to.value)}, ${start})`)
+            .attr("transform", `translate(${self.getXPosition(to.value)}, ${start})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", dynamicDeviationSettings.connectingLineWidth + "px");
@@ -232,7 +232,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
 
     dataLabelG.attr(
         "transform",
-        `translate(${xScaleWidth - dataLabelBBox.width}, ${(self.yScale(from.value) + self.yScale(to.value)) / 2 - dataLabelBBox.height / 2
+        `translate(${xScaleWidth - dataLabelBBox.width}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2
         })`
     );
 
@@ -240,10 +240,10 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-1", true)
-        .attr("x1", (self.xScale(from.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("x1", (self.getXPosition(from.category) ?? 0) + self.scaleBandWidth / 2)
         .attr("x2", end)
-        .attr("y1", self.yScale(from.value))
-        .attr("y2", self.yScale(from.value))
+        .attr("y1", self.getYPosition(from.value))
+        .attr("y2", self.getYPosition(from.value))
         .attr("stroke", self.dynamicDeviationSettings.connectingLineColor)
         .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
         .attr(
@@ -257,10 +257,10 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-2", true)
-        .attr("x1", (self.xScale(to.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("x1", (self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
         .attr("x2", end)
-        .attr("y1", self.yScale(to.value))
-        .attr("y2", self.yScale(to.value))
+        .attr("y1", self.getYPosition(to.value))
+        .attr("y2", self.getYPosition(to.value))
         .attr("stroke", self.dynamicDeviationSettings.connectingLineColor)
         .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
         .attr(
@@ -275,21 +275,21 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .append("circle")
             .attr("class", "connecting-circle-1")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${(self.xScale(from.category) ?? 0) + self.scaleBandWidth / 2}, ${self.yScale(from.value) ?? 0})`)
+            .attr("transform", `translate(${(self.getXPosition(from.category) ?? 0) + self.scaleBandWidth / 2}, ${self.getYPosition(from.value) ?? 0})`)
             .attr("fill", dynamicDeviationSettings.connectingLineColor)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px")
-            .attr("opacity", self.xScale(from.category) && self.yScale(from.value) ? 1 : 0);
+            .attr("opacity", self.getXPosition(from.category) && self.getYPosition(from.value) ? 1 : 0);
 
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${(self.xScale(to.category) ?? 0) + self.scaleBandWidth / 2}, ${self.yScale(to.value) ?? 0})`)
+            .attr("transform", `translate(${(self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2}, ${self.getYPosition(to.value) ?? 0})`)
             .attr("fill", dynamicDeviationSettings.connectingLineColor)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px")
-            .attr("opacity", self.xScale(to.category) && self.yScale(to.value) ? 1 : 0);
+            .attr("opacity", self.getXPosition(to.category) && self.getYPosition(to.value) ? 1 : 0);
     }
 
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
@@ -304,12 +304,12 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
 
     if (isPositiveDeviation) {
         connectorLine
-            .attr("y1", self.yScale(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
-            .attr("y2", self.yScale(to.value) - dynamicDeviationSettings.connectingLineWidth / 2);
+            .attr("y1", self.getYPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
+            .attr("y2", self.getYPosition(to.value) - dynamicDeviationSettings.connectingLineWidth / 2);
     } else {
         connectorLine
-            .attr("y1", self.yScale(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
-            .attr("y2", self.yScale(to.value) + dynamicDeviationSettings.connectingLineWidth / 2);
+            .attr("y1", self.getYPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
+            .attr("y2", self.getYPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2);
     }
 
     if (dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Arrow) {
@@ -319,11 +319,11 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .append("polygon")
                 .attr("class", "arrow-up")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${end - (w * 3) / 2}, ${self.yScale(to.value) - w})`)
+                .attr("transform", `translate(${end - (w * 3) / 2}, ${self.getYPosition(to.value) - w})`)
                 .attr("fill", self.DDConnectorFill);
             connectorLine
-                .attr("y1", self.yScale(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
-                .attr("y2", self.yScale(to.value) + w * 2);
+                .attr("y1", self.getYPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
+                .attr("y2", self.getYPosition(to.value) + w * 2);
         };
 
         const drawDownArrow = () => {
@@ -332,11 +332,11 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .append("polygon")
                 .attr("class", "arrow-down")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${end + (w * 3) / 2}, ${self.yScale(to.value) + w}) rotate(180)`)
+                .attr("transform", `translate(${end + (w * 3) / 2}, ${self.getYPosition(to.value) + w}) rotate(180)`)
                 .attr("fill", self.DDConnectorFill);
             connectorLine
-                .attr("y1", self.yScale(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
-                .attr("y2", self.yScale(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 - w * 2);
+                .attr("y1", self.getYPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
+                .attr("y2", self.getYPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 - w * 2);
         };
 
         if ((isPositiveDeviation && self.isBottomXAxis) || (!isPositiveDeviation && !self.isBottomXAxis)) {
@@ -351,7 +351,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .append("circle")
             .attr("class", "circle-1")
             .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
-            .attr("transform", `translate(${end}, ${self.yScale(from.value)})`)
+            .attr("transform", `translate(${end}, ${self.getYPosition(from.value)})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px");
@@ -360,7 +360,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .append("circle")
             .attr("class", "circle-2")
             .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
-            .attr("transform", `translate(${end}, ${self.yScale(to.value)})`)
+            .attr("transform", `translate(${end}, ${self.getYPosition(to.value)})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
             .attr("stroke-width", "1px");

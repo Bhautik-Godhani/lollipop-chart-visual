@@ -14,7 +14,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     const beforeCutDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
     const afterCutDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
     const secG = cutAndClipMarkerG.append("g");
-    const transX = self.xScale(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
+    const transX = self.getXPosition(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
 
     const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
@@ -23,7 +23,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     } else {
         secG.attr(
             "transform",
-            `translate(${self.isLeftYAxis ? -(width / 2) : self.width - width / 2}, ${self.yScale(self.cutAndClipAxisSettings.breakEnd) -
+            `translate(${self.isLeftYAxis ? -(width / 2) : self.width - width / 2}, ${self.getYPosition(self.cutAndClipAxisSettings.breakEnd) -
             (self.isBottomXAxis ? 0 : self.barCutAndClipMarkerLinesGap / 2)
             })`
         );
@@ -118,11 +118,11 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
 
 export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
     const beforeCutScaleDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
-    const transX = self.xScale(self.isLeftYAxis ? beforeCutScaleDomain[1] : beforeCutScaleDomain[1]);
+    const transX = self.getXPosition(self.isLeftYAxis ? beforeCutScaleDomain[1] : beforeCutScaleDomain[1]);
     const rectHeight = 20;
 
     imageGSelection.attr("transform", (d) => {
-        return `translate(${transX - (!self.isLeftYAxis ? -self.cutAndClipMarkerWidth : 0)}, ${self.yScale(d?.category) + self.scaleBandWidth / 2 - rectHeight / 2 + self.lineSettings.lineWidth})`;
+        return `translate(${transX - (!self.isLeftYAxis ? -self.cutAndClipMarkerWidth : 0)}, ${self.getYPosition(d?.category) + self.scaleBandWidth / 2 - rectHeight / 2 + self.lineSettings.lineWidth})`;
     });
 
     rectSelection
@@ -136,11 +136,11 @@ export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelect
 
 export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
     const afterCutScaleDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
-    const transY = self.yScale(afterCutScaleDomain?.length ? afterCutScaleDomain[0] : 0);
+    const transY = self.getYPosition(afterCutScaleDomain?.length ? afterCutScaleDomain[0] : 0);
     const rectWidth = 20;
 
     imageGSelection.attr("transform", (d) => {
-        return `translate(${self.xScale(d.category) + (self.scaleBandWidth / 2) - rectWidth / 2 + self.lineSettings.lineWidth}, ${transY - (!self.isBottomXAxis ? self.barCutAndClipMarkerLinesGap / 2 : 0)
+        return `translate(${self.getXPosition(d.category) + (self.scaleBandWidth / 2) - rectWidth / 2 + self.lineSettings.lineWidth}, ${transY - (!self.isBottomXAxis ? self.barCutAndClipMarkerLinesGap / 2 : 0)
             })`;
     });
 

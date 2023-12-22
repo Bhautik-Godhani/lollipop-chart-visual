@@ -50,6 +50,7 @@ import {
 	EMarkerColorTypes,
 	ECFApplyOnCategories,
 	EDynamicDeviationDisplayTypes,
+	AxisCategoryType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -307,6 +308,12 @@ export class Visual extends Shadow {
 	// axis
 	public zeroSeparatorLine: D3Selection<SVGElement>;
 	public axisByBarOrientation: Partial<IXAxisSettings | IYAxisSettings>;
+	public xScaleRange: number[];
+	public yScaleRange: number[];
+	public xScaleMinRange: number;
+	public xScaleMaxRange: number;
+	public yScaleMinRange: number;
+	public yScaleMaxRange: number;
 
 	// xAxis
 	public xAxisG: D3Selection<SVGElement>;
@@ -321,6 +328,9 @@ export class Visual extends Shadow {
 	public xScalePaddingOuter: number = 0.25;
 	public isBottomXAxis: boolean;
 	public xAxisStartMargin: number = 10;
+	public isXIsNumericAxis: boolean;
+	public isXIsDateTimeAxis: boolean;
+	public isXIsContinuousAxis: boolean;
 
 	// yAxis
 	public yAxisG: D3Selection<SVGElement>;
@@ -338,6 +348,9 @@ export class Visual extends Shadow {
 	public categoryLabelMargin: number = 10;
 	public yAxisStartMargin: number = 10;
 	public yAxisTicksMaxWidthRatio: number = 0.1;
+	public isYIsNumericAxis: boolean;
+	public isYIsDateTimeAxis: boolean;
+	public isYIsContinuousAxis: boolean;
 
 	// EXPAND ALL
 	public expandAllXAxisG: D3Selection<SVGElement>;
@@ -1113,6 +1126,34 @@ export class Visual extends Shadow {
 		return innerPaddingScale(this.chartSettings.lollipopInnerPadding);
 	}
 
+	getXPosition(value: number | string): number {
+		const xPosition = this.xScale(value);
+
+		if (xPosition > this.xScaleMaxRange) {
+			return this.xScaleMaxRange;
+		}
+
+		if (xPosition < this.xScaleMinRange) {
+			return this.xScaleMinRange;
+		}
+
+		return xPosition;
+	}
+
+	getYPosition(value: number | string): number {
+		const yPosition = this.yScale(value);
+
+		if (yPosition > this.yScaleMaxRange) {
+			return this.yScaleMaxRange;
+		}
+
+		if (yPosition < this.yScaleMinRange) {
+			return this.yScaleMinRange;
+		}
+
+		return yPosition;
+	}
+
 	setBrushScaleBandDomain(categoricalData: any): void {
 		const innerPadding = this.getXScaleInnerPadding();
 		if (this.isHorizontalChart) {
@@ -1161,6 +1202,15 @@ export class Visual extends Shadow {
 		this.isHasErrorUpperBounds = categoricalUpperBoundFields.length > 0;
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
+
+		this.isXIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
+		this.isYIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
+
+		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
+		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
+
+		this.isXIsContinuousAxis = (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
+		this.isYIsContinuousAxis = (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
 
 		if (!this.upperBoundMeasureNames.includes(this.errorBarsSettings.measurement.upperBoundMeasure)) {
 			this.errorBarsSettings.measurement.upperBoundMeasure = undefined;
@@ -2778,6 +2828,16 @@ export class Visual extends Shadow {
 			this.chartData = data;
 		}
 
+		if (this.isXIsContinuousAxis) {
+			if (this.xAxisSettings.isMinimumRangeEnabled && this.xAxisSettings.minimumRange) {
+				this.chartData = this.chartData.filter(d => d.value1 < this.xAxisSettings.minimumRange || d.value2 < this.xAxisSettings.minimumRange);
+			}
+
+			if (this.xAxisSettings.isMaximumRangeEnabled && this.xAxisSettings.maximumRange) {
+				this.chartData = this.chartData.filter(d => d.value1 > this.xAxisSettings.maximumRange || d.value2 > this.xAxisSettings.minimumRange);
+			}
+		}
+
 		if (this.patternSettings.enabled) {
 			this.setVisualPatternData();
 		}
@@ -3878,7 +3938,7 @@ export class Visual extends Shadow {
 			}
 		});
 
-		// const minPos = this.xScale(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
+		// const minPos = this.getXPosition(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
 		const brushed = ({ selection }) => {
 			if (this.isExpandAllApplied) {
 				this.expandAllCategoriesName.forEach((d) => {
@@ -4194,8 +4254,8 @@ export class Visual extends Shadow {
 		if (this.isHorizontalChart) {
 			if (this.isLollipopTypeCircle) {
 				if (d.value1 >= d.value2 || !this.isHasMultiMeasure) {
-					x = this.xScale(isPie2 ? d.value2 : d.value1);
-					y = this.yScale(d.category) + this.scaleBandWidth / 2;
+					x = this.getXPosition(isPie2 ? d.value2 : d.value1);
+					y = this.getYPosition(d.category) + this.scaleBandWidth / 2;
 
 					if (this.isLeftYAxis) {
 						x = x + (isPie2 ? this.circle2Size / 2 : -this.circle2Size / 2) + this.getCircleXScaleDiff(x, isPie2);
@@ -4203,8 +4263,8 @@ export class Visual extends Shadow {
 						x = x - (isPie2 ? this.circle2Size / 2 : -this.circle2Size / 2) - this.getCircleXScaleDiff(x, isPie2);
 					}
 				} else {
-					x = this.xScale(isPie2 ? d.value2 : d.value1);
-					y = this.yScale(d.category) + this.scaleBandWidth / 2;
+					x = this.getXPosition(isPie2 ? d.value2 : d.value1);
+					y = this.getYPosition(d.category) + this.scaleBandWidth / 2;
 
 					if (this.isLeftYAxis) {
 						x = x - (isPie2 ? this.circle2Size / 2 : -this.circle2Size / 2) + this.getCircleXScaleDiff(x, isPie2);
@@ -4216,8 +4276,8 @@ export class Visual extends Shadow {
 		} else {
 			if (this.isLollipopTypeCircle) {
 				if (d.value1 >= d.value2 || !this.isHasMultiMeasure) {
-					x = this.xScale(d.category) + this.scaleBandWidth / 2;
-					y = this.yScale(isPie2 ? d.value2 : d.value1)
+					x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
+					y = this.getYPosition(isPie2 ? d.value2 : d.value1)
 					// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
 					if (this.isBottomXAxis) {
 						y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
@@ -4225,8 +4285,8 @@ export class Visual extends Shadow {
 						y = y - (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + this.getCircleYScaleDiff(y, isPie2);
 					}
 				} else {
-					x = this.xScale(d.category) + this.scaleBandWidth / 2;
-					y = this.yScale(isPie2 ? d.value2 : d.value1)
+					x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
+					y = this.getYPosition(isPie2 ? d.value2 : d.value1)
 					// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
 
 					if (this.isBottomXAxis) {
@@ -4399,7 +4459,7 @@ export class Visual extends Shadow {
 
 	transformDataLabelInside(labelsSelection: any, isEnter: boolean, isData2Label: boolean): void {
 		const fn = (d, labelBBox: any) => {
-			const cx = this.xScale(this.isHorizontalChart ? (isData2Label ? d.value2 : d.value1) : d.category);
+			const cx = this.getXPosition(this.isHorizontalChart ? (isData2Label ? d.value2 : d.value1) : d.category);
 			let x;
 
 			if (!this.isLeftYAxis) {
@@ -4408,7 +4468,7 @@ export class Visual extends Shadow {
 				x = (this.isHorizontalChart ? cx + this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2);
 			}
 
-			const cy = this.yScale(this.isHorizontalChart ? d.category : (isData2Label ? d.value2 : d.value1));
+			const cy = this.getYPosition(this.isHorizontalChart ? d.category : (isData2Label ? d.value2 : d.value1));
 			let y;
 
 			if (this.isBottomXAxis) {
@@ -4432,12 +4492,12 @@ export class Visual extends Shadow {
 
 	drawData1Labels(data: ILollipopChartRow[]): void {
 		const THIS = this;
-		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
-		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
+		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			const xScaleValue = this.xScale(data.category);
-			const yScaleValue = this.yScale(data.category);
+			const xScaleValue = this.getXPosition(data.category);
+			const yScaleValue = this.getYPosition(data.category);
 			return this.isHorizontalChart ? (yScaleValue >= 0 && yScaleValue !== null && yScaleValue !== undefined) : (xScaleValue >= 0 && xScaleValue !== null && xScaleValue !== undefined);
 		});
 
@@ -4560,12 +4620,12 @@ export class Visual extends Shadow {
 
 	drawData2Labels(data: ILollipopChartRow[]): void {
 		const THIS = this;
-		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
-		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
+		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
 		const labelsData = data.filter((data) => {
-			const xScaleValue = this.xScale(data.category);
-			const yScaleValue = this.yScale(data.category);
+			const xScaleValue = this.getXPosition(data.category);
+			const yScaleValue = this.getYPosition(data.category);
 			return this.isHorizontalChart ? (yScaleValue >= 0 && yScaleValue !== null && yScaleValue !== undefined) : (xScaleValue >= 0 && xScaleValue !== null && xScaleValue !== undefined);
 		});
 
@@ -4859,7 +4919,12 @@ export class Visual extends Shadow {
 
 	setScaleBandwidth(): void {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
-		this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+
+		if (this.isXIsContinuousAxis) {
+			this.scaleBandWidth = 0;
+		} else {
+			this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
+		}
 
 		// if (!this.chartSettings.isAutoLollipopWidth) {
 		// 	if (!this.chartSettings.lollipopWidth) {
@@ -4898,7 +4963,7 @@ export class Visual extends Shadow {
 		let xAxisTickHeight: number = 0;
 		let xAxisMaxWordHeight: number = 1;
 
-		if (!this.isHorizontalChart) {
+		if (!this.isHorizontalChart && !THIS.isXIsContinuousAxis) {
 			const xAxisDomain: string[] = this.xScale.domain();
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
@@ -4974,7 +5039,7 @@ export class Visual extends Shadow {
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
 
-				if (!THIS.isHorizontalChart) {
+				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
 						if (!THIS.isBottomXAxis) {
@@ -5030,7 +5095,7 @@ export class Visual extends Shadow {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
-					const truncatedText = THIS.formatNumber(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
+					const truncatedText = THIS.formatNumber(parseFloat(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
 					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				}
 			});
@@ -5103,7 +5168,45 @@ export class Visual extends Shadow {
 		}
 	}
 
-	setXYAxisDomain(): void {
+	setXAxisDomain(): void {
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale;
+
+		const values = this.categoricalData.categories[this.categoricalCategoriesLastIndex].values;
+
+		let min = +d3.min(values, d => +d);
+
+		if (min > 0) {
+			min = 0;
+		}
+
+		let max = +d3.max(values, d => +d);
+
+		if (max >= 0) {
+			max += max * 0.15;
+		} else {
+			max -= max * 0.15;
+		}
+
+		this.isHasNegativeValue = min < 0 || max < 0;
+
+		if (this.isXIsContinuousAxis) {
+			if (this.xAxisSettings.isMinimumRangeEnabled) {
+				min = this.xAxisSettings.minimumRange;
+			}
+
+			if (this.xAxisSettings.isMaximumRangeEnabled) {
+				max = this.xAxisSettings.maximumRange;
+			}
+
+			this.xScale = d3.scaleLinear().nice();
+			this.xScale.domain([min, max]);
+		} else {
+			this.xScale = d3.scaleBand();
+			this.xScale.domain(this.chartData.map((d) => d.category));
+		}
+	}
+
+	setYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
@@ -5112,80 +5215,43 @@ export class Visual extends Shadow {
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
-		if (this.isHorizontalChart) {
-			if (isLinearScale) {
-				this.xScale = d3.scaleLinear().nice();
-			} else if (isLogarithmScale) {
-				if (this.isShowPositiveNegativeLogScale) {
-					this.positiveLogScale = d3.scaleLog().base(10).nice();
-					this.negativeLogScale = d3.scaleLog().base(10).nice();
-				} else {
-					this.xScale = d3.scaleLog().nice();
-				}
+		// if (this.isHorizontalChart) {
+		// 	this.yScale = d3.scaleBand();
+		// 	this.yScale.domain(this.chartData.map((d) => d.category));
+		// } else {
+		this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
+
+		if (isLinearScale) {
+			this.yScale = d3.scaleLinear().nice();
+		} else if (isLogarithmScale) {
+			if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
+				this.positiveLogScale = d3.scaleLog().base(10).nice();
+				this.negativeLogScale = d3.scaleLog().base(10).nice();
 			} else {
-				this.xScale = d3.scaleBand();
+				this.yScale = d3.scaleLog().base(10).nice();
 			}
-
-			this.yScale = d3.scaleBand();
-			this.yScale2 = d3.scaleBand();
-
-			if (isLinearScale) {
-				this.xScale.domain([min, max]);
-			} else if (isLogarithmScale) {
-				if (this.isShowPositiveNegativeLogScale) {
-					if (this.isBottomXAxis) {
-						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
-						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
-					} else {
-						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
-						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
-					}
-				} else {
-					this.xScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
-				}
-			} else {
-				this.xScale.domain(this.chartData.map((d) => d.value1));
-			}
-
-			this.yScale.domain(this.chartData.map((d) => d.category));
-			this.yScale2.domain(this.chartData.map((d) => d.category));
 		} else {
-			this.xScale = d3.scaleBand();
-			this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
-
-			if (isLinearScale) {
-				this.yScale = d3.scaleLinear().nice();
-			} else if (isLogarithmScale) {
-				if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
-					this.positiveLogScale = d3.scaleLog().base(10).nice();
-					this.negativeLogScale = d3.scaleLog().base(10).nice();
-				} else {
-					this.yScale = d3.scaleLog().base(10).nice();
-				}
-			} else {
-				this.yScale = d3.scaleBand();
-			}
-
-			this.xScale.domain(this.chartData.map((d) => d.category));
-
-			if (isLinearScale) {
-				this.yScale.domain([min, max]);
-			} else if (isLogarithmScale) {
-				if (this.isShowPositiveNegativeLogScale) {
-					if (this.isBottomXAxis) {
-						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
-						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
-					} else {
-						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
-						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
-					}
-				} else {
-					this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
-				}
-			} else {
-				this.yScale.domain(this.chartData.map((d) => d.value1));
-			}
+			this.yScale = d3.scaleBand();
 		}
+
+		if (isLinearScale) {
+			this.yScale.domain([min, max]);
+		} else if (isLogarithmScale) {
+			if (this.isShowPositiveNegativeLogScale) {
+				if (this.isBottomXAxis) {
+					this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
+					this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+				} else {
+					this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
+					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+				}
+			} else {
+				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
+			}
+		} else {
+			this.yScale.domain(this.chartData.map((d) => d.value1));
+		}
+		// }
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
@@ -5220,6 +5286,16 @@ export class Visual extends Shadow {
 			} else {
 				this.yScale.range(yAxisRange);
 			}
+		}
+
+		const xScaleRange = this.xScale.range();
+		if (this.xAxisSettings.isInvertRange) {
+			this.xScale.range(xScaleRange.reverse());
+		}
+
+		const yScaleRange = this.yScale.range();
+		if (this.yAxisSettings.isInvertRange) {
+			this.yScale.range(yScaleRange.reverse());
 		}
 	}
 
@@ -5330,8 +5406,8 @@ export class Visual extends Shadow {
 		lineSelection
 			.attr("class", this.xGridSettings.lineType)
 			.classed("grid-line", true)
-			.attr("x1", (d) => this.xScale(d) + this.scaleBandWidth / 2)
-			.attr("x2", (d) => this.xScale(d) + this.scaleBandWidth / 2)
+			.attr("x1", (d) => this.getXPosition(d) + this.scaleBandWidth / 2)
+			.attr("x2", (d) => this.getXPosition(d) + this.scaleBandWidth / 2)
 			.attr("y1", this.margin.top)
 			.attr("y2", this.height)
 			.attr("stroke", this.xGridSettings.lineColor)
@@ -5352,8 +5428,8 @@ export class Visual extends Shadow {
 			.classed("grid-line", true)
 			.attr("x1", 0)
 			.attr("x2", this.width)
-			.attr("y1", (d) => this.yScale(d))
-			.attr("y2", (d) => this.yScale(d))
+			.attr("y1", (d) => this.getYPosition(d))
+			.attr("y2", (d) => this.getYPosition(d))
 			.attr("stroke", this.yGridSettings.lineColor)
 			.attr("stroke-width", this.yGridSettings.lineWidth)
 			.attr("opacity", 1)
@@ -5508,7 +5584,17 @@ export class Visual extends Shadow {
 	}
 
 	drawXYAxis(): void {
-		this.setXYAxisDomain();
+		this.setXAxisDomain();
+		this.setYAxisDomain();
+
+		if (this.isHorizontalChart) {
+			const xScaleCopy = this.xScale.copy();
+			const yScaleCopy = this.yScale.copy();
+
+			this.xScale = yScaleCopy;
+			this.yScale = xScaleCopy;
+		}
+
 		this.setXYAxisRange(this.width, this.height);
 
 		// // // SET X-AXIS TICKS MAX HEIGHT
@@ -5599,6 +5685,15 @@ export class Visual extends Shadow {
 				}
 			});
 
+		this.xScaleRange = this.xScale.range();
+		this.yScaleRange = this.yScale.range();
+
+		this.xScaleMinRange = d3.min(this.xScaleRange);
+		this.xScaleMaxRange = d3.max(this.xScaleRange);
+
+		this.yScaleMinRange = d3.min(this.yScaleRange);
+		this.yScaleMaxRange = d3.max(this.yScaleRange);
+
 		// if (i === 0) {
 		// 	xAxisMaxHeight = d3.min([xAxisMaxHeight, THIS.scaleBandWidth / 2 + THIS.yScaleGWidth]);
 		// }
@@ -5616,9 +5711,6 @@ export class Visual extends Shadow {
 		// }
 
 		// this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
-		console.log(this.positiveLogScale.ticks());
-
 		// this.callXYScaleOnAxisGroup();
 		// this.setXAxisTickStyle();
 		// this.setYAxisTickStyle();
@@ -5633,17 +5725,17 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x1", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis) {
+				if (!this.isLeftYAxis || !this.xAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
-						return this.xScale(d.value1) + THIS.markerMaxSize / 2;
+						return this.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
-						return this.xScale(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getXPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 > d.value2) {
-						const Y1 = this.xScale(d.value2);
+						const Y1 = this.getXPosition(d.value2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
-						const Y2 = this.xScale(d.value1) - THIS.markerMaxSize / 2;
+						const Y2 = this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -5651,9 +5743,9 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.xScale(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
+						const Y1 = this.getXPosition(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
-						const Y2 = this.xScale(d.value2) - THIS.markerMaxSize / 2;
+						const Y2 = this.getXPosition(d.value2) - THIS.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -5664,10 +5756,10 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("x2", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis) {
+				if (!this.isLeftYAxis || !this.xAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
-						const Y1 = THIS.xScale(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.xScale(d.value2);
+						const Y1 = THIS.getXPosition(d.value1) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.getXPosition(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -5676,8 +5768,8 @@ export class Visual extends Shadow {
 							return Y1;
 						}
 					} else {
-						const Y1 = THIS.xScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.xScale(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
+						const Y1 = THIS.getXPosition(d.value2) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.getXPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -5688,14 +5780,14 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (d.value1 > d.value2) {
-						return this.xScale(d.value1) - THIS.markerMaxSize / 2;
+						return this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
 					} else {
-						return this.xScale(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getXPosition(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				}
 			})
-			.attr("y1", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
-			.attr("y2", (d) => this.yScale(d.category) + this.scaleBandWidth / 2)
+			.attr("y1", (d) => this.getYPosition(d.category) + this.scaleBandWidth / 2)
+			.attr("y2", (d) => this.getYPosition(d.category) + this.scaleBandWidth / 2)
 			.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 			.attr("stroke-width", this.lineSettings.lineWidth)
 			.attr(
@@ -5750,20 +5842,20 @@ export class Visual extends Shadow {
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
-			.attr("x1", d => this.xScale(d.category) + THIS.scaleBandWidth / 2)
-			.attr("x2", d => this.xScale(d.category) + THIS.scaleBandWidth / 2)
+			.attr("x1", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
+			.attr("x2", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
 			.attr("y1", (d: ILollipopChartRow) => {
-				if (this.isBottomXAxis) {
+				if (this.isBottomXAxis || this.yAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
-						return this.yScale(d.value1) + THIS.markerMaxSize / 2;
+						return this.getYPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
-						return this.yScale(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getYPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 > d.value2) {
-						const Y1 = this.yScale(d.value2);
+						const Y1 = this.getYPosition(d.value2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
-						const Y2 = this.yScale(d.value1) - THIS.markerMaxSize / 2;
+						const Y2 = this.getYPosition(d.value1) - THIS.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -5771,9 +5863,9 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.yScale(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
+						const Y1 = this.getYPosition(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
-						const Y2 = this.yScale(d.value2) - THIS.markerMaxSize / 2;
+						const Y2 = this.getYPosition(d.value2) - THIS.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -5784,10 +5876,10 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y2", (d: ILollipopChartRow) => {
-				if (this.isBottomXAxis) {
+				if (this.isBottomXAxis || this.yAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
-						const Y1 = THIS.yScale(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.yScale(d.value2);
+						const Y1 = THIS.getYPosition(d.value1) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.getYPosition(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -5796,8 +5888,8 @@ export class Visual extends Shadow {
 							return Y1;
 						}
 					} else {
-						const Y1 = THIS.yScale(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.yScale(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
+						const Y1 = THIS.getYPosition(d.value2) + THIS.markerMaxSize / 2;
+						const Y2 = THIS.getYPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
@@ -5808,9 +5900,9 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (d.value1 > d.value2) {
-						return this.yScale(d.value1) - THIS.markerMaxSize / 2;
+						return this.getYPosition(d.value1) - THIS.markerMaxSize / 2;
 					} else {
-						return this.yScale(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getYPosition(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				}
 			});
@@ -5823,8 +5915,8 @@ export class Visual extends Shadow {
 		labelSelection
 			.attr("transform", d => {
 				const min = d3.min([d.value1, d.value2]);
-				const cx = this.xScale(this.isHasMultiMeasure ? min : 0);
-				let cy = this.yScale(d.category) + this.scaleBandWidth / 2 - this.categoryLabelMargin / 2;
+				const cx = this.getXPosition(this.isHasMultiMeasure ? min : 0);
+				let cy = this.getYPosition(d.category) + this.scaleBandWidth / 2 - this.categoryLabelMargin / 2;
 
 				if (this.isHasMultiMeasure) {
 					cy -= (this.isLollipopTypePie ? maxPieRadius : maxCircleRadius);
@@ -5863,11 +5955,11 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", d => {
-				const cx = this.xScale(this.isHorizontalChart ? (isImage2 ? d.value2 : d.value1) : d.category);
+				const cx = this.getXPosition(this.isHorizontalChart ? (isImage2 ? d.value2 : d.value1) : d.category);
 				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - width / 2;
 			})
 			.attr("y", d => {
-				const cy = this.yScale(this.isHorizontalChart ? d.category : (isImage2 ? d.value2 : d.value1));
+				const cy = this.getYPosition(this.isHorizontalChart ? d.category : (isImage2 ? d.value2 : d.value1));
 				return !this.isHorizontalChart ? cy - width : cy + this.scaleBandWidth / 2 - width / 2;
 			})
 			.on("end", (node, index) => {
@@ -6281,16 +6373,16 @@ export class Visual extends Shadow {
 
 		if (this.isHorizontalChart) {
 			this.zeroSeparatorLine
-				.attr("x1", this.xScale(0))
-				.attr("x2", this.xScale(0))
+				.attr("x1", this.getXPosition(0))
+				.attr("x2", this.getXPosition(0))
 				.attr("y1", this.height)
 				.attr("y2", 0);
 		} else {
 			this.zeroSeparatorLine
 				.attr("x1", 0)
 				.attr("x2", this.width)
-				.attr("y1", this.yScale(0))
-				.attr("y2", this.yScale(0));
+				.attr("y1", this.getYPosition(0))
+				.attr("y2", this.getYPosition(0));
 		}
 	}
 
@@ -6415,7 +6507,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", (d) => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value1 : d.category);
+				const cx = this.getXPosition(this.isHorizontalChart ? d.value1 : d.category);
 				if (!this.isLeftYAxis) {
 					return this.isHorizontalChart ? cx - this.circle1Size / 2 - this.getCircleXScaleDiff(cx, false) : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
 				} else {
@@ -6423,7 +6515,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y", (d) => {
-				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value1);
+				const cy = this.getYPosition(this.isHorizontalChart ? d.category : d.value1);
 				if (this.isBottomXAxis) {
 					return !this.isHorizontalChart ? cy - this.circle1Size / 2 - this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 				} else {
@@ -6465,7 +6557,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", (d) => {
-				const cx = this.xScale(this.isHorizontalChart ? d.value2 : d.category);
+				const cx = this.getXPosition(this.isHorizontalChart ? d.value2 : d.category);
 				if (!this.isLeftYAxis) {
 					return this.isHorizontalChart ? cx - this.circle2Size / 2 - this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
 				} else {
@@ -6473,7 +6565,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y", (d) => {
-				const cy = this.yScale(this.isHorizontalChart ? d.category : d.value2);
+				const cy = this.getYPosition(this.isHorizontalChart ? d.category : d.value2);
 				if (this.isBottomXAxis) {
 					return !this.isHorizontalChart ? cy - this.circle2Size / 2 - this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
 				} else {
@@ -6869,7 +6961,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", (d) => {
-				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
+				const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
 				if (this.isLeftYAxis) {
 					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
 				} else {
@@ -6877,7 +6969,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y", (d) => {
-				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
+				const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
 				if (this.isBottomXAxis) {
 					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
 				} else {
@@ -6946,7 +7038,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", (d) => {
-				const pieX = this.xScale(this.isHorizontalChart ? d[valueKey] : d.category);
+				const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
 				if (this.isLeftYAxis) {
 					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
 				} else {
@@ -6954,7 +7046,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y", (d) => {
-				const pieY = this.yScale(this.isHorizontalChart ? d.category : d[valueKey]);
+				const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
 				if (this.isBottomXAxis) {
 					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
 				} else {

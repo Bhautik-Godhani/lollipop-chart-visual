@@ -16,6 +16,14 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
     let max = +D3Max(self.isHasMultiMeasure ? values.map((val) => val) :
         self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
 
+    if (self.yAxisSettings.isMinimumRangeEnabled && self.yAxisSettings.minimumRange) {
+        min = self.yAxisSettings.minimumRange;
+    }
+
+    if (self.yAxisSettings.isMaximumRangeEnabled && self.yAxisSettings.maximumRange) {
+        max = self.yAxisSettings.maximumRange;
+    }
+
     if (max >= 0) {
         max += max * 0.15;
     } else {

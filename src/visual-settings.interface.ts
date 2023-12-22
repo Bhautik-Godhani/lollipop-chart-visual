@@ -1,5 +1,6 @@
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import {
+	AxisCategoryType,
 	CircleSize,
 	ColorPaletteType,
 	DataLabelsPlacement,
@@ -59,6 +60,12 @@ export interface IXAxisSettings {
 	labelCharLimit: number;
 	isLabelAutoCharLimit: boolean;
 	isShowAxisLine: boolean;
+	categoryType: AxisCategoryType;
+	isMinimumRangeEnabled: boolean;
+	minimumRange: number;
+	isMaximumRangeEnabled: boolean;
+	maximumRange: number;
+	isInvertRange: boolean;
 }
 
 export interface IYAxisSettings {
@@ -78,6 +85,12 @@ export interface IYAxisSettings {
 	isShowLabelsAboveLine: boolean;
 	isShowAxisLine: boolean;
 	isLabelAutoCharLimit: boolean;
+	categoryType: AxisCategoryType;
+	isMaximumRangeEnabled: boolean;
+	maximumRange: number;
+	isMinimumRangeEnabled: boolean;
+	minimumRange: number;
+	isInvertRange: boolean;
 }
 
 export interface ICirclePropsSettings {

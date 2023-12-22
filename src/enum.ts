@@ -370,7 +370,13 @@ export enum EXAxisSettings {
 	LabelTilt = "labelTilt",
 	IsLabelAutoTilt = "isLabelAutoTilt",
 	LabelCharLimit = "labelCharLimit",
-	IsLabelAutoCharLimit = "isLabelAutoCharLimit"
+	IsLabelAutoCharLimit = "isLabelAutoCharLimit",
+	CategoryType = "categoryType",
+	IsMinimumRangeEnabled = "isMinimumRangeEnabled",
+	MinimumRange = "minimumRange",
+	IsMaximumRangeEnabled = "isMaximumRangeEnabled",
+	MaximumRange = "maximumRange",
+	IsInvertRange = "isInvertRange"
 }
 
 export enum EYAxisSettings {
@@ -389,7 +395,12 @@ export enum EYAxisSettings {
 	IsShowLabelsAboveLine = "isShowLabelsAboveLine",
 	IsShowAxisLine = "isShowAxisLine",
 	LabelCharLimit = "labelCharLimit",
-	IsLabelAutoCharLimit = "isLabelAutoCharLimit"
+	IsLabelAutoCharLimit = "isLabelAutoCharLimit",
+	IsMinimumRangeEnabled = "isMinimumRangeEnabled",
+	MinimumRange = "minimumRange",
+	IsMaximumRangeEnabled = "isMaximumRangeEnabled",
+	MaximumRange = "maximumRange",
+	IsInvertRange = "isInvertRange"
 }
 
 export enum EMarkerSettings {
@@ -773,4 +784,9 @@ export enum ECutAndClipAxisSettings {
 	BreakEnd = "breakEnd",
 	MarkerStrokeColor = "markerStrokeColor",
 	MarkerBackgroundColor = "markerBackgroundColor",
+}
+
+export enum AxisCategoryType {
+	Continuous = "continuous",
+	Categorical = "categorical",
 }

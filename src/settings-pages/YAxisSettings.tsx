@@ -2,6 +2,7 @@
 import * as React from "react";
 import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
+  EXAxisSettings,
   EYAxisSettings,
   Position,
 } from "../enum";
@@ -41,6 +42,12 @@ const YAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
+    if (shadow.isXIsContinuousAxis && configValues.isMinimumRangeEnabled && configValues.isMaximumRangeEnabled) {
+      if (configValues.maximumRange < configValues.minimumRange) {
+        return;
+      }
+    }
+
     persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
@@ -118,6 +125,80 @@ const YAxisSettings = (props) => {
               value={configValues.position}
               optionsList={AXIS_POSITION}
               handleChange={value => handleChange(value, EYAxisSettings.Position)}
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Minimum Range"}
+                value={configValues.isMinimumRangeEnabled}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsMinimumRangeEnabled)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={configValues.isMinimumRangeEnabled}>
+            <Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label=""
+                  value={configValues.minimumRange.toString()}
+                  handleChange={(value) => handleChange(+value, EXAxisSettings.MinimumRange)}
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Maximum Range"}
+                value={configValues.isMaximumRangeEnabled}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsMaximumRangeEnabled)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={configValues.isMaximumRangeEnabled}>
+            <Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label=""
+                  value={configValues.maximumRange.toString()}
+                  handleChange={(value) => handleChange(+value, EXAxisSettings.MaximumRange)}
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Logarithm Scale"}
+                value={configValues.isLogarithmScale}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsLogarithmScale)}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Invert Range"}
+              value={configValues.isInvertRange}
+              handleChange={() => handleCheckbox(EXAxisSettings.IsInvertRange)}
+              appearance="checkbox"
             />
           </Column>
         </Row>
