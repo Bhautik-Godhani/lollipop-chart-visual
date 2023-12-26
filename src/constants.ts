@@ -169,7 +169,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	singleColor2: "rgba(156, 195, 213, 1)",
 	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],
 	categoryColors: [],
-	numberOfClasses: 5,
+	numberOfClasses: 8,
 	schemeColors: [
 		'rgb(204,233,255)', 'rgb(160,214,255)', 'rgb(117,195,255)', 'rgb(68,176,255)', 'rgb(25,145,233)'
 	],

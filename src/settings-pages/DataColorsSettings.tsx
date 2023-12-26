@@ -265,6 +265,7 @@ const UIColorPaletteTypes = (
 					<Column>
 						<ColorSchemePicker
 							colorSchemePickerProps={values}
+							keepNumberOfDataClassesOption={false}
 							onChange={(d) => {
 								setConfigValues(() => {
 									return { ...d };
