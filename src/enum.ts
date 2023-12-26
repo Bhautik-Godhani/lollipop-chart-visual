@@ -193,7 +193,10 @@ export enum EChartSettings {
 	showConnectingLine = "showConnectingLine",
 	connectingLineColor = "connectingLineColor",
 	connectingLineWidth = "connectingLineWidth",
-	connectingLineStyle = "connectingLineStyle"
+	connectingLineStyle = "connectingLineStyle",
+	IsIBCSEnabled = "isIBCSEnabled",
+	Theme = "theme",
+	PrevTheme = "prevTheme"
 }
 
 export enum ECircleSettings {

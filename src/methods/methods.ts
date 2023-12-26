@@ -14,7 +14,7 @@ import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
-	if (shadow.IBCSSettings.isIBCSEnabled) {
+	if (shadow.chartSettings.isIBCSEnabled) {
 		ApplyBeforeIBCSAppliedSettingsBack(shadow);
 	}
 
@@ -33,7 +33,7 @@ export const persistProperties = (shadow: Visual, configName: EVisualConfig, set
 				displayName: EVisualSettings.IBCSSettings,
 				properties: {
 					[EVisualSettings.IBCSSettings]: JSON.stringify({
-						...shadow.IBCSSettings,
+						...shadow.chartSettings,
 						[EIBCSSettings.IsIBCSEnabled]: false,
 						[EIBCSSettings.Theme]: undefined,
 						[EIBCSSettings.PrevTheme]: undefined,

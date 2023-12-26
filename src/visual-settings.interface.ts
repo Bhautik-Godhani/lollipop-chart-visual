@@ -174,6 +174,9 @@ export interface IChartSettings {
 	connectingLineColor: string;
 	connectingLineWidth: number;
 	connectingLineStyle: ELineType;
+	isIBCSEnabled: boolean;
+	theme: EIBCSThemes;
+	prevTheme: EIBCSThemes;
 }
 
 export interface IMarkerSettings {

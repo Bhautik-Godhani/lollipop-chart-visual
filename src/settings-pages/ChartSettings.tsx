@@ -1,12 +1,12 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
-import { EChartSettings, ELineType, Orientation } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker } from "@truviz/shadow/dist/Components";
+import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, Accordion, Label } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { persistProperties } from "../methods/methods";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
-import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
+import { DashedLineIcon, DottedLineIcon, IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon, SolidLineIcon } from "./SettingsIcons";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -70,53 +70,147 @@ const UIConnectingLineSettings = (
 	return <>
 		<Row>
 			<Column>
-				<ToggleButton
-					label={"Show Connecting Line"}
-					value={configValues.showConnectingLine}
-					handleChange={(value) => handleChange(value, EChartSettings.showConnectingLine, setConfigValues)}
-					appearance="toggle"
-				/>
+				<Accordion title="Connecting Line" childTopPadding={true} childBottomPadding >
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Show Connecting Line"}
+								value={configValues.showConnectingLine}
+								handleChange={(value) => handleChange(value, EChartSettings.showConnectingLine, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={configValues.showConnectingLine}>
+						<Row>
+							<Column>
+								<SwitchOption
+									label="Line Style"
+									value={configValues.connectingLineStyle}
+									optionsList={LINE_TYPES}
+									handleChange={(value) => handleChange(value, EChartSettings.connectingLineStyle, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<InputControl
+									min={1}
+									type="number"
+									label="Line Width"
+									value={configValues.connectingLineWidth}
+									handleChange={(value) => handleChange(value, EChartSettings.connectingLineWidth, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<ColorPicker
+									label="Line Color"
+									color={configValues.connectingLineColor}
+									handleChange={(value) => handleColor(value, EChartSettings.connectingLineColor, setConfigValues)}
+									colorPalette={vizOptions.host.colorPalette}
+									size="sm"
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</Accordion>
 			</Column>
 		</Row>
-
-		<ConditionalWrapper visible={configValues.showConnectingLine}>
-			<Row>
-				<Column>
-					<SwitchOption
-						label="Line Style"
-						value={configValues.connectingLineStyle}
-						optionsList={LINE_TYPES}
-						handleChange={(value) => handleChange(value, EChartSettings.connectingLineStyle, setConfigValues)}
-					/>
-				</Column>
-			</Row>
-
-			<Row>
-				<Column>
-					<InputControl
-						min={1}
-						type="number"
-						label="Line Width"
-						value={configValues.connectingLineWidth}
-						handleChange={(value) => handleChange(value, EChartSettings.connectingLineWidth, setConfigValues)}
-					/>
-				</Column>
-			</Row>
-
-			<Row>
-				<Column>
-					<ColorPicker
-						label="Line Color"
-						color={configValues.connectingLineColor}
-						handleChange={(value) => handleColor(value, EChartSettings.connectingLineColor, setConfigValues)}
-						colorPalette={vizOptions.host.colorPalette}
-						size="sm"
-					/>
-				</Column>
-			</Row>
-		</ConditionalWrapper>
 	</>
 }
+
+const UIThemeSettings = (
+	shadow: Visual,
+	configValues: IChartSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
+) => {
+	return (
+		<>
+			<Accordion title="IBCS Theme" childBottomPadding>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Enable IBCS Theme"}
+							value={configValues.isIBCSEnabled}
+							handleChange={(value) => handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues)}
+							appearance="toggle"
+						/>
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={configValues.isIBCSEnabled}>
+					<Row>
+						<Column>
+							<Label text="Default"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDefaultVIcon />
+							</div>
+						</Column>
+						<Column>
+							<Label text="Default"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.DefaultHorizontal, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDefaultHIcon />
+							</div>
+						</Column>
+					</Row>
+
+					<Row>
+						<Column>
+							<Label text="Diverging 1"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.Diverging1Vertical, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDiverging1VIcon />
+							</div>
+						</Column>
+						<Column>
+							<Label text="Diverging 1"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.Diverging1Horizontal, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDiverging1HIcon />
+							</div>
+						</Column>
+					</Row>
+
+					<Row>
+						<Column>
+							<Label text="Diverging 2"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.Diverging2Vertical, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDiverging2VIcon />
+							</div>
+						</Column>
+						<Column>
+							<Label text="Diverging 2"></Label>
+							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
+								onClick={
+									() => handleChange(EIBCSThemes.Diverging2Horizontal, EChartSettings.Theme, setConfigValues)
+								}>
+								<IBCSDiverging2HIcon />
+							</div>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+			</Accordion>
+		</>
+	);
+};
 
 const UIGeneralChartSettings = (
 	shadow: Visual,
@@ -251,6 +345,8 @@ const ChartSettings = (props) => {
 			{/* <ConditionalWrapper visible={shadow.isLollipopTypePie}> */}
 			{/* {UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)} */}
 			{/* </ConditionalWrapper> */}
+
+			{UIThemeSettings(shadow, configValues, setConfigValues)}
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>

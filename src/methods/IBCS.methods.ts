@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { SORTING_SETTINGS } from "../constants";
 import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
@@ -110,7 +111,7 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
 export const ApplyIBCSTheme = (self: Visual): void => {
     let beforeIBCSSettings;
 
-    if (!self.IBCSSettings.prevTheme && self.IBCSSettings.theme) {
+    if (!self.chartSettings.prevTheme && self.chartSettings.theme) {
         beforeIBCSSettings = {
             [EVisualSettings.ChartSettings]: { configName: EVisualConfig.ChartConfig, settingName: EVisualSettings.ChartSettings, configValues: self.chartSettings },
             [EVisualSettings.LineSettings]: { configName: EVisualConfig.LineConfig, settingName: EVisualSettings.LineSettings, configValues: self.lineSettings },
@@ -144,9 +145,9 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                         ...self.chartSettings,
                         [EChartSettings.isShowZeroBaseLine]: true,
                         [EChartSettings.orientation]:
-                            (self.IBCSSettings.theme === EIBCSThemes.DefaultHorizontal ||
-                                self.IBCSSettings.theme === EIBCSThemes.Diverging1Horizontal ||
-                                self.IBCSSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
+                            (self.chartSettings.theme === EIBCSThemes.DefaultHorizontal ||
+                                self.chartSettings.theme === EIBCSThemes.Diverging1Horizontal ||
+                                self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
                     }),
                 },
                 selector: null,
@@ -183,7 +184,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.DataColorsSettings]: JSON.stringify({
                         ...self.dataColorsSettings,
-                        [EDataColorsSettings.FillType]: ((self.IBCSSettings.theme === EIBCSThemes.Diverging2Horizontal || self.IBCSSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
+                        [EDataColorsSettings.FillType]: ((self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal || self.chartSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
                         [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
                     }),
                 },
@@ -277,9 +278,9 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 displayName: EVisualSettings.IBCSSettings,
                 properties: {
                     [EVisualSettings.IBCSSettings]: JSON.stringify({
-                        ...self.IBCSSettings,
+                        ...self.chartSettings,
                         [EIBCSSettings.IsIBCSEnabled]: true,
-                        [EIBCSSettings.PrevTheme]: self.IBCSSettings.theme
+                        [EIBCSSettings.PrevTheme]: self.chartSettings.theme
                     }),
                 },
                 selector: null,

@@ -90,7 +90,10 @@ export const CHART_SETTINGS: IChartSettings = {
 	showConnectingLine: true,
 	connectingLineColor: "rgba(0, 0, 0, 1)",
 	connectingLineWidth: 1,
-	connectingLineStyle: ELineType.Dotted
+	connectingLineStyle: ELineType.Dotted,
+	isIBCSEnabled: false,
+	theme: undefined,
+	prevTheme: undefined
 };
 
 export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
