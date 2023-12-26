@@ -37,7 +37,7 @@ export class Enumeration {
 function getLicenseSelection(): EnumerateSectionType {
 	return {
 		name: "license",
-		isShow: true,
+		isShow: false,
 		properties: [
 			{
 				name: "purchased",
