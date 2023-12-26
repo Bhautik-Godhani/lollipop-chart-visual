@@ -164,6 +164,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	fillMax: "rgba(75, 132, 244, 1)",
 	isAddMidColor: true,
 	fillType: ColorPaletteType.Single,
+	isFillTypeChanged: false,
 	singleColor1: "rgba(0, 99, 178, 1)",
 	singleColor2: "rgba(156, 195, 213, 1)",
 	gradientColors: ["rgba(186, 72, 239, 1)", "rgba(127, 88, 246, 1)", "rgba(75, 132, 244, 1)"],

@@ -227,7 +227,8 @@ export interface IDataColorsSettings {
 	fillMid: string;
 	fillMax: string;
 	isAddMidColor: boolean;
-	fillType: ColorPaletteType,
+	fillType: ColorPaletteType;
+	isFillTypeChanged: boolean;
 	singleColor1?: string,
 	singleColor2?: string,
 	gradientColors?: string[],

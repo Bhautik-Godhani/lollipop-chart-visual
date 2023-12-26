@@ -90,7 +90,13 @@ const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setCo
 						label={"Color Palette"}
 						value={configValues.fillType}
 						optionsList={colorPaletteDropdownList}
-						handleChange={(newValue) => handleChange(newValue, EDataColorsSettings.FillType, setConfigValues)}
+						handleChange={(newValue) => {
+							handleChange(newValue, EDataColorsSettings.FillType, setConfigValues);
+
+							if (shadow.isHasNegativeValue) {
+								handleChange(true, EDataColorsSettings.IsFillTypeChanged, setConfigValues)
+							}
+						}}
 					/>
 				</Column>
 			</Row>
@@ -383,9 +389,6 @@ const DataColors = (props) => {
 
 	return (
 		<>
-			<ConditionalWrapper visible={!shadow.isHasMultiMeasure}>
-			</ConditionalWrapper>
-
 			{UIColorPalette(shadow, configValues, setConfigValues)}
 			{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}

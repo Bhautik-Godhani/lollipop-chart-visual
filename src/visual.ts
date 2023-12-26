@@ -52,6 +52,7 @@ import {
 	EDynamicDeviationDisplayTypes,
 	AxisCategoryType,
 	EErrorBarsDirection,
+	EDataColorsSettings,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -2134,6 +2135,24 @@ export class Visual extends Shadow {
 						RenderExpandAllYAxis(this, this.categoricalData);
 					}
 				}
+			}
+
+			if (this.isHasNegativeValue && !this.dataColorsSettings.isFillTypeChanged && this.dataColorsSettings.fillType !== ColorPaletteType.PositiveNegative) {
+				this.visualHost.persistProperties({
+					merge: [
+						{
+							objectName: EVisualConfig.DataColorsConfig,
+							displayName: EVisualSettings.DataColorsSettings,
+							properties: {
+								[EVisualSettings.DataColorsSettings]: JSON.stringify({
+									...this.dataColorsSettings,
+									[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
+								}),
+							},
+							selector: null,
+						},
+					],
+				});
 			}
 
 			if (this.isExpandAllApplied) {

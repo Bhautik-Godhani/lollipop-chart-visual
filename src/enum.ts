@@ -264,6 +264,7 @@ export enum EDataColorsSettings {
 	FillMax = "fillMax",
 	IsAddMidColor = "isAddMidColor",
 	FillType = "fillType",
+	IsFillTypeChanged = "isFillTypeChanged",
 	SingleColor1 = "singleColor1",
 	SingleColor2 = "singleColor2",
 	GradientColors = "gradientColors",
