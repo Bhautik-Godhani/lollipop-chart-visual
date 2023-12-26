@@ -1970,6 +1970,9 @@ export class Visual extends Shadow {
 			const { height: footerHeight } = this.createFooter(this.footerSettings, this.chartContainer);
 			this.footerHeight = this.footerSettings.show ? footerHeight : 0;
 
+			this.container.style("width", "100%");
+			this.container.style("height", `calc(100% - ${this.footerHeight}px)`);
+
 			const isHasSubcategories = !!this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 
 			if (!isHasSubcategories) {
@@ -3087,6 +3090,7 @@ export class Visual extends Shadow {
 			this.legends = renderLegends(
 				this,
 				this.chartContainer,
+				this.footerHeight,
 				this.legendSettings.legendTitle,
 				legendDataPoints,
 				this.legendSettings,

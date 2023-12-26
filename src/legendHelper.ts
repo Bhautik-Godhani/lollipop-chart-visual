@@ -97,6 +97,7 @@ export const renderLegendTitle = (shadow, legendTitle, legendFormattingOptions, 
 export const renderLegends = (
     shadow,
     mainContainer: HTMLElement,
+    bottomSpace: number,
     legendTitle: string,
     legendsData, //: LegendDataPoint[],
     legendFormattingOptions,
@@ -208,7 +209,7 @@ export const renderLegends = (
     const leftRightArrows = legendWidth > legendWrapper.node().clientWidth;
     const topBottomArrows = legendHeight > legendWrapper.node().clientHeight;
 
-    positionLabels(legendFormattingOptions, mainContainer, iconsBar, leftRightArrows, topBottomArrows);
+    positionLabels(legendFormattingOptions, mainContainer, iconsBar, leftRightArrows, topBottomArrows, bottomSpace);
 
     plotNavigationArrows(legendWrapper, legend, legendFormattingOptions, leftRightArrows, topBottomArrows);
 
@@ -350,7 +351,7 @@ export const addEllipsisToLegends = (textNodes, legendFormattingOptions, circleR
     });
 };
 
-export const positionLabels = (legendFormattingOptions, mainContainer, iconsBar, leftRightArrows, topBottomArrows) => {
+export const positionLabels = (legendFormattingOptions, mainContainer, iconsBar, leftRightArrows, topBottomArrows, bottomSpace: number) => {
     d3.select(".visual")
         .on("mouseover", () => {
             if (
@@ -424,17 +425,17 @@ export const positionLabels = (legendFormattingOptions, mainContainer, iconsBar,
             }
         });
 
-    applyStylesToWrapper(legendFormattingOptions, mainContainer)
+    applyStylesToWrapper(legendFormattingOptions, mainContainer, bottomSpace)
 };
 
-export const applyStylesToWrapper = (legendFormattingOptions, mainContainer) => {
+export const applyStylesToWrapper = (legendFormattingOptions, mainContainer, bottomSpace: number) => {
     switch (legendFormattingOptions.legendPosition) {
         case "TopLeft":
             legendWrapper.style("align-items", "flex-start");
             break;
         case "BottomLeft":
             legendWrapper
-                .style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight}px`)
+                .style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight - bottomSpace}px`)
                 .style("align-items", "flex-start");
             break;
         case "TopCenter":
@@ -445,7 +446,7 @@ export const applyStylesToWrapper = (legendFormattingOptions, mainContainer) => 
             }
             break;
         case "BottomCenter":
-            legendWrapper.style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight}px`);
+            legendWrapper.style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight - bottomSpace}px`);
             if (mainContainer.clientWidth < legend.node().clientWidth) {
                 legendWrapper.style("align-items", "flex-start");
             } else {
@@ -460,7 +461,7 @@ export const applyStylesToWrapper = (legendFormattingOptions, mainContainer) => 
             }
             break;
         case "BottomRight":
-            legendWrapper.style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight}px`);
+            legendWrapper.style("margin-top", `${mainContainer.clientHeight - legendWrapper.node().clientHeight - bottomSpace}px`);
             if (mainContainer.clientWidth < legend.node().clientWidth) {
                 legendWrapper.style("align-items", "flex-start");
             } else {
