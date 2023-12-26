@@ -561,3 +561,19 @@ function matchRuleShort(str, rule) {
 	const escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
 	return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
 }
+
+export function calculateStandardDeviation(numbers) {
+	// Step 1: Calculate the mean
+	const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+
+	// Step 2: Calculate the squared differences from the mean
+	const squaredDifferences = numbers.map(num => Math.pow(num - mean, 2));
+
+	// Step 3: Calculate the mean of the squared differences
+	const meanOfSquaredDifferences = squaredDifferences.reduce((sum, squaredDiff) => sum + squaredDiff, 0) / squaredDifferences.length;
+
+	// Step 4: Take the square root of the result from step 3
+	const standardDeviation = Math.sqrt(meanOfSquaredDifferences);
+
+	return standardDeviation;
+}

@@ -1,10 +1,11 @@
 import { Visual } from "../visual";
 import { select, Selection } from "d3-selection";
 import { min as d3Min, max as d3Max, mean, median } from "d3-array";
-import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLinesType, EReferenceType, EXYAxisNames, Position } from "../enum";
+import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLineNameTypes, EReferenceLinesType, EReferenceLineType, EReferenceType, EXYAxisNames, Position } from "../enum";
 import { scaleLinear } from "d3";
 import crypto from "crypto";
 import { IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineValueProps } from "../visual-settings.interface";
+import { calculateStandardDeviation, formatNumber } from "./methods";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const generateSecureRandomBytes = (length) => {
@@ -16,11 +17,17 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
         (d) => d.line1Coord.x1 >= 0 && d.line1Coord.x2 >= 0 && d.line1Coord.y1 >= 0 && d.line1Coord.y2 >= 0 && d.labelCoord.textX1 >= 0 && d.labelCoord.textY1 >= 0
     );
 
-    self.referenceLinesContainerG.selectAll(".referenceLinesG").remove();
+    self.container.selectAll(".referenceLinesG").remove();
 
     if (data && data.length > 0) {
         data.forEach(d => {
-            const referenceLinesG = self.referenceLinesContainerG.append("g").datum(d).attr("class", "referenceLinesG");
+            let referenceLinesG;
+
+            if (d.lineStyle.linePlacement === EReferenceLineType.FRONT) {
+                referenceLinesG = self.container.append("g").raise().datum(d).attr("class", "referenceLinesG");
+            } else if (d.lineStyle.linePlacement === EReferenceLineType.BEHIND) {
+                referenceLinesG = self.container.append("g").lower().datum(d).attr("class", "referenceLinesG");
+            }
 
             const lines = referenceLinesG.append("line").attr("id", "referenceLine1").attr("class", "referenceLine");
             FormattingReferenceLines(self, lines, false);
@@ -79,8 +86,19 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 }
 
 export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
+    const getLabelText = (d: IReferenceLineSettings): string => {
+        switch (d.labelStyle.labelNameType) {
+            case EReferenceLineNameTypes.TEXT:
+                return d.labelStyle.label;
+            case EReferenceLineNameTypes.TEXT_VALUE:
+                return d.labelStyle.label + " " + formatNumber(+d.lineValue1.value, self.numberSettings, undefined);
+            case EReferenceLineNameTypes.VALUE:
+                return formatNumber(+d.lineValue1.value, self.numberSettings, undefined);
+        }
+    }
+
     textSelection
-        .text((d: IReferenceLineSettings) => d.labelStyle.label)
+        .text((d: IReferenceLineSettings) => getLabelText(d))
         .attr("x", (d: IReferenceLineSettings) => {
             if (d.lineValue1.axis === EXYAxisNames.X) {
                 if (self.isHorizontalChart) {
@@ -193,20 +211,57 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, rLine: IReferenceLineLabelSt
             : rLine.labelAlignment === ELCRPosition.Left
                 ? self.height - 20
                 : 20;
-    const textX1 = x1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
+
+    let textX1: number;
+    switch (rLine.labelPosition) {
+        case EBeforeAfterPosition.Before:
+            textX1 = x1 - 10;
+            break;
+        case EBeforeAfterPosition.Center:
+            textX1 = x1 - 5;
+            break;
+        case EBeforeAfterPosition.After:
+            textX1 = x1 + 10;
+            break;
+    }
+
     const textAnchor =
         rLine.labelAlignment === ELCRPosition.Centre
             ? "middle"
             : rLine.labelAlignment === ELCRPosition.Left
                 ? "start"
                 : "end";
-    const textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
+
+    let textAlignment: string;
+    switch (rLine.labelPosition) {
+        case EBeforeAfterPosition.Before:
+            textAlignment = "ideographic"
+            break;
+        case EBeforeAfterPosition.Center:
+            textAlignment = "central"
+            break;
+        case EBeforeAfterPosition.After:
+            textAlignment = "hanging"
+            break;
+    }
 
     return { textX1, textY1, textAnchor, textAlignment };
 };
 
 const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyleProps, y1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
-    const textY1 = y1 + (rLine.labelPosition === EBeforeAfterPosition.Before ? -10 : 10);
+    let textY1: number;
+    switch (rLine.labelPosition) {
+        case EBeforeAfterPosition.Before:
+            textY1 = y1 - 10;
+            break;
+        case EBeforeAfterPosition.Center:
+            textY1 = y1 - 5;
+            break;
+        case EBeforeAfterPosition.After:
+            textY1 = y1 + 10;
+            break;
+    }
+
     const textX1 =
         rLine.labelAlignment === ELCRPosition.Centre
             ? self.width / 2
@@ -219,7 +274,19 @@ const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyl
             : rLine.labelAlignment === ELCRPosition.Left
                 ? "start"
                 : "end";
-    const textAlignment = rLine.labelPosition === EBeforeAfterPosition.Before ? "ideographic" : "hanging";
+
+    let textAlignment: string;
+    switch (rLine.labelPosition) {
+        case EBeforeAfterPosition.Before:
+            textAlignment = "ideographic"
+            break;
+        case EBeforeAfterPosition.Center:
+            textAlignment = "central"
+            break;
+        case EBeforeAfterPosition.After:
+            textAlignment = "hanging"
+            break;
+    }
 
     return { textX1, textY1, textAnchor, textAlignment };
 };
@@ -227,10 +294,10 @@ const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyl
 const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 = 0;
     const y1 =
-        self.getYPosition(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value);
     const x2 = self.width;
     const y2 =
-        self.getYPosition(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value);
 
     return { x1, y1, x2, y2 };
 };
@@ -372,6 +439,9 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             }
 
             switch (rLineValue.computation) {
+                case EReferenceLineComputation.ZeroBaseline:
+                    rLineValue.value = 0 + "";
+                    break;
                 case EReferenceLineComputation.Min:
                     rLineValue.value = d3Min(values, (d) => d) + "";
                     break;
@@ -383,6 +453,9 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                     break;
                 case EReferenceLineComputation.Median:
                     rLineValue.value = median(values, (d) => d) + "";
+                    break;
+                case EReferenceLineComputation.StandardDeviation:
+                    rLineValue.value = calculateStandardDeviation(values) + "";
                     break;
                 case EReferenceLineComputation.Fixed:
                     break;

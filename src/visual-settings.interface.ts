@@ -28,6 +28,8 @@ import {
 	EMarkerTypes,
 	ERankingType,
 	EReferenceLineComputation,
+	EReferenceLineNameTypes,
+	EReferenceLineType,
 	EReferenceLinesType,
 	EReferenceType,
 	ERelationshipToMeasure,
@@ -413,9 +415,11 @@ export interface IReferenceLineStyleProps {
 	lineColor: string;
 	autoLineWidth: boolean;
 	lineWidth: string;
+	linePlacement: EReferenceLineType;
 }
 
 export interface IReferenceLineLabelStyleProps {
+	labelNameType: EReferenceLineNameTypes;
 	textAnchor?: string;
 	textAlignment?: string;
 	label: string;
@@ -428,6 +432,7 @@ export interface IReferenceLineLabelStyleProps {
 	labelPosition: EBeforeAfterPosition;
 	labelAlignment: ELCRPosition;
 	styling: string[];
+	labelOrientation: Orientation;
 }
 
 export interface IReferenceBandStyleProps {

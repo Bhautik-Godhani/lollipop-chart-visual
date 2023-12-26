@@ -459,10 +459,18 @@ export enum EReferenceLineStyleProps {
 	LineColor = "lineColor",
 	AutoLineWidth = "autoLineWidth",
 	LineWidth = "lineWidth",
-	Styling = "styling"
+	Styling = "styling",
+	LinePlacement = "linePlacement"
+}
+
+export enum EReferenceLineNameTypes {
+	TEXT = "text",
+	VALUE = "value",
+	TEXT_VALUE = "text_value"
 }
 
 export enum EReferenceLineLabelStyleProps {
+	LabelNameType = "labelNameType",
 	TextAnchor = "textAnchor",
 	TextAlignment = "textAlignment",
 	Label = "label",
@@ -473,12 +481,18 @@ export enum EReferenceLineLabelStyleProps {
 	AutoFontSize = "autoFontSize",
 	LabelFontSize = "labelFontSize",
 	LabelPosition = "labelPosition",
-	LabelAlignment = "labelAlignment"
+	LabelAlignment = "labelAlignment",
+	LabelOrientation = "labelOrientation"
 }
 
 export enum EReferenceType {
 	REFERENCE_LINE = "referenceLine",
 	REFERENCE_BAND = "referenceBand"
+}
+
+export enum EReferenceLineType {
+	FRONT = "front",
+	BEHIND = "behind"
 }
 
 export enum EMarkerTypes {
@@ -534,11 +548,13 @@ export enum EReferenceLinesType {
 }
 
 export enum EReferenceLineComputation {
+	ZeroBaseline = "zeroBaseline",
 	Min = "min",
 	Max = "max",
 	Average = "average",
 	Median = "median",
 	Fixed = "fixed",
+	StandardDeviation = "standard_deviation"
 }
 
 export enum EXYAxisNames {
@@ -553,6 +569,7 @@ export enum EStartEndPosition {
 
 export enum EBeforeAfterPosition {
 	Before = "before",
+	Center = "center",
 	After = "after",
 }
 

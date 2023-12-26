@@ -11,10 +11,15 @@ import { REFERENCE_LINES_SETTINGS } from "../constants";
 import {
   EBeforeAfterPosition,
   EReferenceLineComputation,
+  EReferenceLineLabelStyleProps,
+  EReferenceLineNameTypes,
+  EReferenceLineStyleProps,
+  EReferenceLineType,
   EReferenceLinesSettings,
   EReferenceLinesType,
   EReferenceType,
   EXYAxisNames,
+  Orientation,
   Position,
 } from "../enum";
 import {
@@ -47,13 +52,54 @@ const LINE_TYPES: ILabelValuePair[] = [
   },
 ];
 
+const LINE_PLACEMENTS: ILabelValuePair[] = [
+  {
+    label: "Front",
+    value: EReferenceLineType.FRONT,
+  },
+  {
+    label: "Behind",
+    value: EReferenceLineType.BEHIND,
+  },
+];
+
+const LABEL_NAME_TYPES: ILabelValuePair[] = [
+  {
+    label: "Text",
+    value: EReferenceLineNameTypes.TEXT,
+  },
+  {
+    label: "Value",
+    value: EReferenceLineNameTypes.VALUE,
+  },
+  {
+    label: "Text & Value",
+    value: EReferenceLineNameTypes.TEXT_VALUE,
+  },
+];
+
+const LABEL_ORIENTATION: ILabelValuePair[] = [
+  {
+    label: "Vertical",
+    value: Orientation.Vertical,
+  },
+  {
+    label: "Horizontal",
+    value: Orientation.Horizontal,
+  },
+];
+
 const ComputationTypeList: ILabelValuePair[] = [
   {
-    label: "Min",
+    label: "Zero Base Line",
+    value: EReferenceLineComputation.ZeroBaseline,
+  },
+  {
+    label: "Minimum",
     value: EReferenceLineComputation.Min,
   },
   {
-    label: "Max",
+    label: "Maximum",
     value: EReferenceLineComputation.Max,
   },
   {
@@ -63,6 +109,10 @@ const ComputationTypeList: ILabelValuePair[] = [
   {
     label: "Median",
     value: EReferenceLineComputation.Median,
+  },
+  {
+    label: "Standard Deviation",
+    value: EReferenceLineComputation.StandardDeviation,
   },
   {
     label: "Fixed",
@@ -141,6 +191,10 @@ const Get_LABEL_POSITION = (shadow: Visual) => {
         value: EBeforeAfterPosition.Before,
       },
       {
+        label: "CENTER",
+        value: EBeforeAfterPosition.Center,
+      },
+      {
         label: "AFTER",
         value: EBeforeAfterPosition.After,
       },
@@ -150,6 +204,10 @@ const Get_LABEL_POSITION = (shadow: Visual) => {
       {
         label: "TOP",
         value: EBeforeAfterPosition.Before,
+      },
+      {
+        label: "CENTER",
+        value: EBeforeAfterPosition.Center,
       },
       {
         label: "BELOW",
@@ -204,7 +262,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     <Row>
       <Column>
         <SelectInput
-          label={"Measure"}
+          label={"Apply On"}
           value={lineValues.measureName}
           optionsList={isValue2 ? line1Measure : AXIS_NAMES}
           handleChange={(value, e) => {
@@ -239,39 +297,48 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           }}
         />
       </Column>
-
-      <Column>
-        <SelectInput
-          label={"At"}
-          value={lineValues.type}
-          optionsList={LINE_TYPES}
-          handleChange={value => handleChange(value, "type", type)}
-        />
-      </Column>
     </Row>
 
-    <ConditionalWrapper visible={lineValues.type === "value" && lineValues.axis === EXYAxisNames.X}>
-      <Row>
-        <Column>
-          <InputControl
-            type="text"
-            value={lineValues.value}
-            handleChange={(value: any) => handleChange(value, "value", type)}
-            min={1}
-            label="Value"
-          />
-        </Column>
-      </Row>
-    </ConditionalWrapper>
-
-    <ConditionalWrapper visible={lineValues.type === "value" && lineValues.axis === EXYAxisNames.Y}>
+    <ConditionalWrapper visible={lineValues.axis === EXYAxisNames.X}>
       <Row>
         <Column>
           <SelectInput
-            label={"Computation"}
+            label={"Based On"}
+            value={lineValues.type}
+            optionsList={LINE_TYPES}
+            handleChange={value => handleChange(value, "type", type)}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={lineValues.type === "value"}>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Select Value"}
+              value={lineValues.value}
+              optionsList={shadow.chartData.map(d => ({
+                label: d.category,
+                value: d.category
+              }))}
+              handleChange={value => handleChange(value, "value", type)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      {UILineValueOptions1(vizOptions, shadow, lineValues, handleChange, isValue2)}
+    </ConditionalWrapper>
+
+
+    <ConditionalWrapper visible={lineValues.axis === EXYAxisNames.Y}>
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Based On"}
             value={lineValues.computation}
             optionsList={ComputationTypeList}
-            handleChange={(value, e) => handleChange(value, "computation", type)}
+            handleChange={(value) => handleChange(value, "computation", type)}
           />
         </Column>
       </Row>
@@ -290,8 +357,6 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
         </Row>
       </ConditionalWrapper>
     </ConditionalWrapper>
-
-    {UILineValueOptions1(vizOptions, shadow, lineValues, handleChange, isValue2)}
   </>
 }
 
@@ -372,6 +437,17 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
         />
       </Column>
     </Row>
+
+    <Row>
+      <Column>
+        <SwitchOption
+          label="Line Placement"
+          value={configValues.linePlacement}
+          optionsList={LINE_PLACEMENTS}
+          handleChange={(value) => handleChange(value, EReferenceLineStyleProps.LinePlacement, EReferenceLinesSettings.LineStyle)}
+        />
+      </Column>
+    </Row>
   </>
 }
 
@@ -379,17 +455,30 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVa
   return <Accordion title="Label Styles" childBottomPadding>
     <Row>
       <Column>
-        <InputControl
-          type="text"
-          value={configValues.label}
-          handleChange={(value: any) => {
-            handleChange(value, "label", EReferenceLinesSettings.LabelStyle);
-          }}
-          min={1}
-          label="Label Name"
+        <SelectInput
+          label={"Label Types"}
+          value={configValues.labelNameType}
+          optionsList={LABEL_NAME_TYPES}
+          handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
         />
       </Column>
     </Row>
+
+    <ConditionalWrapper visible={configValues.labelNameType !== EReferenceLineNameTypes.VALUE}>
+      <Row>
+        <Column>
+          <InputControl
+            type="text"
+            value={configValues.label}
+            handleChange={(value: any) => {
+              handleChange(value, "label", EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+            }}
+            min={1}
+            label="Label Text"
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
 
     <Row>
       <Column>
@@ -520,7 +609,7 @@ const UILabelStyles1 = (shadow: Visual, configValues: IReferenceLineLabelStylePr
             type="number"
             value={configValues.labelFontSize}
             handleChange={(value: any) => {
-              handleChange(value, "labelFontSize", EReferenceLinesSettings.LabelStyle);
+              handleChange(value, "labelFontSize", EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
             }}
             min={1}
           />
@@ -578,8 +667,11 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   return <>
     <Accordion title="Line Options" childBottomPadding>
       {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+    </Accordion>
+    <Accordion title="Line Styles" childBottomPadding>
       {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
     </Accordion>
+
     {UILabelStyles(vizOptions, shadow, configValues.labelStyle, handleChange, handleCheckbox)}
   </>
 }
@@ -595,7 +687,9 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
           {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
         </Tab>
       </Tabs >
+    </Accordion>
 
+    <Accordion title="Line Styles" childBottomPadding>
       {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
     </Accordion>
 
@@ -743,6 +837,18 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
       setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "measureName": d.lineValue1.measureName } }));
     }
   }, [configValues.lineValue1.measureName]);
+
+  React.useEffect(() => {
+    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "type": EReferenceLinesType.Value } }));
+    }
+  }, [configValues.lineValue1.measureName]);
+
+  React.useEffect(() => {
+    if (configValues.lineValue2.axis === EXYAxisNames.Y) {
+      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
+    }
+  }, [configValues.lineValue2.measureName]);
 
   return (
     <>

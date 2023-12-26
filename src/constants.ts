@@ -33,6 +33,8 @@ import {
 	EDynamicDeviationConnectingLineTypes,
 	ETrendLinesTypes,
 	AxisCategoryType,
+	EReferenceLineType,
+	EReferenceLineNameTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -352,8 +354,10 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		lineColor: "rgba(74, 74, 74, 1)",
 		autoLineWidth: true,
 		lineWidth: "3",
+		linePlacement: EReferenceLineType.FRONT
 	},
 	labelStyle: {
+		labelNameType: EReferenceLineNameTypes.VALUE,
 		label: "Reference Line",
 		labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 		labelColor: "rgba(0,0,0,1)",
@@ -363,7 +367,8 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		labelFontSize: "16",
 		labelPosition: EBeforeAfterPosition.Before,
 		labelAlignment: ELCRPosition.Centre,
-		styling: []
+		styling: [],
+		labelOrientation: Orientation.Horizontal
 	},
 	line1Coord: {
 		x1: 0, x2: 0, y1: 0, y2: 0
