@@ -2090,7 +2090,7 @@ export class Visual extends Shadow {
 			}
 
 			if (this.isLollipopTypeCircle) {
-				this.categoriesColorList = this.chartData.map(d => ({
+				this.categoriesColorList = this.categoricalDataPairs.map(d => ({
 					name: d.category,
 					marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
 				}));
