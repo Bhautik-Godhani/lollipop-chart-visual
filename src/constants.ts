@@ -35,6 +35,7 @@ import {
 	AxisCategoryType,
 	EReferenceLineType,
 	EReferenceLineNameTypes,
+	EErrorBarsDirection,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -389,6 +390,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 	isEnabled: true,
 	measurement: {
+		direction: EErrorBarsDirection.Both,
 		applySettingsToMeasure: undefined,
 		calcType: EErrorBarsCalcTypes.ByField,
 		relationshipToMeasure: ERelationshipToMeasure.Absolute,
@@ -419,7 +421,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 	},
 	errorLabels: {
 		isEnabled: true,
-		fontSize: 12,
+		fontSize: 10,
 		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 		color: "rgba(102,102,102,1)",
 		showBackground: false,

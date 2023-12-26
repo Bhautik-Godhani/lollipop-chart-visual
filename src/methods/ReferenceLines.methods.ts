@@ -5,7 +5,8 @@ import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, 
 import { scaleLinear } from "d3";
 import crypto from "crypto";
 import { IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineValueProps } from "../visual-settings.interface";
-import { calculateStandardDeviation, formatNumber } from "./methods";
+import { calculateStandardDeviation } from "./methods";
+import { GetFormattedNumber } from "./NumberFormat.methods";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const generateSecureRandomBytes = (length) => {
@@ -91,9 +92,9 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
             case EReferenceLineNameTypes.TEXT:
                 return d.labelStyle.label;
             case EReferenceLineNameTypes.TEXT_VALUE:
-                return d.labelStyle.label + " " + formatNumber(+d.lineValue1.value, self.numberSettings, undefined);
+                return d.labelStyle.label + " " + GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true);
             case EReferenceLineNameTypes.VALUE:
-                return formatNumber(+d.lineValue1.value, self.numberSettings, undefined);
+                return GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true);
         }
     }
 

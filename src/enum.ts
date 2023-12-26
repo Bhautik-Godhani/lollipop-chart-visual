@@ -614,6 +614,7 @@ export enum EErrorBarsMarkerShape {
 export enum EErrorBarsSettings {
 	IsEnabled = "isEnabled",
 	Measurement = "measurement",
+	Direction = "direction",
 	ApplySettingsToMeasure = "applySettingsToMeasure",
 	CalcType = "calcType",
 	RelationshipToMeasure = "relationshipToMeasure",
@@ -652,6 +653,12 @@ export enum EErrorBarsCalcTypes {
 	ByPercentage = "byPercentage",
 	ByPercentile = "byPercentile",
 	ByStandardDeviation = "byStandardDeviation"
+}
+
+export enum EErrorBarsDirection {
+	Plus = "plus",
+	Minus = "minus",
+	Both = "both"
 }
 
 export enum EErrorBandFillTypes {

@@ -14,6 +14,7 @@ import {
 	EDynamicDeviationLabelDisplayTypes,
 	EErrorBandFillTypes,
 	EErrorBarsCalcTypes,
+	EErrorBarsDirection,
 	EErrorBarsLabelFormat,
 	EErrorBarsMarkerShape,
 	EFontStyle,
@@ -469,6 +470,7 @@ export interface IReferenceLineSettings {
 export interface IErrorBarsSettings {
 	isEnabled: boolean;
 	measurement: {
+		direction: EErrorBarsDirection;
 		applySettingsToMeasure: string;
 		calcType: EErrorBarsCalcTypes;
 		relationshipToMeasure: ERelationshipToMeasure;

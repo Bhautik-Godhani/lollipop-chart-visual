@@ -200,71 +200,71 @@ const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
 	};
 };
 
-export const formatNumber = (number: number | string, options: NumberFormatting, formatter: IValueFormatter = undefined): string => {
-	if (typeof number !== "number") {
-		return number;
-	}
+// export const formatNumber = (number: number | string, options: NumberFormatting, formatter: IValueFormatter = undefined): string => {
+// 	if (typeof number !== "number") {
+// 		return number;
+// 	}
 
-	if (!options.show && formatter) {
-		return formatter.format(number);
-	}
+// 	if (!options.show && formatter) {
+// 		return formatter.format(number);
+// 	}
 
-	let __n = number;
-	let _num;
-	let scaledTo = "none";
+// 	let __n = number;
+// 	let _num;
+// 	let scaledTo = "none";
 
-	const scalingMapping = {
-		thousands: options.thousandScalingLabel,
-		million: options.millionScalingLabel,
-		billion: options.billionScalingLabel,
-		trillion: options.trillionScalingLabel,
-	};
+// 	const scalingMapping = {
+// 		thousands: options.thousandScalingLabel,
+// 		million: options.millionScalingLabel,
+// 		billion: options.billionScalingLabel,
+// 		trillion: options.trillionScalingLabel,
+// 	};
 
-	const defaultScalingMapping = {
-		thousands: "K",
-		million: "M",
-		billion: "B",
-		trillion: "T",
-	};
+// 	const defaultScalingMapping = {
+// 		thousands: "K",
+// 		million: "M",
+// 		billion: "B",
+// 		trillion: "T",
+// 	};
 
-	if (options.scaling) {
-		const scaledNumber = scaleNumber(__n, options.scaling);
-		__n = scaledNumber.n;
-		scaledTo = scaledNumber.scaledTo;
-	}
+// 	if (options.scaling) {
+// 		const scaledNumber = scaleNumber(__n, options.scaling);
+// 		__n = scaledNumber.n;
+// 		scaledTo = scaledNumber.scaledTo;
+// 	}
 
-	if (typeof options.decimalPlaces === "number" && options.decimalPlaces >= 0) {
-		options.decimalPlaces = options.decimalPlaces > 100 ? 100 : options.decimalPlaces;
-		const decimals = Math.floor(options.decimalPlaces);
-		if (typeof __n === "number") {
-			if (!options.thousandsSeparator) {
-				_num = __n.toFixed(decimals).toString();
-			} else {
-				_num = __n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-			}
-		} else {
-			_num = __n;
-		}
-	} else {
-		_num = __n.toString();
-	}
+// 	if (typeof options.decimalPlaces === "number" && options.decimalPlaces >= 0) {
+// 		options.decimalPlaces = options.decimalPlaces > 100 ? 100 : options.decimalPlaces;
+// 		const decimals = Math.floor(options.decimalPlaces);
+// 		if (typeof __n === "number") {
+// 			if (!options.thousandsSeparator) {
+// 				_num = __n.toFixed(decimals).toString();
+// 			} else {
+// 				_num = __n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+// 			}
+// 		} else {
+// 			_num = __n;
+// 		}
+// 	} else {
+// 		_num = __n.toString();
+// 	}
 
-	// _num = formatter.format(parseInt(_num));
-	if (options.decimalSeparator) {
-		_num = _num.replace(".", options.decimalSeparator);
-	}
-	if (options.thousandsSeparator) {
-		_num = _num.replace(/,/g, options.thousandsSeparator);
-	}
+// 	// _num = formatter.format(parseInt(_num));
+// 	if (options.decimalSeparator) {
+// 		_num = _num.replace(".", options.decimalSeparator);
+// 	}
+// 	if (options.thousandsSeparator) {
+// 		_num = _num.replace(/,/g, options.thousandsSeparator);
+// 	}
 
-	if (scaledTo !== "none") {
-		_num += options.scalingLabel ? scalingMapping[scaledTo] : defaultScalingMapping[scaledTo];
-	}
+// 	if (scaledTo !== "none") {
+// 		_num += options.scalingLabel ? scalingMapping[scaledTo] : defaultScalingMapping[scaledTo];
+// 	}
 
-	_num = options.prefix !== "" ? options.prefix + "" + _num + "" + options.suffix : _num + "" + options.suffix;
+// 	_num = options.prefix !== "" ? options.prefix + "" + _num + "" + options.suffix : _num + "" + options.suffix;
 
-	return _num.trim();
-};
+// 	return _num.trim();
+// };
 
 export const parseObject = (obj, def) => {
 	let initialStates = def;

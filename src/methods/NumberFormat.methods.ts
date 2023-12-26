@@ -9,7 +9,7 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
     const isSemanticFormat = isUseSematicFormat ? numberSettings.semanticFormatting : false;
 
     if (number < 0) {
-        if (isMinThousandsLimit ? (number < -1.0e3 && number >= -1.0e5) : (number < -1.0e3 && number >= -1.0e5)) {
+        if (isMinThousandsLimit ? (number < -1.0e3 && number >= -1.0e5) : (number >= -1.0e5)) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e3).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
@@ -35,7 +35,7 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
             );
         }
     } else {
-        if (isMinThousandsLimit ? (number > 1.0e3 && number <= 1.0e5) : (number > 1.0e3 && number <= 1.0e5)) {
+        if (isMinThousandsLimit ? (number > 1.0e3 && number <= 1.0e5) : (number <= 1.0e5)) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e3).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
@@ -121,7 +121,7 @@ export const GetSemanticFormattedNumber = (numberFormatting: NumberFormatting, n
     return formattedNumber;
 }
 
-export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, formatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
+export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, formatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
     const numberSettings = numberFormatting;
 
     if (typeof number !== "number") {

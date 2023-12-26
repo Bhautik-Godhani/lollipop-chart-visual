@@ -26,6 +26,8 @@ export interface ILollipopChartRow {
 	boundsTotal?: number;
 	tooltipUpperBoundValue?: string;
 	tooltipLowerBoundValue?: string;
+	labelUpperBoundValue?: string;
+	labelLowerBoundValue?: string;
 }
 
 export interface IChartSubCategory {

@@ -14,7 +14,8 @@ import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { IReferenceLineSettings } from "../visual-settings.interface";
 import { EReferenceType } from "../enum";
-import { formatNumber, persistProperties } from "../methods/methods";
+import { persistProperties } from "../methods/methods";
+import { GetFormattedNumber } from "../methods/NumberFormat.methods";
 
 const UIReferenceLines = (
   shadow: Visual,
@@ -177,9 +178,9 @@ const ReferenceLines = (props) => {
         console.log(row.lineValue1.type, row);
 
         text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
-        to ${row.lineValue2.rank}` : `at value from ${formatNumber(+row.lineValue1.value, shadow.numberSettings, undefined)} to ${formatNumber(+row.lineValue2.value, shadow.numberSettings, undefined)}`}`;
+        to ${row.lineValue2.rank}` : `at value from ${GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true)} to ${GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true)}`}`;
       } else {
-        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${formatNumber(+row.lineValue1.value, shadow.numberSettings, undefined)}`}`;
+        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true)}`}`;
       }
 
       return {

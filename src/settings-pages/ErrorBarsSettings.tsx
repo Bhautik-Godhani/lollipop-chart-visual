@@ -4,6 +4,7 @@ import { ERROR_BARS_SETTINGS } from "../constants";
 import {
   EErrorBandFillTypes,
   EErrorBarsCalcTypes,
+  EErrorBarsDirection,
   EErrorBarsMarkerShape,
   EErrorBarsSettings,
   EErrorBarsTooltipLabelFormat,
@@ -28,7 +29,7 @@ import { IErrorBarsSettings, ILabelValuePair } from "../visual-settings.interfac
 import { Visual } from "../visual";
 import { IMarkerData } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
-import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
+import { BoldIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
 import { persistProperties } from "../methods/methods";
 
 let MARKERS_LIST: IMarkerData[] = [];
@@ -222,6 +223,21 @@ const ErrorBarsSettings = (props) => {
     },
   ];
 
+  const DIRECTION: ILabelValuePair[] = [
+    {
+      label: "Both",
+      value: EErrorBarsDirection.Both,
+    },
+    {
+      label: "Minus",
+      value: EErrorBarsDirection.Minus,
+    },
+    {
+      label: "Plus",
+      value: EErrorBarsDirection.Plus,
+    },
+  ];
+
   const MEASURES_LIST: ILabelValuePair[] = (shadow as Visual).measureNames.map(d => ({ label: d, value: d }));
   const UPPER_BOUND_LIST: ILabelValuePair[] = (shadow as Visual).upperBoundMeasureNames.map(d => ({ label: d, value: d }));
   const LOWER_BOUND_LIST: ILabelValuePair[] = (shadow as Visual).lowerBoundMeasureNames.map(d => ({ label: d, value: d }));
@@ -264,7 +280,18 @@ const ErrorBarsSettings = (props) => {
       </Row>
 
       <ConditionalWrapper visible={configValues.isEnabled}>
-        <Accordion title="Measurements" open={false} childTopPadding={true} childBottomPadding>
+        <Accordion title="Measurements" open={true} childTopPadding={true} childBottomPadding>
+          <Row>
+            <Column>
+              <SwitchOption
+                label="Direction"
+                value={configValues.measurement.direction}
+                optionsList={DIRECTION}
+                handleChange={(value) => handleChange(value, EErrorBarsSettings.Direction, EErrorBarsSettings.Measurement)}
+              />
+            </Column>
+          </Row>
+
           <Row>
             <Column>
               <SelectInput
@@ -555,7 +582,7 @@ const ErrorBarsSettings = (props) => {
           </ConditionalWrapper>
         </Accordion >
 
-        {/* <Accordion title="Error Labels" childBottomPadding open={false}>
+        <Accordion title="Error Labels" childBottomPadding open={false}>
           <Row>
             <Column>
               <ToggleButton
@@ -657,12 +684,12 @@ const ErrorBarsSettings = (props) => {
                   label={"Label Format"}
                   value={configValues.errorLabels.labelFormat}
                   optionsList={TOOLTIP_LABEL_FORMAT}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.FontFamily, EErrorBarsSettings.ErrorLabels)}
+                  handleChange={(value) => handleChange(value, EErrorBarsSettings.LabelFormat, EErrorBarsSettings.ErrorLabels)}
                 />
               </Column>
             </Row>
           </ConditionalWrapper>
-        </Accordion> */}
+        </Accordion>
 
         < Accordion title="Tooltip" childBottomPadding open={false} >
           <Row>

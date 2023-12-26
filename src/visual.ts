@@ -51,6 +51,7 @@ import {
 	ECFApplyOnCategories,
 	EDynamicDeviationDisplayTypes,
 	AxisCategoryType,
+	EErrorBarsDirection,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -482,6 +483,7 @@ export class Visual extends Shadow {
 	errorBarsAreaG: D3Selection<SVGElement>;
 	errorBarsAreaPath: D3Selection<SVGElement>;
 	errorBarsMarkersG: D3Selection<SVGElement>;
+	errorBarsLabelsG: D3Selection<SVGElement>;
 	errorBarsMarkerDef: D3Selection<SVGElement>;
 	errorBarsMarker: D3Selection<SVGElement>;
 	errorBarsMarkerPath: D3Selection<SVGElement>;
@@ -859,6 +861,8 @@ export class Visual extends Shadow {
 		this.errorBarsLinesG = this.errorBarsContainer.append("g").classed("errorBarsLinesG", true);
 
 		this.errorBarsMarkersG = this.errorBarsContainer.append("g").classed("errorBarsMarkersG", true);
+
+		this.errorBarsLabelsG = this.errorBarsContainer.append("g").classed("errorBarsLabelsG", true);
 
 		this.errorBarsMarkerDef = this.errorBarsMarkersG.append("defs").attr("class", "errorBarsMarkerDefs");
 
@@ -2620,8 +2624,16 @@ export class Visual extends Shadow {
 		}
 
 		const isErrorBarsAbsoluteRelation = this.errorBarsSettings.measurement.relationshipToMeasure === ERelationshipToMeasure.Absolute && !this.errorBarsSettings.measurement.makeSymmetrical;
+		const { errorLabels, tooltip } = this.errorBarsSettings;
 
-		const getUpperLowerBoundsValue = (idx: number, value: number, data: ILollipopChartRow[]): { upperBoundValue: number, lowerBoundValue: number, tooltipUpperBoundValue: string, tooltipLowerBoundValue: string } => {
+		const getUpperLowerBoundsValue = (idx: number, value: number, data: ILollipopChartRow[]): {
+			upperBoundValue: number,
+			lowerBoundValue: number,
+			tooltipUpperBoundValue: string,
+			tooltipLowerBoundValue: string,
+			labelUpperBoundValue: string,
+			labelLowerBoundValue: string
+		} => {
 			let ub: number = 0;
 			let lb: number = 0;
 			let upperBoundValue: number = 0;
@@ -2664,9 +2676,20 @@ export class Visual extends Shadow {
 				}
 			}
 
-			const getBoundForTooltip = (isUpperBound: boolean): string => {
+			switch (this.errorBarsSettings.measurement.direction) {
+				case EErrorBarsDirection.Both:
+					break;
+				case EErrorBarsDirection.Minus:
+					ub = upperBoundValue = value;
+					break;
+				case EErrorBarsDirection.Plus:
+					lb = lowerBoundValue = value;
+					break;
+			}
+
+			const getBoundForTooltip = (labelFormat: EErrorBarsLabelFormat, isUpperBound: boolean): string => {
 				let bound: number;
-				switch (this.errorBarsSettings.tooltip.labelFormat) {
+				switch (labelFormat) {
 					case EErrorBarsLabelFormat.Absolute:
 						bound = isUpperBound ? upperBoundValue : lowerBoundValue;
 						break;
@@ -2687,12 +2710,18 @@ export class Visual extends Shadow {
 				}
 				return bound
 					? this.errorBarsSettings.tooltip.labelFormat !== EErrorBarsLabelFormat.RelativePercentage
-						? this.formatNumber(bound, this.numberSettings, undefined, true, true)
+						? this.formatNumber(+bound, this.numberSettings, undefined, true, false)
 						: bound.toFixed(2) + "%"
 					: undefined;
 			};
 
-			return { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue: getBoundForTooltip(true), tooltipLowerBoundValue: getBoundForTooltip(false) };
+			return {
+				upperBoundValue, lowerBoundValue,
+				tooltipUpperBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, true) : '0',
+				tooltipLowerBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, false) : '0',
+				labelUpperBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, true) : '0',
+				labelLowerBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, false) : '0',
+			};
 		}
 
 		let idx = 0;
@@ -2754,7 +2783,7 @@ export class Visual extends Shadow {
 
 		data.forEach((d, i) => {
 			const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? d.value2 : d.value1, data);
+			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? d.value2 : d.value1, data);
 
 			if (this.errorBarsSettings.isEnabled) {
 				d.upperBoundValue = upperBoundValue;
@@ -2762,6 +2791,8 @@ export class Visual extends Shadow {
 				d.lowerBoundValue = lowerBoundValue;
 				d.tooltipLowerBoundValue = tooltipLowerBoundValue;
 				d.boundsTotal = lowerBoundValue + upperBoundValue;
+				d.labelUpperBoundValue = labelUpperBoundValue;
+				d.labelLowerBoundValue = labelLowerBoundValue;
 			}
 		});
 
