@@ -6375,7 +6375,7 @@ export class Visual extends Shadow {
 			RenderErrorBand(this, []);
 		}
 
-		if (this.isHasNegativeValue) {
+		if (this.chartSettings.isShowZeroBaseLine) {
 			this.drawZeroSeparatorLine();
 		} else {
 			this.zeroSeparatorLine.attr("display", "none");
