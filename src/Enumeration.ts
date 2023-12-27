@@ -62,7 +62,7 @@ function getVisualGeneralSettingsSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "darkMode",
-				isShow: true,
+				isShow: false,
 			},
 			{
 				name: "summaryTableToggle",
