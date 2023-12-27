@@ -523,6 +523,7 @@ const DataLabelsSettings = (props) => {
 							label={"Best Fit Labels"}
 							value={configValues.isShowBestFitLabels}
 							handleChange={() => handleCheckbox(EDataLabelsSettings.isShowBestFitLabels, setConfigValues)}
+							appearance="checkbox"
 						/>
 					</Column>
 				</Row>
