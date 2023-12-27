@@ -481,6 +481,8 @@ export interface IErrorBarsSettings {
 		makeSymmetrical: boolean;
 		upperBoundMeasure: string;
 		lowerBoundMeasure: string;
+		upperBoundValue: number;
+		lowerBoundValue: number;
 		upperBoundPercentage: number;
 		lowerBoundPercentage: number;
 		standardDeviation: number;

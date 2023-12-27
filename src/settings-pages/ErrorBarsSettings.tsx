@@ -164,6 +164,10 @@ const ErrorBarsSettings = (props) => {
       label: "By Standard Deviation",
       value: EErrorBarsCalcTypes.ByStandardDeviation,
     },
+    {
+      label: "By Value",
+      value: EErrorBarsCalcTypes.ByValue,
+    },
   ];
 
   const ERROR_BAND_FILL_TYPE: ILabelValuePair[] = [
@@ -373,6 +377,28 @@ const ErrorBarsSettings = (props) => {
                 />
               </Column>
               <Column></Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByValue}>
+            <Row>
+              <Column>
+                <InputControl
+                  type="number"
+                  label="Upper Bound"
+                  value={configValues.measurement.upperBoundValue}
+                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
+                />
+              </Column>
+
+              <Column>
+                <InputControl
+                  type="number"
+                  label="Lower Bound"
+                  value={configValues.measurement.lowerBoundValue}
+                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
+                />
+              </Column>
             </Row>
           </ConditionalWrapper>
 

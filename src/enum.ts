@@ -625,6 +625,8 @@ export enum EErrorBarsSettings {
 	MakeSymmetrical = "makeSymmetrical",
 	UpperBoundMeasure = "upperBoundMeasure",
 	LowerBoundMeasure = "lowerBoundMeasure",
+	UpperBoundValue = "upperBoundValue",
+	LowerBoundValue = "lowerBoundValue",
 	UpperBoundPercentage = "upperBoundPercentage",
 	LowerBoundPercentage = "lowerBoundPercentage",
 	StandardDeviation = "standardDeviation",
@@ -656,7 +658,8 @@ export enum EErrorBarsCalcTypes {
 	ByField = "byField",
 	ByPercentage = "byPercentage",
 	ByPercentile = "byPercentile",
-	ByStandardDeviation = "byStandardDeviation"
+	ByStandardDeviation = "byStandardDeviation",
+	ByValue = "byValue",
 }
 
 export enum EErrorBarsDirection {

@@ -401,6 +401,8 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		makeSymmetrical: false,
 		upperBoundMeasure: undefined,
 		lowerBoundMeasure: undefined,
+		upperBoundValue: undefined,
+		lowerBoundValue: undefined,
 		upperBoundPercentage: 10,
 		lowerBoundPercentage: 10,
 		standardDeviation: 1

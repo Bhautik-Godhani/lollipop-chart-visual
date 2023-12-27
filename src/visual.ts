@@ -2696,6 +2696,13 @@ export class Visual extends Shadow {
 				case EErrorBarsCalcTypes.ByStandardDeviation: {
 					break;
 				}
+				case EErrorBarsCalcTypes.ByValue: {
+					this.isHasErrorUpperBounds = true;
+					this.isHasErrorLowerBounds = true;
+					ub = upperBoundValue = value + this.errorBarsSettings.measurement.upperBoundValue;
+					lb = lowerBoundValue = value - this.errorBarsSettings.measurement.lowerBoundValue;
+					break;
+				}
 			}
 
 			switch (this.errorBarsSettings.measurement.direction) {
