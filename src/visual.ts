@@ -4946,14 +4946,14 @@ export class Visual extends Shadow {
 		const yAxisTitle = textMeasurementService.getTailoredTextOrDefault(yAxisTitleProperties, this.height);
 
 		this.xAxisTitleText
-			.attr("fill", xAxisSettings.titleColor)
+			.attr("fill", this.getColor(xAxisSettings.titleColor, EHighContrastColorType.Foreground))
 			.attr("font-size", xAxisSettings.titleFontSize)
 			.style("font-family", xAxisSettings.titleFontFamily)
 			.style("display", xAxisSettings.isDisplayTitle ? "block" : "none")
 			.text(xAxisTitle);
 
 		this.yAxisTitleText
-			.attr("fill", yAxisSettings.titleColor)
+			.attr("fill", this.getColor(yAxisSettings.titleColor, EHighContrastColorType.Foreground))
 			.attr("font-size", yAxisSettings.titleFontSize)
 			.style("font-family", this.yAxisSettings.titleFontFamily)
 			.style("display", yAxisSettings.isDisplayTitle ? "block" : "none")
@@ -6820,8 +6820,8 @@ export class Visual extends Shadow {
 
 		pieOption.series[0].label = {
 			show: this.dataLabelsSettings.show,
-			color: this.dataLabelsSettings.color,
-			textBorderColor: this.dataLabelsSettings.borderColor,
+			color: this.getColor(this.dataLabelsSettings.color, EHighContrastColorType.Foreground),
+			textBorderColor: this.getColor(this.dataLabelsSettings.borderColor, EHighContrastColorType.Foreground),
 			textBorderWidth: this.dataLabelsSettings.borderWidth,
 			fontSize: this.getPieDataLabelsFontSize(isPie2),
 			fontFamily: this.dataLabelsSettings.fontFamily,
