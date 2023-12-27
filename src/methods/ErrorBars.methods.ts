@@ -73,10 +73,12 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     }
                 });
 
+            const barColor = errorBars.isMatchSeriesColor ? self.lineSettings.lineColor : errorBars.barColor;
+
             errorBarG
                 .append("path")
                 .attr("class", "errorBarLine")
-                .attr("fill", errorBars.barColor)
+                .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("d", function (d: any) {
@@ -87,7 +89,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("width", errorBars.markerSize)
                 .attr("height", errorBars.markerSize)
                 .attr("href", `#${errorBars.markerShape}_MARKER`)
-                .attr("fill", errorBars.barColor)
+                .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("transform", () => {
@@ -98,7 +100,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("width", errorBars.markerSize)
                 .attr("height", errorBars.markerSize)
                 .attr("href", `#${errorBars.markerShape}_MARKER`)
-                .attr("fill", errorBars.barColor)
+                .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("transform", (d: any) => {

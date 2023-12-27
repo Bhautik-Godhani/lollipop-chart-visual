@@ -351,6 +351,7 @@ export const createPatternsDefs = (self: Visual, svgRootElement) => {
 };
 
 export const createMarkerDefs = (self: Visual, svgRootElement) => {
+	const { errorBars } = self.errorBarsSettings;
 	const filterDef = svgRootElement.append("defs");
 	CATEGORY_MARKERS.map((marker) => {
 		const symbol = filterDef
@@ -361,8 +362,9 @@ export const createMarkerDefs = (self: Visual, svgRootElement) => {
 		marker.paths.forEach(path => {
 			symbol.append("path")
 				.attr("d", path.d)
-				.attr("fill", path.fill)
-				.attr("stroke", path.stroke);
+				.attr("fill", errorBars.isMatchSeriesColor ? self.lineSettings.lineColor : errorBars.barColor)
+				.attr("stroke-width", errorBars.borderSize)
+				.attr("stroke", errorBars.borderColor);
 		})
 	});
 };
