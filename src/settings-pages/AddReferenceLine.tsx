@@ -36,7 +36,7 @@ import {
   Tabs,
   Tab,
 } from "@truviz/shadow/dist/Components";
-import { BoldIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
+import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVerticalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "./SettingsIcons";
 import { ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
@@ -120,20 +120,7 @@ const ComputationTypeList: ILabelValuePair[] = [
   },
 ];
 
-const ALIGNMENT_OPTIONS = [
-  {
-    value: "left",
-    label: <FontAwesomeIcon icon={faAlignLeft} />,
-  },
-  {
-    value: "center",
-    label: <FontAwesomeIcon icon={faAlignCenter} />,
-  },
-  {
-    value: "right",
-    label: <FontAwesomeIcon icon={faAlignRight} />,
-  },
-];
+let ALIGNMENT_OPTIONS = []
 
 const Get_AXIS_NAMES = (shadow: Visual) => {
   const AXIS_NAMES: { label: string; value: string; axis: string }[] = [
@@ -821,6 +808,39 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
   };
 
   const AXIS_NAMES = Get_AXIS_NAMES(shadow);
+
+  if ((shadow as Visual).isHorizontalChart) {
+    ALIGNMENT_OPTIONS = [
+      {
+        value: "left",
+        label: <LeftAlignmentIcon fill="currentColor" />,
+      },
+      {
+        value: "center",
+        label: <CenterHorizontalAlignmentIcon fill="currentColor" />,
+      },
+      {
+        value: "right",
+        label: <RightAlignmentIcon fill="currentColor" />,
+      },
+    ];
+  } else {
+    ALIGNMENT_OPTIONS = [
+      {
+        value: "left",
+        label: <TopAlignmentIcon fill="currentColor" />,
+      },
+      {
+        value: "center",
+        label: <CenterVerticalAlignmentIcon fill="currentColor" />,
+      },
+      {
+        value: "right",
+        label: <BottomAlignmentIcon fill="currentColor" />,
+      },
+    ];
+  }
+
 
   React.useEffect(() => {
     if (!configValues.lineValue1.measureName) {
