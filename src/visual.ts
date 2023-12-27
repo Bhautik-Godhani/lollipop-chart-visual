@@ -1338,7 +1338,7 @@ export class Visual extends Shadow {
 			}, '');
 		}
 
-		if (categoricalRaceBarValues.length > 0) {
+		if (categoricalRaceBarValues.length > 0 && this.raceChartSettings.isEnabled) {
 			let raceBarKeys = [];
 			const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
 				(arr, category: string, index: number) => {
@@ -1361,7 +1361,7 @@ export class Visual extends Shadow {
 			raceBarKeys = raceBarKeys.filter((item, i, ar) => ar.indexOf(item) === i && item);
 			const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
 			const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 1);
-			this.isChartIsRaceChart = isRacePossible;
+			this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
 
 			if (this.isChartIsRaceChart) {
 				const categoricalDataPairsGroup = d3.group(categoricalDataPairsForGrouping, (d: any) => d.category);
@@ -2242,7 +2242,7 @@ export class Visual extends Shadow {
 
 			this.drawLollipopChart();
 
-			if (this.isChartIsRaceChart) {
+			if (this.isChartIsRaceChart && this.raceChartSettings.isEnabled) {
 				RenderRaceChartDataLabel(this);
 				if (!this.isTickerButtonDrawn) {
 					RenderRaceTickerButton(this);

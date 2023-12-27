@@ -322,6 +322,7 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {
+	isEnabled: true,
 	allowTransition: true,
 	transitionDuration: 500,
 	dataChangeInterval: 500,

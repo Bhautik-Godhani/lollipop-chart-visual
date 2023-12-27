@@ -424,6 +424,7 @@ export enum EMarkerSettings {
 }
 
 export enum ERaceChartSettings {
+	IsEnabled = "isEnabled",
 	AllowTransition = "allowTransition",
 	TransitionDuration = "transitionDuration",
 	DataChangeInterval = "dataChangeInterval",

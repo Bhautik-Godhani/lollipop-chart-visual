@@ -393,6 +393,7 @@ export interface IConditionalFormattingProps {
 }
 
 export interface IRaceChartSettings {
+	isEnabled: boolean;
 	allowTransition: boolean;
 	transitionDuration: number;
 	dataChangeInterval: number;
