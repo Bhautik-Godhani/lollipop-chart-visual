@@ -210,7 +210,7 @@ const ErrorBarsSettings = (props) => {
       value: EErrorBarsMarkerShape.Square,
     },
     {
-      label: "Close",
+      label: "Cross",
       value: EErrorBarsMarkerShape.Close,
     },
     {

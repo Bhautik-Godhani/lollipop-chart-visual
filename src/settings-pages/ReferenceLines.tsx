@@ -174,13 +174,14 @@ const ReferenceLines = (props) => {
   const mappedInitialState = React.useMemo(() => {
     return (initialStates || []).map((row: IReferenceLineSettings, rowIndex) => {
       let text;
-      if (row.referenceType === EReferenceType.REFERENCE_BAND) {
-        console.log(row.lineValue1.type, row);
+      const isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN";
+      const isValue2TypeNumber = parseFloat(row.lineValue2.value).toString().length > 0 && parseFloat(row.lineValue2.value).toString() !== "NaN";
 
+      if (row.referenceType === EReferenceType.REFERENCE_BAND) {
         text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
-        to ${row.lineValue2.rank}` : `at value from ${GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true)} to ${GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true)}`}`;
+        to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true) : row.lineValue2.value}`}`;
       } else {
-        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true)}`}`;
+        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value}`}`;
       }
 
       return {
