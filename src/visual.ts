@@ -4950,14 +4950,14 @@ export class Visual extends Shadow {
 			.attr("font-size", xAxisSettings.titleFontSize)
 			.style("font-family", xAxisSettings.titleFontFamily)
 			.style("display", xAxisSettings.isDisplayTitle ? "block" : "none")
-			.text(xAxisTitle);
+			.text(!this.isHorizontalChart ? xAxisTitle : yAxisTitle);
 
 		this.yAxisTitleText
 			.attr("fill", this.getColor(yAxisSettings.titleColor, EHighContrastColorType.Foreground))
 			.attr("font-size", yAxisSettings.titleFontSize)
 			.style("font-family", this.yAxisSettings.titleFontFamily)
 			.style("display", yAxisSettings.isDisplayTitle ? "block" : "none")
-			.text(yAxisTitle);
+			.text(!this.isHorizontalChart ? yAxisTitle : xAxisTitle);
 
 		if (xAxisSettings.position === Position.Bottom) {
 			this.xAxisTitleG.attr(
