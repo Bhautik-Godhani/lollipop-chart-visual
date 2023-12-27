@@ -6707,10 +6707,37 @@ export class Visual extends Shadow {
 			}
 		}
 
+		let itemStyle = {};
+
+		switch (this.markerSettings.markerChart) {
+			case EMarkerChartTypes.PIE: {
+				itemStyle = {
+					borderRadius: 0,
+					borderColor: "#fff",
+					borderWidth: 0,
+				};
+				break;
+			}
+			case EMarkerChartTypes.DONUT: {
+				itemStyle = {
+					borderRadius: 3,
+					borderColor: "#fff",
+					borderWidth: 1,
+				};
+				break;
+			}
+			case EMarkerChartTypes.ROSE: {
+				itemStyle = {
+					borderRadius: 8,
+				};
+				break;
+			}
+		}
+
 		return this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
-			itemStyle: { color: this.getColor(getPieFill(data, this.chartData[id]), EHighContrastColorType.Foreground), className: "pie-slice" },
+			itemStyle: { ...itemStyle, color: this.getColor(getPieFill(data, this.chartData[id]), EHighContrastColorType.Foreground), className: "pie-slice" },
 		}));
 	}
 
@@ -6838,34 +6865,23 @@ export class Visual extends Shadow {
 		};
 
 		const categoryValue = this.chartData.find((d) => d.category === category)[isPie2 ? "value2" : "value1"];
+
 		switch (this.markerSettings.markerChart) {
 			case EMarkerChartTypes.PIE: {
-				pieOption.series[0].itemStyle = {
-					borderRadius: 0,
-					borderColor: "#fff",
-					borderWidth: 0,
-				};
 				pieOption.series[0].roseType = "";
 				break;
 			}
 			case EMarkerChartTypes.DONUT: {
-				pieOption.series[0].itemStyle = {
-					borderRadius: 10,
-					borderColor: "#fff",
-					borderWidth: 2,
-				};
 				pieOption.series[0].roseType = "";
 				break;
 			}
 			case EMarkerChartTypes.ROSE: {
 				pieOption.series[0].roseType = "area";
 				pieOption.series[0].center = ["50%", "50%"];
-				pieOption.series[0].itemStyle = {
-					borderRadius: 8,
-				};
 				break;
 			}
 		}
+
 		return pieOption;
 	}
 
