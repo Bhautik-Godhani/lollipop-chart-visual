@@ -6732,7 +6732,9 @@ export class Visual extends Shadow {
 			}
 			case EMarkerChartTypes.ROSE: {
 				itemStyle = {
-					borderRadius: 8,
+					borderRadius: 3,
+					borderColor: "#fff",
+					borderWidth: 1,
 				};
 				break;
 			}
@@ -6758,7 +6760,7 @@ export class Visual extends Shadow {
 				return ["55%", `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`];
 			}
 			case EMarkerChartTypes.ROSE: {
-				return ["30%", `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`];
+				return ["0%", `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`];
 			}
 			default: {
 				return `${this.pieViewBoxRatio}%`;
@@ -6943,6 +6945,7 @@ export class Visual extends Shadow {
 		const valueKey = isPie2 ? "value2" : "value1";
 		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
 		const d = pieViewBoxRadius * 2;
+
 		pieForeignObjectSelection
 			.attr("id", isPie2 ? "pie2ForeignObject" : "pie1ForeignObject")
 			.attr("width", d)
