@@ -1,17 +1,17 @@
 /* eslint-disable max-lines-per-function */
 import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
-import { NumberFormatting } from "../settings";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import IValueFormatter = valueFormatter.IValueFormatter;
 import { PATTERNS } from "./patterns";
 import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
-import { TooltipData } from "../model";
-import { EDataRolesName, EIBCSSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { ILollipopChartRow, TooltipData } from "../model";
+import { ECFRankingTypes, ECFValueTypes, EDataRolesName, EIBCSSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
+import { sum } from "d3-array";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
 	if (shadow.chartSettings.isIBCSEnabled) {
@@ -451,7 +451,7 @@ export const parseConditionalFormatting = (SETTINGS) => {
 	return [];
 };
 
-export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[]) => {
+export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[], sortedChartData: ILollipopChartRow[]) => {
 	const isMeasureMatch = (el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
 		const result = { match: false, color: "", sourceName, measureType };
 		const v = +el.staticValue;
@@ -502,54 +502,89 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 				return;
 			}
 
-			if (el.applyTo === "measure") {
-				if (el.measureType.measure) {
-					if (el.measureType.measure1) {
-						result = (isMeasureMatch(el, value1, el.sourceName, EDataRolesName.Measure1));
-					} else if (el.measureType.measure2) {
-						result = isMeasureMatch(el, value2, el.sourceName, EDataRolesName.Measure2);
-					}
-				} else if (el.measureType.tooltip) {
-					const results = tooltips.map(d => isMeasureMatch(el, +d.value, d.displayName));
-					result = results.find(d => d.match && d.sourceName === el.sourceName);
-				}
-				if (result.match) {
-					return result;
-				}
-			} else if (el.applyTo === "category") {
-				const v = el.staticValue;
-				const color = el.color;
-				category = el.categoryType.category ? category : subCategory;
+			switch (el.valueType) {
+				case ECFValueTypes.Value:
+					if (el.applyTo === "measure") {
+						if (el.measureType.measure) {
+							if (el.measureType.measure1) {
+								result = (isMeasureMatch(el, value1, el.sourceName, EDataRolesName.Measure1));
+							} else if (el.measureType.measure2) {
+								result = isMeasureMatch(el, value2, el.sourceName, EDataRolesName.Measure2);
+							}
+						} else if (el.measureType.tooltip) {
+							const results = tooltips.map(d => isMeasureMatch(el, +d.value, d.displayName));
+							result = results.find(d => d.match && d.sourceName === el.sourceName);
+						}
+						if (result.match) {
+							return result;
+						}
+					} else if (el.applyTo === "category") {
+						const v = el.staticValue;
+						const color = el.color;
+						category = el.categoryType.category ? category : subCategory;
 
-				switch (el.operator) {
-					case "===":
-						result = { match: matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
-						break;
-					case "!==":
-						result = { match: !matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
-						break;
-					case "contains":
-						result = { match: category.toLowerCase().includes(v.toLowerCase()), color };
-						break;
-					case "doesnotcontain":
-						result = { match: !category.toLowerCase().includes(v.toLowerCase()), color };
-						break;
-					case "beginswith":
-						result = { match: category.toLowerCase().startsWith(v.toLowerCase()), color };
-						break;
-					case "doesnotbeginwith":
-						result = { match: !category.toLowerCase().startsWith(v.toLowerCase()), color };
-						break;
-					case "endswith":
-						result = { match: category.toLowerCase().endsWith(v.toLowerCase()), color };
-						break;
-					case "doesnotendwith":
-						result = { match: !category.toLowerCase().endsWith(v.toLowerCase()), color };
-						break;
+						switch (el.operator) {
+							case "===":
+								result = { match: matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
+								break;
+							case "!==":
+								result = { match: !matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
+								break;
+							case "contains":
+								result = { match: category.toLowerCase().includes(v.toLowerCase()), color };
+								break;
+							case "doesnotcontain":
+								result = { match: !category.toLowerCase().includes(v.toLowerCase()), color };
+								break;
+							case "beginswith":
+								result = { match: category.toLowerCase().startsWith(v.toLowerCase()), color };
+								break;
+							case "doesnotbeginwith":
+								result = { match: !category.toLowerCase().startsWith(v.toLowerCase()), color };
+								break;
+							case "endswith":
+								result = { match: category.toLowerCase().endsWith(v.toLowerCase()), color };
+								break;
+							case "doesnotendwith":
+								result = { match: !category.toLowerCase().endsWith(v.toLowerCase()), color };
+								break;
+						}
+						if (result.match) {
+							return result;
+						}
+					}
+					break;
+
+				case ECFValueTypes.Ranking:
+					if (subCategory) {
+						if (el.rankingType === ECFRankingTypes.TopN) {
+							const isHasCategory = sortedChartData.find(d => d.category === category).subCategories.slice(0, el.staticRankingValue).map(d => d.category).includes(subCategory);
+							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
+						} else if (el.rankingType === ECFRankingTypes.BottomN) {
+							const isHasCategory = sortedChartData.find(d => d.category === category).subCategories.slice(sortedChartData[0].subCategories.length - el.staticRankingValue, sortedChartData[0].subCategories.length).map(d => d.category).includes(subCategory);
+							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
+						}
+					} else {
+						if (el.rankingType === ECFRankingTypes.TopN) {
+							const isHasCategory = sortedChartData.slice(0, el.staticRankingValue).map(d => d.category).includes(category);
+							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
+						} else if (el.rankingType === ECFRankingTypes.BottomN) {
+							const isHasCategory = sortedChartData.slice(sortedChartData.length - el.staticRankingValue, sortedChartData.length).map(d => d.category).includes(category);
+							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
+						}
+					}
+					break;
+
+				case ECFValueTypes.Percentage: {
+					const total = sum(sortedChartData, d => d.value1 + d.value2);
+					const start = total * el.staticPercentValue / 100;
+					const end = total * el.secondaryStaticPercentValue / 100;
+
+					if ((value1 + (value2 ? value2 : 0)) > start && (value1 + (value2 ? value2 : 0)) < end) {
+						return { match: true, color: el.color, sourceName: el.sourceName }
+					}
 				}
-				if (result.match) {
-					return result;
-				}
+					break;
 			}
 		}
 		return { match: false, color: "" };

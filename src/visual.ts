@@ -2393,9 +2393,15 @@ export class Visual extends Shadow {
 	}
 
 	setConditionalFormattingColor(): void {
+		const clonedChartData: ILollipopChartRow[] = JSON.parse(JSON.stringify(this.chartData));
+		clonedChartData.forEach(d => {
+			d.subCategories = d.subCategories.sort((a, b) => this.isHasMultiMeasure ? (b.value1 + b.value2) - (a.value1 + a.value2) : b.value1 - a.value1);
+		})
+		const sortedChartData = clonedChartData.sort((a, b) => this.isHasMultiMeasure ? (b.value1 + b.value2) - (a.value1 + a.value2) : b.value1 - a.value1);
+
 		this.chartData.forEach((d) => {
-			if (!this.isHasSubcategories) {
-				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
+			if (this.isLollipopTypeCircle) {
+				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions, sortedChartData);
 				if (conditionalFormattingResult.match) {
 					if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
 						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
@@ -2408,15 +2414,15 @@ export class Visual extends Shadow {
 				}
 			} else {
 				d.subCategories.forEach((s) => {
-					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
+					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions, sortedChartData);
 					if (conditionalFormattingResult.match) {
 						if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
-							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[s.category].marker1Color = conditionalFormattingResult.color;
 						} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
-							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[s.category].marker2Color = conditionalFormattingResult.color;
 						} else {
-							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
-							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[s.category].marker1Color = conditionalFormattingResult.color;
+							this.subCategoryColorPair[s.category].marker2Color = conditionalFormattingResult.color;
 						}
 					}
 				});

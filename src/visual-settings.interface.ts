@@ -4,9 +4,10 @@ import {
 	CircleSize,
 	ColorPaletteType,
 	DataLabelsPlacement,
-	DisplayUnits,
 	EBeforeAfterPosition,
 	ECFApplyOnCategories,
+	ECFRankingTypes,
+	ECFValueTypes,
 	EDataLabelsBGApplyFor,
 	EDataRolesName,
 	EDynamicDeviationConnectingLineTypes,
@@ -389,7 +390,12 @@ export interface IConditionalFormattingProps {
 	secondaryStaticValue: number | string,
 	sourceName: string,
 	staticValue: string,
-	applyOnCategories: ECFApplyOnCategories[]
+	applyOnCategories: ECFApplyOnCategories[],
+	valueType: ECFValueTypes,
+	rankingType: ECFRankingTypes,
+	staticRankingValue: number,
+	staticPercentValue: number,
+	secondaryStaticPercentValue: number
 }
 
 export interface IRaceChartSettings {

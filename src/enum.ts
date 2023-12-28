@@ -822,3 +822,14 @@ export enum AxisCategoryType {
 	Continuous = "continuous",
 	Categorical = "categorical",
 }
+
+export enum ECFValueTypes {
+	Value = "value",
+	Ranking = "ranking",
+	Percentage = "percent",
+}
+
+export enum ECFRankingTypes {
+	TopN = "topN",
+	BottomN = "bottomN",
+}
