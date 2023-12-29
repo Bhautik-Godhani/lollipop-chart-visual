@@ -156,14 +156,14 @@ const ErrorBarsSettings = (props) => {
       label: "By Percentage",
       value: EErrorBarsCalcTypes.ByPercentage,
     },
-    {
-      label: "By Percentile",
-      value: EErrorBarsCalcTypes.ByPercentile,
-    },
-    {
-      label: "By Standard Deviation",
-      value: EErrorBarsCalcTypes.ByStandardDeviation,
-    },
+    // {
+    //   label: "By Percentile",
+    //   value: EErrorBarsCalcTypes.ByPercentile,
+    // },
+    // {
+    //   label: "By Standard Deviation",
+    //   value: EErrorBarsCalcTypes.ByStandardDeviation,
+    // },
     {
       label: "By Value",
       value: EErrorBarsCalcTypes.ByValue,
