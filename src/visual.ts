@@ -4426,7 +4426,7 @@ export class Visual extends Shadow {
 				});
 		} else {
 			textSelection
-				.attr("fill", dataLabelsSettings.color);
+				.attr("fill", this.getColor(dataLabelsSettings.color, EHighContrastColorType.Foreground));
 		}
 
 		if (labelPlacement === DataLabelsPlacement.Inside) {
