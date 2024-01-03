@@ -172,7 +172,7 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
 
     self.errorBarsAreaPath
         .datum(errorBarsData)
-        .classed(errorBand.lineStyle, true)
+        .attr("class", errorBand.lineStyle)
         .attr("fill", errorBand.fillColor)
         .attr("stroke", errorBand.lineColor)
         .attr("stroke-width", 1.5)
