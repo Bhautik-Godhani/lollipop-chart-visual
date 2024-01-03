@@ -20,6 +20,7 @@ export enum EVisualConfig {
 	Editor = "editor",
 	DynamicDeviationConfig = "dynamicDeviationConfig",
 	CutAndClipAxisConfig = "cutAndClipAxisConfig",
+	SmallMultiplesConfig = "smallMultiplesConfig",
 }
 
 export enum EVisualSettings {
@@ -49,6 +50,7 @@ export enum EVisualSettings {
 	BeforeIBCSSettings = "beforeIBCSSettings",
 	DynamicDeviationSettings = "dynamicDeviationSettings",
 	CutAndClipAxisSettings = "cutAndClipAxisSettings",
+	SmallMultiplesSettings = "smallMultiplesSettings",
 }
 
 export enum ELineType {
@@ -172,12 +174,14 @@ export enum EDataRolesName {
 	ImagesData = "imagesData",
 	ShowBucket = "showBucket",
 	UpperBound = "upperBound",
-	LowerBound = "lowerBound"
+	LowerBound = "lowerBound",
+	SmallMultiples = "smallMultiples",
 }
 
 export enum FontStyle {
 	Italic = "italic",
 	Bold = "bold",
+	UnderLine = "underLine",
 	None = "none",
 }
 
@@ -313,6 +317,7 @@ export enum ESortingSettings {
 	IsSortByCategory = "isSortByCategory",
 	IsSortByMeasure = "isSortByMeasure",
 	IsSortByExtraSortField = "isSortByExtraSortField",
+	SmallMultiples = "smallMultiples",
 }
 
 export enum EShowBucketSettings {

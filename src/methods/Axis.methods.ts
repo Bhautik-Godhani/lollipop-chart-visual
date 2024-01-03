@@ -1,5 +1,6 @@
 import { max as D3Max, min as D3Min } from "d3-array";
 import { Visual } from "../visual";
+import { ESmallMultiplesAxisType } from "@truviz/shadow/dist/Components";
 
 export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } => {
     const values = self.chartData.reduce((arr, d) => {
@@ -9,12 +10,17 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
     let min = +D3Min(self.isHasMultiMeasure ? values.map((val) => val) :
         self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
 
+    let max = +D3Max(self.isHasMultiMeasure ? values.map((val) => val) :
+        self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
+
+    if (self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
+        min = +self.originalCategoricalData.values[0].minLocal;
+        max = +self.originalCategoricalData.values[0].maxLocal;
+    }
+
     if (min > 0) {
         min = 0;
     }
-
-    let max = +D3Max(self.isHasMultiMeasure ? values.map((val) => val) :
-        self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
 
     if (self.yAxisSettings.isMinimumRangeEnabled && self.yAxisSettings.minimumRange) {
         min = self.yAxisSettings.minimumRange;

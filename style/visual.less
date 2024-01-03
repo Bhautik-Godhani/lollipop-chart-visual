@@ -9,7 +9,10 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
+	}
 
+	.lollipopChart,
+	.small-multiple-chart {
 		.xAxisG,
 		.yAxisG,
 		.expandAllXAxisG,
@@ -63,6 +66,10 @@
 		}
 
 		.referenceLinesContainerG {
+			pointer-events: none;
+		}
+
+		.errorBarsContainer {
 			pointer-events: none;
 		}
 	}
@@ -170,4 +177,14 @@ button.dynamic-deviation-button:hover {
 
 .dotted {
 	stroke-linecap: round;
+}
+
+.brush {
+	.overlay {
+		z-index: inherit;
+	}
+
+	.selection {
+		cursor: pointer !important;
+	}
 }

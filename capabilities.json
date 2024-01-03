@@ -24,6 +24,11 @@
 			]
 		},
 		{
+			"displayName": "Small Multiples",
+			"name": "smallMultiples",
+			"kind": "Grouping"
+		},
+		{
 			"displayName": "Race Chart Data",
 			"name": "raceChartData",
 			"kind": "Grouping"
@@ -109,6 +114,11 @@
 						{
 							"for": {
 								"in": "raceChartData"
+							}
+						},
+						{
+							"for": {
+								"in": "smallMultiples"
 							}
 						}
 					],
@@ -316,6 +326,18 @@
 			"properties": {
 				"sorting": {
 					"displayName": "Sorting",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
+		"smallMultiplesConfig": {
+			"displayName": "Small Multiples Configuration",
+			"properties": {
+				"smallMultiplesSettings": {
+					"displayName": "Small Multiples Settings",
 					"description": "",
 					"type": {
 						"text": true

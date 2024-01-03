@@ -30,6 +30,7 @@ export class Enumeration {
 			dynamicDeviationSelection(),
 			getTrendLinesSelection(),
 			cutAndClipAxisSelection(),
+			getSmallMultiplesSelection(),
 		];
 	}
 }
@@ -506,6 +507,19 @@ function dynamicDeviationSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "dynamicDeviationSettings",
+				isShow: true,
+			}
+		]
+	}
+}
+
+function getSmallMultiplesSelection(): EnumerateSectionType {
+	return {
+		name: "smallMultiplesConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "smallMultiplesSettings",
 				isShow: true,
 			},
 		],

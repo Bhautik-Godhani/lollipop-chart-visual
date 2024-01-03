@@ -57,6 +57,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public IBCSConfig = new IBCSConfig();
 	public dynamicDeviationConfig = new DynamicDeviationConfig();
 	public cutAndClipAxisConfig = new CutAndClipAxisConfig();
+	public smallMultiplesConfig = new SmallMultiplesConfig();
 }
 
 export class License {
@@ -176,4 +177,7 @@ export class DynamicDeviationConfig {
 
 export class CutAndClipAxisConfig {
 	public cutAndClipAxisSettings: string = "{}";
+}
+export class SmallMultiplesConfig {
+	public smallMultiplesSettings: string = "{}";
 }

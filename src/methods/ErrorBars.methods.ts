@@ -189,8 +189,8 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
                 "d",
                 area()
                     .y((d: any) => self.getYPosition(d.category) + self.scaleBandWidth / 2)
-                    .x0((d: any) => self.getXPosition(d.lowerBoundValue ? d.lowerBoundValue : d.value))
-                    .x1((d: any) => self.getXPosition(d.upperBoundValue ? d.upperBoundValue : d.value))
+                    .x0((d: any) => self.getXPosition(d.lowerBoundValue ? d.lowerBoundValue : 0))
+                    .x1((d: any) => self.getXPosition(d.upperBoundValue ? d.upperBoundValue : 0))
             );
     } else {
         self.errorBarsAreaPath
@@ -198,8 +198,8 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
                 "d",
                 area()
                     .x((d: any) => self.getXPosition(d.category) + self.scaleBandWidth / 2)
-                    .y0((d: any) => self.getYPosition(d.lowerBoundValue ? d.lowerBoundValue : d.value))
-                    .y1((d: any) => self.getYPosition(d.upperBoundValue ? d.upperBoundValue : d.value))
+                    .y0((d: any) => self.getYPosition(d.lowerBoundValue ? d.lowerBoundValue : 0))
+                    .y1((d: any) => self.getYPosition(d.upperBoundValue ? d.upperBoundValue : 0))
             );
     }
 }
