@@ -39,7 +39,6 @@ import {
 } from "./enum";
 import {
 	EInsideTextColorTypes,
-	IBCSSettings,
 	IBrushAndZoomAreaSettings,
 	IChartSettings,
 	ICirclePropsSettings,
@@ -442,12 +441,6 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		labelFormat: EErrorBarsLabelFormat.Absolute
 	}
 };
-
-export const IBCS_SETTINGS: IBCSSettings = {
-	isIBCSEnabled: false,
-	theme: undefined,
-	prevTheme: undefined
-}
 
 export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	isEnabled: false,

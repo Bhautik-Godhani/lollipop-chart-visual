@@ -4,9 +4,9 @@ import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
 import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, Accordion, Label } from "@truviz/shadow/dist/Components";
 import { IChartSettings, ILabelValuePair } from "../visual-settings.interface";
 import { Visual } from "../visual";
-import { persistProperties } from "../methods/methods";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { DashedLineIcon, DottedLineIcon, IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon, SolidLineIcon } from "./SettingsIcons";
+import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
 
 const ORIENTATIONS: ILabelValuePair[] = [
 	{
@@ -318,7 +318,33 @@ const ChartSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		configValues.prevTheme = shadow.chartSettings.theme;
+
+		// if (configValues.theme) {
+		// 	configValues.isIBCSEnabled = true;
+		// } else {
+		// 	ApplyBeforeIBCSAppliedSettingsBack(shadow);
+		// }
+
+		if (configValues.isIBCSEnabled !== shadow.chartSettings.isIBCSEnabled || configValues.theme !== shadow.chartSettings.theme) {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		} else {
+			if (configValues.isIBCSEnabled) {
+				const newConfigValues = {
+					...configValues,
+					[EChartSettings.IsIBCSEnabled]: false,
+					[EChartSettings.Theme]: undefined,
+					[EChartSettings.PrevTheme]: undefined,
+				};
+				ApplyBeforeIBCSAppliedSettingsBack(shadow);
+				shadow.persistProperties(sectionName, propertyName, newConfigValues);
+			} else {
+				configValues.theme = undefined;
+				configValues.prevTheme = undefined;
+				shadow.persistProperties(sectionName, propertyName, configValues);
+			}
+		}
+
 		closeCurrentSettingHandler();
 	};
 
@@ -337,6 +363,13 @@ const ChartSettings = (props) => {
 			handleChange(Math.ceil(shadow.scaleBandWidth), EChartSettings.lollipopWidth, setConfigValues)
 		}
 	}, []);
+
+	React.useEffect(() => {
+		if (configValues.isIBCSEnabled && configValues.theme === undefined) {
+			handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues);
+		}
+	}, [configValues.isIBCSEnabled])
+
 
 	return (
 		<>

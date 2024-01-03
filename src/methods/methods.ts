@@ -8,7 +8,7 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { ILollipopChartRow, TooltipData } from "../model";
-import { ECFRankingTypes, ECFValueTypes, EDataRolesName, EIBCSSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { ECFRankingTypes, ECFValueTypes, EChartSettings, EDataRolesName, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { sum } from "d3-array";
@@ -29,14 +29,14 @@ export const persistProperties = (shadow: Visual, configName: EVisualConfig, set
 				selector: null,
 			},
 			{
-				objectName: EVisualConfig.IBCSConfig,
-				displayName: EVisualSettings.IBCSSettings,
+				objectName: EVisualConfig.ChartConfig,
+				displayName: EVisualSettings.ChartSettings,
 				properties: {
-					[EVisualSettings.IBCSSettings]: JSON.stringify({
+					[EVisualSettings.ChartSettings]: JSON.stringify({
 						...shadow.chartSettings,
-						[EIBCSSettings.IsIBCSEnabled]: false,
-						[EIBCSSettings.Theme]: undefined,
-						[EIBCSSettings.PrevTheme]: undefined,
+						[EChartSettings.IsIBCSEnabled]: false,
+						[EChartSettings.Theme]: undefined,
+						[EChartSettings.PrevTheme]: undefined,
 					}),
 				},
 				selector: null,

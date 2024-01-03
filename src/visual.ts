@@ -590,7 +590,6 @@ export class Visual extends Shadow {
 	raceChartSettings: IRaceChartSettings;
 	referenceLinesSettings: IReferenceLineSettings[] = [];
 	errorBarsSettings: IErrorBarsSettings;
-	// IBCSSettings: IBCSSettings;
 	dynamicDeviationSettings: IDynamicDeviationSettings;
 	lastDynamicDeviationSettings: IDynamicDeviationSettings;
 	cutAndClipAxisSettings: ICutAndClipAxisSettings;
@@ -732,12 +731,6 @@ export class Visual extends Shadow {
 					Component: () => CutAndClipAxisSettings,
 					icon: CutAndClipAxisIcon
 				},
-				// {
-				// 	name: "IBCS Themes",
-				// 	sectionName: EVisualConfig.IBCSConfig,
-				// 	propertyName: EVisualSettings.IBCSSettings,
-				// 	Component: () => IBCSSettingsComponent,
-				// },
 				{
 					name: "X Axis",
 					sectionName: EVisualConfig.XAxisConfig,
@@ -3448,12 +3441,6 @@ export class Visual extends Shadow {
 			...ERROR_BARS_SETTINGS,
 			...errorBarsConfig,
 		};
-
-		// const IBCSConfig: IBCSSettings = JSON.parse(formatTab[EVisualConfig.IBCSConfig][EVisualSettings.IBCSSettings]);
-		// this.IBCSSettings = {
-		// 	...IBCS_SETTINGS,
-		// 	...IBCSConfig,
-		// };
 
 		this.beforeIBCSSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeIBCSSettings]);
 

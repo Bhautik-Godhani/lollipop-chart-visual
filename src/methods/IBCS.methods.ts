@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { SORTING_SETTINGS } from "../constants";
-import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
+import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
 import { Visual } from "../visual";
 import { IChartSettings, IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
@@ -9,7 +9,7 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeIBCSSettings;
 
     const markerSettings: IMarkerSettings = beforeIBCSSettings[EVisualSettings.MarkerSettings].configValues;
-    const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
+    // const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
     const dataLabelsSettings: IDataLabelsSettings = beforeIBCSSettings[EVisualSettings.DataLabelsSettings].configValues;
     const xAxisSettings: IXAxisSettings = beforeIBCSSettings[EVisualSettings.XAxisSettings].configValues;
     const yAxisSettings: IYAxisSettings = beforeIBCSSettings[EVisualSettings.YAxisSettings].configValues;
@@ -22,14 +22,19 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
 
     self._host.persistProperties({
         merge: [
-            {
-                objectName: EVisualConfig.ChartConfig,
-                displayName: EVisualSettings.ChartSettings,
-                properties: {
-                    [EVisualSettings.ChartSettings]: JSON.stringify(chartSettings),
-                },
-                selector: null,
-            },
+            // {
+            //     objectName: EVisualConfig.ChartConfig,
+            //     displayName: EVisualSettings.ChartSettings,
+            //     properties: {
+            //         [EVisualSettings.ChartSettings]: JSON.stringify({
+            //             ...chartSettings,
+            //             [EIBCSSettings.IsIBCSEnabled]: false,
+            //             [EIBCSSettings.Theme]: undefined,
+            //             [EIBCSSettings.PrevTheme]: undefined,
+            //         }),
+            //     },
+            //     selector: null,
+            // },
             {
                 objectName: EVisualConfig.LineConfig,
                 displayName: EVisualSettings.LineSettings,
@@ -143,6 +148,8 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.ChartSettings]: JSON.stringify({
                         ...self.chartSettings,
+                        [EChartSettings.IsIBCSEnabled]: true,
+                        [EChartSettings.PrevTheme]: self.chartSettings.theme,
                         [EChartSettings.isShowZeroBaseLine]: true,
                         [EChartSettings.orientation]:
                             (self.chartSettings.theme === EIBCSThemes.DefaultHorizontal ||
@@ -273,18 +280,6 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 },
                 selector: null,
             },
-            {
-                objectName: EVisualConfig.IBCSConfig,
-                displayName: EVisualSettings.IBCSSettings,
-                properties: {
-                    [EVisualSettings.IBCSSettings]: JSON.stringify({
-                        ...self.chartSettings,
-                        [EIBCSSettings.IsIBCSEnabled]: true,
-                        [EIBCSSettings.PrevTheme]: self.chartSettings.theme
-                    }),
-                },
-                selector: null,
-            }
         ],
     });
 }

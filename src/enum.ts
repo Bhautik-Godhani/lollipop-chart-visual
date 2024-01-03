@@ -681,12 +681,6 @@ export enum EErrorBandFillTypes {
 	FillAndLine = "fillLine",
 }
 
-export enum EIBCSSettings {
-	IsIBCSEnabled = "isIBCSEnabled",
-	Theme = "theme",
-	PrevTheme = "prevTheme"
-}
-
 export enum EIBCSThemes {
 	DefaultVertical = "defaultVertical",
 	DefaultHorizontal = "defaultHorizontal",
