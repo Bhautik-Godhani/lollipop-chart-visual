@@ -364,7 +364,8 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 	},
 	labelStyle: {
 		labelNameType: EReferenceLineNameTypes.VALUE,
-		label: "Reference Line",
+		lineLabel: "Reference Line",
+		bandLabel: "Reference Band",
 		labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 		labelColor: "rgba(0,0,0,1)",
 		isShowLabelBackground: true,

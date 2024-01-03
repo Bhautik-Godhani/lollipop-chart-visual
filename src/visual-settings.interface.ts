@@ -437,7 +437,8 @@ export interface IReferenceLineLabelStyleProps {
 	labelNameType: EReferenceLineNameTypes;
 	textAnchor?: string;
 	textAlignment?: string;
-	label: string;
+	lineLabel: string;
+	bandLabel: string;
 	labelFontFamily: string;
 	labelColor: string;
 	isShowLabelBackground: boolean;

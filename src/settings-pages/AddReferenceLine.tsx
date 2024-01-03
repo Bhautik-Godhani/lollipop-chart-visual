@@ -438,7 +438,7 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
   </>
 }
 
-const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
+const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <Accordion title="Label Styles" childBottomPadding>
     <Row>
       <Column>
@@ -456,9 +456,9 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVa
         <Column>
           <InputControl
             type="text"
-            value={configValues.label}
+            value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
             handleChange={(value: any) => {
-              handleChange(value, "label", EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+              handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
             }}
             min={1}
             label="Label Text"
@@ -659,7 +659,7 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
     </Accordion>
 
-    {UILabelStyles(vizOptions, shadow, configValues.labelStyle, handleChange, handleCheckbox)}
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
   </>
 }
 
@@ -680,7 +680,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
     </Accordion>
 
-    {UILabelStyles(vizOptions, shadow, configValues.labelStyle, handleChange, handleCheckbox)}
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
     {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
   </>
 }

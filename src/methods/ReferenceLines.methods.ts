@@ -89,11 +89,12 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
     const getLabelText = (d: IReferenceLineSettings): string => {
         const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
+        const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
         switch (d.labelStyle.labelNameType) {
             case EReferenceLineNameTypes.TEXT:
-                return d.labelStyle.label;
+                return labelText;
             case EReferenceLineNameTypes.TEXT_VALUE:
-                return d.labelStyle.label + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
+                return labelText + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
             case EReferenceLineNameTypes.VALUE:
                 return isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value;
         }
