@@ -2441,6 +2441,8 @@ export class Visual extends Shadow {
 				// createMarkerDefs(this, this.svg);
 				// this.createErrorBarsMarkerDefs();
 
+				RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+
 				const onLollipopClick = (ele: D3Selection<SVGElement>) => {
 					this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
 				}
@@ -2456,10 +2458,6 @@ export class Visual extends Shadow {
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
 			this.createErrorBarsMarkerDefs();
-
-			if (!this.isSmallMultiplesEnabled) {
-				RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
-			}
 		} catch (error) {
 			console.error("Error", error);
 		}
@@ -7105,7 +7103,7 @@ export class Visual extends Shadow {
 				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 
 				d.subCategories.forEach(s => {
-					s.defaultValue = d.valueType === DataValuesType.Value1 ? s.value1 : s.value2;
+					s.defaultValue = isPie2 ? s.value2 : s.value1;
 					s.valueType = d.valueType;
 				})
 
@@ -7118,8 +7116,8 @@ export class Visual extends Shadow {
 					})
 				})
 
-				ele.selectAll("path").attr("id", (pieData: IChartSubCategory) => {
-					return pieData.valueType === DataValuesType.Value1 ? PieType.Pie1 : PieType.Pie2;
+				ele.selectAll("path").attr("id", () => {
+					return isPie2 ? PieType.Pie2 : PieType.Pie1;
 				});
 
 				ele.selectAll("path").attr("class", () => {
@@ -7239,6 +7237,11 @@ export class Visual extends Shadow {
 				const ePieChart = echarts.init(ele.node());
 				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 				ePieChart.resize();
+
+				d.subCategories.forEach(s => {
+					s.defaultValue = isPie2 ? s.value2 : s.value1;
+					s.valueType = d.valueType;
+				})
 
 				ele.selectAll("path").data(d.subCategories);
 				ele.selectAll("path").each(function () {
