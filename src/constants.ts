@@ -464,7 +464,7 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	isAutoConnectorColor: true,
 	connectorPositiveColor: "rgba(142, 185, 0, 1)",
 	connectorNegativeColor: "rgba(255, 0, 10, 1)",
-	connectorWidth: 5,
+	connectorWidth: 3,
 	connectingLineColor: "rgba(0, 0, 0, 1)",
 	connectingLineWidth: 3,
 	isShowStartIndicator: true,
