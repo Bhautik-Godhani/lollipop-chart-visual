@@ -176,16 +176,18 @@ const XAxisSettings = (props) => {
           </Row>
         </ConditionalWrapper>
 
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Invert Range"}
-              value={configValues.isInvertRange}
-              handleChange={() => handleCheckbox(EXAxisSettings.IsInvertRange)}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
+        <ConditionalWrapper visible={!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && configValues.categoryType === AxisCategoryType.Continuous}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Invert Range"}
+                value={configValues.isInvertRange}
+                handleChange={() => handleCheckbox(EXAxisSettings.IsInvertRange)}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
         <ConditionalWrapper visible={configValues.categoryType === AxisCategoryType.Continuous}>
           <Row>
@@ -421,7 +423,7 @@ const XAxisSettings = (props) => {
             </Row>
           </ConditionalWrapper>
         </ConditionalWrapper>
-      </ConditionalWrapper>
+      </ConditionalWrapper >
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}

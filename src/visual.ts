@@ -7445,6 +7445,46 @@ export class Visual extends Shadow {
 	}
 
 	setSummaryTableConfig(): void {
+		const seedDataFromVisual = [];
+
+		if (!this.isHasSubcategories) {
+			this.categoricalData.categories[0].values.forEach((d, i) => {
+				const obj = {};
+
+				this.categoricalData.categories.forEach(c => {
+					obj[c.source.displayName] = c.values[i] ? c.values[i] : 0;
+				});
+
+				this.categoricalData.values.forEach(v => {
+					obj[v.source.displayName] = v.values[i] ? v.values[i] : 0;
+				});
+
+				seedDataFromVisual.push(obj);
+			});
+		} else {
+			const group = d3.group(this.categoricalData.values, d => d.source.groupName);
+
+			this.categoricalData.categories[0].values.forEach((d, i) => {
+				[...group.keys()].forEach(g => {
+					const obj = {};
+
+					this.categoricalData.categories.forEach(c => {
+						obj[c.source.displayName] = c.values[i] ? c.values[i] : 0;
+					});
+
+					obj[this.categoricalSubCategoryField.displayName] = g;
+
+					const groupBy = group.get(g);
+
+					groupBy.forEach(d => {
+						obj[d.source.displayName] = d.values[i] ? d.values[i] : 0;
+					});
+
+					seedDataFromVisual.push(obj);
+				});
+			});
+		}
+
 		this.summaryTableConfig = {
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
 			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
@@ -7455,23 +7495,24 @@ export class Visual extends Shadow {
 				sidebar: { columns: true, filters: true },
 				allowedAggregations: true,
 			},
-			numberFormatter: (value, field) => {
-				if (this.isHasSubcategories) {
-					field = field.split("_").splice(3).join("_");
-				}
+			seedDataFromVisual: seedDataFromVisual,
+			// numberFormatter: (value, field) => {
+			// 	if (this.isHasSubcategories) {
+			// 		field = field.split("_").splice(3).join("_");
+			// 	}
 
-				if (this.imagesDataFieldsName.includes(field)) {
-					return value;
-				}
+			// 	if (this.imagesDataFieldsName.includes(field)) {
+			// 		return value;
+			// 	}
 
-				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
-					return this.numberSettings.show
-						? this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter, true, true)
-						: powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
-				} else {
-					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
-				}
-			},
+			// 	if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
+			// 		return this.numberSettings.show
+			// 			? this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter, true, true)
+			// 			: powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+			// 	} else {
+			// 		return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+			// 	}
+			// },
 			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
 			viewport: {
 				width: this.vizOptions.options.viewport.width,
@@ -7479,43 +7520,43 @@ export class Visual extends Shadow {
 			},
 		};
 
-		if (this.rankingSettings.category.enabled) {
-			this.summaryTableConfig = {
-				...this.summaryTableConfig,
-				matrixRanking: {
-					row: {
-						rank: this.rankingSettings.category.rankingType,
-						count: this.rankingSettings.category.count,
-					},
-					column: {
-						rank: this.rankingSettings.subCategory.rankingType,
-						count: this.rankingSettings.subCategory.count,
-					},
-				},
-			};
-		}
+		// if (this.rankingSettings.category.enabled) {
+		// 	this.summaryTableConfig = {
+		// 		...this.summaryTableConfig,
+		// 		matrixRanking: {
+		// 			row: {
+		// 				rank: this.rankingSettings.category.rankingType,
+		// 				count: this.rankingSettings.category.count,
+		// 			},
+		// 			column: {
+		// 				rank: this.rankingSettings.subCategory.rankingType,
+		// 				count: this.rankingSettings.subCategory.count,
+		// 			},
+		// 		},
+		// 	};
+		// }
 
-		if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
-			const matrixSorting = { row: [], column: [] };
-			if (this.sortingSettings.category.enabled) {
-				matrixSorting.row.push({
-					column: this.sortingSettings.category.sortBy,
-					order: +this.sortingSettings.category.sortOrder === 1 ? "asc" : "desc",
-				});
-			}
+		// if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
+		// 	const matrixSorting = { row: [], column: [] };
+		// 	if (this.sortingSettings.category.enabled) {
+		// 		matrixSorting.row.push({
+		// 			column: this.sortingSettings.category.sortBy,
+		// 			order: +this.sortingSettings.category.sortOrder === 1 ? "asc" : "desc",
+		// 		});
+		// 	}
 
-			if (this.sortingSettings.subCategory.enabled) {
-				matrixSorting.column.push({
-					column: this.sortingSettings.subCategory.sortBy,
-					order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc",
-				});
-			}
+		// 	if (this.sortingSettings.subCategory.enabled) {
+		// 		matrixSorting.column.push({
+		// 			column: this.sortingSettings.subCategory.sortBy,
+		// 			order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc",
+		// 		});
+		// 	}
 
-			this.summaryTableConfig = {
-				...this.summaryTableConfig,
-				matrixSorting: matrixSorting,
-			};
-		}
+		// 	this.summaryTableConfig = {
+		// 		...this.summaryTableConfig,
+		// 		matrixSorting: matrixSorting,
+		// 	};
+		// }
 	}
 
 	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields): void {
