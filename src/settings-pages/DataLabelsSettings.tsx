@@ -499,10 +499,20 @@ const DataLabelsSettings = (props) => {
 	// }
 
 	React.useEffect(() => {
-		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !dataLabelsSettings.showBackground) {
+		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !configValues.showBackground) {
+			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		}
+
+		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 	}, []);
+
+	React.useEffect(() => {
+		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		}
+	}, [configValues.placement, configValues.textColorTypes]);
 
 	return (
 		<>

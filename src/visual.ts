@@ -4407,7 +4407,7 @@ export class Visual extends Shadow {
 		if (labelPlacement === DataLabelsPlacement.Inside) {
 			textSelection
 				.attr("fill", d => {
-					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.color, EHighContrastColorType.Foreground)
+					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, false) : this.dataLabelsSettings.color, EHighContrastColorType.Foreground)
 				});
 		} else {
 			textSelection
@@ -4432,7 +4432,7 @@ export class Visual extends Shadow {
 				.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
 				.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 				.attr("stroke", d =>
-					this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, false) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+					this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
 				.attr("stroke-width", 3)
 				.attr("stroke-linejoin", "round")
 				.style("text-anchor", "middle")

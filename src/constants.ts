@@ -122,13 +122,13 @@ export const LINE_SETTINGS: ILineSettings = {
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	show: true,
-	color: "#fff",
+	color: "rgba(93, 93, 93, 1)",
 	borderColor: "rgba(255, 255, 255,1)",
 	borderWidth: 1,
 	orientation: Orientation.Horizontal,
 	fontSize: 12,
 	fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
-	showBackground: true,
+	showBackground: false,
 	backgroundColor: "rgba(93, 93, 93, 1)",
 	fontStyle: [],
 	placement: DataLabelsPlacement.Outside,
