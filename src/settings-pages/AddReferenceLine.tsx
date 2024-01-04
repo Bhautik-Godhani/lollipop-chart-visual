@@ -168,39 +168,65 @@ const Get_AXIS_NAMES = (shadow: Visual) => {
   return AXIS_NAMES;
 }
 
-const Get_LABEL_POSITION = (shadow: Visual) => {
+const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings) => {
   let LABEL_POSITION: ILabelValuePair[] = [];
 
-  if (!shadow.isHorizontalChart) {
-    LABEL_POSITION = [
-      {
-        label: "BEFORE",
-        value: EBeforeAfterPosition.Before,
-      },
-      {
-        label: "CENTER",
-        value: EBeforeAfterPosition.Center,
-      },
-      {
-        label: "AFTER",
-        value: EBeforeAfterPosition.After,
-      },
-    ];
+  if (configValues.referenceType === EReferenceType.REFERENCE_LINE) {
+    if (!shadow.isHorizontalChart) {
+      LABEL_POSITION = [
+        {
+          label: "BEFORE",
+          value: EBeforeAfterPosition.Before,
+        },
+        {
+          label: "AFTER",
+          value: EBeforeAfterPosition.After,
+        },
+      ];
+    } else {
+      LABEL_POSITION = [
+        {
+          label: "TOP",
+          value: EBeforeAfterPosition.Before,
+        },
+        {
+          label: "BELOW",
+          value: EBeforeAfterPosition.After,
+        },
+      ];
+    }
   } else {
-    LABEL_POSITION = [
-      {
-        label: "TOP",
-        value: EBeforeAfterPosition.Before,
-      },
-      {
-        label: "CENTER",
-        value: EBeforeAfterPosition.Center,
-      },
-      {
-        label: "BELOW",
-        value: EBeforeAfterPosition.After,
-      },
-    ];
+    if (!shadow.isHorizontalChart) {
+      LABEL_POSITION = [
+        {
+          label: "BEFORE",
+          value: EBeforeAfterPosition.Before,
+        },
+        {
+          label: "CENTER",
+          value: EBeforeAfterPosition.Center,
+        },
+        {
+          label: "AFTER",
+          value: EBeforeAfterPosition.After,
+        },
+      ];
+    } else {
+      LABEL_POSITION = [
+        {
+          label: "TOP",
+          value: EBeforeAfterPosition.Before,
+        },
+        {
+          label: "CENTER",
+          value: EBeforeAfterPosition.Center,
+        },
+        {
+          label: "BELOW",
+          value: EBeforeAfterPosition.After,
+        },
+      ];
+    }
   }
 
   return LABEL_POSITION;
@@ -564,7 +590,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
         </Column>
       </Row>
 
-      {UILabelStyles1(shadow, configValues, handleChange)}
+      {UILabelStyles1(shadow, config, configValues, handleChange)}
     </ConditionalWrapper>
   </Accordion>
 }
@@ -598,8 +624,8 @@ const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVal
   </Accordion>
 }
 
-const UILabelStyles1 = (shadow: Visual, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any) => {
-  const LABEL_POSITION: ILabelValuePair[] = Get_LABEL_POSITION(shadow);
+const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any) => {
+  const LABEL_POSITION: ILabelValuePair[] = Get_LABEL_POSITION(shadow, config);
 
   return <>
     <ConditionalWrapper visible={!configValues.autoFontSize}>
@@ -882,6 +908,12 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
       setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
     }
   }, [configValues.lineValue2.measureName]);
+
+  React.useEffect(() => {
+    if (configValues.referenceType === EReferenceType.REFERENCE_LINE && configValues.labelStyle.labelPosition === EBeforeAfterPosition.Center) {
+      handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle)
+    }
+  }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
 
   return (
     <>
