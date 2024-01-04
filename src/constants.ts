@@ -452,7 +452,7 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	position: Position.Right,
 	labelDisplayType: EDynamicDeviationLabelDisplayTypes.Value,
 	labelFontSize: 12,
-	labelFontColor: "rgba(102,102,102,1)",
+	labelFontColor: "rgba(255,255,255,1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	isShowLabelBorder: false,
 	borderWidth: 2,
