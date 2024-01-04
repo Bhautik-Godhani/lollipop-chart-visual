@@ -5933,7 +5933,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x1", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis || !this.xAxisSettings.isInvertRange) {
+				if (!this.isLeftYAxis || this.xAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
 						return this.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
@@ -5964,7 +5964,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("x2", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis || !this.xAxisSettings.isInvertRange) {
+				if (!this.isLeftYAxis || this.xAxisSettings.isInvertRange) {
 					if (d.value1 > d.value2) {
 						const Y1 = THIS.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 						const Y2 = THIS.getXPosition(d.value2);
