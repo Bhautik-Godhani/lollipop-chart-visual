@@ -434,6 +434,7 @@ export interface IReferenceLineStyleProps {
 }
 
 export interface IReferenceLineLabelStyleProps {
+	show: boolean,
 	labelNameType: EReferenceLineNameTypes;
 	textAnchor?: string;
 	textAlignment?: string;

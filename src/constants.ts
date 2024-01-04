@@ -362,6 +362,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		linePlacement: EReferenceLineType.FRONT
 	},
 	labelStyle: {
+		show: true,
 		labelNameType: EReferenceLineNameTypes.VALUE,
 		lineLabel: "Reference Line",
 		bandLabel: "Reference Band",

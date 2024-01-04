@@ -442,117 +442,130 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
   return <Accordion title="Label Styles" childBottomPadding>
     <Row>
       <Column>
-        <SelectInput
-          label={"Label Types"}
-          value={configValues.labelNameType}
-          optionsList={LABEL_NAME_TYPES}
-          handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
-        />
-      </Column>
-    </Row>
-
-    <ConditionalWrapper visible={configValues.labelNameType !== EReferenceLineNameTypes.VALUE}>
-      <Row>
-        <Column>
-          <InputControl
-            type="text"
-            value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
-            handleChange={(value: any) => {
-              handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
-            }}
-            min={1}
-            label="Label Text"
-          />
-        </Column>
-      </Row>
-    </ConditionalWrapper>
-
-    <Row>
-      <Column>
-        <ColorPicker
-          label={"Color"}
-          color={configValues.labelColor}
-          handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle)}
-          colorPalette={vizOptions.host.colorPalette}
-          size="sm"
-        />
-      </Column>
-    </Row>
-
-    <Row>
-      <Column>
         <ToggleButton
-          label="Show Background"
-          value={configValues.isShowLabelBackground}
-          handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle)}
+          label="Show Labels"
+          value={configValues.show}
+          handleChange={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
           appearance="toggle"
         />
       </Column>
     </Row>
 
-    <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+    <ConditionalWrapper visible={configValues.show}>
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Label Types"}
+            value={configValues.labelNameType}
+            optionsList={LABEL_NAME_TYPES}
+            handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={configValues.labelNameType !== EReferenceLineNameTypes.VALUE}>
+        <Row>
+          <Column>
+            <InputControl
+              type="text"
+              value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
+              handleChange={(value: any) => {
+                handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+              }}
+              min={1}
+              label="Label Text"
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
       <Row>
         <Column>
           <ColorPicker
-            label={"Background"}
-            color={configValues.labelBackgroundColor}
-            handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle)}
+            label={"Color"}
+            color={configValues.labelColor}
+            handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle)}
             colorPalette={vizOptions.host.colorPalette}
             size="sm"
           />
         </Column>
       </Row>
+
+      <Row>
+        <Column>
+          <ToggleButton
+            label="Show Background"
+            value={configValues.isShowLabelBackground}
+            handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle)}
+            appearance="toggle"
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+        <Row>
+          <Column>
+            <ColorPicker
+              label={"Background"}
+              color={configValues.labelBackgroundColor}
+              handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle)}
+              colorPalette={vizOptions.host.colorPalette}
+              size="sm"
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Font Family"}
+            value={configValues.labelFontFamily}
+            isFontSelector={true}
+            optionsList={[]}
+            handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <SwitchOption
+            label="Styling"
+            value={configValues.styling}
+            optionsList={[
+              {
+                label: <BoldIcon style={{ fill: "currentColor" }} />,
+                value: "bold",
+              },
+              {
+                label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                value: "italic",
+              },
+              {
+                label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                value: "underline",
+              },
+            ]}
+            isMultiple
+            handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <ToggleButton
+            label="Auto Font Size"
+            value={configValues.autoFontSize}
+            handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
+            appearance="toggle"
+          />
+        </Column>
+      </Row>
+
+      {UILabelStyles1(shadow, configValues, handleChange)}
     </ConditionalWrapper>
-
-    <Row>
-      <Column>
-        <SelectInput
-          label={"Font Family"}
-          value={configValues.labelFontFamily}
-          isFontSelector={true}
-          optionsList={[]}
-          handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
-        />
-      </Column>
-    </Row>
-
-    <Row>
-      <Column>
-        <SwitchOption
-          label="Styling"
-          value={configValues.styling}
-          optionsList={[
-            {
-              label: <BoldIcon style={{ fill: "currentColor" }} />,
-              value: "bold",
-            },
-            {
-              label: <ItalicIcon style={{ fill: "currentColor" }} />,
-              value: "italic",
-            },
-            {
-              label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-              value: "underline",
-            },
-          ]}
-          isMultiple
-          handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
-        />
-      </Column>
-    </Row>
-
-    <Row>
-      <Column>
-        <ToggleButton
-          label="Auto Font Size"
-          value={configValues.autoFontSize}
-          handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
-          appearance="toggle"
-        />
-      </Column>
-    </Row>
-
-    {UILabelStyles1(shadow, configValues, handleChange)}
   </Accordion>
 }
 

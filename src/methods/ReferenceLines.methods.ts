@@ -39,7 +39,12 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
             }
 
             const texts = referenceLinesG.append("text").attr("class", "referenceLineText");
-            FormattingReferenceLineText(self, texts);
+
+            if (d.labelStyle.show) {
+                FormattingReferenceLineText(self, texts);
+            } else {
+                texts.attr("display", "none");
+            }
 
             if (d && d.referenceType === EReferenceType.REFERENCE_BAND && d.bandStyle.isShowBackgroundColor) {
                 const bandRect = referenceLinesG.append("rect").attr("class", "referenceBand");
@@ -101,6 +106,7 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
     }
 
     textSelection
+        .attr("display", "block")
         .text((d: IReferenceLineSettings) => getLabelText(d))
         .attr("x", (d: IReferenceLineSettings) => {
             if (d.lineValue1.axis === EXYAxisNames.X) {

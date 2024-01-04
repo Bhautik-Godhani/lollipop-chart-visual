@@ -480,6 +480,7 @@ export enum EReferenceLineNameTypes {
 }
 
 export enum EReferenceLineLabelStyleProps {
+	Show = "show",
 	LabelNameType = "labelNameType",
 	TextAnchor = "textAnchor",
 	TextAlignment = "textAlignment",
