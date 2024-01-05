@@ -2308,7 +2308,7 @@ export class Visual extends Shadow {
 					}));
 				}
 
-				this.configLegend();
+				// this.configLegend();
 				this.setMargins();
 
 				this.smallMultiplesGridContainer.selectAll("*").remove();
@@ -2371,6 +2371,8 @@ export class Visual extends Shadow {
 				}
 
 				this.drawLollipopChart();
+
+				this.configLegend();
 
 				if (this.isChartIsRaceChart) {
 					RenderRaceChartDataLabel(this);
@@ -3151,14 +3153,17 @@ export class Visual extends Shadow {
 								pattern: undefined
 							},
 						},
-						{
+					]
+
+					if (this.isHasNegativeValue) {
+						legendDataPoints.push({
 							data: {
 								name: "Negative",
 								color: this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground),
 								pattern: undefined
 							},
-						}
-					]
+						})
+					}
 					break;
 			}
 		}
