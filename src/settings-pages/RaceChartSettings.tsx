@@ -63,7 +63,7 @@ const RaceChartSettings = (props) => {
     }));
   };
 
-  const handleColor = ({ rgb }, n) => {
+  const handleColor = (rgb, n) => {
     setConfigValues((d) => ({
       ...d,
       [n]: rgb,
