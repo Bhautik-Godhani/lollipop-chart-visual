@@ -19,7 +19,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
         const dataValue = isPositiveDeviation ? to.value - from.value : -(from.value - to.value);
 
         if (displayType === EDynamicDeviationLabelDisplayTypes.Value) {
-            return (dataValue >= 0 ? "+" : "") + self.formatNumber(dataValue, self.numberSettings, undefined, false, false);
+            return (dataValue >= 0 ? "+" : "") + self.formatNumber(dataValue, self.numberSettings, undefined, true, true);
         } else if (displayType === EDynamicDeviationLabelDisplayTypes.Percentage) {
             if (isPositiveDeviation) {
                 return "+" + ((to.value * 100) / from.value).toFixed(2) + "%";

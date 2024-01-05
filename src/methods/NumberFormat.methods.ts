@@ -128,8 +128,12 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
         return number;
     }
 
-    if (!numberSettings.show && formatter) {
-        return formatter.format(number);
+    if (!numberSettings.show) {
+        if (formatter) {
+            return formatter.format(number);
+        } else {
+            return number.toString();
+        }
     }
 
     let formattedNumber: string | number = "0";
