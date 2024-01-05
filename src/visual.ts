@@ -96,6 +96,7 @@ import {
 	IErrorBarsMarker,
 	IErrorBarsSettings,
 	IFooterSettings,
+	IGridLinesPropsSettings,
 	IGridLinesSettings,
 	IHighContrastDetails,
 	ILabelValuePair,
@@ -112,9 +113,7 @@ import {
 	ISortingProps,
 	ISortingSettings,
 	IXAxisSettings,
-	IXGridLinesSettings,
 	IYAxisSettings,
-	IYGridLinesSettings,
 } from "./visual-settings.interface";
 import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
@@ -579,8 +578,8 @@ export class Visual extends Shadow {
 	pieSettings: IPieSettings;
 	legendSettings: ILegendSettings;
 	numberSettings: NumberFormatting;
-	xGridSettings: IXGridLinesSettings;
-	yGridSettings: IYGridLinesSettings;
+	xGridSettings: IGridLinesPropsSettings;
+	yGridSettings: IGridLinesPropsSettings;
 	gridSettings: IGridLinesSettings;
 	dataColorsSettings: IDataColorsSettings;
 	rankingSettings: IRankingSettings;

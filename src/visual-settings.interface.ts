@@ -137,20 +137,6 @@ export interface IGridLinesSettings {
 	yGridLines: IGridLinesPropsSettings;
 }
 
-export interface IXGridLinesSettings {
-	show: boolean;
-	lineType: string;
-	lineWidth: number;
-	lineColor: string;
-}
-
-export interface IYGridLinesSettings {
-	show: boolean;
-	lineType: string;
-	lineWidth: number;
-	lineColor: string;
-}
-
 export interface ILegendSettings {
 	show: boolean;
 	legendPosition: ELegendPosition;

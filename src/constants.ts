@@ -47,6 +47,7 @@ import {
 	IDataLabelsSettings,
 	IDynamicDeviationSettings,
 	IErrorBarsSettings,
+	IGridLinesPropsSettings,
 	IGridLinesSettings,
 	ILineSettings,
 	IMarkerSettings,
@@ -59,9 +60,7 @@ import {
 	ISortingSettings,
 	ITrendLinesSettings,
 	IXAxisSettings,
-	IXGridLinesSettings,
 	IYAxisSettings,
-	IYGridLinesSettings,
 } from "./visual-settings.interface";
 
 export const PIE1_SETTINGS: IPiePropsSettings = {
@@ -141,14 +140,14 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	isShowBestFitLabels: true
 };
 
-export const X_GRID_LINES_SETTINGS: IXGridLinesSettings = {
+export const X_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {
 	show: false,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
 	lineColor: "rgba(151,151,151,1)",
 };
 
-export const Y_GRID_LINES_SETTINGS: IYGridLinesSettings = {
+export const Y_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {
 	show: false,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
