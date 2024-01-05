@@ -1,12 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { isEmpty } from "lodash";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAlignLeft,
-  faAlignRight,
-  faAlignCenter,
-} from "@fortawesome/free-solid-svg-icons";
 import { REFERENCE_LINES_SETTINGS } from "../constants";
 import {
   EBeforeAfterPosition,
@@ -15,6 +9,7 @@ import {
   EReferenceLineNameTypes,
   EReferenceLineStyleProps,
   EReferenceLineType,
+  EReferenceLineValueProps,
   EReferenceLinesSettings,
   EReferenceLinesType,
   EReferenceType,
@@ -889,6 +884,14 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
     if (!configValues.lineValue2.measureName) {
       setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "measureName": AXIS_NAMES[0].value } }));
     }
+
+    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+
+    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
   }, []);
 
   React.useEffect(() => {
@@ -914,6 +917,20 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
       handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle)
     }
   }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
+
+  React.useEffect(() => {
+    console.log("test");
+
+    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+  }, [configValues.lineValue1.computation, configValues.lineValue1.axis]);
+
+  React.useEffect(() => {
+    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
 
   return (
     <>
