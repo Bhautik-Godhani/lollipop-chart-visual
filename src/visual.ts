@@ -377,10 +377,10 @@ export class Visual extends Shadow {
 	// circle
 	public circleClass: string = "lollipop-circle";
 	public circleClassSelector: string = ".lollipop-circle";
-	public minCircleSize: number = 15;
-	public maxCircleSize: number = 40;
+	public minCircleSize: number = 10;
+	public maxCircleSize: number = 30;
 	public brushAndZoomAreaCircleMinSize: number = 10;
-	public brushAndZoomAreaCircleMaxSize: number = 40;
+	public brushAndZoomAreaCircleMaxSize: number = 30;
 	public brushAndZoomAreaCircleSize: number = 12;
 
 	// circle1
@@ -412,8 +412,8 @@ export class Visual extends Shadow {
 	pieEmphasizeScaleSize: number = 4;
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
-	public minPieSize: number = 25;
-	public maxPieSize: number = 40;
+	public minPieSize: number = 15;
+	public maxPieSize: number = 30;
 
 	// connecting line
 	public connectingLineG: D3Selection<SVGElement>;
@@ -5487,7 +5487,7 @@ export class Visual extends Shadow {
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
-		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height * 2;
+		const dataLabelHeight = this.isHasNegativeValue ? getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height * 2 : 0;
 
 		if (this.isHorizontalChart) {
 			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0];
