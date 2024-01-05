@@ -22,6 +22,7 @@ import {
 } from "@truviz/shadow/dist/Components";
 import { IDynamicDeviationSettings, ILabelValuePair } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, DynamicDeviationArrowIcon, DynamicDeviationBarIcon, DynamicDeviationDotsIcon, SolidLineIcon } from "./SettingsIcons";
+import { Visual } from "../visual";
 
 const LINE_TYPES = [
   {
@@ -199,7 +200,7 @@ const DynamicDeviationSettings = (props) => {
             <Column>
               <InputControl
                 min={0}
-                max={100}
+                max={(shadow as Visual).chartData.length}
                 type="number"
                 label="From Index"
                 value={configValues.fromIndex.toString() ?? ""}
@@ -210,11 +211,11 @@ const DynamicDeviationSettings = (props) => {
             <Column>
               <InputControl
                 min={0}
-                max={100}
+                max={(shadow as Visual).chartData.length}
                 type="number"
                 label="To Index"
                 value={configValues.toIndex.toString() ?? ""}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.FromIndex)}
+                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ToIndex)}
               />
             </Column>
           </Row>
