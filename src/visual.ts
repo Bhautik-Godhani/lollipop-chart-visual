@@ -6164,12 +6164,38 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x", d => {
-				const cx = this.getXPosition(this.isHorizontalChart ? (isImage2 ? d.value2 : d.value1) : d.category);
-				return this.isHorizontalChart ? cx : cx + this.scaleBandWidth / 2 - width / 2;
+				if (isImage2) {
+					const cx = this.getXPosition(this.isHorizontalChart ? d.value2 : d.category);
+					if (!this.isLeftYAxis) {
+						return this.isHorizontalChart ? cx - this.circle2Size / 2 - this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+					} else {
+						return this.isHorizontalChart ? cx - this.circle2Size / 2 + this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle2Size / 2;
+					}
+				} else {
+					const cx = this.getXPosition(this.isHorizontalChart ? d.value1 : d.category);
+					if (!this.isLeftYAxis) {
+						return this.isHorizontalChart ? cx - this.circle1Size / 2 - this.getCircleXScaleDiff(cx, false) : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					} else {
+						return this.isHorizontalChart ? cx - this.circle1Size / 2 + this.getCircleXScaleDiff(cx, true) : cx + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					}
+				}
 			})
 			.attr("y", d => {
-				const cy = this.getYPosition(this.isHorizontalChart ? d.category : (isImage2 ? d.value2 : d.value1));
-				return !this.isHorizontalChart ? cy - width : cy + this.scaleBandWidth / 2 - width / 2;
+				if (isImage2) {
+					const cy = this.getYPosition(this.isHorizontalChart ? d.category : d.value2);
+					if (this.isBottomXAxis) {
+						return !this.isHorizontalChart ? cy - this.circle2Size / 2 - this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					} else {
+						return !this.isHorizontalChart ? cy - this.circle2Size / 2 + this.getCircleYScaleDiff(cy, true) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					}
+				} else {
+					const cy = this.getYPosition(this.isHorizontalChart ? d.category : d.value1);
+					if (this.isBottomXAxis) {
+						return !this.isHorizontalChart ? cy - this.circle1Size / 2 - this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					} else {
+						return !this.isHorizontalChart ? cy - this.circle1Size / 2 + this.getCircleYScaleDiff(cy, false) : cy + this.scaleBandWidth / 2 - this.circle1Size / 2;
+					}
+				}
 			})
 			.on("end", (node, index) => {
 				if (index === this.chartData.length - 1) {
