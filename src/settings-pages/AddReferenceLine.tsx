@@ -866,7 +866,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
   } else {
     ALIGNMENT_OPTIONS = [
       {
-        value: "left",
+        value: "right",
         label: <TopAlignmentIcon fill="currentColor" />,
       },
       {
@@ -874,7 +874,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
         label: <CenterVerticalAlignmentIcon fill="currentColor" />,
       },
       {
-        value: "right",
+        value: "left",
         label: <BottomAlignmentIcon fill="currentColor" />,
       },
     ];
