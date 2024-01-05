@@ -5486,6 +5486,9 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
+		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
+		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height * 2;
+
 		if (this.isHorizontalChart) {
 			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0];
 
@@ -5509,7 +5512,7 @@ export class Visual extends Shadow {
 				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
 			}
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, this.yAxisSettings.labelFontSize] : [this.yAxisStartMargin, yScaleHeight - this.yAxisSettings.labelFontSize * 1.25];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - dataLabelHeight, dataLabelHeight] : [this.yAxisStartMargin - dataLabelHeight, yScaleHeight - dataLabelHeight];
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
