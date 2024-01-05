@@ -5326,7 +5326,7 @@ export class Visual extends Shadow {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
-					const truncatedText = THIS.formatNumber(parseFloat(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
+					const truncatedText = THIS.formatNumber(parseFloat(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
 					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				}
 			});
@@ -5368,7 +5368,7 @@ export class Visual extends Shadow {
 				};
 
 				if (!THIS.isHorizontalChart) {
-					const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, false);
+					const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
 					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				} else {
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
