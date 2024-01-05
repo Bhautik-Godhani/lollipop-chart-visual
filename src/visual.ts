@@ -203,6 +203,7 @@ export class Visual extends Shadow {
 	public isPatternApplied: boolean;
 	public isLollipopTypeCircle: boolean;
 	public isLollipopTypePie: boolean;
+	public isChartRacePossible: boolean;
 	public isChartIsRaceChart: boolean;
 	public isHasSmallMultiplesData: boolean;
 
@@ -1349,6 +1350,8 @@ export class Visual extends Shadow {
 			}, '');
 		}
 
+		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
+
 		if (categoricalRaceBarValues.length > 0 && this.raceChartSettings.isEnabled) {
 			let raceBarKeys = [];
 			const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
@@ -1941,6 +1944,7 @@ export class Visual extends Shadow {
 			this.brushWidth = 0;
 			this.brushHeight = 0;
 			this.isChartIsRaceChart = false;
+			this.isChartRacePossible = false;
 			this.categoricalCategoriesLastIndex = 0;
 			this.expandAllXScaleGHeight = 0;
 			this.expandAllYScaleGWidth = 0;

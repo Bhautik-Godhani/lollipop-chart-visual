@@ -396,7 +396,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 };
 
 export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
-	isEnabled: true,
+	isEnabled: false,
 	measurement: {
 		direction: EErrorBarsDirection.Both,
 		applySettingsToMeasure: undefined,
