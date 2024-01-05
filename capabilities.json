@@ -3,12 +3,14 @@
 		{
 			"displayName": "Category",
 			"name": "category",
-			"kind": "Grouping"
+			"kind": "Grouping",
+			"description": "Add a field that represents each category in the Lollipop chart."
 		},
 		{
 			"displayName": "Sub Category",
 			"name": "subCategory",
-			"kind": "Grouping"
+			"kind": "Grouping",
+			"description": " Add a field to divide each category into further sub-categories."
 		},
 		{
 			"displayName": "Measure",
@@ -21,7 +23,8 @@
 				{
 					"integer": true
 				}
-			]
+			],
+			"description": "Add a multiple numerical field or measure to visualize the data."
 		},
 		{
 			"displayName": "Small Multiples",
@@ -31,7 +34,8 @@
 		{
 			"displayName": "Race Chart Data",
 			"name": "raceChartData",
-			"kind": "Grouping"
+			"kind": "Grouping",
+			"description": "Add a date-based field to show changes in data over time."
 		},
 		{
 			"displayName": "Upper Bound",
@@ -44,7 +48,8 @@
 				{
 					"integer": true
 				}
-			]
+			],
+			"description": "Add an upper limit to the Error bar."
 		},
 		{
 			"displayName": "Lower Bound",
@@ -57,22 +62,26 @@
 				{
 					"integer": true
 				}
-			]
+			],
+			"description": "Add a lower limit to the Error bar."
 		},
 		{
 			"displayName": "Tooltips",
 			"name": "tooltip",
-			"kind": "Measure"
+			"kind": "Measure",
+			"description": "Include additional data fields in the tooltip when hovering over specific parts of the visualization."
 		},
 		{
 			"displayName": "Sort",
 			"name": "sort",
-			"kind": "Measure"
+			"kind": "Measure",
+			"description": "(Optional) Drag a field to apply custom sorting."
 		},
 		{
 			"displayName": "Images Data",
 			"name": "imagesData",
-			"kind": "Measure"
+			"kind": "Measure",
+			"description": "(Optional) Add Base-64 URL field to add images."
 		},
 		{
 			"displayName": "Show",
@@ -85,7 +94,8 @@
 				{
 					"integer": true
 				}
-			]
+			],
+			"description": "(Optional) Control the visual rendering with a custom condition. Use measure with Boolean logic (1 and 0), where 1 is show and 0 is hide."
 		}
 	],
 	"dataViewMappings": [
