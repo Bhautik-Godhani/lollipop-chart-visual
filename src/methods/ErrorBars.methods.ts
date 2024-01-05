@@ -3,7 +3,7 @@ import { Visual } from "../visual";
 import { select } from "d3-selection";
 import { area } from "d3";
 import { ILollipopChartRow } from "../model";
-import { EFontStyle, EHighContrastColorType, ELineType } from "../enum";
+import { EErrorBandFillTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
 
 export const getErrorBarLine = (self: Visual, width: number, height: number) => {
     width = width === 1 ? 1 : width / 2 + 0.5;
@@ -173,9 +173,9 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
     self.errorBarsAreaPath
         .datum(errorBarsData)
         .attr("class", errorBand.lineStyle)
-        .attr("fill", errorBand.fillColor)
+        .attr("fill", errorBand.fillType !== EErrorBandFillTypes.Line ? errorBand.fillColor : "transparent")
         .attr("stroke", errorBand.lineColor)
-        .attr("stroke-width", 1.5)
+        .attr("stroke-width", errorBand.fillType !== EErrorBandFillTypes.Fill ? 1.5 : 0)
         .attr(
             "stroke-dasharray",
             errorBand.lineStyle === ELineType.Dotted
