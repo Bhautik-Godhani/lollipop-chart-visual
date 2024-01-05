@@ -79,6 +79,8 @@ import {
 	ERROR_BARS_SETTINGS,
 	DYNAMIC_DEVIATION_SETTINGS,
 	CUT_AND_CLIP_AXIS_SETTINGS,
+	POSITIVE_COLOR,
+	NEGATIVE_COLOR,
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -3142,14 +3144,14 @@ export class Visual extends Shadow {
 						{
 							data: {
 								name: "Positive",
-								color: this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground),
+								color: this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground),
 								pattern: undefined
 							},
 						},
 						{
 							data: {
 								name: "Negative",
-								color: this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground),
+								color: this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground),
 								pattern: undefined
 							},
 						}
@@ -3207,14 +3209,14 @@ export class Visual extends Shadow {
 						{
 							data: {
 								name: "Positive",
-								color: this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground),
+								color: this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground),
 								pattern: undefined
 							},
 						},
 						{
 							data: {
 								name: "Negative",
-								color: this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground),
+								color: this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground),
 								pattern: undefined
 							},
 						}
@@ -6017,17 +6019,17 @@ export class Visual extends Shadow {
 		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical) {
 			if (!this.isHasMultiMeasure) {
 				if (d.value1 >= 0) {
-					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+					return this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground);
 				} else {
-					return this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground);
+					return this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground);
 				}
 			} else {
 				if (d.value1 >= 0 && d.value2 >= 0) {
-					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+					return this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground);
 				} else if (d.value1 <= 0 && d.value2 <= 0) {
-					return this.getColor("rgba(208, 2, 27, 1)", EHighContrastColorType.Foreground);
+					return this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground);
 				} else {
-					return this.getColor("rgba(23, 177, 105, 1)", EHighContrastColorType.Foreground);
+					return this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground);
 				}
 			}
 		} else {

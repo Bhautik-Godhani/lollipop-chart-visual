@@ -160,6 +160,9 @@ export const GRID_LINES_SETTINGS: IGridLinesSettings = {
 	yGridLines: Y_GRID_LINES_SETTINGS,
 };
 
+export const POSITIVE_COLOR = "rgba(141, 200, 61, 1)";
+export const NEGATIVE_COLOR = "rgba(229, 51, 39, 1)";
+
 export const DATA_COLORS: IDataColorsSettings = {
 	fillMin: "rgba(186, 72, 239, 1)",
 	fillMid: "rgba(127, 88, 246, 1)",
@@ -179,8 +182,8 @@ export const DATA_COLORS: IDataColorsSettings = {
 	colorScheme: "Blue",
 	reverse: false,
 	isGradient: true,
-	negativeColor: "rgba(208, 2, 27, 1)",
-	positiveColor: "rgba(23, 177, 105, 1)",
+	negativeColor: NEGATIVE_COLOR,
+	positiveColor: POSITIVE_COLOR,
 	gradientAppliedToMeasure: EMarkerColorTypes.Marker1
 };
 
@@ -462,8 +465,8 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	backgroundColorTransparency: 90,
 	connectorType: EDynamicDeviationConnectingLineTypes.Arrow,
 	isAutoConnectorColor: true,
-	connectorPositiveColor: "rgba(142, 185, 0, 1)",
-	connectorNegativeColor: "rgba(255, 0, 10, 1)",
+	connectorPositiveColor: POSITIVE_COLOR,
+	connectorNegativeColor: NEGATIVE_COLOR,
 	connectorWidth: 3,
 	connectingLineColor: "rgba(0, 0, 0, 1)",
 	connectingLineWidth: 3,
