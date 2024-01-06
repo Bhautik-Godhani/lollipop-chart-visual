@@ -253,10 +253,6 @@ const Get_RANK_ORDER = (shadow: Visual, configValues: IReferenceLineValueProps) 
   return RANK_ORDER;
 }
 
-const resetChanges = (setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => {
-  setConfigValues({ ...REFERENCE_LINES_SETTINGS });
-};
-
 const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
   const AXIS_NAMES = Get_AXIS_NAMES(shadow);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
@@ -729,6 +725,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
     value: "",
     rank: "",
   });
+  const defaultSettings = JSON.parse(JSON.stringify(isAddNew ? REFERENCE_LINES_SETTINGS : details));
 
   React.useEffect(() => {
     if (configValues.lineValue1.type === "value") {
@@ -932,6 +929,13 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
     }
   }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
 
+  const resetChanges = () => {
+    setConfigValues(d => ({
+      ...d,
+      ...defaultSettings
+    }));
+  };
+
   return (
     <>
       <Tabs selected={configValues.referenceType} onChange={(value) => {
@@ -948,7 +952,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
         </Tab>
       </Tabs >
 
-      {UIFooter(isAddNew, closeCurrentSettingHandler, handleAdd, resetChanges.bind(configValues))}
+      {UIFooter(isAddNew, closeCurrentSettingHandler, handleAdd, resetChanges)}
     </>
   );
 };
