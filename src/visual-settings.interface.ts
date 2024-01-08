@@ -178,6 +178,7 @@ export interface IMarkerSettings {
 	marker1Style: MarkerStyleProps;
 	marker2Style: MarkerStyleProps;
 	selectedImageDataField: string;
+	isAutoLollipopTypePie: boolean;
 }
 
 export interface MarkerStyleProps {

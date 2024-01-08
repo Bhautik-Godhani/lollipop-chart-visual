@@ -320,7 +320,8 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: { isAutoMarkerSize: false, markerSize: 20 },
 	marker2Style: { isAutoMarkerSize: false, markerSize: 20 },
-	selectedImageDataField: undefined
+	selectedImageDataField: undefined,
+	isAutoLollipopTypePie: false
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {

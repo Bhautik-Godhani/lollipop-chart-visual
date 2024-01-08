@@ -1222,6 +1222,44 @@ export class Visual extends Shadow {
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 
+		if (this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.SHAPE && !this.markerSettings.isAutoLollipopTypePie) {
+			this.visualHost.persistProperties({
+				merge: [
+					{
+						objectName: EVisualConfig.MarkerConfig,
+						displayName: EVisualSettings.MarkerSettings,
+						properties: {
+							[EVisualSettings.MarkerSettings]: JSON.stringify({
+								...this.markerSettings,
+								isAutoLollipopTypePie: true,
+								markerType: EMarkerTypes.CHART
+							}),
+						},
+						selector: null,
+					},
+				],
+			});
+		}
+
+		if (!this.isHasSubcategories && this.markerSettings.isAutoLollipopTypePie) {
+			this.visualHost.persistProperties({
+				merge: [
+					{
+						objectName: EVisualConfig.MarkerConfig,
+						displayName: EVisualSettings.MarkerSettings,
+						properties: {
+							[EVisualSettings.MarkerSettings]: JSON.stringify({
+								...this.markerSettings,
+								isAutoLollipopTypePie: false,
+								markerType: EMarkerTypes.SHAPE
+							}),
+						},
+						selector: null,
+					},
+				],
+			});
+		}
+
 		this.isXIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 		this.isYIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 
