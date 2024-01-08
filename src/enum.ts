@@ -352,6 +352,7 @@ export enum DataValuesType {
 export enum EPatternSettings {
 	Enabled = "enabled",
 	CategoryPatterns = "categoryPatterns",
+	MeasuresPatterns = "measuresPatterns",
 	SubcategoryPatterns = "subCategoryPatterns",
 	IsPatternBorderEnabled = "isPatternBorderEnabled",
 	PatternBorderWidth = "patternBorderWidth"

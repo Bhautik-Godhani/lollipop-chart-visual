@@ -51,6 +51,7 @@ import {
 	EDynamicDeviationDisplayTypes,
 	AxisCategoryType,
 	EErrorBarsDirection,
+	RankingDataValuesType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -437,6 +438,7 @@ export class Visual extends Shadow {
 
 	// patterns
 	categoryPatterns: IPatternProps[] = [];
+	measuresPatterns: IPatternProps[] = [];
 	subCategoryPatterns: IPatternProps[] = [];
 
 	// image marker
@@ -1752,6 +1754,10 @@ export class Visual extends Shadow {
 		this.measureNames = [...new Set(this.categoricalMeasureFields.map((d) => d.source.displayName))] as any;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 
+		this.isPatternApplied =
+			this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
+			this.isHasMultiMeasure && this.patternSettings.enabled && this.patternSettings.measuresPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
 			this.markerSettings.markerType = EMarkerTypes.SHAPE;
 		}
@@ -3062,6 +3068,24 @@ export class Visual extends Shadow {
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 			}));
 
+		if (this.isHasMultiMeasure) {
+			this.measuresPatterns = this.measureNames
+				.map((d) => {
+					const pattern = this.patternSettings.measuresPatterns.find((p) => p.name === d);
+					const obj = {
+						name: d,
+						patternIdentifier: pattern ? pattern.patternIdentifier ? pattern.patternIdentifier : "NONE" : "NONE",
+						isImagePattern: pattern ? pattern.isImagePattern ? pattern.isImagePattern : false : false,
+						dimensions: pattern ? pattern.dimensions ? pattern.dimensions : undefined : undefined,
+					};
+					return obj;
+				});
+
+			this.measuresPatterns.forEach(d => {
+				this.patternByMeasures[d.name === this.measure1DisplayName ? RankingDataValuesType.Value1 : RankingDataValuesType.Value2] = d;
+			});
+		}
+
 		if (this.isHasSubcategories) {
 			this.subCategoryPatterns = this.chartData[0].subCategories
 				.map((d) => ({
@@ -3072,6 +3096,8 @@ export class Visual extends Shadow {
 				}));
 		}
 	}
+
+	patternByMeasures: { [measureName: string]: IPatternProps } = {};
 
 	private configLegend(): void {
 		if (this.legendSettings.show) {
@@ -3502,7 +3528,6 @@ export class Visual extends Shadow {
 		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
-		this.isPatternApplied = this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
 
 		if (!this.xAxisSettings.show) {
 			this.xAxisSettings.isDisplayLabel = false;
@@ -6692,9 +6717,12 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
-
-				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+				let pattern = d.pattern;
+				if (this.isHasMultiMeasure && this.isPatternApplied) {
+					pattern = this.patternByMeasures[DataValuesType.Value1];
+				}
+				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+					return `url('#${generatePattern(this.svg, pattern, color)}')`;
 				} else {
 					return color;
 				}
@@ -6782,9 +6810,12 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
-
-				if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-					return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+				let pattern = d.pattern;
+				if (this.isHasMultiMeasure && this.isPatternApplied) {
+					pattern = this.patternByMeasures[DataValuesType.Value2];
+				}
+				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+					return `url('#${generatePattern(this.svg, pattern, color)}')`;
 				} else {
 					return color;
 				}
@@ -7853,8 +7884,12 @@ export class Visual extends Shadow {
 					const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
-					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+					let pattern = d.pattern;
+					if (this.isHasMultiMeasure && this.isPatternApplied) {
+						pattern = this.patternByMeasures[DataValuesType.Value1];
+					}
+					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+						return `url('#${generatePattern(this.svg, pattern, color)}')`;
 					} else {
 						return color;
 					}
@@ -7869,8 +7904,12 @@ export class Visual extends Shadow {
 					const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker2Color : null), EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
-					if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-						return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+					let pattern = d.pattern;
+					if (this.isHasMultiMeasure && this.isPatternApplied) {
+						pattern = this.patternByMeasures[DataValuesType.Value2];
+					}
+					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+						return `url('#${generatePattern(this.svg, pattern, color)}')`;
 					} else {
 						return color;
 					}

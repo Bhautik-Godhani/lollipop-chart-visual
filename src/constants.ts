@@ -303,6 +303,7 @@ export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 export const PATTERN_SETTINGS: IPatternSettings = {
 	enabled: false,
 	categoryPatterns: [],
+	measuresPatterns: [],
 	subCategoryPatterns: [],
 	isPatternBorderEnabled: false,
 	patternBorderWidth: 1

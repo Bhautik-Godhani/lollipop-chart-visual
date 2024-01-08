@@ -30,8 +30,8 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 };
 
 const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
-	return <ConditionalWrapper visible={!shadow.isHasSubcategories}>
-		{configValues.categoryPatterns.map((category, index) => (
+	return <>{
+		configValues.categoryPatterns.map((category, index) => (
 			<PatternPicker
 				label={category.name}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
@@ -49,12 +49,12 @@ const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setC
 					}));
 				}}
 			/>
-		))}
-	</ConditionalWrapper>
+		))
+	}</>
 }
 
 const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
-	return <ConditionalWrapper visible={shadow.isHasSubcategories}>
+	return <>
 		{configValues.subCategoryPatterns.map((category, index) => (
 			<PatternPicker
 				label={category.name}
@@ -74,7 +74,31 @@ const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, s
 				}}
 			/>
 		))}
-	</ConditionalWrapper>
+	</>
+}
+
+const UIMultipleMeasuresPatterns = (shadow: Visual, configValues: IPatternSettings, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
+	return <>
+		{configValues.measuresPatterns.map((category, index) => (
+			<PatternPicker
+				label={category.name}
+				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
+				handleChange={(e: IPatternData) => {
+					const patterns = [...configValues.measuresPatterns];
+					patterns[index].patternIdentifier = e.value;
+
+					if (e.value === "image") {
+						patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+					}
+
+					setConfigValues((d) => ({
+						...d,
+						[EPatternSettings.MeasuresPatterns]: patterns,
+					}));
+				}}
+			/>
+		))}
+	</>
 }
 
 const FillPatterns = (props) => {
@@ -103,6 +127,7 @@ const FillPatterns = (props) => {
 		setConfigValues({
 			...PATTERN_SETTINGS,
 			categoryPatterns: shadow.categoryPatterns,
+			measuresPatterns: shadow.measuresPatterns,
 			subCategoryPatterns: shadow.subCategoryPatterns
 		});
 	};
@@ -110,22 +135,23 @@ const FillPatterns = (props) => {
 	const [configValues, setConfigValues] = React.useState<IPatternSettings>({
 		...initialStates,
 		categoryPatterns: shadow.categoryPatterns,
+		measuresPatterns: shadow.measuresPatterns,
 		subCategoryPatterns: shadow.subCategoryPatterns,
 	});
 
 	return (
 		<>
-			<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+			<ConditionalWrapper visible={(!shadow.isLollipopTypePie && !shadow.isHasMultiMeasure)}>
 				<Row>
 					<Column>
 						<Quote>
-							<strong>Note: </strong>Fill patterns are only supported in case of Sub-category.
+							<strong>Note: </strong>Fill patterns are only supported in the case of Pie/Rose/Donut markers and multiple measures.
 						</Quote>
 					</Column>
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isHasSubcategories}>
+			<ConditionalWrapper visible={shadow.isLollipopTypePie || shadow.isHasMultiMeasure}>
 				<Row>
 					<Column>
 						<ToggleButton
@@ -144,8 +170,14 @@ const FillPatterns = (props) => {
 				</ConditionalWrapper>
 
 				<ConditionalWrapper visible={configValues.enabled}>
-					{UICategoryPatterns(shadow, configValues, setConfigValues)}
-					{UISubCategoryPatterns(shadow, configValues, setConfigValues)}
+					{/* {UICategoryPatterns(shadow, configValues, setConfigValues)} */}
+					{shadow.isLollipopTypePie && (
+						UISubCategoryPatterns(shadow, configValues, setConfigValues)
+					)}
+					{shadow.isHasMultiMeasure && (
+						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+					)}
+
 					{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 				</ConditionalWrapper>
 

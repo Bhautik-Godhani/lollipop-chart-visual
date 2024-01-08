@@ -357,6 +357,7 @@ export interface IPatternProps {
 export interface IPatternSettings {
 	enabled: boolean,
 	categoryPatterns: IPatternProps[],
+	measuresPatterns: IPatternProps[],
 	subCategoryPatterns: IPatternProps[],
 	isPatternBorderEnabled: boolean,
 	patternBorderWidth: number
