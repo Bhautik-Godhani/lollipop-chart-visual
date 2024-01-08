@@ -311,16 +311,29 @@ export const PATTERN_SETTINGS: IPatternSettings = {
 
 export const MARKER_SETTINGS: IMarkerSettings = {
 	markerType: EMarkerTypes.SHAPE,
-	markerShape: EMarkerShapeTypes.DEFAULT,
-	markerChart: EMarkerChartTypes.DONUT,
-	markerShapeValue: undefined,
-	markerShapePath: "",
-	markerShapeBase64Url: "",
-	dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
-	marker1Style: { isAutoMarkerSize: false, markerSize: 20 },
-	marker2Style: { isAutoMarkerSize: false, markerSize: 20 },
-	selectedImageDataField: undefined,
+	marker1Style: {
+		isAutoMarkerSize: false,
+		markerSize: 20,
+		markerShape: EMarkerShapeTypes.DEFAULT,
+		markerChart: EMarkerChartTypes.DONUT,
+		markerShapeValue: undefined,
+		markerShapePath: "",
+		markerShapeBase64Url: "",
+		dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
+		selectedImageDataField: undefined,
+	},
+	marker2Style: {
+		isAutoMarkerSize: false,
+		markerSize: 20,
+		markerShape: EMarkerShapeTypes.DEFAULT,
+		markerChart: EMarkerChartTypes.DONUT,
+		markerShapeValue: undefined,
+		markerShapePath: "",
+		markerShapeBase64Url: "",
+		dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
+		selectedImageDataField: undefined,
+	},
 	isAutoLollipopTypePie: false
 };
 

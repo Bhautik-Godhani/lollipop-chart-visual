@@ -168,22 +168,22 @@ export interface IChartSettings {
 
 export interface IMarkerSettings {
 	markerType: EMarkerTypes;
+	markerStyleType: EMarkerStyleTypes.Marker1Style,
+	marker1Style: MarkerStyleProps;
+	marker2Style: MarkerStyleProps;
+	isAutoLollipopTypePie: boolean;
+}
+
+export interface MarkerStyleProps {
 	markerShape: EMarkerShapeTypes;
 	markerChart: EMarkerChartTypes;
 	markerShapeValue: IconDefinition;
 	markerShapePath: string;
 	markerShapeBase64Url: string;
 	dropdownMarkerType: string;
-	markerStyleType: EMarkerStyleTypes.Marker1Style,
-	marker1Style: MarkerStyleProps;
-	marker2Style: MarkerStyleProps;
+	isAutoMarkerSize: boolean;
+	markerSize: number;
 	selectedImageDataField: string;
-	isAutoLollipopTypePie: boolean;
-}
-
-export interface MarkerStyleProps {
-	isAutoMarkerSize: boolean,
-	markerSize: number
 }
 
 export enum EInsideTextColorTypes {

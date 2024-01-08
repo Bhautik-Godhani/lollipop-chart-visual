@@ -17,7 +17,8 @@ export interface ILollipopChartRow {
 	valueType?: DataValuesType;
 	defaultValue?: number;
 	pattern?: IPatternProps;
-	imageDataUrl?: string;
+	imageDataUrl1?: string;
+	imageDataUrl2?: string;
 	raceChartKey?: string;
 	raceChartDataLabel?: string;
 	positions: { dataLabel1X: number, dataLabel1Y: number, dataLabel2X: number, dataLabel2Y: number };

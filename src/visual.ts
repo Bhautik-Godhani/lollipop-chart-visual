@@ -442,7 +442,8 @@ export class Visual extends Shadow {
 	subCategoryPatterns: IPatternProps[] = [];
 
 	// image marker
-	isShowImageMarker: boolean;
+	isShowImageMarker1: boolean;
+	isShowImageMarker2: boolean;
 	imageMarkerClass: string = "image-marker";
 	imageMarkerClassSelector: string = ".image-marker";
 
@@ -1895,12 +1896,20 @@ export class Visual extends Shadow {
 					.filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
 		}
 
-		if (this.isHasImagesData && (!this.markerSettings.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.selectedImageDataField))) {
-			this.markerSettings.selectedImageDataField = this.imagesDataFieldsName[0];
+		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
+			this.markerSettings.marker1Style.selectedImageDataField = this.imagesDataFieldsName[0];
 		}
 
-		if (!this.isHasImagesData && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES) {
-			this.markerSettings.markerShape = EMarkerShapeTypes.DEFAULT;
+		if (this.isHasImagesData && (!this.markerSettings.marker2Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker2Style.selectedImageDataField))) {
+			this.markerSettings.marker2Style.selectedImageDataField = this.imagesDataFieldsName[0];
+		}
+
+		if (!this.isHasImagesData && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES) {
+			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
+		if (!this.isHasImagesData && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES) {
+			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
 		if (!this.isHasSubcategories) {
@@ -2177,8 +2186,12 @@ export class Visual extends Shadow {
 			} else {
 				this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
 			}
-			this.isShowImageMarker = this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.IMAGES
-				&& this.isHasImagesData && !!this.markerSettings.selectedImageDataField;
+
+			this.isShowImageMarker1 = this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES
+				&& this.isHasImagesData && !!this.markerSettings.marker1Style.selectedImageDataField;
+
+			this.isShowImageMarker2 = this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES
+				&& this.isHasImagesData && !!this.markerSettings.marker2Style.selectedImageDataField;
 
 			const popupOptions = document.querySelector(".popup-options");
 			const popupOptionsHeader = document.querySelector(".popup-options-header");
@@ -2784,10 +2797,13 @@ export class Visual extends Shadow {
 			${categoricalData.categories[0].values.length}-
 			${categoricalData.values.length}-
 			${this.markerSettings.markerType}-
-			${this.markerSettings.markerShape}-
-			${this.markerSettings.markerChart}-
+			${this.markerSettings.marker1Style.markerShape}-
+			${this.markerSettings.marker1Style.markerChart}-
+			${this.markerSettings.marker2Style.markerShape}-
+			${this.markerSettings.marker2Style.markerChart}-
 			${this.yAxisSettings.isShowLabelsAboveLine}-
-			${this.isShowImageMarker}`;
+			${this.isShowImageMarker1}-
+			${this.isShowImageMarker2}`;
 		}
 
 		const isErrorBarsAbsoluteRelation = this.errorBarsSettings.measurement.relationshipToMeasure === ERelationshipToMeasure.Absolute && !this.errorBarsSettings.measurement.makeSymmetrical;
@@ -2908,7 +2924,8 @@ export class Visual extends Shadow {
 					this.raceChartKeysList.push(raceChartKey);
 				}
 
-				const selectedImageDataFieldIndex = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.selectedImageDataField);
+				const selectedImageDataFieldIndex1 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker1Style.selectedImageDataField);
+				const selectedImageDataFieldIndex2 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker2Style.selectedImageDataField);
 
 				const value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
 				const value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
@@ -2923,7 +2940,8 @@ export class Visual extends Shadow {
 					raceChartDataLabel,
 					value1: value1,
 					value2: value2,
-					imageDataUrl: this.isHasImagesData && this.isShowImageMarker ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex].values[idx] : null,
+					imageDataUrl1: this.isHasImagesData && this.isShowImageMarker1 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex1].values[idx] : null,
+					imageDataUrl2: this.isHasImagesData && this.isShowImageMarker2 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex2].values[idx] : null,
 					identity: undefined,
 					selected: false,
 					isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
@@ -2996,7 +3014,8 @@ export class Visual extends Shadow {
 							raceChartDataLabel: "",
 							value1: 0,
 							value2: 0,
-							imageDataUrl: null,
+							imageDataUrl1: null,
+							imageDataUrl2: null,
 							subCategories: [],
 							selected: false,
 							identity: null,
@@ -6226,17 +6245,18 @@ export class Visual extends Shadow {
 	imageMarkerFormatting(markerSelection: D3Selection<SVGImageElement>, isImage2: boolean, isEnter: boolean): void {
 		const width = isImage2 ? this.circle2Size : this.circle1Size;
 		const height = isImage2 ? this.circle2Size : this.circle1Size;
+		const markerSettings = isImage2 ? this.markerSettings.marker2Style : this.markerSettings.marker1Style;
 
 		markerSelection
 			.attr("width", width)
 			.attr("height", height)
 			.attr("xlink:href", (d) => {
-				if (this.isHasImagesData && this.isShowImageMarker && d.imageDataUrl) {
+				if (this.isHasImagesData && (isImage2 ? this.isShowImageMarker2 : this.isShowImageMarker1) && d.imageDataUrl) {
 					return d.imageDataUrl;
 				}
 
-				if (this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url) {
-					return this.markerSettings.markerShapeBase64Url;
+				if (markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && markerSettings.markerShapeBase64Url) {
+					return markerSettings.markerShapeBase64Url;
 				}
 			})
 			.transition()
@@ -6356,19 +6376,38 @@ export class Visual extends Shadow {
 		}
 
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
-		let marker: IMarkerData;
 
-		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-			const markerShapeValue = this.markerSettings.markerShapeValue;
-			marker = {
-				label: this.markerSettings.markerShapeValue.iconName,
-				value: this.markerSettings.markerShapeValue.iconName,
+		let marker1: IMarkerData;
+		let marker2: IMarkerData;
+
+		// marker 1
+		const marker1Style = this.markerSettings.marker1Style;
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker1Style.markerShapeValue;
+			marker1 = {
+				label: marker1Style.markerShapeValue.iconName,
+				value: marker1Style.markerShapeValue.iconName,
 				w: markerShapeValue.icon[0],
 				h: markerShapeValue.icon[1],
-				paths: [{ d: this.markerSettings.markerShapePath, stroke: undefined }]
+				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
 			}
 		} else {
-			marker = CATEGORY_MARKERS.find(d => d.value === this.markerSettings.dropdownMarkerType);
+			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
+		}
+
+		// marker 2
+		const marker2Style = this.markerSettings.marker2Style;
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker2Style.markerShapeValue;
+			marker2 = {
+				label: marker2Style.markerShapeValue.iconName,
+				value: marker2Style.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: marker2Style.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker2 = CATEGORY_MARKERS.find(d => d.value === marker2Style.dropdownMarkerType);
 		}
 
 		this.lollipopSelection = lollipopSelection.join(
@@ -6381,7 +6420,9 @@ export class Visual extends Shadow {
 
 				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
-				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+
+				// marker 1
+				if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
 					const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
 						.classed(this.circleClass, true)
 						.classed(this.imageMarkerClass, true)
@@ -6393,8 +6434,52 @@ export class Visual extends Shadow {
 						});
 
 					this.imageMarkerFormatting(imageMarker1Selection, false, true);
+				} else {
+					if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+						const symbol1 = lollipopG.append("defs")
+							.append("symbol")
+							.attr("id", d => `${d.category}_${marker1.value}_MARKER1`)
+							.attr("class", "marker1-symbol")
+							.attr("viewBox", `0 0 ${marker1.w} ${marker1.h}`);
 
-					if (this.isHasMultiMeasure) {
+						const path1Selection = symbol1.append("path")
+							.attr("d", marker1.paths[0].d)
+							.attr("class", "marker1-path");
+
+						const circle1Selection = lollipopG.append("use")
+							.attr("id", CircleType.Circle1)
+							.classed(this.circleClass, true)
+							.classed(this.circle1Class, true);
+
+						this.setPath1Formatting(path1Selection);
+						this.setCircle1Formatting(circle1Selection, marker1, true);
+
+						circle1Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							});
+
+						path1Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							});
+					} else {
+						const pie1Selection = lollipopG.append("foreignObject")
+							.attr("id", "pie1ForeignObject");
+						this.enterPieChart(pie1Selection, false, true);
+						this.setPieDataLabelsDisplayStyle();
+
+						pie1Selection
+							.datum(d => {
+								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+							});
+					}
+				}
+
+
+				// marker 2
+				if (this.isHasMultiMeasure) {
+					if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
 						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
 							.classed(this.circleClass, true)
 							.classed(this.imageMarkerClass, true)
@@ -6406,46 +6491,16 @@ export class Visual extends Shadow {
 							});
 
 						this.imageMarkerFormatting(imageMarker2Selection, true, true);
-					}
-				} else {
-					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-						const symbol1 = lollipopG.append("defs")
-							.append("symbol")
-							.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
-							.attr("class", "marker1-symbol")
-							.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
-
-						const path1Selection = symbol1.append("path")
-							.attr("d", marker.paths[0].d)
-							.attr("class", "marker1-path");
-
-						const circle1Selection = lollipopG.append("use")
-							.attr("id", CircleType.Circle1)
-							.classed(this.circleClass, true)
-							.classed(this.circle1Class, true);
-
-						this.setPath1Formatting(path1Selection);
-						this.setCircle1Formatting(circle1Selection, marker, true);
-
-						circle1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
-
-						path1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
-
-						if (this.isHasMultiMeasure) {
+					} else {
+						if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 							const symbol2 = lollipopG.append("defs")
 								.append("symbol")
-								.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
+								.attr("id", d => `${d.category}_${marker2.value}_MARKER2`)
 								.attr("class", "marker2-symbol")
-								.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+								.attr("viewBox", `0 0 ${marker2.w} ${marker2.h}`);
 
 							const path2Selection = symbol2.append("path")
-								.attr("d", marker.paths[0].d)
+								.attr("d", marker2.paths[0].d)
 								.attr("class", "marker2-path");
 
 							const circle2Selection = lollipopG.append("use")
@@ -6453,7 +6508,7 @@ export class Visual extends Shadow {
 								.classed(this.circleClass, true).classed(this.circle2Class, true);
 
 							this.setPath2Formatting(path2Selection);
-							this.setCircle2Formatting(circle2Selection, marker, true);
+							this.setCircle2Formatting(circle2Selection, marker2, true);
 
 							path2Selection
 								.datum(d => {
@@ -6464,14 +6519,7 @@ export class Visual extends Shadow {
 								.datum(d => {
 									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 								});
-						}
-					} else {
-						const pie1Selection = lollipopG.append("foreignObject")
-							.attr("id", "pie1ForeignObject");
-						this.enterPieChart(pie1Selection, false, true);
-						this.setPieDataLabelsDisplayStyle();
-
-						if (this.isHasMultiMeasure) {
+						} else {
 							const pie2Selection = lollipopG.append("foreignObject")
 								.attr("id", "pie2ForeignObject");
 							this.enterPieChart(pie2Selection, true, true);
@@ -6482,13 +6530,118 @@ export class Visual extends Shadow {
 									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 								})
 						}
-
-						pie1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
 					}
 				}
+
+
+				// if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+				// 	// const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
+				// 	// 	.classed(this.circleClass, true)
+				// 	// 	.classed(this.imageMarkerClass, true)
+				// 	// 	.classed("image-marker1", true);
+
+				// 	// imageMarker1Selection
+				// 	// 	.datum(d => {
+				// 	// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				// 	// 	});
+
+				// 	// this.imageMarkerFormatting(imageMarker1Selection, false, true);
+
+				// 	// if (this.isHasMultiMeasure) {
+				// 	// 	const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
+				// 	// 		.classed(this.circleClass, true)
+				// 	// 		.classed(this.imageMarkerClass, true)
+				// 	// 		.classed("image-marker2", true);
+
+				// 	// 	imageMarker2Selection
+				// 	// 		.datum(d => {
+				// 	// 			return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+				// 	// 		});
+
+				// 	// 	this.imageMarkerFormatting(imageMarker2Selection, true, true);
+				// 	// }
+				// } else {
+				// 	if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+				// 		// const symbol1 = lollipopG.append("defs")
+				// 		// 	.append("symbol")
+				// 		// 	.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
+				// 		// 	.attr("class", "marker1-symbol")
+				// 		// 	.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+				// 		// const path1Selection = symbol1.append("path")
+				// 		// 	.attr("d", marker.paths[0].d)
+				// 		// 	.attr("class", "marker1-path");
+
+				// 		// const circle1Selection = lollipopG.append("use")
+				// 		// 	.attr("id", CircleType.Circle1)
+				// 		// 	.classed(this.circleClass, true)
+				// 		// 	.classed(this.circle1Class, true);
+
+				// 		// this.setPath1Formatting(path1Selection);
+				// 		// this.setCircle1Formatting(circle1Selection, marker, true);
+
+				// 		// circle1Selection
+				// 		// 	.datum(d => {
+				// 		// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				// 		// 	});
+
+				// 		// path1Selection
+				// 		// 	.datum(d => {
+				// 		// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				// 		// 	});
+
+				// 		// if (this.isHasMultiMeasure) {
+				// 		// 	const symbol2 = lollipopG.append("defs")
+				// 		// 		.append("symbol")
+				// 		// 		.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
+				// 		// 		.attr("class", "marker2-symbol")
+				// 		// 		.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+
+				// 		// 	const path2Selection = symbol2.append("path")
+				// 		// 		.attr("d", marker.paths[0].d)
+				// 		// 		.attr("class", "marker2-path");
+
+				// 		// 	const circle2Selection = lollipopG.append("use")
+				// 		// 		.attr("id", CircleType.Circle2)
+				// 		// 		.classed(this.circleClass, true).classed(this.circle2Class, true);
+
+				// 		// 	this.setPath2Formatting(path2Selection);
+				// 		// 	this.setCircle2Formatting(circle2Selection, marker, true);
+
+				// 		// 	path2Selection
+				// 		// 		.datum(d => {
+				// 		// 			return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				// 		// 		});
+
+				// 		// 	circle2Selection
+				// 		// 		.datum(d => {
+				// 		// 			return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+				// 		// 		});
+				// 		// }
+				// 	} else {
+				// 		const pie1Selection = lollipopG.append("foreignObject")
+				// 			.attr("id", "pie1ForeignObject");
+				// 		this.enterPieChart(pie1Selection, false, true);
+				// 		this.setPieDataLabelsDisplayStyle();
+
+				// 		if (this.isHasMultiMeasure) {
+				// 			const pie2Selection = lollipopG.append("foreignObject")
+				// 				.attr("id", "pie2ForeignObject");
+				// 			this.enterPieChart(pie2Selection, true, true);
+				// 			this.setPieDataLabelsDisplayStyle(true);
+
+				// 			pie2Selection
+				// 				.datum(d => {
+				// 					return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+				// 				})
+				// 		}
+
+				// 		pie1Selection
+				// 			.datum(d => {
+				// 				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				// 			});
+				// 	}
+				// }
 
 				if (this.isHorizontalChart) {
 					this.setHorizontalLinesFormatting(lineSelection, true);
@@ -6503,27 +6656,34 @@ export class Visual extends Shadow {
 				return lollipopG;
 			},
 			(update) => {
+				const marker1Style = this.markerSettings.marker1Style;
+				const marker2Style = this.markerSettings.marker2Style;
+
 				const lineSelection = update.select(this.lineClassSelector).attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
 				const marker1SymbolSelection = update.select(".marker1-symbol");
 
 				const marker2SymbolSelection = update.select(".marker2-symbol");
 
-				if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+				// marker 1
+				if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 					marker1SymbolSelection
-						.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
-						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
-
-					marker2SymbolSelection
-						.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
-						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+						.attr("id", d => `${d.category}_${marker1.value}_MARKER1`)
+						.attr("viewBox", `0 0 ${marker1.w} ${marker1.h}`);
 				}
 
-				const path1Selection = update.select(".marker1-path").attr("d", this.isLollipopTypeCircle ? marker.paths[0].d : "");
+				// marker 2
+				if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+					marker2SymbolSelection
+						.attr("id", d => `${d.category}_${marker2.value}_MARKER2`)
+						.attr("viewBox", `0 0 ${marker2.w} ${marker2.h}`);
+				}
+
+				const path1Selection = update.select(".marker1-path").attr("d", this.isLollipopTypeCircle ? marker1.paths[0].d : "");
 
 				const circle1Selection = update.select(this.circle1ClassSelector);
 
-				const path2Selection = update.select(".marker2-path").attr("d", this.isLollipopTypeCircle ? marker.paths[0].d : "");
+				const path2Selection = update.select(".marker2-path").attr("d", this.isLollipopTypeCircle ? marker2.paths[0].d : "");
 
 				const circle2Selection = update.select(this.circle2ClassSelector);
 
@@ -6541,23 +6701,59 @@ export class Visual extends Shadow {
 					this.setVerticalLinesFormatting(lineSelection, false);
 				}
 
-				if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
+				// marker 1
+				if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker1Style.markerShapeBase64Url))) {
 					this.imageMarkerFormatting(imageMarker1Selection, false, false);
 
 					if (this.isHasMultiMeasure) {
 						this.imageMarkerFormatting(imageMarker2Selection, true, false);
 					}
 				} else {
-					if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+					if (this.isLollipopTypeCircle && (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 						pie1Selection.remove();
 						pie2Selection.remove();
 
 						this.setPath1Formatting(path1Selection);
-						this.setCircle1Formatting(circle1Selection, marker, false);
+						this.setCircle1Formatting(circle1Selection, marker1, false);
 
 						if (this.isHasMultiMeasure) {
 							this.setPath2Formatting(path2Selection);
-							this.setCircle2Formatting(circle2Selection, marker, false);
+							this.setCircle2Formatting(circle2Selection, marker2, false);
+						} else {
+							circle2Selection.remove();
+						}
+					} else {
+						circle1Selection.remove();
+						circle2Selection.remove();
+
+						this.updatePieChart(pie1Selection, false, false);
+						this.setPieDataLabelsDisplayStyle();
+
+						if (this.isHasMultiMeasure) {
+							this.updatePieChart(pie2Selection, true, false);
+							this.setPieDataLabelsDisplayStyle(true);
+						}
+					}
+				}
+
+				// marker 2
+				if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker2Style.markerShapeBase64Url))) {
+					this.imageMarkerFormatting(imageMarker1Selection, false, false);
+
+					if (this.isHasMultiMeasure) {
+						this.imageMarkerFormatting(imageMarker2Selection, true, false);
+					}
+				} else {
+					if (this.isLollipopTypeCircle && (this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+						pie1Selection.remove();
+						pie2Selection.remove();
+
+						this.setPath1Formatting(path1Selection);
+						this.setCircle1Formatting(circle1Selection, marker1, false);
+
+						if (this.isHasMultiMeasure) {
+							this.setPath2Formatting(path2Selection);
+							this.setCircle2Formatting(circle2Selection, marker2, false);
 						} else {
 							circle2Selection.remove();
 						}
@@ -6974,7 +7170,7 @@ export class Visual extends Shadow {
 
 		let itemStyle = {};
 
-		switch (this.markerSettings.markerChart) {
+		switch (isPie2 ? this.markerSettings.marker2Style.markerChart : this.markerSettings.marker1Style.markerChart) {
 			case EMarkerChartTypes.PIE: {
 				itemStyle = {
 					borderRadius: 0,
@@ -7012,8 +7208,8 @@ export class Visual extends Shadow {
 		return `${category}-${subCategory}`.replace(/ /g, "").toLocaleLowerCase().trim();
 	}
 
-	getPieChartSeriesRadius(): string | string[] | number[] {
-		switch (this.markerSettings.markerChart) {
+	getPieChartSeriesRadius(isPie2: boolean): string | string[] | number[] {
+		switch (isPie2 ? this.markerSettings.marker2Style.markerChart : this.markerSettings.marker1Style.markerChart) {
 			case EMarkerChartTypes.PIE: {
 				return `${this.pieViewBoxRatio - this.pieEmphasizeScaleSize}%`;
 			}
@@ -7032,7 +7228,7 @@ export class Visual extends Shadow {
 	getPieDataLabelsFontSize(isPie2: boolean = false): number {
 		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
 		let autoFontSize = this.dataLabelsSettings.fontSize;
-		switch (this.markerSettings.markerChart) {
+		switch (isPie2 ? this.markerSettings.marker2Style.markerChart : this.markerSettings.marker1Style.markerChart) {
 			case EMarkerChartTypes.PIE:
 				autoFontSize = (pieRadius - pieRadius * (this.pieEmphasizeScaleSize / 100)) / 2;
 				break;
@@ -7090,7 +7286,7 @@ export class Visual extends Shadow {
 			series: [
 				{
 					type: "pie",
-					radius: this.getPieChartSeriesRadius(),
+					radius: this.getPieChartSeriesRadius(isPie2),
 					emphasis: {
 						scale: false,
 					},
@@ -7133,7 +7329,7 @@ export class Visual extends Shadow {
 
 		const categoryValue = this.chartData.find((d) => d.category === category)[isPie2 ? "value2" : "value1"];
 
-		switch (this.markerSettings.markerChart) {
+		switch (isPie2 ? this.markerSettings.marker2Style.markerChart : this.markerSettings.marker1Style.markerChart) {
 			case EMarkerChartTypes.PIE: {
 				pieOption.series[0].roseType = "";
 				break;
@@ -7834,9 +8030,12 @@ export class Visual extends Shadow {
 			${this.categoricalData.categories[0].values.length}-
 			${this.categoricalData.values.length}-
 			${this.markerSettings.markerType}-
-			${this.markerSettings.markerShape}-
-			${this.markerSettings.markerChart}-
-			${this.isShowImageMarker}`;
+			${this.markerSettings.marker1Style.markerShape}-
+			${this.markerSettings.marker1Style.markerChart}-
+			${this.markerSettings.marker2Style.markerShape}-
+			${this.markerSettings.marker2Style.markerChart}-
+			${this.isShowImageMarker1}-
+			${this.isShowImageMarker2}`;
 		}
 
 		const categories = [...new Set(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values)];
@@ -7907,22 +8106,46 @@ export class Visual extends Shadow {
 			this.brushYScale.domain([min, max]);
 		}
 
-		let marker: IMarkerData;
-		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-			const markerShapeValue = this.markerSettings.markerShapeValue;
-			marker = {
-				label: this.markerSettings.markerShapeValue.iconName,
-				value: this.markerSettings.markerShapeValue.iconName,
+		let marker1: IMarkerData;
+		let marker2: IMarkerData;
+
+		const marker1Style = this.markerSettings.marker1Style;
+		const marker2Style = this.markerSettings.marker2Style;
+
+		// marker 1
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker1Style.markerShapeValue;
+			marker1 = {
+				label: marker1Style.markerShapeValue.iconName,
+				value: marker1Style.markerShapeValue.iconName,
 				w: markerShapeValue.icon[0],
 				h: markerShapeValue.icon[1],
-				paths: [{ d: this.markerSettings.markerShapePath, stroke: undefined }]
+				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
 			}
 		} else {
-			marker = CATEGORY_MARKERS.find(d => d.value === this.markerSettings.dropdownMarkerType);
+			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
 		}
 
-		if (this.markerSettings.markerType === EMarkerTypes.CHART || this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
-			marker = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
+		if (this.markerSettings.markerType === EMarkerTypes.CHART || marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			marker1 = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
+		}
+
+		// marker 2
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker2Style.markerShapeValue;
+			marker2 = {
+				label: marker2Style.markerShapeValue.iconName,
+				value: marker2Style.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: marker2Style.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker2 = CATEGORY_MARKERS.find(d => d.value === marker2Style.dropdownMarkerType);
+		}
+
+		if (this.markerSettings.markerType === EMarkerTypes.CHART || marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			marker2 = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
 		}
 
 		const setPath1Formatting = (circleSelection: any): void => {
@@ -7931,7 +8154,7 @@ export class Visual extends Shadow {
 					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 					const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
-					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
+					color = color && !this.isShowImageMarker1 ? color : "rgba(92,113,187,1)";
 					let pattern = d.pattern;
 					if (this.isHasMultiMeasure && this.isPatternApplied) {
 						pattern = this.patternByMeasures[DataValuesType.Value1];
@@ -7951,7 +8174,7 @@ export class Visual extends Shadow {
 					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 					const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker2Color : null), EHighContrastColorType.Foreground);
-					color = color && !this.isShowImageMarker ? color : "rgba(92,113,187,1)";
+					color = color && !this.isShowImageMarker2 ? color : "rgba(92,113,187,1)";
 					let pattern = d.pattern;
 					if (this.isHasMultiMeasure && this.isPatternApplied) {
 						pattern = this.patternByMeasures[DataValuesType.Value2];
@@ -8069,15 +8292,15 @@ export class Visual extends Shadow {
 
 				const symbol1 = lollipopG.append("defs")
 					.append("symbol")
-					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER1`)
+					.attr("id", d => `${d.category}_${marker1.value}_BRUSH_MARKER1`)
 					.attr("class", "marker1-symbol")
-					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+					.attr("viewBox", `0 0 ${marker1.w} ${marker1.h}`);
 
 				const path1Selection = symbol1.append("path")
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					})
-					.attr("d", marker.paths[0].d)
+					.attr("d", marker1.paths[0].d)
 					.attr("class", "marker1-path");
 
 				const circle1Selection = lollipopG.append("use")
@@ -8088,20 +8311,20 @@ export class Visual extends Shadow {
 					.classed("chart-circle1", true);
 
 				setPath1Formatting(path1Selection);
-				setCircleFormatting(circle1Selection, false, marker, true);
+				setCircleFormatting(circle1Selection, false, marker1, true);
 
 				if (this.isHasMultiMeasure) {
 					const symbol2 = lollipopG.append("defs")
 						.append("symbol")
-						.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER2`)
+						.attr("id", d => `${d.category}_${marker2.value}_BRUSH_MARKER2`)
 						.attr("class", "marker2-symbol")
-						.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+						.attr("viewBox", `0 0 ${marker2.w} ${marker2.h}`);
 
 					const path2Selection = symbol2.append("path")
 						.datum(d => {
 							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 						})
-						.attr("d", marker.paths[0].d)
+						.attr("d", marker2.paths[0].d)
 						.attr("class", "marker2-path");
 
 					const circle2Selection = lollipopG.append("use")
@@ -8112,7 +8335,7 @@ export class Visual extends Shadow {
 						.classed("chart-circle2", true);
 
 					setPath2Formatting(path2Selection);
-					setCircleFormatting(circle2Selection, true, marker, true);
+					setCircleFormatting(circle2Selection, true, marker2, true);
 				}
 
 				if (this.isHorizontalChart) {
@@ -8130,32 +8353,32 @@ export class Visual extends Shadow {
 
 				update
 					.select(".marker1-symbol")
-					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER1`)
-					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+					.attr("id", d => `${d.category}_${marker1.value}_BRUSH_MARKER1`)
+					.attr("viewBox", `0 0 ${marker1.w} ${marker1.h}`);
 
 				update
 					.select(".marker2-symbol")
-					.attr("id", d => `${d.category}_${marker.value}_BRUSH_MARKER2`)
-					.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
+					.attr("id", d => `${d.category}_${marker1.value}_BRUSH_MARKER2`)
+					.attr("viewBox", `0 0 ${marker1.w} ${marker1.h}`);
 
 				const path1Selection = update.select(".marker1-path")
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					})
-					.attr("d", marker.paths[0].d);
+					.attr("d", marker1.paths[0].d);
 
 				const path2Selection = update.select(".marker2-path")
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 					})
-					.attr("d", marker.paths[0].d);
+					.attr("d", marker2.paths[0].d);
 
 				setPath1Formatting(path1Selection);
-				setCircleFormatting(circle1Selection, false, marker, false);
+				setCircleFormatting(circle1Selection, false, marker1, false);
 
 				if (this.isHasMultiMeasure) {
 					setPath2Formatting(path2Selection);
-					setCircleFormatting(circle2Selection, true, marker, false);
+					setCircleFormatting(circle2Selection, true, marker2, false);
 				}
 
 				if (this.isHorizontalChart) {

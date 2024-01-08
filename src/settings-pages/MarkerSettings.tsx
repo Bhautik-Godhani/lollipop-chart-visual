@@ -77,22 +77,24 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 	);
 };
 
-const UIMarkerShapeTypes = (shadow: Visual, configValues: IMarkerSettings, initialStates: IMarkerSettings, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStates: IMarkerSettings, markerStyleTypes: EMarkerStyleTypes, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+	const configValues = config[config.markerStyleType];
+
 	return (
 		<>
 			<ConditionalWrapper visible={shadow.isHasImagesData}>
 				<Row disableTopPadding>
 					<Column>
 						<Tabs selected={configValues.markerShape} onChange={(value) => {
-							handleChange(value, EMarkerSettings.MarkerShape, setConfigValues)
+							handleMarkerStyleChange(value, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues)
 						}}>
 							<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
 								<MarkerPicker
 									label="Select Marker"
 									marker={{ label: configValues.dropdownMarkerType, value: configValues.dropdownMarkerType }}
 									handleChange={(e: IMarkerData) => {
-										handleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, setConfigValues);
-										handleChange(e.value, EMarkerSettings.DropdownMarkerType, setConfigValues);
+										handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+										handleMarkerStyleChange(e.value, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
 									}}
 									markersList={MARKERS_LIST}
 								/>
@@ -109,17 +111,17 @@ const UIMarkerShapeTypes = (shadow: Visual, configValues: IMarkerSettings, initi
 												label: d,
 												value: d
 											}))}
-											handleChange={(value) => handleChange(value, EMarkerSettings.SelectedImageDataField, setConfigValues)}
+											handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SelectedImageDataField, markerStyleTypes, setConfigValues)}
 										/>
 									</Column>
 								</Row>
 							</Tab>
 
 							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
-								<IconsTab configValues={configValues} setConfigValues={setConfigValues} initialStates={initialStates} />
+								<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
 							</Tab>
 							<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>
-								<UploadTab configValues={configValues} setConfigValues={setConfigValues} />
+								<UploadTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} />
 							</Tab>
 						</Tabs>
 					</Column>
@@ -130,35 +132,35 @@ const UIMarkerShapeTypes = (shadow: Visual, configValues: IMarkerSettings, initi
 				<Row disableTopPadding>
 					<Column>
 						<Tabs selected={configValues.markerShape} onChange={(value) => {
-							handleChange(value, EMarkerSettings.MarkerShape, setConfigValues)
+							handleMarkerStyleChange(value, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues)
 						}}>
 							<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
 								<MarkerPicker
 									label="Select Marker"
 									marker={{ label: configValues.dropdownMarkerType, value: configValues.dropdownMarkerType }}
 									handleChange={(e: IMarkerData) => {
-										handleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, setConfigValues);
-										handleChange(e.value, EMarkerSettings.DropdownMarkerType, setConfigValues);
+										handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+										handleMarkerStyleChange(e.value, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
 									}}
 									markersList={MARKERS_LIST}
 								/>
 							</Tab>
 
 							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
-								<IconsTab configValues={configValues} setConfigValues={setConfigValues} initialStates={initialStates} />
+								<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
 							</Tab>
 							<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>
-								<UploadTab configValues={configValues} setConfigValues={setConfigValues} />
+								<UploadTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} />
 							</Tab>
 						</Tabs>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
+			</ConditionalWrapper >
 		</>
 	)
 }
 
-const IconsTab = ({ configValues, setConfigValues, initialStates }) => (
+const IconsTab = ({ configValues, markerStyleTypes, setConfigValues, initialStates }) => (
 	<Row>
 		<Column>
 			<IconPicker
@@ -168,9 +170,12 @@ const IconsTab = ({ configValues, setConfigValues, initialStates }) => (
 					setConfigValues((d) => ({
 						...d,
 						shapeValue: icon,
-						[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.ICONS_LIST,
-						[EMarkerSettings.MarkerShapePath]: icon.icon[4],
-						[EMarkerSettings.MarkerShapeValue]: icon,
+						[markerStyleTypes]: {
+							...d[markerStyleTypes],
+							[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.ICONS_LIST,
+							[EMarkerSettings.MarkerShapePath]: icon.icon[4],
+							[EMarkerSettings.MarkerShapeValue]: icon,
+						}
 					}));
 				}}
 			/>
@@ -178,7 +183,7 @@ const IconsTab = ({ configValues, setConfigValues, initialStates }) => (
 	</Row>
 );
 
-const UploadTab = ({ configValues, setConfigValues }) => (
+const UploadTab = ({ configValues, markerStyleTypes, setConfigValues }) => (
 	<Row>
 		<Column>
 			<FileUploader
@@ -186,8 +191,11 @@ const UploadTab = ({ configValues, setConfigValues }) => (
 				handleChange={(image) => {
 					setConfigValues((d) => ({
 						...d,
-						[EMarkerSettings.MarkerShapeBase64Url]: image.image,
-						[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.UPLOAD_ICON,
+						[markerStyleTypes]: {
+							...d[markerStyleTypes],
+							[EMarkerSettings.MarkerShapeBase64Url]: image.image,
+							[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.UPLOAD_ICON,
+						}
 					}));
 				}}
 			/>
@@ -256,11 +264,11 @@ const MarkerSettings = (props) => {
 			handleChange(EMarkerTypes.SHAPE, EMarkerSettings.MarkerType, setConfigValues)
 		}
 
-		if (configValues.markerShape === EMarkerShapeTypes.IMAGES && (!configValues.selectedImageDataField || !shadow.imagesDataFieldsName.includes(configValues.selectedImageDataField)) && shadow.imagesDataFieldsName.length > 0) {
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && (!configValues[configValues.markerStyleType].selectedImageDataField || !shadow.imagesDataFieldsName.includes(configValues[configValues.markerStyleType].selectedImageDataField)) && shadow.imagesDataFieldsName.length > 0) {
 			handleChange(shadow.imagesDataFieldsName[0], EMarkerSettings.SelectedImageDataField, setConfigValues);
 		}
 
-		if (configValues.markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length === 0) {
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length === 0) {
 			handleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, setConfigValues);
 		}
 
@@ -277,9 +285,21 @@ const MarkerSettings = (props) => {
 		<>
 			<Row>
 				<Column>
-
 					<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-						{UIMarkerShapeTypes(shadow, configValues, initialStates, setConfigValues)}
+						<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+							<Row>
+								<Column>
+									<SwitchOption
+										label={'Select Measure'}
+										value={configValues.markerStyleType}
+										optionsList={MARKER_STYLE_TYPES}
+										handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
+
+						{UIMarkerShapeTypes(shadow, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
 					</ConditionalWrapper>
 
 					<ConditionalWrapper visible={shadow.isHasSubcategories}>
@@ -294,8 +314,21 @@ const MarkerSettings = (props) => {
 							</Column>
 						</Row>
 
+						<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+							<Row>
+								<Column>
+									<SwitchOption
+										label={'Select Measure'}
+										value={configValues.markerStyleType}
+										optionsList={MARKER_STYLE_TYPES}
+										handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
+
 						<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.SHAPE}>
-							{UIMarkerShapeTypes(shadow, configValues, initialStates, setConfigValues)}
+							{UIMarkerShapeTypes(shadow, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
 						</ConditionalWrapper>
 
 						<ConditionalWrapper visible={configValues.markerType === EMarkerTypes.CHART}>
@@ -303,26 +336,13 @@ const MarkerSettings = (props) => {
 								<Column>
 									<ImageOption
 										isShowImageTooltip={true}
-										value={configValues.markerChart}
+										value={configValues[configValues.markerStyleType].markerChart}
 										images={MARKER_CHART_TYPES}
-										handleChange={(value) => handleChange(value, EMarkerSettings.MarkerChart, setConfigValues)}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerChart, configValues.markerStyleType, setConfigValues)}
 									/>
 								</Column>
 							</Row>
 						</ConditionalWrapper>
-					</ConditionalWrapper>
-
-					<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
-						<Row>
-							<Column>
-								<SwitchOption
-									label={'Select Measure'}
-									value={configValues.markerStyleType}
-									optionsList={MARKER_STYLE_TYPES}
-									handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
-								/>
-							</Column>
-						</Row>
 					</ConditionalWrapper>
 
 					<Row>
