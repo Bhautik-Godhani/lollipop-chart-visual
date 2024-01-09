@@ -52,6 +52,7 @@ import {
 	AxisCategoryType,
 	EErrorBarsDirection,
 	RankingDataValuesType,
+	ECFApplyOnCategories,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -255,10 +256,10 @@ export class Visual extends Shadow {
 	conditionalFormattingConditions: IConditionalFormattingProps[] = [];
 	categoriesColorList: { name: string, marker: string }[] = [];
 	subCategoriesColorList: { name: string, marker: string }[] = [];
-	categoryColorPairWithIndex: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
-	subCategoryColorPairWithIndex: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
-	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string } } = {};
-	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string } } = {};
+	categoryColorPairWithIndex: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	subCategoryColorPairWithIndex: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	isHasNegativeValue: boolean;
 	markerMaxSize: number = 0;
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
@@ -633,13 +634,13 @@ export class Visual extends Shadow {
 			},
 			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
 			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
-			// CFConfig: {
-			// 	isSupportApplyOn: true, applyOnCategories: [
-			// 		{ label: "Marker", value: ECFApplyOnCategories.Marker },
-			// 		{ label: "Line", value: ECFApplyOnCategories.Line },
-			// 		{ label: "Labels", value: ECFApplyOnCategories.Labels },
-			// 	]
-			// },
+			CFConfig: {
+				isSupportApplyOn: true, applyOnCategories: [
+					{ label: "Marker", value: ECFApplyOnCategories.Marker },
+					{ label: "Line", value: ECFApplyOnCategories.Line },
+					{ label: "Labels", value: ECFApplyOnCategories.Labels },
+				]
+			},
 			smallMultiplesConfig: {
 				showGridLayoutOnly: false,
 				showXYAxisSettings: true
@@ -1490,11 +1491,11 @@ export class Visual extends Shadow {
 
 		// set colors for all pairs
 		this.categoricalDataPairs.forEach((data, i) => {
-			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: "", marker2Color: "" };
+			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
 		});
 
 		this.subCategoriesName.forEach((name, i) => {
-			this.subCategoryColorPairWithIndex[`${i}-${name}`] = { marker1Color: "", marker2Color: "" };
+			this.subCategoryColorPairWithIndex[`${i}-${name}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
 		});
 
 		this.setColorsByDataColorsSettings();
@@ -2545,41 +2546,62 @@ export class Visual extends Shadow {
 	}
 
 	setConditionalFormattingColor(): void {
-		const clonedChartData: ILollipopChartRow[] = JSON.parse(JSON.stringify(this.chartData));
-		clonedChartData.forEach(d => {
-			d.subCategories = d.subCategories.sort((a, b) => this.isHasMultiMeasure ? (b.value1 + b.value2) - (a.value1 + a.value2) : b.value1 - a.value1);
-		})
-		const sortedChartData = clonedChartData.sort((a, b) => this.isHasMultiMeasure ? (b.value1 + b.value2) - (a.value1 + a.value2) : b.value1 - a.value1);
-
 		this.chartData.forEach((d) => {
-			if (this.isLollipopTypeCircle) {
-				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions, sortedChartData);
+			if (!this.isHasSubcategories) {
+				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
 				if (conditionalFormattingResult.match) {
-					if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
-						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
-					} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
-						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
-					} else {
-						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.color;
-						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.color;
+					// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+					// 	this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+					// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+					// 	this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+					// } else {
+					if (conditionalFormattingResult.markerColor) {
+						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 					}
+
+					// }
+					if (conditionalFormattingResult.lineColor) {
+						this.categoryColorPair[d.category].lineColor = conditionalFormattingResult.lineColor;
+					}
+
+					if (conditionalFormattingResult.labelColor) {
+						this.categoryColorPair[d.category].labelColor = conditionalFormattingResult.labelColor;
+					}
+				} else {
+					// this.categoryColorPair[d.category].lineColor = undefined;
+					// this.categoryColorPair[d.category].labelColor = undefined;
 				}
 			} else {
 				d.subCategories.forEach((s) => {
-					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions, sortedChartData);
+					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
 					if (conditionalFormattingResult.match) {
-						if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
-							this.subCategoryColorPair[s.category].marker1Color = conditionalFormattingResult.color;
-						} else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
-							this.subCategoryColorPair[s.category].marker2Color = conditionalFormattingResult.color;
-						} else {
-							this.subCategoryColorPair[s.category].marker1Color = conditionalFormattingResult.color;
-							this.subCategoryColorPair[s.category].marker2Color = conditionalFormattingResult.color;
+						// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+						// 	this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+						// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+						// 	this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+						// } else {
+						if (conditionalFormattingResult.markerColor) {
+							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 						}
+
+						// }
+						if (conditionalFormattingResult.lineColor) {
+							this.subCategoryColorPair[d.category].lineColor = conditionalFormattingResult.lineColor;
+						}
+
+						if (conditionalFormattingResult.labelColor) {
+							this.subCategoryColorPair[d.category].labelColor = conditionalFormattingResult.labelColor;
+						}
+					} else {
+						// this.subCategoryColorPair[d.category].lineColor = undefined;
+						// this.subCategoryColorPair[d.category].labelColor = undefined;
 					}
 				});
 			}
 		});
+
 	}
 
 	private sortSubcategoryData(): void {
@@ -4499,11 +4521,13 @@ export class Visual extends Shadow {
 		if (labelPlacement === DataLabelsPlacement.Inside) {
 			textSelection
 				.attr("fill", d => {
-					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, false) : this.dataLabelsSettings.color, EHighContrastColorType.Foreground)
+					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : this.dataLabelsSettings.color), EHighContrastColorType.Foreground)
 				});
 		} else {
 			textSelection
-				.attr("fill", this.getColor(dataLabelsSettings.color, EHighContrastColorType.Foreground));
+				.attr("fill", d => {
+					return this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color;
+				});
 		}
 
 		if (labelPlacement === DataLabelsPlacement.Inside) {
@@ -6130,7 +6154,7 @@ export class Visual extends Shadow {
 				}
 			}
 		} else {
-			return this.getColor(this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+			return this.getColor(this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
 		}
 	}
 

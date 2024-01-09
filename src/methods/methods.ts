@@ -8,7 +8,7 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { ILollipopChartRow, TooltipData } from "../model";
-import { ECFRankingTypes, ECFValueTypes, EChartSettings, EDataRolesName, EVisualConfig, EVisualSettings } from "../enum";
+import { ECFApplyOnCategories, ECFRankingTypes, ECFValueTypes, EChartSettings, EDataRolesName, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { sum } from "d3-array";
@@ -439,6 +439,9 @@ export const parseConditionalFormatting = (SETTINGS) => {
 		if (!parsed.values || !Array.isArray(parsed.values)) return [];
 		const flattened = [];
 		parsed.values.forEach((el) => {
+			el.conditions.forEach(d => {
+				d.applyOnCategories = el.applyOnCategories;
+			})
 			flattened.push(...(el.conditions || []));
 		});
 		if (!Array.isArray(flattened) || !(flattened ? flattened.length : 0)) {
@@ -451,41 +454,47 @@ export const parseConditionalFormatting = (SETTINGS) => {
 	return [];
 };
 
-export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[], sortedChartData: ILollipopChartRow[]) => {
-	const isMeasureMatch = (el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
-		const result = { match: false, color: "", sourceName, measureType };
+export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[])
+	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
+	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;
 		const color = el.color;
 
+		if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+			result.markerColor = color;
+		}
+
+		if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+			result.lineColor = color;
+		}
+
+		if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+			result.labelColor = color;
+		}
+
 		switch (el.operator) {
 			case "===":
 				result.match = value === v;
-				result.color = color;
 				break;
 			case "!==":
 				result.match = value !== v;
-				result.color = color;
 				break;
 			case "<":
 				result.match = value < v;
-				result.color = color;
 				break;
 			case ">":
 				result.match = value > v;
-				result.color = color;
 				break;
 			case "<=":
 				result.match = value <= v;
-				result.color = color;
 				break;
 			case ">=":
 				result.match = value >= v;
-				result.color = color;
 				break;
 			case "<>":
 				result.match = value > 0 ? value >= v && value <= +v2 : value <= v && value >= +v2;
-				result.color = color;
 				break;
 		}
 
@@ -493,8 +502,8 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 	}
 
 	try {
-		if (!Array.isArray(flattened) || !flattened) return { match: false, color: "" };
-		let result: { match: boolean, color: string, sourceName?: string, measureType?: EDataRolesName } = { match: false, color: "", sourceName: "", measureType: undefined };
+		if (!Array.isArray(flattened) || !flattened) return { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined };
+		let result: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName: "", measureType: undefined };
 		for (let index = 0; index < flattened.length; index++) {
 			const el = flattened[index];
 
@@ -502,96 +511,77 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 				return;
 			}
 
-			switch (el.valueType) {
-				case ECFValueTypes.Value:
-					if (el.applyTo === "measure") {
-						if (el.measureType.measure) {
-							if (el.measureType.measure1) {
-								result = (isMeasureMatch(el, value1, el.sourceName, EDataRolesName.Measure1));
-							} else if (el.measureType.measure2) {
-								result = isMeasureMatch(el, value2, el.sourceName, EDataRolesName.Measure2);
-							}
-						} else if (el.measureType.tooltip) {
-							const results = tooltips.map(d => isMeasureMatch(el, +d.value, d.displayName));
-							result = results.find(d => d.match && d.sourceName === el.sourceName);
-						}
-						if (result.match) {
-							return result;
-						}
-					} else if (el.applyTo === "category") {
-						const v = el.staticValue;
-						const color = el.color;
-						category = el.categoryType.category ? category : subCategory;
-
-						switch (el.operator) {
-							case "===":
-								result = { match: matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
-								break;
-							case "!==":
-								result = { match: !matchRuleShort(category.toLowerCase(), v.toLowerCase()), color };
-								break;
-							case "contains":
-								result = { match: category.toLowerCase().includes(v.toLowerCase()), color };
-								break;
-							case "doesnotcontain":
-								result = { match: !category.toLowerCase().includes(v.toLowerCase()), color };
-								break;
-							case "beginswith":
-								result = { match: category.toLowerCase().startsWith(v.toLowerCase()), color };
-								break;
-							case "doesnotbeginwith":
-								result = { match: !category.toLowerCase().startsWith(v.toLowerCase()), color };
-								break;
-							case "endswith":
-								result = { match: category.toLowerCase().endsWith(v.toLowerCase()), color };
-								break;
-							case "doesnotendwith":
-								result = { match: !category.toLowerCase().endsWith(v.toLowerCase()), color };
-								break;
-						}
-						if (result.match) {
-							return result;
-						}
+			if (el.applyTo === "measure") {
+				if (el.measureType.measure) {
+					if (el.measureType.measure1) {
+						(isMeasureMatch(result, el, value1, el.sourceName, EDataRolesName.Measure1));
+					} else if (el.measureType.measure2) {
+						isMeasureMatch(result, el, value2, el.sourceName, EDataRolesName.Measure2);
 					}
-					break;
-
-				case ECFValueTypes.Ranking:
-					if (subCategory) {
-						if (el.rankingType === ECFRankingTypes.TopN) {
-							const isHasCategory = sortedChartData.find(d => d.category === category).subCategories.slice(0, el.staticRankingValue).map(d => d.category).includes(subCategory);
-							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
-						} else if (el.rankingType === ECFRankingTypes.BottomN) {
-							const isHasCategory = sortedChartData.find(d => d.category === category).subCategories.slice(sortedChartData[0].subCategories.length - el.staticRankingValue, sortedChartData[0].subCategories.length).map(d => d.category).includes(subCategory);
-							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
-						}
-					} else {
-						if (el.rankingType === ECFRankingTypes.TopN) {
-							const isHasCategory = sortedChartData.slice(0, el.staticRankingValue).map(d => d.category).includes(category);
-							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
-						} else if (el.rankingType === ECFRankingTypes.BottomN) {
-							const isHasCategory = sortedChartData.slice(sortedChartData.length - el.staticRankingValue, sortedChartData.length).map(d => d.category).includes(category);
-							return { match: isHasCategory, color: el.color, sourceName: el.sourceName };
-						}
-					}
-					break;
-
-				case ECFValueTypes.Percentage: {
-					const total = sum(sortedChartData, d => d.value1 + d.value2);
-					const start = total * el.staticPercentValue / 100;
-					const end = total * el.secondaryStaticPercentValue / 100;
-
-					if ((value1 + (value2 ? value2 : 0)) > start && (value1 + (value2 ? value2 : 0)) < end) {
-						return { match: true, color: el.color, sourceName: el.sourceName }
-					}
+				} else if (el.measureType.tooltip) {
+					const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
+					result = results.find(d => d.match && d.sourceName === el.sourceName);
 				}
-					break;
+				// if (result.match) {
+				// 	return result;
+				// }
+			} else if (el.applyTo === "category") {
+				const v = el.staticValue;
+				const color = el.color;
+				category = el.categoryType.category ? category : subCategory;
+
+				if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+					result.markerColor = color;
+				}
+
+				if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+					result.lineColor = color;
+				}
+
+				if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+					result.labelColor = color;
+				}
+
+				switch (el.operator) {
+					case "===":
+						result.match = matchRuleShort(category.toLowerCase(), v.toLowerCase());
+						break;
+					case "!==":
+						result.match = !matchRuleShort(category.toLowerCase(), v.toLowerCase());
+						break;
+					case "contains":
+						result.match = category.toLowerCase().includes(v.toLowerCase());
+						break;
+					case "doesnotcontain":
+						result.match = !category.toLowerCase().includes(v.toLowerCase());
+						break;
+					case "beginswith":
+						result.match = category.toLowerCase().startsWith(v.toLowerCase());
+						break;
+					case "doesnotbeginwith":
+						result.match = !category.toLowerCase().startsWith(v.toLowerCase());
+						break;
+					case "endswith":
+						result.match = category.toLowerCase().endsWith(v.toLowerCase());
+						break;
+					case "doesnotendwith":
+						result.match = !category.toLowerCase().endsWith(v.toLowerCase());
+						break;
+				}
+				// if (result.match) {
+				// 	return result;
+				// }
 			}
 		}
-		return { match: false, color: "" };
+
+		if (result.match) {
+			return result;
+		}
+		return { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined };
 	} catch (e) {
-		console.log("Error fetching conditional formatting colors", flattened);
+		console.log("Error fetching conditional formatting colors", e);
 	}
-	return { match: false, color: "" };
+	return { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined };
 };
 
 function matchRuleShort(str, rule) {
