@@ -257,7 +257,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
   const AXIS_NAMES = Get_AXIS_NAMES(shadow);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
   const line1Measure = [{
-    label: configValues.lineValue1.measureName,
+    label: AXIS_NAMES.find(d => d.value === configValues.lineValue1.measureName)?.label,
     value: configValues.lineValue1.measureName,
     axis: configValues.lineValue1.axis,
   }];
@@ -309,7 +309,11 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           <SelectInput
             label={"Based On"}
             value={lineValues.type}
-            optionsList={LINE_TYPES}
+            optionsList={isValue2 ?
+              [{
+                label: LINE_TYPES.find(d => d.value === configValues.lineValue1.type)?.label,
+                value: configValues.lineValue1.type,
+              }] : LINE_TYPES}
             handleChange={value => handleChange(value, "type", type)}
           />
         </Column>
@@ -341,7 +345,10 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           <SelectInput
             label={"Based On"}
             value={lineValues.computation}
-            optionsList={ComputationTypeList}
+            optionsList={isValue2 ? [{
+              label: ComputationTypeList.find(d => d.value === configValues.lineValue1.computation)?.label,
+              value: configValues.lineValue1.computation,
+            }] : ComputationTypeList}
             handleChange={(value) => handleChange(value, "computation", type)}
           />
         </Column>
@@ -928,6 +935,16 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
       handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
   }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
+
+  React.useEffect(() => {
+    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
+      handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.measureName, EReferenceLineValueProps.MeasureName, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues.lineValue1.measureName, configValues.lineValue1.type, configValues.lineValue1.computation]);
+
 
   const resetChanges = () => {
     setConfigValues(() => defaultSettings);
