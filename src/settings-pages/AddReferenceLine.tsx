@@ -725,7 +725,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
     value: "",
     rank: "",
   });
-  const defaultSettings = JSON.parse(JSON.stringify(isAddNew ? REFERENCE_LINES_SETTINGS : details));
+  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : details;
 
   React.useEffect(() => {
     if (configValues.lineValue1.type === "value") {
@@ -930,10 +930,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
   }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
 
   const resetChanges = () => {
-    setConfigValues(d => ({
-      ...d,
-      ...defaultSettings
-    }));
+    setConfigValues(() => defaultSettings);
   };
 
   return (
