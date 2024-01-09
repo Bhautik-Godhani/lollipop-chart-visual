@@ -510,7 +510,7 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.PenultimateToLast:
             {
-                const from = self.chartData[1];
+                const from = self.chartData[chartDataLength - 2];
                 const to = self.chartData[chartDataLength - 1];
                 RenderDynamicDeviation(
                     self,
