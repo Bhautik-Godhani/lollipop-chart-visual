@@ -55,7 +55,7 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {
-            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale).ticks(height / 70));
+            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale));
         } else if (self.yAxisSettings.position === Position.Right) {
             select(yAxisG)
                 .attr("transform", `translate(${width}, 0)`)

@@ -3212,14 +3212,14 @@ export class Visual extends Shadow {
 								data: {
 									name: this.measure1DisplayName,
 									color: this.getColor(this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: undefined
+									pattern: this.patternByMeasures[DataValuesType.Value1]
 								},
 							},
 							{
 								data: {
 									name: this.measure2DisplayName,
 									color: this.getColor(this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-									pattern: undefined
+									pattern: this.patternByMeasures[DataValuesType.Value2]
 								},
 							}
 						]
@@ -3236,7 +3236,7 @@ export class Visual extends Shadow {
 							data: {
 								name: d,
 								color: this.getColor(this.categoryColorPair[this.chartData[0].category][`marker${i + 1}Color`], EHighContrastColorType.Foreground),
-								pattern: undefined
+								pattern: this.patternByMeasures[`value${i + 1}`]
 							}
 						}))
 					} else {
@@ -3290,14 +3290,14 @@ export class Visual extends Shadow {
 								data: {
 									name: this.measure1DisplayName,
 									color: this.getColor(this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: undefined
+									pattern: this.patternByMeasures[DataValuesType.Value1]
 								},
 							},
 							{
 								data: {
 									name: this.measure2DisplayName,
 									color: this.getColor(this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-									pattern: undefined
+									pattern: this.patternByMeasures[DataValuesType.Value2]
 								},
 							}
 						]
@@ -3309,6 +3309,7 @@ export class Visual extends Shadow {
 				case ColorPaletteType.Sequential:
 				case ColorPaletteType.ByCategory:
 				case ColorPaletteType.Gradient:
+					// only this needs to be change for pattern
 					legendDataPoints = this.subCategoriesName.map((d, i) => ({
 						data: {
 							name: d,
@@ -4521,12 +4522,12 @@ export class Visual extends Shadow {
 		if (labelPlacement === DataLabelsPlacement.Inside) {
 			textSelection
 				.attr("fill", d => {
-					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : this.dataLabelsSettings.color), EHighContrastColorType.Foreground)
+					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : this.dataLabelsSettings.color), EHighContrastColorType.Foreground)
 				});
 		} else {
 			textSelection
 				.attr("fill", d => {
-					return this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color;
+					return this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color;
 				});
 		}
 
@@ -5539,8 +5540,8 @@ export class Visual extends Shadow {
 				max = this.xAxisSettings.maximumRange;
 			}
 
-			this.xScale = d3.scaleLinear().nice();
-			this.xScale.domain([min, max]);
+			this.xScale = d3.scaleLinear();
+			this.xScale.domain([min, max]).nice();
 		} else {
 			this.xScale = d3.scaleBand();
 			this.xScale.domain(this.chartData.map((d) => d.category));
@@ -5560,23 +5561,23 @@ export class Visual extends Shadow {
 		// 	this.yScale = d3.scaleBand();
 		// 	this.yScale.domain(this.chartData.map((d) => d.category));
 		// } else {
-		this.yScale = isLinearScale ? d3.scaleLinear().nice() : d3.scaleBand();
+		this.yScale = isLinearScale ? d3.scaleLinear() : d3.scaleBand();
 
 		if (isLinearScale) {
-			this.yScale = d3.scaleLinear().nice();
+			this.yScale = d3.scaleLinear();
 		} else if (isLogarithmScale) {
 			if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
-				this.positiveLogScale = d3.scaleLog().base(10).nice();
-				this.negativeLogScale = d3.scaleLog().base(10).nice();
+				this.positiveLogScale = d3.scaleLog().base(10);
+				this.negativeLogScale = d3.scaleLog().base(10);
 			} else {
-				this.yScale = d3.scaleLog().base(10).nice();
+				this.yScale = d3.scaleLog().base(10);
 			}
 		} else {
 			this.yScale = d3.scaleBand();
 		}
 
 		if (isLinearScale) {
-			this.yScale.domain([min, max]);
+			this.yScale.domain([min, max]).nice();
 		} else if (isLogarithmScale) {
 			if (this.isShowPositiveNegativeLogScale) {
 				if (this.isBottomXAxis) {
@@ -5587,7 +5588,7 @@ export class Visual extends Shadow {
 					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
 				}
 			} else {
-				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
+				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]).nice();
 			}
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
@@ -6154,7 +6155,7 @@ export class Visual extends Shadow {
 				}
 			}
 		} else {
-			return this.getColor(this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+			return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
 		}
 	}
 
