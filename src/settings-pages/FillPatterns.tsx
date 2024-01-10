@@ -2,7 +2,7 @@ import * as React from "react";
 import { IPatternData, PatternPicker, Quote } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
-import { EPatternSettings } from "../enum";
+import { ColorPaletteType, EPatternSettings } from "../enum";
 import { IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
 import { parseObject, persistProperties } from "../methods/methods";
@@ -171,10 +171,11 @@ const FillPatterns = (props) => {
 
 				<ConditionalWrapper visible={configValues.enabled}>
 					{/* {UICategoryPatterns(shadow, configValues, setConfigValues)} */}
-					{shadow.isLollipopTypePie && (
+					{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
 						UISubCategoryPatterns(shadow, configValues, setConfigValues)
 					)}
-					{shadow.isHasMultiMeasure && (
+
+					{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
 						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
 					)}
 

@@ -3147,23 +3147,21 @@ export class Visual extends Shadow {
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 			}));
 
-		if (this.isHasMultiMeasure) {
-			this.measuresPatterns = this.measureNames
-				.map((d) => {
-					const pattern = this.patternSettings.measuresPatterns.find((p) => p.name === d);
-					const obj = {
-						name: d,
-						patternIdentifier: pattern ? pattern.patternIdentifier ? pattern.patternIdentifier : "NONE" : "NONE",
-						isImagePattern: pattern ? pattern.isImagePattern ? pattern.isImagePattern : false : false,
-						dimensions: pattern ? pattern.dimensions ? pattern.dimensions : undefined : undefined,
-					};
-					return obj;
-				});
-
-			this.measuresPatterns.forEach(d => {
-				this.patternByMeasures[d.name === this.measure1DisplayName ? RankingDataValuesType.Value1 : RankingDataValuesType.Value2] = d;
+		this.measuresPatterns = this.measureNames
+			.map((d) => {
+				const pattern = this.patternSettings.measuresPatterns.find((p) => p.name === d);
+				const obj = {
+					name: d,
+					patternIdentifier: pattern ? pattern.patternIdentifier ? pattern.patternIdentifier : "NONE" : "NONE",
+					isImagePattern: pattern ? pattern.isImagePattern ? pattern.isImagePattern : false : false,
+					dimensions: pattern ? pattern.dimensions ? pattern.dimensions : undefined : undefined,
+				};
+				return obj;
 			});
-		}
+
+		this.measuresPatterns.forEach(d => {
+			this.patternByMeasures[d.name === this.measure1DisplayName ? RankingDataValuesType.Value1 : RankingDataValuesType.Value2] = d;
+		});
 
 		if (this.isHasSubcategories) {
 			this.subCategoryPatterns = this.chartData[0].subCategories
@@ -6987,7 +6985,7 @@ export class Visual extends Shadow {
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
-				if (this.isHasMultiMeasure && this.isPatternApplied) {
+				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 					pattern = this.patternByMeasures[DataValuesType.Value1];
 				}
 				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -7080,7 +7078,7 @@ export class Visual extends Shadow {
 				const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : this.categoryColorPair[d.category].marker2Color, EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
-				if (this.isHasMultiMeasure && this.isPatternApplied) {
+				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 					pattern = this.patternByMeasures[DataValuesType.Value2];
 				}
 				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -7186,8 +7184,14 @@ export class Visual extends Shadow {
 				}
 			}
 
-			if (d.pattern && d.pattern.patternIdentifier && d.pattern.patternIdentifier !== "" && String(d.pattern.patternIdentifier).toUpperCase() !== "NONE") {
-				return `url('#${generatePattern(this.svg, d.pattern, color)}')`;
+			let pattern = d.pattern;
+
+			if ((this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single) && this.isPatternApplied) {
+				pattern = this.patternByMeasures[isPie2 ? DataValuesType.Value2 : DataValuesType.Value1];
+			}
+
+			if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+				return `url('#${generatePattern(this.svg, pattern, color)}')`;
 			} else {
 				return color;
 			}
@@ -8181,7 +8185,7 @@ export class Visual extends Shadow {
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker1 ? color : "rgba(92,113,187,1)";
 					let pattern = d.pattern;
-					if (this.isHasMultiMeasure && this.isPatternApplied) {
+					if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 						pattern = this.patternByMeasures[DataValuesType.Value1];
 					}
 					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
@@ -8201,7 +8205,7 @@ export class Visual extends Shadow {
 					let color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker2Color : null), EHighContrastColorType.Foreground);
 					color = color && !this.isShowImageMarker2 ? color : "rgba(92,113,187,1)";
 					let pattern = d.pattern;
-					if (this.isHasMultiMeasure && this.isPatternApplied) {
+					if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 						pattern = this.patternByMeasures[DataValuesType.Value2];
 					}
 					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {

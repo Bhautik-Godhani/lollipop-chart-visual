@@ -167,7 +167,7 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
   let LABEL_POSITION: ILabelValuePair[] = [];
 
   if (configValues.referenceType === EReferenceType.REFERENCE_LINE) {
-    if (!shadow.isHorizontalChart) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
           label: "BEFORE",
@@ -191,7 +191,7 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
       ];
     }
   } else {
-    if (!shadow.isHorizontalChart) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
           label: "BEFORE",
@@ -847,7 +847,7 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
 
   const AXIS_NAMES = Get_AXIS_NAMES(shadow);
 
-  if ((shadow as Visual).isHorizontalChart) {
+  if (configValues.lineValue1.axis === EXYAxisNames.Y) {
     ALIGNMENT_OPTIONS = [
       {
         value: "left",
