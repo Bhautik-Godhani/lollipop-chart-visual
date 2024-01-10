@@ -53,6 +53,7 @@ import {
 	EErrorBarsDirection,
 	RankingDataValuesType,
 	ECFApplyOnCategories,
+	ECFValueTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -2324,13 +2325,15 @@ export class Visual extends Shadow {
 				this.conditionalFormattingConditions
 					.forEach((cf: IConditionalFormattingProps) => {
 						if (cf.applyTo === "measure") {
-							const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
-							cf.measureType = {
-								measure: roles[EDataRolesName.Measure],
-								measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
-								measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
-								tooltip: roles[EDataRolesName.Tooltip]
-							};
+							if (cf.valueType === ECFValueTypes.Value) {
+								const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
+								cf.measureType = {
+									measure: roles[EDataRolesName.Measure],
+									measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
+									measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
+									tooltip: roles[EDataRolesName.Tooltip]
+								};
+							}
 						} else if (cf.applyTo === "category") {
 							cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
 						}

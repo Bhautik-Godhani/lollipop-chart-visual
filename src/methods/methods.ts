@@ -507,70 +507,72 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 		for (let index = 0; index < flattened.length; index++) {
 			const el = flattened[index];
 
-			if (!(el.sourceName !== "" && el.sourceName)) {
-				return;
-			}
+			if (el.valueType === ECFValueTypes.Value) {
+				if (!(el.sourceName !== "" && el.sourceName)) {
+					return;
+				}
 
-			if (el.applyTo === "measure") {
-				if (el.measureType.measure) {
-					if (el.measureType.measure1) {
-						(isMeasureMatch(result, el, value1, el.sourceName, EDataRolesName.Measure1));
-					} else if (el.measureType.measure2) {
-						isMeasureMatch(result, el, value2, el.sourceName, EDataRolesName.Measure2);
+				if (el.applyTo === "measure") {
+					if (el.measureType.measure) {
+						if (el.measureType.measure1) {
+							(isMeasureMatch(result, el, value1, el.sourceName, EDataRolesName.Measure1));
+						} else if (el.measureType.measure2) {
+							isMeasureMatch(result, el, value2, el.sourceName, EDataRolesName.Measure2);
+						}
+					} else if (el.measureType.tooltip) {
+						const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
+						result = results.find(d => d.match && d.sourceName === el.sourceName);
 					}
-				} else if (el.measureType.tooltip) {
-					const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
-					result = results.find(d => d.match && d.sourceName === el.sourceName);
-				}
-				// if (result.match) {
-				// 	return result;
-				// }
-			} else if (el.applyTo === "category") {
-				const v = el.staticValue;
-				const color = el.color;
-				category = el.categoryType.category ? category : subCategory;
+					// if (result.match) {
+					// 	return result;
+					// }
+				} else if (el.applyTo === "category") {
+					const v = el.staticValue;
+					const color = el.color;
+					category = el.categoryType.category ? category : subCategory;
 
-				if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-					result.markerColor = color;
-				}
+					if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+						result.markerColor = color;
+					}
 
-				if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
-					result.lineColor = color;
-				}
+					if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+						result.lineColor = color;
+					}
 
-				if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
-					result.labelColor = color;
-				}
+					if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+						result.labelColor = color;
+					}
 
-				switch (el.operator) {
-					case "===":
-						result.match = matchRuleShort(category.toLowerCase(), v.toLowerCase());
-						break;
-					case "!==":
-						result.match = !matchRuleShort(category.toLowerCase(), v.toLowerCase());
-						break;
-					case "contains":
-						result.match = category.toLowerCase().includes(v.toLowerCase());
-						break;
-					case "doesnotcontain":
-						result.match = !category.toLowerCase().includes(v.toLowerCase());
-						break;
-					case "beginswith":
-						result.match = category.toLowerCase().startsWith(v.toLowerCase());
-						break;
-					case "doesnotbeginwith":
-						result.match = !category.toLowerCase().startsWith(v.toLowerCase());
-						break;
-					case "endswith":
-						result.match = category.toLowerCase().endsWith(v.toLowerCase());
-						break;
-					case "doesnotendwith":
-						result.match = !category.toLowerCase().endsWith(v.toLowerCase());
-						break;
+					switch (el.operator) {
+						case "===":
+							result.match = matchRuleShort(category.toLowerCase(), v.toLowerCase());
+							break;
+						case "!==":
+							result.match = !matchRuleShort(category.toLowerCase(), v.toLowerCase());
+							break;
+						case "contains":
+							result.match = category.toLowerCase().includes(v.toLowerCase());
+							break;
+						case "doesnotcontain":
+							result.match = !category.toLowerCase().includes(v.toLowerCase());
+							break;
+						case "beginswith":
+							result.match = category.toLowerCase().startsWith(v.toLowerCase());
+							break;
+						case "doesnotbeginwith":
+							result.match = !category.toLowerCase().startsWith(v.toLowerCase());
+							break;
+						case "endswith":
+							result.match = category.toLowerCase().endsWith(v.toLowerCase());
+							break;
+						case "doesnotendwith":
+							result.match = !category.toLowerCase().endsWith(v.toLowerCase());
+							break;
+					}
+					// if (result.match) {
+					// 	return result;
+					// }
 				}
-				// if (result.match) {
-				// 	return result;
-				// }
 			}
 		}
 
