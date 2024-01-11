@@ -166,13 +166,14 @@ import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings"
 import { RemoveDynamicDeviation, RenderDynamicDeviation, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
 import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
 import CutAndClipAxisSettings from "./settings-pages/CutAndClipAxisSettings";
-import { RenderBarCutAndClipMarker } from "./methods/CutAndClipMarker.methods";
+import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClipMarkerOnAxis } from "./methods/CutAndClipMarker.methods";
 import { GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
 import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
+import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -2429,6 +2430,73 @@ export class Visual extends Shadow {
 						}
 						CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
 					}
+				}
+
+				this.isCutAndClipAxisEnabled = GetIsCutAndClipAxisEnabled(this);
+
+				this.isShowRegularXAxis =
+					(!this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
+					(this.isCutAndClipAxisEnabled && !this.isHorizontalChart) ||
+					!this.isCutAndClipAxisEnabled;
+				this.isShowRegularYAxis =
+					(!this.isCutAndClipAxisEnabled && !this.isHorizontalChart) ||
+					(this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
+					!this.isCutAndClipAxisEnabled;
+
+				if (this.isCutAndClipAxisEnabled) {
+					if (!this.isHorizontalChart) {
+						this.yAxisG.selectAll(".domain").remove();
+						this.yAxisG.selectAll(".tick").remove();
+					} else {
+						this.xAxisG.selectAll(".domain").remove();
+						this.xAxisG.selectAll(".tick").remove();
+					}
+				}
+
+				this.isCutAndClipAxisEnabledLastValue = GetIsCutAndClipAxisEnabled(this);
+				this.isLastChartTypeIsHorizontal = this.chartSettings.orientation === Orientation.Horizontal;
+
+				if (this.isCutAndClipAxisEnabled) {
+					RenderLinearCutAxis(this);
+
+					if (this.isHorizontalChart) {
+						this.xAxisG.classed("cut-clip-axis", true);
+						this.yAxisG.classed("cut-clip-axis", false);
+					} else {
+						this.xAxisG.classed("cut-clip-axis", false);
+						this.yAxisG.classed("cut-clip-axis", true);
+					}
+
+					if (!this.isHorizontalChart) {
+						this.yScale = GetCutAndClipYScale.bind(this);
+						this.setYAxisTickStyle();
+					} else {
+						this.xScale = GetCutAndClipXScale.bind(this);
+					}
+				} else {
+					this.xAxisG.classed("cut-clip-axis", false);
+					this.yAxisG.classed("cut-clip-axis", false);
+					this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
+				}
+
+				// -----
+
+				// const axisConfig: IAxisConfig = {
+				// 	categoricalData: this.categoricalData,
+				// 	width: this.width,
+				// 	height: this.height,
+				// 	xAxisG: this.xAxisG.node(),
+				// 	yAxisG: this.yAxisG.node(),
+				// 	xAxisYPos: this.height,
+				// 	yAxisXPos: this.width,
+				// };
+
+				// this.isLinearScale = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
+
+				if (this.isCutAndClipAxisEnabled) {
+					RenderCutAndClipMarkerOnAxis(this);
+				} else {
+					this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 				}
 
 				this.drawLollipopChart();
@@ -6902,6 +6970,12 @@ export class Visual extends Shadow {
 			}
 		} else {
 			this.connectingLineG.selectAll("*").remove();
+		}
+
+		if (this.isCutAndClipAxisEnabled) {
+			RenderCutAndClipMarkerOnAxis(this);
+		} else {
+			this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 		}
 
 		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled ? this.chartData : []);

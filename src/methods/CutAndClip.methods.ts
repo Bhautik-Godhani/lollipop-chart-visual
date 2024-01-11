@@ -18,32 +18,32 @@ export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, c
 
     if (self.isHorizontalChart) {
         if (!isOnlySetDomain) {
-            self.beforeCutLinearScale = isLogarithmScale ? scaleSymlog().nice() : scaleLinear().nice();
-            self.afterCutLinearScale = isLogarithmScale ? scaleSymlog().nice() : scaleLinear().nice();
+            self.beforeCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
+            self.afterCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
         }
 
         if (isLinearScale) {
             if (self.isLeftYAxis) {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]);
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]);
+                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
+                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
             } else {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]);
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]);
+                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
+                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
             }
         }
     } else {
         if (!isOnlySetDomain) {
-            self.beforeCutLinearScale = isLogarithmScale ? scaleSymlog().nice() : scaleLinear().nice();
-            self.afterCutLinearScale = isLogarithmScale ? scaleSymlog().nice() : scaleLinear().nice();
+            self.beforeCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
+            self.afterCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
         }
 
         if (isLinearScale) {
             if (self.isBottomXAxis) {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]);
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]);
+                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
+                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
             } else {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]);
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]);
+                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
+                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
             }
         }
     }
@@ -122,33 +122,33 @@ export const CallLinearCutScaleOnAxisGroup = (self: Visual): void => {
         if (self.xAxisSettings.position === Position.Bottom) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisBottom(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 45));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisBottom(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 45));
         } else if (self.xAxisSettings.position === Position.Top) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisTop(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 45));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisTop(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 45));
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 70));
+                .call(axisLeft(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 35));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 70));
+                .call(axisLeft(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 35));
         } else if (self.yAxisSettings.position === Position.Right) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 70));
+                .call(axisRight(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 35));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 70));
+                .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 35));
         }
     }
 }
