@@ -2472,6 +2472,7 @@ export class Visual extends Shadow {
 						this.setYAxisTickStyle();
 					} else {
 						this.xScale = GetCutAndClipXScale.bind(this);
+						this.setXAxisTickStyle();
 					}
 				} else {
 					this.xAxisG.classed("cut-clip-axis", false);
@@ -5506,7 +5507,7 @@ export class Visual extends Shadow {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
-					const truncatedText = THIS.formatNumber(parseFloat(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
+					const truncatedText = THIS.formatNumber(parseFloat(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString()), THIS.numberSettings, undefined, false, true);
 					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 				}
 			});
