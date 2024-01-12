@@ -1020,17 +1020,47 @@ export class Visual extends Shadow {
 		const isSortByExternalFields = sortingSettings.isSortByExtraSortField;
 
 		const sortByName = () => {
-			if (this.isHorizontalChart) {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-					data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+			if (!this.isXIsDateTimeAxis && !this.isXIsNumericAxis) {
+				if (this.isHorizontalChart) {
+					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+						data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+					} else {
+						data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					}
 				} else {
-					data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+					} else {
+						data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					}
 				}
-			} else {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-					data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+			} else if (this.isXIsNumericAxis) {
+				if (this.isHorizontalChart) {
+					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+						data.sort((a, b) => a[categoryKey] - b[categoryKey]);
+					} else {
+						data.sort((a, b) => b[categoryKey] - a[categoryKey]);
+					}
 				} else {
-					data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => a[categoryKey] - b[categoryKey]);
+					} else {
+						data.sort((a, b) => b[categoryKey] - a[categoryKey]);
+					}
+				}
+			} else if (this.isXIsDateTimeAxis) {
+				if (this.isHorizontalChart) {
+					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+						data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
+					} else {
+						data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
+					}
+				} else {
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
+					} else {
+						data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
+					}
 				}
 			}
 		};
@@ -4443,7 +4473,7 @@ export class Visual extends Shadow {
 
 			this.brushScaleBand.range(xScale.range());
 
-			brushG = smallMultiplesGridItemContent.brushG;
+			brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
 
 			const newXScaleDomain = [];
 			let brushArea = selection;
@@ -5648,31 +5678,45 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
-				const firstChar = text.charAt(0);
-				const unicodeValue = firstChar.charCodeAt(0);
-				const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
-				const isDecimalNumber = text.includes(".");
 
-				if (isDecimalNumber) {
-					text = text.split(".")[0];
-				}
+				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
+					const firstChar = text.charAt(0);
+					const unicodeValue = firstChar.charCodeAt(0);
+					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
+					const isDecimalNumber = text.includes(".");
 
-				if (isNegativeNumber) {
-					text = (extractDigitsFromString(text.substring(1)) * -1).toString();
-				}
+					if (isDecimalNumber) {
+						text = text.split(".")[0];
+					}
 
-				ele.text("");
+					if (isNegativeNumber) {
+						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
+					}
 
-				const textProperties: TextProperties = {
-					text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
-					fontFamily: yAxisSettings.labelFontFamily,
-					fontSize: yAxisSettings.labelFontSize + "px",
-				};
+					ele.text("");
 
-				if (!THIS.isHorizontalChart) {
-					const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
-					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+					const textProperties: TextProperties = {
+						text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
+						fontFamily: yAxisSettings.labelFontFamily,
+						fontSize: yAxisSettings.labelFontSize + "px",
+					};
+
+					if (!THIS.isHorizontalChart) {
+						const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
+						ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+					} else {
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
+						ele.append("tspan").text(truncatedText);
+					}
 				} else {
+					const textProperties: TextProperties = {
+						text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
+						fontFamily: yAxisSettings.labelFontFamily,
+						fontSize: yAxisSettings.labelFontSize + "px",
+					};
+
+					ele.text("");
+
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(truncatedText);
 				}
