@@ -1270,8 +1270,8 @@ export class Visual extends Shadow {
 		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
 		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
 
-		this.isXIsContinuousAxis = (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
-		this.isYIsContinuousAxis = (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
+		this.isXIsContinuousAxis = !this.isHorizontalChart && (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
+		this.isYIsContinuousAxis = this.isHorizontalChart && (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
 
 		if (!this.upperBoundMeasureNames.includes(this.errorBarsSettings.measurement.upperBoundMeasure)) {
 			this.errorBarsSettings.measurement.upperBoundMeasure = undefined;
@@ -3243,6 +3243,26 @@ export class Visual extends Shadow {
 					isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
+		}
+
+		if (this.isXIsContinuousAxis && !this.isHorizontalChart) {
+			if (this.xAxisSettings.isMinimumRangeEnabled && this.xAxisSettings.minimumRange) {
+				this.chartData = this.chartData.filter(d => +d.category >= this.xAxisSettings.minimumRange);
+			}
+
+			if (this.xAxisSettings.isMaximumRangeEnabled && this.xAxisSettings.maximumRange) {
+				this.chartData = this.chartData.filter(d => +d.category <= this.xAxisSettings.maximumRange);
+			}
+		}
+
+		if (this.isYIsContinuousAxis && this.isHorizontalChart) {
+			if (this.yAxisSettings.isMinimumRangeEnabled && this.yAxisSettings.minimumRange) {
+				this.chartData = this.chartData.filter(d => +d.category >= this.yAxisSettings.minimumRange);
+			}
+
+			if (this.yAxisSettings.isMaximumRangeEnabled && this.yAxisSettings.maximumRange) {
+				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
+			}
 		}
 	}
 
@@ -5332,7 +5352,7 @@ export class Visual extends Shadow {
 	setScaleBandwidth(): void {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 
-		if (this.isXIsContinuousAxis) {
+		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
 			this.scaleBandWidth = 0;
 		} else {
 			this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
@@ -5412,7 +5432,7 @@ export class Visual extends Shadow {
 		this.xAxisG
 			.selectAll("text")
 			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
-			.attr("dy", isApplyTilt ? "-0.5em" : "0.35em")
+			.attr("dy", isApplyTilt ? "-0.5em" : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
 			.attr("y", () => {
 				if (this.isHorizontalChart) {
 					return this.isBottomXAxis ? 9 : -9;
@@ -5502,6 +5522,11 @@ export class Visual extends Shadow {
 					const firstChar = text.charAt(0);
 					const unicodeValue = firstChar.charCodeAt(0);
 					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
+					const isDecimalNumber = text.includes(".");
+
+					if (isDecimalNumber) {
+						text = text.split(".")[0];
+					}
 
 					if (isNegativeNumber) {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
@@ -5535,6 +5560,11 @@ export class Visual extends Shadow {
 				const firstChar = text.charAt(0);
 				const unicodeValue = firstChar.charCodeAt(0);
 				const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
+				const isDecimalNumber = text.includes(".");
+
+				if (isDecimalNumber) {
+					text = text.split(".")[0];
+				}
 
 				if (isNegativeNumber) {
 					text = (extractDigitsFromString(text.substring(1)) * -1).toString();
@@ -5601,13 +5631,25 @@ export class Visual extends Shadow {
 
 		this.isHasNegativeValue = min < 0 || max < 0;
 
-		if (this.isXIsContinuousAxis) {
-			if (this.xAxisSettings.isMinimumRangeEnabled) {
-				min = this.xAxisSettings.minimumRange;
+		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
+			if (this.isXIsContinuousAxis) {
+				if (this.xAxisSettings.isMinimumRangeEnabled) {
+					min = this.xAxisSettings.minimumRange;
+				}
+
+				if (this.xAxisSettings.isMaximumRangeEnabled) {
+					max = this.xAxisSettings.maximumRange;
+				}
 			}
 
-			if (this.xAxisSettings.isMaximumRangeEnabled) {
-				max = this.xAxisSettings.maximumRange;
+			if (this.isYIsContinuousAxis) {
+				if (this.yAxisSettings.isMinimumRangeEnabled) {
+					min = this.yAxisSettings.minimumRange;
+				}
+
+				if (this.yAxisSettings.isMaximumRangeEnabled) {
+					max = this.yAxisSettings.maximumRange;
+				}
 			}
 
 			this.xScale = d3.scaleLinear();
@@ -5685,12 +5727,22 @@ export class Visual extends Shadow {
 				this.xScale.range(xAxisRange);
 			}
 
-			this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
+
+
+			if (this.isYIsContinuousAxis) {
+				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize] : [this.xAxisStartMargin + this.markerMaxSize, yScaleHeight - this.markerMaxSize]);
+			} else {
+				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
+			}
 		} else {
 			if (this.isSmallMultiplesEnabled) {
 				this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
 			} else {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+				if (this.isXIsContinuousAxis) {
+					this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
+				} else {
+					this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+				}
 			}
 
 			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - dataLabelHeight, dataLabelHeight] : [this.yAxisStartMargin - dataLabelHeight, yScaleHeight - dataLabelHeight];

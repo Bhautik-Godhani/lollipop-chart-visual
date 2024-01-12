@@ -2,6 +2,9 @@
 import * as React from "react";
 import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
+  AxisCategoryType,
+  EVisualConfig,
+  EVisualSettings,
   EXAxisSettings,
   EYAxisSettings,
   Position,
@@ -17,8 +20,19 @@ import {
   SelectInput,
   ColorPicker,
 } from "@truviz/shadow/dist/Components";
-import { ILabelValuePair, IYAxisSettings } from "../visual-settings.interface";
+import { ILabelValuePair, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
 import { persistProperties } from "../methods/methods";
+
+const AXIS_MODE: ILabelValuePair[] = [
+  {
+    label: "Continuous",
+    value: AxisCategoryType.Continuous,
+  },
+  {
+    label: "Categorical",
+    value: AxisCategoryType.Categorical,
+  },
+];
 
 const YAxisSettings = (props) => {
   const {
@@ -42,11 +56,22 @@ const YAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    if (shadow.isXIsContinuousAxis && configValues.isMinimumRangeEnabled && configValues.isMaximumRangeEnabled) {
+    if (configValues.categoryType === AxisCategoryType.Continuous && configValues.isMinimumRangeEnabled && configValues.isMaximumRangeEnabled) {
       if (configValues.maximumRange < configValues.minimumRange) {
         return;
       }
     }
+
+    const xAxisSettings: IXAxisSettings = {
+      ...shadow.xAxisSettings,
+      isMinimumRangeEnabled: configValues.isMinimumRangeEnabled,
+      isMaximumRangeEnabled: configValues.isMaximumRangeEnabled,
+      minimumRange: configValues.minimumRange,
+      maximumRange: configValues.maximumRange,
+      isLogarithmScale: configValues.isLogarithmScale,
+      categoryType: configValues.categoryType
+    };
+    shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xAxisSettings);
 
     persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
@@ -104,6 +129,20 @@ const YAxisSettings = (props) => {
     }
   }, [configValues.isDisplayTitle]);
 
+  React.useEffect(() => {
+    if (configValues.categoryType === AxisCategoryType.Categorical) {
+      setConfigValues((d) => ({
+        ...d,
+        [EXAxisSettings.IsMinimumRangeEnabled]: false,
+      }));
+
+      setConfigValues((d) => ({
+        ...d,
+        [EXAxisSettings.IsMaximumRangeEnabled]: false,
+      }));
+    }
+  }, [configValues.categoryType]);
+
   return (
     <>
       <Row>
@@ -129,7 +168,20 @@ const YAxisSettings = (props) => {
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+        <ConditionalWrapper visible={shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Axis Mode"}
+                value={configValues.categoryType}
+                optionsList={AXIS_MODE}
+                handleChange={(value) => handleChange(value, EXAxisSettings.CategoryType)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={!shadow.isHorizontalChart || configValues.categoryType === AxisCategoryType.Continuous}>
           <Row>
             <Column>
               <ToggleButton

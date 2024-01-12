@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP } from "../constants";
-import { AxisCategoryType, EXAxisSettings, Position } from "../enum";
+import { AxisCategoryType, EVisualConfig, EVisualSettings, EXAxisSettings, Position } from "../enum";
 import {
   InputControl,
   Row,
@@ -13,7 +13,7 @@ import {
   SelectInput,
   ColorPicker,
 } from "@truviz/shadow/dist/Components";
-import { ILabelValuePair, IXAxisSettings } from "../visual-settings.interface";
+import { ILabelValuePair, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
 import { persistProperties } from "../methods/methods";
 
 const AXIS_MODE: ILabelValuePair[] = [
@@ -49,11 +49,22 @@ const XAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    if (shadow.isXIsContinuousAxis && configValues.isMinimumRangeEnabled && configValues.isMaximumRangeEnabled) {
+    if (configValues.categoryType === AxisCategoryType.Continuous && configValues.isMinimumRangeEnabled && configValues.isMaximumRangeEnabled) {
       if (configValues.maximumRange < configValues.minimumRange) {
         return;
       }
     }
+
+    const yAxisSettings: IYAxisSettings = {
+      ...shadow.yAxisSettings,
+      isMinimumRangeEnabled: configValues.isMinimumRangeEnabled,
+      isMaximumRangeEnabled: configValues.isMaximumRangeEnabled,
+      minimumRange: configValues.minimumRange,
+      maximumRange: configValues.maximumRange,
+      isLogarithmScale: configValues.isLogarithmScale,
+      categoryType: configValues.categoryType
+    };
+    shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yAxisSettings);
 
     persistProperties(shadow, sectionName, propertyName, configValues);
     closeCurrentSettingHandler();

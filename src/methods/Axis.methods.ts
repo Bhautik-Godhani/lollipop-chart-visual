@@ -1,6 +1,7 @@
 import { max as D3Max, min as D3Min } from "d3-array";
 import { Visual } from "../visual";
 import { ESmallMultiplesAxisType } from "@truviz/shadow/dist/Components";
+import { AxisCategoryType } from "../enum";
 
 export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } => {
     const values = self.chartData.reduce((arr, d) => {
@@ -22,12 +23,14 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
         min = 0;
     }
 
-    if (self.yAxisSettings.isMinimumRangeEnabled && self.yAxisSettings.minimumRange) {
-        min = self.yAxisSettings.minimumRange;
-    }
+    if (self.yAxisSettings.categoryType === AxisCategoryType.Categorical) {
+        if (self.yAxisSettings.isMinimumRangeEnabled && self.yAxisSettings.minimumRange) {
+            min = self.yAxisSettings.minimumRange;
+        }
 
-    if (self.yAxisSettings.isMaximumRangeEnabled && self.yAxisSettings.maximumRange) {
-        max = self.yAxisSettings.maximumRange;
+        if (self.yAxisSettings.isMaximumRangeEnabled && self.yAxisSettings.maximumRange) {
+            max = self.yAxisSettings.maximumRange;
+        }
     }
 
     if (max >= 0) {

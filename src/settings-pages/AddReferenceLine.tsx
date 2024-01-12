@@ -923,8 +923,6 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
   }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
 
   React.useEffect(() => {
-    console.log("test");
-
     if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
       handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
