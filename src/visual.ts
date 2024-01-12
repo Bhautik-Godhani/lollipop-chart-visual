@@ -54,6 +54,7 @@ import {
 	RankingDataValuesType,
 	ECFApplyOnCategories,
 	ECFValueTypes,
+	ECFRankingTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -2674,6 +2675,96 @@ export class Visual extends Shadow {
 			}
 		});
 
+		const chartData = JSON.parse(JSON.stringify(this.chartData)).sort((a: ILollipopChartRow, b: ILollipopChartRow) => (b.value1 + b.value2) - (a.value1 + a.value2));
+		chartData.forEach((d: ILollipopChartRow, i) => {
+			this.conditionalFormattingConditions.forEach((c) => {
+				if (c.valueType === ECFValueTypes.Ranking) {
+					if (c.rankingType === ECFRankingTypes.TopN) {
+						if (i < c.staticRankingValue) {
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+								this.categoryColorPair[d.category].marker1Color = c.color;
+								this.categoryColorPair[d.category].marker2Color = c.color;
+							}
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+								this.categoryColorPair[d.category].lineColor = c.color;
+							}
+
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+								this.categoryColorPair[d.category].labelColor = c.color;
+							}
+						}
+					} else if (c.rankingType === ECFRankingTypes.BottomN) {
+						if (i > ((chartData.length - 1) - c.staticRankingValue)) {
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+								this.categoryColorPair[d.category].marker1Color = c.color;
+								this.categoryColorPair[d.category].marker2Color = c.color;
+							}
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+								this.categoryColorPair[d.category].lineColor = c.color;
+							}
+
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+								this.categoryColorPair[d.category].labelColor = c.color;
+							}
+						}
+					}
+				}
+			});
+
+			if (!this.isHasSubcategories) {
+				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
+				if (conditionalFormattingResult.match) {
+					// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+					// 	this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+					// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+					// 	this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+					// } else {
+					if (conditionalFormattingResult.markerColor) {
+						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+					}
+
+					// }
+					if (conditionalFormattingResult.lineColor) {
+						this.categoryColorPair[d.category].lineColor = conditionalFormattingResult.lineColor;
+					}
+
+					if (conditionalFormattingResult.labelColor) {
+						this.categoryColorPair[d.category].labelColor = conditionalFormattingResult.labelColor;
+					}
+				} else {
+					// this.categoryColorPair[d.category].lineColor = undefined;
+					// this.categoryColorPair[d.category].labelColor = undefined;
+				}
+			} else {
+				d.subCategories.forEach((s) => {
+					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
+					if (conditionalFormattingResult.match) {
+						// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
+						// 	this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+						// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
+						// 	this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+						// } else {
+						if (conditionalFormattingResult.markerColor) {
+							this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
+							this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+						}
+
+						// }
+						if (conditionalFormattingResult.lineColor) {
+							this.subCategoryColorPair[d.category].lineColor = conditionalFormattingResult.lineColor;
+						}
+
+						if (conditionalFormattingResult.labelColor) {
+							this.subCategoryColorPair[d.category].labelColor = conditionalFormattingResult.labelColor;
+						}
+					} else {
+						// this.subCategoryColorPair[d.category].lineColor = undefined;
+						// this.subCategoryColorPair[d.category].labelColor = undefined;
+					}
+				});
+			}
+		});
 	}
 
 	private sortSubcategoryData(): void {
