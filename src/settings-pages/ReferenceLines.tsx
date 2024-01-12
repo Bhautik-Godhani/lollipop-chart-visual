@@ -65,7 +65,7 @@ const UIReferenceLines = (
           <Row>
             <Column>
               <IconButton
-                text="Add New Reference Line"
+                text="Add New Reference Line/Band"
                 icon={<PlusIcon fill="var(--blackColor)" />}
                 onClick={() => initAdd()}
               />
@@ -178,7 +178,7 @@ const ReferenceLines = (props) => {
       const isValue2TypeNumber = parseFloat(row.lineValue2.value).toString().length > 0 && parseFloat(row.lineValue2.value).toString() !== "NaN";
 
       if (row.referenceType === EReferenceType.REFERENCE_BAND) {
-        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
+        text = `Band on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
         to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true) : row.lineValue2.value}`}`;
       } else {
         text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value}`}`;
