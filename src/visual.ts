@@ -3060,13 +3060,13 @@ export class Visual extends Shadow {
 					this.isHasErrorUpperBounds = true;
 					this.isHasErrorLowerBounds = true;
 					ub = upperBoundValue = value + (value * this.errorBarsSettings.measurement.upperBoundPercentage) / 100;
-					lb = lowerBoundValue = value - (value * this.errorBarsSettings.measurement.upperBoundPercentage) / 100;
+					lb = lowerBoundValue = value - (value * this.errorBarsSettings.measurement.lowerBoundPercentage) / 100;
 					break;
 				case EErrorBarsCalcTypes.ByPercentile: {
 					this.isHasErrorUpperBounds = true;
 					this.isHasErrorLowerBounds = true;
 					ub = upperBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.upperBoundPercentage / 100);
-					lb = lowerBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.upperBoundPercentage / 100);
+					lb = lowerBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.lowerBoundPercentage / 100);
 					break;
 				}
 				case EErrorBarsCalcTypes.ByStandardDeviation: {

@@ -319,51 +319,113 @@ const ErrorBarsSettings = (props) => {
           </Row>
 
           <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Upper Bound"}
-                  value={configValues.measurement.upperBoundMeasure}
-                  optionsList={UPPER_BOUND_LIST}
-                  handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
-            </Row>
-
-            <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
               <Row>
                 <Column>
                   <SelectInput
-                    label={"Lower Bound"}
-                    value={configValues.measurement.lowerBoundMeasure}
-                    optionsList={LOWER_BOUND_LIST}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                    label={"Upper Bound"}
+                    value={configValues.measurement.upperBoundMeasure}
+                    optionsList={UPPER_BOUND_LIST}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
               </Row>
+
+              <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                <Row>
+                  <Column>
+                    <SelectInput
+                      label={"Lower Bound"}
+                      value={configValues.measurement.lowerBoundMeasure}
+                      optionsList={LOWER_BOUND_LIST}
+                      handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Bound Value"}
+                    value={configValues.measurement.upperBoundMeasure}
+                    optionsList={UPPER_BOUND_LIST}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+                <Column></Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+              <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                <Row>
+                  <Column>
+                    <SelectInput
+                      label={"Bound Value"}
+                      value={configValues.measurement.lowerBoundMeasure}
+                      optionsList={LOWER_BOUND_LIST}
+                      handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                    />
+                  </Column>
+                  <Column></Column>
+                </Row>
+              </ConditionalWrapper>
             </ConditionalWrapper>
           </ConditionalWrapper>
 
           <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentage || configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentile}>
-            <Row>
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Upper Bound (%)"
-                  value={configValues.measurement.upperBoundPercentage}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Upper Bound (%)"
+                    value={configValues.measurement.upperBoundPercentage}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
 
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Lower Bound (%)"
-                  value={configValues.measurement.lowerBoundPercentage}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
-            </Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Lower Bound (%)"
+                    value={configValues.measurement.lowerBoundPercentage}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Bound Value (%)"
+                    value={configValues.measurement.upperBoundPercentage}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+                <Column></Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Bound Value (%)"
+                    value={configValues.measurement.lowerBoundPercentage}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+                <Column></Column>
+              </Row>
+            </ConditionalWrapper>
           </ConditionalWrapper>
 
           <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByStandardDeviation}>
@@ -381,25 +443,55 @@ const ErrorBarsSettings = (props) => {
           </ConditionalWrapper>
 
           <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByValue}>
-            <Row>
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Upper Bound"
-                  value={configValues.measurement.upperBoundValue}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Upper Bound"
+                    value={configValues.measurement.upperBoundValue}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
 
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Lower Bound"
-                  value={configValues.measurement.lowerBoundValue}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
-            </Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Lower Bound"
+                    value={configValues.measurement.lowerBoundValue}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Bound Value"
+                    value={configValues.measurement.upperBoundValue}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+                <Column></Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Bound Value"
+                    value={configValues.measurement.lowerBoundValue}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+                <Column></Column>
+              </Row>
+            </ConditionalWrapper>
           </ConditionalWrapper>
 
           <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
