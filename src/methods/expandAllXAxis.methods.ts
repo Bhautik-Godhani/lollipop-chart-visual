@@ -28,7 +28,6 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): voi
 				.call(
 					axisBottom(self[`${category}Scale`])
 						.ticks(width / 90)
-						.tickFormat((d: string) => d.split("-")[0]) as any
 				);
 
 			SetExpandAllXAxisTickStyle(self);
@@ -40,7 +39,6 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): voi
 				.call(
 					axisTop(self[`${category}Scale`])
 						.ticks(width / 90)
-						.tickFormat((d: string) => d.split("-")[0])
 				);
 
 			SetExpandAllXAxisTickStyle(self);
@@ -62,6 +60,8 @@ export const SetExpandAllXAxisTickStyle = (self: Visual) => {
 			.attr("font-size", labelFontSize)
 			.attr("display", isDisplayLabel ? "block" : "none")
 			.each((d: string, i, nodes) => {
+				d = d.split("--")[0];
+
 				const textProperties: TextProperties = {
 					text: d,
 					fontFamily: labelFontFamily,
@@ -94,7 +94,7 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 				.call(
 					axisLeft(self[`${category}Scale`])
 						.ticks(expandAllScaleWidth / 90)
-						.tickFormat((d: string) => d.split("-")[0]) as any
+						.tickFormat((d: string) => d.split("--")[0]) as any
 				);
 
 			SetExpandAllYAxisTickStyle(self);
@@ -106,7 +106,7 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 				.call(
 					axisLeft(self[`${category}Scale`])
 						.ticks(expandAllScaleWidth / 90)
-						.tickFormat((d: string) => d.split("-")[0]) as any
+						.tickFormat((d: string) => d.split("--")[0]) as any
 				);
 
 			SetExpandAllYAxisTickStyle(self);

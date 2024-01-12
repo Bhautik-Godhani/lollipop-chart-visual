@@ -1616,7 +1616,7 @@ export class Visual extends Shadow {
 				.forEach((d) => {
 					if (!d["isIdToCategoryAdded"]) {
 						d.values = d.values.map((d: string, i: number) => {
-							if (d.split("-").length === 2) {
+							if (d.toString().split("--").length === 2) {
 								return d;
 							} else {
 								return d + "-" + i.toString();
@@ -1631,10 +1631,10 @@ export class Visual extends Shadow {
 				.forEach((d) => {
 					// if (!d["isIdToCategoryAdded"]) {
 					d.values = d.values.map((d: string, i: number) => {
-						if (d.split("-").length === 2) {
+						if (d.toString().split("--").length === 2) {
 							return d;
 						} else {
-							return d + "-" + i.toString();
+							return d + "--" + i.toString();
 						}
 					});
 					d["isIdToCategoryAdded"] = true;
@@ -2150,10 +2150,10 @@ export class Visual extends Shadow {
 					.forEach((d) => {
 						if (!d["isIdToCategoryAdded"]) {
 							d.values = d.values.map((d: string, i: number) => {
-								if (d.split("-").length === 2) {
+								if (d.toString().split("--").length === 2) {
 									return d;
 								} else {
-									return d + "-" + i.toString();
+									return d + "--" + i.toString();
 								}
 							});
 							d["isIdToCategoryAdded"] = true;
@@ -5582,7 +5582,12 @@ export class Visual extends Shadow {
 			// })
 			.each(function () {
 				const ele = d3.select(this);
-				const text = ele.text().toString();
+				let text = ele.text().toString();
+
+				if (text.includes("--")) {
+					text = text.split("--")[0];
+				}
+
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
 				ele.text("");
 
@@ -8235,7 +8240,7 @@ export class Visual extends Shadow {
 					.axisBottom(this.brushScaleBand)
 					.ticks(this.width / 90)
 					.tickFormat((d) => {
-						const text = (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						const text = (typeof d === "string" && this.isExpandAllApplied ? d.split("--")[0] : d) as string;
 						const textProperties: TextProperties = {
 							text,
 							fontFamily: this.xAxisSettings.labelFontFamily,
@@ -8266,7 +8271,7 @@ export class Visual extends Shadow {
 					.axisRight(this.brushScaleBand)
 					.ticks(this.height / 70)
 					.tickFormat((d) => {
-						const text = (typeof d === "string" && this.isExpandAllApplied ? d.split("-")[0] : d) as string;
+						const text = (typeof d === "string" && this.isExpandAllApplied ? d.split("--")[0] : d) as string;
 						const textProperties: TextProperties = {
 							text,
 							fontFamily: this.yAxisSettings.labelFontFamily,
