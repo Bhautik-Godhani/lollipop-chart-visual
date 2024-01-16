@@ -1,5 +1,5 @@
 /* eslint-disable max-lines-per-function */
-import { SORTING_SETTINGS } from "../constants";
+import { POSITIVE_COLOR, SORTING_SETTINGS } from "../constants";
 import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
 import { Visual } from "../visual";
@@ -165,7 +165,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.LineSettings]: JSON.stringify({
                         ...self.lineSettings,
-                        [ELineSettings.lineColor]: "rgba(64, 64, 64, 1)",
+                        [ELineSettings.lineColor]: (self.chartSettings.theme === EIBCSThemes.DefaultVertical || self.chartSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
                         [ELineSettings.lineWidth]: 4,
                         [ELineSettings.lineType]: ELineType.Solid,
                     }),
