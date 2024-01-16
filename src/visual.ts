@@ -5758,17 +5758,18 @@ export class Visual extends Shadow {
 		const values = this.categoricalData.categories[this.categoricalCategoriesLastIndex].values;
 
 		let min = +d3.min(values, d => +d);
-
-		if (min > 0) {
-			min = 0;
-		}
-
 		let max = +d3.max(values, d => +d);
 
-		if (max >= 0) {
-			max += max * 0.15;
-		} else {
-			max -= max * 0.15;
+		if (!this.isXIsContinuousAxis) {
+			if (min > 0) {
+				min = 0;
+			}
+
+			if (max >= 0) {
+				max += max * 0.15;
+			} else {
+				max -= max * 0.15;
+			}
 		}
 
 		this.isHasNegativeValue = min < 0 || max < 0;
