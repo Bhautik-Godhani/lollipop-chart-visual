@@ -4,33 +4,51 @@ import { Visual } from "../visual";
 import { axisBottom, axisTop } from "d3-axis";
 
 export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: number, xAxisG: SVGElement): void => {
-    if (self.isHorizontalChart && self.isShowPositiveNegativeLogScale) {
-        let positiveTicks: any[] = self.positiveLogScale.ticks(self.positiveLogScaleWidth / 90);
-        positiveTicks = positiveTicks.filter(function (d) {
-            return d === Math.pow(10, Math.round(Math.log10(d)));
-        });
+    if (self.isHorizontalChart && (self.isLogarithmScale || self.isShowPositiveNegativeLogScale)) {
+        if (self.isShowPositiveNegativeLogScale) {
+            let positiveTicks: any[] = self.positiveLogScale.ticks(self.positiveLogScaleWidth / 90);
+            positiveTicks = positiveTicks.filter(function (d) {
+                return d === Math.pow(10, Math.round(Math.log10(d)));
+            });
 
-        let negativeTicks: any[] = self.negativeLogScale.ticks(self.negativeLogScaleWidth / 90);
-        negativeTicks = negativeTicks.filter(function (d) {
-            return d === Math.pow(10, Math.round(Math.log10(d))) && d !== 0.1;
-        });
+            let negativeTicks: any[] = self.negativeLogScale.ticks(self.negativeLogScaleWidth / 90);
+            negativeTicks = negativeTicks.filter(function (d) {
+                return d === Math.pow(10, Math.round(Math.log10(d))) && d !== 0.1;
+            });
 
-        self.positiveLogScaleTicks = positiveTicks;
-        self.negativeLogScaleTicks = negativeTicks.map(d => d * -1);
+            self.positiveLogScaleTicks = positiveTicks;
+            self.negativeLogScaleTicks = negativeTicks.map(d => d * -1);
 
-        if (self.xAxisSettings.position === Position.Bottom) {
-            select(xAxisG).attr("transform", "translate(0," + height + ")");
+            if (self.xAxisSettings.position === Position.Bottom) {
+                select(xAxisG).attr("transform", "translate(0," + height + ")");
 
-            self.negativeLogXAxisG
-                .attr("transform", `translate(${self.isBottomXAxis ? 0 : self.positiveLogScaleWidth}, 0)`)
-                .call(axisBottom(self.negativeLogScale).tickValues(negativeTicks).tickFormat(d => "-" + (d === 0.1 ? "isZero" : "") + d));
+                self.negativeLogXAxisG
+                    .attr("transform", `translate(${self.isBottomXAxis ? 0 : self.positiveLogScaleWidth}, 0)`)
+                    .call(axisBottom(self.negativeLogScale).tickValues(negativeTicks).tickFormat(d => "-" + (d === 0.1 ? "isZero" : "") + d));
 
-            self.positiveLogXAxisG
-                .attr("transform", `translate(${self.isBottomXAxis ? self.negativeLogScaleWidth : 0}, 0)`)
-                .call(axisBottom(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
-        } else if (self.xAxisSettings.position === Position.Top) {
-            select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90));
+                self.positiveLogXAxisG
+                    .attr("transform", `translate(${self.isBottomXAxis ? self.negativeLogScaleWidth : 0}, 0)`)
+                    .call(axisBottom(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
+            } else if (self.xAxisSettings.position === Position.Top) {
+                select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90));
+            }
+        } else {
+            let positiveTicks: any[] = self.xScale.ticks(width / 90);
+            positiveTicks = positiveTicks.filter(function (d) {
+                return d === Math.pow(10, Math.round(Math.log10(d)));
+            });
+
+            if (self.xAxisSettings.position === Position.Bottom) {
+                select(xAxisG)
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(axisBottom(self.xScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
+            } else if (self.yAxisSettings.position === Position.Right) {
+                select(xAxisG)
+                    .attr("transform", "translate(0," + 0 + ")")
+                    .call(axisTop(self.xScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
+            }
         }
+
     } else {
         if (self.xAxisSettings.position === Position.Bottom) {
             select(xAxisG)

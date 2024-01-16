@@ -1182,7 +1182,7 @@ export class Visual extends Shadow {
 	}
 
 	getXPosition(value: number | string): number {
-		const xPosition = this.xScale(value);
+		const xPosition = this.xScale(this.xAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
 		if (xPosition > this.xScaleMaxRange) {
 			return this.xScaleMaxRange;
@@ -1196,7 +1196,7 @@ export class Visual extends Shadow {
 	}
 
 	getYPosition(value: number | string): number {
-		const yPosition = this.yScale(value);
+		const yPosition = this.yScale(this.yAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
 		if (yPosition > this.yScaleMaxRange) {
 			return this.yScaleMaxRange;
@@ -5689,7 +5689,7 @@ export class Visual extends Shadow {
 				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
 					const firstChar = text.charAt(0);
 					const unicodeValue = firstChar.charCodeAt(0);
-					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
+					const isNegativeNumber = (unicodeValue === 8722 || text.includes("-")) && extractDigitsFromString(text);
 					const isDecimalNumber = text.includes(".");
 
 					if (isDecimalNumber) {
@@ -5753,7 +5753,7 @@ export class Visual extends Shadow {
 	}
 
 	setXAxisDomain(): void {
-		this.isShowPositiveNegativeLogScale = this.isLogarithmScale;
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 
 		const values = this.categoricalData.categories[this.categoricalCategoriesLastIndex].values;
 
@@ -5807,7 +5807,7 @@ export class Visual extends Shadow {
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
 
-		this.isShowPositiveNegativeLogScale = this.isLogarithmScale;
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
