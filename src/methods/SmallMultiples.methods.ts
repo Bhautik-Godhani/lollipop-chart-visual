@@ -1,10 +1,9 @@
 /* eslint-disable max-lines-per-function */
 import { create, select } from "d3-selection";
 import { Visual } from "../visual";
-import { EFontStyle } from "../enum";
 import { group } from "d3-array";
 import { getSVGTextSize } from "./methods";
-import { ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
+import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
@@ -219,6 +218,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             textEle.style("color", headerSettings.fontColor);
             textEle.style("font-weight", headerSettings.fontStyles.includes(EFontStyle.Bold) ? "bold" : "");
             textEle.style("font-style", headerSettings.fontStyles.includes(EFontStyle.Italic) ? "italic" : "");
+            textEle.style("text-decoration", () => {
+                const referenceLineTextDecor: string[] = [];
+                if (headerSettings.fontStyles.includes(EFontStyle.UnderLine)) referenceLineTextDecor.push("underline");
+                return referenceLineTextDecor.length ? referenceLineTextDecor.join(" ") : "";
+            });
             textEle.style("text-align", headerSettings.alignment);
 
             if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
