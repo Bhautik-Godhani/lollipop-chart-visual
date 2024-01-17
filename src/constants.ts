@@ -168,7 +168,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	fillMid: "rgba(127, 88, 246, 1)",
 	fillMax: "rgba(75, 132, 244, 1)",
 	isAddMidColor: true,
-	fillType: ColorPaletteType.Single,
+	fillType: ColorPaletteType.Sequential,
 	isFillTypeChanged: false,
 	singleColor1: "rgba(0, 99, 178, 1)",
 	singleColor2: "rgba(156, 195, 213, 1)",
