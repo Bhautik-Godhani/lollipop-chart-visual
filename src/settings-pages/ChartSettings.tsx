@@ -38,6 +38,7 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 	setConfigValues((d) => ({
 		...d,
 		[n]: val,
+		isResetInIBCSPressed: false
 	}));
 };
 
@@ -45,6 +46,7 @@ const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateActio
 	setConfigValues((d) => ({
 		...d,
 		[n]: rgb,
+		isResetInIBCSPressed: false
 	}));
 };
 
@@ -326,10 +328,10 @@ const ChartSettings = (props) => {
 		// 	ApplyBeforeIBCSAppliedSettingsBack(shadow);
 		// }
 
-		if (configValues.isIBCSEnabled !== shadow.chartSettings.isIBCSEnabled || configValues.theme !== shadow.chartSettings.theme) {
+		if (!configValues.isResetInIBCSPressed && (configValues.isIBCSEnabled !== shadow.chartSettings.isIBCSEnabled || configValues.theme !== shadow.chartSettings.theme)) {
 			shadow.persistProperties(sectionName, propertyName, configValues);
 		} else {
-			if (configValues.isIBCSEnabled) {
+			if (configValues.isIBCSEnabled || configValues.isResetInIBCSPressed) {
 				const newConfigValues = {
 					...configValues,
 					[EChartSettings.IsIBCSEnabled]: false,
@@ -349,11 +351,16 @@ const ChartSettings = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({ ...CHART_SETTINGS });
+		if (configValues.isIBCSEnabled) {
+			setConfigValues({ ...CHART_SETTINGS, isResetInIBCSPressed: true });
+		} else {
+			setConfigValues({ ...CHART_SETTINGS });
+		}
 	};
 
 	const [configValues, setConfigValues] = React.useState<IChartSettings>({
 		...initialStates,
+		isResetInIBCSPressed: false
 	});
 
 	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);

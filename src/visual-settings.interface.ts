@@ -167,6 +167,7 @@ export interface IChartSettings {
 	isIBCSEnabled: boolean;
 	theme: EIBCSThemes;
 	prevTheme: EIBCSThemes;
+	isResetInIBCSPressed?: boolean;
 }
 
 export interface IMarkerSettings {
