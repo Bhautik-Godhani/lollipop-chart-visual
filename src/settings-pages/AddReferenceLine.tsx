@@ -170,11 +170,11 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
     if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
-          label: "BEFORE",
+          label: "LEFT",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "AFTER",
+          label: "RIGHT",
           value: EBeforeAfterPosition.After,
         },
       ];
@@ -185,7 +185,7 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "BELOW",
+          label: "BOTTOM",
           value: EBeforeAfterPosition.After,
         },
       ];
@@ -194,15 +194,15 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
     if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
-          label: "BEFORE",
+          label: "LEFT",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "CENTER",
+          label: "MIDDLE",
           value: EBeforeAfterPosition.Center,
         },
         {
-          label: "AFTER",
+          label: "RIGHT",
           value: EBeforeAfterPosition.After,
         },
       ];
@@ -217,7 +217,7 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
           value: EBeforeAfterPosition.Center,
         },
         {
-          label: "BELOW",
+          label: "BOTTOM",
           value: EBeforeAfterPosition.After,
         },
       ];
