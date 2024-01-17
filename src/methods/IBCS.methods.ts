@@ -193,6 +193,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                         ...self.dataColorsSettings,
                         [EDataColorsSettings.FillType]: ((self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal || self.chartSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
                         [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
+                        [EDataColorsSettings.SingleColor2]: "rgba(64, 64, 64, 1)",
                     }),
                 },
                 selector: null,
