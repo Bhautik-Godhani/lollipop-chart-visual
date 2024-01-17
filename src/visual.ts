@@ -5559,7 +5559,7 @@ export class Visual extends Shadow {
 			.attr("dy", isApplyTilt ? "-0.5em" : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
 			.attr("y", () => {
 				if (this.isHorizontalChart) {
-					return this.isBottomXAxis ? 9 : -9;
+					return this.isBottomXAxis ? 9 : 0;
 				} else {
 					return this.isBottomXAxis ? 9 : 9;
 				}
@@ -5862,7 +5862,8 @@ export class Visual extends Shadow {
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
-		const dataLabelHeight = this.isHasNegativeValue ? getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height * 2 : 0;
+		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
+		const negDataLabelHeight = this.isHasNegativeValue ? dataLabelHeight : 0;
 
 		if (this.isHorizontalChart) {
 			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0];
@@ -5897,7 +5898,7 @@ export class Visual extends Shadow {
 				}
 			}
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - dataLabelHeight, dataLabelHeight] : [this.yAxisStartMargin - dataLabelHeight, yScaleHeight - dataLabelHeight];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight, dataLabelHeight / 2] : [this.yAxisStartMargin - dataLabelHeight / 2, yScaleHeight - negDataLabelHeight];
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
