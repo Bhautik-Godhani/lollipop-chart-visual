@@ -4,6 +4,7 @@ import {
 	CircleSize,
 	ColorPaletteType,
 	DataLabelsPlacement,
+	EAxisDateFormats,
 	EBeforeAfterPosition,
 	ECFApplyOnCategories,
 	ECFRankingTypes,
@@ -70,6 +71,7 @@ export interface IXAxisSettings {
 	isMaximumRangeEnabled: boolean;
 	maximumRange: number;
 	isInvertRange: boolean;
+	dateFormat: EAxisDateFormats;
 }
 
 export interface IYAxisSettings {
@@ -95,6 +97,7 @@ export interface IYAxisSettings {
 	isMinimumRangeEnabled: boolean;
 	minimumRange: number;
 	isInvertRange: boolean;
+	dateFormat: EAxisDateFormats;
 }
 
 export interface ICirclePropsSettings {

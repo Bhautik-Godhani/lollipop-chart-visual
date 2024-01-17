@@ -55,6 +55,7 @@ import {
 	ECFApplyOnCategories,
 	ECFValueTypes,
 	ECFRankingTypes,
+	EAxisDateFormats,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -168,7 +169,7 @@ import { RemoveDynamicDeviation, RenderDynamicDeviation, SetDynamicDeviationData
 import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
 import CutAndClipAxisSettings from "./settings-pages/CutAndClipAxisSettings";
 import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClipMarkerOnAxis } from "./methods/CutAndClipMarker.methods";
-import { GetAxisDomainMinMax } from "./methods/Axis.methods";
+import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
@@ -5590,6 +5591,10 @@ export class Visual extends Shadow {
 					text = text.split("--")[0];
 				}
 
+				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis) {
+					text = FormatAxisDate(THIS.xAxisSettings.dateFormat, new Date(text));
+				}
+
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
 				ele.text("");
 
@@ -5685,6 +5690,10 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
+
+				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis) {
+					text = FormatAxisDate(THIS.yAxisSettings.dateFormat, new Date(text));
+				}
 
 				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
 					const firstChar = text.charAt(0);

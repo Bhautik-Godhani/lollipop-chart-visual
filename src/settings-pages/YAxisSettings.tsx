@@ -3,6 +3,7 @@ import * as React from "react";
 import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
   AxisCategoryType,
+  EAxisDateFormats,
   EVisualConfig,
   EVisualSettings,
   EXAxisSettings,
@@ -31,6 +32,21 @@ const AXIS_MODE: ILabelValuePair[] = [
   {
     label: "Categorical",
     value: AxisCategoryType.Categorical,
+  },
+];
+
+const AXIS_DATE_FORMATS: ILabelValuePair[] = [
+  {
+    label: "DD:MM:YYYY",
+    value: EAxisDateFormats.DDMMYYYY,
+  },
+  {
+    label: "DD:MM:YYYY hh:mm",
+    value: EAxisDateFormats.DDMMYYYYHHMM,
+  },
+  {
+    label: "DD:MM:YYYY hh:mm AM/PM",
+    value: EAxisDateFormats.DDMMYYYYHHMMAMPM,
   },
 ];
 
@@ -69,7 +85,8 @@ const YAxisSettings = (props) => {
       minimumRange: configValues.minimumRange,
       maximumRange: configValues.maximumRange,
       isLogarithmScale: configValues.isLogarithmScale,
-      categoryType: configValues.categoryType
+      categoryType: configValues.categoryType,
+      dateFormat: configValues.dateFormat
     };
     shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xAxisSettings);
 
@@ -335,6 +352,19 @@ const YAxisSettings = (props) => {
             />
           </Column>
         </Row>
+
+        <ConditionalWrapper visible={shadow.isYIsDateTimeAxis && shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Date Format"}
+                value={configValues.dateFormat}
+                optionsList={AXIS_DATE_FORMATS}
+                handleChange={value => handleChange(value, EYAxisSettings.DateFormat)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
         <ConditionalWrapper visible={configValues.isDisplayLabel}>
           <ConditionalWrapper visible={shadow.isHorizontalChart}>

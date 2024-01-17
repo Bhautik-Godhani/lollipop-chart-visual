@@ -36,6 +36,7 @@ import {
 	EReferenceLineType,
 	EReferenceLineNameTypes,
 	EErrorBarsDirection,
+	EAxisDateFormats,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -227,7 +228,8 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	maximumRange: 0,
 	isMinimumRangeEnabled: false,
 	minimumRange: 0,
-	isInvertRange: false
+	isInvertRange: false,
+	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -252,7 +254,8 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	maximumRange: 0,
 	isMinimumRangeEnabled: false,
 	minimumRange: 0,
-	isInvertRange: false
+	isInvertRange: false,
+	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {

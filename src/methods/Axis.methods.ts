@@ -1,7 +1,8 @@
 import { max as D3Max, min as D3Min } from "d3-array";
 import { Visual } from "../visual";
 import { ESmallMultiplesAxisType } from "@truviz/shadow/dist/Components";
-import { AxisCategoryType } from "../enum";
+import { AxisCategoryType, EAxisDateFormats } from "../enum";
+import { timeFormat } from "d3";
 
 export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } => {
     const values = self.chartData.reduce((arr, d) => {
@@ -42,4 +43,20 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
     self.isHasNegativeValue = min < 0 || max < 0;
 
     return { min, max };
+}
+
+export const FormatAxisDate = (dateFormat: EAxisDateFormats, date: Date): string => {
+    switch (dateFormat) {
+        case EAxisDateFormats.DDMMYYYY:
+            return timeFormat("%d:%m:%Y")(date);
+
+        case EAxisDateFormats.DDMMYYYYHHMM:
+            return timeFormat("%d:%m:%Y %H:%M")(date);
+
+        case EAxisDateFormats.DDMMYYYYHHMMAMPM:
+            return timeFormat("%d:%m:%Y %I:%M %p")(date);
+
+        default:
+            return timeFormat("%d:%m:%Y")(date);
+    }
 }
