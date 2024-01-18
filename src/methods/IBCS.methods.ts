@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
 import { POSITIVE_COLOR, SORTING_SETTINGS } from "../constants";
-import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
+import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
 import { Visual } from "../visual";
-import { IChartSettings, IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
+import { IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
 
 export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeIBCSSettings;
@@ -178,9 +178,20 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.MarkerSettings]: JSON.stringify({
                         ...self.markerSettings,
-                        [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
-                        [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
-                        [EMarkerSettings.MarkerSize]: 20,
+                        [EMarkerSettings.Marker1Style]: {
+                            ...self.markerSettings.marker1Style,
+                            [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+                            [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+                            [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
+                            [EMarkerSettings.MarkerSize]: 20,
+                        },
+                        [EMarkerSettings.Marker2Style]: {
+                            ...self.markerSettings.marker2Style,
+                            [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+                            [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+                            [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
+                            [EMarkerSettings.MarkerSize]: 20,
+                        }
                     }),
                 },
                 selector: null,
