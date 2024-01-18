@@ -43,7 +43,7 @@ const UIReferenceLines = (
 
           <Row>
             <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <Button text="Add New Line" variant="primary" clickHandler={() => initAdd()} />
+              <Button text="Add New Line/Band" variant="primary" clickHandler={() => initAdd()} />
             </Column>
           </Row>
 

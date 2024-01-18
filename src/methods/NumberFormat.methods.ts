@@ -201,7 +201,7 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
         }
     }
 
-    return numberSettings.prefix + " " + formattedNumber + " " + numberSettings.suffix;
+    return numberSettings.prefix + "" + formattedNumber + "" + numberSettings.suffix;
 }
 
 export const extractDigitsFromString = (str) => {
