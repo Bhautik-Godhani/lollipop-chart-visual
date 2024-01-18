@@ -2278,7 +2278,6 @@ export class Visual extends Shadow {
 					containerWidth: vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width,
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
 					categories: this.smallMultiplesCategories,
-					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					onCellRendered: (category, index, ele) => {
 						DrawSmallMultipleBarChart(this, settings, this.smallMultiplesCategories.findIndex(d => d === category), ele);
 					},
@@ -2635,6 +2634,7 @@ export class Visual extends Shadow {
 	}
 
 	private createErrorBarsMarkerDefs(): void {
+		this.errorBarsMarkerDefsG.selectAll("*").remove();
 		ErrorBarsMarkers.forEach((d: IErrorBarsMarker) => {
 			const symbol = this.errorBarsMarkerDefsG.append("defs")
 				.append("symbol")
@@ -2645,7 +2645,7 @@ export class Visual extends Shadow {
 			symbol.append("path")
 				.attr("d", d.path)
 				.attr("class", "marker1-path")
-				.attr("fill", "rgb(108, 105, 102)")
+				.attr("fill", this.errorBarsSettings.errorBars.markerColor)
 				.attr("stroke", "rgb(255, 255, 255)")
 				.attr("stroke-width", 1);
 		})

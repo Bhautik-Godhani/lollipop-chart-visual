@@ -654,6 +654,7 @@ export enum EErrorBarsSettings {
 	BarWidth = "barWidth",
 	MarkerShape = "markerShape",
 	MarkerSize = "markerSize",
+	MarkerColor = "markerColor",
 	BorderColor = "borderColor",
 	BorderSize = "borderSize",
 	ErrorBand = "errorBand",

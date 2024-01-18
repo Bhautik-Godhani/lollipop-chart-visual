@@ -498,6 +498,7 @@ export interface IErrorBarsSettings {
 		barWidth: number;
 		markerShape: EErrorBarsMarkerShape;
 		markerSize: number;
+		markerColor: string;
 		borderColor: string;
 		borderSize: number;
 	},

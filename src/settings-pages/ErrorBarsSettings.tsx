@@ -597,7 +597,14 @@ const ErrorBarsSettings = (props) => {
                   handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerSize, EErrorBarsSettings.ErrorBars)}
                 />
               </Column>
-              <Column></Column>
+              <Column>
+                <ColorPicker
+                  label={"Marker Color"}
+                  color={configValues.errorBars.markerColor}
+                  handleChange={value => handleChange(value, EErrorBarsSettings.MarkerColor, EErrorBarsSettings.ErrorBars)}
+                  colorPalette={vizOptions.host.colorPalette}
+                />
+              </Column>
             </Row>
 
             <Row>

@@ -436,6 +436,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		barWidth: 1,
 		markerShape: EErrorBarsMarkerShape.Dash,
 		markerSize: 8,
+		markerColor: "rgba(108, 105, 102, 1)",
 		borderColor: "rgba(255, 255, 255, 1)",
 		borderSize: 1
 	},
