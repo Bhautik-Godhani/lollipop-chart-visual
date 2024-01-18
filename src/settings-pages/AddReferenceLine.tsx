@@ -345,10 +345,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           <SelectInput
             label={"Based On"}
             value={lineValues.computation}
-            optionsList={isValue2 ? [{
-              label: ComputationTypeList.find(d => d.value === configValues.lineValue1.computation)?.label,
-              value: configValues.lineValue1.computation,
-            }] : ComputationTypeList}
+            optionsList={ComputationTypeList}
             handleChange={(value) => handleChange(value, "computation", type)}
           />
         </Column>
