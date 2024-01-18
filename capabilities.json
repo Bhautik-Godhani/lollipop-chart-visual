@@ -29,7 +29,8 @@
 		{
 			"displayName": "Small Multiples",
 			"name": "smallMultiples",
-			"kind": "Grouping"
+			"kind": "Grouping",
+			"description": "Split your visual into several smaller visuals, each corresponding to the selected fields."
 		},
 		{
 			"displayName": "Race Chart Data",
