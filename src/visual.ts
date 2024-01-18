@@ -5306,13 +5306,19 @@ export class Visual extends Shadow {
 	drawTooltip(): void {
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
-			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, true)),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
 			(datapoint: any) => datapoint.selectionId
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
-			(datapoint: any) => (this.isHasMultiMeasure ? getClevelandTooltipData(datapoint) : getTooltipData(datapoint, false)),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, false, false)),
+			(datapoint: any) => datapoint.selectionId
+		);
+
+		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(".errorBarG"),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
 			(datapoint: any) => datapoint.selectionId
 		);
 
@@ -5320,7 +5326,7 @@ export class Visual extends Shadow {
 			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
 		};
 
-		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean): VisualTooltipDataItem[] => {
+		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean): VisualTooltipDataItem[] => {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
@@ -5332,9 +5338,17 @@ export class Visual extends Shadow {
 					value: isCircle1
 						? numberFormatter(value.value1, this.measureNumberFormatter[0])
 						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: this.categoryColorPair[value.category].marker1Color,
+					color: isCircle1 ? this.categoryColorPair[value.category].marker1Color : this.categoryColorPair[value.category].marker2Color,
 				},
 			];
+
+			if (isMultiMeasure) {
+				tooltipData.push({
+					displayName: this.measure2DisplayName,
+					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
+					color: this.categoryColorPair[value.category].marker2Color,
+				})
+			}
 
 			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
