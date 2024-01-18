@@ -148,7 +148,7 @@ const UIThemeSettings = (
 				<ConditionalWrapper visible={configValues.isIBCSEnabled}>
 					<Row>
 						<Column>
-							<Label text="Default"></Label>
+							<Label text="IBCS 1"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues)
@@ -157,7 +157,7 @@ const UIThemeSettings = (
 							</div>
 						</Column>
 						<Column>
-							<Label text="Default"></Label>
+							<Label text="IBCS 2"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.DefaultHorizontal, EChartSettings.Theme, setConfigValues)
@@ -169,7 +169,7 @@ const UIThemeSettings = (
 
 					<Row>
 						<Column>
-							<Label text="Diverging 1"></Label>
+							<Label text="IBCS 3"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.Diverging1Vertical, EChartSettings.Theme, setConfigValues)
@@ -178,7 +178,7 @@ const UIThemeSettings = (
 							</div>
 						</Column>
 						<Column>
-							<Label text="Diverging 1"></Label>
+							<Label text="IBCS 4"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.Diverging1Horizontal, EChartSettings.Theme, setConfigValues)
@@ -190,7 +190,7 @@ const UIThemeSettings = (
 
 					<Row>
 						<Column>
-							<Label text="Diverging 2"></Label>
+							<Label text="IBCS 5"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.Diverging2Vertical, EChartSettings.Theme, setConfigValues)
@@ -199,7 +199,7 @@ const UIThemeSettings = (
 							</div>
 						</Column>
 						<Column>
-							<Label text="Diverging 2"></Label>
+							<Label text="IBCS 6"></Label>
 							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
 								onClick={
 									() => handleChange(EIBCSThemes.Diverging2Horizontal, EChartSettings.Theme, setConfigValues)
