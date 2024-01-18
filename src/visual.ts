@@ -6296,7 +6296,7 @@ export class Visual extends Shadow {
 				.selectAll("text")
 				.each(function () {
 					const ele = d3.select(this);
-					const start = SVGBBox.x + THIS.yScaleGWidth;
+					const start = SVGBBox.x;
 					const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
 
 					if ((bBox.x - start) < 0) {
