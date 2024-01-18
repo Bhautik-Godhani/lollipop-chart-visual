@@ -62,7 +62,7 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
         }
     }
 
-    return number.toString();
+    return (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, number.toString(), number).toString() : number.toString());
 }
 
 export const ThousandsSeparator = (numberSettings: NumberFormatting, number: number): string => {
