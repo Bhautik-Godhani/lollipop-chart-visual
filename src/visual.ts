@@ -2252,6 +2252,14 @@ export class Visual extends Shadow {
 
 			this.setCategoricalDataFields(this.categoricalData);
 
+			if (this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData) {
+				this.config.smallMultiplesConfig.showInfoPage = false;
+			} else {
+				this.config.smallMultiplesConfig.showInfoPage = true;
+				this.config.smallMultiplesConfig.infoMessage = `This option allows you to see the small multiples data view. To enable this functionality, 
+							add categorical small multiple data into the small multiples data field`;
+			}
+
 			// SMALL MULTIPLE VISUAL
 			if (this.isSmallMultiplesEnabled) {
 				if (this.isHasSmallMultiplesData) {
