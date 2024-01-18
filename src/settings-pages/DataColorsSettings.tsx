@@ -42,7 +42,7 @@ const handleCategoryChange = (rgb, i, setConfigValues: React.Dispatch<React.SetS
 };
 
 const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
-	const colorPaletteDropdownList = [
+	let colorPaletteDropdownList = [
 		{
 			label: "Single",
 			value: ColorPaletteType.Single,
@@ -74,12 +74,40 @@ const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setCo
 	];
 
 	if (!shadow.isHasMultiMeasure && shadow.isLollipopTypeCircle) {
-		colorPaletteDropdownList.push(
+		colorPaletteDropdownList = [
+			{
+				label: "Single",
+				value: ColorPaletteType.Single,
+			},
+			{
+				label: "Power BI Theme",
+				value: ColorPaletteType.PowerBi,
+			},
+			{
+				label: "Gradient",
+				value: ColorPaletteType.Gradient,
+			},
 			{
 				label: "By Category",
 				value: ColorPaletteType.ByCategory,
 			},
-		)
+			{
+				label: "Sequential",
+				value: ColorPaletteType.Sequential,
+			},
+			{
+				label: "Diverging",
+				value: ColorPaletteType.Diverging,
+			},
+			{
+				label: "Qualitative",
+				value: ColorPaletteType.Qualitative,
+			},
+			{
+				label: "Positive/Negative",
+				value: ColorPaletteType.PositiveNegative,
+			}
+		];
 	}
 
 	return (
