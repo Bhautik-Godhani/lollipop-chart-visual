@@ -4749,7 +4749,7 @@ export class Visual extends Shadow {
 		} else {
 			textSelection
 				.attr("fill", d => {
-					return this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color;
+					return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
 				});
 		}
 
@@ -7211,7 +7211,7 @@ export class Visual extends Shadow {
 
 	drawZeroSeparatorLine(): void {
 		this.zeroSeparatorLine
-			.attr("stroke", this.chartSettings.zeroBaseLineColor)
+			.attr("stroke", this.getColor(this.chartSettings.zeroBaseLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
 			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
 
