@@ -2403,7 +2403,7 @@ export class Visual extends Shadow {
 					}));
 				}
 
-				// this.configLegend();
+				this.configLegend();
 				this.setMargins();
 
 				this.smallMultiplesGridContainer.selectAll("*").remove();
