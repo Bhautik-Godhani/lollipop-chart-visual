@@ -654,7 +654,7 @@ export class Visual extends Shadow {
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
 			components: [
 				{
-					name: "Chart",
+					name: "Chart Options",
 					sectionName: "chartConfig",
 					propertyName: "chartSettings",
 					Component: () => ChartSettings,
