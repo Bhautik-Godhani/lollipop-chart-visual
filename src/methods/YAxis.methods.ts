@@ -39,7 +39,7 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                     .call(axisRight(self.negativeLogScale).tickValues(negativeTicks).tickFormat(d => "-" + (d === 0.1 ? "isZero" : "") + d));
             }
         } else if (self.isLogarithmScale) {
-            let positiveTicks: any[] = self.yScale.ticks(self.height / 70);
+            let positiveTicks: any[] = self.yScale.ticks(self.height / 90);
             positiveTicks = positiveTicks.filter(function (d) {
                 return d === Math.pow(10, Math.round(Math.log10(d)));
             });
@@ -55,11 +55,11 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {
-            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale));
+            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale).ticks(height / 90));
         } else if (self.yAxisSettings.position === Position.Right) {
             select(yAxisG)
                 .attr("transform", `translate(${width}, 0)`)
-                .call(axisRight(self.yScale).ticks(height / 70));
+                .call(axisRight(self.yScale).ticks(height / 90));
         }
     }
 }

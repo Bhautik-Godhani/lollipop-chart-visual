@@ -34,10 +34,14 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
         }
     }
 
-    if (max >= 0) {
-        max += max * 0.1;
-    } else {
-        max -= max * 0.1;
+    // if (max >= 0) {
+    //     max += max * 0.1;
+    // } else {
+    //     max -= max * 0.1;
+    // }
+
+    if (max < 0) {
+        max = 0;
     }
 
     self.isHasNegativeValue = min < 0 || max < 0;

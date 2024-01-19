@@ -377,7 +377,7 @@ const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
     if (rLineValue.type === EReferenceLinesType.Ranking) {
         const domain: string = self.isHorizontalChart
             ? self.xScale.ticks(self.width / 90)
-            : self.yScale.ticks(self.height / 70);
+            : self.yScale.ticks(self.height / 90);
         if (rLineValue.rankOrder === Position.Start || rLineValue.rankOrder === Position.Bottom) {
             value = domain[parseInt(rLineValue.rank) - 1];
         } else {
