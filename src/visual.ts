@@ -7572,7 +7572,7 @@ export class Visual extends Shadow {
 				break;
 
 			case EMarkerChartTypes.ROSE:
-				autoFontSize = pieRadius - pieRadius * ((70 + this.pieEmphasizeScaleSize) / 100);
+				autoFontSize = pieRadius - pieRadius * ((45 + this.pieEmphasizeScaleSize) / 100);
 				break;
 		}
 
