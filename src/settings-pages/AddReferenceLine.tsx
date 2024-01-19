@@ -932,6 +932,18 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
   }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
 
   React.useEffect(() => {
+    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+  }, [configValues.lineValue1.axis]);
+
+  React.useEffect(() => {
+    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
+      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues.lineValue2.axis]);
+
+  React.useEffect(() => {
     if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
       handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
       handleChange(configValues.lineValue1.measureName, EReferenceLineValueProps.MeasureName, EReferenceLinesSettings.LineValue2);

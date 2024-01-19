@@ -305,7 +305,8 @@ export const generateSecureRandomBytes = (length) => {
 }
 
 export const createPatternsDefs = (self: Visual, svgRootElement) => {
-	const filterDef = svgRootElement.append("defs");
+	svgRootElement.selectAll(".pattern-defs").remove();
+	const filterDef = svgRootElement.append("defs").attr("class", "pattern-defs");
 	PATTERNS.map((pattern) => {
 		if (self.isHasSubcategories) {
 			self.subCategoriesName.forEach(d => {
@@ -352,7 +353,8 @@ export const createPatternsDefs = (self: Visual, svgRootElement) => {
 
 export const createMarkerDefs = (self: Visual, svgRootElement) => {
 	const { errorBars } = self.errorBarsSettings;
-	const filterDef = svgRootElement.append("defs");
+	svgRootElement.selectAll(".marker-defs").remove();
+	const filterDef = svgRootElement.append("defs").attr("class", "marker-defs");
 	CATEGORY_MARKERS.map((marker) => {
 		const symbol = filterDef
 			.append("symbol")
@@ -370,10 +372,10 @@ export const createMarkerDefs = (self: Visual, svgRootElement) => {
 };
 
 export const generatePattern = (svgRootElement, pattern, color, isLegend = false) => {
-	let defs = svgRootElement.select("defs");
+	let defs = svgRootElement.select(".pattern-defs");
 
 	if (defs.empty()) {
-		defs = svgRootElement.append("defs");
+		defs = svgRootElement.append("defs").attr("class", "pattern-defs");
 	}
 	let patternId;
 	if (pattern.isImagePattern) {
