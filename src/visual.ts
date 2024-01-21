@@ -147,7 +147,7 @@ import RankingSettings from "./settings-pages/RankingSettings";
 import SortingSettings from "./settings-pages/SortingSettings";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
 import PatternSettings from "./settings-pages/FillPatterns";
-import XAxisSettings from "./settings-pages/XAxisSettings";
+import AxisSettings from "./settings-pages/AxisSettings";
 import YAxisSettings from "./settings-pages/YAxisSettings";
 import RaceChartSettings from "./settings-pages/RaceChartSettings";
 import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
@@ -744,19 +744,19 @@ export class Visual extends Shadow {
 					icon: CutAndClipAxisIcon
 				},
 				{
-					name: "X Axis",
+					name: "Axis",
 					sectionName: EVisualConfig.XAxisConfig,
 					propertyName: EVisualSettings.XAxisSettings,
-					Component: () => XAxisSettings,
+					Component: () => AxisSettings,
 					icon: XAxisSettingsIcon
 				},
-				{
-					name: "Y Axis",
-					sectionName: EVisualConfig.YAxisConfig,
-					propertyName: EVisualSettings.YAxisSettings,
-					Component: () => YAxisSettings,
-					icon: YAxisSettingsIcon
-				},
+				// {
+				// 	name: "Y Axis",
+				// 	sectionName: EVisualConfig.YAxisConfig,
+				// 	propertyName: EVisualSettings.YAxisSettings,
+				// 	Component: () => YAxisSettings,
+				// 	icon: YAxisSettingsIcon
+				// },
 				{
 					name: "Fill Patterns",
 					sectionName: "patternConfig",
