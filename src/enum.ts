@@ -845,3 +845,9 @@ export enum ECFRankingTypes {
 	TopN = "topN",
 	BottomN = "bottomN",
 }
+
+export enum ELineTypeTabs {
+	All = "all",
+	Line = "line",
+	Band = "band"
+}

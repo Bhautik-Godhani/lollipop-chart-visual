@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import AddReferenceLine from "./AddReferenceLine";
 import {
@@ -8,104 +9,15 @@ import {
   IconButton,
   Separator,
   DraggableRows,
+  SwitchOption,
+  ConditionalWrapper,
 } from "@truviz/shadow/dist/Components";
-import { EditIcon, PlusIcon, ReferenceLinePlaceholderIcon, TrashIcon } from "./SettingsIcons";
+import { EditIcon, PlusIcon, ReferenceBandPlaceholderIcon, ReferenceLinePlaceholderIcon, TrashIcon } from "./SettingsIcons";
 import { Visual } from "../visual";
-import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { IReferenceLineSettings } from "../visual-settings.interface";
-import { EReferenceType } from "../enum";
+import { ELineTypeTabs, EReferenceType } from "../enum";
 import { persistProperties } from "../methods/methods";
 import { GetFormattedNumber } from "../methods/NumberFormat.methods";
-
-const UIReferenceLines = (
-  shadow: Visual,
-  vizOptions: ShadowUpdateOptions,
-  id: number,
-  isDetailsOpen: boolean,
-  initialStates: IReferenceLineSettings[],
-  mappedInitialState: any[],
-  initAdd: (...args: any) => any,
-  onAdd: (...args: any) => any,
-  onUpdate: (...args: any) => any,
-  closeAddEdit: (...args: any) => any,
-  closeCurrentSettingHandler: (...args: any) => any,
-  setInitialStates: React.Dispatch<React.SetStateAction<IReferenceLineSettings[]>>
-) => {
-  return <>
-    {
-      !isDetailsOpen && initialStates.length === 0 && (
-        <>
-          <Row>
-            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <ReferenceLinePlaceholderIcon />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <Button text="Add New Line/Band" variant="primary" clickHandler={() => initAdd()} />
-            </Column>
-          </Row>
-
-          <Footer
-            cancelButtonHandler={() => {
-              closeCurrentSettingHandler();
-            }}
-            cancelButtonText="CLOSE"
-            isShowResetButton={false}
-            isShowSaveButton={false}
-          />
-        </>
-      )
-    }
-
-    {
-      !isDetailsOpen && initialStates.length > 0 && (
-        <>
-          <Row>
-            <Column>
-              <IconButton
-                text="Add New Reference Line/Band"
-                icon={<PlusIcon fill="var(--blackColor)" />}
-                onClick={() => initAdd()}
-              />
-            </Column>
-          </Row>
-          <Separator />
-          <Row>
-            <Column>
-              <DraggableRows data={mappedInitialState} setData={setInitialStates} />
-            </Column>
-          </Row>
-          <Footer
-            cancelButtonHandler={() => {
-              closeCurrentSettingHandler();
-            }}
-            cancelButtonText="CLOSE"
-            isShowResetButton={false}
-            isShowSaveButton={false}
-          />
-        </>
-      )
-    }
-
-    {
-      isDetailsOpen && (
-        <>
-          <AddReferenceLine
-            shadow={shadow}
-            details={typeof id === "number" ? initialStates[id] : {}}
-            onAdd={onAdd}
-            onUpdate={onUpdate}
-            index={id}
-            closeCurrentSettingHandler={closeAddEdit}
-            vizOptions={vizOptions}
-          />
-        </>
-      )
-    }
-  </>
-}
 
 const ReferenceLines = (props) => {
   const {
@@ -135,6 +47,7 @@ const ReferenceLines = (props) => {
 
   const [id, setId] = React.useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
+  const [selectedLineType, setSelectedLineType] = React.useState(ELineTypeTabs.All);
 
   const initAdd = () => {
     setId(null);
@@ -186,6 +99,7 @@ const ReferenceLines = (props) => {
 
       return {
         name: rowIndex.toString(),
+        row: row,
         displayContent: text,
         showContextMenu: true,
         contextMenuElement: [
@@ -208,9 +122,207 @@ const ReferenceLines = (props) => {
     });
   }, [initialStates]);
 
+  React.useEffect(() => {
+    if (selectedLineType === ELineTypeTabs.All && initialStates.length === 0) {
+      setSelectedLineType(() => ELineTypeTabs.Line);
+    }
+  }, [initialStates]);
+
+  const LineTypeTabs = [
+    {
+      label: "Line",
+      value: ELineTypeTabs.Line
+    },
+    {
+      label: "Band",
+      value: ELineTypeTabs.Band
+    }
+  ]
+
+  if (initialStates.length > 0) {
+    LineTypeTabs.unshift({
+      label: "All",
+      value: ELineTypeTabs.All
+    })
+  }
+
   return (
     <>
-      {UIReferenceLines(shadow, vizOptions, id, isDetailsOpen, initialStates, mappedInitialState, initAdd, onAdd, onUpdate, closeAddEdit, closeCurrentSettingHandler, setInitialStates)}
+      <Row>
+        <Column>
+          <SwitchOption
+            value={selectedLineType}
+            optionsList={LineTypeTabs}
+            handleChange={(value) => {
+              setSelectedLineType(() => value);
+              setIsDetailsOpen(false);
+            }}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.All}>
+        {!isDetailsOpen && initialStates.length > 0 && (
+          <>
+            <Row>
+              <Column>
+                <DraggableRows data={mappedInitialState} setData={setInitialStates} />
+              </Column>
+            </Row>
+
+            <Footer
+              cancelButtonHandler={() => {
+                closeCurrentSettingHandler();
+              }}
+              cancelButtonText="CLOSE"
+              isShowResetButton={false}
+              isShowSaveButton={false}
+            />
+          </>
+        )}
+
+        {!isDetailsOpen && initialStates.length === 0 && (
+          <Footer
+            cancelButtonHandler={() => {
+              closeCurrentSettingHandler();
+            }}
+            cancelButtonText="CLOSE"
+            isShowResetButton={false}
+            isShowSaveButton={false}
+          />
+        )}
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Line}>
+        {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length === 0 && (
+          <>
+            <Row>
+              <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <ReferenceLinePlaceholderIcon />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Button text="Add New Line" variant="primary" clickHandler={() => initAdd()} />
+              </Column>
+            </Row>
+
+            <Footer
+              cancelButtonHandler={() => {
+                closeCurrentSettingHandler();
+              }}
+              cancelButtonText="CLOSE"
+              isShowResetButton={false}
+              isShowSaveButton={false}
+            />
+          </>
+        )}
+
+        {
+          !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length > 0 && (
+            <>
+              <Row>
+                <Column>
+                  <IconButton
+                    text="Add New Reference Line"
+                    icon={<PlusIcon fill="var(--blackColor)" />}
+                    onClick={() => initAdd()}
+                  />
+                </Column>
+              </Row>
+              <Separator />
+              <Row>
+                <Column>
+                  <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_LINE)} setData={setInitialStates} />
+                </Column>
+              </Row>
+              <Footer
+                cancelButtonHandler={() => {
+                  closeCurrentSettingHandler();
+                }}
+                cancelButtonText="CLOSE"
+                isShowResetButton={false}
+                isShowSaveButton={false}
+              />
+            </>
+          )
+        }
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Band}>
+        {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length === 0 && (
+          <>
+            <Row>
+              <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <ReferenceBandPlaceholderIcon />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Button text="Add New Band" variant="primary" clickHandler={() => initAdd()} />
+              </Column>
+            </Row>
+
+            <Footer
+              cancelButtonHandler={() => {
+                closeCurrentSettingHandler();
+              }}
+              cancelButtonText="CLOSE"
+              isShowResetButton={false}
+              isShowSaveButton={false}
+            />
+          </>
+        )}
+
+        {
+          !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length > 0 && (
+            <>
+              <Row>
+                <Column>
+                  <IconButton
+                    text="Add New Reference Band"
+                    icon={<PlusIcon fill="var(--blackColor)" />}
+                    onClick={() => initAdd()}
+                  />
+                </Column>
+              </Row>
+              <Separator />
+              <Row>
+                <Column>
+                  <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_BAND)} setData={setInitialStates} />
+                </Column>
+              </Row>
+              <Footer
+                cancelButtonHandler={() => {
+                  closeCurrentSettingHandler();
+                }}
+                cancelButtonText="CLOSE"
+                isShowResetButton={false}
+                isShowSaveButton={false}
+              />
+            </>
+          )
+        }
+      </ConditionalWrapper>
+
+      {
+        isDetailsOpen && (
+          <>
+            <AddReferenceLine
+              shadow={shadow}
+              details={typeof id === "number" ? initialStates[id] : {}}
+              isLineUI={selectedLineType === ELineTypeTabs.Line}
+              onAdd={onAdd}
+              onUpdate={onUpdate}
+              index={id}
+              closeCurrentSettingHandler={closeAddEdit}
+              vizOptions={vizOptions}
+            />
+          </>
+        )
+      }
     </>
   );
 };

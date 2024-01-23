@@ -719,7 +719,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   </>
 }
 
-const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions, closeCurrentSettingHandler }) => {
+const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeCurrentSettingHandler }) => {
   const isAddNew = isEmpty(details);
   const isInitialRender = React.useRef(0);
   const [configValues, setConfigValues] = React.useState<IReferenceLineSettings>(
@@ -952,6 +952,19 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
     }
   }, [configValues.lineValue1.measureName, configValues.lineValue1.type, configValues.lineValue1.computation]);
 
+  React.useEffect(() => {
+    if (isLineUI) {
+      setConfigValues((d) => ({
+        ...d,
+        [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_LINE
+      }));
+    } else {
+      setConfigValues((d) => ({
+        ...d,
+        [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_BAND
+      }));
+    }
+  }, []);
 
   const resetChanges = () => {
     setConfigValues(() => defaultSettings);
@@ -959,19 +972,13 @@ const AddReferenceLines = ({ shadow, details, onAdd, onUpdate, index, vizOptions
 
   return (
     <>
-      <Tabs selected={configValues.referenceType} onChange={(value) => {
-        setConfigValues((d) => ({
-          ...d,
-          [EReferenceLinesSettings.ReferenceType]: value
-        }));
-      }}>
-        <Tab title={"Reference Line"} identifier={EReferenceType.REFERENCE_LINE}>
-          {UIReferenceLine(vizOptions, shadow, configValues, handleChange, handleCheckbox)}
-        </Tab>
-        <Tab title={"Reference Band"} identifier={EReferenceType.REFERENCE_BAND}>
-          {UIReferenceBand(vizOptions, shadow, configValues, handleChange, handleCheckbox)}
-        </Tab>
-      </Tabs >
+      <ConditionalWrapper visible={isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_LINE)}>
+        {UIReferenceLine(vizOptions, shadow, configValues, handleChange, handleCheckbox)}
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={!isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND)}>
+        {UIReferenceBand(vizOptions, shadow, configValues, handleChange, handleCheckbox)}=
+      </ConditionalWrapper>
 
       {UIFooter(isAddNew, closeCurrentSettingHandler, handleAdd, resetChanges)}
     </>
