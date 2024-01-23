@@ -608,3 +608,24 @@ export function calculateStandardDeviation(numbers) {
 
 	return standardDeviation;
 }
+
+export function calculatePowerBiStandardDeviation(data: number[]): number {
+	const n = data.length;
+
+	// Step 1: Calculate the mean
+	const mean = data.reduce((sum, value) => sum + value, 0) / n;
+
+	// Step 2: Calculate squared differences from the mean
+	const squaredDifferences = data.map(value => Math.pow(value - mean, 2));
+
+	// Step 3: Calculate the sum of squared differences
+	const sumSquaredDifferences = squaredDifferences.reduce((sum, value) => sum + value, 0);
+
+	// Step 4: Calculate the variance (divide by n-1 for sample standard deviation)
+	const variance = sumSquaredDifferences / (n - 1);
+
+	// Step 5: Take the square root to get the standard deviation
+	const standardDeviation = Math.sqrt(variance);
+
+	return standardDeviation;
+}

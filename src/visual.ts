@@ -124,7 +124,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { GetWordsSplitByWidth, calculatePowerBiStandardDeviation, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -3081,6 +3081,10 @@ export class Visual extends Shadow {
 					break;
 				}
 				case EErrorBarsCalcTypes.ByStandardDeviation: {
+					// const isMeasure2 = this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+					// const sd = calculatePowerBiStandardDeviation(this.chartData.map(d => isMeasure2 ? d.value2 : d.value1));
+					// ub = upperBoundValue = value + sd;
+					// lb = lowerBoundValue = value - sd;
 					break;
 				}
 				case EErrorBarsCalcTypes.ByValue: {
