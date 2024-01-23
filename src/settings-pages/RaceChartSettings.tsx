@@ -210,7 +210,7 @@ const RaceChartSettings = (props) => {
           <Row>
             <Column>
               <ToggleButton
-                label={"Auto Button Radius"}
+                label={"Auto Play Button Radius"}
                 value={configValues.isTickerButtonAutoRadius}
                 handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
                 appearance="toggle"
@@ -232,7 +232,7 @@ const RaceChartSettings = (props) => {
 
               <Column>
                 <ColorPicker
-                  label={"Ticker Button Color"}
+                  label={"Play Button Color"}
                   color={configValues.tickerButtonColor}
                   handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
                   colorPalette={vizOptions.host.colorPalette}
@@ -245,7 +245,7 @@ const RaceChartSettings = (props) => {
             <Row>
               <Column>
                 <ColorPicker
-                  label={"Ticker Button Color"}
+                  label={"Play Button Color"}
                   color={configValues.tickerButtonColor}
                   handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
                   colorPalette={vizOptions.host.colorPalette}
