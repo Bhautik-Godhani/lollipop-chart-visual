@@ -401,6 +401,21 @@ const DataColors = (props) => {
 		}
 	}, []);
 
+	React.useEffect(() => {
+		setConfigValues((d) => ({
+			...d,
+			[EDataColorsSettings.IsFillTypeChanged]: true,
+		}));
+	}, [configValues]);
+
+	React.useEffect(() => {
+		if (!configValues.isFillTypeChanged && shadow.isHasNegativeValue && shadow.isHasPositiveValue)
+			setConfigValues((d) => ({
+				...d,
+				[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
+			}));
+	}, []);
+
 	const resetChanges = () => {
 		setConfigValues({ ...DATA_COLORS });
 	};

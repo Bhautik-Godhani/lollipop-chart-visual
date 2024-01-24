@@ -266,6 +266,7 @@ export class Visual extends Shadow {
 	subCategoryColorPairWithIndex: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	isHasPositiveValue: boolean;
 	isHasNegativeValue: boolean;
 	markerMaxSize: number = 0;
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
@@ -5847,8 +5848,6 @@ export class Visual extends Shadow {
 	}
 
 	setXAxisDomain(): void {
-		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
-
 		const values = this.categoricalData.categories[this.categoricalCategoriesLastIndex].values;
 
 		let min = +d3.min(values, d => +d);
@@ -5865,8 +5864,6 @@ export class Visual extends Shadow {
 				max -= max * 0.15;
 			}
 		}
-
-		this.isHasNegativeValue = min < 0 || max < 0;
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
 			if (this.isXIsContinuousAxis) {
@@ -5902,14 +5899,9 @@ export class Visual extends Shadow {
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
 
-		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
-		// if (this.isHorizontalChart) {
-		// 	this.yScale = d3.scaleBand();
-		// 	this.yScale.domain(this.chartData.map((d) => d.category));
-		// } else {
 		this.yScale = isLinearScale ? d3.scaleLinear() : d3.scaleBand();
 
 		if (isLinearScale) {
@@ -5942,7 +5934,10 @@ export class Visual extends Shadow {
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
 		}
-		// }
+
+		this.isHasNegativeValue = min < 0 || max < 0;
+		this.isHasPositiveValue = min >= 0 || max >= 0;
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
@@ -6250,6 +6245,10 @@ export class Visual extends Shadow {
 	drawXYAxis(isShowXAxis: boolean, isShowYAxis: boolean): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
+
+		if (!this.dataColorsSettings.isFillTypeChanged && this.isHasNegativeValue && this.isHasPositiveValue) {
+			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
+		}
 
 		if (this.isHorizontalChart) {
 			const xScaleCopy = this.xScale.copy();
