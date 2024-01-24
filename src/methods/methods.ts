@@ -463,41 +463,53 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;
 		const color = el.color;
+		let match: boolean;
 
-		if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-			result.markerColor = color;
+		if (!result.match) {
+			switch (el.operator) {
+				case "===":
+					match = value === v;
+					result.match = match;
+					break;
+				case "!==":
+					match = value !== v;
+					result.match = match;
+					break;
+				case "<":
+					match = value < v;
+					result.match = match;
+					break;
+				case ">":
+					match = value > v;
+					result.match = match;
+					break;
+				case "<=":
+					match = value <= v;
+					result.match = match;
+					break;
+				case ">=":
+					match = value >= v;
+					result.match = match;
+					break;
+				case "<>":
+					match = value > 0 ? value >= v && value <= +v2 : value <= v && value >= +v2;
+					result.match = match;
+					break;
+			}
 		}
 
-		if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
-			result.lineColor = color;
-		}
+		if (match) {
+			if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+				result.markerColor = color;
+			}
 
-		if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
-			result.labelColor = color;
-		}
+			if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+				result.lineColor = color;
+			}
 
-		switch (el.operator) {
-			case "===":
-				result.match = value === v;
-				break;
-			case "!==":
-				result.match = value !== v;
-				break;
-			case "<":
-				result.match = value < v;
-				break;
-			case ">":
-				result.match = value > v;
-				break;
-			case "<=":
-				result.match = value <= v;
-				break;
-			case ">=":
-				result.match = value >= v;
-				break;
-			case "<>":
-				result.match = value > 0 ? value >= v && value <= +v2 : value <= v && value >= +v2;
-				break;
+			if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+				result.labelColor = color;
+			}
 		}
 
 		return result;
@@ -532,48 +544,58 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 					const v = el.staticValue;
 					const color = el.color;
 					category = el.categoryType.category ? category : subCategory;
+					let match: boolean;
 
-					if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-						result.markerColor = color;
+					if (!result.match) {
+						switch (el.operator) {
+							case "===":
+								match = matchRuleShort(category.toLowerCase(), v.toLowerCase());
+								result.match = match;
+								break;
+							case "!==":
+								match = !matchRuleShort(category.toLowerCase(), v.toLowerCase());
+								result.match = match;
+								break;
+							case "contains":
+								match = category.toLowerCase().includes(v.toLowerCase());
+								result.match = match;
+								break;
+							case "doesnotcontain":
+								match = !category.toLowerCase().includes(v.toLowerCase());
+								result.match = match;
+								break;
+							case "beginswith":
+								match = category.toLowerCase().startsWith(v.toLowerCase());
+								result.match = match;
+								break;
+							case "doesnotbeginwith":
+								match = !category.toLowerCase().startsWith(v.toLowerCase());
+								result.match = match;
+								break;
+							case "endswith":
+								match = category.toLowerCase().endsWith(v.toLowerCase());
+								result.match = match;
+								break;
+							case "doesnotendwith":
+								match = !category.toLowerCase().endsWith(v.toLowerCase());
+								result.match = match;
+								break;
+						}
 					}
 
-					if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
-						result.lineColor = color;
-					}
+					if (match) {
+						if (el.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+							result.markerColor = color;
+						}
 
-					if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
-						result.labelColor = color;
-					}
+						if (el.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+							result.lineColor = color;
+						}
 
-					switch (el.operator) {
-						case "===":
-							result.match = matchRuleShort(category.toLowerCase(), v.toLowerCase());
-							break;
-						case "!==":
-							result.match = !matchRuleShort(category.toLowerCase(), v.toLowerCase());
-							break;
-						case "contains":
-							result.match = category.toLowerCase().includes(v.toLowerCase());
-							break;
-						case "doesnotcontain":
-							result.match = !category.toLowerCase().includes(v.toLowerCase());
-							break;
-						case "beginswith":
-							result.match = category.toLowerCase().startsWith(v.toLowerCase());
-							break;
-						case "doesnotbeginwith":
-							result.match = !category.toLowerCase().startsWith(v.toLowerCase());
-							break;
-						case "endswith":
-							result.match = category.toLowerCase().endsWith(v.toLowerCase());
-							break;
-						case "doesnotendwith":
-							result.match = !category.toLowerCase().endsWith(v.toLowerCase());
-							break;
+						if (el.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+							result.labelColor = color;
+						}
 					}
-					// if (result.match) {
-					// 	return result;
-					// }
 				}
 			}
 		}
