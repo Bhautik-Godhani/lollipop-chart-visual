@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
@@ -78,54 +79,87 @@ const UIConnectingLineSettings = (
 	return <>
 		<Row>
 			<Column>
-				<Accordion title="Connecting Line" childTopPadding={true} childBottomPadding >
+				<Accordion title="Connecting Line"
+					open={configValues.showConnectingLine}
+					isShowToggle={true}
+					showToggleValue={configValues.showConnectingLine}
+					onShowToggleChange={(value) => handleChange(value, EChartSettings.showConnectingLine, setConfigValues)}
+					negativeMargins={false}
+					childTopPadding={false}
+					childBottomPadding={true}>
 					<Row>
 						<Column>
-							<ToggleButton
-								label={"Show Connecting Line"}
-								value={configValues.showConnectingLine}
-								handleChange={(value) => handleChange(value, EChartSettings.showConnectingLine, setConfigValues)}
-								appearance="toggle"
+							<SwitchOption
+								label="Line Style"
+								value={configValues.connectingLineStyle}
+								optionsList={LINE_TYPES}
+								handleChange={(value) => handleChange(value, EChartSettings.connectingLineStyle, setConfigValues)}
 							/>
 						</Column>
 					</Row>
 
-					<ConditionalWrapper visible={configValues.showConnectingLine}>
-						<Row>
-							<Column>
-								<SwitchOption
-									label="Line Style"
-									value={configValues.connectingLineStyle}
-									optionsList={LINE_TYPES}
-									handleChange={(value) => handleChange(value, EChartSettings.connectingLineStyle, setConfigValues)}
-								/>
-							</Column>
-						</Row>
+					<Row>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Width"
+								value={configValues.connectingLineWidth}
+								handleChange={(value) => handleChange(value, EChartSettings.connectingLineWidth, setConfigValues)}
+							/>
+						</Column>
 
-						<Row>
-							<Column>
-								<InputControl
-									min={1}
-									type="number"
-									label="Line Width"
-									value={configValues.connectingLineWidth}
-									handleChange={(value) => handleChange(value, EChartSettings.connectingLineWidth, setConfigValues)}
-								/>
-							</Column>
-						</Row>
+						<Column>
+							<ColorPicker
+								label="Color"
+								color={configValues.connectingLineColor}
+								handleChange={(value) => handleColor(value, EChartSettings.connectingLineColor, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+							/>
+						</Column>
+					</Row>
+				</Accordion>
+			</Column>
+		</Row>
+	</>
+}
 
-						<Row>
-							<Column>
-								<ColorPicker
-									label="Line Color"
-									color={configValues.connectingLineColor}
-									handleChange={(value) => handleColor(value, EChartSettings.connectingLineColor, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
-								/>
-							</Column>
-						</Row>
-					</ConditionalWrapper>
+const UIZeroBaseLineSettings = (
+	vizOptions: ShadowUpdateOptions,
+	configValues: IChartSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
+) => {
+	return <>
+		<Row>
+			<Column>
+				<Accordion title="Zero Base Line"
+					open={configValues.isShowZeroBaseLine}
+					isShowToggle={true}
+					showToggleValue={configValues.isShowZeroBaseLine}
+					onShowToggleChange={(value) => handleChange(value, EChartSettings.isShowZeroBaseLine, setConfigValues)}
+					negativeMargins={false}
+					childTopPadding={false}
+					childBottomPadding={true}>
+					<Row>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Width"
+								value={configValues.zeroBaseLineSize}
+								handleChange={(value) => handleChange(value, EChartSettings.zeroBaseLineSize, setConfigValues)}
+							/>
+						</Column>
+
+						<Column>
+							<ColorPicker
+								label="Color"
+								color={configValues.zeroBaseLineColor}
+								handleChange={(value) => handleColor(value, EChartSettings.zeroBaseLineColor, setConfigValues)}
+								colorPalette={vizOptions.host.colorPalette}
+							/>
+						</Column>
+					</Row>
 				</Accordion>
 			</Column>
 		</Row>
@@ -139,83 +173,88 @@ const UIThemeSettings = (
 ) => {
 	return (
 		<>
-			<Accordion title="IBCS Theme" childBottomPadding>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Enable IBCS Theme"}
-							value={configValues.isIBCSEnabled}
-							handleChange={(value) => handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
+			<Row>
+				<Column>
+					<Accordion title="IBCS Theme"
+						open={configValues.isIBCSEnabled}
+						isShowToggle={true}
+						showToggleValue={configValues.isIBCSEnabled}
+						onShowToggleChange={(value) => handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues)}
+						negativeMargins={false}
+						childTopPadding={false}
+						childBottomPadding={true}>
+						<Row>
+							<Column>
+								<Label text="Chart Type" classNames={["label-10px"]}></Label>
+							</Column>
+						</Row>
 
-				<ConditionalWrapper visible={configValues.isIBCSEnabled}>
-					<Row>
-						<Column>
-							<Label text="IBCS 1"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDefaultVIcon />
-							</div>
-						</Column>
-						<Column>
-							<Label text="IBCS 2"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.DefaultHorizontal, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDefaultHIcon />
-							</div>
-						</Column>
-					</Row>
+						<Row disableTopPadding={true}>
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDefaultVIcon />
+								</div>
+								<Label text="IBCS 1" classNames={["label-8px"]}></Label>
+							</Column>
 
-					<Row>
-						<Column>
-							<Label text="IBCS 3"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.Diverging1Vertical, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDiverging1VIcon />
-							</div>
-						</Column>
-						<Column>
-							<Label text="IBCS 4"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.Diverging1Horizontal, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDiverging1HIcon />
-							</div>
-						</Column>
-					</Row>
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.Diverging1Vertical, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDiverging1VIcon />
+								</div>
+								<Label text="IBCS 3" classNames={["label-8px"]}></Label>
+							</Column>
 
-					<Row>
-						<Column>
-							<Label text="IBCS 5"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.Diverging2Vertical, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDiverging2VIcon />
-							</div>
-						</Column>
-						<Column>
-							<Label text="IBCS 6"></Label>
-							<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
-								onClick={
-									() => handleChange(EIBCSThemes.Diverging2Horizontal, EChartSettings.Theme, setConfigValues)
-								}>
-								<IBCSDiverging2HIcon />
-							</div>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
-			</Accordion>
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.Diverging2Vertical, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDiverging2VIcon />
+								</div>
+								<Label text="IBCS 5" classNames={["label-8px"]}></Label>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.DefaultHorizontal, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDefaultHIcon />
+								</div>
+								<Label text="IBCS 2" classNames={["label-8px"]}></Label>
+							</Column>
+
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.Diverging1Horizontal, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDiverging1HIcon />
+								</div>
+								<Label text="IBCS 4" classNames={["label-8px"]}></Label>
+							</Column>
+
+							<Column>
+								<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
+									onClick={
+										() => handleChange(EIBCSThemes.Diverging2Horizontal, EChartSettings.Theme, setConfigValues)
+									}>
+									<IBCSDiverging2HIcon />
+								</div>
+								<Label text="IBCS 6" classNames={["label-8px"]}></Label>
+							</Column>
+						</Row>
+					</Accordion>
+				</Column>
+			</Row>
 		</>
 	);
 };
@@ -231,75 +270,49 @@ const UIGeneralChartSettings = (
 		<>
 			<Row>
 				<Column>
-					<ImageOption
-						isShowImageTooltip={true}
-						value={configValues.orientation}
-						images={ORIENTATIONS}
-						handleChange={(value) => handleChange(value, EChartSettings.orientation, setConfigValues)}
-					/>
+					<Accordion title="Lollipop" open={true} negativeMargins={false} childTopPadding={false} childBottomPadding={true}>
+						<Row disableTopPadding={true}>
+							<Column>
+								<ImageOption
+									isShowImageTooltip={true}
+									value={configValues.orientation}
+									images={ORIENTATIONS}
+									handleChange={(value) => handleChange(value, EChartSettings.orientation, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<ToggleButton
+									label={"Auto Category Width"}
+									value={configValues.isAutoLollipopWidth}
+									handleChange={(value) => handleChange(value, EChartSettings.isAutoLollipopWidth, setConfigValues)}
+									appearance="toggle"
+								/>
+							</Column>
+						</Row>
+
+						<ConditionalWrapper visible={!configValues.isAutoLollipopWidth}>
+							<Row appearance="padded">
+								<Column>
+									<InputControl
+										min={+Math.ceil(shadow.scaleBandWidth).toFixed(0)}
+										type="number"
+										label="Min Width"
+										value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}
+										handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
+									/>
+								</Column>
+								<Column></Column>
+							</Row>
+						</ConditionalWrapper>
+					</Accordion>
 				</Column>
 			</Row>
-
-			<Row>
-				<Column>
-					<ToggleButton
-						label={"Auto Lollipop Width"}
-						value={configValues.isAutoLollipopWidth}
-						handleChange={(value) => handleChange(value, EChartSettings.isAutoLollipopWidth, setConfigValues)}
-						appearance="toggle"
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={!configValues.isAutoLollipopWidth}>
-				<Row appearance="padded">
-					<Column>
-						<InputControl
-							min={+Math.ceil(shadow.scaleBandWidth).toFixed(0)}
-							type="number"
-							label="Width"
-							value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}
-							handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
-						/>
-					</Column>
-					<Column></Column>
-				</Row>
-			</ConditionalWrapper>
-
-			<Row>
-				<Column>
-					<ToggleButton
-						label={"Show Zero Base Line"}
-						value={configValues.isShowZeroBaseLine}
-						handleChange={(value) => handleChange(value, EChartSettings.isShowZeroBaseLine, setConfigValues)}
-						appearance="toggle"
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={configValues.isShowZeroBaseLine}>
-				<Row>
-					<Column>
-						<InputControl
-							min={1}
-							type="number"
-							label="Line Size"
-							value={configValues.zeroBaseLineSize}
-							handleChange={(value) => handleChange(value, EChartSettings.zeroBaseLineSize, setConfigValues)}
-						/>
-					</Column>
-					<Column>
-						<ColorPicker
-							label="Line Color"
-							color={configValues.zeroBaseLineColor}
-							handleChange={(value) => handleColor(value, EChartSettings.zeroBaseLineColor, setConfigValues)}
-							colorPalette={vizOptions.host.colorPalette}
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper >
 
 			{UIConnectingLineSettings(vizOptions, configValues, setConfigValues)}
+			{UIZeroBaseLineSettings(vizOptions, configValues, setConfigValues)}
 		</>
 	);
 };
@@ -383,14 +396,9 @@ const ChartSettings = (props) => {
 		}
 	}, [configValues.isIBCSEnabled])
 
-
 	return (
 		<>
 			{UIGeneralChartSettings(shadow, vizOptions, configValues, isHasSubCategories, setConfigValues)}
-
-			{/* <ConditionalWrapper visible={shadow.isLollipopTypePie}> */}
-			{/* {UIPieTypeSettings(configValues, pieConfigValues, isDumbbellChart, setPieConfigValues)} */}
-			{/* </ConditionalWrapper> */}
 
 			{UIThemeSettings(shadow, configValues, setConfigValues)}
 
