@@ -1,4 +1,5 @@
-import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, SwitchOption } from "@truviz/shadow/dist/Components";
+/* eslint-disable max-lines-per-function */
+import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import * as React from "react";
 import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
@@ -155,23 +156,22 @@ const UIGradientColorPalette = (
 			< ConditionalWrapper visible={values.fillType === ColorPaletteType.Gradient && shadow.isLollipopTypePie && shadow.isHasSubcategories && shadow.isHasMultiMeasure} >
 				<Row>
 					<Column>
-						<SwitchOption
-							label={"Select Measure"}
+						<SelectInput
+							label={"By"}
 							value={configValues.gradientAppliedToMeasure}
+							isFontSelector={false}
 							optionsList={MARKER_TYPES}
-							handleChange={(value) => {
-								setConfigValues((d) => ({
-									...d,
-									[EDataColorsSettings.GradientAppliedToMeasure]: value,
-								}));
-							}}
+							handleChange={(value) => setConfigValues((d) => ({
+								...d,
+								[EDataColorsSettings.GradientAppliedToMeasure]: value,
+							}))}
 						/>
 					</Column>
 				</Row>
 			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={values.fillType === ColorPaletteType.Gradient}>
-				<Row>
+				<Row disableTopPadding>
 					<Column>
 						<GradientPicker
 							minColor={values.fillMin}
@@ -313,7 +313,6 @@ const UIColorPaletteTypes = (
 							color={values.positiveColor}
 							handleChange={(value) => handleColorChange(value, EDataColorsSettings.PositiveColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
 						/>
 					</Column>
 
@@ -323,7 +322,6 @@ const UIColorPaletteTypes = (
 							color={values.negativeColor}
 							handleChange={(value) => handleColorChange(value, EDataColorsSettings.NegativeColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
 						/>
 					</Column>
 				</Row>
@@ -436,6 +434,32 @@ const DataColors = (props) => {
 		<>
 			{UIColorPalette(shadow, configValues, setConfigValues)}
 			{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
+
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Customize 'Others' color"}
+						value={configValues.isCustomizeOthersColor}
+						handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
+				<Row appearance="padded">
+					<Column>
+						<ColorPicker
+							label={"Color"}
+							color={configValues.othersColor}
+							handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

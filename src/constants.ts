@@ -184,7 +184,9 @@ export const DATA_COLORS: IDataColorsSettings = {
 	isGradient: true,
 	negativeColor: NEGATIVE_COLOR,
 	positiveColor: POSITIVE_COLOR,
-	gradientAppliedToMeasure: EMarkerColorTypes.Marker1
+	gradientAppliedToMeasure: EMarkerColorTypes.Marker1,
+	isCustomizeOthersColor: false,
+	othersColor: "rgba(84, 84, 84, 1)"
 };
 
 export const RANKING_SETTINGS: IRankingSettings = {
