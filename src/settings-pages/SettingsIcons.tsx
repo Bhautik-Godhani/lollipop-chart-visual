@@ -836,3 +836,31 @@ export const HorizontalOrientationIcon = (props: SVGProps<SVGSVGElement>) => (
 		<path d="M58.1248 47.2917C55.7086 47.2917 53.7498 45.3329 53.7498 42.9167C53.7498 40.5004 55.7086 38.5417 58.1248 38.5417C60.5411 38.5417 62.4998 40.5004 62.4998 42.9167C62.4998 45.3329 60.5411 47.2917 58.1248 47.2917Z" fill="#4D4D4D" />
 	</svg>
 );
+
+export const MarkerCircleIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https`://www.w3.org/2000/svg" {...props}>
+		<path d="M8.75004 1.33301C7.87456 1.33301 7.00766 1.50545 6.19882 1.84048C5.38998 2.17551 4.65505 2.66657 4.036 3.28563C2.78575 4.53587 2.08337 6.23156 2.08337 7.99967C2.08337 9.76779 2.78575 11.4635 4.036 12.7137C4.65505 13.3328 5.38998 13.8238 6.19882 14.1589C7.00766 14.4939 7.87456 14.6663 8.75004 14.6663C10.5182 14.6663 12.2138 13.964 13.4641 12.7137C14.7143 11.4635 15.4167 9.76779 15.4167 7.99967C15.4167 7.1242 15.2443 6.25729 14.9092 5.44845C14.5742 4.63961 14.0831 3.90469 13.4641 3.28563C12.845 2.66657 12.1101 2.17551 11.3013 1.84048C10.4924 1.50545 9.62552 1.33301 8.75004 1.33301Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const MarkerSquareIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M4.58331 2C3.47874 2 2.58331 2.89543 2.58331 4V12C2.58331 13.1046 3.47874 14 4.58331 14H12.5833C13.6879 14 14.5833 13.1046 14.5833 12V4C14.5833 2.89543 13.6879 2 12.5833 2H4.58331Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const MarkerTriangleIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path fill-rule="evenodd" clip-rule="evenodd" d="M15.106 12.4856C15.5058 13.1524 15.0256 14 14.2488 14H2.25135C1.47368 14 0.994307 13.1515 1.39408 12.4856L7.39323 2.48631C7.47982 2.33852 7.60468 2.21573 7.7552 2.13035C7.90572 2.04496 8.07657 2 8.2505 2C8.42443 2 8.59528 2.04496 8.7458 2.13035C8.89632 2.21573 9.02118 2.33852 9.10777 2.48631L15.106 12.4856Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const MarkerDiamondIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M2.33564 9.39698C1.55449 8.61603 1.55449 7.34985 2.33564 6.5689L7.3202 1.58559C8.10134 0.804641 9.36783 0.804639 10.149 1.58559L15.1335 6.5689C15.9147 7.34985 15.9147 8.61602 15.1335 9.39698L10.149 14.3803C9.36783 15.1612 8.10134 15.1612 7.3202 14.3803L2.33564 9.39698Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);

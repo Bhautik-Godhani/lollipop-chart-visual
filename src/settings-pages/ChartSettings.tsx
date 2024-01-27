@@ -185,7 +185,7 @@ const UIThemeSettings = (
 						childBottomPadding={true}>
 						<Row>
 							<Column>
-								<Label text="Chart Type" classNames={["label-10px"]}></Label>
+								<Label text="Chart Type"></Label>
 							</Column>
 						</Row>
 
@@ -197,7 +197,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDefaultVIcon />
 								</div>
-								<Label text="IBCS 1" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 1" classNames={["text-label"]}></Label>
 							</Column>
 
 							<Column>
@@ -207,7 +207,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDiverging1VIcon />
 								</div>
-								<Label text="IBCS 3" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 3" classNames={["text-label"]}></Label>
 							</Column>
 
 							<Column>
@@ -217,7 +217,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDiverging2VIcon />
 								</div>
-								<Label text="IBCS 5" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 5" classNames={["text-label"]}></Label>
 							</Column>
 						</Row>
 
@@ -229,7 +229,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDefaultHIcon />
 								</div>
-								<Label text="IBCS 2" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 2" classNames={["text-label"]}></Label>
 							</Column>
 
 							<Column>
@@ -239,7 +239,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDiverging1HIcon />
 								</div>
-								<Label text="IBCS 4" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 4" classNames={["text-label"]}></Label>
 							</Column>
 
 							<Column>
@@ -249,7 +249,7 @@ const UIThemeSettings = (
 									}>
 									<IBCSDiverging2HIcon />
 								</div>
-								<Label text="IBCS 6" classNames={["label-8px"]}></Label>
+								<Label text="IBCS 6" classNames={["text-label"]}></Label>
 							</Column>
 						</Row>
 					</Accordion>
