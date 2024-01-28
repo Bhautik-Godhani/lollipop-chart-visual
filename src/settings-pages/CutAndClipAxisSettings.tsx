@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { CUT_AND_CLIP_AXIS_SETTINGS } from "../constants";
 import { ECutAndClipAxisSettings } from "../enum";
@@ -90,49 +91,53 @@ const CutAndClipAxisSettings = (props) => {
       </ConditionalWrapper>
 
       <ConditionalWrapper visible={configValues.isEnabled}>
-        <Row>
-          <Column >
-            <InputControl
-              min={0}
-              type="number"
-              label="Break Start"
-              value={configValues.breakStart.toString()}
-              handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
-            />
-          </Column>
-
+        <Row appearance="padded">
           <Column>
-            <InputControl
-              min={0}
-              type="number"
-              label="Break End"
-              value={configValues.breakEnd?.toString()}
-              handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
-            />
-          </Column>
-        </Row>
+            <Row>
+              <Column >
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Break Start"
+                  value={configValues.breakStart}
+                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
+                />
+              </Column>
 
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Marker Line Color"}
-              color={configValues.markerStrokeColor}
-              handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
-              colorPalette={vizOptions.host.colorPalette}
-              size="sm"
-            />
-          </Column>
-        </Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Break End"
+                  value={configValues.breakEnd}
+                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
+                />
+              </Column>
+            </Row>
 
-        <Row>
-          <Column>
-            <ColorPicker
-              label={"Marker Background Color"}
-              color={configValues.markerBackgroundColor}
-              handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
-              colorPalette={vizOptions.host.colorPalette}
-              size="sm"
-            />
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Marker Line Color"}
+                  color={configValues.markerStrokeColor}
+                  handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Marker Background Color"}
+                  color={configValues.markerBackgroundColor}
+                  handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
           </Column>
         </Row>
       </ConditionalWrapper>
