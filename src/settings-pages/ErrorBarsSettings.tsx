@@ -284,300 +284,303 @@ const ErrorBarsSettings = (props) => {
       </Row>
 
       <ConditionalWrapper visible={configValues.isEnabled}>
-        <Accordion title="Measurements" open={true} childTopPadding={true} childBottomPadding>
-          <Row>
-            <Column>
-              <SwitchOption
-                label="Direction"
-                value={configValues.measurement.direction}
-                optionsList={DIRECTION}
-                handleChange={(value) => handleChange(value, EErrorBarsSettings.Direction, EErrorBarsSettings.Measurement)}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <SelectInput
-                label={"Apply Settings To Measure"}
-                value={configValues.measurement.applySettingsToMeasure}
-                optionsList={MEASURES_LIST}
-                handleChange={value => handleChange(value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement)}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <SelectInput
-                label={"Calculation Type"}
-                value={configValues.measurement.calcType}
-                optionsList={CALCULATION_TYPE}
-                handleChange={value => handleChange(value, EErrorBarsSettings.CalcType, EErrorBarsSettings.Measurement)}
-              />
-            </Column>
-          </Row>
-
-          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+        <Row>
+          <Column>
+            <Accordion title="Measure" open={true}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
               <Row>
                 <Column>
-                  <SelectInput
-                    label={"Upper Bound"}
-                    value={configValues.measurement.upperBoundMeasure}
-                    optionsList={UPPER_BOUND_LIST}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
+                  <SwitchOption
+                    label="Position"
+                    value={configValues.measurement.direction}
+                    optionsList={DIRECTION}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.Direction, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
               </Row>
 
-              <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Apply To Measure"}
+                    value={configValues.measurement.applySettingsToMeasure}
+                    optionsList={MEASURES_LIST}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Based On"}
+                    value={configValues.measurement.calcType}
+                    optionsList={CALCULATION_TYPE}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.CalcType, EErrorBarsSettings.Measurement)}
+                  />
+                </Column>
+              </Row>
+
+              <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
                 <Row>
                   <Column>
-                    <SelectInput
-                      label={"Lower Bound"}
-                      value={configValues.measurement.lowerBoundMeasure}
-                      optionsList={LOWER_BOUND_LIST}
-                      handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                    <ToggleButton
+                      label="Make Symmetrical"
+                      value={configValues.measurement.makeSymmetrical}
+                      handleChange={() => handleCheckbox(EErrorBarsSettings.MakeSymmetrical, EErrorBarsSettings.Measurement)}
+                      appearance="toggle"
                     />
                   </Column>
                 </Row>
+
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+                  <Row>
+                    <Column>
+                      <SelectInput
+                        label={"Upper Bound"}
+                        value={configValues.measurement.upperBoundMeasure}
+                        optionsList={UPPER_BOUND_LIST}
+                        handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                  </Row>
+
+                  <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                    <Row>
+                      <Column>
+                        <SelectInput
+                          label={"Lower Bound"}
+                          value={configValues.measurement.lowerBoundMeasure}
+                          optionsList={LOWER_BOUND_LIST}
+                          handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                        />
+                      </Column>
+                    </Row>
+                  </ConditionalWrapper>
+                </ConditionalWrapper>
+
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+                  <Row>
+                    <Column>
+                      <SelectInput
+                        label={"Select Field"}
+                        value={configValues.measurement.upperBoundMeasure}
+                        optionsList={UPPER_BOUND_LIST}
+                        handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                  </Row>
+                </ConditionalWrapper>
+
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+                  <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                    <Row>
+                      <Column>
+                        <SelectInput
+                          label={"Select Field"}
+                          value={configValues.measurement.lowerBoundMeasure}
+                          optionsList={LOWER_BOUND_LIST}
+                          handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                        />
+                      </Column>
+                    </Row>
+                  </ConditionalWrapper>
+                </ConditionalWrapper>
               </ConditionalWrapper>
-            </ConditionalWrapper>
 
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
-              <Row>
-                <Column>
-                  <SelectInput
-                    label={"Bound Value"}
-                    value={configValues.measurement.upperBoundMeasure}
-                    optionsList={UPPER_BOUND_LIST}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.UpperBoundMeasure, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-                <Column></Column>
-              </Row>
-            </ConditionalWrapper>
+              <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentage || configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentile}>
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Upper Bound (%)"
+                        value={configValues.measurement.upperBoundPercentage}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
 
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
-              <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Lower Bound (%)"
+                        value={configValues.measurement.lowerBoundPercentage}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                  </Row>
+                </ConditionalWrapper>
+
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Value (%)"
+                        value={configValues.measurement.upperBoundPercentage}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                    <Column></Column>
+                  </Row>
+                </ConditionalWrapper>
+
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Value (%)"
+                        value={configValues.measurement.lowerBoundPercentage}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                    <Column></Column>
+                  </Row>
+                </ConditionalWrapper>
+              </ConditionalWrapper>
+
+              <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByStandardDeviation}>
                 <Row>
                   <Column>
-                    <SelectInput
-                      label={"Bound Value"}
-                      value={configValues.measurement.lowerBoundMeasure}
-                      optionsList={LOWER_BOUND_LIST}
-                      handleChange={value => handleChange(value, EErrorBarsSettings.LowerBoundMeasure, EErrorBarsSettings.Measurement)}
+                    <InputControl
+                      type="number"
+                      label="Standard Deviations"
+                      value={configValues.measurement.standardDeviation}
+                      handleChange={(value: any) => handleChange(value, EErrorBarsSettings.StandardDeviation, EErrorBarsSettings.Measurement)}
                     />
                   </Column>
                   <Column></Column>
                 </Row>
               </ConditionalWrapper>
-            </ConditionalWrapper>
-          </ConditionalWrapper>
 
-          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentage || configValues.measurement.calcType === EErrorBarsCalcTypes.ByPercentile}>
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Upper Bound (%)"
-                    value={configValues.measurement.upperBoundPercentage}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
+              <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByValue}>
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Upper Bound"
+                        value={configValues.measurement.upperBoundValue}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
 
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Lower Bound (%)"
-                    value={configValues.measurement.lowerBoundPercentage}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-              </Row>
-            </ConditionalWrapper>
-
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Bound Value (%)"
-                    value={configValues.measurement.upperBoundPercentage}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-                <Column></Column>
-              </Row>
-            </ConditionalWrapper>
-
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Bound Value (%)"
-                    value={configValues.measurement.lowerBoundPercentage}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-                <Column></Column>
-              </Row>
-            </ConditionalWrapper>
-          </ConditionalWrapper>
-
-          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByStandardDeviation}>
-            <Row>
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Standard Deviations"
-                  value={configValues.measurement.standardDeviation}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.StandardDeviation, EErrorBarsSettings.Measurement)}
-                />
-              </Column>
-              <Column></Column>
-            </Row>
-          </ConditionalWrapper>
-
-          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByValue}>
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Both}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Upper Bound"
-                    value={configValues.measurement.upperBoundValue}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Lower Bound"
-                    value={configValues.measurement.lowerBoundValue}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-              </Row>
-            </ConditionalWrapper>
-
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Bound Value"
-                    value={configValues.measurement.upperBoundValue}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-                <Column></Column>
-              </Row>
-            </ConditionalWrapper>
-
-            <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="number"
-                    label="Bound Value"
-                    value={configValues.measurement.lowerBoundValue}
-                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-                <Column></Column>
-              </Row>
-            </ConditionalWrapper>
-          </ConditionalWrapper>
-
-          <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
-            <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
-              <Row>
-                <Column>
-                  <SwitchOption
-                    label="Relationship To Measure"
-                    value={configValues.measurement.relationshipToMeasure}
-                    optionsList={RELATIONSHIP_TO_MEASURE}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.RelationshipToMeasure, EErrorBarsSettings.Measurement)}
-                  />
-                </Column>
-              </Row>
-            </ConditionalWrapper>
-
-            <Row>
-              <Column>
-                <ToggleButton
-                  label="Make Symmetrical"
-                  value={configValues.measurement.makeSymmetrical}
-                  handleChange={() => handleCheckbox(EErrorBarsSettings.MakeSymmetrical, EErrorBarsSettings.Measurement)}
-                  appearance="toggle"
-                />
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-        </Accordion>
-
-        <Accordion title="Error Bars" childBottomPadding open={false}>
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Error Bars"}
-                value={configValues.errorBars.isEnabled}
-                handleChange={(value) => handleChange(value, EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorBars)}
-              />
-            </Column>
-          </Row>
-
-          <ConditionalWrapper visible={configValues.errorBars.isEnabled}>
-            <Row>
-              <Column>
-                <ToggleButton
-                  label={"Match Series Color"}
-                  value={configValues.errorBars.isMatchSeriesColor}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.IsMatchSeriesColor, EErrorBarsSettings.ErrorBars)}
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <InputControl
-                  type="number"
-                  label="Bar Width"
-                  value={configValues.errorBars.barWidth}
-                  handleChange={(value: any) => handleChange(value, EErrorBarsSettings.BarWidth, EErrorBarsSettings.ErrorBars)}
-                />
-              </Column>
-
-              <Column>
-                <ConditionalWrapper visible={!configValues.errorBars.isMatchSeriesColor}>
-                  <ColorPicker
-                    label={"Bar Color"}
-                    color={configValues.errorBars.barColor}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.BarColor, EErrorBarsSettings.ErrorBars)}
-                    colorPalette={vizOptions.host.colorPalette}
-                  />
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Lower Bound"
+                        value={configValues.measurement.lowerBoundValue}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                  </Row>
                 </ConditionalWrapper>
-              </Column>
-            </Row>
 
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Select Marker"}
-                  value={configValues.errorBars.markerShape}
-                  isFontSelector={false}
-                  optionsList={MARKER_TYPES}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars)}
-                />
-              </Column>
-            </Row>
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Plus}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Value"
+                        value={configValues.measurement.upperBoundValue}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                    <Column></Column>
+                  </Row>
+                </ConditionalWrapper>
 
-            {/* <MarkerPicker
+                <ConditionalWrapper visible={configValues.measurement.direction === EErrorBarsDirection.Minus}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="number"
+                        label="Value"
+                        value={configValues.measurement.lowerBoundValue}
+                        handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                    <Column></Column>
+                  </Row>
+                </ConditionalWrapper>
+              </ConditionalWrapper>
+
+              <ConditionalWrapper visible={configValues.measurement.calcType === EErrorBarsCalcTypes.ByField}>
+                <ConditionalWrapper visible={!configValues.measurement.makeSymmetrical}>
+                  <Row>
+                    <Column>
+                      <SwitchOption
+                        label="Relationship To Measure"
+                        value={configValues.measurement.relationshipToMeasure}
+                        optionsList={RELATIONSHIP_TO_MEASURE}
+                        handleChange={value => handleChange(value, EErrorBarsSettings.RelationshipToMeasure, EErrorBarsSettings.Measurement)}
+                      />
+                    </Column>
+                  </Row>
+                </ConditionalWrapper>
+              </ConditionalWrapper>
+            </Accordion>
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <Accordion title="Error Bar Style"
+              open={configValues.errorBars.isEnabled}
+              isShowToggle={true}
+              showToggleValue={configValues.errorBars.isEnabled}
+              onShowToggleChange={(value) => handleChange(value, EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorBars)}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label={"Match Line Color"}
+                    value={configValues.errorBars.isMatchSeriesColor}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.IsMatchSeriesColor, EErrorBarsSettings.ErrorBars)}
+                  />
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <InputControl
+                    type="number"
+                    label="Bar Width"
+                    value={configValues.errorBars.barWidth}
+                    handleChange={(value: any) => handleChange(value, EErrorBarsSettings.BarWidth, EErrorBarsSettings.ErrorBars)}
+                  />
+                </Column>
+
+                <Column>
+                  <ConditionalWrapper visible={!configValues.errorBars.isMatchSeriesColor}>
+                    <ColorPicker
+                      label={"Bar Color"}
+                      color={configValues.errorBars.barColor}
+                      handleChange={value => handleColor(value, EErrorBarsSettings.BarColor, EErrorBarsSettings.ErrorBars)}
+                      colorPalette={vizOptions.host.colorPalette}
+                    />
+                  </ConditionalWrapper>
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Marker Type"}
+                    value={configValues.errorBars.markerShape}
+                    isFontSelector={false}
+                    optionsList={MARKER_TYPES}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars)}
+                  />
+                </Column>
+              </Row>
+
+              {/* <MarkerPicker
               label="Select Marker"
               marker={{ label: configValues.errorBars.markerShape, value: configValues.errorBars.markerShape }}
               handleChange={(e: IMarkerData) => {
@@ -586,75 +589,89 @@ const ErrorBarsSettings = (props) => {
               markersList={MARKERS_LIST}
             /> */}
 
-            <Row>
-              <Column>
-                <InputControl
-                  min={0}
-                  max={30}
-                  type="number"
-                  label="Marker Size"
-                  value={configValues.errorBars.markerSize}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerSize, EErrorBarsSettings.ErrorBars)}
-                />
-              </Column>
-              <Column>
-                <ColorPicker
-                  label={"Marker Color"}
-                  color={configValues.errorBars.markerColor}
-                  handleChange={value => handleChange(value, EErrorBarsSettings.MarkerColor, EErrorBarsSettings.ErrorBars)}
-                  colorPalette={vizOptions.host.colorPalette}
-                />
-              </Column>
-            </Row>
+              <Row>
+                <Column>
+                  <InputControl
+                    min={0}
+                    max={30}
+                    type="number"
+                    label="Marker Size"
+                    value={configValues.errorBars.markerSize}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerSize, EErrorBarsSettings.ErrorBars)}
+                  />
+                </Column>
 
-            <Row>
-              <Column>
-                <InputControl
-                  min={0}
-                  max={10}
-                  type="number"
-                  label="Border Size"
-                  value={configValues.errorBars.borderSize}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.BorderSize, EErrorBarsSettings.ErrorBars)}
-                />
-              </Column>
+                <Column>
+                  <ColorPicker
+                    label={"Marker Color"}
+                    color={configValues.errorBars.markerColor}
+                    handleChange={value => handleColor(value, EErrorBarsSettings.MarkerColor, EErrorBarsSettings.ErrorBars)}
+                    colorPalette={vizOptions.host.colorPalette}
+                  />
+                </Column>
+              </Row>
 
-              <Column>
-                <ColorPicker
-                  label={"Border Color"}
-                  color={configValues.errorBars.borderColor}
-                  handleChange={value => handleChange(value, EErrorBarsSettings.BorderColor, EErrorBarsSettings.ErrorBars)}
-                  colorPalette={vizOptions.host.colorPalette}
-                />
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-        </Accordion >
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label={"Enable Border"}
+                    value={configValues.errorBars.isBorderEnabled}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.IsBorderEnabled, EErrorBarsSettings.ErrorBars)}
+                  />
+                </Column>
+              </Row>
 
-        <Accordion title="Error Band" childBottomPadding open={false}>
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Error Band"}
-                value={configValues.errorBand.isEnabled}
-                handleChange={(value) => handleChange(value, EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorBand)}
-              />
-            </Column>
-          </Row>
+              <ConditionalWrapper visible={configValues.errorBars.isBorderEnabled}>
+                <Row>
+                  <Column>
+                    <InputControl
+                      min={0}
+                      max={10}
+                      type="number"
+                      label="Size"
+                      value={configValues.errorBars.borderSize}
+                      handleChange={(value) => handleChange(value, EErrorBarsSettings.BorderSize, EErrorBarsSettings.ErrorBars)}
+                    />
+                  </Column>
 
-          <ConditionalWrapper visible={configValues.errorBand.isEnabled}>
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Fill Type"}
-                  value={configValues.errorBand.fillType}
-                  optionsList={ERROR_BAND_FILL_TYPE}
-                  handleChange={value => handleChange(value, EErrorBarsSettings.FillType, EErrorBarsSettings.ErrorBand)}
-                />
-              </Column>
-            </Row>
+                  <Column>
+                    <ColorPicker
+                      label={"Color"}
+                      color={configValues.errorBars.borderColor}
+                      handleChange={value => handleColor(value, EErrorBarsSettings.BorderColor, EErrorBarsSettings.ErrorBars)}
+                      colorPalette={vizOptions.host.colorPalette}
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
 
-            {/* <Row>
+            </Accordion >
+          </Column>
+        </Row>
+
+
+        <Row>
+          <Column>
+            <Accordion title="Error Band"
+              open={configValues.errorBand.isEnabled}
+              isShowToggle={true}
+              showToggleValue={configValues.errorBand.isEnabled}
+              onShowToggleChange={(value) => handleChange(value, EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorBand)}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Fill Type"}
+                    value={configValues.errorBand.fillType}
+                    optionsList={ERROR_BAND_FILL_TYPE}
+                    handleChange={value => handleChange(value, EErrorBarsSettings.FillType, EErrorBarsSettings.ErrorBand)}
+                  />
+                </Column>
+              </Row>
+
+              {/* <Row>
               <Column>
                 <ToggleButton
                   label={"Match Series Color"}
@@ -664,183 +681,179 @@ const ErrorBarsSettings = (props) => {
               </Column>
             </Row> */}
 
-            <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Line}>
+              <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Line}>
+                <Row>
+                  <Column>
+                    <ColorPicker
+                      label={"Fill Color"}
+                      color={configValues.errorBand.fillColor}
+                      handleChange={value => handleColor(value, EErrorBarsSettings.FillColor, EErrorBarsSettings.ErrorBand)}
+                      colorPalette={vizOptions.host.colorPalette}
+                      size="sm"
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+
+              <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Fill}>
+                <Row>
+                  <Column>
+                    <ColorPicker
+                      label={"Line Color"}
+                      color={configValues.errorBand.lineColor}
+                      handleChange={value => handleColor(value, EErrorBarsSettings.LineColor, EErrorBarsSettings.ErrorBand)}
+                      colorPalette={vizOptions.host.colorPalette}
+                      size="sm"
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+
+              <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Fill}>
+                <Row>
+                  <Column>
+                    <SwitchOption
+                      label="Line Style"
+                      value={configValues.errorBand.lineStyle}
+                      optionsList={LINE_TYPES}
+                      handleChange={(value) => handleChange(value, EErrorBarsSettings.LineStyle, EErrorBarsSettings.ErrorBand)}
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+            </Accordion >
+          </Column>
+        </Row>
+
+
+        <Row>
+          <Column>
+            <Accordion title="Error Labels" open={configValues.errorLabels.isEnabled}
+              isShowToggle={true}
+              showToggleValue={configValues.errorLabels.isEnabled}
+              onShowToggleChange={() => handleCheckbox(EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorLabels)}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
               <Row>
                 <Column>
-                  <ColorPicker
-                    label={"Fill Color"}
-                    color={configValues.errorBand.fillColor}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.FillColor, EErrorBarsSettings.ErrorBand)}
-                    colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
+                  <SelectInput
+                    label={"Label Format"}
+                    value={configValues.errorLabels.labelFormat}
+                    optionsList={TOOLTIP_LABEL_FORMAT}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.LabelFormat, EErrorBarsSettings.ErrorLabels)}
                   />
                 </Column>
               </Row>
-            </ConditionalWrapper>
 
-            <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Fill}>
               <Row>
                 <Column>
-                  <ColorPicker
-                    label={"Line Color"}
-                    color={configValues.errorBand.lineColor}
-                    handleChange={value => handleChange(value, EErrorBarsSettings.LineColor, EErrorBarsSettings.ErrorBand)}
-                    colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
+                  <SelectInput
+                    label={"Font Family"}
+                    value={configValues.errorLabels.fontFamily}
+                    isFontSelector={true}
+                    optionsList={[]}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.FontFamily, EErrorBarsSettings.ErrorLabels)}
                   />
                 </Column>
               </Row>
-            </ConditionalWrapper>
 
-            <ConditionalWrapper visible={configValues.errorBand.fillType !== EErrorBandFillTypes.Fill}>
               <Row>
                 <Column>
                   <SwitchOption
-                    label="Line Style"
-                    value={configValues.errorBand.lineStyle}
-                    optionsList={LINE_TYPES}
-                    handleChange={(value) => handleChange(value, EErrorBarsSettings.LineStyle, EErrorBarsSettings.ErrorBand)}
+                    label="Styling"
+                    value={configValues.errorLabels.fontStyle}
+                    optionsList={[
+                      {
+                        label: <BoldIcon style={{ fill: "currentColor" }} />,
+                        value: "bold",
+                      },
+                      {
+                        label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                        value: "italic",
+                      },
+                      {
+                        label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                        value: "underline",
+                      },
+                    ]}
+                    isMultiple
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.FontStyle, EErrorBarsSettings.ErrorLabels)}
                   />
                 </Column>
               </Row>
-            </ConditionalWrapper>
-          </ConditionalWrapper>
-        </Accordion >
 
-        <Accordion title="Error Labels" childBottomPadding open={false}>
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Error Labels"}
-                value={configValues.errorLabels.isEnabled}
-                handleChange={() => handleCheckbox(EErrorBarsSettings.IsEnabled, EErrorBarsSettings.ErrorLabels)}
-                appearance="toggle"
-              />
-            </Column>
-          </Row>
+              <Row>
+                <Column>
+                  <InputControl
+                    min={1}
+                    type="number"
+                    label="Text Size"
+                    value={configValues.errorLabels.fontSize}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.FontSize, EErrorBarsSettings.ErrorLabels)}
+                  />
+                </Column>
 
-          <ConditionalWrapper visible={configValues.errorLabels.isEnabled}>
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Font Family"}
-                  value={configValues.errorLabels.fontFamily}
-                  isFontSelector={true}
-                  optionsList={[]}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.FontFamily, EErrorBarsSettings.ErrorLabels)}
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <InputControl
-                  min={1}
-                  type="number"
-                  label="Font Size"
-                  value={configValues.errorLabels.fontSize}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.FontSize, EErrorBarsSettings.ErrorLabels)}
-                />
-              </Column>
-
-              <Column>
-                <ColorPicker
-                  label="Font Color"
-                  color={configValues.errorLabels.color}
-                  handleChange={(value) => handleColor(value, EErrorBarsSettings.Color, EErrorBarsSettings.ErrorLabels)}
-                  colorPalette={vizOptions.host.colorPalette}
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <SwitchOption
-                  label="Font Style"
-                  value={configValues.errorLabels.fontStyle}
-                  optionsList={[
-                    {
-                      label: <BoldIcon style={{ fill: "currentColor" }} />,
-                      value: "bold",
-                    },
-                    {
-                      label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                      value: "italic",
-                    },
-                    {
-                      label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                      value: "underline",
-                    },
-                  ]}
-                  isMultiple
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.FontStyle, EErrorBarsSettings.ErrorLabels)}
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <ToggleButton
-                  label={"Show Background"}
-                  value={configValues.errorLabels.showBackground}
-                  handleChange={() => handleCheckbox(EErrorBarsSettings.ShowBackground, EErrorBarsSettings.ErrorLabels)}
-                  appearance="toggle"
-                />
-              </Column>
-            </Row>
-
-            <ConditionalWrapper visible={configValues.errorLabels.showBackground}>
-              <Row appearance="padded">
                 <Column>
                   <ColorPicker
-                    label="Background Color"
-                    color={configValues.errorLabels.backgroundColor}
-                    handleChange={(value) => handleChange(value, EErrorBarsSettings.BackgroundColor, EErrorBarsSettings.ErrorLabels)}
+                    label="Color"
+                    color={configValues.errorLabels.color}
+                    handleChange={(value) => handleColor(value, EErrorBarsSettings.Color, EErrorBarsSettings.ErrorLabels)}
                     colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
                   />
                 </Column>
               </Row>
-            </ConditionalWrapper>
 
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Label Format"}
-                  value={configValues.errorLabels.labelFormat}
-                  optionsList={TOOLTIP_LABEL_FORMAT}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.LabelFormat, EErrorBarsSettings.ErrorLabels)}
-                />
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-        </Accordion>
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label={"Show Background"}
+                    value={configValues.errorLabels.showBackground}
+                    handleChange={() => handleCheckbox(EErrorBarsSettings.ShowBackground, EErrorBarsSettings.ErrorLabels)}
+                    appearance="toggle"
+                  />
+                </Column>
+              </Row>
 
-        < Accordion title="Tooltip" childBottomPadding open={false} >
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Tooltip"}
-                value={configValues.tooltip.isEnabled}
-                handleChange={() => handleCheckbox(EErrorBarsSettings.IsEnabled, EErrorBarsSettings.Tooltip)}
-                appearance="toggle"
-              />
-            </Column>
-          </Row>
+              <ConditionalWrapper visible={configValues.errorLabels.showBackground}>
+                <Row appearance="padded">
+                  <Column>
+                    <ColorPicker
+                      label="Color"
+                      color={configValues.errorLabels.backgroundColor}
+                      handleChange={(value) => handleColor(value, EErrorBarsSettings.BackgroundColor, EErrorBarsSettings.ErrorLabels)}
+                      colorPalette={vizOptions.host.colorPalette}
+                      size="sm"
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+            </Accordion>
+          </Column>
+        </Row>
 
-          <ConditionalWrapper visible={configValues.tooltip.isEnabled}>
-            <Row>
-              <Column>
-                <SelectInput
-                  label={"Tooltip Label Format"}
-                  value={configValues.tooltip.labelFormat}
-                  optionsList={TOOLTIP_LABEL_FORMAT}
-                  handleChange={(value) => handleChange(value, EErrorBarsSettings.LabelFormat, EErrorBarsSettings.Tooltip)}
-                />
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-        </Accordion >
+        <Row>
+          <Column>
+            < Accordion title="Tooltip" open={configValues.tooltip.isEnabled}
+              isShowToggle={true}
+              showToggleValue={configValues.tooltip.isEnabled}
+              onShowToggleChange={() => handleCheckbox(EErrorBarsSettings.IsEnabled, EErrorBarsSettings.Tooltip)}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Label Format"}
+                    value={configValues.tooltip.labelFormat}
+                    optionsList={TOOLTIP_LABEL_FORMAT}
+                    handleChange={(value) => handleChange(value, EErrorBarsSettings.LabelFormat, EErrorBarsSettings.Tooltip)}
+                  />
+                </Column>
+              </Row>
+            </Accordion >
+          </Column>
+        </Row>
       </ConditionalWrapper >
 
       <Footer

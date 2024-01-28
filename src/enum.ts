@@ -672,7 +672,8 @@ export enum EErrorBarsSettings {
 	FontStyle = "fontStyle",
 	LabelFormat = "labelFormat",
 	Tooltip = "tooltip",
-	LineColor = "lineColor"
+	LineColor = "lineColor",
+	IsBorderEnabled = "isBorderEnabled"
 }
 
 export enum EErrorBarsCalcTypes {

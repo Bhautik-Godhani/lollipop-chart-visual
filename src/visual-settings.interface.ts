@@ -237,7 +237,9 @@ export interface IDataColorsSettings {
 	categories?: any[],
 	positiveColor: string,
 	negativeColor: string,
-	gradientAppliedToMeasure: EMarkerColorTypes
+	gradientAppliedToMeasure: EMarkerColorTypes,
+	isCustomizeOthersColor: boolean,
+	othersColor: string
 }
 
 export interface ICategoryRankingProps {
@@ -499,6 +501,7 @@ export interface IErrorBarsSettings {
 		markerShape: EErrorBarsMarkerShape;
 		markerSize: number;
 		markerColor: string;
+		isBorderEnabled: boolean;
 		borderColor: string;
 		borderSize: number;
 	},
