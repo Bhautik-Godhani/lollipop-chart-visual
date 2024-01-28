@@ -108,7 +108,7 @@ const UIDataLabelsFontFamilyAndStyle = (
 			<Row>
 				<Column>
 					<SwitchOption
-						label="Font Style"
+						label="Styling"
 						value={configValues.fontStyle}
 						optionsList={[
 							{
@@ -143,7 +143,7 @@ const UIDataLabelsFontSettings = (
 	return (
 		<>
 			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
-				<Row>
+				<Row appearance="padded">
 					<Column>
 						<InputControl
 							min={1}
@@ -156,7 +156,7 @@ const UIDataLabelsFontSettings = (
 
 					<Column>
 						<ColorPicker
-							label="Font Color"
+							label="Text Color"
 							color={configValues.color}
 							handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
@@ -540,7 +540,7 @@ const DataLabelsSettings = (props) => {
 
 				<Row>
 					<Column>
-						<SelectInput
+						<SwitchOption
 							label={"Placement"}
 							value={configValues.placement}
 							optionsList={LABEL_PLACEMENTS}
