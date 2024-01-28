@@ -570,6 +570,15 @@ const ErrorBarsSettings = (props) => {
 
               <Row>
                 <Column>
+                  {/* <MarkerPicker
+                    label="Marker Type"
+                    marker={{ label: configValues.errorBars.markerShape, value: configValues.errorBars.markerShape }}
+                    handleChange={(e: IMarkerData) => {
+                      handleChange(e.value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars);
+                    }}
+                    markersList={MARKER_TYPES}
+                  /> */}
+
                   <SelectInput
                     label={"Marker Type"}
                     value={configValues.errorBars.markerShape}
@@ -662,7 +671,7 @@ const ErrorBarsSettings = (props) => {
               childBottomPadding={true}>
               <Row>
                 <Column>
-                  <SelectInput
+                  <SwitchOption
                     label={"Fill Type"}
                     value={configValues.errorBand.fillType}
                     optionsList={ERROR_BAND_FILL_TYPE}
