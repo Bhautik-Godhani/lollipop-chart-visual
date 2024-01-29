@@ -30,11 +30,24 @@ import {
   Accordion,
   Tabs,
   Tab,
+  PopupModHeader,
+  Breadcrumb,
 } from "@truviz/shadow/dist/Components";
 import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVerticalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "./SettingsIcons";
 import { ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+
+const AXIS_NAMES: ILabelValuePair[] = [
+  {
+    label: "X - Axis",
+    value: EXYAxisNames.X,
+  },
+  {
+    label: "Y - Axis",
+    value: EXYAxisNames.Y,
+  },
+];
 
 const LINE_TYPES: ILabelValuePair[] = [
   {
@@ -170,22 +183,22 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
     if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
-          label: "LEFT",
+          label: "Left",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "RIGHT",
+          label: "Right",
           value: EBeforeAfterPosition.After,
         },
       ];
     } else {
       LABEL_POSITION = [
         {
-          label: "TOP",
+          label: "Top",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "BOTTOM",
+          label: "Bottom",
           value: EBeforeAfterPosition.After,
         },
       ];
@@ -194,30 +207,30 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
     if (configValues.lineValue1.axis === EXYAxisNames.X) {
       LABEL_POSITION = [
         {
-          label: "LEFT",
+          label: "Left",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "MIDDLE",
+          label: "Middle",
           value: EBeforeAfterPosition.Center,
         },
         {
-          label: "RIGHT",
+          label: "Right",
           value: EBeforeAfterPosition.After,
         },
       ];
     } else {
       LABEL_POSITION = [
         {
-          label: "TOP",
+          label: "Top",
           value: EBeforeAfterPosition.Before,
         },
         {
-          label: "CENTER",
+          label: "Center",
           value: EBeforeAfterPosition.Center,
         },
         {
-          label: "BOTTOM",
+          label: "Bottom",
           value: EBeforeAfterPosition.After,
         },
       ];
@@ -266,7 +279,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     <Row>
       <Column>
         <SelectInput
-          label={"Apply On"}
+          label={"Based On"}
           value={lineValues.measureName}
           optionsList={isValue2 ? line1Measure : AXIS_NAMES}
           handleChange={(value, e) => {
@@ -304,26 +317,28 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     </Row>
 
     <ConditionalWrapper visible={lineValues.axis === EXYAxisNames.X}>
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Based On"}
-            value={lineValues.type}
-            optionsList={isValue2 ?
-              [{
-                label: LINE_TYPES.find(d => d.value === configValues.lineValue1.type)?.label,
-                value: configValues.lineValue1.type,
-              }] : LINE_TYPES}
-            handleChange={value => handleChange(value, "type", type)}
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={!isValue2}>
+        <Row>
+          <Column>
+            <SwitchOption
+              label={"Select Type"}
+              value={lineValues.type}
+              optionsList={isValue2 ?
+                [{
+                  label: LINE_TYPES.find(d => d.value === configValues.lineValue1.type)?.label,
+                  value: configValues.lineValue1.type,
+                }] : LINE_TYPES}
+              handleChange={value => handleChange(value, "type", type)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <ConditionalWrapper visible={lineValues.type === "value"}>
         <Row>
           <Column>
             <SelectInput
-              label={"Select Value"}
+              label={"Value"}
               value={lineValues.value}
               optionsList={shadow.chartData.map(d => ({
                 label: d.category,
@@ -343,7 +358,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
       <Row>
         <Column>
           <SelectInput
-            label={"Based On"}
+            label={"Value"}
             value={lineValues.computation}
             optionsList={ComputationTypeList}
             handleChange={(value) => handleChange(value, "computation", type)}
@@ -432,13 +447,13 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
             handleChange(value, "lineWidth", EReferenceLinesSettings.LineStyle);
           }}
           min={1}
-          label="Width"
+          label="Line Width"
         />
       </Column>
 
       <Column>
         <ColorPicker
-          label={"Color"}
+          label={"Line Color"}
           color={configValues.lineColor}
           handleChange={value => handleChange(value, "lineColor", EReferenceLinesSettings.LineStyle)}
           colorPalette={vizOptions.host.colorPalette}
@@ -449,7 +464,7 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
     <Row>
       <Column>
         <SwitchOption
-          label="Line Placement"
+          label="Placement"
           value={configValues.linePlacement}
           optionsList={LINE_PLACEMENTS}
           handleChange={(value) => handleChange(value, EReferenceLineStyleProps.LinePlacement, EReferenceLinesSettings.LineStyle)}
@@ -460,163 +475,169 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
 }
 
 const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
-  return <Accordion title="Label Styles" childBottomPadding>
-    <Row>
-      <Column>
-        <ToggleButton
-          label="Show Labels"
-          value={configValues.show}
-          handleChange={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
-          appearance="toggle"
-        />
-      </Column>
-    </Row>
-
-    <ConditionalWrapper visible={configValues.show}>
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Label Types"}
-            value={configValues.labelNameType}
-            optionsList={LABEL_NAME_TYPES}
-            handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.labelNameType !== EReferenceLineNameTypes.VALUE}>
+  return <Row enableBottomPadding>
+    <Column>
+      <Accordion title="Label Styles"
+        open={configValues.show}
+        isShowToggle={true}
+        showToggleValue={configValues.show}
+        onShowToggleChange={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
+        negativeMargins={false}
+        childTopPadding={false}
+        childBottomPadding={true}>
         <Row>
           <Column>
-            <InputControl
-              type="text"
-              value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
-              handleChange={(value: any) => {
-                handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
-              }}
-              min={1}
-              label="Label Text"
+            <SelectInput
+              label={"Label Type"}
+              value={configValues.labelNameType}
+              optionsList={LABEL_NAME_TYPES}
+              handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
             />
           </Column>
         </Row>
-      </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ColorPicker
-            label={"Color"}
-            color={configValues.labelColor}
-            handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle)}
-            colorPalette={vizOptions.host.colorPalette}
-            size="sm"
-          />
-        </Column>
-      </Row>
+        <ConditionalWrapper visible={configValues.labelNameType !== EReferenceLineNameTypes.VALUE}>
+          <Row>
+            <Column>
+              <InputControl
+                type="text"
+                value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
+                handleChange={(value: any) => {
+                  handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+                }}
+                min={1}
+                label="Label Name"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ToggleButton
-            label="Show Background"
-            value={configValues.isShowLabelBackground}
-            handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.isShowLabelBackground}>
         <Row>
           <Column>
             <ColorPicker
-              label={"Background"}
-              color={configValues.labelBackgroundColor}
-              handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle)}
+              label={"Label Color"}
+              color={configValues.labelColor}
+              handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle)}
               colorPalette={vizOptions.host.colorPalette}
               size="sm"
             />
           </Column>
         </Row>
-      </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Font Family"}
-            value={configValues.labelFontFamily}
-            isFontSelector={true}
-            optionsList={[]}
-            handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
-          />
-        </Column>
-      </Row>
+        <Row>
+          <Column>
+            <ToggleButton
+              label="Show Background"
+              value={configValues.isShowLabelBackground}
+              handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
 
-      <Row>
-        <Column>
-          <SwitchOption
-            label="Styling"
-            value={configValues.styling}
-            optionsList={[
-              {
-                label: <BoldIcon style={{ fill: "currentColor" }} />,
-                value: "bold",
-              },
-              {
-                label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                value: "italic",
-              },
-              {
-                label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                value: "underline",
-              },
-            ]}
-            isMultiple
-            handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
-          />
-        </Column>
-      </Row>
+        <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+          <Row appearance="padded">
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.labelBackgroundColor}
+                handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle)}
+                colorPalette={vizOptions.host.colorPalette}
+                size="sm"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ToggleButton
-            label="Auto Font Size"
-            value={configValues.autoFontSize}
-            handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Font Family"}
+              value={configValues.labelFontFamily}
+              isFontSelector={true}
+              optionsList={[]}
+              handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
+            />
+          </Column>
+        </Row>
 
-      {UILabelStyles1(shadow, config, configValues, handleChange)}
-    </ConditionalWrapper>
-  </Accordion>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Styling"
+              value={configValues.styling}
+              optionsList={[
+                {
+                  label: <BoldIcon style={{ fill: "currentColor" }} />,
+                  value: "bold",
+                },
+                {
+                  label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                  value: "italic",
+                },
+                {
+                  label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                  value: "underline",
+                },
+              ]}
+              isMultiple
+              handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
+            />
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <ToggleButton
+              label="Auto Text Size"
+              value={configValues.autoFontSize}
+              handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        {UILabelStyles1(shadow, config, configValues, handleChange)}
+      </Accordion>
+    </Column>
+  </Row>
 }
 
 const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceBandStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
-  return <Accordion title="Band Styles" childBottomPadding>
-    <Row>
-      <Column>
-        <ToggleButton
-          label="Show Background"
-          value={configValues.isShowBackgroundColor}
-          handleChange={() => handleCheckbox("isShowBackgroundColor", EReferenceLinesSettings.BandStyle)}
-          appearance="toggle"
-        />
-      </Column>
-    </Row>
+  return <Row enableBottomPadding>
+    <Column>
+      <Accordion title="Band Styles"
+        open={true}
+        negativeMargins={false}
+        childTopPadding={false}
+        childBottomPadding={true}>
+        <Row>
+          <Column>
+            <ToggleButton
+              label="Show Background"
+              value={configValues.isShowBackgroundColor}
+              handleChange={() => handleCheckbox("isShowBackgroundColor", EReferenceLinesSettings.BandStyle)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
 
-    <ConditionalWrapper visible={configValues.isShowBackgroundColor}>
-      <Row>
-        <Column>
-          <ColorPicker
-            label={"Background Color"}
-            color={configValues.backgroundColor}
-            handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle)}
-            colorPalette={vizOptions.host.colorPalette}
-            size="sm"
-          />
-        </Column>
-      </Row>
-    </ConditionalWrapper>
-  </Accordion>
+        <ConditionalWrapper visible={configValues.isShowBackgroundColor}>
+          <Row appearance="padded">
+            <Column>
+              <ColorPicker
+                label={"Color"}
+                color={configValues.backgroundColor}
+                handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle)}
+                colorPalette={vizOptions.host.colorPalette}
+                size="sm"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+      </Accordion>
+    </Column>
+  </Row>
 }
 
 const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any) => {
@@ -624,7 +645,7 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
 
   return <>
     <ConditionalWrapper visible={!configValues.autoFontSize}>
-      <Row>
+      <Row appearance="padded">
         <Column>
           <InputControl
             type="number"
@@ -673,10 +694,13 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
   </>
 }
 
-const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, handleAdd: () => void, resetChanges: () => void) => {
+const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, handleChangeContent: (path: string) => void, handleAdd: () => void, resetChanges: () => void) => {
   return (
     <Footer
-      cancelButtonHandler={closeCurrentSettingHandler}
+      cancelButtonHandler={() => {
+        closeCurrentSettingHandler();
+        handleChangeContent("homePage");
+      }}
       saveButtonConfig={{ isDisabled: false, text: isAddNew ? "APPLY" : "APPLY", handler: handleAdd }}
       resetButtonHandler={resetChanges}
       disableTopPadding
@@ -686,12 +710,40 @@ const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, han
 
 const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <>
-    <Accordion title="Line Options" childBottomPadding>
-      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
-    </Accordion>
-    <Accordion title="Line Styles" childBottomPadding>
-      {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
-    </Accordion>
+    <Row>
+      <Column>
+        <SwitchOption
+          label="Select Axis"
+          value={configValues.lineValue1.axis}
+          optionsList={AXIS_NAMES}
+          handleChange={(value) => handleChange(value, EReferenceLineValueProps.Axis)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <Accordion title="General"
+          open={true}
+          negativeMargins={false}
+          childTopPadding={false}
+          childBottomPadding={true}>
+          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+        </Accordion>
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <Accordion title="Line Options"
+          open={true}
+          negativeMargins={false}
+          childTopPadding={false}
+          childBottomPadding={true}>
+          {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
+        </Accordion>
+      </Column>
+    </Row>
 
     {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
   </>
@@ -699,27 +751,55 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
 
 const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <>
-    <Accordion title="Line Options" childBottomPadding>
-      <Tabs selected={"Band_Start"}>
-        <Tab title={"Band Start"} identifier={"Band_Start"}>
-          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
-        </Tab>
-        <Tab title={"Band End"} identifier={"Band_End"}>
-          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
-        </Tab>
-      </Tabs >
-    </Accordion>
+    <Row>
+      <Column>
+        <SwitchOption
+          label="Select Axis"
+          value={configValues.lineValue1.axis}
+          optionsList={AXIS_NAMES}
+          handleChange={(value) => handleChange(value, EReferenceLineValueProps.Axis)}
+        />
+      </Column>
+    </Row>
 
-    <Accordion title="Line Styles" childBottomPadding>
-      {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
-    </Accordion>
+    <Row>
+      <Column>
+        <Accordion title="General"
+          open={true}
+          negativeMargins={false}
+          childTopPadding={false}
+          childBottomPadding={true}>
 
-    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
-    {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
+          <Tabs selected={"Band_Start"}>
+            <Tab title={"Band Start"} identifier={"Band_Start"}>
+              {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+            </Tab>
+            <Tab title={"Band End"} identifier={"Band_End"}>
+              {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
+            </Tab>
+          </Tabs >
+        </Accordion>
+
+        <Row>
+          <Column>
+            <Accordion title="Line Options"
+              open={true}
+              negativeMargins={false}
+              childTopPadding={false}
+              childBottomPadding={true}>
+              {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
+            </Accordion>
+          </Column>
+        </Row>
+
+        {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
+        {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
+      </Column>
+    </Row>
   </>
 }
 
-const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeCurrentSettingHandler }) => {
+const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeCurrentSettingHandler, handleChangeContent }) => {
   const isAddNew = isEmpty(details);
   const isInitialRender = React.useRef(0);
   const [configValues, setConfigValues] = React.useState<IReferenceLineSettings>(
@@ -820,6 +900,8 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
       if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
       if (values.type === "ranking" && !validateField("rank", true)) return;
     }
+
+    handleChangeContent("homePage");
 
     if (isAddNew) {
       onAdd(configValues);
@@ -972,15 +1054,30 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   return (
     <>
+      <PopupModHeader
+        title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
+        icon={"BACK_BUTTON"}
+        closeSettingsPopup={closeCurrentSettingHandler}
+        onIconClickHandler={() => {
+          closeCurrentSettingHandler();
+          handleChangeContent("homePage");
+        }}
+      />
+
+      <Row>
+        <Column> <Breadcrumb crumbs={[(isLineUI ? "Reference Lines" : "Reference Bands"),
+        isAddNew ? (isLineUI ? "New Line" : "New Band") : (isLineUI ? "Edit Line" : "Edit Band")]} /> </Column>
+      </Row>
+
       <ConditionalWrapper visible={isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_LINE)}>
         {UIReferenceLine(vizOptions, shadow, configValues, handleChange, handleCheckbox)}
       </ConditionalWrapper>
 
       <ConditionalWrapper visible={!isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND)}>
-        {UIReferenceBand(vizOptions, shadow, configValues, handleChange, handleCheckbox)}=
+        {UIReferenceBand(vizOptions, shadow, configValues, handleChange, handleCheckbox)}
       </ConditionalWrapper>
 
-      {UIFooter(isAddNew, closeCurrentSettingHandler, handleAdd, resetChanges)}
+      {UIFooter(isAddNew, closeCurrentSettingHandler, handleChangeContent, handleAdd, resetChanges)}
     </>
   );
 };

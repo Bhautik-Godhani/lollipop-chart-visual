@@ -89,7 +89,6 @@ const UIXAxisGridLines = (
 									color={configValues[EGridLinesSettings.xGridLines].lineColor}
 									handleChange={(value) => handleColor(value, "lineColor", EGridLinesSettings.xGridLines, setConfigValues)}
 									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
 								/>
 							</Column>
 						</Row>
@@ -146,7 +145,6 @@ const UIYAxisGridLines = (
 									color={configValues[EGridLinesSettings.yGridLines].lineColor}
 									handleChange={(value) => handleColor(value, "lineColor", EGridLinesSettings.yGridLines, setConfigValues)}
 									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
 								/>
 							</Column>
 						</Row>

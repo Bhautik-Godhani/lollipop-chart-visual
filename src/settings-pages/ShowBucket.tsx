@@ -18,89 +18,85 @@ const UIShowBucketSettings = (
 ) => {
 	return (
 		<>
-			<Row appearance="padded">
+			<Row >
 				<Column>
-					<Row disableTopPadding>
-						<Column>
-							<SelectInput
-								label={"Select Field"}
-								tooltip={"Field should always have either 1 or 0"}
-								value={shadow.isShowBucketChartFieldName.toLowerCase()}
-								optionsList={[
-									{
-										label: shadow.isShowBucketChartFieldName,
-										value: shadow.isShowBucketChartFieldName.toLowerCase(),
-									},
-								]}
-								handleChange={(value) => handleChange(value, EShowBucketSettings.ShowBucketField)}
-							/>
-						</Column>
-					</Row>
-
-					<Row>
-						<Column>
-							<InputControl
-								label={"Message"}
-								type="textarea"
-								value={configValues.message}
-								handleChange={(value: any) => {
-									handleChange(+value, EShowBucketSettings.Message);
-								}}
-							/>
-						</Column>
-					</Row>
-
-					<Row>
-						<Column>
-							<ToggleSwitch
-								label="Show Icon"
-								appearance="checkbox"
-								value={configValues.showIcon}
-								handleChange={(value) => handleChange(value, EShowBucketSettings.ShowIcon)}
-							/>
-						</Column>
-					</Row>
-
-					<Row>
-						<Column>
-							<SelectInput
-								label={"Font Family"}
-								value={configValues.fontFamily}
-								isFontSelector={true}
-								optionsList={[]}
-								handleChange={(value) => handleChange(value, EShowBucketSettings.FontFamily)}
-							/>
-						</Column>
-					</Row>
-
-					<Row>
-						<Column>
-							<SwitchOption
-								label="Styling"
-								value={configValues.styling}
-								optionsList={[
-									{
-										label: <BoldIcon style={{ fill: "currentColor" }} />,
-										value: "bold",
-									},
-									{
-										label: <ItalicIcon style={{ fill: "currentColor" }} />,
-										value: "italic",
-									},
-									{
-										label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-										value: "underline",
-									},
-								]}
-								isMultiple
-								handleChange={(value) => handleChange(value, EShowBucketSettings.Styling)}
-							/>
-						</Column>
-					</Row>
-
-					{UIShowBucketSettings1(vizOptions, configValues, handleChange)}
+					<SelectInput
+						label={"Select Field"}
+						tooltip={"Field should always have either 1 or 0"}
+						value={shadow.isShowBucketChartFieldName.toLowerCase()}
+						optionsList={[
+							{
+								label: shadow.isShowBucketChartFieldName,
+								value: shadow.isShowBucketChartFieldName.toLowerCase(),
+							},
+						]}
+						handleChange={(value) => handleChange(value, EShowBucketSettings.ShowBucketField)}
+					/>
 				</Column>
 			</Row>
+
+			<Row>
+				<Column>
+					<InputControl
+						label={"Message"}
+						type="textarea"
+						value={configValues.message}
+						handleChange={(value: any) => {
+							handleChange(+value, EShowBucketSettings.Message);
+						}}
+					/>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<ToggleSwitch
+						label="Show Icon"
+						appearance="checkbox"
+						value={configValues.showIcon}
+						handleChange={(value) => handleChange(value, EShowBucketSettings.ShowIcon)}
+					/>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<SelectInput
+						label={"Font Family"}
+						value={configValues.fontFamily}
+						isFontSelector={true}
+						optionsList={[]}
+						handleChange={(value) => handleChange(value, EShowBucketSettings.FontFamily)}
+					/>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<SwitchOption
+						label="Styling"
+						value={configValues.styling}
+						optionsList={[
+							{
+								label: <BoldIcon style={{ fill: "currentColor" }} />,
+								value: "bold",
+							},
+							{
+								label: <ItalicIcon style={{ fill: "currentColor" }} />,
+								value: "italic",
+							},
+							{
+								label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+								value: "underline",
+							},
+						]}
+						isMultiple
+						handleChange={(value) => handleChange(value, EShowBucketSettings.Styling)}
+					/>
+				</Column>
+			</Row>
+
+			{UIShowBucketSettings1(vizOptions, configValues, handleChange)}
 		</>
 	);
 };
