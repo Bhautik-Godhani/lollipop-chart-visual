@@ -56,6 +56,7 @@ export interface IXAxisSettings {
 	titleColor: string;
 	titleFontSize: number;
 	titleFontFamily: string;
+	titleStyling: EFontStyle[];
 	isDisplayLabel: boolean;
 	labelColor: string;
 	labelFontFamily: string;
@@ -65,12 +66,14 @@ export interface IXAxisSettings {
 	labelCharLimit: number;
 	isLabelAutoCharLimit: boolean;
 	isShowAxisLine: boolean;
+	axisLineColor: string;
 	categoryType: AxisCategoryType;
 	isMinimumRangeEnabled: boolean;
 	minimumRange: number;
 	isMaximumRangeEnabled: boolean;
 	maximumRange: number;
 	isInvertRange: boolean;
+	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
 }
 
@@ -83,6 +86,7 @@ export interface IYAxisSettings {
 	titleColor: string;
 	titleFontSize: number;
 	titleFontFamily: string;
+	titleStyling: EFontStyle[];
 	isDisplayLabel: boolean;
 	labelColor: string;
 	labelFontFamily: string;
@@ -90,6 +94,7 @@ export interface IYAxisSettings {
 	labelCharLimit: number;
 	isShowLabelsAboveLine: boolean;
 	isShowAxisLine: boolean;
+	axisLineColor: string;
 	isLabelAutoCharLimit: boolean;
 	categoryType: AxisCategoryType;
 	isMaximumRangeEnabled: boolean;
@@ -97,6 +102,7 @@ export interface IYAxisSettings {
 	isMinimumRangeEnabled: boolean;
 	minimumRange: number;
 	isInvertRange: boolean;
+	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
 }
 

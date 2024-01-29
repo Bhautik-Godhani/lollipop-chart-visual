@@ -374,11 +374,13 @@ export enum EXAxisSettings {
 	TitleColor = "titleColor",
 	TitleFontSize = "titleFontSize",
 	TitleFontFamily = "titleFontFamily",
+	TitleStyling = "titleStyling",
 	IsDisplayLabel = "isDisplayLabel",
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
 	IsShowAxisLine = "isShowAxisLine",
+	AxisLineColor = "axisLineColor",
 	LabelTilt = "labelTilt",
 	IsLabelAutoTilt = "isLabelAutoTilt",
 	LabelCharLimit = "labelCharLimit",
@@ -389,6 +391,7 @@ export enum EXAxisSettings {
 	IsMaximumRangeEnabled = "isMaximumRangeEnabled",
 	MaximumRange = "maximumRange",
 	IsInvertRange = "isInvertRange",
+	IsAutoDateFormat = "isAutoDateFormat",
 	DateFormat = "dateFormat"
 }
 
@@ -407,12 +410,14 @@ export enum EYAxisSettings {
 	TitleColor = "titleColor",
 	TitleFontSize = "titleFontSize",
 	TitleFontFamily = "titleFontFamily",
+	TitleStyling = "titleStyling",
 	IsDisplayLabel = "isDisplayLabel",
 	LabelColor = "labelColor",
 	LabelFontFamily = "labelFontFamily",
 	LabelFontSize = "labelFontSize",
 	IsShowLabelsAboveLine = "isShowLabelsAboveLine",
 	IsShowAxisLine = "isShowAxisLine",
+	AxisLineColor = "axisLineColor",
 	LabelCharLimit = "labelCharLimit",
 	IsLabelAutoCharLimit = "isLabelAutoCharLimit",
 	IsMinimumRangeEnabled = "isMinimumRangeEnabled",
@@ -420,6 +425,7 @@ export enum EYAxisSettings {
 	IsMaximumRangeEnabled = "isMaximumRangeEnabled",
 	MaximumRange = "maximumRange",
 	IsInvertRange = "isInvertRange",
+	IsAutoDateFormat = "isAutoDateFormat",
 	DateFormat = "dateFormat"
 }
 

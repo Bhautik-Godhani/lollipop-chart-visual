@@ -216,6 +216,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
 	titleFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	titleStyling: [],
 	isDisplayLabel: true,
 	labelColor: "rgba(84, 84, 84, 1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
@@ -224,6 +225,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	labelTilt: 30,
 	labelCharLimit: 20,
 	isShowAxisLine: false,
+	axisLineColor: "rgba(84, 84, 84, 1)",
 	isLabelAutoCharLimit: true,
 	categoryType: AxisCategoryType.Categorical,
 	isMaximumRangeEnabled: false,
@@ -231,6 +233,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	isMinimumRangeEnabled: false,
 	minimumRange: 0,
 	isInvertRange: false,
+	isAutoDateFormat: true,
 	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
 };
 
@@ -243,6 +246,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	titleColor: "rgba(84, 84, 84, 1)",
 	titleFontSize: 12,
 	titleFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+	titleStyling: [],
 	isDisplayLabel: true,
 	labelColor: "rgba(84, 84, 84, 1)",
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
@@ -250,6 +254,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	labelCharLimit: 20,
 	isShowLabelsAboveLine: false,
 	isShowAxisLine: false,
+	axisLineColor: "rgba(84, 84, 84, 1)",
 	isLabelAutoCharLimit: true,
 	categoryType: AxisCategoryType.Categorical,
 	isMaximumRangeEnabled: false,
@@ -257,6 +262,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	isMinimumRangeEnabled: false,
 	minimumRange: 0,
 	isInvertRange: false,
+	isAutoDateFormat: true,
 	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
 };
 

@@ -93,7 +93,7 @@ const CutAndClipAxisSettings = (props) => {
       <ConditionalWrapper visible={configValues.isEnabled}>
         <Row appearance="padded">
           <Column>
-            <Row>
+            <Row disableTopPadding={true}>
               <Column >
                 <InputControl
                   min={0}
