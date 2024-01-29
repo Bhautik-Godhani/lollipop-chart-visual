@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GRID_LINES_SETTINGS as GRID_LINES_SETTINGS_IMP } from "../constants";
 import { EGridLinesSettings, ELineType } from "../enum";
-import { ColorPicker, Column, ConditionalWrapper, Footer, RangeSlider, Row, SwitchOption, Tab, Tabs, ToggleButton } from "@truviz/shadow/dist/Components";
+import { Accordion, ColorPicker, Column, Footer, InputControl, Row, SwitchOption } from "@truviz/shadow/dist/Components";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { IGridLinesSettings } from "../visual-settings.interface";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
@@ -52,21 +52,18 @@ const UIXAxisGridLines = (
 		<>
 			<Row>
 				<Column>
-					<ToggleButton
-						label={"Enable X Grid"}
-						value={configValues[EGridLinesSettings.xGridLines].show}
-						handleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.xGridLines, setConfigValues)}
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={configValues[EGridLinesSettings.xGridLines].show}>
-				<Row appearance="padded">
-					<Column>
-						<Row disableTopPadding>
+					<Accordion title="X Axis Lines"
+						open={configValues[EGridLinesSettings.xGridLines].show}
+						isShowToggle={true}
+						showToggleValue={configValues[EGridLinesSettings.xGridLines].show}
+						onShowToggleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.xGridLines, setConfigValues)}
+						negativeMargins={false}
+						childTopPadding={false}
+						childBottomPadding={true}>
+						<Row>
 							<Column>
 								<SwitchOption
-									label="Style"
+									label="Line Style"
 									value={configValues[EGridLinesSettings.xGridLines].lineType}
 									optionsList={LINE_TYPES}
 									handleChange={(value) => handleChange(value, EGridLinesSettings.lineType, EGridLinesSettings.xGridLines, setConfigValues)}
@@ -76,18 +73,16 @@ const UIXAxisGridLines = (
 
 						<Row>
 							<Column>
-								<RangeSlider
+								<InputControl
 									min={1}
 									max={10}
-									label="Width"
-									isViewEditable={true}
-									viewValueSuffix="px"
+									type="number"
+									label="Border Width"
+									value={configValues[EGridLinesSettings.xGridLines].lineWidth}
 									handleChange={(value) => handleChange(value, EGridLinesSettings.lineWidth, EGridLinesSettings.xGridLines, setConfigValues)}
-									value={configValues[EGridLinesSettings.xGridLines].lineWidth} />
+								/>
 							</Column>
-						</Row>
 
-						<Row>
 							<Column>
 								<ColorPicker
 									label="Color"
@@ -98,9 +93,9 @@ const UIXAxisGridLines = (
 								/>
 							</Column>
 						</Row>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
+					</Accordion>
+				</Column>
+			</Row>
 		</>
 	);
 };
@@ -114,21 +109,18 @@ const UIYAxisGridLines = (
 		<>
 			<Row>
 				<Column>
-					<ToggleButton
-						label={"Enable Y Grid"}
-						value={configValues[EGridLinesSettings.yGridLines].show}
-						handleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.yGridLines, setConfigValues)}
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={configValues[EGridLinesSettings.yGridLines].show}>
-				<Row appearance="padded">
-					<Column>
-						<Row disableTopPadding>
+					<Accordion title="Y Axis Lines"
+						open={configValues[EGridLinesSettings.yGridLines].show}
+						isShowToggle={true}
+						showToggleValue={configValues[EGridLinesSettings.yGridLines].show}
+						onShowToggleChange={() => handleCheckbox(EGridLinesSettings.show, EGridLinesSettings.yGridLines, setConfigValues)}
+						negativeMargins={false}
+						childTopPadding={false}
+						childBottomPadding={true}>
+						<Row>
 							<Column>
 								<SwitchOption
-									label="Style"
+									label="Line Style"
 									value={configValues[EGridLinesSettings.yGridLines].lineType}
 									optionsList={LINE_TYPES}
 									handleChange={(value) => handleChange(value, EGridLinesSettings.lineType, EGridLinesSettings.yGridLines, setConfigValues)}
@@ -138,18 +130,16 @@ const UIYAxisGridLines = (
 
 						<Row>
 							<Column>
-								<RangeSlider
+								<InputControl
 									min={1}
 									max={10}
-									label="Width"
-									isViewEditable={true}
-									viewValueSuffix="px"
+									type="number"
+									label="Border Width"
+									value={configValues[EGridLinesSettings.yGridLines].lineWidth}
 									handleChange={(value) => handleChange(value, EGridLinesSettings.lineWidth, EGridLinesSettings.yGridLines, setConfigValues)}
-									value={configValues[EGridLinesSettings.yGridLines].lineWidth} />
+								/>
 							</Column>
-						</Row>
 
-						<Row>
 							<Column>
 								<ColorPicker
 									label="Color"
@@ -160,9 +150,9 @@ const UIYAxisGridLines = (
 								/>
 							</Column>
 						</Row>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
+					</Accordion >
+				</Column >
+			</Row >
 		</>
 	);
 };
@@ -217,15 +207,8 @@ const GridLinesSettings = (props) => {
 
 	return (
 		<>
-			<Tabs selected={EGridLinesSettings.xGridLines}>
-				<Tab title={"X-Axis"} identifier={EGridLinesSettings.xGridLines}>
-					{UIXAxisGridLines(vizOptions, configValues, setConfigValues)}
-				</Tab>
-				<Tab title={"Y-Axis"} identifier={EGridLinesSettings.yGridLines}>
-					{UIYAxisGridLines(vizOptions, configValues, setConfigValues)}
-				</Tab>
-			</Tabs >
-
+			{UIXAxisGridLines(vizOptions, configValues, setConfigValues)}
+			{UIYAxisGridLines(vizOptions, configValues, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
