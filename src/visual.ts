@@ -173,9 +173,10 @@ import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
-import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
+import { COLORBREWER, DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
 import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
+import ShowCondition from "./settings-pages/ShowBucket";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -272,6 +273,7 @@ export class Visual extends Shadow {
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
 	measureNamesByTotal: { name: string, total: number }[] = [];
 	groupNamesByTotal: { name: string, total: number }[] = [];
+	schemeColors: string[] = [];
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -642,7 +644,7 @@ export class Visual extends Shadow {
 			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
 			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
 			CFConfig: {
-				isSupportApplyOn: true, applyOnCategories: [
+				isSupportApplyOn: true, isShowBasedOnValueDropDown: true, applyOnCategories: [
 					{ label: "Marker", value: ECFApplyOnCategories.Marker },
 					{ label: "Line", value: ECFApplyOnCategories.Line },
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
@@ -678,7 +680,7 @@ export class Visual extends Shadow {
 					icon: LineSettingsIcon
 				},
 				{
-					name: "Data Colors",
+					name: "Colors",
 					sectionName: "dataColorsConfig",
 					propertyName: "dataColorsSettings",
 					Component: () => DataColorsSettings,
@@ -699,7 +701,7 @@ export class Visual extends Shadow {
 					icon: DataLabelsIcon
 				},
 				{
-					name: "Brush And Zoom Area",
+					name: "Preview Slider",
 					sectionName: "brushAndZoomAreaConfig",
 					propertyName: "brushAndZoomAreaSettings",
 					Component: () => BrushAndZoomAreaSettings,
@@ -718,6 +720,7 @@ export class Visual extends Shadow {
 					propertyName: "referenceLinesSettings",
 					Component: () => ReferenceLinesSettings,
 					icon: ReferenceLinesIcon,
+					displayHeader: false
 				},
 				{
 					name: "Error Bars",
@@ -799,7 +802,7 @@ export class Visual extends Shadow {
 					name: Components.ShowCondition,
 					sectionName: "showBucketConfig",
 					propertyName: "showBucket",
-					Component: Components.ShowCondition,
+					Component: () => ShowCondition,
 					icon: ShowConditionIcon
 				},
 			],
@@ -2392,7 +2395,7 @@ export class Visual extends Shadow {
 					this.setChartData(this.categoricalData);
 				}
 
-				// this.setColorsByDataColorsSettings();
+				this.setColorsByDataColorsSettings();
 
 				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 					this.setRemainingAsOthersDataColor();
@@ -3785,10 +3788,15 @@ export class Visual extends Shadow {
 		// }
 
 		const dataColorsConfig = JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]);
+
 		this.dataColorsSettings = {
 			...DATA_COLORS,
 			...dataColorsConfig,
 		};
+
+		if (!this.dataColorsSettings.schemeColors && [ColorPaletteType.Sequential, ColorPaletteType.Diverging, ColorPaletteType.Qualitative].includes(this.dataColorsSettings.fillType)) {
+			this.dataColorsSettings.schemeColors = COLORBREWER[this.dataColorsSettings.fillType][this.dataColorsSettings.colorScheme];
+		}
 
 		const clonedRankingSettings = JSON.parse(JSON.stringify(this.rankingSettings ? this.rankingSettings : {}));
 		const rankingConfig = JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]);
@@ -3906,8 +3914,10 @@ export class Visual extends Shadow {
 			this.yAxisSettings.isDisplayLabel = false;
 		}
 
+		this.schemeColors = JSON.parse(JSON.stringify(this.dataColorsSettings.schemeColors));
+
 		if (!this.dataColorsSettings.reverse) {
-			this.dataColorsSettings.schemeColors = this.dataColorsSettings.schemeColors.reverse();
+			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
 		}
 
 		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
