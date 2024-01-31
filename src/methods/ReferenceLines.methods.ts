@@ -434,11 +434,11 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
         const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
         if (rLineValue.type === EReferenceLinesType.Value && rLineValue.axis === EXYAxisNames.Y) {
             let values = [];
-            const isCategoricalReferenceLinesMeasure = self.categoricalReferenceLinesNames.includes(rLineValue.measureName);
+            const isCategoricalReferenceLinesMeasure = self.categoricalReferenceLinesNames.includes(rLineValue.axis);
 
             if (isCategoricalReferenceLinesMeasure) {
                 const referenceLineData = self.categoricalReferenceLinesDataFields.filter(
-                    (d) => d.source.displayName === rLineValue.measureName
+                    (d) => d.source.displayName === rLineValue.axis
                 );
                 values = referenceLineData.reduce((arr, cur) => [...arr, ...cur.values], []);
             }

@@ -416,7 +416,6 @@ export interface IRaceChartSettings {
 }
 
 export interface IReferenceLineValueProps {
-	measureName: string;
 	axis: EXYAxisNames;
 	value: string;
 	rankOrder: Position;

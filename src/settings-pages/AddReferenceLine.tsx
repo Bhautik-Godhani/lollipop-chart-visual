@@ -131,11 +131,10 @@ const ComputationTypeList: ILabelValuePair[] = [
 let ALIGNMENT_OPTIONS = []
 
 const Get_AXIS_NAMES = (shadow: Visual) => {
-  const AXIS_NAMES: { label: string; value: string; axis: string }[] = [
+  const AXIS_NAMES: { label: string; value: string; }[] = [
     {
-      label: shadow.categoryDisplayName,
-      value: shadow.categoryDisplayName,
-      axis: EXYAxisNames.X,
+      label: "X - Axis",
+      value: EXYAxisNames.X,
     },
   ];
 
@@ -150,15 +149,13 @@ const Get_AXIS_NAMES = (shadow: Visual) => {
   // } else {
   if (!shadow.isHasMultiMeasure) {
     AXIS_NAMES.push({
-      label: shadow.measure1DisplayName,
-      value: shadow.measure1DisplayName,
-      axis: EXYAxisNames.Y,
+      label: "Y - Axis",
+      value: EXYAxisNames.Y,
     });
   } else {
     AXIS_NAMES.push({
-      label: shadow.measure1DisplayName + ' & ' + shadow.measure2DisplayName,
-      value: shadow.measure1DisplayName,
-      axis: EXYAxisNames.Y,
+      label: "Y - Axis",
+      value: EXYAxisNames.Y,
     });
   }
   // }
@@ -166,9 +163,8 @@ const Get_AXIS_NAMES = (shadow: Visual) => {
   if (shadow.categoricalReferenceLinesNames.length) {
     shadow.categoricalReferenceLinesNames.forEach((name) => {
       AXIS_NAMES.push({
-        label: name,
-        value: name,
-        axis: EXYAxisNames.Y,
+        label: "Y - Axis",
+        value: EXYAxisNames.Y,
       });
     });
   }
@@ -269,52 +265,48 @@ const Get_RANK_ORDER = (shadow: Visual, configValues: IReferenceLineValueProps) 
 const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
   const AXIS_NAMES = Get_AXIS_NAMES(shadow);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
-  const line1Measure = [{
-    label: AXIS_NAMES.find(d => d.value === configValues.lineValue1.measureName)?.label,
-    value: configValues.lineValue1.measureName,
-    axis: configValues.lineValue1.axis,
-  }];
 
   return <>
-    <Row>
-      <Column>
-        <SelectInput
-          label={"Based On"}
-          value={lineValues.measureName}
-          optionsList={isValue2 ? line1Measure : AXIS_NAMES}
-          handleChange={(value, e) => {
-            handleChange(e.axis, "axis", type);
-            handleChange(e.value, "measureName", type);
+    <ConditionalWrapper visible={!isValue2}>
+      <Row>
+        <Column>
+          <SwitchOption
+            label="Select Axis"
+            value={configValues.lineValue1.axis}
+            optionsList={AXIS_NAMES}
+            handleChange={(value) => {
+              handleChange(value, "axis", type);
 
-            if (shadow.isHorizontalChart) {
-              if (
-                e.axis === EXYAxisNames.Y &&
-                (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
-              ) {
-                handleChange(Position.Start, "rankOrder", type);
-              } else if (
-                e.axis === EXYAxisNames.X &&
-                (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
-              ) {
-                handleChange(Position.Top, "rankOrder", type);
+              if (shadow.isHorizontalChart) {
+                if (
+                  value === EXYAxisNames.Y &&
+                  (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
+                ) {
+                  handleChange(Position.Start, "rankOrder", type);
+                } else if (
+                  value === EXYAxisNames.X &&
+                  (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
+                ) {
+                  handleChange(Position.Top, "rankOrder", type);
+                }
+              } else {
+                if (
+                  value === EXYAxisNames.X &&
+                  (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
+                ) {
+                  handleChange(Position.Start, "rankOrder", type);
+                } else if (
+                  value === EXYAxisNames.Y &&
+                  (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
+                ) {
+                  handleChange(Position.Top, "rankOrder", type);
+                }
               }
-            } else {
-              if (
-                e.axis === EXYAxisNames.X &&
-                (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
-              ) {
-                handleChange(Position.Start, "rankOrder", type);
-              } else if (
-                e.axis === EXYAxisNames.Y &&
-                (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
-              ) {
-                handleChange(Position.Top, "rankOrder", type);
-              }
-            }
-          }}
-        />
-      </Column>
-    </Row>
+            }}
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
 
     <ConditionalWrapper visible={lineValues.axis === EXYAxisNames.X}>
       <ConditionalWrapper visible={!isValue2}>
@@ -371,7 +363,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           <Column>
             <InputControl
               type="text"
-              value={lineValues.value}
+              value={lineValues.value ?? "0"}
               handleChange={(value: any) => handleChange(value, "value", type)}
               min={1}
               label="Value"
@@ -712,17 +704,6 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   return <>
     <Row>
       <Column>
-        <SwitchOption
-          label="Select Axis"
-          value={configValues.lineValue1.axis}
-          optionsList={AXIS_NAMES}
-          handleChange={(value) => handleChange(value, EReferenceLineValueProps.Axis)}
-        />
-      </Column>
-    </Row>
-
-    <Row>
-      <Column>
         <Accordion title="General"
           open={true}
           negativeMargins={false}
@@ -751,17 +732,6 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
 
 const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <>
-    <Row>
-      <Column>
-        <SwitchOption
-          label="Select Axis"
-          value={configValues.lineValue1.axis}
-          optionsList={AXIS_NAMES}
-          handleChange={(value) => handleChange(value, EReferenceLineValueProps.Axis)}
-        />
-      </Column>
-    </Row>
-
     <Row>
       <Column>
         <Accordion title="General"
@@ -890,12 +860,22 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   const handleAdd = () => {
     const values = configValues.lineValue1;
+
+    if (values.value === null) {
+      values.value = "0";
+    }
+
     if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
     if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
     if (values.type === "ranking" && !validateField("rank", false)) return;
 
     if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
       const values = configValues.lineValue2;
+
+      if (values.value === null) {
+        values.value = "0";
+      }
+
       if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
       if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
       if (values.type === "ranking" && !validateField("rank", true)) return;
@@ -960,81 +940,22 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
 
   React.useEffect(() => {
-    if (!configValues.lineValue1.measureName) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "measureName": AXIS_NAMES[0].value } }));
+    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
 
-    if (!configValues.lineValue2.measureName) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "measureName": AXIS_NAMES[0].value } }));
+    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
 
-    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
+      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
 
-    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
+      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
-  }, []);
 
-  React.useEffect(() => {
-    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "measureName": d.lineValue1.measureName } }));
-    }
-  }, [configValues.lineValue1.measureName]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "type": EReferenceLinesType.Value } }));
-    }
-  }, [configValues.lineValue1.measureName]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue2.axis === EXYAxisNames.Y) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
-    }
-  }, [configValues.lineValue2.measureName]);
-
-  React.useEffect(() => {
-    if (configValues.referenceType === EReferenceType.REFERENCE_LINE && configValues.labelStyle.labelPosition === EBeforeAfterPosition.Center) {
-      handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle)
-    }
-  }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-  }, [configValues.lineValue1.computation, configValues.lineValue1.axis]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-  }, [configValues.lineValue2.computation, configValues.lineValue2.axis]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-  }, [configValues.lineValue1.axis]);
-
-  React.useEffect(() => {
-    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
-      handleChange("0", EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-  }, [configValues.lineValue2.axis]);
-
-  React.useEffect(() => {
-    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
-      handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
-      handleChange(configValues.lineValue1.measureName, EReferenceLineValueProps.MeasureName, EReferenceLinesSettings.LineValue2);
-      handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2);
-      handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
-    }
-  }, [configValues.lineValue1.measureName, configValues.lineValue1.type, configValues.lineValue1.computation]);
-
-  React.useEffect(() => {
     if (isLineUI) {
       setConfigValues((d) => ({
         ...d,
@@ -1047,6 +968,58 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
       }));
     }
   }, []);
+
+  // line value 1
+  React.useEffect(() => {
+    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "type": EReferenceLinesType.Value } }));
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
+      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.value) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+  }, [configValues]);
+
+  // line value 2
+  React.useEffect(() => {
+    if (configValues.lineValue2.axis === EXYAxisNames.Y) {
+      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
+      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+
+    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+
+    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.value) {
+      handleChange(null, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues]);
+
+  React.useEffect(() => {
+    if (configValues.referenceType === EReferenceType.REFERENCE_LINE && configValues.labelStyle.labelPosition === EBeforeAfterPosition.Center) {
+      handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle)
+    }
+  }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
+
+  React.useEffect(() => {
+    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
+      handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues.lineValue1.axis, configValues.lineValue1.type, configValues.lineValue1.computation]);
 
   const resetChanges = () => {
     setConfigValues(() => defaultSettings);
