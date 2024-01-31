@@ -3574,7 +3574,7 @@ export class Visual extends Shadow {
 							data: {
 								name: this.measure1DisplayName,
 								color: this.getColor(this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-								pattern: undefined
+								pattern: this.chartData[0].subCategories[0].pattern
 							}
 						}]
 					} else {
@@ -3607,7 +3607,7 @@ export class Visual extends Shadow {
 						data: {
 							name: d,
 							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
-							pattern: undefined
+							pattern: this.subCategoryPatterns.find(s => s.name === d)
 						}
 					}))
 					break;
