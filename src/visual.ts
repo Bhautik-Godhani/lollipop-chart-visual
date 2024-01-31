@@ -1531,19 +1531,6 @@ export class Visual extends Shadow {
 
 		this.setCategoricalDataPairsByRanking();
 
-		// set colors for all pairs
-		this.categoricalDataPairs.forEach((data, i) => {
-			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
-		});
-
-		this.categoricalDataPairs.forEach(d => {
-			this.subCategoriesName.forEach((name, i) => {
-				this.subCategoryColorPairWithIndex[`${i}-${d.category}-${name}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
-			});
-		});
-
-		this.setColorsByDataColorsSettings();
-
 		if (this.sortingSettings.category.enabled) {
 			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
 
@@ -1557,6 +1544,19 @@ export class Visual extends Shadow {
 				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
 			}
 		}
+
+		// set colors for all pairs
+		this.categoricalDataPairs.forEach((data, i) => {
+			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
+		});
+
+		this.categoricalDataPairs.forEach(d => {
+			this.subCategoriesName.forEach((name, i) => {
+				this.subCategoryColorPairWithIndex[`${i}-${d.category}-${name}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
+			});
+		});
+
+		this.setColorsByDataColorsSettings();
 
 		const clonedCategoricalRaceBarValues = clonedCategoricalData.categories.filter(
 			(value) => value.source.roles[EDataRolesName.RaceChartData]
@@ -2268,6 +2268,12 @@ export class Visual extends Shadow {
 							add categorical small multiple data into the small multiples data field`;
 			}
 
+			this.svg.selectAll(".generated-pattern-defs").remove();
+			this.svg.append("defs").attr("class", "generated-pattern-defs")
+
+			createPatternsDefs(this, this.svg);
+			createMarkerDefs(this, this.svg);
+
 			// SMALL MULTIPLE VISUAL
 			if (this.isSmallMultiplesEnabled) {
 				if (this.isHasSmallMultiplesData) {
@@ -2555,6 +2561,9 @@ export class Visual extends Shadow {
 					this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 				}
 
+				this.drawXGridLines();
+				this.drawYGridLines();
+
 				this.drawLollipopChart();
 
 				this.configLegend();
@@ -2647,8 +2656,9 @@ export class Visual extends Shadow {
 				this.behavior.renderSelection(this.interactivityService.hasSelection());
 			}
 
-			createPatternsDefs(this, this.svg);
-			createMarkerDefs(this, this.svg);
+			// createPatternsDefs(this, this.svg);
+			// createMarkerDefs(this, this.svg);
+
 			this.createErrorBarsMarkerDefs();
 		} catch (error) {
 			console.error("Error", error);
@@ -4058,7 +4068,7 @@ export class Visual extends Shadow {
 		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
 		const colorIdxRangeScale = d3.scaleLinear()
 			.domain([0, keys.length - 1])
-			.range([1, 0]);
+			.range(!this.isHorizontalChart ? [1, 0] : [0, 1]);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(keys.length / marker.schemeColors.length);
@@ -4160,7 +4170,9 @@ export class Visual extends Shadow {
 						this.categoricalDataPairs.forEach((data, i: number) => {
 							this.measureNames.forEach((d, j) => {
 								const color = getMarkerColor(j);
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
+								if (this.categoryColorPairWithIndex[`${i}-${data.category}`]) {
+									this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
+								}
 							});
 						});
 					} else {
@@ -4450,7 +4462,7 @@ export class Visual extends Shadow {
 			])
 			.on("brush", brushed);
 
-		const expectedBar = Math.ceil(this.height / barDistance);
+		const expectedBar = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.minLollipopCount : Math.ceil(this.height / barDistance);
 		const totalBar = totalBarsCount;
 		const heightByExpectedBar = (expectedBar * this.height) / totalBar;
 		const xPos = this.viewPortWidth - this.brushWidth - this.settingsPopupOptionsWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth;
@@ -4636,7 +4648,7 @@ export class Visual extends Shadow {
 			])
 			.on("brush", brushed);
 
-		const expectedBar = Math.ceil(scaleWidth / barDistance);
+		const expectedBar = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.minLollipopCount : Math.ceil(scaleWidth / barDistance);
 		const totalBar = totalBarsCount;
 		let widthByExpectedBar = (expectedBar * scaleWidth) / totalBar;
 
@@ -7577,6 +7589,7 @@ export class Visual extends Shadow {
 			}
 
 			if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+
 				return `url('#${generatePattern(this.svg, pattern, color)}')`;
 			} else {
 				return color;

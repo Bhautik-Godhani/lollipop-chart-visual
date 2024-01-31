@@ -372,10 +372,9 @@ export const createMarkerDefs = (self: Visual, svgRootElement) => {
 };
 
 export const generatePattern = (svgRootElement, pattern, color, isLegend = false) => {
-	let defs = svgRootElement.select(".pattern-defs");
-
+	let defs = svgRootElement.select(".generated-pattern-defs");
 	if (defs.empty()) {
-		defs = svgRootElement.append("defs").attr("class", "pattern-defs");
+		defs = svgRootElement.append("defs").attr("class", "generated-pattern-defs");
 	}
 	let patternId;
 	if (pattern.isImagePattern) {
