@@ -132,7 +132,7 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
@@ -450,6 +450,7 @@ export class Visual extends Shadow {
 	categoryPatterns: IPatternProps[] = [];
 	measuresPatterns: IPatternProps[] = [];
 	subCategoryPatterns: IPatternProps[] = [];
+	patternByMeasures: { [measureName: string]: IPatternProps } = {};
 
 	// image marker
 	isShowImageMarker1: boolean;
@@ -3468,8 +3469,6 @@ export class Visual extends Shadow {
 			}
 		}
 	}
-
-	patternByMeasures: { [measureName: string]: IPatternProps } = {};
 
 	private configLegend(): void {
 		if (this.legendSettings.show) {

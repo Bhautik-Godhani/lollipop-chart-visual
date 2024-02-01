@@ -1,5 +1,5 @@
 import { Visual } from '../visual';
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { selectAll } from 'd3-selection';
 import { DataValuesType } from '../enum';
 
@@ -18,6 +18,11 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
         offsetValues: [0, 0],
         isNodeCentricAnnotation: true,
         isClickNodeFromOutside: true,
+        getPosition: () => {
+            return {
+                x: 0, y: 0
+            }
+        }
     });
     self.visualAnnotations.initializeAnnotations();
     self.behavior.setVisualAnnotations(self.visualAnnotations);
