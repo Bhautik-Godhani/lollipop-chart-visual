@@ -155,6 +155,7 @@ export enum DataLabelsPlacement {
 
 export enum DisplayUnits {
 	Auto = "auto",
+	Relative = "relative",
 	None = "none",
 	Thousands = "thousands",
 	Millions = "million",

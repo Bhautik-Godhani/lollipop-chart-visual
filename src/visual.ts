@@ -56,6 +56,7 @@ import {
 	ECFValueTypes,
 	ECFRankingTypes,
 	EAxisDateFormats,
+	DisplayUnits,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -3762,9 +3763,9 @@ export class Visual extends Shadow {
 			...SMConfig,
 		};
 
-		this.legendSettings = formatTab[EVisualSettings.Legend];
-		this.numberSettings = formatTab[EVisualSettings.NumberFormatting];
-		this.footerSettings = formatTab[EVisualSettings.Footer];
+		this.legendSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.Legend]));
+		this.numberSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.NumberFormatting]));
+		this.footerSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.Footer]));
 
 		const xAxisConfig = JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]);
 		this.xAxisSettings = {
@@ -5917,6 +5918,31 @@ export class Visual extends Shadow {
 
 	setYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
+
+		if (this.numberSettings.scaling === DisplayUnits.Relative) {
+			if (min < 0 && max < 0) {
+				if ((min >= -1.0e6)) {
+					this.numberSettings.scaling = DisplayUnits.Thousands;
+				} else if (min < -1.0e6 && min >= -1.0e9) {
+					this.numberSettings.scaling = DisplayUnits.Millions;
+				} else if (min < -1.0e9 && min >= -1.0e12) {
+					this.numberSettings.scaling = DisplayUnits.Billions;
+				} else if (min < -1.0e12) {
+					this.numberSettings.scaling = DisplayUnits.Trillions;
+				}
+			} else {
+				if ((max <= 1.0e6)) {
+					this.numberSettings.scaling = DisplayUnits.Thousands;
+				} else if (max > 1.0e6 && max <= 1.0e9) {
+					this.numberSettings.scaling = DisplayUnits.Millions;
+				} else if (max > 1.0e9 && max <= 1.0e12) {
+					this.numberSettings.scaling = DisplayUnits.Billions;
+				} else if (max > 1.0e12) {
+					this.numberSettings.scaling = DisplayUnits.Trillions;
+				}
+			}
+		}
+
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
 

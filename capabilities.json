@@ -532,6 +532,10 @@
 								"value": "auto"
 							},
 							{
+								"displayName": "Relative",
+								"value": "relative"
+							},
+							{
 								"displayName": "None",
 								"value": "none"
 							},
