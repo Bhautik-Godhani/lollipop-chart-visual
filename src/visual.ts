@@ -1345,6 +1345,18 @@ export class Visual extends Shadow {
 		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
 		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
 
+		if (this.isHasMultiMeasure) {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+		} else {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
+		}
+
+		this.isShowImageMarker1 = this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES
+			&& this.isHasImagesData && !!this.markerSettings.marker1Style.selectedImageDataField;
+
+		this.isShowImageMarker2 = this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES
+			&& this.isHasImagesData && !!this.markerSettings.marker2Style.selectedImageDataField;
+
 		if ((this.isHasMultiMeasure || this.isLollipopTypePie) && this.dataColorsSettings.fillType === ColorPaletteType.ByCategory) {
 			this.dataColorsSettings.fillType = ColorPaletteType.Single;
 		}
@@ -2226,18 +2238,6 @@ export class Visual extends Shadow {
 			this.setCircle2Radius();
 			this.setPie1Radius();
 			this.setPie2Radius();
-
-			if (this.isHasMultiMeasure) {
-				this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
-			} else {
-				this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
-			}
-
-			this.isShowImageMarker1 = this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES
-				&& this.isHasImagesData && !!this.markerSettings.marker1Style.selectedImageDataField;
-
-			this.isShowImageMarker2 = this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES
-				&& this.isHasImagesData && !!this.markerSettings.marker2Style.selectedImageDataField;
 
 			const popupOptions = document.querySelector(".popup-options");
 			const popupOptionsHeader = document.querySelector(".popup-options-header");
@@ -6664,9 +6664,9 @@ export class Visual extends Shadow {
 		markerSelection
 			.attr("width", width)
 			.attr("height", height)
-			.attr("xlink:href", (d) => {
-				if (this.isHasImagesData && (isImage2 ? this.isShowImageMarker2 : this.isShowImageMarker1) && d.imageDataUrl) {
-					return d.imageDataUrl;
+			.attr("xlink:href", (d: ILollipopChartRow) => {
+				if (this.isHasImagesData && (isImage2 ? this.isShowImageMarker2 : this.isShowImageMarker1) && (isImage2 ? d.imageDataUrl2 : d.imageDataUrl1)) {
+					return isImage2 ? d.imageDataUrl2 : d.imageDataUrl1;
 				}
 
 				if (markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && markerSettings.markerShapeBase64Url) {

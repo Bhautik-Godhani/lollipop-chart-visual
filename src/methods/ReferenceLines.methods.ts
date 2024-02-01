@@ -403,8 +403,6 @@ const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
         value = rLineValue.value;
     }
 
-    console.log(value);
-
     if (value === undefined || value === null) {
         return;
     }
