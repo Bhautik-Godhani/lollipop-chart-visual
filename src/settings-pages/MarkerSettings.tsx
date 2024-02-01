@@ -204,22 +204,61 @@ const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStat
 							handleMarkerStyleChange(value, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues)
 						}}>
 							<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
-								<Row>
-									<Column>
-										<SwitchOption
-											label="Marker Type"
-											value={configValues.dropdownMarkerType}
-											optionsList={MARKERS_LIST}
-											handleChange={(e) => {
-												handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
-												handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
-											}}
+								<ConditionalWrapper visible={shadow.isHasSubcategories}>
+									<Row>
+										<Column>
+											<SwitchOption
+												label={"Marker Type"}
+												value={config.markerType}
+												optionsList={MARKER_TYPES}
+												handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
+											/>
+										</Column>
+									</Row>
+
+									<ConditionalWrapper visible={config.markerType === EMarkerTypes.SHAPE}>
+										<Row>
+											<Column>
+												<SwitchOption
+													value={configValues.dropdownMarkerType}
+													optionsList={MARKERS_LIST}
+													handleChange={(e) => {
+														handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+														handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
+													}}
+												/>
+											</Column>
+										</Row>
+									</ConditionalWrapper>
+
+									<ConditionalWrapper visible={config.markerType === EMarkerTypes.CHART}>
+										<ImageOption
+											isShowImageTooltip={true}
+											value={config[config.markerStyleType].markerChart}
+											images={MARKER_CHART_TYPES}
+											handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerChart, config.markerStyleType, setConfigValues)}
 										/>
-									</Column>
-								</Row>
+									</ConditionalWrapper>
+								</ConditionalWrapper>
+
+								<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+									<Row>
+										<Column>
+											<SwitchOption
+												label="Marker Type"
+												value={configValues.dropdownMarkerType}
+												optionsList={MARKERS_LIST}
+												handleChange={(e) => {
+													handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+													handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
+												}}
+											/>
+										</Column>
+									</Row>
+								</ConditionalWrapper>
 							</Tab>
 
-							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
+							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST} disabled>
 								<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
 							</Tab>
 							<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>

@@ -94,14 +94,28 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
     const getLabelText = (d: IReferenceLineSettings): string => {
         const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
-        const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
-        switch (d.labelStyle.labelNameType) {
-            case EReferenceLineNameTypes.TEXT:
-                return labelText;
-            case EReferenceLineNameTypes.TEXT_VALUE:
-                return labelText + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
-            case EReferenceLineNameTypes.VALUE:
-                return isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value;
+        const isValue2TypeNumber = parseFloat(d.lineValue2.value).toString().length > 0 && parseFloat(d.lineValue2.value).toString() !== "NaN";
+
+        if (d.referenceType === EReferenceType.REFERENCE_BAND) {
+            switch (d.labelStyle.labelNameType) {
+                case EReferenceLineNameTypes.TEXT:
+                    return d.labelStyle.bandLabel;
+                case EReferenceLineNameTypes.TEXT_VALUE:
+                    return d.labelStyle.bandLabel + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value) +
+                        " - " + (isValue2TypeNumber ? GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true) : d.lineValue2.value);
+                case EReferenceLineNameTypes.VALUE:
+                    return (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value) +
+                        " - " + (isValue2TypeNumber ? GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true) : d.lineValue2.value);
+            }
+        } else {
+            switch (d.labelStyle.labelNameType) {
+                case EReferenceLineNameTypes.TEXT:
+                    return d.labelStyle.lineLabel;
+                case EReferenceLineNameTypes.TEXT_VALUE:
+                    return d.labelStyle.lineLabel + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
+                case EReferenceLineNameTypes.VALUE:
+                    return (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
+            }
         }
     }
 
@@ -332,6 +346,8 @@ const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
         } else {
             value = domain[domain.length - (parseInt(rLineValue.rank) - 1) - 1];
         }
+
+        rLineValue.value = value;
     } else {
         value = rLineValue.value;
     }
@@ -386,6 +402,8 @@ const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
     } else {
         value = rLineValue.value;
     }
+
+    console.log(value);
 
     if (value === undefined || value === null) {
         return;

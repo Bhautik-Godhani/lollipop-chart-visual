@@ -971,9 +971,9 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   // line value 1
   React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "type": EReferenceLinesType.Value } }));
-    }
+    // if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+    //   setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue1]: { ...d[EReferenceLinesSettings.LineValue1], "type": EReferenceLinesType.Value } }));
+    // }
 
     if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
       handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
@@ -990,9 +990,9 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   // line value 2
   React.useEffect(() => {
-    if (configValues.lineValue2.axis === EXYAxisNames.Y) {
-      setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
-    }
+    // if (configValues.lineValue2.axis === EXYAxisNames.Y) {
+    //   setConfigValues((d) => ({ ...d, [EReferenceLinesSettings.LineValue2]: { ...d[EReferenceLinesSettings.LineValue2], "type": EReferenceLinesType.Value } }));
+    // }
 
     if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
       handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
