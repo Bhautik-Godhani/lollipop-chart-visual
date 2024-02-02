@@ -5921,8 +5921,6 @@ export class Visual extends Shadow {
 	setYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
 
-		console.log(min, max);
-
 		if (this.numberSettings.scaling === DisplayUnits.Relative) {
 			if (min < 0 && max < 0) {
 				if ((min >= -1.0e6)) {
@@ -5985,8 +5983,6 @@ export class Visual extends Shadow {
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
 		}
-
-		console.log(this.yScale.domain());
 
 		this.isHasNegativeValue = min < 0 || max < 0;
 		this.isHasPositiveValue = min >= 0 || max >= 0;

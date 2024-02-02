@@ -86,7 +86,7 @@ export const CHART_SETTINGS: IChartSettings = {
 	isShowZeroBaseLine: true,
 	zeroBaseLineColor: "rgba(211, 211, 211, 1)",
 	zeroBaseLineSize: 1,
-	showConnectingLine: true,
+	showConnectingLine: false,
 	connectingLineColor: "rgba(0, 0, 0, 1)",
 	connectingLineWidth: 1,
 	connectingLineStyle: ELineType.Dotted,

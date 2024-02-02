@@ -201,7 +201,8 @@ export enum EChartSettings {
 	connectingLineStyle = "connectingLineStyle",
 	IsIBCSEnabled = "isIBCSEnabled",
 	Theme = "theme",
-	PrevTheme = "prevTheme"
+	PrevTheme = "prevTheme",
+	IsResetInIBCSPressed = "isResetInIBCSPressed"
 }
 
 export enum ECircleSettings {

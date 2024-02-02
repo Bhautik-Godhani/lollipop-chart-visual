@@ -179,7 +179,9 @@ const UIThemeSettings = (
 						open={configValues.isIBCSEnabled}
 						isShowToggle={true}
 						showToggleValue={configValues.isIBCSEnabled}
-						onShowToggleChange={(value) => handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues)}
+						onShowToggleChange={(value) => {
+							handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues);
+						}}
 						negativeMargins={false}
 						childTopPadding={false}
 						childBottomPadding={true}>
@@ -392,7 +394,9 @@ const ChartSettings = (props) => {
 
 	React.useEffect(() => {
 		if (configValues.isIBCSEnabled && configValues.theme === undefined) {
-			handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues);
+			setConfigValues({ ...configValues, theme: EIBCSThemes.DefaultVertical });
+		} else {
+			setConfigValues({ ...configValues, isResetInIBCSPressed: true });
 		}
 	}, [configValues.isIBCSEnabled])
 
