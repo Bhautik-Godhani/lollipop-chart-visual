@@ -258,7 +258,7 @@ const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStat
 								</ConditionalWrapper>
 							</Tab>
 
-							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST} disabled>
+							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
 								<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
 							</Tab>
 							<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>

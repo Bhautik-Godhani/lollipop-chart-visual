@@ -174,10 +174,11 @@ import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
-import { COLORBREWER, DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
 import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
+import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings, SmallMultiplesSettings } from "./SmallMultiplesGridLayout";
+import { COLORBREWER } from "./color-schemes";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -692,7 +693,7 @@ export class Visual extends Shadow {
 					name: "Small Multiples",
 					sectionName: EVisualConfig.SmallMultiplesConfig,
 					propertyName: EVisualSettings.SmallMultiplesSettings,
-					Component: Components.SmallMultiples,
+					Component: () => SmallMultiplesSettings,
 					icon: SmallMultipleIcon
 				},
 				{
@@ -2302,6 +2303,7 @@ export class Visual extends Shadow {
 					containerWidth: vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width,
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
 					categories: this.smallMultiplesCategories,
+					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					onCellRendered: (category, index, ele) => {
 						DrawSmallMultipleBarChart(this, settings, this.smallMultiplesCategories.findIndex(d => d === category), ele);
 					},
@@ -5909,7 +5911,7 @@ export class Visual extends Shadow {
 			}
 
 			this.xScale = d3.scaleLinear();
-			this.xScale.domain([min, max]).nice();
+			this.xScale.domain([min, max]);
 		} else {
 			this.xScale = d3.scaleBand();
 			this.xScale.domain(this.chartData.map((d) => d.category));
@@ -5918,6 +5920,8 @@ export class Visual extends Shadow {
 
 	setYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
+
+		console.log(min, max);
 
 		if (this.numberSettings.scaling === DisplayUnits.Relative) {
 			if (min < 0 && max < 0) {
@@ -5965,7 +5969,7 @@ export class Visual extends Shadow {
 		}
 
 		if (isLinearScale) {
-			this.yScale.domain([min, max]).nice();
+			this.yScale.domain([min, max]);
 		} else if (isLogarithmScale) {
 			if (this.isShowPositiveNegativeLogScale) {
 				if (this.isBottomXAxis) {
@@ -5976,11 +5980,13 @@ export class Visual extends Shadow {
 					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
 				}
 			} else {
-				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]).nice();
+				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
 			}
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
 		}
+
+		console.log(this.yScale.domain());
 
 		this.isHasNegativeValue = min < 0 || max < 0;
 		this.isHasPositiveValue = min >= 0 || max >= 0;
@@ -5991,9 +5997,10 @@ export class Visual extends Shadow {
 		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
 		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
 		const negDataLabelHeight = this.isHasNegativeValue ? dataLabelHeight : 0;
+		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0];
+			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize + outsideDataLabelHeight * 2, xScaleWidth - this.markerMaxSize - outsideDataLabelHeight * 2] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize - outsideDataLabelHeight * 2, this.markerMaxSize + outsideDataLabelHeight * 2];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
@@ -6025,7 +6032,7 @@ export class Visual extends Shadow {
 				}
 			}
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight, dataLabelHeight / 2] : [this.yAxisStartMargin - dataLabelHeight / 2, yScaleHeight - negDataLabelHeight];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - this.markerMaxSize - outsideDataLabelHeight, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + this.markerMaxSize + outsideDataLabelHeight, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
