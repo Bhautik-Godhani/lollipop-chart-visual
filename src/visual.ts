@@ -6068,8 +6068,8 @@ export class Visual extends Shadow {
 			.attr("x2", this.xScale.range()[1])
 			.attr("y1", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
 			.attr("y2", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
-			.attr("fill", "rgba(84, 84, 84, 1)")
-			.attr("stroke", "rgba(84, 84, 84, 1)")
+			.attr("fill", this.getColor(this.xAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
+			.attr("stroke", this.getColor(this.xAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", "1px");
 	}
 
@@ -6088,8 +6088,8 @@ export class Visual extends Shadow {
 			.attr("x2", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
 			.attr("y1", this.yScale.range()[0])
 			.attr("y2", this.yScale.range()[1])
-			.attr("fill", "rgba(84, 84, 84, 1)")
-			.attr("stroke", "rgba(84, 84, 84, 1)")
+			.attr("fill", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
+			.attr("stroke", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", "1px");
 	}
 
