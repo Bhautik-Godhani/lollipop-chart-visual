@@ -1,3 +1,4 @@
+/* eslint-disable no-self-assign */
 import { DisplayUnits, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import IValueFormatter = valueFormatter.IValueFormatter;
@@ -33,6 +34,11 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
                 numberSettings.trillionScalingLabel
             );
+        } else {
+            formattedNumber = DecimalSeparator(numberFormatting, +number.toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber).toString()
+            );
         }
     } else {
         if (isMinThousandsLimit ? (number > 1.0e3 && number <= 1.0e6) : (number <= 1.0e6)) {
@@ -59,6 +65,11 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
                 numberSettings.trillionScalingLabel
             );
+        } else {
+            formattedNumber = DecimalSeparator(numberFormatting, +number.toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber).toString()
+            );
         }
     }
 
@@ -79,7 +90,7 @@ export const DecimalSeparator = (numberSettings: NumberFormatting, number: numbe
 
 export const GetSemanticFormattedNumber = (numberFormatting: NumberFormatting, number: string, originalNumber: number): string | number => {
     const numberSettings = numberFormatting;
-    let formattedNumber: any;
+    let formattedNumber: string;
     if (numberSettings.semanticFormatting) {
         if (parseFloat(number) >= 0) {
             switch (numberSettings.positiveFormat) {

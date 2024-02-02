@@ -138,17 +138,17 @@ export const CallLinearCutScaleOnAxisGroup = (self: Visual): void => {
         if (self.yAxisSettings.position === Position.Left) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 35));
+                .call(axisLeft(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 35));
+                .call(axisLeft(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
         } else if (self.yAxisSettings.position === Position.Right) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 35));
+                .call(axisRight(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 35));
+                .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
         }
     }
 }

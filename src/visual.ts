@@ -5992,11 +5992,11 @@ export class Visual extends Shadow {
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
 		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
-		const negDataLabelHeight = this.isHasNegativeValue ? dataLabelHeight : 0;
+		const negDataLabelHeight = this.isHasNegativeValue ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
 		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize + outsideDataLabelHeight * 2, xScaleWidth - this.markerMaxSize - outsideDataLabelHeight * 2] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize - outsideDataLabelHeight * 2, this.markerMaxSize + outsideDataLabelHeight * 2];
+			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelHeight, xScaleWidth - negDataLabelHeight] : [xScaleWidth - this.xAxisStartMargin - negDataLabelHeight, this.markerMaxSize + negDataLabelHeight];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
@@ -6028,7 +6028,7 @@ export class Visual extends Shadow {
 				}
 			}
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - this.markerMaxSize - outsideDataLabelHeight, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + this.markerMaxSize + outsideDataLabelHeight, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + negDataLabelHeight, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
