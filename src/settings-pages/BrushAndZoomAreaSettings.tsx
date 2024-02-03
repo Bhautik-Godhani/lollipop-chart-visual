@@ -1,6 +1,6 @@
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, Accordion } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, Accordion, Quote } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS as BRUSH_AND_ZOOM_AREA_SETTINGS_IMP } from "../constants";
 import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
 import { EBrushAndZoomAreaSettings } from "../enum";
@@ -227,11 +227,28 @@ const BrushAndZoomAreaSettings = (props) => {
 		if (!configValues.height) {
 			handleChange(shadow.brushAndZoomAreaHeight, EBrushAndZoomAreaSettings.Height, setConfigValues)
 		}
+
+		if (shadow.isSmallMultiplesEnabled && configValues.enabled) {
+			handleChange(false, EBrushAndZoomAreaSettings.Enabled, setConfigValues)
+		}
 	}, []);
 
 	return (
 		<>
-			{UIGeneralChartSettings(shadow, vizOptions, configValues, setConfigValues)}
+			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
+				<Row>
+					<Column>
+						<Quote>
+							<strong>Note: </strong>Please remove the small multiples data to use this feature.
+						</Quote>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled}>
+				{UIGeneralChartSettings(shadow, vizOptions, configValues, setConfigValues)}
+			</ConditionalWrapper>
+
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
