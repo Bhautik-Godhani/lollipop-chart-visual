@@ -5204,42 +5204,74 @@ export class Visual extends Shadow {
 					.attr("opacity", (d: ILollipopChartRow) => {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.isLeftYAxis) {
-									if (d.positions.dataLabel1X < 1) {
-										if (isHideInsideLabel) {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, false);
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
+									if (isHideInsideLabel) {
+										if (!isHideOutSideLabel) {
+											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside);
+											THIS.transformData1LabelOutside(ele, false);
 										} else {
 											return 0;
 										}
+									} else {
+										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, false, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(dataLabelGSelection, false, false);
+										return 1;
 									}
 								} else {
-									if (d.positions.dataLabel1X + getBBox.width > THIS.width) {
-										if (isHideInsideLabel) {
-											return 0;
-										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, false);
+									if (THIS.isLeftYAxis) {
+										if (d.positions.dataLabel1X <= getBBox.width) {
+											if (isHideInsideLabel) {
+												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, false);
+											} else {
+												return 0;
+											}
+										}
+									} else {
+										if (d.positions.dataLabel1X + getBBox.width > THIS.width) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, false);
+											}
 										}
 									}
 								}
 							} else {
-								if (THIS.isBottomXAxis) {
-									if (d.positions.dataLabel1Y + getBBox.height > THIS.height) {
-										if (isHideInsideLabel) {
-											return 0;
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+									const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
+									if (isHideInsideLabel) {
+										if (!isHideOutSideLabel) {
+											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside);
+											THIS.transformData1LabelOutside(ele, false);
 										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, false);
+											return 0;
 										}
+									} else {
+										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, false, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(dataLabelGSelection, false, false);
+										return 1;
 									}
 								} else {
-									if (d.positions.dataLabel1Y < 1) {
-										if (isHideInsideLabel) {
-											return 0;
-										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, false);
+									if (THIS.isBottomXAxis) {
+										if (d.positions.dataLabel1Y + getBBox.height > THIS.height) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, false);
+											}
+										}
+									} else {
+										if (d.positions.dataLabel1Y <= getBBox.height) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, false);
+											}
 										}
 									}
 								}
@@ -5334,42 +5366,75 @@ export class Visual extends Shadow {
 					.attr("opacity", (d: ILollipopChartRow) => {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.isLeftYAxis) {
-									if (d.positions.dataLabel2X < 1) {
-										if (isHideInsideLabel) {
-											return 0;
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
+
+									if (isHideInsideLabel) {
+										if (!isHideOutSideLabel) {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false);
 										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, true);
+											return 0;
 										}
+									} else {
+										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
+										return 1;
 									}
 								} else {
-									if (d.positions.dataLabel2X + getBBox.width > THIS.width) {
-										if (isHideInsideLabel) {
-											return 0;
-										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, true);
+									if (THIS.isLeftYAxis) {
+										if (d.positions.dataLabel2X <= getBBox.width) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, true);
+											}
+										}
+									} else {
+										if (d.positions.dataLabel2X + getBBox.width > THIS.width) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, true);
+											}
 										}
 									}
 								}
 							} else {
-								if (THIS.isBottomXAxis) {
-									if (d.positions.dataLabel2Y + getBBox.height > THIS.height) {
-										if (isHideInsideLabel) {
-											return 0;
+								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+									if (isHideInsideLabel) {
+										if (!isHideOutSideLabel) {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false);
 										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, true);
+											return 0;
 										}
+									} else {
+										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
+										return 1;
 									}
 								} else {
-									if (d.positions.dataLabel2Y < 1) {
-										if (isHideInsideLabel) {
-											return 0;
-										} else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-											THIS.transformDataLabelInside(ele, false, true);
+									if (THIS.isBottomXAxis) {
+										if (d.positions.dataLabel2Y + getBBox.height > THIS.height) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, true);
+											}
+										}
+									} else {
+										if (d.positions.dataLabel2Y <= getBBox.height) {
+											if (isHideInsideLabel) {
+												return 0;
+											} else {
+												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+												THIS.transformDataLabelInside(ele, false, true);
+											}
 										}
 									}
 								}
