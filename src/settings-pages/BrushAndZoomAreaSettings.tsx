@@ -1,6 +1,6 @@
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, Accordion, Quote } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, AccordionAlt, Quote } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS as BRUSH_AND_ZOOM_AREA_SETTINGS_IMP } from "../constants";
 import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
 import { EBrushAndZoomAreaSettings } from "../enum";
@@ -24,61 +24,49 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 
 const UIWidthSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	return <ConditionalWrapper visible={shadow.isHorizontalChart}>
-		<Row>
-			<Column>
-				<Accordion title="Track Manual Width"
-					open={configValues.isAutoWidth}
-					isShowToggle={true}
-					showToggleValue={configValues.isAutoWidth}
-					onShowToggleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
-					negativeMargins={false}
-					childTopPadding={false}
-					childBottomPadding={true}>
-					<Row>
-						<Column>
-							<InputControl
-								min={1}
-								type="number"
-								label="Width"
-								value={configValues.width}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</Accordion>
-			</Column>
-		</Row>
-	</ConditionalWrapper>
+		<AccordionAlt title="Track Manual Width"
+			open={configValues.isAutoWidth}
+			showToggle={true}
+			toggleValue={configValues.isAutoWidth}
+			onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
+		>
+			<Row>
+				<Column>
+					<InputControl
+						min={1}
+						type="number"
+						label="Width"
+						value={configValues.width}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+		</AccordionAlt>
+	</ConditionalWrapper >
 }
 
 const UIHeightSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	return <ConditionalWrapper visible={!shadow.isHorizontalChart}>
-		<Row>
-			<Column>
-				<Accordion title="Track Manual Height"
-					open={configValues.isAutoHeight}
-					isShowToggle={true}
-					showToggleValue={configValues.isAutoHeight}
-					onShowToggleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
-					negativeMargins={false}
-					childTopPadding={false}
-					childBottomPadding={true}>
-					<Row>
-						<Column>
-							<InputControl
-								min={shadow.brushAndZoomAreaMinHeight}
-								max={shadow.height / 2}
-								type="number"
-								label="Height"
-								value={configValues.height}
-								handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</Accordion>
-			</Column>
-		</Row>
-	</ConditionalWrapper>
+		<AccordionAlt title="Track Manual Height"
+			open={configValues.isAutoHeight}
+			showToggle={true}
+			toggleValue={configValues.isAutoHeight}
+			onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
+		>
+			<Row>
+				<Column>
+					<InputControl
+						min={shadow.brushAndZoomAreaMinHeight}
+						max={shadow.height / 2}
+						type="number"
+						label="Height"
+						value={configValues.height}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+		</AccordionAlt>
+	</ConditionalWrapper >
 }
 
 const UIGeneralChartSettings = (
@@ -89,77 +77,71 @@ const UIGeneralChartSettings = (
 ) => {
 	return (
 		<>
-			<Row>
-				<Column>
-					<Accordion title="Enable Brush Area"
-						open={configValues.enabled}
-						isShowToggle={true}
-						showToggleValue={configValues.enabled}
-						onShowToggleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled, setConfigValues)}
-						negativeMargins={false}
-						childTopPadding={false}
-						childBottomPadding={true}>
-						<Row>
-							<Column>
-								<InputControl
-									min={5}
-									type="number"
-									label="Preview Lollipop Count"
-									value={configValues.minLollipopCount}
-									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.MinLollipopCount, setConfigValues)}
-								/>
-							</Column>
-						</Row>
+			<AccordionAlt title="Enable Brush Area"
+				open={configValues.enabled}
+				showToggle={true}
+				toggleValue={configValues.enabled}
+				onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled, setConfigValues)}
+			>
+				<Row>
+					<Column>
+						<InputControl
+							min={5}
+							type="number"
+							label="Preview Lollipop Count"
+							value={configValues.minLollipopCount}
+							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.MinLollipopCount, setConfigValues)}
+						/>
+					</Column>
+				</Row>
 
-						<Row>
-							<Column>
-								<ColorPicker
-									label="Default Track"
-									color={configValues.trackBackgroundColor}
-									handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.TrackBackgroundColor, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
-								/>
-							</Column>
-						</Row>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Default Track"
+							color={configValues.trackBackgroundColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.TrackBackgroundColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
 
-						<Row>
-							<Column>
-								<ColorPicker
-									label="Selected Track"
-									color={configValues.selectionTrackBackgroundColor}
-									handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBackgroundColor, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
-								/>
-							</Column>
-						</Row>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Selected Track"
+							color={configValues.selectionTrackBackgroundColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBackgroundColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
 
-						<Row>
-							<Column>
-								<ColorPicker
-									label="Selected Track Border"
-									color={configValues.selectionTrackBorderColor}
-									handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBorderColor, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
-								/>
-							</Column>
-						</Row>
+				<Row>
+					<Column>
+						<ColorPicker
+							label="Selected Track Border"
+							color={configValues.selectionTrackBorderColor}
+							handleChange={(value) => handleColor(value, EBrushAndZoomAreaSettings.SelectionTrackBorderColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
+						/>
+					</Column>
+				</Row>
 
-						<Row>
-							<Column>
-								<ToggleSwitch
-									label="Show Axis Labels"
-									value={configValues.isShowAxis}
-									handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis, setConfigValues)}
-									appearance="checkbox"
-								/>
-							</Column>
-						</Row>
-					</Accordion>
-				</Column>
-			</Row>
+				<Row>
+					<Column>
+						<ToggleSwitch
+							label="Show Axis Labels"
+							value={configValues.isShowAxis}
+							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsShowAxis, setConfigValues)}
+							appearance="checkbox"
+						/>
+					</Column>
+				</Row>
+			</AccordionAlt>
 
 			<ConditionalWrapper visible={configValues.enabled}>
 				{UIWidthSettings(shadow, configValues, setConfigValues)}

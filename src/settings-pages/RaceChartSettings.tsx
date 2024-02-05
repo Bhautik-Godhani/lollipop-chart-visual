@@ -11,7 +11,7 @@ import {
   SelectInput,
   ColorPicker,
   Quote,
-  Accordion,
+  AccordionAlt,
 } from "@truviz/shadow/dist/Components";
 import { IRaceChartSettings } from "../visual-settings.interface";
 import { ERaceChartSettings } from "../enum";
@@ -99,157 +99,141 @@ const RaceChartSettings = (props) => {
         </Row>
 
         <ConditionalWrapper visible={configValues.isEnabled}>
-          <Row>
-            <Column>
-              <Accordion title="Animation Transition"
-                open={configValues.allowTransition}
-                isShowToggle={true}
-                showToggleValue={configValues.allowTransition}
-                onShowToggleChange={(value) => handleChange(value, ERaceChartSettings.AllowTransition)}
-                negativeMargins={false}
-                childTopPadding={false}
-                childBottomPadding={true}>
-                <Row>
-                  <Column>
-                    <InputControl
-                      min={0}
-                      type="number"
-                      label="Interval"
-                      value={configValues.dataChangeInterval.toString()}
-                      handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
-                    />
-                  </Column>
 
-                  <Column>
-                    <InputControl
-                      min={0}
-                      type="number"
-                      label="Duration"
-                      value={configValues.transitionDuration.toString()}
-                      handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
-                    />
-                  </Column>
-                </Row>
-              </Accordion>
-            </Column>
-          </Row>
+          <AccordionAlt title="Animation Transition"
+            open={configValues.allowTransition}
+            showToggle={true}
+            toggleValue={configValues.allowTransition}
+            onChangeToggle={(value) => handleChange(value, ERaceChartSettings.AllowTransition)}
+          >
+            <Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Interval"
+                  value={configValues.dataChangeInterval.toString()}
+                  handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
+                />
+              </Column>
 
-          <Row>
-            <Column>
-              <Accordion title="Text Styles"
-                open={true}
-                negativeMargins={false}
-                childTopPadding={false}
-                childBottomPadding={true}>
-                <Row>
-                  <Column>
-                    <ToggleButton
-                      label={"Auto Text Size"}
-                      value={configValues.isLabelAutoFontSize}
-                      handleChange={() => handleCheckbox(ERaceChartSettings.IsLabelAutoFontSize)}
-                      appearance="toggle"
-                    />
-                  </Column>
-                </Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Duration"
+                  value={configValues.transitionDuration.toString()}
+                  handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
+                />
+              </Column>
+            </Row>
+          </AccordionAlt>
 
-                <ConditionalWrapper visible={!configValues.isLabelAutoFontSize}>
-                  <Row appearance="padded">
-                    <Column>
-                      <InputControl
-                        min={0}
-                        type="number"
-                        label="Text Size"
-                        value={configValues.labelFontSize.toString()}
-                        handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize)}
-                      />
-                    </Column>
-                  </Row>
-                </ConditionalWrapper>
+          <AccordionAlt title="Text Styles"
+            open={true}
+          >
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Auto Text Size"}
+                  value={configValues.isLabelAutoFontSize}
+                  handleChange={() => handleCheckbox(ERaceChartSettings.IsLabelAutoFontSize)}
+                  appearance="toggle"
+                />
+              </Column>
+            </Row>
 
-                <Row>
-                  <Column>
-                    <SelectInput
-                      label={"Label Font Family"}
-                      value={configValues.labelFontFamily}
-                      isFontSelector={true}
-                      optionsList={[]}
-                      handleChange={value => handleChange(value, ERaceChartSettings.LabelFontFamily)}
-                    />
-                  </Column>
-                </Row>
+            <ConditionalWrapper visible={!configValues.isLabelAutoFontSize}>
+              <Row appearance="padded">
+                <Column>
+                  <InputControl
+                    min={0}
+                    type="number"
+                    label="Text Size"
+                    value={configValues.labelFontSize.toString()}
+                    handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize)}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
 
-                <Row>
-                  <Column>
-                    <ColorPicker
-                      label={"Label Color"}
-                      color={configValues.labelColor}
-                      handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
-                      colorPalette={vizOptions.host.colorPalette}
-                      size="sm"
-                    />
-                  </Column>
-                </Row>
-              </Accordion>
-            </Column>
-          </Row>
+            <Row>
+              <Column>
+                <SelectInput
+                  label={"Label Font Family"}
+                  value={configValues.labelFontFamily}
+                  isFontSelector={true}
+                  optionsList={[]}
+                  handleChange={value => handleChange(value, ERaceChartSettings.LabelFontFamily)}
+                />
+              </Column>
+            </Row>
 
-          <Row>
-            <Column>
-              <Accordion title="Play Button"
-                open={true}
-                negativeMargins={false}
-                childTopPadding={false}
-                childBottomPadding={true}>
-                <Row>
-                  <Column>
-                    <ToggleButton
-                      label={"Auto Play Button Radius"}
-                      value={configValues.isTickerButtonAutoRadius}
-                      handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
-                      appearance="toggle"
-                    />
-                  </Column>
-                </Row>
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Label Color"}
+                  color={configValues.labelColor}
+                  handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+          </AccordionAlt>
 
-                <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
-                  <Row>
-                    <Column>
-                      <InputControl
-                        min={0}
-                        type="number"
-                        label="Radius"
-                        value={configValues.tickerButtonRadius.toString()}
-                        handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
-                      />
-                    </Column>
+          <AccordionAlt title="Play Button"
+            open={true}
+          >
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Auto Play Button Radius"}
+                  value={configValues.isTickerButtonAutoRadius}
+                  handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
+                  appearance="toggle"
+                />
+              </Column>
+            </Row>
 
-                    <Column>
-                      <ColorPicker
-                        label={"Play Button Color"}
-                        color={configValues.tickerButtonColor}
-                        handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                        colorPalette={vizOptions.host.colorPalette}
-                      />
-                    </Column>
-                  </Row>
-                </ConditionalWrapper>
+            <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
+              <Row>
+                <Column>
+                  <InputControl
+                    min={0}
+                    type="number"
+                    label="Radius"
+                    value={configValues.tickerButtonRadius.toString()}
+                    handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
+                  />
+                </Column>
 
-                <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
-                  <Row>
-                    <Column>
-                      <ColorPicker
-                        label={"Play Button Color"}
-                        color={configValues.tickerButtonColor}
-                        handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                        colorPalette={vizOptions.host.colorPalette}
-                        size="sm"
-                      />
-                    </Column>
-                  </Row>
-                </ConditionalWrapper>
-              </Accordion>
-            </Column>
-          </Row>
+                <Column>
+                  <ColorPicker
+                    label={"Play Button Color"}
+                    color={configValues.tickerButtonColor}
+                    handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                    colorPalette={vizOptions.host.colorPalette}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
+              <Row>
+                <Column>
+                  <ColorPicker
+                    label={"Play Button Color"}
+                    color={configValues.tickerButtonColor}
+                    handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                    colorPalette={vizOptions.host.colorPalette}
+                    size="sm"
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+          </AccordionAlt>
+
         </ConditionalWrapper>
       </ConditionalWrapper>
 

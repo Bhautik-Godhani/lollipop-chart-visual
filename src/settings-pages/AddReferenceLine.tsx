@@ -27,7 +27,7 @@ import {
   Footer,
   SelectInput,
   ColorPicker,
-  Accordion,
+  AccordionAlt,
   Tabs,
   Tab,
   PopupModHeader,
@@ -467,16 +467,14 @@ const UILineStyleOptions = (vizOptions: ShadowUpdateOptions, configValues: IRefe
 }
 
 const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
-  return <Row enableBottomPadding>
+  return <Row disableTopPadding>
     <Column>
-      <Accordion title="Label Styles"
+      <AccordionAlt title="Label Styles"
         open={configValues.show}
-        isShowToggle={true}
-        showToggleValue={configValues.show}
-        onShowToggleChange={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
-        negativeMargins={false}
-        childTopPadding={false}
-        childBottomPadding={true}>
+        showToggle={true}
+        toggleValue={configValues.show}
+        onChangeToggle={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
+      >
         <Row>
           <Column>
             <SelectInput
@@ -590,19 +588,17 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
         </Row>
 
         {UILabelStyles1(shadow, config, configValues, handleChange)}
-      </Accordion>
+      </AccordionAlt>
     </Column>
   </Row>
 }
 
 const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceBandStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
-  return <Row enableBottomPadding>
+  return <Row disableTopPadding>
     <Column>
-      <Accordion title="Band Styles"
+      <AccordionAlt title="Band Styles"
         open={true}
-        negativeMargins={false}
-        childTopPadding={false}
-        childBottomPadding={true}>
+      >
         <Row>
           <Column>
             <ToggleButton
@@ -627,7 +623,7 @@ const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVal
             </Column>
           </Row>
         </ConditionalWrapper>
-      </Accordion>
+      </AccordionAlt>
     </Column>
   </Row>
 }
@@ -702,29 +698,17 @@ const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, han
 
 const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <>
-    <Row>
-      <Column>
-        <Accordion title="General"
-          open={true}
-          negativeMargins={false}
-          childTopPadding={false}
-          childBottomPadding={true}>
-          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
-        </Accordion>
-      </Column>
-    </Row>
+    <AccordionAlt title="General"
+      open={true}
+    >
+      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+    </AccordionAlt>
 
-    <Row>
-      <Column>
-        <Accordion title="Line Options"
-          open={true}
-          negativeMargins={false}
-          childTopPadding={false}
-          childBottomPadding={true}>
-          {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
-        </Accordion>
-      </Column>
-    </Row>
+    <AccordionAlt title="Line Options"
+      open={true}
+    >
+      {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
+    </AccordionAlt>
 
     {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
   </>
@@ -732,40 +716,27 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
 
 const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
   return <>
-    <Row>
-      <Column>
-        <Accordion title="General"
-          open={true}
-          negativeMargins={false}
-          childTopPadding={false}
-          childBottomPadding={true}>
+    <AccordionAlt title="General"
+      open={true}
+    >
+      <Tabs selected={"Band_Start"}>
+        <Tab title={"Band Start"} identifier={"Band_Start"}>
+          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+        </Tab>
+        <Tab title={"Band End"} identifier={"Band_End"}>
+          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
+        </Tab>
+      </Tabs >
+    </AccordionAlt>
 
-          <Tabs selected={"Band_Start"}>
-            <Tab title={"Band Start"} identifier={"Band_Start"}>
-              {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
-            </Tab>
-            <Tab title={"Band End"} identifier={"Band_End"}>
-              {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
-            </Tab>
-          </Tabs >
-        </Accordion>
+    <AccordionAlt title="Line Options"
+      open={true}
+    >
+      {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
+    </AccordionAlt>
 
-        <Row>
-          <Column>
-            <Accordion title="Line Options"
-              open={true}
-              negativeMargins={false}
-              childTopPadding={false}
-              childBottomPadding={true}>
-              {UILineStyleOptions(vizOptions, configValues.lineStyle, handleChange)}
-            </Accordion>
-          </Column>
-        </Row>
-
-        {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
-        {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
-      </Column>
-    </Row>
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
+    {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)}
   </>
 }
 

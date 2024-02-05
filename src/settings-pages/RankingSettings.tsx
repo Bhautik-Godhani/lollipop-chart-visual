@@ -1,7 +1,7 @@
 import * as React from "react";
 import { RANKING_SETTINGS as RANKING_SETTINGS_IMP } from "../constants";
 import {
-	Accordion,
+	AccordionAlt,
 	ColorPicker,
 	// ColorPicker,
 	Column,
@@ -252,7 +252,7 @@ const Ranking = (props) => {
 
 	return (
 		<>
-			<Accordion title="By Category" childBottomPadding>
+			<AccordionAlt title="By Category">
 				<Row>
 					<Column>
 						<ToggleButton
@@ -267,10 +267,10 @@ const Ranking = (props) => {
 				<ConditionalWrapper visible={categoryRanking.enabled}>
 					{UIByCategoryRankingSettings(vizOptions, categoryRanking, setConfigValues)}
 				</ConditionalWrapper>
-			</Accordion>
+			</AccordionAlt>
 
 			<ConditionalWrapper visible={shadow.isHasSubcategories}>
-				<Accordion title="By Sub-category" childBottomPadding>
+				<AccordionAlt title="By Sub-category">
 					<Row>
 						<Column>
 							<ToggleButton
@@ -285,7 +285,7 @@ const Ranking = (props) => {
 					<ConditionalWrapper visible={groupByRanking.enabled}>
 						{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
 					</ConditionalWrapper>
-				</Accordion>
+				</AccordionAlt>
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}

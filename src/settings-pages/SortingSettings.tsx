@@ -3,7 +3,7 @@ import * as React from "react";
 import { SORTING_SETTINGS as SORTING_SETTINGS_IMP } from "../constants";
 import { parseObject, persistProperties } from "../methods/methods";
 import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
-import { Accordion, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
+import { AccordionAlt, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, ISortingProps, ISortingSettings } from "../visual-settings.interface";
 
 const SORT_ORDER: ILabelValuePair[] = [
@@ -154,7 +154,7 @@ const UIGroupBySortingSettings = (
 	);
 };
 
-const UICategorySortingWithoutAccordionSettings = (
+const UICategorySortingWithoutAccordionAltSettings = (
 	shadow: any,
 	categorySettings: ISortingProps,
 	CATEGORY_SORT_ON: ILabelValuePair[],
@@ -348,16 +348,16 @@ const SortingSettings = (props) => {
 	return (
 		<>
 			<ConditionalWrapper visible={shadow.isHasSubcategories}>
-				<Accordion title="By Category" childBottomPadding>
+				<AccordionAlt title="By Category">
 					{UICategorySortingSettings(categorySettings, CATEGORY_SORT_ON, setConfigValues)}
-				</Accordion>
+				</AccordionAlt>
 
-				<Accordion title="By Sub-category" childBottomPadding>
+				<AccordionAlt title="By Sub-category">
 					{UIGroupBySortingSettings(groupBySettings, GROUP_BY_SORT_ON, setConfigValues)}
-				</Accordion>
+				</AccordionAlt>
 			</ConditionalWrapper>
 
-			{!shadow.isHasSubcategories && UICategorySortingWithoutAccordionSettings(shadow, categorySettings, CATEGORY_SORT_ON, setConfigValues)}
+			{!shadow.isHasSubcategories && UICategorySortingWithoutAccordionAltSettings(shadow, categorySettings, CATEGORY_SORT_ON, setConfigValues)}
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
