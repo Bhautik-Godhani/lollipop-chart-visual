@@ -177,7 +177,7 @@ import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./m
 import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
-import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings, SmallMultiplesSettings } from "./SmallMultiplesGridLayout";
+import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings, SmallMultiplesSettings } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout";
 import { COLORBREWER } from "./color-schemes";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
@@ -693,7 +693,7 @@ export class Visual extends Shadow {
 					name: "Small Multiples",
 					sectionName: EVisualConfig.SmallMultiplesConfig,
 					propertyName: EVisualSettings.SmallMultiplesSettings,
-					Component: () => SmallMultiplesSettings,
+					Component: Components.SmallMultiples,
 					icon: SmallMultipleIcon
 				},
 				{
@@ -5701,8 +5701,12 @@ export class Visual extends Shadow {
 					text = text.split("--")[0];
 				}
 
-				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis) {
-					text = FormatAxisDate(THIS.xAxisSettings.dateFormat, new Date(text));
+				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart) {
+					if (xAxisSettings.isAutoDateFormat) {
+						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
+					} else {
+						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+					}
 				}
 
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
@@ -5801,8 +5805,12 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				let text = ele.text();
 
-				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis) {
-					text = FormatAxisDate(THIS.yAxisSettings.dateFormat, new Date(text));
+				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
+					if (yAxisSettings.isAutoDateFormat) {
+						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
+					} else {
+						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+					}
 				}
 
 				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {

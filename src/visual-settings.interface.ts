@@ -75,6 +75,7 @@ export interface IXAxisSettings {
 	isInvertRange: boolean;
 	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
+	customDateFormat: string;
 }
 
 export interface IYAxisSettings {
@@ -104,6 +105,7 @@ export interface IYAxisSettings {
 	isInvertRange: boolean;
 	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
+	customDateFormat: string;
 }
 
 export interface ICirclePropsSettings {

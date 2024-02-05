@@ -394,13 +394,15 @@ export enum EXAxisSettings {
 	MaximumRange = "maximumRange",
 	IsInvertRange = "isInvertRange",
 	IsAutoDateFormat = "isAutoDateFormat",
-	DateFormat = "dateFormat"
+	DateFormat = "dateFormat",
+	CustomDateFormat = "customDateFormat"
 }
 
 export enum EAxisDateFormats {
-	DDMMYYYY = "dd:mm:yyyy",
-	DDMMYYYYHHMM = "dd:mm:yyyy hh:mm",
-	DDMMYYYYHHMMAMPM = "dd:mm:yyyy hh:mm am/pm"
+	Custom = "custom",
+	DDMMYYYY = "DD:MM:YYYY",
+	DDMMYYYYHHMM = "DD:MM:YYYY HH:mm",
+	DDMMYYYYHHMMAMPM = "DD:MM:YYYY hh:mm A"
 }
 
 export enum EYAxisSettings {
@@ -428,7 +430,8 @@ export enum EYAxisSettings {
 	MaximumRange = "maximumRange",
 	IsInvertRange = "isInvertRange",
 	IsAutoDateFormat = "isAutoDateFormat",
-	DateFormat = "dateFormat"
+	DateFormat = "dateFormat",
+	CustomDateFormat = "customDateFormat"
 }
 
 export enum EMarkerSettings {

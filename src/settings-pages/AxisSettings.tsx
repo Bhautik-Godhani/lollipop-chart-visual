@@ -57,6 +57,10 @@ const AXIS_MODE: ILabelValuePair[] = [
 
 const AXIS_DATE_FORMATS: ILabelValuePair[] = [
   {
+    label: "Custom",
+    value: EAxisDateFormats.Custom,
+  },
+  {
     label: "DD:MM:YYYY",
     value: EAxisDateFormats.DDMMYYYY,
   },
@@ -457,12 +461,30 @@ const UIXAxis = (
           <ConditionalWrapper visible={!xConfigValues.isAutoDateFormat}>
             <Row appearance="padded">
               <Column>
-                <SelectInput
-                  label={"Date Format"}
-                  value={xConfigValues.dateFormat}
-                  optionsList={AXIS_DATE_FORMATS}
-                  handleChange={value => handleXChange(value, EXAxisSettings.DateFormat, setXConfigValues)}
-                />
+                <Row>
+                  <Column>
+                    <SelectInput
+                      label={"Date Format"}
+                      value={xConfigValues.dateFormat}
+                      optionsList={AXIS_DATE_FORMATS}
+                      handleChange={value => handleXChange(value, EXAxisSettings.DateFormat, setXConfigValues)}
+                    />
+                  </Column>
+                </Row>
+
+                <ConditionalWrapper visible={xConfigValues.dateFormat === EAxisDateFormats.Custom}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="text"
+                        placeholder="DD:MM:YYYY hh:mm A"
+                        label=""
+                        value={xConfigValues.customDateFormat}
+                        handleChange={(value) => handleXChange(value, EXAxisSettings.CustomDateFormat, setXConfigValues)}
+                      />
+                    </Column>
+                  </Row>
+                </ConditionalWrapper>
               </Column>
             </Row>
           </ConditionalWrapper>
@@ -790,12 +812,30 @@ const UIYAxis = (
           <ConditionalWrapper visible={yConfigValues.isAutoDateFormat}>
             <Row appearance="padded">
               <Column>
-                <SelectInput
-                  label={"Date Format"}
-                  value={yConfigValues.dateFormat}
-                  optionsList={AXIS_DATE_FORMATS}
-                  handleChange={value => handleYChange(value, EYAxisSettings.DateFormat, setYConfigValues)}
-                />
+                <Row>
+                  <Column>
+                    <SelectInput
+                      label={"Date Format"}
+                      value={yConfigValues.dateFormat}
+                      optionsList={AXIS_DATE_FORMATS}
+                      handleChange={value => handleYChange(value, EYAxisSettings.DateFormat, setYConfigValues)}
+                    />
+                  </Column>
+                </Row>
+
+                <ConditionalWrapper visible={yConfigValues.dateFormat === EAxisDateFormats.Custom}>
+                  <Row>
+                    <Column>
+                      <InputControl
+                        type="text"
+                        placeholder="DD:MM:YYYY hh:mm A"
+                        label=""
+                        value={yConfigValues.customDateFormat}
+                        handleChange={(value) => handleYChange(value, EYAxisSettings.CustomDateFormat, setYConfigValues)}
+                      />
+                    </Column>
+                  </Row>
+                </ConditionalWrapper>
               </Column>
             </Row>
           </ConditionalWrapper>

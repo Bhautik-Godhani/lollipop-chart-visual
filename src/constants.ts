@@ -234,7 +234,8 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	minimumRange: 0,
 	isInvertRange: false,
 	isAutoDateFormat: true,
-	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
+	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
+	customDateFormat: "DD:MM:YYYY hh:mm A"
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -263,7 +264,8 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	minimumRange: 0,
 	isInvertRange: false,
 	isAutoDateFormat: true,
-	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM
+	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
+	customDateFormat: "DD:MM:YYYY hh:mm A"
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {
