@@ -135,10 +135,11 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	isAutoFontSize: true,
 	showLabelsBelowReferenceLine: false,
 	isColorChanged: false,
-	textColorTypes: EInsideTextColorTypes.FIXED,
+	textColorTypes: EInsideTextColorTypes.CONTRAST,
 	applyFor: EDataLabelsBGApplyFor.ONLY_PATTERNS,
 	isShowBGChangedWhenPatternApplied: false,
-	isShowBestFitLabels: true
+	isShowBestFitLabels: true,
+	isTextColorTypeChanged: false
 };
 
 export const X_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {

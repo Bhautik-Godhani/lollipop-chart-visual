@@ -244,7 +244,8 @@ export enum EDataLabelsSettings {
 	textColorTypes = "textColorTypes",
 	applyFor = "applyFor",
 	isShowBGChangedWhenPatternApplied = "isShowBGChangedWhenPatternApplied",
-	isShowBestFitLabels = "isShowBestFitLabels"
+	isShowBestFitLabels = "isShowBestFitLabels",
+	IsTextColorTypeChanged = "isTextColorTypeChanged"
 }
 
 export enum EGridLinesSettings {

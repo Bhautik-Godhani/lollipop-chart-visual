@@ -223,6 +223,7 @@ export interface IDataLabelsSettings {
 	applyFor: EDataLabelsBGApplyFor,
 	isShowBGChangedWhenPatternApplied: boolean;
 	isShowBestFitLabels: boolean;
+	isTextColorTypeChanged: boolean;
 }
 
 export interface IDataColorsSettings {

@@ -333,7 +333,10 @@ const UIInsideLabelsTextColorSettings = (
 					label="Font Color"
 					value={insideDataLabels.textColorTypes}
 					optionsList={INSIDE_TEXT_COLOR_TYPES}
-					handleChange={(value) => handleChange(value, EDataLabelsSettings.textColorTypes, setConfigValues)}
+					handleChange={(value) => {
+						handleChange(value, EDataLabelsSettings.textColorTypes, setConfigValues);
+						handleChange(true, EDataLabelsSettings.IsTextColorTypeChanged, setConfigValues);
+					}}
 				/>
 			</Column>
 		</Row>
@@ -503,15 +506,19 @@ const DataLabelsSettings = (props) => {
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		// if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+		// 	handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		// }
+
+		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
+			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, setConfigValues);
 		}
 	}, []);
 
 	React.useEffect(() => {
-		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
-		}
+		// if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+		// 	handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		// }
 	}, [configValues.placement, configValues.textColorTypes]);
 
 	return (
