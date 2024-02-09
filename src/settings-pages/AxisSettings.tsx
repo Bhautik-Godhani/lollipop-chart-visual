@@ -191,8 +191,8 @@ const UIXAxis = (
                 min={0}
                 type="number"
                 label=""
-                value={xConfigValues.minimumRange.toString()}
-                handleChange={(value) => handleXChange(+value, EXAxisSettings.MinimumRange, setXConfigValues)}
+                value={xConfigValues.minimumRange}
+                handleChange={(value) => handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues)}
               />
             </Column>
             <Column></Column>
@@ -217,8 +217,8 @@ const UIXAxis = (
                 min={0}
                 type="number"
                 label=""
-                value={xConfigValues.maximumRange.toString()}
-                handleChange={(value) => handleXChange(+value, EXAxisSettings.MaximumRange, setXConfigValues)}
+                value={xConfigValues.maximumRange}
+                handleChange={(value) => handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues)}
               />
             </Column>
             <Column></Column>
@@ -334,8 +334,8 @@ const UIXAxis = (
             <InputControl
               label="Text Size"
               type="number"
-              value={xConfigValues.titleFontSize.toString()}
-              handleChange={(value: any) => handleXChange(+value, EXAxisSettings.TitleFontSize, setXConfigValues)}
+              value={xConfigValues.titleFontSize}
+              handleChange={(value: any) => handleXChange(value, EXAxisSettings.TitleFontSize, setXConfigValues)}
               min={1}
             />
           </Column>
@@ -362,8 +362,8 @@ const UIXAxis = (
             <InputControl
               label="Text Size"
               type="number"
-              value={xConfigValues.labelFontSize.toString()}
-              handleChange={(value: any) => handleXChange(+value, EXAxisSettings.LabelFontSize, setXConfigValues)}
+              value={xConfigValues.labelFontSize}
+              handleChange={(value: any) => handleXChange(value, EXAxisSettings.LabelFontSize, setXConfigValues)}
               min={1}
             />
           </Column>
@@ -556,8 +556,8 @@ const UIYAxis = (
                 min={0}
                 type="number"
                 label=""
-                value={yConfigValues.minimumRange.toString()}
-                handleChange={(value) => handleYChange(+value, EXAxisSettings.MinimumRange, setYConfigValues)}
+                value={yConfigValues.minimumRange}
+                handleChange={(value) => handleYChange(value, EXAxisSettings.MinimumRange, setYConfigValues)}
               />
             </Column>
             <Column></Column>
@@ -582,8 +582,8 @@ const UIYAxis = (
                 min={0}
                 type="number"
                 label=""
-                value={yConfigValues.maximumRange.toString()}
-                handleChange={(value) => handleYChange(+value, EXAxisSettings.MaximumRange, setYConfigValues)}
+                value={yConfigValues.maximumRange}
+                handleChange={(value) => handleYChange(value, EXAxisSettings.MaximumRange, setYConfigValues)}
               />
             </Column>
             <Column></Column>
@@ -698,8 +698,8 @@ const UIYAxis = (
               <InputControl
                 label="Text Size"
                 type="number"
-                value={yConfigValues.titleFontSize.toString()}
-                handleChange={(value: any) => handleYChange(+value, EYAxisSettings.TitleFontSize, setYConfigValues)}
+                value={yConfigValues.titleFontSize}
+                handleChange={(value: any) => handleYChange(value, EYAxisSettings.TitleFontSize, setYConfigValues)}
                 min={1}
               />
             </Column>
@@ -727,8 +727,8 @@ const UIYAxis = (
             <InputControl
               label="Text Size"
               type="number"
-              value={yConfigValues.labelFontSize.toString()}
-              handleChange={(value: any) => handleYChange(+value, EYAxisSettings.LabelFontSize, setYConfigValues)}
+              value={yConfigValues.labelFontSize}
+              handleChange={(value: any) => handleYChange(value, EYAxisSettings.LabelFontSize, setYConfigValues)}
               min={1}
             />
           </Column>
