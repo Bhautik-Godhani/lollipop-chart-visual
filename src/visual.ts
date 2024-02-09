@@ -133,7 +133,7 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
-import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
+// import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
@@ -446,7 +446,7 @@ export class Visual extends Shadow {
 
 	// annotations
 	annotationBarClass: string = "annotation-slice";
-	visualAnnotations: VisualAnnotations;
+	// visualAnnotations: VisualAnnotations;
 
 	// patterns
 	categoryPatterns: IPatternProps[] = [];
@@ -7533,8 +7533,8 @@ export class Visual extends Shadow {
 	}
 
 	updateAnnotationNodeElements(): void {
-		this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
-		this.visualAnnotations.renderAnnotations();
+		// this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
+		// this.visualAnnotations.renderAnnotations();
 	}
 
 	setCircle1Formatting(circleSelection: D3Selection<any>, marker: IMarkerData, isEnter: boolean): void {
@@ -7726,11 +7726,13 @@ export class Visual extends Shadow {
 			}
 		}
 
-		return this.chartData[id].subCategories.map((data) => ({
+		const data = this.chartData[id].subCategories.map((data) => ({
 			value: isPie2 ? data.value2 : data.value1,
 			name: data.category,
 			itemStyle: { ...itemStyle, color: this.getColor(getPieFill(data, this.chartData[id]), EHighContrastColorType.Foreground), className: "pie-slice" },
 		}));
+
+		return data;
 	}
 
 	getPieSliceClass(category: string, subCategory: string): string {
@@ -7820,6 +7822,7 @@ export class Visual extends Shadow {
 						scale: false,
 					},
 					data: this.getPieChartSeriesDataByCategory(category, isPie2),
+					startAngle: 270
 				},
 			],
 		};
