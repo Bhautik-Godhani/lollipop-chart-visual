@@ -302,7 +302,7 @@ export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {
 
 export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	enabled: false,
-	minLollipopCount: 20,
+	minLollipopCount: 10,
 	isShowAxis: false,
 	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
 	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.4)",
