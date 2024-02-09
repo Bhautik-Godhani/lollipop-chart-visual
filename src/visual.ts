@@ -3932,6 +3932,10 @@ export class Visual extends Shadow {
 			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
 		}
 
+		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.dataLabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.dataLabelsSettings.isTextColorTypeChanged) {
+			this.dataLabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
+		}
+
 		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
 		this.isLeftYAxis = this.yAxisSettings.position === Position.Left;
 
@@ -4991,7 +4995,7 @@ export class Visual extends Shadow {
 				) {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
 						const xPos = x;
-						const yPos = y - markerSize - labelDistance;
+						const yPos = y - markerSize - labelDistance + (this.xAxisSettings.position === Position.Top ? bBox.height / 2 : 0);
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
 						// const xPos = x;
@@ -5001,7 +5005,7 @@ export class Visual extends Shadow {
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
 						const xPos = x;
-						const yPos = y + markerSize + labelDistance;
+						const yPos = y + markerSize + labelDistance + (this.xAxisSettings.position === Position.Top ? bBox.height / 2 : 0);
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
 						// const xPos = x - bBox.height / 2;
