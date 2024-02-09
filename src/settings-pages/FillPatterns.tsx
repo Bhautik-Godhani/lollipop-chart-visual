@@ -155,7 +155,7 @@ const FillPatterns = (props) => {
 				<Row>
 					<Column>
 						<ToggleButton
-							label={"Enabled"}
+							label={"Enable"}
 							value={configValues.enabled}
 							handleChange={() => handleCheckbox(EPatternSettings.Enabled, setConfigValues)}
 							appearance="toggle"
