@@ -304,6 +304,7 @@ export class Visual extends Shadow {
 	public brushLollipopG: D3Selection<SVGElement>;
 	public brushHeight: number = 0;
 	public brushWidth: number = 0;
+	public brushMargin: number = 0;
 	public isHorizontalBrushDisplayed: boolean;
 	public isVerticalBrushDisplayed: boolean;
 	public minScaleBandWidth: number = 0;
@@ -2055,6 +2056,7 @@ export class Visual extends Shadow {
 			this.isInFocusMode = vizOptions.options.isInFocus;
 			this.isValidShowBucket = true;
 			this.brushWidth = 0;
+			this.brushMargin = 0;
 			this.brushHeight = 0;
 			this.isChartIsRaceChart = false;
 			this.isChartRacePossible = false;
@@ -2380,6 +2382,7 @@ export class Visual extends Shadow {
 
 				if (this.isVerticalBrushDisplayed) {
 					this.brushWidth = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaWidth : 10;
+					this.brushMargin = 10;
 				}
 
 				this.conditionalFormattingConditions
@@ -3027,10 +3030,10 @@ export class Visual extends Shadow {
 
 		if (this.yAxisSettings.position === Position.Left) {
 			this.margin.left = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.expandAllYScaleGWidth;
-			this.margin.right = this.brushWidth + this.brushYAxisTicksMaxWidth;
+			this.margin.right = this.brushWidth + this.brushMargin + this.brushYAxisTicksMaxWidth;
 		} else if (this.yAxisSettings.position === Position.Right) {
 			this.margin.left = this.yAxisTitleMargin;
-			this.margin.right = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.brushWidth + this.expandAllYScaleGWidth + this.brushYAxisTicksMaxWidth;
+			this.margin.right = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.brushWidth + this.brushMargin + this.expandAllYScaleGWidth + this.brushYAxisTicksMaxWidth;
 		}
 
 		this.setChartWidthHeight();
@@ -4456,6 +4459,7 @@ export class Visual extends Shadow {
 				this.isVerticalBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
 				this.brushWidth = 0;
+				this.brushMargin = 0;
 				this.drawXYAxis(true, true);
 			}
 		};
