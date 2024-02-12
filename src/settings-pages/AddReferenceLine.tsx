@@ -37,6 +37,8 @@ import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVer
 import { ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
+import { min as d3Min, max as d3Max, mean, median } from "d3-array";
+import { calculateStandardDeviation } from "../methods/methods";
 
 const AXIS_NAMES: ILabelValuePair[] = [
   {
@@ -988,9 +990,65 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
       handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
       handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2);
-      handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
+
+      if (!configValues.lineValue2.computation) {
+        handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
+      }
     }
   }, [configValues.lineValue1.axis, configValues.lineValue1.type, configValues.lineValue1.computation]);
+
+  const setLineValue = (isLine2: boolean) => {
+    const rLine = configValues;
+    const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
+    const type = isLine2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
+    if (rLineValue.type === EReferenceLinesType.Value && rLineValue.axis === EXYAxisNames.Y) {
+      let values = [];
+      const isCategoricalReferenceLinesMeasure = shadow.categoricalReferenceLinesNames.includes(rLineValue.axis);
+
+      if (isCategoricalReferenceLinesMeasure) {
+        const referenceLineData = shadow.categoricalReferenceLinesDataFields.filter(
+          (d) => d.source.displayName === rLineValue.axis
+        );
+        values = referenceLineData.reduce((arr, cur) => [...arr, ...cur.values], []);
+      }
+
+      if (!isCategoricalReferenceLinesMeasure) {
+        values = shadow.chartData.map((d) => (d.value1));
+      }
+
+      switch (rLineValue.computation) {
+        case EReferenceLineComputation.ZeroBaseline:
+          handleChange(0 + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.Min:
+          handleChange(d3Min(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.Max:
+          handleChange(d3Max(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.Average:
+          handleChange(mean(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.Median:
+          handleChange(median(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.StandardDeviation:
+          handleChange(calculateStandardDeviation(values) + "", EReferenceLineValueProps.Value, type);
+          break;
+        case EReferenceLineComputation.Fixed:
+          break;
+      }
+    }
+  }
+
+  React.useEffect(() => {
+    setLineValue(false);
+  }, [configValues.lineValue1]);
+
+  React.useEffect(() => {
+    setLineValue(true);
+  }, [configValues.lineValue2]);
+
 
   const resetChanges = () => {
     setConfigValues(() => defaultSettings);
