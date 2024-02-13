@@ -6073,11 +6073,21 @@ export class Visual extends Shadow {
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
 		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
 		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
-		const negDataLabelHeight = this.isHasNegativeValue ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
+		const data1Labels = d3.map(this.chartData, d => this.formatNumber(d.value1, this.numberSettings, this.measureNumberFormatter[0], true, true));
+		const data1LabelWidth = getSVGTextSize((data1Labels.find(d => d.length === d3.max(data1Labels, d => d.length))),
+			this.dataLabelsSettings.fontFamily,
+			this.dataLabelsSettings.fontSize,
+			this.dataLabelsSettings.fontStyle[EFontStyle.Bold],
+			this.dataLabelsSettings.fontStyle[EFontStyle.Italic],
+			this.dataLabelsSettings.fontStyle[EFontStyle.UnderLine]).width;
+
+		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
 		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
+		const outsideDataLabelWidth = (this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth : 0) + this.markerMaxSize;
+		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth + this.markerMaxSize : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelHeight, xScaleWidth - negDataLabelHeight] : [xScaleWidth - this.xAxisStartMargin - negDataLabelHeight, this.markerMaxSize + negDataLabelHeight];
+			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth, this.markerMaxSize + outsideDataLabelWidth];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
