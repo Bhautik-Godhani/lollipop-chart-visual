@@ -2247,7 +2247,7 @@ export class Visual extends Shadow {
 			const popupOptionsHeader = document.querySelector(".popup-options-header");
 			this.settingsPopupOptionsWidth = popupOptions ? (popupOptions.clientWidth ? popupOptions.clientWidth : 0) : 0;
 			this.settingsPopupOptionsHeight = popupOptions ? (popupOptions.clientHeight ? popupOptions.clientHeight : 0) : 0;
-			this.settingsBtnWidth = vizOptions.options.isInFocus ? this.settingsPopupOptionsWidth : 0;
+			this.settingsBtnWidth = vizOptions.options.isInFocus ? this.settingsPopupOptionsWidth + 5 : 0;
 			this.settingsBtnHeight = popupOptionsHeader ? popupOptionsHeader.clientHeight : 0;
 
 			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;

@@ -32,13 +32,13 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     if (self.isHorizontalChart) {
         secG
             .append("rect")
-            .attr("width", width)
-            .attr("height", height + width)
+            .attr("width", height + width)
+            .attr("height", width)
             .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
             .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
             .attr("stroke-width", "3px")
-            // .attr("stroke-dasharray", `${width / 2} ${self.cutAndClipMarkerHeight} `)
-            .attr("transform", `translate(${0}, ${- (height + width) / 2}) rotate(${self.cutAndClipMarkerTilt})`);
+            .attr("stroke-dasharray", `${height + width} ${width} `)
+            .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
     } else {
         secG
             .append("rect")
@@ -47,7 +47,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
             .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
             .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
             .attr("stroke-width", "3px")
-            // .attr("stroke-dasharray", `${width} ${self.cutAndClipMarkerHeight} `)
+            .attr("stroke-dasharray", `${width} ${height} `)
             .attr(
                 "transform",
                 `translate(${0}, ${((width - 3) * self.cutAndClipMarkerTilt) / 100}) rotate(${- self.cutAndClipMarkerTilt})`
@@ -97,10 +97,7 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
         .data(filteredData, (d) => Math.random());
     imageGSelection.join(
         (enter) => {
-            const clipG = enter.append("g").attr("clip-path", (d) => {
-                return `url(#cutMarkerClipOnAxis)`;
-                // return `url(#${self.getBarIdByCategory(d?.category)}Clip)`;
-            });
+            const clipG = enter.append("g");
             const imageG = clipG.append("g").attr("class", "barCutAndClipMarkersG");
             const rect = imageG.append("rect").attr("class", "barCutAndClipRect");
             self.isHorizontalChart
@@ -126,12 +123,13 @@ export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelect
     });
 
     rectSelection
-        .attr("width", self.cutAndClipMarkerWidth)
-        .attr("height", rectHeight)
+        .attr("width", rectHeight)
+        .attr("height", self.cutAndClipMarkerWidth)
         .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
         .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
         .attr("stroke-width", "3px")
-        .attr("transform", `translate(${0}, ${- self.cutAndClipMarkerWidth / 2}) rotate(${self.cutAndClipMarkerTilt})`);
+        .attr("stroke-dasharray", `${rectHeight} ${self.cutAndClipMarkerHeight} `)
+        .attr("transform", `translate(${rectHeight}, ${- self.cutAndClipMarkerWidth / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
 }
 
 export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
@@ -149,7 +147,7 @@ export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSele
         .attr("height", self.cutAndClipMarkerHeight)
         .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
         .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
-        // .attr("stroke-dasharray", `${rectWidth} ${self.cutAndClipMarkerHeight} `)
+        .attr("stroke-dasharray", `${rectWidth} ${self.cutAndClipMarkerHeight} `)
         .attr("stroke-width", "3px")
         .attr(
             "transform",
