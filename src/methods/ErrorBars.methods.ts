@@ -1,15 +1,13 @@
 /* eslint-disable max-lines-per-function */
 import { Visual } from "../visual";
 import { select } from "d3-selection";
-import { area } from "d3";
+import { area, max, min } from "d3";
 import { ILollipopChartRow } from "../model";
 import { EErrorBandFillTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
 
 export const getErrorBarLine = (self: Visual, width: number, height: number) => {
     width = width === 1 ? 1 : width / 2 + 0.5;
-    if (!self.isHorizontalChart) {
-        return `M${width},${height}L-${width},${height}L-${width},0L${width},0Z`;
-    }
+    return `M${width},${height}L-${width},${height}L-${width},0L${width},0Z`;
 }
 
 export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]) => {
@@ -30,6 +28,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 // .attr("stroke-width", errorBars.borderSize)
                 .each(function (d) {
                     const isValue2 = self.isHasMultiMeasure && self.errorBarsSettings.measurement.applySettingsToMeasure === self.measure2DisplayName;
+                    let width = 0;
                     let height = 0;
                     let value1 = 0;
                     let value2 = 0;
@@ -50,25 +49,43 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
                     if (!self.isHorizontalChart) {
                         height = Math.abs(self.getYPosition(value1) - self.getYPosition(value2));
+                    } else {
+                        width = Math.abs(self.getXPosition(value1) - self.getXPosition(value2));
                     }
 
-                    select(this).datum({ ...d, height: height, errorBarValue1: value1, errorBarValue2: value2, });
+                    select(this).datum({ ...d, width: width, height: height, errorBarValue1: value1, errorBarValue2: value2, });
                 })
                 .attr("transform", (d: any) => {
-                    const value1 = d.errorBarValue1;
-                    const value2 = d.errorBarValue2;
+                    const value1 = self.isBottomXAxis ? min([d.errorBarValue1, d.errorBarValue2]) : max([d.errorBarValue1, d.errorBarValue2]);
+                    const value2 = self.isBottomXAxis ? max([d.errorBarValue1, d.errorBarValue2]) : min([d.errorBarValue1, d.errorBarValue2]);
 
-                    if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
-                        if (value1 > 0) {
-                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1)})`;
+                    if (self.isHorizontalChart) {
+                        if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
+                            if (self.isLeftYAxis ? value1 > 0 : value1 < 0) {
+                                return `translate(${self.getXPosition(value1)}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
+                            } else {
+                                return `translate(${self.getXPosition(value1) + d.width}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
+                            }
                         } else {
-                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1) - d.height})`;
+                            if (self.isLeftYAxis ? value1 > 0 : value1 < 0) {
+                                return `translate(${self.getXPosition(value2)}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
+                            } else {
+                                return `translate(${self.getXPosition(value2) + d.width}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
+                            }
                         }
                     } else {
-                        if (value1 > 0) {
-                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2)})`;
+                        if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
+                            if (self.isBottomXAxis ? value1 > 0 : value1 < 0) {
+                                return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1)}) rotate(0)`;
+                            } else {
+                                return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1) - d.height}) rotate(0)`;
+                            }
                         } else {
-                            return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2) - d.height})`;
+                            if (self.isBottomXAxis ? value1 > 0 : value1 < 0) {
+                                return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2)}) rotate(0)`;
+                            } else {
+                                return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2) - d.height}) rotate(0)`;
+                            }
                         }
                     }
                 });
@@ -82,7 +99,11 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("d", function (d: any) {
-                    return getErrorBarLine(self, errorBars.barWidth, d.height);
+                    if (self.isHorizontalChart) {
+                        return getErrorBarLine(self, errorBars.barWidth, d.width);
+                    } else {
+                        return getErrorBarLine(self, errorBars.barWidth, d.height);
+                    }
                 });
 
             errorBarG.append("use")
@@ -93,7 +114,11 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("transform", () => {
-                    return `translate(${-errorBars.markerSize / 2}, ${-errorBars.markerSize / 2})`;
+                    if (self.isHorizontalChart) {
+                        return `translate(${-errorBars.markerSize / 2}, ${-errorBars.markerSize / 2})`;
+                    } else {
+                        return `translate(${-errorBars.markerSize / 2}, ${-errorBars.markerSize / 2})`;
+                    }
                 });
 
             errorBarG.append("use")
@@ -104,14 +129,24 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.borderSize)
                 .attr("transform", (d: any) => {
-                    return `translate(${-errorBars.markerSize / 2}, ${d.height - errorBars.markerSize / 2})`;
+                    if (self.isHorizontalChart) {
+                        return `translate(${-errorBars.markerSize / 2}, ${d.width - errorBars.markerSize / 2})`;
+                    } else {
+                        return `translate(${-errorBars.markerSize / 2}, ${d.height - errorBars.markerSize / 2})`;
+                    }
                 });
 
             const errorBarUpperBoundLabelG = errorBarG.append("g")
                 .attr("class", "errorBarUpperBoundLabelG");
 
             const errorBarUpperBoundLabel = errorBarUpperBoundLabelG.append("text")
-                .text(d => d.labelUpperBoundValue)
+                .text(d => {
+                    if (self.isBottomXAxis) {
+                        return d.lowerBoundValue < d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                    } else {
+                        return d.lowerBoundValue > d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                    }
+                })
                 .attr("dy", "-0.5em")
                 .attr("fill", errorLabels.color)
                 .style("font-size", errorLabels.fontSize)
@@ -137,7 +172,13 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("class", "errorBarLowerBoundLabelG");
 
             errorBarLowerBoundLabelG.append("text")
-                .text(d => d.labelLowerBoundValue)
+                .text(d => {
+                    if (self.isBottomXAxis) {
+                        return d.upperBoundValue < d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                    } else {
+                        return d.upperBoundValue > d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                    }
+                })
                 .attr("dy", "0.15em")
                 .attr("fill", errorLabels.color)
                 .style("font-size", errorLabels.fontSize)
@@ -152,7 +193,11 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("text-anchor", "middle")
                 .attr("opacity", errorLabels.isEnabled ? "1" : "0")
                 .attr("transform", (d: any) => {
-                    return `translate(${0}, ${d.height + errorLabels.fontSize})`;
+                    if (self.isHorizontalChart) {
+                        return `translate(${0}, ${d.width + errorLabels.fontSize})`;
+                    } else {
+                        return `translate(${0}, ${d.height + errorLabels.fontSize})`;
+                    }
                 });
 
             select(errorBarLowerBoundLabelG as any).node().clone(true)
