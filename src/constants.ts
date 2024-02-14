@@ -451,7 +451,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		borderSize: 1
 	},
 	errorBand: {
-		isEnabled: true,
+		isEnabled: false,
 		isMatchSeriesColor: false,
 		fillType: EErrorBandFillTypes.Fill,
 		fillColor: "rgba(155, 155, 155, 0.4)",
@@ -462,9 +462,9 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		isEnabled: true,
 		fontSize: 10,
 		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
-		color: "rgba(102,102,102,1)",
-		showBackground: false,
-		backgroundColor: "rgba(0,0,0,0.2)",
+		color: "rgba(255,255,255,1)",
+		showBackground: true,
+		backgroundColor: "rgba(0,0,0,1)",
 		fontStyle: [],
 		labelFormat: EErrorBarsLabelFormat.Absolute
 	},
