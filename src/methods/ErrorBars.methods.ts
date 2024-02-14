@@ -3,7 +3,7 @@ import { Visual } from "../visual";
 import { select } from "d3-selection";
 import { area, max, min } from "d3";
 import { ILollipopChartRow } from "../model";
-import { EErrorBandFillTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
+import { EErrorBandFillTypes, EErrorBarsDirection, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
 
 export const getErrorBarLine = (self: Visual, width: number, height: number) => {
     width = width === 1 ? 1 : width / 2 + 0.5;
@@ -141,7 +141,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
             const errorBarUpperBoundLabel = errorBarUpperBoundLabelG.append("text")
                 .text(d => {
-                    if (self.isBottomXAxis) {
+                    if (self.isBottomXAxis || self.isLeftYAxis) {
                         return d.lowerBoundValue < d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
                     } else {
                         return d.lowerBoundValue > d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
@@ -159,7 +159,14 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     return referenceLineTextDecor.length ? referenceLineTextDecor.join(" ") : "";
                 })
                 .attr("text-anchor", "middle")
-                .attr("opacity", errorLabels.isEnabled ? "1" : "0");
+                .attr("opacity", errorLabels.isEnabled ? "1" : "0")
+                .attr("display", d => {
+                    if (self.isBottomXAxis || self.isLeftYAxis) {
+                        return d.lowerBoundValue < d.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                    } else {
+                        return d.lowerBoundValue > d.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                    }
+                });
 
             select(errorBarUpperBoundLabel as any).node().clone(true)
                 .lower()
@@ -173,7 +180,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
             errorBarLowerBoundLabelG.append("text")
                 .text(d => {
-                    if (self.isBottomXAxis) {
+                    if (self.isBottomXAxis || self.isLeftYAxis) {
                         return d.upperBoundValue < d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
                     } else {
                         return d.upperBoundValue > d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
@@ -197,6 +204,13 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                         return `translate(${0}, ${d.width + errorLabels.fontSize})`;
                     } else {
                         return `translate(${0}, ${d.height + errorLabels.fontSize})`;
+                    }
+                })
+                .attr("display", d => {
+                    if (self.isBottomXAxis || self.isLeftYAxis) {
+                        return d.upperBoundValue < d.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                    } else {
+                        return d.upperBoundValue > d.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
                     }
                 });
 
