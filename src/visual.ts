@@ -3204,7 +3204,7 @@ export class Visual extends Shadow {
 				}
 				return bound
 					? this.errorBarsSettings.tooltip.labelFormat !== EErrorBarsLabelFormat.RelativePercentage
-						? this.formatNumber(+bound, this.numberSettings, undefined, true, false)
+						? this.formatNumber(+bound, this.numberSettings, undefined, true, true)
 						: bound.toFixed(2) + "%"
 					: undefined;
 			};
