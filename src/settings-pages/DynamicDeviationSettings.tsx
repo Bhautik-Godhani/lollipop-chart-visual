@@ -23,7 +23,7 @@ import {
   AccordionAlt
 } from "@truviz/shadow/dist/Components";
 import { IDynamicDeviationSettings, ILabelValuePair } from "../visual-settings.interface";
-import { DashedLineIcon, DottedLineIcon, DynamicDeviationArrowIcon, DynamicDeviationBarIcon, DynamicDeviationDotsIcon, SolidLineIcon } from "./SettingsIcons";
+import { DashedLineIcon, DottedLineIcon, DynamicDeviationArrowIcon, DynamicDeviationBarIcon, DynamicDeviationDotsIcon, DynamicDeviationPlaceholderIcon, SolidLineIcon } from "./SettingsIcons";
 import { Visual } from "../visual";
 
 const LINE_TYPES = [
@@ -172,6 +172,14 @@ const DynamicDeviationSettings = (props) => {
           />
         </Column>
       </Row>
+
+      <ConditionalWrapper visible={!configValues.isEnabled}>
+        <Row>
+          <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <DynamicDeviationPlaceholderIcon />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <ConditionalWrapper visible={configValues.isEnabled}>
         <AccordionAlt title="Display" open={true}>

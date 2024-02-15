@@ -29,7 +29,7 @@ import { IErrorBarsSettings, ILabelValuePair } from "../visual-settings.interfac
 import { Visual } from "../visual";
 import { IMarkerData } from "./markerSelector";
 import { CATEGORY_MARKERS } from "./markers";
-import { BoldIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
+import { BoldIcon, DashedLineIcon, DottedLineIcon, ErrorBarsPlaceholderIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
 import { persistProperties } from "../methods/methods";
 
 let MARKERS_LIST: IMarkerData[] = [];
@@ -282,6 +282,14 @@ const ErrorBarsSettings = (props) => {
           />
         </Column>
       </Row>
+
+      <ConditionalWrapper visible={!configValues.isEnabled}>
+        <Row>
+          <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <ErrorBarsPlaceholderIcon />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <ConditionalWrapper visible={configValues.isEnabled}>
 
