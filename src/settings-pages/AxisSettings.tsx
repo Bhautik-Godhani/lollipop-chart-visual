@@ -159,7 +159,7 @@ const UIXAxis = (
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={shadow.isHorizontalChart}>
+      {/* <ConditionalWrapper visible={shadow.isHorizontalChart}>
         <Row>
           <Column>
             <ToggleButton
@@ -170,9 +170,9 @@ const UIXAxis = (
             />
           </Column>
         </Row>
-      </ConditionalWrapper>
+      </ConditionalWrapper> */}
 
-      <ConditionalWrapper visible={xConfigValues.categoryType === AxisCategoryType.Continuous}>
+      <ConditionalWrapper visible={xConfigValues.categoryType === AxisCategoryType.Continuous || shadow.isHorizontalChart}>
         <Row>
           <Column>
             <ToggleButton
@@ -237,7 +237,7 @@ const UIXAxis = (
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous}>
+      <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
         <Row>
           <Column>
             <ToggleButton
@@ -602,16 +602,18 @@ const UIYAxis = (
         </Row>
       </ConditionalWrapper>
 
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Invert Range"}
-            value={yConfigValues.isInvertRange}
-            handleChange={() => handleYCheckbox(EXAxisSettings.IsInvertRange, setYConfigValues)}
-            appearance="checkbox"
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Invert Range"}
+              value={yConfigValues.isInvertRange}
+              handleChange={() => handleYCheckbox(EXAxisSettings.IsInvertRange, setYConfigValues)}
+              appearance="checkbox"
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <Row>
         <Column>
