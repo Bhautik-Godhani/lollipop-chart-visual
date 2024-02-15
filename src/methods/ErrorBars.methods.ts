@@ -168,12 +168,14 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     }
                 });
 
-            select(errorBarUpperBoundLabel as any).node().clone(true)
-                .lower()
-                .attr("stroke", self.getColor(errorLabels.backgroundColor, EHighContrastColorType.Background))
-                .attr("stroke-width", 3)
-                .attr("stroke-linejoin", "round")
-                .attr("opacity", errorLabels.showBackground ? "1" : "0");
+            if (errorLabels.isEnabled) {
+                select(errorBarUpperBoundLabel as any).node().clone(true)
+                    .lower()
+                    .attr("stroke", self.getColor(errorLabels.backgroundColor, EHighContrastColorType.Background))
+                    .attr("stroke-width", 3)
+                    .attr("stroke-linejoin", "round")
+                    .attr("opacity", errorLabels.showBackground ? "1" : "0");
+            }
 
             const errorBarLowerBoundLabelG = errorBarG.append("g")
                 .attr("class", "errorBarLowerBoundLabelG");
@@ -214,12 +216,14 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     }
                 });
 
-            select(errorBarLowerBoundLabelG as any).node().clone(true)
-                .lower()
-                .attr("stroke", self.getColor(errorLabels.backgroundColor, EHighContrastColorType.Background))
-                .attr("stroke-width", 3)
-                .attr("stroke-linejoin", "round")
-                .attr("opacity", errorLabels.showBackground ? "1" : "0");
+            if (errorBars.isEnabled) {
+                select(errorBarLowerBoundLabelG as any).node().clone(true)
+                    .lower()
+                    .attr("stroke", self.getColor(errorLabels.backgroundColor, EHighContrastColorType.Background))
+                    .attr("stroke-width", 3)
+                    .attr("stroke-linejoin", "round")
+                    .attr("opacity", errorLabels.showBackground ? "1" : "0");
+            }
 
             return errorBarG;
         }

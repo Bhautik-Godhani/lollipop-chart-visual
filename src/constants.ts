@@ -348,7 +348,8 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 		dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 		selectedImageDataField: undefined,
 	},
-	isAutoLollipopTypePie: false
+	isAutoLollipopTypePie: false,
+	isAutoLollipopTypeImage: false,
 };
 
 export const RACE_CHART_SETTINGS: IRaceChartSettings = {
@@ -459,7 +460,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		lineColor: "rgba(155, 155, 155, 1)",
 	},
 	errorLabels: {
-		isEnabled: true,
+		isEnabled: false,
 		fontSize: 10,
 		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 		color: "rgba(255,255,255,1)",

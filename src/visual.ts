@@ -2749,8 +2749,8 @@ export class Visual extends Shadow {
 				.attr("d", d.path)
 				.attr("class", "marker1-path")
 				.attr("fill", this.errorBarsSettings.errorBars.markerColor)
-				.attr("stroke", "rgb(255, 255, 255)")
-				.attr("stroke-width", 1);
+				.attr("stroke", this.errorBarsSettings.errorBars.borderColor)
+				.attr("stroke-width", this.errorBarsSettings.errorBars.borderSize);
 		})
 	}
 

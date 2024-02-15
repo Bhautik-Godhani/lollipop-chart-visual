@@ -184,6 +184,7 @@ export interface IMarkerSettings {
 	marker1Style: MarkerStyleProps;
 	marker2Style: MarkerStyleProps;
 	isAutoLollipopTypePie: boolean;
+	isAutoLollipopTypeImage: boolean;
 }
 
 export interface MarkerStyleProps {
