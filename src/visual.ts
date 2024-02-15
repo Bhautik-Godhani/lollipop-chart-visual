@@ -1084,7 +1084,7 @@ export class Visual extends Shadow {
 			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
 
 			if (this.isHorizontalChart) {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+				if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
 					data.sort((a, b) => {
 						return a[measureIndex] - b[measureIndex];
 					});
@@ -1261,7 +1261,7 @@ export class Visual extends Shadow {
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.isHasSubcategories = !!categoricalSubCategoryField;
-		this.isHasImagesData = !!categoricalImageDataFields;
+		this.isHasImagesData = categoricalImageDataFields.length > 0;
 		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))] as any;
 		this.upperBoundMeasureNames = [...new Set(categoricalUpperBoundFields.map((d) => d.source.displayName))] as any;
 		this.lowerBoundMeasureNames = [...new Set(categoricalLowerBoundFields.map((d) => d.source.displayName))] as any;
