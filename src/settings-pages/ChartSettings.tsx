@@ -283,8 +283,8 @@ const UIGeneralChartSettings = (
 								// min={+Math.ceil(shadow.scaleBandWidth).toFixed(0)}
 								type="number"
 								label="Min Width"
-								value={configValues.lollipopWidth ? configValues.lollipopWidth.toString() : undefined}
-								handleChange={(value) => handleChange(+value, EChartSettings.lollipopWidth, setConfigValues)}
+								value={configValues.lollipopWidth}
+								handleChange={(value) => handleChange(value, EChartSettings.lollipopWidth, setConfigValues)}
 							/>
 						</Column>
 						<Column></Column>
