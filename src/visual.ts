@@ -246,6 +246,7 @@ export class Visual extends Shadow {
 	subCategoryDisplayName: string;
 	categoriesName: string[] = [];
 	measureNames: string[] = [];
+	sortExtraMeasureNames: string[] = [];
 	upperBoundMeasureNames: string[] = [];
 	lowerBoundMeasureNames: string[] = [];
 	imagesDataFieldsName: string[] = [];
@@ -1263,6 +1264,7 @@ export class Visual extends Shadow {
 		this.isHasSubcategories = !!categoricalSubCategoryField;
 		this.isHasImagesData = categoricalImageDataFields.length > 0;
 		this.measureNames = [...new Set(categoricalMeasureFields.map((d) => d.source.displayName))] as any;
+		this.sortExtraMeasureNames = [...new Set(categoricalSortFields.map((d) => d.source.displayName))] as any;
 		this.upperBoundMeasureNames = [...new Set(categoricalUpperBoundFields.map((d) => d.source.displayName))] as any;
 		this.lowerBoundMeasureNames = [...new Set(categoricalLowerBoundFields.map((d) => d.source.displayName))] as any;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
@@ -1913,6 +1915,7 @@ export class Visual extends Shadow {
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = !!this.categoricalImagesDataFields;
 		this.measureNames = [...new Set(this.categoricalMeasureFields.map((d) => d.source.displayName))] as any;
+		this.sortExtraMeasureNames = [...new Set(this.categoricalSortFields.map((d) => d.source.displayName))] as any;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 
 		this.isPatternApplied =

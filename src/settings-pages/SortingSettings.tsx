@@ -335,7 +335,7 @@ const SortingSettings = (props) => {
 
 		if (
 			!configValues.category.sortBy ||
-			(!(shadow.measureNames as string[]).includes(configValues.category.sortBy) && configValues.category.isSortByMeasure)
+			(!([...shadow.measureNames, ...shadow.sortExtraMeasureNames]).includes(configValues.category.sortBy) && configValues.category.isSortByMeasure)
 		) {
 			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 		}
