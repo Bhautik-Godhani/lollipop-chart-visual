@@ -57,6 +57,7 @@ import {
 	ECFRankingTypes,
 	EAxisDateFormats,
 	DisplayUnits,
+	EMarkerSettings,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -1270,7 +1271,47 @@ export class Visual extends Shadow {
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 
-		if (this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.SHAPE && !this.markerSettings.isAutoLollipopTypePie) {
+		if (!this.isHasImagesData) {
+			if (this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.SHAPE && !this.markerSettings.isAutoLollipopTypePie) {
+				this.visualHost.persistProperties({
+					merge: [
+						{
+							objectName: EVisualConfig.MarkerConfig,
+							displayName: EVisualSettings.MarkerSettings,
+							properties: {
+								[EVisualSettings.MarkerSettings]: JSON.stringify({
+									...this.markerSettings,
+									isAutoLollipopTypePie: true,
+									markerType: EMarkerTypes.CHART
+								}),
+							},
+							selector: null,
+						},
+					],
+				});
+			}
+
+			if (!this.isHasSubcategories && this.markerSettings.isAutoLollipopTypePie) {
+				this.visualHost.persistProperties({
+					merge: [
+						{
+							objectName: EVisualConfig.MarkerConfig,
+							displayName: EVisualSettings.MarkerSettings,
+							properties: {
+								[EVisualSettings.MarkerSettings]: JSON.stringify({
+									...this.markerSettings,
+									isAutoLollipopTypePie: false,
+									markerType: EMarkerTypes.SHAPE
+								}),
+							},
+							selector: null,
+						},
+					],
+				});
+			}
+		}
+
+		if (this.isHasImagesData && !this.markerSettings.isAutoLollipopTypeImage) {
 			this.visualHost.persistProperties({
 				merge: [
 					{
@@ -1279,8 +1320,18 @@ export class Visual extends Shadow {
 						properties: {
 							[EVisualSettings.MarkerSettings]: JSON.stringify({
 								...this.markerSettings,
-								isAutoLollipopTypePie: true,
-								markerType: EMarkerTypes.CHART
+								isAutoLollipopTypeImage: true,
+								markerType: EMarkerTypes.SHAPE,
+								[EMarkerSettings.Marker1Style]: {
+									...this.markerSettings.marker1Style,
+									[EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+									[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.IMAGES,
+								},
+								[EMarkerSettings.Marker2Style]: {
+									...this.markerSettings.marker2Style,
+									[EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+									[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.IMAGES,
+								}
 							}),
 						},
 						selector: null,
@@ -1289,7 +1340,7 @@ export class Visual extends Shadow {
 			});
 		}
 
-		if (!this.isHasSubcategories && this.markerSettings.isAutoLollipopTypePie) {
+		if (!this.isHasImagesData && this.markerSettings.isAutoLollipopTypeImage) {
 			this.visualHost.persistProperties({
 				merge: [
 					{
@@ -1298,8 +1349,18 @@ export class Visual extends Shadow {
 						properties: {
 							[EVisualSettings.MarkerSettings]: JSON.stringify({
 								...this.markerSettings,
-								isAutoLollipopTypePie: false,
-								markerType: EMarkerTypes.SHAPE
+								isAutoLollipopTypeImage: false,
+								markerType: EMarkerTypes.SHAPE,
+								[EMarkerSettings.Marker1Style]: {
+									...this.markerSettings.marker1Style,
+									[EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+									[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+								},
+								[EMarkerSettings.Marker2Style]: {
+									...this.markerSettings.marker2Style,
+									[EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+									[EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+								}
 							}),
 						},
 						selector: null,
@@ -5647,7 +5708,7 @@ export class Visual extends Shadow {
 		}
 
 		if (yAxisSettings.position === Position.Left) {
-			this.yAxisTitleG.attr("transform", `translate(${-this.margin.left + this.yAxisTitleMargin}, ${this.height / 2})`);
+			this.yAxisTitleG.attr("transform", `translate(${-this.yScaleGWidth - this.yAxisTitleMargin / 2 - this.yAxisTitleSize.width / 2}, ${this.height / 2})`);
 		} else if (yAxisSettings.position === Position.Right) {
 			this.yAxisTitleG.attr(
 				"transform",
@@ -6171,14 +6232,25 @@ export class Visual extends Shadow {
 			this.yAxisLineG.attr("transform", `translate(${this.width}, 0)`);
 		}
 
+		let y1: number = 0;
+		let y2: number = 0;
+
+		if (this.isCutAndClipAxisEnabled) {
+			y1 = this.afterCutLinearScale.range()[1];
+			y2 = this.beforeCutLinearScale.range()[0];
+		} else {
+			y1 = this.yScale.range()[0];
+			y2 = this.yScale.range()[1];
+		}
+
 		this.yAxisLineG.select(".yAxisLine").remove();
 		this.yAxisLineG
 			.append("line")
 			.attr("class", "yAxisLine")
 			.attr("x1", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
 			.attr("x2", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
-			.attr("y1", this.yScale.range()[0])
-			.attr("y2", this.yScale.range()[1])
+			.attr("y1", y1)
+			.attr("y2", y2)
 			.attr("fill", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", "1px");
