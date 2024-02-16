@@ -249,14 +249,14 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 },
                 selector: null,
             },
-            {
-                objectName: EVisualConfig.SortingConfig,
-                displayName: EVisualSettings.Sorting,
-                properties: {
-                    [EVisualSettings.Sorting]: JSON.stringify(SORTING_SETTINGS),
-                },
-                selector: null,
-            },
+            // {
+            //     objectName: EVisualConfig.SortingConfig,
+            //     displayName: EVisualSettings.Sorting,
+            //     properties: {
+            //         [EVisualSettings.Sorting]: JSON.stringify(SORTING_SETTINGS),
+            //     },
+            //     selector: null,
+            // },
             {
                 objectName: EVisualSettings.Legend,
                 properties: {
