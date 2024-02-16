@@ -1,6 +1,6 @@
 import * as React from "react";
 import ToggleSwitch from "@truviz/shadow/dist/Components/ToggleButton/ToggleSwitch";
-import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, AccordionAlt, Quote } from "@truviz/shadow/dist/Components";
+import { Row, Column, Footer, ConditionalWrapper, ColorPicker, InputControl, Quote, ToggleButton } from "@truviz/shadow/dist/Components";
 import { BRUSH_AND_ZOOM_AREA_SETTINGS as BRUSH_AND_ZOOM_AREA_SETTINGS_IMP } from "../constants";
 import { IBrushAndZoomAreaSettings } from "../visual-settings.interface";
 import { EBrushAndZoomAreaSettings } from "../enum";
@@ -24,13 +24,19 @@ const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateActi
 
 const UIWidthSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	return <ConditionalWrapper visible={shadow.isHorizontalChart}>
-		<AccordionAlt title="Track Manual Width"
-			open={configValues.isAutoWidth}
-			showToggle={true}
-			toggleValue={configValues.isAutoWidth}
-			onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
-		>
-			<Row>
+		<Row>
+			<Column>
+				<ToggleButton
+					label={"Track Manual Width"}
+					value={configValues.isAutoWidth}
+					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
+					appearance="toggle"
+				/>
+			</Column>
+		</Row>
+
+		<ConditionalWrapper visible={!configValues.isAutoWidth}>
+			<Row appearance="padded">
 				<Column>
 					<InputControl
 						min={1}
@@ -40,20 +46,27 @@ const UIWidthSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings
 						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Width, setConfigValues)}
 					/>
 				</Column>
+				<Column></Column>
 			</Row>
-		</AccordionAlt>
+		</ConditionalWrapper>
 	</ConditionalWrapper >
 }
 
 const UIHeightSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	return <ConditionalWrapper visible={!shadow.isHorizontalChart}>
-		<AccordionAlt title="Track Manual Height"
-			open={configValues.isAutoHeight}
-			showToggle={true}
-			toggleValue={configValues.isAutoHeight}
-			onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
-		>
-			<Row>
+		<Row>
+			<Column>
+				<ToggleButton
+					label={"Track Manual Height"}
+					value={configValues.isAutoHeight}
+					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
+					appearance="toggle"
+				/>
+			</Column>
+		</Row>
+
+		<ConditionalWrapper visible={!configValues.isAutoHeight}>
+			<Row appearance="padded">
 				<Column>
 					<InputControl
 						min={shadow.brushAndZoomAreaMinHeight}
@@ -64,8 +77,9 @@ const UIHeightSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSetting
 						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Height, setConfigValues)}
 					/>
 				</Column>
+				<Column></Column>
 			</Row>
-		</AccordionAlt>
+		</ConditionalWrapper >
 	</ConditionalWrapper >
 }
 
@@ -77,12 +91,18 @@ const UIGeneralChartSettings = (
 ) => {
 	return (
 		<>
-			<AccordionAlt title="Enable Brush Area"
-				open={configValues.enabled}
-				showToggle={true}
-				toggleValue={configValues.enabled}
-				onChangeToggle={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled, setConfigValues)}
-			>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Enable"}
+						value={configValues.enabled}
+						handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.Enabled, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues.enabled}>
 				<Row>
 					<Column>
 						<InputControl
@@ -141,11 +161,11 @@ const UIGeneralChartSettings = (
 						/>
 					</Column>
 				</Row>
-			</AccordionAlt>
 
-			<ConditionalWrapper visible={configValues.enabled}>
-				{UIWidthSettings(shadow, configValues, setConfigValues)}
-				{UIHeightSettings(shadow, configValues, setConfigValues)}
+				<ConditionalWrapper visible={configValues.enabled}>
+					{UIWidthSettings(shadow, configValues, setConfigValues)}
+					{UIHeightSettings(shadow, configValues, setConfigValues)}
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 		</>
 	);
