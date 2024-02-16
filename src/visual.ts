@@ -178,8 +178,8 @@ import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./m
 import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
-import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings, SmallMultiplesSettings } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout";
 import { COLORBREWER } from "./color-schemes";
+import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -6462,7 +6462,7 @@ export class Visual extends Shadow {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
-		if (!this.dataColorsSettings.isFillTypeChanged && this.isHasNegativeValue && this.isHasPositiveValue && !this.isIBCSEnabled) {
+		if (!this.isSmallMultiplesEnabled && !this.dataColorsSettings.isFillTypeChanged && this.minCategoryValueDataPair.value < 0 && this.maxCategoryValueDataPair.value > 0 && !this.isIBCSEnabled) {
 			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
 		}
 
