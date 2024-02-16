@@ -2440,6 +2440,8 @@ export class Visual extends Shadow {
 					vizOptions.options.viewport.height
 				);
 
+				this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
+
 				if (this.isHorizontalBrushDisplayed) {
 					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaHeight : 10;
 				}
@@ -6456,6 +6458,20 @@ export class Visual extends Shadow {
 		// 	const yAxisTicksMaxWidth = d3.max(yAxisTicksWidth, (d) => d);
 		// 	this.yScaleGWidth = yAxisTicksMaxWidth;
 		// }
+	}
+
+	private toggleLegendBasedOnGroupByData(isHasMultiMeasure: boolean, isHasSubcategories: boolean): void {
+		if ((isHasSubcategories || isHasMultiMeasure) && !this.legendSettings.show && !this.legendSettings.isLegendAutoChanged) {
+			this._host.persistProperties({
+				merge: [
+					{
+						objectName: EVisualSettings.Legend,
+						properties: { show: true, isLegendAutoChanged: true },
+						selector: null,
+					},
+				],
+			});
+		}
 	}
 
 	drawXYAxis(isShowXAxis: boolean, isShowYAxis: boolean): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
