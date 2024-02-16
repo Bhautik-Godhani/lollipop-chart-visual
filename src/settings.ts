@@ -109,6 +109,7 @@ export class Legend {
 	public legendColor: string = "#404040";
 	public fontSize: string = "8";
 	public fontFamily: string = "Segoe UI";
+	public isLegendAutoChanged: boolean = false;
 }
 
 export class NumberFormatting {

@@ -453,6 +453,13 @@
 						"bool": true
 					}
 				},
+				"isLegendAutoChanged": {
+					"displayName": "",
+					"description": "",
+					"type": {
+						"bool": true
+					}
+				},
 				"legendTitle": {
 					"displayName": "Legend Title",
 					"description": "",

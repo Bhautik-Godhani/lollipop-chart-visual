@@ -156,6 +156,7 @@ export interface ILegendSettings {
 	legendColor: string;
 	fontSize: string;
 	fontFamily: string;
+	isLegendAutoChanged: boolean;
 }
 
 export interface IChartSettings {
