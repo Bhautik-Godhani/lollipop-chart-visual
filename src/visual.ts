@@ -6462,7 +6462,7 @@ export class Visual extends Shadow {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
-		if (!this.dataColorsSettings.isFillTypeChanged && this.isHasNegativeValue && this.isHasPositiveValue) {
+		if (!this.dataColorsSettings.isFillTypeChanged && this.isHasNegativeValue && this.isHasPositiveValue && !this.isIBCSEnabled) {
 			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
 		}
 
@@ -7021,7 +7021,29 @@ export class Visual extends Shadow {
 
 		this.lollipopSelection = lollipopSelection.join(
 			(enter) => {
-				const lollipopG = enter.append("g").attr("class", "lollipop-group");
+				const lollipopG = enter.append("g").attr("class", "lollipop-group").attr("display", d => {
+					if (this.isHorizontalChart) {
+						if (this.xAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					} else {
+						if (this.yAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					}
+				});
 
 				lollipopG.on("click", () => {
 					this.handleCreateOwnDynamicDeviationOnBarClick(lollipopG.node());
@@ -7265,6 +7287,30 @@ export class Visual extends Shadow {
 				return lollipopG;
 			},
 			(update) => {
+				update.attr("display", d => {
+					if (this.isHorizontalChart) {
+						if (this.xAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					} else {
+						if (this.yAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					}
+				});
+
 				const marker1Style = this.markerSettings.marker1Style;
 				const marker2Style = this.markerSettings.marker2Style;
 
