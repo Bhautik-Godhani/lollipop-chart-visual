@@ -6217,12 +6217,23 @@ export class Visual extends Shadow {
 			this.xAxisLineG.attr("transform", "translate(0," + 0 + ")");
 		}
 
+		let x1: number = 0;
+		let x2: number = 0;
+
+		if (this.isCutAndClipAxisEnabled && this.isHorizontalChart) {
+			x1 = this.afterCutLinearScale.range()[1];
+			x2 = this.beforeCutLinearScale.range()[0];
+		} else {
+			x1 = this.yAxisStartMargin;
+			x2 = this.isLeftYAxis ? this.width : this.width - this.yAxisStartMargin;
+		}
+
 		this.xAxisLineG.select(".xAxisLine").remove();
 		this.xAxisLineG
 			.append("line")
 			.attr("class", "xAxisLine")
-			.attr("x1", this.xScale.range()[0])
-			.attr("x2", this.xScale.range()[1])
+			.attr("x1", x1)
+			.attr("x2", x2)
 			.attr("y1", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
 			.attr("y2", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
 			.attr("fill", this.getColor(this.xAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
@@ -6240,12 +6251,12 @@ export class Visual extends Shadow {
 		let y1: number = 0;
 		let y2: number = 0;
 
-		if (this.isCutAndClipAxisEnabled) {
+		if (this.isCutAndClipAxisEnabled && !this.isHorizontalChart) {
 			y1 = this.afterCutLinearScale.range()[1];
 			y2 = this.beforeCutLinearScale.range()[0];
 		} else {
-			y1 = this.yScale.range()[0];
-			y2 = this.yScale.range()[1];
+			y1 = this.isBottomXAxis ? 0 : this.xAxisStartMargin;
+			y2 = this.height - this.xAxisStartMargin;
 		}
 
 		this.yAxisLineG.select(".yAxisLine").remove();

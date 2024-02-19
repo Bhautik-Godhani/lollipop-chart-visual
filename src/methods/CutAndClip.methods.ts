@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Visual } from "../visual";
 import powerbi from "powerbi-visuals-api";
 import { axisBottom, axisLeft, axisRight, axisTop, scaleLinear, scaleSymlog } from "d3";
@@ -71,7 +72,7 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
     if (self.isHorizontalChart) {
         if (self.isLeftYAxis) {
             self.beforeCutLinearScale.range([
-                0,
+                self.xAxisStartMargin,
                 beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap,
             ]);
 
@@ -83,14 +84,14 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
             ]);
 
             self.beforeCutLinearScale.range([
-                xScaleWidth,
+                xScaleWidth - self.xAxisStartMargin,
                 width - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
         }
     } else {
         if (self.isBottomXAxis) {
             self.beforeCutLinearScale.range([
-                height,
+                height - self.yAxisStartMargin,
                 height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
 
@@ -98,7 +99,7 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
         } else {
             self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, height]);
 
-            self.beforeCutLinearScale.range([0, beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap]);
+            self.beforeCutLinearScale.range([self.yAxisStartMargin, beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap]);
         }
     }
 }
