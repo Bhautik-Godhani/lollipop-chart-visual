@@ -98,10 +98,6 @@ const DynamicDeviationSettings = (props) => {
       value: EDynamicDeviationDisplayTypes.Auto,
     },
     {
-      label: "Create Your Own",
-      value: EDynamicDeviationDisplayTypes.CreateYourOwn,
-    },
-    {
       label: "Custom Range",
       value: EDynamicDeviationDisplayTypes.CustomRange,
     },
@@ -159,6 +155,21 @@ const DynamicDeviationSettings = (props) => {
       [n]: rgb,
     }));
   };
+
+  if (!(shadow as Visual).isSmallMultiplesEnabled) {
+    DISPLAY_TYPES.unshift(
+      {
+        label: "Create Your Own",
+        value: EDynamicDeviationDisplayTypes.CreateYourOwn,
+      }
+    )
+  }
+
+  React.useEffect(() => {
+    if (configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isSmallMultiplesEnabled) {
+      handleChange(EDynamicDeviationDisplayTypes.FirstToLast, EDynamicDeviationSettings.DisplayType);
+    }
+  }, []);
 
   return (
     <>
