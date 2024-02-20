@@ -16,9 +16,10 @@ import {
 import { EditIcon, PlusIcon, ReferenceBandPlaceholderIcon, ReferenceLinePlaceholderIcon, ReferenceLinesIcon, TrashIcon } from "./SettingsIcons";
 import { Visual } from "../visual";
 import { IReferenceLineSettings } from "../visual-settings.interface";
-import { ELineTypeTabs, EReferenceType } from "../enum";
+import { ELineTypeTabs, EReferenceType, EXYAxisNames } from "../enum";
 import { persistProperties } from "../methods/methods";
 import { GetFormattedNumber } from "../methods/NumberFormat.methods";
+import { isEmpty } from "lodash";
 
 const ReferenceLines = (props) => {
   const {
@@ -101,11 +102,23 @@ const ReferenceLines = (props) => {
       const isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN";
       const isValue2TypeNumber = parseFloat(row.lineValue2.value).toString().length > 0 && parseFloat(row.lineValue2.value).toString() !== "NaN";
 
+      const getAxisName = (axis: EXYAxisNames) => {
+        if (axis === EXYAxisNames.X && shadow.isHorizontalChart) {
+          return EXYAxisNames.Y;
+        }
+
+        if (axis === EXYAxisNames.Y && shadow.isHorizontalChart) {
+          return EXYAxisNames.X;
+        }
+
+        return axis;
+      }
+
       if (row.referenceType === EReferenceType.REFERENCE_BAND) {
-        text = `Band on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
+        text = `Band on ${getAxisName(row.lineValue1.axis)} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
         to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true) : row.lineValue2.value}`}`;
       } else {
-        text = `Line on ${row.lineValue1.axis} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value}`}`;
+        text = `Line on ${getAxisName(row.lineValue1.axis)} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true) : row.lineValue1.value}`}`;
       }
 
       return {
@@ -368,7 +381,7 @@ const ReferenceLines = (props) => {
         <AddReferenceLine
           shadow={shadow}
           details={typeof id === "number" ? initialStates[id] : {}}
-          isLineUI={selectedLineType === ELineTypeTabs.Line}
+          isLineUI={isEmpty(typeof id === "number" ? initialStates[id] : {}) ? selectedLineType === ELineTypeTabs.Line : initialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
           onAdd={onAdd}
           onUpdate={onUpdate}
           index={id}

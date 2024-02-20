@@ -94,28 +94,14 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
     const getLabelText = (d: IReferenceLineSettings): string => {
         const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
-        const isValue2TypeNumber = parseFloat(d.lineValue2.value).toString().length > 0 && parseFloat(d.lineValue2.value).toString() !== "NaN";
-
-        if (d.referenceType === EReferenceType.REFERENCE_BAND) {
-            switch (d.labelStyle.labelNameType) {
-                case EReferenceLineNameTypes.TEXT:
-                    return d.labelStyle.bandLabel;
-                case EReferenceLineNameTypes.TEXT_VALUE:
-                    return d.labelStyle.bandLabel + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value) +
-                        " - " + (isValue2TypeNumber ? GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true) : d.lineValue2.value);
-                case EReferenceLineNameTypes.VALUE:
-                    return (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value) +
-                        " - " + (isValue2TypeNumber ? GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true) : d.lineValue2.value);
-            }
-        } else {
-            switch (d.labelStyle.labelNameType) {
-                case EReferenceLineNameTypes.TEXT:
-                    return d.labelStyle.lineLabel;
-                case EReferenceLineNameTypes.TEXT_VALUE:
-                    return d.labelStyle.lineLabel + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
-                case EReferenceLineNameTypes.VALUE:
-                    return (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
-            }
+        const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
+        switch (d.labelStyle.labelNameType) {
+            case EReferenceLineNameTypes.TEXT:
+                return labelText;
+            case EReferenceLineNameTypes.TEXT_VALUE:
+                return labelText + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
+            case EReferenceLineNameTypes.VALUE:
+                return isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value;
         }
     }
 
@@ -317,10 +303,10 @@ const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyl
 const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 = 0;
     const y1 =
-        self.getYPosition(value);
+        self.getYPosition(value) + self.scaleBandWidth / 2;
     const x2 = self.width;
     const y2 =
-        self.getYPosition(value);
+        self.getYPosition(value) + self.scaleBandWidth / 2;
 
     return { x1, y1, x2, y2 };
 };
@@ -346,8 +332,6 @@ const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
         } else {
             value = domain[domain.length - (parseInt(rLineValue.rank) - 1) - 1];
         }
-
-        rLineValue.value = value;
     } else {
         value = rLineValue.value;
     }
@@ -450,11 +434,11 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
         const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
         if (rLineValue.type === EReferenceLinesType.Value && rLineValue.axis === EXYAxisNames.Y) {
             let values = [];
-            const isCategoricalReferenceLinesMeasure = self.categoricalReferenceLinesNames.includes(rLineValue.axis);
+            const isCategoricalReferenceLinesMeasure = self.categoricalReferenceLinesNames.includes(rLineValue.measureName);
 
             if (isCategoricalReferenceLinesMeasure) {
                 const referenceLineData = self.categoricalReferenceLinesDataFields.filter(
-                    (d) => d.source.displayName === rLineValue.axis
+                    (d) => d.source.displayName === rLineValue.measureName
                 );
                 values = referenceLineData.reduce((arr, cur) => [...arr, ...cur.values], []);
             }
@@ -546,8 +530,20 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                         const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
                         rLine.line1Coord = rLine.line2Coord;
                         rLine.line2Coord = clonedRLine.line1Coord;
-                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                        switch (rLine.labelStyle.labelPosition) {
+                            case EBeforeAfterPosition.Before:
+                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                                break;
+                            case EBeforeAfterPosition.Center:
+                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                                break;
+                            case EBeforeAfterPosition.After:
+                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                                break;
+                        }
                     }
                 }
 
@@ -556,8 +552,21 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                         const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
                         rLine.line1Coord = rLine.line2Coord;
                         rLine.line2Coord = clonedRLine.line1Coord;
-                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+
+                        switch (rLine.labelStyle.labelPosition) {
+                            case EBeforeAfterPosition.Before:
+                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                                break;
+                            case EBeforeAfterPosition.Center:
+                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                                break;
+                            case EBeforeAfterPosition.After:
+                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                                break;
+                        }
                     }
                 }
             }
