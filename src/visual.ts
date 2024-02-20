@@ -3345,7 +3345,9 @@ export class Visual extends Shadow {
 
 		data.forEach((d, i) => {
 			const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? d.value2 : d.value1, data);
+			const value1 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value1) : d.value1;
+			const value2 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value2) : d.value2;
+			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1, data);
 
 			if (this.errorBarsSettings.isEnabled) {
 				d.upperBoundValue = upperBoundValue;
@@ -7511,8 +7513,8 @@ export class Visual extends Shadow {
 			this.drawData2Labels([]);
 		}
 
-		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
-		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled && this.isLollipopTypeCircle ? this.chartData : []);
+		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : []);
+		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : []);
 
 		if (this.errorBarsSettings.measurement.calcType === EErrorBarsCalcTypes.ByField && !this.isHasErrorLowerBounds && !this.isHasErrorUpperBounds) {
 			RenderErrorBars(this, []);
