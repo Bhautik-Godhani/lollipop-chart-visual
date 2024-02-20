@@ -336,6 +336,7 @@ const ErrorBarsSettings = (props) => {
                   value={configValues.measurement.makeSymmetrical}
                   handleChange={() => handleCheckbox(EErrorBarsSettings.MakeSymmetrical, EErrorBarsSettings.Measurement)}
                   appearance="toggle"
+                  tooltip="Use the identical measure for both the upper and lower limits of the error bar."
                 />
               </Column>
             </Row>
