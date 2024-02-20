@@ -866,3 +866,9 @@ export enum ELineTypeTabs {
 	Line = "line",
 	Band = "band"
 }
+
+export enum ECFBasedOnValueTypes {
+	Value = "value",
+	Ranking = "ranking",
+	Percentage = "percent",
+}

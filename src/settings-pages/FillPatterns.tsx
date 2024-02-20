@@ -141,7 +141,7 @@ const FillPatterns = (props) => {
 
 	return (
 		<>
-			<ConditionalWrapper visible={(!shadow.isLollipopTypePie && !shadow.isHasMultiMeasure)}>
+			{/* <ConditionalWrapper visible={(!shadow.isLollipopTypePie && !shadow.isHasMultiMeasure)}>
 				<Row>
 					<Column>
 						<Quote>
@@ -149,47 +149,50 @@ const FillPatterns = (props) => {
 						</Quote>
 					</Column>
 				</Row>
+			</ConditionalWrapper> */}
+
+			{/* <ConditionalWrapper visible={shadow.isLollipopTypePie || shadow.isHasMultiMeasure}> */}
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Enable"}
+						value={configValues.enabled}
+						handleChange={() => handleCheckbox(EPatternSettings.Enabled, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={!configValues.enabled}>
+				<div className="section section-preview-image">
+					<PreviewPatterns />
+				</div>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isLollipopTypePie || shadow.isHasMultiMeasure}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Enable"}
-							value={configValues.enabled}
-							handleChange={() => handleCheckbox(EPatternSettings.Enabled, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={!configValues.enabled}>
-					<div className="section section-preview-image">
-						<PreviewPatterns />
-					</div>
-				</ConditionalWrapper>
-
-				<ConditionalWrapper visible={configValues.enabled}>
-					{/* {UICategoryPatterns(shadow, configValues, setConfigValues)} */}
-					{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
-						UISubCategoryPatterns(shadow, configValues, setConfigValues)
-					)}
-
-					{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
-						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-					)}
-
-					{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
-				</ConditionalWrapper>
-
-				{configValues.enabled && (
-					<div className="section">
-						<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
-							<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
-						</p>
-					</div>
+			<ConditionalWrapper visible={configValues.enabled}>
+				{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
+					UICategoryPatterns(shadow, configValues, setConfigValues)
 				)}
+
+				{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
+					UISubCategoryPatterns(shadow, configValues, setConfigValues)
+				)}
+
+				{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
+					UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+				)}
+
+				{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 			</ConditionalWrapper>
+
+			{configValues.enabled && (
+				<div className="section">
+					<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
+						<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
+					</p>
+				</div>
+			)}
+			{/* </ConditionalWrapper> */}
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>

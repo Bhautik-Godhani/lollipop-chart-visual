@@ -58,6 +58,7 @@ import {
 	EAxisDateFormats,
 	DisplayUnits,
 	EMarkerSettings,
+	ECFBasedOnValueTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -650,7 +651,8 @@ export class Visual extends Shadow {
 			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
 			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
 			CFConfig: {
-				isSupportApplyOn: true, isShowBasedOnValueDropDown: true, applyOnCategories: [
+				isSupportApplyOn: true, fieldsBasedOn: [ECFBasedOnValueTypes.Value, ECFBasedOnValueTypes.Ranking, ECFBasedOnValueTypes.Percentage],
+				isShowBasedOnValueDropDown: true, applyOnCategories: [
 					{ label: "Marker", value: ECFApplyOnCategories.Marker },
 					{ label: "Line", value: ECFApplyOnCategories.Line },
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
@@ -4016,9 +4018,11 @@ export class Visual extends Shadow {
 	}
 
 	setVisualPatternData(): void {
-		this.chartData.forEach((d) => {
-			d.pattern = this.patternSettings.categoryPatterns.find((p) => p.name === d.category);
-		});
+		if (this.isLollipopTypeCircle && !this.isHasMultiMeasure) {
+			this.chartData.forEach((d) => {
+				d.pattern = this.patternSettings.categoryPatterns.find((p) => p.name === d.category);
+			});
+		}
 
 		this.chartData.forEach((d) => {
 			d.subCategories.forEach((s) => {
