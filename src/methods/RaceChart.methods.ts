@@ -1,6 +1,6 @@
 import { EPlayPauseButton } from '../enum';
 import { Visual } from '../visual';
-import { interval } from "d3";
+import { interval, min, sum } from "d3";
 
 export const StartChartRace = (self: Visual) => {
     if (self.ticker) {
@@ -42,27 +42,71 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         self.raceChartDataLabelText = self.raceChartDataLabelG.append("text").attr("class", "raceBarDataLabel");
     }
 
-    const minFontSize = 24;
-    const labelFontSize =
-        self.raceChartSettings.isLabelAutoFontSize
-            ? self.width * 0.06 > minFontSize
-                ? self.width * 0.06
-                : minFontSize
-            : self.raceChartSettings.labelFontSize;
+    const minFontSize = 20;
+    const maxFontSize = 30;
+    let labelFontSize;
+
+    if (self.raceChartSettings.isLabelAutoFontSize) {
+        const autoSize = min([self.width / 25, self.height / 10]);
+        if (autoSize > minFontSize && autoSize < maxFontSize) {
+            labelFontSize = autoSize;
+        } else if (autoSize < minFontSize) {
+            labelFontSize = minFontSize;
+        } else if (autoSize > maxFontSize) {
+            labelFontSize = maxFontSize;
+        }
+    } else {
+        labelFontSize = self.raceChartSettings.labelFontSize;
+    }
+
+    self.raceChartDataLabelText.selectAll("*").remove();
 
     self.raceChartDataLabelText
-        .text(self.raceChartDataLabelOnTick)
+        .attr("fill", self.raceChartSettings.labelColor)
+        .attr("font-family", self.raceChartSettings.labelFontFamily)
+        .attr("text-anchor", "middle");
+
+    self.raceChartDataLabelText
+        .append("tspan")
+        .attr("x", "0")
+        .attr("font-size", labelFontSize)
+        .text(self.raceChartDataLabelOnTick);
+
+    const getTotalValue = () => {
+        if (self.isLollipopTypePie) {
+            if (self.isHasMultiMeasure) {
+                return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => (s.value1 + s.value2))), self.numberSettings, undefined, true, true);
+            } else {
+                return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value1)), self.numberSettings, undefined, true, true);
+            }
+        } else {
+            if (self.isHasMultiMeasure) {
+                return self.formatNumber(sum(self.chartData, d => (d.value1 + d.value2)), self.numberSettings, undefined, true, true);
+            } else {
+                return self.formatNumber(sum(self.chartData, d => d.value1), self.numberSettings, undefined, true, true);
+            }
+        }
+    }
+
+    self.raceChartDataLabelText
+        .append("tspan")
+        .attr("x", "0")
+        .attr("dy", labelFontSize)
+        .attr("font-size", labelFontSize / 1.5)
+        .text(`Total : ${getTotalValue()}`);
+
+    const textBBox = self.raceChartDataLabelText.node().getBBox();
+
+    self.raceChartDataLabelText
         .attr(
             "transform",
             "translate(" +
-            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right) +
+            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right - textBBox.width / 2) +
             "," +
-            self.height +
+            (self.height - textBBox.height) +
             ")"
         )
-        .attr("fill", self.raceChartSettings.labelColor)
-        .style("font-family", self.raceChartSettings.labelFontFamily)
-        .style("font-size", labelFontSize);
+
     self.isRaceChartDataLabelDrawn = true;
 }
 
@@ -80,7 +124,7 @@ export const RenderRaceTickerButton = (self: Visual): void => {
                 raceBarDateLabelTextBBox.width / 2 -
                 tickerButtonRadius / 2) +
             "," +
-            (self.height - tickerButtonRadius - raceBarDateLabelTextBBox.height) +
+            (self.height - tickerButtonRadius * 2 - 10 - raceBarDateLabelTextBBox.height) +
             ")"
         )
         .on("click", () => {
@@ -146,7 +190,7 @@ export const UpdateTickerButton = (self: Visual): void => {
                 raceDateLabelTextBBox.width / 2 -
                 tickerButtonRadius / 2) +
             "," +
-            (self.height - tickerButtonRadius - raceDateLabelTextBBox.height) +
+            (self.height - tickerButtonRadius * 2 - 10 - raceDateLabelTextBBox.height) +
             ")"
         );
 
