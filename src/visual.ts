@@ -3206,7 +3206,7 @@ export class Visual extends Shadow {
 					}
 
 					if (this.errorBarsSettings.measurement.makeSymmetrical) {
-						lb = lowerBoundValue = -upperBoundValue;
+						lb = lowerBoundValue = value - Math.abs(value - upperBoundValue);
 					}
 
 					break;
