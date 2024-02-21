@@ -59,6 +59,7 @@ import {
 	DisplayUnits,
 	EMarkerSettings,
 	ECFBasedOnValueTypes,
+	EPatternByDataTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -4024,11 +4025,14 @@ export class Visual extends Shadow {
 			});
 		}
 
-		this.chartData.forEach((d) => {
-			d.subCategories.forEach((s) => {
-				s.pattern = this.patternSettings.subCategoryPatterns.find((p) => p.name === s.category);
+		if ((this.isLollipopTypePie && this.isHasMultiMeasure && this.patternSettings.basedOn === EPatternByDataTypes.BySubCategory) ||
+			(this.isLollipopTypePie && !this.isHasMultiMeasure)) {
+			this.chartData.forEach((d) => {
+				d.subCategories.forEach((s) => {
+					s.pattern = this.patternSettings.subCategoryPatterns.find((p) => p.name === s.category);
+				});
 			});
-		});
+		}
 	}
 
 	setChartDataByRanking(): void {
@@ -7857,8 +7861,10 @@ export class Visual extends Shadow {
 
 			let pattern = d.pattern;
 
-			if ((this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single) && this.isPatternApplied) {
-				pattern = this.patternByMeasures[isPie2 ? DataValuesType.Value2 : DataValuesType.Value1];
+			if (this.isLollipopTypePie && this.isHasMultiMeasure && this.patternSettings.basedOn === EPatternByDataTypes.ByMeasures) {
+				if ((this.isLollipopTypePie) && this.isPatternApplied) {
+					pattern = this.patternByMeasures[isPie2 ? DataValuesType.Value2 : DataValuesType.Value1];
+				}
 			}
 
 			if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {

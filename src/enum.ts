@@ -357,6 +357,7 @@ export enum DataValuesType {
 export enum EPatternSettings {
 	Enabled = "enabled",
 	CategoryPatterns = "categoryPatterns",
+	BasedOn = "basedOn",
 	MeasuresPatterns = "measuresPatterns",
 	SubcategoryPatterns = "subCategoryPatterns",
 	IsPatternBorderEnabled = "isPatternBorderEnabled",
@@ -871,4 +872,9 @@ export enum ECFBasedOnValueTypes {
 	Value = "value",
 	Ranking = "ranking",
 	Percentage = "percent",
+}
+
+export enum EPatternByDataTypes {
+	ByMeasures = "byMeasures",
+	BySubCategory = "bySubCategory"
 }

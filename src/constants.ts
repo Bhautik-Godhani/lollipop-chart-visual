@@ -37,6 +37,7 @@ import {
 	EReferenceLineNameTypes,
 	EErrorBarsDirection,
 	EAxisDateFormats,
+	EPatternByDataTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -319,8 +320,9 @@ export const PATTERN_SETTINGS: IPatternSettings = {
 	categoryPatterns: [],
 	measuresPatterns: [],
 	subCategoryPatterns: [],
+	basedOn: EPatternByDataTypes.BySubCategory,
 	isPatternBorderEnabled: false,
-	patternBorderWidth: 1
+	patternBorderWidth: 1,
 };
 
 export const MARKER_SETTINGS: IMarkerSettings = {

@@ -29,6 +29,7 @@ import {
 	EMarkerShapeTypes,
 	EMarkerStyleTypes,
 	EMarkerTypes,
+	EPatternByDataTypes,
 	ERankingType,
 	EReferenceLineComputation,
 	EReferenceLineNameTypes,
@@ -377,6 +378,7 @@ export interface IPatternSettings {
 	categoryPatterns: IPatternProps[],
 	measuresPatterns: IPatternProps[],
 	subCategoryPatterns: IPatternProps[],
+	basedOn: EPatternByDataTypes,
 	isPatternBorderEnabled: boolean,
 	patternBorderWidth: number
 }

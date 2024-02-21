@@ -1,12 +1,24 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { IPatternData, PatternPicker, Quote } from "@truviz/shadow/dist/Components";
+import { IPatternData, PatternPicker, SelectInput } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
-import { ColorPaletteType, EPatternSettings } from "../enum";
-import { IPatternSettings } from "../visual-settings.interface";
+import { ColorPaletteType, EPatternByDataTypes, EPatternSettings } from "../enum";
+import { ILabelValuePair, IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
 import { parseObject, persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
+
+const BASED_ON_TYPES: ILabelValuePair[] = [
+	{
+		value: EPatternByDataTypes.ByMeasures,
+		label: "By Measures"
+	},
+	{
+		value: EPatternByDataTypes.BySubCategory,
+		label: "By Sub Category"
+	}
+];
 
 const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IPatternSettings>>) => {
 	setConfigValues((d) => ({
@@ -170,17 +182,45 @@ const FillPatterns = (props) => {
 			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={configValues.enabled}>
-				{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
-					UICategoryPatterns(shadow, configValues, setConfigValues)
-				)}
+				<ConditionalWrapper visible={shadow.isHasMultiMeasure && shadow.isLollipopTypePie}>
+					<Row>
+						<Column>
+							<SelectInput
+								label={"Based On"}
+								value={configValues.basedOn}
+								optionsList={BASED_ON_TYPES}
+								handleChange={(value) => {
+									setConfigValues((d) => ({
+										...d,
+										[EPatternSettings.BasedOn]: value,
+									}));
+								}}
+							/>
+						</Column>
+					</Row>
 
-				{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
-					UISubCategoryPatterns(shadow, configValues, setConfigValues)
-				)}
+					{configValues.basedOn === EPatternByDataTypes.ByMeasures && (
+						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+					)}
 
-				{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
-					UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-				)}
+					{configValues.basedOn === EPatternByDataTypes.BySubCategory && (
+						UISubCategoryPatterns(shadow, configValues, setConfigValues)
+					)}
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
+					{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
+						UICategoryPatterns(shadow, configValues, setConfigValues)
+					)}
+
+					{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
+						UISubCategoryPatterns(shadow, configValues, setConfigValues)
+					)}
+
+					{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
+						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+					)}
+				</ConditionalWrapper>
 
 				{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 			</ConditionalWrapper>
