@@ -5656,31 +5656,31 @@ export class Visual extends Shadow {
 
 	// XY Axis Title
 	drawXYAxisTitle(): void {
-		if (this.isHorizontalChart) {
-			if (this.xAxisSettings.isDisplayTitle) {
-				if (this.xAxisSettings.titleName.length === 0) {
-					this.xAxisSettings.titleName = this.measureNames.join(" and ");
-				}
-			}
+		// if (this.isHorizontalChart) {
+		// 	if (this.xAxisSettings.isDisplayTitle) {
+		// 		if (this.xAxisSettings.titleName.length === 0) {
+		// 			this.xAxisSettings.titleName = this.measureNames.join(" and ");
+		// 		}
+		// 	}
 
-			if (this.yAxisSettings.isDisplayTitle) {
-				if (this.yAxisSettings.titleName.length === 0) {
-					this.yAxisSettings.titleName = this.categoryDisplayName;
-				}
-			}
-		} else {
-			if (this.xAxisSettings.isDisplayTitle) {
-				if (this.xAxisSettings.titleName.length === 0) {
-					this.xAxisSettings.titleName = this.categoryDisplayName;
-				}
-			}
-
-			if (this.yAxisSettings.isDisplayTitle) {
-				if (this.yAxisSettings.titleName.length === 0) {
-					this.yAxisSettings.titleName = this.measureNames.join(" and ");
-				}
+		// 	if (this.yAxisSettings.isDisplayTitle) {
+		// 		if (this.yAxisSettings.titleName.length === 0) {
+		// 			this.yAxisSettings.titleName = this.categoryDisplayName;
+		// 		}
+		// 	}
+		// } else {
+		if (this.xAxisSettings.isDisplayTitle) {
+			if (this.xAxisSettings.titleName.length === 0) {
+				this.xAxisSettings.titleName = this.categoryDisplayName;
 			}
 		}
+
+		if (this.yAxisSettings.isDisplayTitle) {
+			if (this.yAxisSettings.titleName.length === 0) {
+				this.yAxisSettings.titleName = this.measureNames.join(" and ");
+			}
+		}
+		// }
 
 		const xAxisSettings = this.xAxisSettings;
 		const yAxisSettings = this.yAxisSettings;
@@ -7709,8 +7709,8 @@ export class Visual extends Shadow {
 	}
 
 	updateAnnotationNodeElements(): void {
-		this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
-		this.visualAnnotations.renderAnnotations();
+		// this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
+		// this.visualAnnotations.renderAnnotations();
 	}
 
 	setCircle1Formatting(circleSelection: D3Selection<any>, marker: IMarkerData, isEnter: boolean): void {
