@@ -23,9 +23,6 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
         (enter) => {
             const errorBarG = enter.append("g")
                 .attr("class", "errorBarG")
-                // .attr("fill", errorBars.barColor)
-                // .attr("stroke", errorBars.borderColor)
-                // .attr("stroke-width", errorBars.borderSize)
                 .each(function (d) {
                     const isValue2 = self.isHasMultiMeasure && self.errorBarsSettings.measurement.applySettingsToMeasure === self.measure2DisplayName;
                     let width = 0;
@@ -97,7 +94,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("class", "errorBarLine")
                 .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
-                .attr("stroke-width", errorBars.borderSize)
+                .attr("stroke-width", errorBars.isBorderEnabled ? errorBars.borderSize : 0)
                 .attr("d", function (d: any) {
                     if (self.isHorizontalChart) {
                         return getErrorBarLine(self, errorBars.barWidth, d.width);
@@ -112,7 +109,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("href", `#${errorBars.markerShape}_MARKER`)
                 .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
-                .attr("stroke-width", errorBars.borderSize)
+                .attr("stroke-width", errorBars.isBorderEnabled ? errorBars.borderSize : 0)
                 .attr("transform", () => {
                     if (self.isHorizontalChart) {
                         return `translate(${-errorBars.markerSize / 2}, ${-errorBars.markerSize / 2})`;
@@ -127,7 +124,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("href", `#${errorBars.markerShape}_MARKER`)
                 .attr("fill", barColor)
                 .attr("stroke", errorBars.borderColor)
-                .attr("stroke-width", errorBars.borderSize)
+                .attr("stroke-width", errorBars.isBorderEnabled ? errorBars.borderSize : 0)
                 .attr("transform", (d: any) => {
                     if (self.isHorizontalChart) {
                         return `translate(${-errorBars.markerSize / 2}, ${d.width - errorBars.markerSize / 2})`;
