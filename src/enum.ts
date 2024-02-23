@@ -646,6 +646,10 @@ export enum EErrorBarsMarkerShape {
 	Dash = "dash",
 	Minus = "minus",
 	Plus = "plus",
+	TriangleDown = "triangleDown",
+	TriangleLeft = "triangleLeft",
+	TriangleRight = "triangleRight",
+	TriangleUp = "triangleUp"
 }
 
 export enum EErrorBarsSettings {

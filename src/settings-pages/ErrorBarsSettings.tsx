@@ -225,6 +225,22 @@ const ErrorBarsSettings = (props) => {
       label: "Plus",
       value: EErrorBarsMarkerShape.Plus,
     },
+    {
+      label: "Triangle Down",
+      value: EErrorBarsMarkerShape.TriangleDown,
+    },
+    {
+      label: "Triangle Left",
+      value: EErrorBarsMarkerShape.TriangleLeft,
+    },
+    {
+      label: "Triangle Right",
+      value: EErrorBarsMarkerShape.TriangleRight,
+    },
+    {
+      label: "Triangle Up",
+      value: EErrorBarsMarkerShape.TriangleUp,
+    },
   ];
 
   const DIRECTION: ILabelValuePair[] = [
