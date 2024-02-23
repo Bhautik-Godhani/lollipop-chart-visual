@@ -120,7 +120,8 @@ const UIXAxis = (
   vizOptions: ShadowUpdateOptions,
   shadow: Visual,
   xConfigValues: IXAxisSettings,
-  setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>
+  setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>,
+  setYConfigValues: React.Dispatch<React.SetStateAction<IYAxisSettings>>
 ) => {
   return <>
     <Row>
@@ -153,7 +154,10 @@ const UIXAxis = (
               label={"Axis Mode"}
               value={xConfigValues.categoryType}
               optionsList={AXIS_MODE}
-              handleChange={(value) => handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues)}
+              handleChange={(value) => {
+                handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
+                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+              }}
             />
           </Column>
         </Row>
@@ -178,7 +182,10 @@ const UIXAxis = (
             <ToggleButton
               label={"Minimum Range"}
               value={xConfigValues.isMinimumRangeEnabled}
-              handleChange={() => handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues)}
+              handleChange={() => {
+                handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
+                handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
+              }}
               appearance="toggle"
             />
           </Column>
@@ -192,7 +199,10 @@ const UIXAxis = (
                 type="number"
                 label=""
                 value={xConfigValues.minimumRange}
-                handleChange={(value) => handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues)}
+                handleChange={(value) => {
+                  handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
+                  handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
+                }}
               />
             </Column>
             <Column></Column>
@@ -204,7 +214,10 @@ const UIXAxis = (
             <ToggleButton
               label={"Maximum Range"}
               value={xConfigValues.isMaximumRangeEnabled}
-              handleChange={() => handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues)}
+              handleChange={() => {
+                handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
+                handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
+              }}
               appearance="toggle"
             />
           </Column>
@@ -218,7 +231,10 @@ const UIXAxis = (
                 type="number"
                 label=""
                 value={xConfigValues.maximumRange}
-                handleChange={(value) => handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues)}
+                handleChange={(value) => {
+                  handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
+                  handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
+                }}
               />
             </Column>
             <Column></Column>
@@ -230,7 +246,10 @@ const UIXAxis = (
             <ToggleButton
               label={"Logarithm Scale"}
               value={xConfigValues.isLogarithmScale}
-              handleChange={() => handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues)}
+              handleChange={() => {
+                handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+              }}
               appearance="checkbox"
             />
           </Column>
@@ -467,7 +486,10 @@ const UIXAxis = (
                       label={"Date Format"}
                       value={xConfigValues.dateFormat}
                       optionsList={AXIS_DATE_FORMATS}
-                      handleChange={value => handleXChange(value, EXAxisSettings.DateFormat, setXConfigValues)}
+                      handleChange={value => {
+                        handleXChange(value, EXAxisSettings.DateFormat, setXConfigValues);
+                        handleYChange(value, EYAxisSettings.DateFormat, setYConfigValues);
+                      }}
                     />
                   </Column>
                 </Row>
@@ -498,7 +520,8 @@ const UIYAxis = (
   vizOptions: ShadowUpdateOptions,
   shadow: Visual,
   yConfigValues: IYAxisSettings,
-  setYConfigValues: React.Dispatch<React.SetStateAction<IYAxisSettings>>
+  setYConfigValues: React.Dispatch<React.SetStateAction<IYAxisSettings>>,
+  setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>,
 ) => {
   return <>
     <Row>
@@ -531,7 +554,10 @@ const UIYAxis = (
               label={"Axis Mode"}
               value={yConfigValues.categoryType}
               optionsList={AXIS_MODE}
-              handleChange={(value) => handleYChange(value, EXAxisSettings.CategoryType, setYConfigValues)}
+              handleChange={(value) => {
+                handleYChange(value, EXAxisSettings.CategoryType, setYConfigValues);
+                handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
+              }}
             />
           </Column>
         </Row>
@@ -543,7 +569,10 @@ const UIYAxis = (
             <ToggleButton
               label={"Minimum Range"}
               value={yConfigValues.isMinimumRangeEnabled}
-              handleChange={() => handleYCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setYConfigValues)}
+              handleChange={() => {
+                handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
+                handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
+              }}
               appearance="toggle"
             />
           </Column>
@@ -557,7 +586,10 @@ const UIYAxis = (
                 type="number"
                 label=""
                 value={yConfigValues.minimumRange}
-                handleChange={(value) => handleYChange(value, EXAxisSettings.MinimumRange, setYConfigValues)}
+                handleChange={(value) => {
+                  handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
+                  handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
+                }}
               />
             </Column>
             <Column></Column>
@@ -569,7 +601,10 @@ const UIYAxis = (
             <ToggleButton
               label={"Maximum Range"}
               value={yConfigValues.isMaximumRangeEnabled}
-              handleChange={() => handleYCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setYConfigValues)}
+              handleChange={() => {
+                handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
+                handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
+              }}
               appearance="toggle"
             />
           </Column>
@@ -583,7 +618,10 @@ const UIYAxis = (
                 type="number"
                 label=""
                 value={yConfigValues.maximumRange}
-                handleChange={(value) => handleYChange(value, EXAxisSettings.MaximumRange, setYConfigValues)}
+                handleChange={(value) => {
+                  handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
+                  handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
+                }}
               />
             </Column>
             <Column></Column>
@@ -595,7 +633,10 @@ const UIYAxis = (
             <ToggleButton
               label={"Logarithm Scale"}
               value={yConfigValues.isLogarithmScale}
-              handleChange={() => handleYCheckbox(EXAxisSettings.IsLogarithmScale, setYConfigValues)}
+              handleChange={() => {
+                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+                handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+              }}
               appearance="checkbox"
             />
           </Column>
@@ -820,7 +861,10 @@ const UIYAxis = (
                       label={"Date Format"}
                       value={yConfigValues.dateFormat}
                       optionsList={AXIS_DATE_FORMATS}
-                      handleChange={value => handleYChange(value, EYAxisSettings.DateFormat, setYConfigValues)}
+                      handleChange={value => {
+                        handleYChange(value, EYAxisSettings.DateFormat, setYConfigValues);
+                        handleXChange(value, EXAxisSettings.DateFormat, setXConfigValues);
+                      }}
                     />
                   </Column>
                 </Row>
@@ -894,38 +938,41 @@ const XAxisSettings = (props) => {
       }
     }
 
-    if ((JSON.stringify(shadow.xAxisSettings)) !== (JSON.stringify(xConfigValues))) {
-      const yAxisSettings: IYAxisSettings = {
-        ...shadow.yAxisSettings,
-        isMinimumRangeEnabled: xConfigValues.isMinimumRangeEnabled,
-        isMaximumRangeEnabled: xConfigValues.isMaximumRangeEnabled,
-        minimumRange: xConfigValues.minimumRange,
-        maximumRange: xConfigValues.maximumRange,
-        isLogarithmScale: xConfigValues.isLogarithmScale,
-        categoryType: xConfigValues.categoryType,
-        dateFormat: xConfigValues.dateFormat
-      };
-      shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yAxisSettings);
+    // if ((JSON.stringify(shadow.xAxisSettings)) !== (JSON.stringify(xConfigValues))) {
+    //   const yAxisSettings: IYAxisSettings = {
+    //     ...shadow.yAxisSettings,
+    //     isMinimumRangeEnabled: xConfigValues.isMinimumRangeEnabled,
+    //     isMaximumRangeEnabled: xConfigValues.isMaximumRangeEnabled,
+    //     minimumRange: xConfigValues.minimumRange,
+    //     maximumRange: xConfigValues.maximumRange,
+    //     isLogarithmScale: xConfigValues.isLogarithmScale,
+    //     categoryType: xConfigValues.categoryType,
+    //     dateFormat: xConfigValues.dateFormat
+    //   };
+    //   shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yAxisSettings);
 
-      persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
-      closeCurrentSettingHandler();
-    }
+    //   persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    //   closeCurrentSettingHandler();
+    // }
 
-    if ((JSON.stringify(shadow.yAxisSettings)) !== (JSON.stringify(yConfigValues))) {
-      const xAxisSettings: IXAxisSettings = {
-        ...shadow.xAxisSettings,
-        isMinimumRangeEnabled: yConfigValues.isMinimumRangeEnabled,
-        isMaximumRangeEnabled: yConfigValues.isMaximumRangeEnabled,
-        minimumRange: yConfigValues.minimumRange,
-        maximumRange: yConfigValues.maximumRange,
-        isLogarithmScale: yConfigValues.isLogarithmScale,
-        categoryType: yConfigValues.categoryType,
-        dateFormat: yConfigValues.dateFormat
-      };
-      shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xAxisSettings);
+    // if ((JSON.stringify(shadow.yAxisSettings)) !== (JSON.stringify(yConfigValues))) {
+    //   const xAxisSettings: IXAxisSettings = {
+    //     ...shadow.xAxisSettings,
+    //     isMinimumRangeEnabled: yConfigValues.isMinimumRangeEnabled,
+    //     isMaximumRangeEnabled: yConfigValues.isMaximumRangeEnabled,
+    //     minimumRange: yConfigValues.minimumRange,
+    //     maximumRange: yConfigValues.maximumRange,
+    //     isLogarithmScale: yConfigValues.isLogarithmScale,
+    //     categoryType: yConfigValues.categoryType,
+    //     dateFormat: yConfigValues.dateFormat
+    //   };
+    //   shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xAxisSettings);
 
-      persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
-    }
+    //   persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    // }
+
+    persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
 
     closeCurrentSettingHandler();
   };
@@ -999,10 +1046,10 @@ const XAxisSettings = (props) => {
     <>
       <Tabs selected={EXYAxisNames.X}>
         <Tab title={"X - Axis"} identifier={EXYAxisNames.X}>
-          {UIXAxis(vizOptions, shadow, xConfigValues, setXConfigValues)}
+          {UIXAxis(vizOptions, shadow, xConfigValues, setXConfigValues, setYConfigValues)}
         </Tab>
         <Tab title={"Y - Axis"} identifier={EXYAxisNames.Y}>
-          {UIYAxis(vizOptions, shadow, yConfigValues, setYConfigValues)}
+          {UIYAxis(vizOptions, shadow, yConfigValues, setYConfigValues, setXConfigValues)}
         </Tab>
       </Tabs >
 
