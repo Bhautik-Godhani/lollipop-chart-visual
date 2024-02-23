@@ -8641,7 +8641,7 @@ export class Visual extends Shadow {
 			return textMeasurementService.measureSvgTextWidth({ ...textProperties, text: d });
 		});
 		const brushYAxisTicksMaxWidth = d3.max(brushYAxisTicksWidth, (d) => +d);
-		this.brushYAxisTicksMaxWidth = brushYAxisTicksMaxWidth;
+		this.brushYAxisTicksMaxWidth = brushYAxisTicksMaxWidth + 10;
 	}
 
 	drawBrushXAxis(): void {
@@ -8696,7 +8696,7 @@ export class Visual extends Shadow {
 
 		this.brushYAxisG
 			.selectAll("text")
-			.attr("x", "0")
+			.attr("x", "10")
 			.attr("fill", this.yAxisSettings.labelColor)
 			.style("font-family", this.yAxisSettings.labelFontFamily)
 			.attr("font-size", this.yAxisSettings.labelFontSize);
