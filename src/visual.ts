@@ -2375,6 +2375,10 @@ export class Visual extends Shadow {
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					onCellRendered: (category, index, ele) => {
 						DrawSmallMultipleBarChart(this, settings, this.smallMultiplesCategories.findIndex(d => d === category), ele);
+
+						if (index === this.smallMultiplesCategories.length - 1) {
+							this.configLegend();
+						}
 					},
 					getXYAxisNodeElementAndMeasures: (width, height) => {
 						this.viewPortWidth = width;
