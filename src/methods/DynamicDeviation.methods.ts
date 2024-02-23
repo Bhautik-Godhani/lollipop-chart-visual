@@ -444,6 +444,7 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
                     RemoveDynamicDeviation(self);
                     self.fromCategoryValueDataPair = undefined;
                     self.toCategoryValueDataPair = undefined;
+                    self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
                 }
 
                 if (self.fromCategoryValueDataPair && self.toCategoryValueDataPair) {
