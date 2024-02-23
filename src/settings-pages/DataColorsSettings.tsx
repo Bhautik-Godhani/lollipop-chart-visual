@@ -289,7 +289,7 @@ const UIColorPaletteTypes = (
 					values.fillType as any
 				)}
 			>
-				<Row>
+				<Row disableTopPadding>
 					<Column>
 						<ColorSchemePicker
 							colorSchemePickerProps={values}
