@@ -386,7 +386,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		measureName: undefined,
 		computation: EReferenceLineComputation.Fixed,
 		rankOrder: Position.Start,
-		rank: "1",
+		rank: "2",
 	},
 	lineStyle: {
 		lineStyle: ELineType.Dashed,

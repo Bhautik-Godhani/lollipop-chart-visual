@@ -7544,6 +7544,7 @@ export class Visual extends Shadow {
 		this.lollipopG.selectAll(".lollipop-group")
 			.on("mouseover", function () {
 				if (isCreateOwnDynamicDeviation || THIS.isDynamicDeviationButtonSelected) {
+					THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
 					if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
 						const data: any = d3.select(this).datum();
 						const toCategoryValueDataPair = { category: data.category, value: data.value1 };
@@ -7556,6 +7557,7 @@ export class Visual extends Shadow {
 		if (this.dynamicDeviationSettings.isEnabled && this.isLollipopTypeCircle && !this.isHasMultiMeasure) {
 			SetDynamicDeviationDataAndDrawLines(this);
 		} else {
+			this.lollipopG.selectAll(".lollipop-group").style("cursor", "auto");
 			RemoveDynamicDeviation(this);
 		}
 
