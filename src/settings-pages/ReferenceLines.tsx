@@ -71,6 +71,7 @@ const ReferenceLines = (props) => {
   };
 
   const onAdd = (details) => {
+    details.referenceType = selectedLineType;
     initialStates.push(details);
     setInitialStates([...initialStates]);
     applyChanges(initialStates);

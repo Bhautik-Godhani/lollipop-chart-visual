@@ -868,8 +868,8 @@ export enum ECFRankingTypes {
 
 export enum ELineTypeTabs {
 	All = "all",
-	Line = "line",
-	Band = "band"
+	Line = "referenceLine",
+	Band = "referenceBand"
 }
 
 export enum ECFBasedOnValueTypes {
