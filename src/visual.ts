@@ -2378,6 +2378,26 @@ export class Visual extends Shadow {
 
 						if (index === this.smallMultiplesCategories.length - 1) {
 							this.configLegend();
+
+							if (this.isLollipopTypeCircle) {
+								this.categoriesColorList = this.chartData.map(d => ({
+									name: d.category,
+									marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
+								}));
+							}
+
+							if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
+								this.subCategoriesColorList = [];
+								this.chartData.forEach(c => {
+									c.subCategories.forEach(d => {
+										const obj = {
+											name: `${c.category}-${d.category}`,
+											marker: this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color ? this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color : this.colorPalette.getColor(d.category).value,
+										}
+										this.subCategoriesColorList.push(obj);
+									});
+								});
+							}
 						}
 					},
 					getXYAxisNodeElementAndMeasures: (width, height) => {
