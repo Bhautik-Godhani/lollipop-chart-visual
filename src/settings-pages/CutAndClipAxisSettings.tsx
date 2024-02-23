@@ -34,7 +34,7 @@ const CutAndClipAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    if (configValues.breakEnd > configValues.breakStart) {
+    if ((configValues.isEnabled && (configValues.breakEnd > configValues.breakStart)) || !configValues.isEnabled) {
       shadow.persistProperties(sectionName, propertyName, configValues);
       closeCurrentSettingHandler();
     }
