@@ -280,10 +280,11 @@ const UIGeneralChartSettings = (
 					<Row appearance="padded">
 						<Column>
 							<InputControl
-								// min={+Math.ceil(shadow.scaleBandWidth).toFixed(0)}
+								min={20}
+								max={180}
 								type="number"
 								label="Min Width"
-								value={configValues.lollipopWidth}
+								value={configValues.lollipopWidth ? configValues.lollipopWidth : Math.ceil(shadow.scaleBandWidth)}
 								handleChange={(value) => handleChange(value, EChartSettings.lollipopWidth, setConfigValues)}
 							/>
 						</Column>
@@ -364,12 +365,6 @@ const ChartSettings = (props) => {
 	});
 
 	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);
-
-	React.useEffect(() => {
-		if (!configValues.lollipopWidth) {
-			handleChange(Math.ceil(shadow.scaleBandWidth), EChartSettings.lollipopWidth, setConfigValues)
-		}
-	}, []);
 
 	React.useEffect(() => {
 		if (configValues.isIBCSEnabled && configValues.theme === undefined) {
