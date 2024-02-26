@@ -95,13 +95,23 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
     const getLabelText = (d: IReferenceLineSettings): string => {
         const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
         const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
+        let labelValue: string;
+
+        if (d.referenceType === EReferenceType.REFERENCE_BAND) {
+            labelValue = isValue1TypeNumber ?
+                GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) + " - " + GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true) :
+                d.lineValue1.value + " - " + d.lineValue2.value;
+        } else {
+            labelValue = isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value;
+        }
+
         switch (d.labelStyle.labelNameType) {
             case EReferenceLineNameTypes.TEXT:
                 return labelText;
             case EReferenceLineNameTypes.TEXT_VALUE:
-                return labelText + " " + (isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value);
+                return labelText + " " + labelValue;
             case EReferenceLineNameTypes.VALUE:
-                return isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true) : d.lineValue1.value;
+                return labelValue;
         }
     }
 
@@ -322,7 +332,7 @@ const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: n
     return { x1, y1, x2, y2 };
 };
 
-const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string, value: string } => {
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
@@ -368,7 +378,7 @@ const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
         newTextAlignment = textAlignment;
     }
 
-    return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
+    return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value };
 }
 
 const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
@@ -472,8 +482,9 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
         }
 
         let value: string;
+        let newValue: string;
         if (rLineValue.axis === EXYAxisNames.X) {
-            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForXAxisRefLine(self, rLineValue, rLine.labelStyle, value);
+            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value: value2 } = setValueForXAxisRefLine(self, rLineValue, rLine.labelStyle, value);
             x1 = newX1;
             x2 = newX2;
             y1 = newY1;
@@ -482,6 +493,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             textY1 = newTextY1;
             textAnchor = newTextAnchor;
             textAlignment = newTextAlignment;
+            newValue = value2;
         } else if (rLineValue.axis === EXYAxisNames.Y) {
             const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLineValue, rLine.labelStyle, value);
             x1 = newX1;
@@ -501,6 +513,10 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.line2Coord.y2 = y2;
             rLine.line2Coord.textX1 = textX1;
             rLine.line2Coord.textY1 = textY1;
+
+            if (rLineValue.axis === EXYAxisNames.X) {
+                rLine.lineValue2.value = newValue;
+            }
         } else {
             rLine.line1Coord.x1 = x1;
             rLine.line1Coord.x2 = x2;
@@ -510,6 +526,10 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.line1Coord.textY1 = textY1;
             rLine.labelStyle.textAnchor = textAnchor;
             rLine.labelStyle.textAlignment = textAlignment;
+
+            if (rLineValue.axis === EXYAxisNames.X) {
+                rLine.lineValue1.value = newValue;
+            }
         }
     }
 
