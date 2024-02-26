@@ -128,7 +128,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetWordsSplitByWidth, calculatePowerBiStandardDeviation, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { GetOnlyWordsFromString, GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -1262,6 +1262,8 @@ export class Visual extends Shadow {
 		const categoricalUpperBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.UpperBound]);
 		const categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
 
+		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
+
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.isHasSubcategories = !!categoricalSubCategoryField;
@@ -1275,6 +1277,16 @@ export class Visual extends Shadow {
 		this.isHasErrorUpperBounds = categoricalUpperBoundFields.length > 0;
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
+
+		if (this.isExpandAllApplied) {
+			const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);
+			const categoriesName = categoricalCategoriesFields[this.categoricalCategoriesLastIndex].values
+				.map((d: string, i) => d + " " + startCategories.map(d => d.values[i]).join(" ")).filter(
+					(v, i, a) => a.findIndex((t) => t === v) === i
+				) as string[];
+
+			categoricalData.categories[categoricalCategoriesLastIndex].values = categoriesName;
+		}
 
 		if (!this.isHasImagesData) {
 			if (this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.SHAPE && !this.markerSettings.isAutoLollipopTypePie) {
@@ -1703,37 +1715,37 @@ export class Visual extends Shadow {
 			});
 		}
 
-		if (this.isExpandAllApplied) {
-			clonedCategoricalData.categories
-				.filter((d) => !!d.source.roles[EDataRolesName.Category])
-				.forEach((d) => {
-					if (!d["isIdToCategoryAdded"]) {
-						d.values = d.values.map((d: string, i: number) => {
-							if (d.toString().split("--").length === 2) {
-								return d;
-							} else {
-								return d + "-" + i.toString();
-							}
-						});
-						d["isIdToCategoryAdded"] = true;
-					}
-				});
+		// if (this.isExpandAllApplied) {
+		// 	clonedCategoricalData.categories
+		// 		.filter((d) => !!d.source.roles[EDataRolesName.Category])
+		// 		.forEach((d) => {
+		// 			if (!d["isIdToCategoryAdded"]) {
+		// 				d.values = d.values.map((d: string, i: number) => {
+		// 					if (d.toString().split("--").length === 2) {
+		// 						return d;
+		// 					} else {
+		// 						return d + "-" + i.toString();
+		// 					}
+		// 				});
+		// 				d["isIdToCategoryAdded"] = true;
+		// 			}
+		// 		});
 
-			categoricalData.categories
-				.filter((d) => !!d.source.roles[EDataRolesName.Category])
-				.forEach((d) => {
-					// if (!d["isIdToCategoryAdded"]) {
-					d.values = d.values.map((d: string, i: number) => {
-						if (d.toString().split("--").length === 2) {
-							return d;
-						} else {
-							return d + "--" + i.toString();
-						}
-					});
-					d["isIdToCategoryAdded"] = true;
-					// }
-				});
-		}
+		// 	categoricalData.categories
+		// 		.filter((d) => !!d.source.roles[EDataRolesName.Category])
+		// 		.forEach((d) => {
+		// 			// if (!d["isIdToCategoryAdded"]) {
+		// 			d.values = d.values.map((d: string, i: number) => {
+		// 				if (d.toString().split("--").length === 2) {
+		// 					return d;
+		// 				} else {
+		// 					return d + "--" + i.toString();
+		// 				}
+		// 			});
+		// 			d["isIdToCategoryAdded"] = true;
+		// 			// }
+		// 		});
+		// }
 
 		const dataLength = categoricalData.categories[this.categoricalCategoriesLastIndex].values.length;
 
@@ -2641,8 +2653,6 @@ export class Visual extends Shadow {
 					this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
 				}
 
-				// -----
-
 				// const axisConfig: IAxisConfig = {
 				// 	categoricalData: this.categoricalData,
 				// 	width: this.width,
@@ -3332,7 +3342,7 @@ export class Visual extends Shadow {
 
 				const obj: ILollipopChartRow = {
 					uid: getUID(cat),
-					category: <string>cat.toString(),
+					category: cat.toString(),
 					raceChartKey,
 					raceChartDataLabel,
 					value1: value1,
@@ -3518,7 +3528,7 @@ export class Visual extends Shadow {
 
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
-				name: d.category,
+				name: GetOnlyWordsFromString(d.category),
 				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
 				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
@@ -3635,9 +3645,9 @@ export class Visual extends Shadow {
 					} else {
 						legendDataPoints = this.chartData.map(d => ({
 							data: {
-								name: d.category,
+								name: GetOnlyWordsFromString(d.category),
 								color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
-								pattern: undefined
+								pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category)
 							}
 						}))
 					}
@@ -5599,7 +5609,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: typeof value.category === "string" ? value.category.toUpperCase() : value.category,
+					value: GetOnlyWordsFromString((typeof value.category === "string" ? value.category.toUpperCase() : value.category)),
 					color: "transparent",
 				},
 				{

@@ -650,3 +650,7 @@ export function calculatePowerBiStandardDeviation(data: number[]): number {
 
 	return standardDeviation;
 }
+
+export const GetOnlyWordsFromString = (text: string) => {
+	return (text.match(/[a-zA-Z]+/g) || []).join(" ");
+}
