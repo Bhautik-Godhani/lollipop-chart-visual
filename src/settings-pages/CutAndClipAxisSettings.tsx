@@ -10,6 +10,7 @@ import {
   ToggleButton,
   Footer,
   ColorPicker,
+  Quote,
 } from "@truviz/shadow/dist/Components";
 import { ICutAndClipAxisSettings } from "../visual-settings.interface";
 import { CutAndClipAxisPlaceholderIcon } from "./SettingsIcons";
@@ -71,63 +72,75 @@ const CutAndClipAxisSettings = (props) => {
 
   return (
     <>
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Enable"}
-            value={configValues.isEnabled}
-            handleChange={() => handleCheckbox(ECutAndClipAxisSettings.IsEnabled)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={!configValues.isEnabled}>
+      <ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
         <Row>
-          <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <CutAndClipAxisPlaceholderIcon />
+          <Column>
+            <Quote>
+              <strong>Note: </strong>Please remove the small multiples data to use this feature.
+            </Quote>
           </Column>
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={configValues.isEnabled}>
-        <Row appearance="padded">
+      <ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled}>
+        <Row>
           <Column>
-            <Row disableTopPadding={true}>
-              <Column >
-                <InputControl
-                  min={0}
-                  type="number"
-                  label="Break Start"
-                  value={configValues.breakStart}
-                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
-                />
-              </Column>
-
-              <Column>
-                <InputControl
-                  min={0}
-                  type="number"
-                  label="Break End"
-                  value={configValues.breakEnd}
-                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <ColorPicker
-                  label={"Marker Line Color"}
-                  color={configValues.markerStrokeColor}
-                  handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
-                  colorPalette={vizOptions.host.colorPalette}
-                  size="sm"
-                />
-              </Column>
-            </Row>
+            <ToggleButton
+              label={"Enable"}
+              value={configValues.isEnabled}
+              handleChange={() => handleCheckbox(ECutAndClipAxisSettings.IsEnabled)}
+              appearance="toggle"
+            />
           </Column>
         </Row>
+
+        <ConditionalWrapper visible={!configValues.isEnabled}>
+          <Row>
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <CutAndClipAxisPlaceholderIcon />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={configValues.isEnabled}>
+          <Row appearance="padded">
+            <Column>
+              <Row disableTopPadding={true}>
+                <Column >
+                  <InputControl
+                    min={0}
+                    type="number"
+                    label="Break Start"
+                    value={configValues.breakStart}
+                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
+                  />
+                </Column>
+
+                <Column>
+                  <InputControl
+                    min={0}
+                    type="number"
+                    label="Break End"
+                    value={configValues.breakEnd}
+                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
+                  />
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <ColorPicker
+                    label={"Marker Line Color"}
+                    color={configValues.markerStrokeColor}
+                    handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
+                    colorPalette={vizOptions.host.colorPalette}
+                    size="sm"
+                  />
+                </Column>
+              </Row>
+            </Column>
+          </Row>
+        </ConditionalWrapper>
       </ConditionalWrapper>
 
       <Footer
