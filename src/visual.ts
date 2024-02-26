@@ -6693,7 +6693,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("x1", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis || this.xAxisSettings.isInvertRange) {
+				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
 					if (d.value1 > d.value2) {
 						return this.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
@@ -6724,7 +6724,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("x2", (d: ILollipopChartRow) => {
-				if (!this.isLeftYAxis || this.xAxisSettings.isInvertRange) {
+				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
 					if (d.value1 > d.value2) {
 						const Y1 = THIS.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 						const Y2 = THIS.getXPosition(d.value2);
@@ -6822,7 +6822,7 @@ export class Visual extends Shadow {
 			.attr("x1", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
 			.attr("x2", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
 			.attr("y1", (d: ILollipopChartRow) => {
-				if (this.isBottomXAxis || this.yAxisSettings.isInvertRange) {
+				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
 					if (d.value1 > d.value2) {
 						return this.getYPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
@@ -6853,7 +6853,7 @@ export class Visual extends Shadow {
 				}
 			})
 			.attr("y2", (d: ILollipopChartRow) => {
-				if (this.isBottomXAxis || this.yAxisSettings.isInvertRange) {
+				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
 					if (d.value1 > d.value2) {
 						const Y1 = THIS.getYPosition(d.value1) + THIS.markerMaxSize / 2;
 						const Y2 = THIS.getYPosition(d.value2);
