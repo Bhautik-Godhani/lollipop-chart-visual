@@ -245,6 +245,10 @@ function getLegendSelection(): EnumerateSectionType {
 				name: "fontFamily",
 				isShow: true,
 			},
+			{
+				name: "isLegendAutoChanged",
+				isShow: false,
+			},
 		],
 	};
 }
