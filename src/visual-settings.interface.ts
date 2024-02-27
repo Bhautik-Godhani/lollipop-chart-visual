@@ -65,6 +65,7 @@ export interface IXAxisSettings {
 	labelTilt: number;
 	isLabelAutoTilt: boolean;
 	labelCharLimit: number;
+	labelStyling: EFontStyle[];
 	isLabelAutoCharLimit: boolean;
 	isShowAxisLine: boolean;
 	axisLineColor: string;
@@ -94,6 +95,7 @@ export interface IYAxisSettings {
 	labelFontFamily: string;
 	labelFontSize: number;
 	labelCharLimit: number;
+	labelStyling: EFontStyle[];
 	isShowLabelsAboveLine: boolean;
 	isShowAxisLine: boolean;
 	axisLineColor: string;

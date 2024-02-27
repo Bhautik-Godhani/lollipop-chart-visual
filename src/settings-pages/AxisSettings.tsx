@@ -74,6 +74,21 @@ const AXIS_DATE_FORMATS: ILabelValuePair[] = [
   },
 ];
 
+const STYLING = [
+  {
+    label: <BoldIcon style={{ fill: "currentColor" }} />,
+    value: "bold",
+  },
+  {
+    label: <ItalicIcon style={{ fill: "currentColor" }} />,
+    value: "italic",
+  },
+  {
+    label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+    value: "underline",
+  },
+];
+
 const handleXChange = (val, n, setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>) => {
   setXConfigValues((d) => ({
     ...d,
@@ -328,20 +343,7 @@ const UIXAxis = (
             <SwitchOption
               label="Styling"
               value={xConfigValues.titleStyling}
-              optionsList={[
-                {
-                  label: <BoldIcon style={{ fill: "currentColor" }} />,
-                  value: "bold",
-                },
-                {
-                  label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                  value: "italic",
-                },
-                {
-                  label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                  value: "underline",
-                },
-              ]}
+              optionsList={STYLING}
               isMultiple
               handleChange={(value) => handleXChange(value, EXAxisSettings.TitleStyling, setXConfigValues)}
             />
@@ -405,6 +407,18 @@ const UIXAxis = (
               isFontSelector={true}
               optionsList={[]}
               handleChange={value => handleXChange(value, EXAxisSettings.LabelFontFamily, setXConfigValues)}
+            />
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Styling"
+              value={xConfigValues.labelStyling}
+              optionsList={STYLING}
+              isMultiple
+              handleChange={(value) => handleXChange(value, EXAxisSettings.LabelStyling, setXConfigValues)}
             />
           </Column>
         </Row>
@@ -794,6 +808,18 @@ const UIYAxis = (
               isFontSelector={true}
               optionsList={[]}
               handleChange={value => handleYChange(value, EYAxisSettings.LabelFontFamily, setYConfigValues)}
+            />
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Styling"
+              value={yConfigValues.labelStyling}
+              optionsList={STYLING}
+              isMultiple
+              handleChange={(value) => handleYChange(value, EYAxisSettings.LabelStyling, setYConfigValues)}
             />
           </Column>
         </Row>

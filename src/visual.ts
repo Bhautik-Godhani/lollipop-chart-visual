@@ -5739,6 +5739,9 @@ export class Visual extends Shadow {
 			.attr("font-size", xAxisSettings.titleFontSize)
 			.style("font-family", xAxisSettings.titleFontFamily)
 			.style("display", xAxisSettings.isDisplayTitle ? "block" : "none")
+			.style("text-decoration", this.xAxisSettings.titleStyling.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", this.xAxisSettings.titleStyling.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", this.xAxisSettings.titleStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			.text(!this.isHorizontalChart ? xAxisTitle : yAxisTitle);
 
 		this.yAxisTitleText
@@ -5746,6 +5749,9 @@ export class Visual extends Shadow {
 			.attr("font-size", yAxisSettings.titleFontSize)
 			.style("font-family", this.yAxisSettings.titleFontFamily)
 			.style("display", yAxisSettings.isDisplayTitle ? "block" : "none")
+			.style("text-decoration", this.yAxisSettings.titleStyling.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", this.yAxisSettings.titleStyling.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", this.yAxisSettings.titleStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			.text(!this.isHorizontalChart ? yAxisTitle : xAxisTitle);
 
 		if (xAxisSettings.position === Position.Bottom) {
@@ -5863,6 +5869,9 @@ export class Visual extends Shadow {
 			.style("font-family", xAxisSettings.labelFontFamily)
 			.attr("font-size", xAxisSettings.labelFontSize)
 			.attr("display", xAxisSettings.isDisplayLabel ? "block" : "none")
+			.style("text-decoration", this.xAxisSettings.labelStyling.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", this.xAxisSettings.labelStyling.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", this.xAxisSettings.labelStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			.attr("text-anchor", () => {
 				if (this.isBottomXAxis) {
 					return isApplyTilt ? "end" : "middle";
@@ -5979,6 +5988,9 @@ export class Visual extends Shadow {
 			.style("font-family", yAxisSettings.labelFontFamily)
 			.attr("font-size", yAxisSettings.labelFontSize)
 			.style("text-anchor", yAxisSettings.position === Position.Left ? "end" : "start")
+			.style("text-decoration", this.yAxisSettings.labelStyling.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", this.yAxisSettings.labelStyling.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", this.yAxisSettings.labelStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			// .text((d: any) => {
 			// 	if (!this.isHorizontalChart && typeof d === "number") {
 			// 		return formatNumber(d, this.numberSettings, undefined);
