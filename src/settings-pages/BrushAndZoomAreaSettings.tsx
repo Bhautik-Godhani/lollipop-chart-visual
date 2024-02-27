@@ -27,7 +27,7 @@ const UIWidthSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSettings
 		<Row>
 			<Column>
 				<ToggleButton
-					label={"Track Manual Width"}
+					label={"Track Auto Width"}
 					value={configValues.isAutoWidth}
 					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoWidth, setConfigValues)}
 					appearance="toggle"
@@ -57,7 +57,7 @@ const UIHeightSettings = (shadow: Visual, configValues: IBrushAndZoomAreaSetting
 		<Row>
 			<Column>
 				<ToggleButton
-					label={"Track Manual Height"}
+					label={"Track Auto Height"}
 					value={configValues.isAutoHeight}
 					handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.IsAutoHeight, setConfigValues)}
 					appearance="toggle"
