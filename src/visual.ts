@@ -182,6 +182,7 @@ import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from ".
 import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
+import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -699,7 +700,7 @@ export class Visual extends Shadow {
 					name: "Small Multiples",
 					sectionName: EVisualConfig.SmallMultiplesConfig,
 					propertyName: EVisualSettings.SmallMultiplesSettings,
-					Component: Components.SmallMultiples,
+					Component: () => SmallMultiplesSettings,
 					icon: SmallMultipleIcon
 				},
 				{
@@ -4947,7 +4948,7 @@ export class Visual extends Shadow {
 			.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true));
 
-		if (labelPlacement === DataLabelsPlacement.Inside) {
+		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
 				.attr("fill", d => {
 					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : this.dataLabelsSettings.color), EHighContrastColorType.Foreground)
@@ -4959,7 +4960,7 @@ export class Visual extends Shadow {
 				});
 		}
 
-		if (labelPlacement === DataLabelsPlacement.Inside) {
+		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
 			if (!textShadow.node()) {
 				textShadow = textSelection.clone(true);
