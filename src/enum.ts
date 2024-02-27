@@ -222,6 +222,7 @@ export enum ELineSettings {
 	lineType = "lineType",
 	lineWidth = "lineWidth",
 	lineColor = "lineColor",
+	isApplyMarkerColor = "isApplyMarkerColor"
 }
 
 export enum EDataLabelsSettings {

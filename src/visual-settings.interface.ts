@@ -135,6 +135,7 @@ export interface ILineSettings {
 	lineType: string;
 	lineWidth: number;
 	lineColor: string;
+	isApplyMarkerColor: boolean;
 }
 
 export interface IGridLinesPropsSettings {

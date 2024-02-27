@@ -6802,14 +6802,15 @@ export class Visual extends Shadow {
 				}
 			}
 		} else {
+			const lineColor = this.lineSettings.isApplyMarkerColor ? this.categoryColorPair[d.category].marker1Color : this.lineSettings.lineColor;
 			if (this.isLollipopTypeCircle) {
-				return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+				return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
 			} else {
 				if (this.firstCFLine) {
 					const str = `${d.category}-${this.firstCFLine.staticValue}`;
-					return this.getColor(this.subCategoryColorPair[str] && this.subCategoryColorPair[str].lineColor ? this.subCategoryColorPair[str].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+					return this.getColor(this.subCategoryColorPair[str] && this.subCategoryColorPair[str].lineColor ? this.subCategoryColorPair[str].lineColor : lineColor, EHighContrastColorType.Foreground);
 				} else {
-					return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : this.lineSettings.lineColor, EHighContrastColorType.Foreground);
+					return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
 				}
 			}
 		}

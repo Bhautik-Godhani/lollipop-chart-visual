@@ -119,6 +119,7 @@ export const LINE_SETTINGS: ILineSettings = {
 	lineType: ELineType.Solid,
 	lineWidth: 4,
 	lineColor: "rgba(128, 128, 128, 1)",
+	isApplyMarkerColor: false
 };
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {

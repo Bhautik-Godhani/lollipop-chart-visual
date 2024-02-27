@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
 import { ELineSettings, ELineType } from "../enum";
@@ -129,16 +130,33 @@ const LineSettings = (props) => {
 							handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
 						/>
 					</Column>
+					<Column></Column>
+				</Row>
 
+				<Row>
 					<Column>
-						<ColorPicker
-							label="Line Color"
-							color={configValues.lineColor}
-							handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
-							colorPalette={vizOptions.host.colorPalette}
+						<ToggleButton
+							label={"Same color as Marker"}
+							value={configValues.isApplyMarkerColor}
+							handleChange={() => handleCheckbox(ELineSettings.isApplyMarkerColor)}
+							appearance="checkbox"
 						/>
 					</Column>
 				</Row>
+
+				<ConditionalWrapper visible={!configValues.isApplyMarkerColor}>
+					<Row>
+						<Column>
+							<ColorPicker
+								label="Color"
+								color={configValues.lineColor}
+								handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
