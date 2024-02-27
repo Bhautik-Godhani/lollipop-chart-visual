@@ -526,6 +526,16 @@ const DataLabelsSettings = (props) => {
 		if (configValues.placement === DataLabelsPlacement.Outside && !configValues.isShowBackgroundChange && configValues.showBackground) {
 			handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
 		}
+
+		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.FIXED) {
+			if (!configValues.isColorChanged) {
+				handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, setConfigValues);
+			}
+
+			if (!configValues.isShowBackgroundChange) {
+				handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
+			}
+		}
 	}, [configValues.placement, configValues.textColorTypes]);
 
 	return (
