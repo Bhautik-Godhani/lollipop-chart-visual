@@ -1,7 +1,7 @@
 import { line } from "d3-shape";
 import { ILollipopChartRow } from "../model";
 import { Visual } from "../visual";
-import { ELineType } from "../enum";
+import { EHighContrastColorType, ELineType } from "../enum";
 
 export const RenderConnectingLine = (self: Visual, chartData: ILollipopChartRow[], isValue2: boolean): void => {
     const connectingLine: any = self.connectingLineG
@@ -10,7 +10,7 @@ export const RenderConnectingLine = (self: Visual, chartData: ILollipopChartRow[
         .classed("connectingLine", true)
         .datum(chartData)
         .attr("fill", "none")
-        .attr("stroke", self.chartSettings.connectingLineColor)
+        .attr("stroke", self.getColor(self.chartSettings.connectingLineColor, EHighContrastColorType.Foreground))
         .attr("stroke-width", self.chartSettings.connectingLineWidth)
         .attr(
             "stroke-dasharray",
