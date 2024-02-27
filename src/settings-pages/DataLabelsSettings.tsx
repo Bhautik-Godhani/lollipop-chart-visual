@@ -296,7 +296,10 @@ const UICircleLollipopLabelsSettings = (
 						<ToggleButton
 							label={"Show Background"}
 							value={configValues.showBackground}
-							handleChange={() => handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues)}
+							handleChange={() => {
+								handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
+								handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
+							}}
 							appearance="toggle"
 						/>
 					</Column>
@@ -506,9 +509,9 @@ const DataLabelsSettings = (props) => {
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
-		// if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-		// 	handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
-		// }
+		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		}
 
 		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
 			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, setConfigValues);
@@ -516,9 +519,13 @@ const DataLabelsSettings = (props) => {
 	}, []);
 
 	React.useEffect(() => {
-		// if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-		// 	handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
-		// }
+		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		}
+
+		if (configValues.placement === DataLabelsPlacement.Outside && !configValues.isShowBackgroundChange && configValues.showBackground) {
+			handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
+		}
 	}, [configValues.placement, configValues.textColorTypes]);
 
 	return (

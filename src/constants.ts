@@ -140,7 +140,8 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	applyFor: EDataLabelsBGApplyFor.ONLY_PATTERNS,
 	isShowBGChangedWhenPatternApplied: false,
 	isShowBestFitLabels: true,
-	isTextColorTypeChanged: false
+	isTextColorTypeChanged: false,
+	isShowBackgroundChange: false
 };
 
 export const X_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {

@@ -227,6 +227,7 @@ export interface IDataLabelsSettings {
 	isShowBGChangedWhenPatternApplied: boolean;
 	isShowBestFitLabels: boolean;
 	isTextColorTypeChanged: boolean;
+	isShowBackgroundChange: boolean;
 }
 
 export interface IDataColorsSettings {

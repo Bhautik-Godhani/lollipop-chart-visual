@@ -245,7 +245,8 @@ export enum EDataLabelsSettings {
 	applyFor = "applyFor",
 	isShowBGChangedWhenPatternApplied = "isShowBGChangedWhenPatternApplied",
 	isShowBestFitLabels = "isShowBestFitLabels",
-	IsTextColorTypeChanged = "isTextColorTypeChanged"
+	IsTextColorTypeChanged = "isTextColorTypeChanged",
+	IsShowBackgroundChange = "isShowBackgroundChange"
 }
 
 export enum EGridLinesSettings {
