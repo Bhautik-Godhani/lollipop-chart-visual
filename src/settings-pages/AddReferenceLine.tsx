@@ -207,7 +207,7 @@ const Get_LABEL_POSITION = (shadow: Visual, configValues: IReferenceLineSettings
       ];
     }
   } else {
-    if (configValues.lineValue1.axis === EXYAxisNames.X) {
+    if ((configValues.lineValue1.axis === EXYAxisNames.X && !shadow.isHorizontalChart) || (configValues.lineValue1.axis === EXYAxisNames.Y && shadow.isHorizontalChart)) {
       LABEL_POSITION = [
         {
           label: "Left",
