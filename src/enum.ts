@@ -487,6 +487,7 @@ export enum EReferenceLineValueProps {
 	MeasureName = "measureName",
 	Axis = "axis",
 	Value = "value",
+	IsValueChanged = "isValueChanged",
 	RankOrder = "rankOrder",
 	Computation = "computation",
 	Rank = "rank",

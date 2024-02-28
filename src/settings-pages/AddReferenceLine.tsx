@@ -377,7 +377,10 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
               <InputControl
                 type="text"
                 value={lineValues.value}
-                handleChange={(value: any) => handleChange(value, "value", type)}
+                handleChange={(value: any) => {
+                  handleChange(value, "value", type);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, type);
+                }}
                 min={1}
                 label="Value"
               />
@@ -1201,6 +1204,12 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
       }
     }
   }, [configValues.lineValue1.axis, configValues.lineValue1.type, configValues.lineValue1.computation]);
+
+  React.useEffect(() => {
+    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.isValueChanged) {
+      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    }
+  }, [configValues.lineValue1.computation]);
 
   const setLineValue = (isLine2: boolean) => {
     const rLine = configValues;

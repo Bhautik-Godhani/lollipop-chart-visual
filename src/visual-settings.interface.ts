@@ -430,6 +430,7 @@ export interface IReferenceLineValueProps {
 	measureName: string;
 	axis: EXYAxisNames;
 	value: string;
+	isValueChanged: boolean;
 	rankOrder: Position;
 	computation: EReferenceLineComputation;
 	rank: string;
