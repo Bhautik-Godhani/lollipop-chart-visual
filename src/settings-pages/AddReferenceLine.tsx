@@ -958,7 +958,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     value: "",
     rank: "",
   });
-  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : details;
+  const defaultSettings = REFERENCE_LINES_SETTINGS;
 
   React.useEffect(() => {
     if (configValues.lineValue1.type === "value") {
