@@ -5013,7 +5013,7 @@ export class Visual extends Shadow {
 			.classed("dataLabelText", true)
 			.attr("text-anchor", "middle")
 			.attr("dy", "0.35em")
-			.attr("font-size", this.getDataLabelsFontSize(isData2Label))
+			.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
 			.style("font-family", dataLabelsSettings.fontFamily)
 			.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 			.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
@@ -5301,21 +5301,23 @@ export class Visual extends Shadow {
 	transformDataLabelInside(labelsSelection: any, isEnter: boolean, isData2Label: boolean): void {
 		const fn = (d, labelBBox: any) => {
 			const cx = this.getXPosition(this.isHorizontalChart ? (isData2Label ? d.value2 : d.value1) : d.category);
+			const xScaleDiff = this.isLollipopTypeCircle ? this.getCircleXScaleDiff(cx, isData2Label) : this.getPieXScaleDiff(cx, isData2Label);
 			let x;
 
 			if (!this.isLeftYAxis) {
-				x = (this.isHorizontalChart ? cx - this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2);
+				x = (this.isHorizontalChart ? cx - xScaleDiff : cx + this.scaleBandWidth / 2);
 			} else {
-				x = (this.isHorizontalChart ? cx + this.getCircleXScaleDiff(cx, isData2Label) : cx + this.scaleBandWidth / 2);
+				x = (this.isHorizontalChart ? cx + xScaleDiff : cx + this.scaleBandWidth / 2);
 			}
 
 			const cy = this.getYPosition(this.isHorizontalChart ? d.category : (isData2Label ? d.value2 : d.value1));
+			const yScaleDiff = this.isLollipopTypeCircle ? this.getCircleYScaleDiff(cy, isData2Label) : this.getPieYScaleDiff(cy, isData2Label);
 			let y;
 
 			if (this.isBottomXAxis) {
-				y = (!this.isHorizontalChart ? cy - this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2);
+				y = (!this.isHorizontalChart ? cy - yScaleDiff : cy + this.scaleBandWidth / 2);
 			} else {
-				y = (!this.isHorizontalChart ? cy + this.getCircleYScaleDiff(cy, isData2Label) : cy + this.scaleBandWidth / 2);
+				y = (!this.isHorizontalChart ? cy + yScaleDiff : cy + this.scaleBandWidth / 2);
 			}
 
 			return `translate(${x}, ${y})`;
@@ -5389,7 +5391,7 @@ export class Visual extends Shadow {
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
 				const borderSize = THIS.dataLabelsSettings.showBackground ? 3 : 0;
-				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.circle1Size || (getBBox.height + borderSize) > THIS.circle1Size;
+				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
@@ -5551,7 +5553,7 @@ export class Visual extends Shadow {
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
 				const borderSize = THIS.dataLabelsSettings.showBackground ? 3 : 0;
-				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.circle2Size || (getBBox.height + borderSize) > THIS.circle2Size;
+				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
@@ -7633,7 +7635,7 @@ export class Visual extends Shadow {
 			}
 		) as any;
 
-		if (this.isLollipopTypeCircle || (this.isLollipopTypePie && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside)) {
+		if (this.isLollipopTypeCircle || (this.isLollipopTypePie)) {
 			this.drawData1Labels(this.dataLabelsSettings.show ? this.chartData : []);
 			this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure ? this.chartData : []);
 		} else {
@@ -8141,7 +8143,8 @@ export class Visual extends Shadow {
 		// };
 
 		pieOption.series[0].label = {
-			show: this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside,
+			show: false,
+			// show: this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside,
 			color: this.getColor(this.dataLabelsSettings.color, EHighContrastColorType.Foreground),
 			textBorderColor: this.getColor(this.dataLabelsSettings.borderColor, EHighContrastColorType.Foreground),
 			textBorderWidth: this.dataLabelsSettings.borderWidth,
