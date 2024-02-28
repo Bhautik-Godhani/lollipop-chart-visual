@@ -207,7 +207,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
         })
         .attr("x", (d: IReferenceLineSettings) => {
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
-                return self.width - (self.width - d.line1Coord.x1) + +d.lineStyle.lineWidth / 2;
+                return self.width - (self.width - (d.line1Coord.x1 > d.line2Coord.x1 ? d.line2Coord.x1 : d.line1Coord.x1)) + +d.lineStyle.lineWidth / 2;
             } else {
                 return self.yAxisStartMargin;
             }
@@ -216,7 +216,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
                 return 0;
             } else {
-                return d.line1Coord.y1 + +d.lineStyle.lineWidth / 2;
+                return ((d.line1Coord.y1 > d.line2Coord.y1) ? d.line2Coord.y1 : d.line1Coord.y1) + +d.lineStyle.lineWidth / 2;
             }
         })
         .attr("fill", (d: IReferenceLineSettings) => d.bandStyle.backgroundColor)
@@ -545,11 +545,29 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
-                if (rLine.lineValue1.axis === EXYAxisNames.X || !self.isHorizontalChart) {
-                    if (rLine.line1Coord.x1 > rLine.line2Coord.x1) {
-                        const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
-                        rLine.line1Coord = rLine.line2Coord;
-                        rLine.line2Coord = clonedRLine.line1Coord;
+                if (rLine.lineValue1.axis === EXYAxisNames.X) {
+                    if ((rLine.line1Coord.x1 > rLine.line2Coord.x1 && !self.isHorizontalChart) || (rLine.line1Coord.y1 > rLine.line2Coord.y1 && self.isHorizontalChart)) {
+                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // rLine.line1Coord = rLine.line2Coord;
+                        // rLine.line2Coord = clonedRLine.line1Coord;
+                        switch (rLine.labelStyle.labelPosition) {
+                            case EBeforeAfterPosition.Before:
+                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                                break;
+                            case EBeforeAfterPosition.Center:
+                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                                break;
+                            case EBeforeAfterPosition.After:
+                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                                break;
+                        }
+                    } else {
+                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // rLine.line1Coord = rLine.line2Coord;
+                        // rLine.line2Coord = clonedRLine.line1Coord;
                         switch (rLine.labelStyle.labelPosition) {
                             case EBeforeAfterPosition.Before:
                                 rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
@@ -567,11 +585,29 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                     }
                 }
 
-                if (rLine.lineValue1.axis === EXYAxisNames.Y || self.isHorizontalChart) {
-                    if (rLine.line1Coord.y1 > rLine.line2Coord.y1) {
-                        const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
-                        rLine.line1Coord = rLine.line2Coord;
-                        rLine.line2Coord = clonedRLine.line1Coord;
+                if (rLine.lineValue1.axis === EXYAxisNames.Y) {
+                    if ((rLine.line1Coord.y1 > rLine.line2Coord.y1 && !self.isHorizontalChart) || (rLine.line1Coord.x1 > rLine.line2Coord.x1 && self.isHorizontalChart)) {
+                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // rLine.line1Coord = rLine.line2Coord;
+                        // rLine.line2Coord = clonedRLine.line1Coord;
+                        switch (rLine.labelStyle.labelPosition) {
+                            case EBeforeAfterPosition.Before:
+                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                                break;
+                            case EBeforeAfterPosition.Center:
+                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                                break;
+                            case EBeforeAfterPosition.After:
+                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                                break;
+                        }
+                    } else {
+                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // rLine.line1Coord = rLine.line2Coord;
+                        // rLine.line2Coord = clonedRLine.line1Coord;
 
                         switch (rLine.labelStyle.labelPosition) {
                             case EBeforeAfterPosition.Before:
