@@ -2,8 +2,9 @@
 import { Visual } from "../visual";
 import powerbi from "powerbi-visuals-api";
 import { axisBottom, axisLeft, axisRight, axisTop, scaleLinear, scaleSymlog } from "d3";
-import { Position } from "../enum";
+import { EFontStyle, Position } from "../enum";
 import { GetAxisDomainMinMax } from "./Axis.methods";
+import { getSVGTextSize } from "./methods";
 
 export const RenderLinearCutAxis = (self: Visual): void => {
     SetLinearCutAxisDomain(self, false, self.categoricalData);
@@ -68,6 +69,8 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
         ((yScaleHeight) * afterCutAreaInPercentage) / 100;
     self.beforeCutLinearScaleArea = beforeCutLinearScaleArea;
     self.afterCutLinearScaleArea = afterCutLinearScaleArea;
+    const { labelFontSize, labelFontFamily, labelStyling } = self.yAxisSettings;
+    const yAxisLabelHeight = getSVGTextSize('100K', labelFontFamily, labelFontSize, labelStyling[EFontStyle.Bold], labelStyling[EFontStyle.Italic], labelStyling[EFontStyle.UnderLine]).height;
 
     if (self.isHorizontalChart) {
         if (self.isLeftYAxis) {
@@ -95,9 +98,9 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
                 height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
 
-            self.afterCutLinearScale.range([height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap, 0]);
+            self.afterCutLinearScale.range([height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap, yAxisLabelHeight / 2]);
         } else {
-            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, height]);
+            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, height - yAxisLabelHeight / 2]);
 
             self.beforeCutLinearScale.range([self.yAxisStartMargin, beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap]);
         }
