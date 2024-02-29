@@ -314,19 +314,23 @@ const UIColorPaletteTypes = (
 							color={values.positiveColor}
 							handleChange={(value) => handleColorChange(value, EDataColorsSettings.PositiveColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
 						/>
 					</Column>
+				</Row>
 
+				<Row>
 					<Column>
 						<ColorPicker
 							label={"Negative Color"}
 							color={values.negativeColor}
 							handleChange={(value) => handleColorChange(value, EDataColorsSettings.NegativeColor, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
 						/>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
+			</ConditionalWrapper >
 		</>
 	);
 };
