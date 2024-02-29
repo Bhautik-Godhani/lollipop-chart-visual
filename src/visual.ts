@@ -1042,15 +1042,16 @@ export class Visual extends Shadow {
 			if (!this.isXIsDateTimeAxis && !this.isXIsNumericAxis) {
 				if (this.isHorizontalChart) {
 					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-						data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
 					} else {
 						data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
 					}
 				} else {
 					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
 					} else {
-						data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
 					}
 				}
 			} else if (this.isXIsNumericAxis) {
@@ -1625,6 +1626,8 @@ export class Visual extends Shadow {
 		this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
 
 		this.setCategoricalDataPairsByRanking();
+
+		console.log("expandAllCategoriesName", this.expandAllCategoriesName);
 
 		if (this.sortingSettings.category.enabled) {
 			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
@@ -3517,9 +3520,9 @@ export class Visual extends Shadow {
 					// .withCategory(this.categoricalData.categories[1] as any, this.currentSmallMultipleIndex)
 					.createSelectionId();
 
-				if (this.smallMultiplesGridItemId) {
-					this.selectionIdByCategories[category] = selectionId;
-				}
+				// if (this.smallMultiplesGridItemId) {
+				this.selectionIdByCategories[category] = selectionId;
+				// }
 			});
 		} else {
 			const categoricalData = this.vizOptions.options.dataViews[0];
@@ -3652,6 +3655,8 @@ export class Visual extends Shadow {
 				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
 			}
 		}
+
+		console.log(this.chartData);
 	}
 
 	private configLegend(): void {
@@ -5661,19 +5666,19 @@ export class Visual extends Shadow {
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
-			(datapoint: any) => datapoint.selectionId
+			(datapoint: any) => datapoint.identity
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, false, false)),
-			(datapoint: any) => datapoint.selectionId
+			(datapoint: any) => datapoint.identity
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(".errorBarG"),
 			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
-			(datapoint: any) => datapoint.selectionId
+			(datapoint: any) => datapoint.identity
 		);
 
 		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
