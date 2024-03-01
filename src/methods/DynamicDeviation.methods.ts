@@ -3,6 +3,7 @@ import { create, select as d3Select, Selection } from "d3-selection";
 import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, EDynamicDeviationLabelDisplayTypes, EHighContrastColorType, ELineType } from "../enum";
 import DynamicDeviationIcon from "../../assets/icons/DeviationIcon.svg";
 import { ICategoryValuePair } from "../visual-settings.interface";
+import { getSVGTextSize } from "./methods";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair): void => {
@@ -78,13 +79,13 @@ export const RemoveDynamicDeviation = (self: Visual): void => {
 export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
-    const labelToConnectorDistance = 10;
+    const labelToConnectorDistance = getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
     const start = dataLabelBBox.height + labelToConnectorDistance;
     const isPositiveDeviation = from.value < to.value;
 
     dataLabelG.attr(
         "transform",
-        `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${0})`
+        `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${labelToConnectorDistance})`
     );
 
     self.dynamicDeviationG
@@ -221,7 +222,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
 export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
-    const labelToConnectorDistance = 10;
+    const labelToConnectorDistance = getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
     let dynamicDeviationSpace = 0;
     if (self.dynamicDeviationSettings.isEnabled) {
         dynamicDeviationSpace = self.width * 0.05;
