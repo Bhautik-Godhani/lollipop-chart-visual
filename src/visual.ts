@@ -1496,7 +1496,7 @@ export class Visual extends Shadow {
 
 		if (
 			!this.sortingSettings.category.sortBy ||
-			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure)
+			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure && !this.sortingSettings.category.isSortByExtraSortField)
 		) {
 			this.sortingSettings.category.sortBy = this.measure1DisplayName;
 		}
@@ -1994,7 +1994,7 @@ export class Visual extends Shadow {
 
 		if (
 			!this.sortingSettings.category.sortBy ||
-			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure)
+			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure && !this.sortingSettings.category.isSortByExtraSortField)
 		) {
 			this.sortingSettings.category.sortBy = this.measure1DisplayName;
 		}
