@@ -2488,6 +2488,7 @@ export class Visual extends Shadow {
 
 				DrawSmallMultiplesGridLayout(settings);
 			} else {
+				this.sortSubcategoryData(clonedCategoricalData);
 
 				// NORMAL CHART
 				this.categoricalData = this.setInitialChartData(
@@ -2510,7 +2511,7 @@ export class Visual extends Shadow {
 				}
 
 				if (!this.isScrollBrushDisplayed) {
-					this.sortSubcategoryData();
+					this.sortSubcategoryData(this.categoricalData);
 					this.setCategoricalDataFields(this.categoricalData);
 					this.setChartData(this.categoricalData);
 				}
@@ -3059,13 +3060,13 @@ export class Visual extends Shadow {
 		this.firstCFLabel = this.conditionalFormattingConditions.filter(d => d.sourceName === this.subCategoryDisplayName).find(d => d.applyOnCategories.includes(ECFApplyOnCategories.Labels));
 	}
 
-	private sortSubcategoryData(): void {
+	private sortSubcategoryData(categoricalData: powerbi.DataViewCategorical): void {
 		const { enabled, sortOrder, sortBy, isSortByCategory } = this.sortingSettings.subCategory;
 		if (enabled && this.isHasSubcategories) {
 			if (isSortByCategory) {
 				if (this.isHorizontalChart) {
 					if (sortOrder === ESortOrderTypes.DESC) {
-						this.categoricalData.values.sort((a, b) => {
+						categoricalData.values.sort((a, b) => {
 							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
 								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
 							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
@@ -3073,7 +3074,7 @@ export class Visual extends Shadow {
 							}
 						});
 					} else {
-						this.categoricalData.values.sort((a, b) => {
+						categoricalData.values.sort((a, b) => {
 							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
 								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
 							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
@@ -3083,7 +3084,7 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (sortOrder === ESortOrderTypes.ASC) {
-						this.categoricalData.values.sort((a, b) => {
+						categoricalData.values.sort((a, b) => {
 							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
 								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
 							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
@@ -3091,7 +3092,7 @@ export class Visual extends Shadow {
 							}
 						});
 					} else {
-						this.categoricalData.values.sort((a, b) => {
+						categoricalData.values.sort((a, b) => {
 							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
 								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
 							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
@@ -3101,11 +3102,11 @@ export class Visual extends Shadow {
 					}
 				}
 			} else {
-				const clonedCategoricalDataValues: powerbi.DataViewValueColumn[] = JSON.parse(JSON.stringify(this.categoricalData.values));
-				const displayNames = clonedCategoricalDataValues.map((d) => d.source.displayName);
+				const categoricalDataValues: powerbi.DataViewValueColumn[] = JSON.parse(JSON.stringify(categoricalData.values));
+				const displayNames = categoricalDataValues.map((d) => d.source.displayName);
 
 				if (displayNames.includes(sortBy)) {
-					const categoricalValuesBySort = clonedCategoricalDataValues.filter((d) => d.source.displayName === sortBy);
+					const categoricalValuesBySort = categoricalDataValues.filter((d) => d.source.displayName === sortBy);
 					categoricalValuesBySort.forEach((d) => {
 						d["total"] = d3.sum(d.values, (v) => +v);
 					});
@@ -3118,17 +3119,17 @@ export class Visual extends Shadow {
 
 					const sortedGroupNames: string[] = categoricalValuesBySort.map((d) => d.source.groupName as string);
 					sortedGroupNames.forEach((d, i) => {
-						const valuesByGroupName = clonedCategoricalDataValues.filter((v) => v.source.groupName === d);
+						const valuesByGroupName = categoricalDataValues.filter((v) => v.source.groupName === d);
 						valuesByGroupName.forEach((v, j) => {
-							this.categoricalData.values[i * valuesByGroupName.length + j] = v;
+							categoricalData.values[i * valuesByGroupName.length + j] = v;
 						});
 					});
 				}
 			}
 		}
 
-		const categoricalMeasureFields = this.categoricalData.values
-			? this.categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure])
+		const categoricalMeasureFields = categoricalData.values
+			? categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure])
 			: [];
 
 		this.subCategoriesName = categoricalMeasureFields
@@ -3138,7 +3139,7 @@ export class Visual extends Shadow {
 	}
 
 	public renderErrorMessages(): boolean {
-		const categoricalCategoriesFields = this.categoricalData.categories
+		const categoricalCategoriesFields = this.clonedCategoricalData.categories
 			? !!this.categoricalData.categories.find((d) => d.source.roles[EDataRolesName.Category])
 			: false;
 		if (!categoricalCategoriesFields) {
@@ -4436,7 +4437,6 @@ export class Visual extends Shadow {
 		}
 
 		const markerSeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings);
-
 		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
 			//.CIRCLE 1 Colors
 			this.categoricalDataPairs.forEach(d => {
@@ -4633,7 +4633,7 @@ export class Visual extends Shadow {
 					}
 				});
 
-				this.sortSubcategoryData();
+				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
@@ -4807,7 +4807,7 @@ export class Visual extends Shadow {
 					}
 				});
 
-				this.sortSubcategoryData();
+				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
