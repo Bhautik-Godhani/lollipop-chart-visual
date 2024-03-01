@@ -145,7 +145,7 @@ const CutAndClipAxisSettings = (props) => {
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
-        saveButtonConfig={{ isDisabled: !configValues.isEnabled, text: "APPLY", handler: applyChanges }}
+        saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
         resetButtonHandler={resetChanges}
       />
     </>

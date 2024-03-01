@@ -1627,8 +1627,6 @@ export class Visual extends Shadow {
 
 		this.setCategoricalDataPairsByRanking();
 
-		console.log("expandAllCategoriesName", this.expandAllCategoriesName);
-
 		if (this.sortingSettings.category.enabled) {
 			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
 
@@ -2362,6 +2360,23 @@ export class Visual extends Shadow {
 			createPatternsDefs(this, this.svg);
 			createMarkerDefs(this, this.svg);
 
+			this.conditionalFormattingConditions
+				.forEach((cf: IConditionalFormattingProps) => {
+					if (cf.applyTo === "measure") {
+						if (cf.valueType === ECFValueTypes.Value) {
+							const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
+							cf.measureType = {
+								measure: roles[EDataRolesName.Measure],
+								measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
+								measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
+								tooltip: roles[EDataRolesName.Tooltip]
+							};
+						}
+					} else if (cf.applyTo === "category") {
+						cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
+					}
+				});
+
 			// SMALL MULTIPLE VISUAL
 			if (this.isSmallMultiplesEnabled) {
 				if (this.isHasSmallMultiplesData) {
@@ -2493,23 +2508,6 @@ export class Visual extends Shadow {
 					this.brushWidth = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaWidth : 10;
 					this.brushMargin = 10;
 				}
-
-				this.conditionalFormattingConditions
-					.forEach((cf: IConditionalFormattingProps) => {
-						if (cf.applyTo === "measure") {
-							if (cf.valueType === ECFValueTypes.Value) {
-								const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
-								cf.measureType = {
-									measure: roles[EDataRolesName.Measure],
-									measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
-									measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
-									tooltip: roles[EDataRolesName.Tooltip]
-								};
-							}
-						} else if (cf.applyTo === "category") {
-							cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
-						}
-					});
 
 				if (!this.isScrollBrushDisplayed) {
 					this.sortSubcategoryData();
@@ -3655,8 +3653,6 @@ export class Visual extends Shadow {
 				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
 			}
 		}
-
-		console.log(this.chartData);
 	}
 
 	private configLegend(): void {
