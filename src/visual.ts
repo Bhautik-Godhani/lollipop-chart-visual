@@ -3676,7 +3676,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	private configLegend(): void {
+	public configLegend(): void {
 		if (this.legendSettings.show) {
 			d3.select("div.legend-wrapper").attr("display", "block");
 			this.drawLegend();
