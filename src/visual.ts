@@ -275,6 +275,8 @@ export class Visual extends Shadow {
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	isHasPositiveValue: boolean;
+	CFCategoryColorPair: { [category: string]: { marker1Color: boolean, marker2Color: boolean } } = {};
+	CFSubCategoryColorPair: { [subCategory: string]: { marker1Color: boolean, marker2Color: boolean } } = {};
 	isHasNegativeValue: boolean;
 	markerMaxSize: number = 0;
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
@@ -2807,6 +2809,10 @@ export class Visual extends Shadow {
 					// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
 					// 	this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 					// } else {
+
+					this.CFCategoryColorPair[d.category].marker1Color = true;
+					this.CFCategoryColorPair[d.category].marker2Color = true;
+
 					if (conditionalFormattingResult.markerColor) {
 						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
 						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
@@ -2833,6 +2839,10 @@ export class Visual extends Shadow {
 						// } else if (conditionalFormattingResult.measureType === EDataRolesName.Measure2) {
 						// 	this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 						// } else {
+
+						this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
+						this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
+
 						if (conditionalFormattingResult.markerColor) {
 							this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = conditionalFormattingResult.markerColor;
 							this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = conditionalFormattingResult.markerColor;
@@ -2862,6 +2872,9 @@ export class Visual extends Shadow {
 					if (c.valueType === ECFValueTypes.Ranking) {
 						if (c.rankingType === ECFRankingTypes.TopN) {
 							if (i < c.staticRankingValue) {
+								this.CFCategoryColorPair[d.category].marker1Color = true;
+								this.CFCategoryColorPair[d.category].marker2Color = true;
+
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker1Color = c.color;
 									this.categoryColorPair[d.category].marker2Color = c.color;
@@ -2875,6 +2888,9 @@ export class Visual extends Shadow {
 								}
 							}
 						} else if (c.rankingType === ECFRankingTypes.BottomN) {
+							this.CFCategoryColorPair[d.category].marker1Color = true;
+							this.CFCategoryColorPair[d.category].marker2Color = true;
+
 							if (i > ((chartData.length - 1) - c.staticRankingValue)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker1Color = c.color;
@@ -2963,6 +2979,7 @@ export class Visual extends Shadow {
 							if (isPercentageMatch(c, percentage1)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker1Color = c.color;
+									this.CFCategoryColorPair[d.category].marker1Color = true;
 								}
 							}
 
@@ -2971,6 +2988,7 @@ export class Visual extends Shadow {
 								if (isPercentageMatch(c, percentage2)) {
 									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 										this.categoryColorPair[d.category].marker2Color = c.color;
+										this.CFCategoryColorPair[d.category].marker2Color = true;
 									}
 								}
 							}
@@ -2984,6 +3002,7 @@ export class Visual extends Shadow {
 								if (isPercentageMatch(c, percentage1)) {
 									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 										this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
+										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
 									}
 								}
 
@@ -2992,6 +3011,7 @@ export class Visual extends Shadow {
 									if (isPercentageMatch(c, percentage2)) {
 										if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 											this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+											this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
 										}
 									}
 								}
@@ -4404,6 +4424,7 @@ export class Visual extends Shadow {
 
 		this.categoricalDataPairs.forEach((d, i) => {
 			this.categoryColorPair[d.category] = this.categoryColorPairWithIndex[`${i}-${d.category}`];
+			this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
 		});
 
 		if (this.rankingSettings.category.enabled) {
@@ -4515,6 +4536,7 @@ export class Visual extends Shadow {
 		this.categoricalDataPairs.forEach(d => {
 			this.subCategoriesName.forEach((c, i) => {
 				this.subCategoryColorPair[`${d.category}-${c}`] = this.subCategoryColorPairWithIndex[`${i}-${d.category}-${c}`];
+				this.CFSubCategoryColorPair[`${d.category}-${c}`] = { marker1Color: false, marker2Color: false };
 			});
 		});
 	}
@@ -7785,8 +7807,7 @@ export class Visual extends Shadow {
 	setPath1Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
-				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
-				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].marker1Color; const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
 				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
