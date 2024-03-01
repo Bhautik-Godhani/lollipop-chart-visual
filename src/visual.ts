@@ -5708,6 +5708,11 @@ export class Visual extends Shadow {
 		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean): VisualTooltipDataItem[] => {
+			const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].marker1Color;
+			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].marker2Color;
+			const posNegColor1 = value.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+			const posNegColor2 = value.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
@@ -5719,7 +5724,8 @@ export class Visual extends Shadow {
 					value: isCircle1
 						? numberFormatter(value.value1, this.measureNumberFormatter[0])
 						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: isCircle1 ? this.categoryColorPair[value.category].marker1Color : this.categoryColorPair[value.category].marker2Color,
+					color: isCircle1 ? (isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color) :
+						(isPosNegColorScheme2 ? posNegColor2 : this.categoryColorPair[value.category].marker2Color),
 				},
 			];
 
@@ -5727,7 +5733,7 @@ export class Visual extends Shadow {
 				tooltipData.push({
 					displayName: this.measure2DisplayName,
 					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: this.categoryColorPair[value.category].marker2Color,
+					color: (isPosNegColorScheme2 ? posNegColor2 : this.categoryColorPair[value.category].marker2Color),
 				})
 			}
 
@@ -7807,7 +7813,8 @@ export class Visual extends Shadow {
 	setPath1Formatting(circleSelection: any): void {
 		circleSelection
 			.style("fill", (d: ILollipopChartRow) => {
-				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].marker1Color; const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].marker1Color;
+				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
 				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
