@@ -4122,6 +4122,10 @@ export class Visual extends Shadow {
 		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
 		this.isLeftYAxis = this.yAxisSettings.position === Position.Left;
 
+		if (this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && this.isLollipopTypePie) {
+			this.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.FirstToLast;
+		}
+
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
 		// }
@@ -7677,7 +7681,7 @@ export class Visual extends Shadow {
 				}
 			});
 
-		if (this.dynamicDeviationSettings.isEnabled && this.isLollipopTypeCircle && !this.isHasMultiMeasure) {
+		if (this.dynamicDeviationSettings.isEnabled && !this.isHasMultiMeasure) {
 			SetDynamicDeviationDataAndDrawLines(this);
 		} else {
 			this.lollipopG.selectAll(".lollipop-group").style("cursor", "auto");

@@ -156,7 +156,7 @@ const DynamicDeviationSettings = (props) => {
     }));
   };
 
-  if (!(shadow as Visual).isSmallMultiplesEnabled) {
+  if (!(shadow as Visual).isSmallMultiplesEnabled && shadow.isLollipopTypeCircle) {
     DISPLAY_TYPES.unshift(
       {
         label: "Create Your Own",
@@ -166,7 +166,8 @@ const DynamicDeviationSettings = (props) => {
   }
 
   React.useEffect(() => {
-    if (configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isSmallMultiplesEnabled) {
+    if ((configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isSmallMultiplesEnabled) ||
+      configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isLollipopTypePie) {
       handleChange(EDynamicDeviationDisplayTypes.FirstToLast, EDynamicDeviationSettings.DisplayType);
     }
   }, []);
