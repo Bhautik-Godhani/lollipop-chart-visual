@@ -4,6 +4,7 @@ import { Visual } from "../visual";
 import { group } from "d3-array";
 import { getSVGTextSize } from "./methods";
 import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
+import { RenderConnectingLine } from "./ConnectingLine.methods";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
@@ -159,6 +160,9 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             const errorBarsMarkerDef = create("svg:defs").attr("class", "errorBarsMarkerDefs");
             const errorBarsMarker = create("svg:marker").attr("class", "errorBarsMarker");
             const errorBarsMarkerPath = create("svg:path").attr("class", "errorBarsMarkerPath");
+            const dynamicDeviationG = create("svg:g").classed("dynamicDeviationG", true);
+            const zeroSeparatorLine = create("svg:line").classed("zeroSeparatorLine", true);
+            const connectingLineG = create("svg:g").classed("connectingLineG", true);
 
             svg.node().append(container.node());
             container.node().append(lollipopG.node());
@@ -170,7 +174,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             container.node().append(referenceLinesContainerG.node());
             container.node().append(xGridLinesG.node());
             container.node().append(yGridLinesG.node());
+            container.node().append(dynamicDeviationG.node());
+            container.node().append(zeroSeparatorLine.node());
+            container.node().append(connectingLineG.node());
 
+            // error bars
             container.node().append(errorBarsContainer.node());
             errorBarsContainer.node().append(errorBarsMarkerDefsG.node());
             errorBarsContainer.node().append(errorBarsAreaG.node());
@@ -209,6 +217,10 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             }
 
             self.setColorsByDataColorsSettings();
+
+            if (self.conditionalFormattingConditions.length) {
+                self.setConditionalFormattingColor();
+            }
 
             const textEle = create("div");
             div.node().append(textEle.node());
@@ -288,6 +300,9 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.referenceLinesContainerG = referenceLinesContainerG as any;
             self.xGridLinesG = xGridLinesG as any;
             self.yGridLinesG = yGridLinesG as any;
+            self.dynamicDeviationG = dynamicDeviationG as any;
+            self.zeroSeparatorLine = zeroSeparatorLine as any;
+            self.connectingLineG = connectingLineG as any;
 
             self.errorBarsContainer = errorBarsContainer as any;
             self.errorBarsMarkerDefsG = errorBarsMarkerDefsG as any;
@@ -325,6 +340,29 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 self.margin.bottom = 0;
                 self.drawLollipopChart();
             }
+
+            // zero separator line
+            if (self.chartSettings.isShowZeroBaseLine) {
+                self.drawZeroSeparatorLine();
+            } else {
+                self.zeroSeparatorLine.attr("display", "none");
+            }
+
+            // connecting line
+            if (self.chartSettings.showConnectingLine) {
+                self.connectingLineG.selectAll("*").remove();
+
+                RenderConnectingLine(self, self.chartData, false);
+                if (self.isHasMultiMeasure) {
+                    RenderConnectingLine(self, self.chartData, true);
+                }
+            } else {
+                self.connectingLineG.selectAll("*").remove();
+            }
+
+            self.configLegend();
+            self.drawXGridLines();
+            self.drawYGridLines();
 
             if (isUniformXScale) {
                 xAxisG.style("display", "none");
