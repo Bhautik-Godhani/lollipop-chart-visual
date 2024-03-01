@@ -4659,6 +4659,7 @@ export class Visual extends Shadow {
 					}
 				});
 
+				this.configLegend();
 				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
@@ -4833,6 +4834,7 @@ export class Visual extends Shadow {
 					}
 				});
 
+				this.configLegend();
 				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
