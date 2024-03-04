@@ -6906,7 +6906,7 @@ export class Visual extends Shadow {
 	}
 
 	getLineStroke(d: ILollipopChartRow): string {
-		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical) {
+		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical && (!this.CFCategoryColorPair[d.category].marker1Color && !this.CFCategoryColorPair[d.category].marker2Color)) {
 			if (!this.isHasMultiMeasure) {
 				if (d.value1 >= 0) {
 					return this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground);
