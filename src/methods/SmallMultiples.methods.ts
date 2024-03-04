@@ -163,6 +163,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             const dynamicDeviationG = create("svg:g").classed("dynamicDeviationG", true);
             const zeroSeparatorLine = create("svg:line").classed("zeroSeparatorLine", true);
             const connectingLineG = create("svg:g").classed("connectingLineG", true);
+            const xAxisTitleG = create("svg:g").classed("xAxisTitleG", true);
+            const yAxisTitleG = create("svg:g").classed("yAxisTitleG", true);
 
             svg.node().append(container.node());
             container.node().append(lollipopG.node());
@@ -177,6 +179,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             container.node().append(dynamicDeviationG.node());
             container.node().append(zeroSeparatorLine.node());
             container.node().append(connectingLineG.node());
+            container.node().append(xAxisTitleG.node());
+            container.node().append(yAxisTitleG.node());
 
             // error bars
             container.node().append(errorBarsContainer.node());
@@ -303,6 +307,10 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.dynamicDeviationG = dynamicDeviationG as any;
             self.zeroSeparatorLine = zeroSeparatorLine as any;
             self.connectingLineG = connectingLineG as any;
+            self.xAxisTitleG = xAxisTitleG as any;
+            self.yAxisTitleG = yAxisTitleG as any;
+            self.xAxisTitleText = xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
+            self.yAxisTitleText = yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
 
             self.errorBarsContainer = errorBarsContainer as any;
             self.errorBarsMarkerDefsG = errorBarsMarkerDefsG as any;
@@ -360,6 +368,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 self.connectingLineG.selectAll("*").remove();
             }
 
+            self.setMargins();
+            self.drawXYAxisTitle();
             self.configLegend();
             self.drawXGridLines();
             self.drawYGridLines();

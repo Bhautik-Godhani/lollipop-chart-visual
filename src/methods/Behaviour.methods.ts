@@ -7,7 +7,7 @@ import {
 } from "powerbi-visuals-utils-interactivityutils/lib/interactivityBaseService";
 import { SelectableDataPoint } from "powerbi-visuals-utils-interactivityutils/lib/interactivitySelectionService";
 import { Visual } from "../visual";
-import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
 import { ILollipopChartRow } from "../model";
 
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
@@ -29,7 +29,7 @@ export class Behavior implements IInteractiveBehavior {
 	private options: BehaviorOptions;
 	private visualAnnotations: VisualAnnotations;
 
-	public setVisualAnnotations(ref: VisualAnnotations): void {
+	public setVisualAnnotations(ref: any): void {
 		this.visualAnnotations = ref;
 	}
 
