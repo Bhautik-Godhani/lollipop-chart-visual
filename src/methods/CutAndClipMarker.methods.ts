@@ -19,7 +19,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
     if (self.isHorizontalChart) {
-        secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : self.margin.top})`);
+        secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : width + width / 4})`);
     } else {
         secG.attr(
             "transform",
