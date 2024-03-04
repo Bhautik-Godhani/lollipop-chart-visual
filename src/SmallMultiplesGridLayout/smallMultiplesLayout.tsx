@@ -63,9 +63,9 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
       case ESmallMultiplesShadowType.None:
         return null;
       case ESmallMultiplesShadowType.Simple:
-        return "rgba(0, 0, 0, 0.24) 0px 3px 8px";
+        return `${shadowSettings.color} 0px 3px 8px`;
       case ESmallMultiplesShadowType.StandOut:
-        return "rgba(0, 0, 0, 0.35) 0px 5px 15px";
+        return `${shadowSettings.color} 0px 5px 15px`;
       case ESmallMultiplesShadowType.Custom:
         return `${shadowSettings.horizontalOffset}px ${shadowSettings.verticalOffset}px ${shadowSettings.blur}px ${shadowSettings.spread
           }px ${shadowSettings.color} ${shadowSettings.inset ? "inset" : ""}`;

@@ -402,7 +402,7 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
 };
 
 export const GetReactPaginationLayout = (config: ISmallMultiplesGridLayoutSettings, columns: number, totalRows: number, firstItem: number): ILayoutItemProps[] => {
-    let iterator = firstItem;
+    let iterator = firstItem - 1;
     const layout: ILayoutItemProps[] = [];
 
     if (config.layoutType === ESmallMultiplesLayoutType.Grid) {
