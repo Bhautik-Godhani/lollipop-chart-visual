@@ -1,11 +1,11 @@
 import { Visual } from "../visual";
 import { select, Selection } from "d3-selection";
 import { min as d3Min, max as d3Max, mean, median } from "d3-array";
-import { EBeforeAfterPosition, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLineNameTypes, EReferenceLinesType, EReferenceLineType, EReferenceType, EXYAxisNames, Position } from "../enum";
+import { EBeforeAfterPosition, EFontStyle, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLineNameTypes, EReferenceLinesType, EReferenceLineType, EReferenceType, EXYAxisNames, Position } from "../enum";
 import { scaleLinear } from "d3";
 import crypto from "crypto";
 import { IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineValueProps } from "../visual-settings.interface";
-import { calculateStandardDeviation } from "./methods";
+import { calculateStandardDeviation, GetSVGTextSize2 } from "./methods";
 import { GetFormattedNumber } from "./NumberFormat.methods";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
@@ -91,33 +91,33 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
         });
 }
 
-export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
-    const getLabelText = (d: IReferenceLineSettings): string => {
-        const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
-        const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
-        let labelValue: string;
+const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
+    const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
+    const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
+    let labelValue: string;
 
-        if (d.referenceType === EReferenceType.REFERENCE_BAND) {
-            labelValue = isValue1TypeNumber ?
-                GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) + " - " + GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true, true) :
-                d.lineValue1.value + " - " + d.lineValue2.value;
-        } else {
-            labelValue = isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) : d.lineValue1.value;
-        }
-
-        switch (d.labelStyle.labelNameType) {
-            case EReferenceLineNameTypes.TEXT:
-                return labelText;
-            case EReferenceLineNameTypes.TEXT_VALUE:
-                return labelText + " " + labelValue;
-            case EReferenceLineNameTypes.VALUE:
-                return labelValue;
-        }
+    if (d.referenceType === EReferenceType.REFERENCE_BAND) {
+        labelValue = isValue1TypeNumber ?
+            GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) + " - " + GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true, true) :
+            d.lineValue1.value + " - " + d.lineValue2.value;
+    } else {
+        labelValue = isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) : d.lineValue1.value;
     }
 
+    switch (d.labelStyle.labelNameType) {
+        case EReferenceLineNameTypes.TEXT:
+            return labelText;
+        case EReferenceLineNameTypes.TEXT_VALUE:
+            return labelText + " " + labelValue;
+        case EReferenceLineNameTypes.VALUE:
+            return labelValue;
+    }
+}
+
+export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
     textSelection
         .attr("display", "block")
-        .text((d: IReferenceLineSettings) => getLabelText(d))
+        .text((d: IReferenceLineSettings) => d.labelText)
         .attr("x", (d: IReferenceLineSettings) => {
             if (d.lineValue1.axis === EXYAxisNames.X) {
                 if (self.isHorizontalChart) {
@@ -166,12 +166,11 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
             return calcFontSize + "px";
         })
         .style("font-family", (d: IReferenceLineSettings) => d.labelStyle.labelFontFamily)
-        .style("font-weight", (d: IReferenceLineSettings) => (d.labelStyle.styling.includes("bold") ? "bold" : "normal"))
-        .style("font-style", (d: IReferenceLineSettings) => (d.labelStyle.styling.includes("italic") ? "italic" : "normal"))
+        .style("font-weight", (d: IReferenceLineSettings) => (d.labelStyle.styling.includes(EFontStyle.Bold) ? "bold" : "normal"))
+        .style("font-style", (d: IReferenceLineSettings) => (d.labelStyle.styling.includes(EFontStyle.Italic) ? "italic" : "normal"))
         .style("text-decoration", (d: IReferenceLineSettings) => {
             const referenceLineTextDecor: string[] = [];
-            if (d.labelStyle.styling.includes("underline")) referenceLineTextDecor.push("underline");
-            if (d.labelStyle.styling.includes("strike")) referenceLineTextDecor.push("line-through");
+            if (d.labelStyle.styling.includes(EFontStyle.UnderLine)) referenceLineTextDecor.push("underline");
             return referenceLineTextDecor.length ? referenceLineTextDecor.join(" ") : "";
         })
         .attr("opacity", (d: IReferenceLineSettings) => {
@@ -223,7 +222,20 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
         .style("pointer-events", "none");
 }
 
-const getTextX1Y1ForHorizontalLine = (self: Visual, rLine: IReferenceLineLabelStyleProps, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
+    if (rLine.labelPosition === EBeforeAfterPosition.After) {
+        if ((x1 + 20 + labelTextBBox.height) > self.width) {
+            rLine.labelPosition = EBeforeAfterPosition.Before;
+        }
+    }
+
+    if (rLine.labelPosition === EBeforeAfterPosition.Before) {
+        if (labelTextBBox.height > (x1 - 10 + self.margin.left)) {
+            rLine.labelPosition = EBeforeAfterPosition.After;
+        }
+    }
+
     const textY1 =
         rLine.labelAlignment === ELCRPosition.Centre
             ? self.height / 2
@@ -267,7 +279,20 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, rLine: IReferenceLineLabelSt
     return { textX1, textY1, textAnchor, textAlignment };
 };
 
-const getTextX1Y1ForVerticalLine = (self: Visual, rLine: IReferenceLineLabelStyleProps, y1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const getTextX1Y1ForVerticalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, y1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+    const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
+    if (rLine.labelPosition === EBeforeAfterPosition.After) {
+        if ((y1 + 10 + labelTextBBox.height) > (self.height - self.margin.bottom)) {
+            rLine.labelPosition = EBeforeAfterPosition.Before;
+        }
+    }
+
+    if (rLine.labelPosition === EBeforeAfterPosition.Before) {
+        if (labelTextBBox.height > (y1 - 10 + self.margin.top)) {
+            rLine.labelPosition = EBeforeAfterPosition.After;
+        }
+    }
+
     let textY1: number;
     switch (rLine.labelPosition) {
         case EBeforeAfterPosition.Before:
@@ -332,7 +357,7 @@ const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: n
     return { x1, y1, x2, y2 };
 };
 
-const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string, value: string } => {
+const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string, value: string } => {
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
@@ -365,13 +390,13 @@ const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
     }
 
     if (self.isHorizontalChart) {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLineLabelStyle, newY1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
         newTextAlignment = textAlignment;
     } else {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLineLabelStyle, newX1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
@@ -381,7 +406,7 @@ const setValueForXAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
     return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value };
 }
 
-const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rLineValue: IReferenceLineValueProps, rLineLabelStyle: IReferenceLineLabelStyleProps, value: string): { x1: number, y1: number, x2: number, y2: number, textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
@@ -416,13 +441,13 @@ const setValueForYAxisRefLine = (self: Visual, rLineValue: IReferenceLineValuePr
     }
 
     if (self.isHorizontalChart) {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLineLabelStyle, newX1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
         newTextAlignment = textAlignment;
     } else {
-        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLineLabelStyle, newY1);
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
         newTextX1 = textX1;
         newTextY1 = textY1;
         newTextAnchor = textAnchor;
@@ -484,7 +509,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
         let value: string;
         let newValue: string;
         if (rLineValue.axis === EXYAxisNames.X) {
-            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value: value2 } = setValueForXAxisRefLine(self, rLineValue, rLine.labelStyle, value);
+            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value: value2 } = setValueForXAxisRefLine(self, rLine, rLineValue, rLine.labelStyle, value);
             x1 = newX1;
             x2 = newX2;
             y1 = newY1;
@@ -495,7 +520,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             textAlignment = newTextAlignment;
             newValue = value2;
         } else if (rLineValue.axis === EXYAxisNames.Y) {
-            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLineValue, rLine.labelStyle, value);
+            const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLine, rLineValue, rLine.labelStyle, value);
             x1 = newX1;
             x2 = newX2;
             y1 = newY1;
@@ -535,6 +560,12 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
     return self.referenceLinesSettings.reduce(
         (arr: IReferenceLineSettings[], rLine: IReferenceLineSettings) => {
+            const labelFontSizeFn = scaleLinear().range([8, 40]).domain([10, 2000]);
+            const calcFontSize = rLine.labelStyle.autoFontSize ? labelFontSizeFn(self.chartContainer.clientWidth) : rLine.labelStyle.labelFontSize;
+
+            rLine.labelStyle.labelFontSize = calcFontSize.toString();
+            rLine.labelText = getLabelText(self, rLine);
+
             setData(rLine, false);
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {

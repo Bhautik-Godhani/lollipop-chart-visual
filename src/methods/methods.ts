@@ -7,11 +7,11 @@ import { PATTERNS } from "./patterns";
 import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
-import { ILollipopChartRow, TooltipData } from "../model";
-import { ECFApplyOnCategories, ECFRankingTypes, ECFValueTypes, EChartSettings, EDataRolesName, EVisualConfig, EVisualSettings } from "../enum";
+import { TooltipData } from "../model";
+import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
-import { sum } from "d3-array";
+import { select } from "d3-selection";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
 	if (shadow.chartSettings.isIBCSEnabled) {
@@ -653,4 +653,38 @@ export function calculatePowerBiStandardDeviation(data: number[]): number {
 
 export const GetOnlyWordsFromString = (text: string) => {
 	return (text.match(/[a-zA-Z]+/g) || []).join(" ");
+}
+
+export const GetSVGTextSize2 = (
+	textContent: string,
+	fontFamily: string,
+	fontSize: number,
+	fontStyle: EFontStyle[] = [],
+	strokeWidth: number = 0) => {
+	// Create a temporary SVG element
+	const svg = select(document.body).append("svg").attr("visibility", "hidden");
+
+	// Create a text element within the SVG
+	const text = svg.append("text")
+		.attr("font-size", fontSize)
+		.attr("font-family", fontFamily);
+
+	if (fontStyle) {
+		text
+			.attr("text-decoration", fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.attr("font-weight", fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+			.attr("font-style", fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+			.attr("stroke-width", strokeWidth);
+	}
+
+	text.text(textContent);
+
+	// Get the bounding box of the text element
+	const bbox = text.node().getBBox();
+
+	// Remove the SVG element from the DOM
+	svg.remove();
+
+	// Return width and height
+	return { width: bbox.width, height: bbox.height };
 }

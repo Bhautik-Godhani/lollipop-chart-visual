@@ -460,7 +460,7 @@ export interface IReferenceLineLabelStyleProps {
 	labelFontSize: string;
 	labelPosition: EBeforeAfterPosition;
 	labelAlignment: ELCRPosition;
-	styling: string[];
+	styling: EFontStyle[];
 	labelOrientation: Orientation;
 }
 
@@ -493,6 +493,7 @@ export interface IReferenceLineSettings {
 	line1Coord: IReferenceLineCoord;
 	line2Coord: IReferenceLineCoord;
 	labelCoord: IReferenceLabelCoord;
+	labelText?: string;
 }
 
 export interface IErrorBarsSettings {
