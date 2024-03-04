@@ -4,8 +4,8 @@ import { Selection } from "d3-selection";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
-    const width = self.isHorizontalChart ? self.cutAndClipMarkerWidth : 20;
-    const height = self.isHorizontalChart ? 12 : 6;
+    const width = 12;
+    const height = 6;
     self.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
     const cutAndClipMarkerG = self.axisCutAndClipMarkerG
         .append("g")
@@ -19,11 +19,11 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
     if (self.isHorizontalChart) {
-        secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height : 0})`);
+        secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : self.margin.top})`);
     } else {
         secG.attr(
             "transform",
-            `translate(${self.isLeftYAxis ? -(width / 2) : self.width - width / 2}, ${self.getYPosition(self.cutAndClipAxisSettings.breakEnd) -
+            `translate(${self.isLeftYAxis ? (width / 4) : self.width - width - width / 4}, ${self.getYPosition(self.cutAndClipAxisSettings.breakStart) -
             (self.isBottomXAxis ? 0 : self.barCutAndClipMarkerLinesGap / 2)
             })`
         );
@@ -32,12 +32,12 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     if (self.isHorizontalChart) {
         secG
             .append("rect")
-            .attr("width", height + width)
-            .attr("height", width)
+            .attr("width", width)
+            .attr("height", height)
             .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
             .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
             .attr("stroke-width", "3px")
-            .attr("stroke-dasharray", `${height + width} ${width} `)
+            .attr("stroke-dasharray", `${width} ${height} `)
             .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
     } else {
         secG
