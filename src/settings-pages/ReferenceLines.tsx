@@ -175,6 +175,8 @@ const ReferenceLines = (props) => {
     setContentShown(() => "homePage");
   }, []);
 
+  const filteredInitialStates = selectedLineType !== ELineTypeTabs.All ? initialStates.filter(d => d.referenceType === (selectedLineType as any)) : initialStates;
+
   return (
     <>
       <ConditionalWrapper visible={contentShown === "deletePage" && mappedInitialState && mappedInitialState.length > 0}>
@@ -381,8 +383,8 @@ const ReferenceLines = (props) => {
       <ConditionalWrapper visible={contentShown === "form"}>
         <AddReferenceLine
           shadow={shadow}
-          details={typeof id === "number" ? initialStates[id] : {}}
-          isLineUI={isEmpty(typeof id === "number" ? initialStates[id] : {}) ? selectedLineType === ELineTypeTabs.Line : initialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
+          details={typeof id === "number" ? filteredInitialStates[id] : {}}
+          isLineUI={isEmpty(typeof id === "number" ? filteredInitialStates[id] : {}) ? selectedLineType === ELineTypeTabs.Line : filteredInitialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
           onAdd={onAdd}
           onUpdate={onUpdate}
           index={id}
