@@ -165,6 +165,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             const connectingLineG = create("svg:g").classed("connectingLineG", true);
             const xAxisTitleG = create("svg:g").classed("xAxisTitleG", true);
             const yAxisTitleG = create("svg:g").classed("yAxisTitleG", true);
+            const xAxisLineG = create("svg:g").classed("xAxisLineG", true);
+            const yAxisLineG = create("svg:g").classed("yAxisLineG", true);
 
             svg.node().append(container.node());
             container.node().append(lollipopG.node());
@@ -181,6 +183,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             container.node().append(connectingLineG.node());
             container.node().append(xAxisTitleG.node());
             container.node().append(yAxisTitleG.node());
+            container.node().append(xAxisLineG.node());
+            container.node().append(yAxisLineG.node());
 
             // error bars
             container.node().append(errorBarsContainer.node());
@@ -309,6 +313,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.connectingLineG = connectingLineG as any;
             self.xAxisTitleG = xAxisTitleG as any;
             self.yAxisTitleG = yAxisTitleG as any;
+            self.xAxisLineG = xAxisLineG as any;
+            self.yAxisLineG = yAxisLineG as any;
             self.xAxisTitleText = xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
             self.yAxisTitleText = yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
 
@@ -366,6 +372,18 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 }
             } else {
                 self.connectingLineG.selectAll("*").remove();
+            }
+
+            if (self.xAxisSettings.isShowAxisLine) {
+                self.drawXAxisLine();
+            } else {
+                self.xAxisLineG.select(".xAxisLine").remove();
+            }
+
+            if (self.yAxisSettings.isShowAxisLine) {
+                self.drawYAxisLine();
+            } else {
+                self.yAxisLineG.select(".yAxisLine").remove();
             }
 
             self.setMargins();
