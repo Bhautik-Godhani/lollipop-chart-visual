@@ -381,7 +381,6 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
                   handleChange(value, "value", type);
                   handleChange(true, EReferenceLineValueProps.IsValueChanged, type);
                 }}
-                min={1}
                 label="Value"
               />
             </Column>
@@ -872,7 +871,6 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
                   handleChange(value, "value", EReferenceLinesSettings.LineValue1);
                   handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
                 }}
-                min={1}
                 label="Value"
               />
             </Column>
@@ -925,7 +923,6 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
                 type="text"
                 value={configValues.lineValue2.value}
                 handleChange={(value: any) => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
-                min={1}
                 label="Value"
               />
             </Column>
@@ -1174,7 +1171,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && (configValues.lineValue1.value === undefined || configValues.lineValue1.value === null)) {
       handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
-  }, [configValues.lineValue1]);
+  }, [configValues.lineValue1.axis, configValues.lineValue1.computation, configValues.lineValue1.measureName, configValues.lineValue1.type]);
 
   // line value 2
   React.useEffect(() => {
@@ -1189,7 +1186,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && (configValues.lineValue2.value === undefined || configValues.lineValue2.value === null)) {
       handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
-  }, [configValues.lineValue2]);
+  }, [configValues.lineValue2.axis, configValues.lineValue2.computation, configValues.lineValue2.measureName, configValues.lineValue2.type]);
 
   React.useEffect(() => {
     if (configValues.referenceType === EReferenceType.REFERENCE_LINE && configValues.labelStyle.labelPosition === EBeforeAfterPosition.Center) {
