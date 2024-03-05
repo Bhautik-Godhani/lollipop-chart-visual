@@ -2,7 +2,7 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, AccordionAlt, Label, ImageOption } from "@truviz/shadow/dist/Components";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, AccordionAlt, Label, ImageOption, RangeSlider } from "@truviz/shadow/dist/Components";
 import { IChartSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
@@ -279,16 +279,16 @@ const UIGeneralChartSettings = (
 				<ConditionalWrapper visible={!configValues.isAutoLollipopWidth}>
 					<Row appearance="padded">
 						<Column>
-							<InputControl
+							<RangeSlider
 								min={20}
 								max={180}
-								type="number"
-								label="Min Width"
+								label="Min Category Width (px)"
 								value={configValues.lollipopWidth ? configValues.lollipopWidth : Math.ceil(shadow.scaleBandWidth)}
 								handleChange={(value) => handleChange(value, EChartSettings.lollipopWidth, setConfigValues)}
-							/>
+								isViewEditable
+								stepValue={1}
+							></RangeSlider>
 						</Column>
-						<Column></Column>
 					</Row>
 				</ConditionalWrapper>
 			</AccordionAlt>
