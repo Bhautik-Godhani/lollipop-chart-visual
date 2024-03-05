@@ -138,6 +138,18 @@ const CutAndClipAxisSettings = (props) => {
                   />
                 </Column>
               </Row>
+
+              <Row>
+                <Column>
+                  <ColorPicker
+                    label={"Marker Background Color"}
+                    color={configValues.markerBackgroundColor}
+                    handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
+                    colorPalette={vizOptions.host.colorPalette}
+                    size="sm"
+                  />
+                </Column>
+              </Row>
             </Column>
           </Row>
         </ConditionalWrapper>
