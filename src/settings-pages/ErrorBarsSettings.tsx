@@ -27,10 +27,10 @@ import {
 } from "@truviz/shadow/dist/Components";
 import { IErrorBarsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { Visual } from "../visual";
-import { IMarkerData } from "./markerSelector";
-import { CATEGORY_MARKERS } from "./markers";
+import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { BoldIcon, DashedLineIcon, DottedLineIcon, ErrorBarsPlaceholderIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
 import { persistProperties } from "../methods/methods";
+import { ErrorBarsMarkers } from "../error-bars-markers";
 
 let MARKERS_LIST: IMarkerData[] = [];
 
@@ -87,15 +87,18 @@ const ErrorBarsSettings = (props) => {
     }));
   };
 
-  MARKERS_LIST = [];
-  CATEGORY_MARKERS.map((marker) => {
-    MARKERS_LIST.push({
-      label: marker.label.split("_").join(" ").toLowerCase(),
-      value: marker.value,
-      paths: marker.paths,
-      w: marker.w,
-      h: marker.h,
-    });
+  MARKERS_LIST = ErrorBarsMarkers.map(d => {
+    return {
+      label: d.shape,
+      value: d.shape,
+      w: d.w,
+      h: d.h,
+      paths: [{
+        d: d.path,
+        fill: "var(--activeSelected)",
+        stroke: undefined
+      }]
+    }
   });
 
   const markerIconsList: { label: any; value: string }[] = [
@@ -586,33 +589,16 @@ const ErrorBarsSettings = (props) => {
 
           <Row>
             <Column>
-              {/* <MarkerPicker
-                    label="Marker Type"
-                    marker={{ label: configValues.errorBars.markerShape, value: configValues.errorBars.markerShape }}
-                    handleChange={(e: IMarkerData) => {
-                      handleChange(e.value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars);
-                    }}
-                    markersList={MARKER_TYPES}
-                  /> */}
-
-              <SelectInput
-                label={"Marker Type"}
-                value={configValues.errorBars.markerShape}
-                isFontSelector={false}
-                optionsList={MARKER_TYPES}
-                handleChange={(value) => handleChange(value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars)}
+              <MarkerPicker
+                label="Marker Type"
+                marker={{ label: configValues.errorBars.markerShape, value: configValues.errorBars.markerShape }}
+                handleChange={(e: IMarkerData) => {
+                  handleChange(e.value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars);
+                }}
+                markersList={MARKERS_LIST}
               />
             </Column>
           </Row>
-
-          {/* <MarkerPicker
-              label="Select Marker"
-              marker={{ label: configValues.errorBars.markerShape, value: configValues.errorBars.markerShape }}
-              handleChange={(e: IMarkerData) => {
-                handleChange(e.value, EErrorBarsSettings.MarkerShape, EErrorBarsSettings.ErrorBars);
-              }}
-              markersList={MARKERS_LIST}
-            /> */}
 
           <Row>
             <Column>
