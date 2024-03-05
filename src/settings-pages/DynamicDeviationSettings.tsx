@@ -174,258 +174,270 @@ const DynamicDeviationSettings = (props) => {
 
   return (
     <>
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Enable"}
-            value={configValues.isEnabled}
-            handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsEnabled)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={!configValues.isEnabled}>
+      <ConditionalWrapper visible={shadow.isHasMultiMeasure}>
         <Row>
-          <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <DynamicDeviationPlaceholderIcon />
+          <Column>
+            <Quote>
+              <strong>Note: </strong>Please add single measure only to use this functionality.
+            </Quote>
           </Column>
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={configValues.isEnabled}>
-        <AccordionAlt title="Display" open={true}>
+      <ConditionalWrapper visible={!shadow.isHasMultiMeasure}>
+        <Row>
+          <Column>
+            <ToggleButton
+              label={"Enable"}
+              value={configValues.isEnabled}
+              handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsEnabled)}
+              appearance="toggle"
+            />
+          </Column>
+        </Row>
+
+        <ConditionalWrapper visible={!configValues.isEnabled}>
           <Row>
-            <Column>
-              <SelectInput
-                label={"Display Style"}
-                value={configValues.displayType}
-                optionsList={DISPLAY_TYPES}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.DisplayType)}
-              />
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <DynamicDeviationPlaceholderIcon />
             </Column>
           </Row>
+        </ConditionalWrapper>
 
-          <ConditionalWrapper visible={configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn}>
+        <ConditionalWrapper visible={configValues.isEnabled}>
+          <AccordionAlt title="Display" open={true}>
             <Row>
               <Column>
-                <Quote>
-                  <strong>Note:</strong> &nbsp;
-                  By selecting 'Create Your Own' type you will get plus icon to select bar on mouse hover (click to select it).
-                  Once selected the first bar, by hovering on any other bar you will get deviation line and click on bar to save it.
-                </Quote>
-              </Column>
-            </Row>
-          </ConditionalWrapper>
-
-          <ConditionalWrapper visible={configValues.displayType === EDynamicDeviationDisplayTypes.CustomRange}>
-            <Row>
-              <Column>
-                <InputControl
-                  min={0}
-                  max={(shadow as Visual).chartData.length}
-                  type="number"
-                  label="From Index"
-                  value={configValues.fromIndex}
-                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.FromIndex)}
-                />
-              </Column>
-
-              <Column>
-                <InputControl
-                  min={0}
-                  max={(shadow as Visual).chartData.length}
-                  type="number"
-                  label="To Index"
-                  value={configValues.toIndex}
-                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ToIndex)}
+                <SelectInput
+                  label={"Display Style"}
+                  value={configValues.displayType}
+                  optionsList={DISPLAY_TYPES}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.DisplayType)}
                 />
               </Column>
             </Row>
-          </ConditionalWrapper>
 
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Start Indicator"}
-                value={configValues.isShowStartIndicator}
-                handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsShowStartIndicator)}
-                appearance="checkbox"
-              />
-            </Column>
-          </Row>
+            <ConditionalWrapper visible={configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn}>
+              <Row>
+                <Column>
+                  <Quote>
+                    <strong>Note:</strong> &nbsp;
+                    By selecting 'Create Your Own' type you will get plus icon to select bar on mouse hover (click to select it).
+                    Once selected the first bar, by hovering on any other bar you will get deviation line and click on bar to save it.
+                  </Quote>
+                </Column>
+              </Row>
+            </ConditionalWrapper>
 
-          <Row>
-            <Column>
-              <ColorPicker
-                label={"Connector Positive Color"}
-                color={configValues.connectorPositiveColor}
-                handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorPositiveColor)}
-                colorPalette={vizOptions.host.colorPalette}
-                size="sm"
-              />
-            </Column>
-          </Row>
+            <ConditionalWrapper visible={configValues.displayType === EDynamicDeviationDisplayTypes.CustomRange}>
+              <Row>
+                <Column>
+                  <InputControl
+                    min={0}
+                    max={(shadow as Visual).chartData.length}
+                    type="number"
+                    label="From Index"
+                    value={configValues.fromIndex}
+                    handleChange={(value) => handleChange(value, EDynamicDeviationSettings.FromIndex)}
+                  />
+                </Column>
 
-          <Row>
-            <Column>
-              <ColorPicker
-                label={"Connector Negative Color"}
-                color={configValues.connectorNegativeColor}
-                handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorNegativeColor)}
-                colorPalette={vizOptions.host.colorPalette}
-                size="sm"
-              />
-            </Column>
-          </Row>
-        </AccordionAlt>
+                <Column>
+                  <InputControl
+                    min={0}
+                    max={(shadow as Visual).chartData.length}
+                    type="number"
+                    label="To Index"
+                    value={configValues.toIndex}
+                    handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ToIndex)}
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
 
-        <AccordionAlt title="Connectors"
-          open={true}
-        >
-          <Row>
-            <Column>
-              <SwitchOption
-                label="Connector Type"
-                value={configValues.connectorType}
-                optionsList={[
-                  {
-                    label: <DynamicDeviationArrowIcon fill="currentColor" />,
-                    value: EDynamicDeviationConnectingLineTypes.Arrow,
-                  },
-                  {
-                    label: <DynamicDeviationDotsIcon fill="currentColor" />,
-                    value: EDynamicDeviationConnectingLineTypes.Dots,
-                  },
-                  {
-                    label: <DynamicDeviationBarIcon fill="currentColor" />,
-                    value: EDynamicDeviationConnectingLineTypes.Bar,
-                  },
-                ]}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorType)}
-              />
-            </Column>
-          </Row>
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Show Start Indicator"}
+                  value={configValues.isShowStartIndicator}
+                  handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsShowStartIndicator)}
+                  appearance="checkbox"
+                />
+              </Column>
+            </Row>
 
-          <Row>
-            <Column >
-              <InputControl
-                min={0}
-                type="number"
-                label="Connector Width"
-                value={configValues.connectorWidth}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorWidth)}
-              />
-            </Column>
-            <Column></Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <SwitchOption
-                label="Line Style"
-                value={configValues.connectingLineType}
-                optionsList={LINE_TYPES}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectingLineType)}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <InputControl
-                min={0}
-                type="number"
-                label="Line Width"
-                value={configValues.connectingLineWidth}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.connectingLineWidth)}
-              />
-            </Column>
-
-            <Column>
-              <ColorPicker
-                label={"Line Color"}
-                color={configValues.connectingLineColor}
-                handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectingLineColor)}
-                colorPalette={vizOptions.host.colorPalette}
-              />
-            </Column>
-          </Row>
-        </AccordionAlt>
-
-        <AccordionAlt title="Label Styles"
-          open={true}
-        >
-          <Row>
-            <Column>
-              <SelectInput
-                label={"Label Display Type"}
-                value={configValues.labelDisplayType}
-                optionsList={LABEL_DISPLAY_TYPE}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.LabelDisplayType)}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <SelectInput
-                label={"Font Family"}
-                value={configValues.labelFontFamily}
-                isFontSelector={true}
-                optionsList={[]}
-                handleChange={value => handleChange(value, EDynamicDeviationSettings.LabelFontFamily)}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <InputControl
-                min={0}
-                type="number"
-                label="Text Size"
-                value={configValues.labelFontSize}
-                handleChange={(value) => handleChange(value, EDynamicDeviationSettings.LabelFontSize)}
-              />
-            </Column>
-
-            <Column>
-              <ColorPicker
-                label={"Color"}
-                color={configValues.labelFontColor}
-                handleChange={value => handleColor(value, EDynamicDeviationSettings.LabelFontColor)}
-                colorPalette={vizOptions.host.colorPalette}
-              />
-            </Column>
-          </Row>
-
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Show Label Background"}
-                value={configValues.isShowLabelBackground}
-                handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsShowLabelBackground)}
-                appearance="toggle"
-              />
-            </Column>
-          </Row>
-
-          <ConditionalWrapper visible={configValues.isShowLabelBackground}>
-            <Row appearance="padded">
+            <Row>
               <Column>
                 <ColorPicker
-                  label={"Color"}
-                  color={configValues.backgroundColor}
-                  handleChange={value => handleColor(value, EDynamicDeviationSettings.BackgroundColor)}
+                  label={"Connector Positive Color"}
+                  color={configValues.connectorPositiveColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorPositiveColor)}
                   colorPalette={vizOptions.host.colorPalette}
                   size="sm"
                 />
               </Column>
             </Row>
-          </ConditionalWrapper>
-        </AccordionAlt>
 
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Connector Negative Color"}
+                  color={configValues.connectorNegativeColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorNegativeColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+          </AccordionAlt>
+
+          <AccordionAlt title="Connectors"
+            open={true}
+          >
+            <Row>
+              <Column>
+                <SwitchOption
+                  label="Connector Type"
+                  value={configValues.connectorType}
+                  optionsList={[
+                    {
+                      label: <DynamicDeviationArrowIcon fill="currentColor" />,
+                      value: EDynamicDeviationConnectingLineTypes.Arrow,
+                    },
+                    {
+                      label: <DynamicDeviationDotsIcon fill="currentColor" />,
+                      value: EDynamicDeviationConnectingLineTypes.Dots,
+                    },
+                    {
+                      label: <DynamicDeviationBarIcon fill="currentColor" />,
+                      value: EDynamicDeviationConnectingLineTypes.Bar,
+                    },
+                  ]}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorType)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column >
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Connector Width"
+                  value={configValues.connectorWidth}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorWidth)}
+                />
+              </Column>
+              <Column></Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <SwitchOption
+                  label="Line Style"
+                  value={configValues.connectingLineType}
+                  optionsList={LINE_TYPES}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectingLineType)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Line Width"
+                  value={configValues.connectingLineWidth}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.connectingLineWidth)}
+                />
+              </Column>
+
+              <Column>
+                <ColorPicker
+                  label={"Line Color"}
+                  color={configValues.connectingLineColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectingLineColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                />
+              </Column>
+            </Row>
+          </AccordionAlt>
+
+          <AccordionAlt title="Label Styles"
+            open={true}
+          >
+            <Row>
+              <Column>
+                <SelectInput
+                  label={"Label Display Type"}
+                  value={configValues.labelDisplayType}
+                  optionsList={LABEL_DISPLAY_TYPE}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.LabelDisplayType)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <SelectInput
+                  label={"Font Family"}
+                  value={configValues.labelFontFamily}
+                  isFontSelector={true}
+                  optionsList={[]}
+                  handleChange={value => handleChange(value, EDynamicDeviationSettings.LabelFontFamily)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <InputControl
+                  min={0}
+                  type="number"
+                  label="Text Size"
+                  value={configValues.labelFontSize}
+                  handleChange={(value) => handleChange(value, EDynamicDeviationSettings.LabelFontSize)}
+                />
+              </Column>
+
+              <Column>
+                <ColorPicker
+                  label={"Color"}
+                  color={configValues.labelFontColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.LabelFontColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Show Label Background"}
+                  value={configValues.isShowLabelBackground}
+                  handleChange={() => handleCheckbox(EDynamicDeviationSettings.IsShowLabelBackground)}
+                  appearance="toggle"
+                />
+              </Column>
+            </Row>
+
+            <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+              <Row appearance="padded">
+                <Column>
+                  <ColorPicker
+                    label={"Color"}
+                    color={configValues.backgroundColor}
+                    handleChange={value => handleColor(value, EDynamicDeviationSettings.BackgroundColor)}
+                    colorPalette={vizOptions.host.colorPalette}
+                    size="sm"
+                  />
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+          </AccordionAlt>
+
+        </ConditionalWrapper>
       </ConditionalWrapper>
 
       {/* <Row>
