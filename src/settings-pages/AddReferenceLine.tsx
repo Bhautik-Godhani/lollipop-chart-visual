@@ -868,7 +868,10 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <InputControl
                 type="text"
                 value={configValues.lineValue1.value}
-                handleChange={(value: any) => handleChange(value, "value", EReferenceLinesSettings.LineValue1)}
+                handleChange={(value: any) => {
+                  handleChange(value, "value", EReferenceLinesSettings.LineValue1);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
+                }}
                 min={1}
                 label="Value"
               />
