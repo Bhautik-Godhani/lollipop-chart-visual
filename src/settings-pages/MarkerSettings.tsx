@@ -342,7 +342,11 @@ const MarkerSettings = (props) => {
 	};
 
 	const resetChanges = () => {
-		setConfigValues({ ...MARKER_SETTINGS });
+		if ((shadow as Visual).isHasSubcategories) {
+			setConfigValues({ ...MARKER_SETTINGS, markerType: EMarkerTypes.CHART });
+		} else {
+			setConfigValues({ ...MARKER_SETTINGS });
+		}
 	};
 
 	const [configValues, setConfigValues] = React.useState<IMarkerSettings>({
