@@ -3400,7 +3400,8 @@ export class Visual extends Shadow {
 						}
 						break;
 				}
-				return bound
+
+				return (bound !== undefined && bound !== null)
 					? this.errorBarsSettings.tooltip.labelFormat !== EErrorBarsLabelFormat.RelativePercentage
 						? this.formatNumber(+bound, this.numberSettings, undefined, true, true)
 						: bound.toFixed(2) + "%"
@@ -4710,6 +4711,7 @@ export class Visual extends Shadow {
 			.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
 
 		this.brushG.select(".selection")
+			.attr("fill-opacity", "1")
 			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
 			.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 	}
@@ -4896,6 +4898,7 @@ export class Visual extends Shadow {
 				.attr("pointer-events", this.brushAndZoomAreaSettings.enabled ? "auto" : "none");
 
 			d3.select(brushG).select(".selection")
+				.attr("fill-opacity", "1")
 				.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBackgroundColor)
 				.attr("stroke", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.selectionTrackBorderColor : BRUSH_AND_ZOOM_AREA_SETTINGS.selectionTrackBorderColor);
 		}
@@ -5748,7 +5751,7 @@ export class Visual extends Shadow {
 			});
 
 			if (this.errorBarsSettings.tooltip.isEnabled) {
-				if (this.isHasErrorUpperBounds && value.tooltipUpperBoundValue) {
+				if (this.isHasErrorUpperBounds && (value.tooltipUpperBoundValue !== undefined && value.tooltipUpperBoundValue !== null)) {
 					tooltipData.push({
 						displayName: "Upper",
 						value: value.tooltipUpperBoundValue,
@@ -5756,7 +5759,7 @@ export class Visual extends Shadow {
 					});
 				}
 
-				if (this.isHasErrorLowerBounds && value.tooltipLowerBoundValue) {
+				if (this.isHasErrorLowerBounds && (value.tooltipLowerBoundValue !== undefined && value.tooltipLowerBoundValue !== null)) {
 					tooltipData.push({
 						displayName: "Lower",
 						value: value.tooltipLowerBoundValue,

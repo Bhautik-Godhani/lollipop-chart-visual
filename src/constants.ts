@@ -311,7 +311,7 @@ export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	minLollipopCount: 10,
 	isShowAxis: false,
 	trackBackgroundColor: "rgba(225, 225, 225, 0.5)",
-	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.4)",
+	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.2)",
 	selectionTrackBorderColor: "rgba(225, 225, 225, 1)",
 	isAutoWidth: true,
 	isAutoHeight: true,
