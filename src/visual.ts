@@ -128,7 +128,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption } from "echarts";
-import { GetOnlyWordsFromString, GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -3624,7 +3624,7 @@ export class Visual extends Shadow {
 
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
-				name: GetOnlyWordsFromString(d.category),
+				name: d.category.replace(/--\d+/g, ''),
 				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
 				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
@@ -3741,7 +3741,7 @@ export class Visual extends Shadow {
 					} else {
 						legendDataPoints = this.chartData.map(d => ({
 							data: {
-								name: GetOnlyWordsFromString(d.category),
+								name: d.category.replace(/--\d+/g, ''),
 								color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
 								pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category)
 							}
@@ -5725,7 +5725,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: GetOnlyWordsFromString((typeof value.category === "string" ? value.category.toUpperCase() : value.category)),
+					value: (typeof value.category === "string" ? value.category.toUpperCase() : value.category).replace(/--\d+/g, ''),
 					color: "transparent",
 				},
 				{
