@@ -3826,14 +3826,18 @@ export class Visual extends Shadow {
 								pattern: undefined
 							},
 						},
-						{
-							data: {
-								name: "Negative",
-								color: this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground),
-								pattern: undefined
-							},
-						}
 					]
+
+					if (this.isHasNegativeValue) {
+						legendDataPoints.push(
+							{
+								data: {
+									name: "Negative",
+									color: this.getColor(NEGATIVE_COLOR, EHighContrastColorType.Foreground),
+									pattern: undefined
+								},
+							})
+					}
 					break;
 			}
 		}
@@ -5869,7 +5873,7 @@ export class Visual extends Shadow {
 		if (xAxisSettings.position === Position.Bottom) {
 			this.xAxisTitleG.attr(
 				"transform",
-				`translate(${this.width / 2}, ${this.height + this.margin.bottom - this.brushHeight - this.xAxisTitleMargin})`
+				`translate(${this.width / 2}, ${this.height + this.margin.bottom - this.brushHeight - this.xAxisTitleMargin - this.brushXAxisTicksMaxHeight})`
 			);
 		} else if (xAxisSettings.position === Position.Top) {
 			this.xAxisTitleG.attr("transform", `translate(${this.width / 2}, ${-this.margin.top + 2 * this.xAxisTitleMargin})`);
@@ -5880,7 +5884,7 @@ export class Visual extends Shadow {
 		} else if (yAxisSettings.position === Position.Right) {
 			this.yAxisTitleG.attr(
 				"transform",
-				`translate(${this.width + this.margin.right - this.brushWidth / 2 - this.yAxisTitleMargin}, ${this.height / 2})`
+				`translate(${this.width + this.margin.right - this.brushWidth - this.yAxisTitleMargin - this.brushYAxisTicksMaxWidth}, ${this.height / 2})`
 			);
 		}
 	}
