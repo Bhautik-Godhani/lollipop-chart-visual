@@ -922,7 +922,10 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <InputControl
                 type="text"
                 value={configValues.lineValue2.value}
-                handleChange={(value: any) => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
+                handleChange={(value: any) => {
+                  handleChange(value, "value", EReferenceLinesSettings.LineValue2);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2);
+                }}
                 label="Value"
               />
             </Column>
@@ -1206,10 +1209,18 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
   }, [configValues.lineValue1.axis, configValues.lineValue1.type, configValues.lineValue1.computation]);
 
   React.useEffect(() => {
+    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
     if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.isValueChanged) {
       handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
   }, [configValues.lineValue1.computation]);
+
+  React.useEffect(() => {
+    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2);
+    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.isValueChanged) {
+      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    }
+  }, [configValues.lineValue2.computation]);
 
   const setLineValue = (isLine2: boolean) => {
     const rLine = configValues;
