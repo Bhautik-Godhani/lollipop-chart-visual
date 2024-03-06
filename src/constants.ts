@@ -342,6 +342,11 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 		markerShapeBase64Url: "",
 		dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 		selectedImageDataField: undefined,
+		isShowMarkerOutline: false,
+		outlineWidth: 1,
+		outlineColor: "rgba(128, 128, 128, 1)",
+		sameOutlineAsMarkerColor: false,
+		showOutlineOnly: false
 	},
 	marker2Style: {
 		isAutoMarkerSize: false,
@@ -353,6 +358,11 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 		markerShapeBase64Url: "",
 		dropdownMarkerType: EMarkerDefaultShapes.CIRCLE,
 		selectedImageDataField: undefined,
+		isShowMarkerOutline: false,
+		outlineWidth: 1,
+		outlineColor: "rgba(128, 128, 128, 1)",
+		sameOutlineAsMarkerColor: false,
+		showOutlineOnly: false
 	},
 	isAutoLollipopTypePie: false,
 	isAutoLollipopTypeImage: false,

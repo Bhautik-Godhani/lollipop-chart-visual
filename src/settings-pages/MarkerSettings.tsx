@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EMarkerChartTypes, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes } from "../enum";
-import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton } from "@truviz/shadow/dist/Components";
+import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton, ColorPicker } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IMarkerSettings } from "../visual-settings.interface";
 import { MARKER_SETTINGS as MARKER_SETTINGS_IMP } from "../constants";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -448,6 +448,72 @@ const MarkerSettings = (props) => {
 					<Column></Column>
 				</Row>
 			</ConditionalWrapper>
+
+			{/* <ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
+				<Row>
+					<Column>
+						<ToggleButton
+							label={"Marker Outline"}
+							value={configValues[configValues.markerStyleType].isShowMarkerOutline}
+							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsShowMarkerOutline, configValues.markerStyleType, setConfigValues)}
+							appearance="toggle"
+						/>
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isShowMarkerOutline}>
+					<Row appearance="padded">
+						<Column>
+							<Row>
+								<Column>
+									<InputControl
+										min={0}
+										type="number"
+										label={"Width"}
+										value={configValues[configValues.markerStyleType].outlineWidth}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineWidth, configValues.markerStyleType, setConfigValues)}
+									/>
+								</Column>
+								<Column></Column>
+							</Row>
+
+							<Row>
+								<Column>
+									<ColorPicker
+										label="Color"
+										color={configValues[configValues.markerStyleType].outlineColor}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineColor, configValues.markerStyleType, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+
+							<Row>
+								<Column>
+									<ToggleButton
+										label={"Same color as Marker"}
+										value={configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SameOutlineAsMarkerColor, configValues.markerStyleType, setConfigValues)}
+										appearance="checkbox"
+									/>
+								</Column>
+							</Row>
+
+							<Row>
+								<Column>
+									<ToggleButton
+										label={"Show outline only"}
+										value={configValues[configValues.markerStyleType].showOutlineOnly}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.ShowOutlineOnly, configValues.markerStyleType, setConfigValues)}
+										appearance="checkbox"
+									/>
+								</Column>
+							</Row>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+			</ConditionalWrapper> */}
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>

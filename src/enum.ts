@@ -454,7 +454,12 @@ export enum EMarkerSettings {
 	IsAutoMarkerSize = "isAutoMarkerSize",
 	MarkerSize = "markerSize",
 	SelectedImageDataField = "selectedImageDataField",
-	IsAutoLollipopTypePie = "isAutoLollipopTypePie"
+	IsAutoLollipopTypePie = "isAutoLollipopTypePie",
+	IsShowMarkerOutline = "isShowMarkerOutline",
+	OutlineWidth = "outlineWidth",
+	OutlineColor = "outlineColor",
+	SameOutlineAsMarkerColor = "sameOutlineAsMarkerColor",
+	ShowOutlineOnly = "showOutlineOnly"
 }
 
 export enum ERaceChartSettings {

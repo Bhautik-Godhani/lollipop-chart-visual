@@ -202,6 +202,11 @@ export interface MarkerStyleProps {
 	isAutoMarkerSize: boolean;
 	markerSize: number;
 	selectedImageDataField: string;
+	isShowMarkerOutline: boolean;
+	outlineWidth: number;
+	outlineColor: string;
+	sameOutlineAsMarkerColor: boolean;
+	showOutlineOnly: boolean;
 }
 
 export enum EInsideTextColorTypes {
