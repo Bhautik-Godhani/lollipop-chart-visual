@@ -449,7 +449,7 @@ const MarkerSettings = (props) => {
 				</Row>
 			</ConditionalWrapper>
 
-			{/* <ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
+			<ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
 				<Row>
 					<Column>
 						<ToggleButton
@@ -461,7 +461,7 @@ const MarkerSettings = (props) => {
 					</Column>
 				</Row>
 
-				<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isShowMarkerOutline}>
+				<ConditionalWrapper visible={configValues[configValues.markerStyleType].isShowMarkerOutline}>
 					<Row appearance="padded">
 						<Column>
 							<Row>
@@ -513,7 +513,7 @@ const MarkerSettings = (props) => {
 						</Column>
 					</Row>
 				</ConditionalWrapper>
-			</ConditionalWrapper> */}
+			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
