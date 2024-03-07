@@ -662,7 +662,8 @@ export class Visual extends Shadow {
 					{ label: "Marker", value: ECFApplyOnCategories.Marker },
 					{ label: "Line", value: ECFApplyOnCategories.Line },
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
-				]
+				],
+				showPercentageAllOption: true
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
