@@ -474,6 +474,9 @@ export enum ERaceChartSettings {
 	TickerButtonRadius = "tickerButtonRadius",
 	IsTickerButtonAutoRadius = "isTickerButtonAutoRadius",
 	TickerButtonColor = "tickerButtonColor",
+	FontStyles = "fontStyles",
+	IsShowLabelBackground = "isShowLabelBackground",
+	BackgroundColor = "backgroundColor"
 }
 
 export enum EReferenceLinesSettings {

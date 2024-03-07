@@ -12,11 +12,13 @@ import {
   ColorPicker,
   Quote,
   AccordionAlt,
+  SwitchOption,
 } from "@truviz/shadow/dist/Components";
 import { IRaceChartSettings } from "../visual-settings.interface";
 import { ERaceChartSettings } from "../enum";
 import { persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
+import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
 
 const RaceChartSettings = (props) => {
   const {
@@ -171,11 +173,36 @@ const RaceChartSettings = (props) => {
               <Row>
                 <Column>
                   <SelectInput
-                    label={"Label Font Family"}
+                    label={"Font Family"}
                     value={configValues.labelFontFamily}
                     isFontSelector={true}
                     optionsList={[]}
                     handleChange={value => handleChange(value, ERaceChartSettings.LabelFontFamily)}
+                  />
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <SwitchOption
+                    label="Styling"
+                    value={configValues.fontStyles}
+                    optionsList={[
+                      {
+                        label: <BoldIcon style={{ fill: "currentColor" }} />,
+                        value: "bold",
+                      },
+                      {
+                        label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                        value: "italic",
+                      },
+                      {
+                        label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                        value: "underline",
+                      },
+                    ]}
+                    isMultiple
+                    handleChange={value => handleChange(value, ERaceChartSettings.FontStyles)}
                   />
                 </Column>
               </Row>
@@ -191,6 +218,31 @@ const RaceChartSettings = (props) => {
                   />
                 </Column>
               </Row>
+
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label="Show Background"
+                    value={configValues.isShowLabelBackground}
+                    handleChange={() => handleCheckbox(ERaceChartSettings.IsShowLabelBackground)}
+                    appearance="toggle"
+                  />
+                </Column>
+              </Row>
+
+              <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+                <Row appearance="padded">
+                  <Column>
+                    <ColorPicker
+                      label={"Color"}
+                      color={configValues.backgroundColor}
+                      handleChange={value => handleChange(value, ERaceChartSettings.BackgroundColor)}
+                      colorPalette={vizOptions.host.colorPalette}
+                      size="sm"
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
             </AccordionAlt>
 
             <AccordionAlt title="Play Button"

@@ -429,6 +429,9 @@ export interface IRaceChartSettings {
 	tickerButtonRadius: number;
 	isTickerButtonAutoRadius: boolean;
 	tickerButtonColor: string;
+	fontStyles: EFontStyle[];
+	isShowLabelBackground: boolean;
+	backgroundColor: string;
 }
 
 export interface IReferenceLineValueProps {

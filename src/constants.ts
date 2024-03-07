@@ -380,6 +380,9 @@ export const RACE_CHART_SETTINGS: IRaceChartSettings = {
 	tickerButtonRadius: 30,
 	isTickerButtonAutoRadius: true,
 	tickerButtonColor: "rgba(102,102,102,1)",
+	fontStyles: [],
+	isShowLabelBackground: false,
+	backgroundColor: "rgba(0,0,0,1)"
 };
 
 export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {

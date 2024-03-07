@@ -1,6 +1,6 @@
-import { EPlayPauseButton } from '../enum';
+import { EFontStyle, EHighContrastColorType, EPlayPauseButton } from '../enum';
 import { Visual } from '../visual';
-import { interval, min, sum } from "d3";
+import { interval, min, select, sum } from "d3";
 
 export const StartChartRace = (self: Visual) => {
     if (self.ticker) {
@@ -60,10 +60,14 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
     }
 
     self.raceChartDataLabelText.selectAll("*").remove();
+    self.raceChartDataLabelG.selectAll(".label-shadow").remove();
 
     self.raceChartDataLabelText
+        .style("text-decoration", self.raceChartSettings.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
+        .style("font-weight", self.raceChartSettings.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
+        .style("font-style", self.raceChartSettings.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
         .attr("fill", self.raceChartSettings.labelColor)
-        .attr("font-family", self.raceChartSettings.labelFontFamily)
+        .style("font-family", self.raceChartSettings.labelFontFamily)
         .attr("text-anchor", "middle");
 
     self.raceChartDataLabelText
@@ -106,6 +110,15 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             (self.height - textBBox.height) +
             ")"
         )
+
+    const clonedTitle = select(self.raceChartDataLabelText as any).node().clone(true);
+    clonedTitle
+        .lower()
+        .attr("class", "label-shadow")
+        .attr("stroke", self.getColor(self.raceChartSettings.backgroundColor, EHighContrastColorType.Background))
+        .attr("stroke-width", 4)
+        .attr("stroke-linejoin", "round")
+        .attr("opacity", self.raceChartSettings.isShowLabelBackground ? "1" : "0");
 
     self.isRaceChartDataLabelDrawn = true;
 }
