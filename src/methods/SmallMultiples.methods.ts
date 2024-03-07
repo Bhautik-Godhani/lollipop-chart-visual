@@ -45,35 +45,39 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 return;
             }
 
-            svgDiv.style("height", `calc(${100}% - ${headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0}px)`);
+            let svgDivMargin = 0;
 
             if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
                 if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
                     svgDiv.style("margin-bottom", "0px");
-                    svgDiv.style("margin-top", "10px");
+                    svgDiv.style("margin-top", "5px");
+                    svgDivMargin = 5;
                 } else if (headerSettings.position === ESmallMultiplesHeaderPosition.Bottom) {
                     svgDiv.style("margin-top", "0px");
-                    svgDiv.style("margin-bottom", "10px");
+                    svgDiv.style("margin-bottom", "5px");
+                    svgDivMargin = 5;
                 }
             } else {
                 svgDiv.style("margin-top", "0px");
                 svgDiv.style("margin-bottom", "0px");
             }
 
-            svgDiv.style("height", `calc(${100}% - ${headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0}px)`);
+            svgDiv.style("height", `calc(${100}% - ${svgDivMargin + (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0)}px)`);
 
-            if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
-                if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
-                    svgDiv.style("margin-bottom", "0px");
-                    svgDiv.style("margin-top", "10px");
-                } else if (headerSettings.position === ESmallMultiplesHeaderPosition.Bottom) {
-                    svgDiv.style("margin-top", "0px");
-                    svgDiv.style("margin-bottom", "10px");
-                }
-            } else {
-                svgDiv.style("margin-top", "0px");
-                svgDiv.style("margin-bottom", "0px");
-            }
+            // svgDiv.style("height", `calc(${100}% - ${headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0}px)`);
+
+            // if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
+            //     if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
+            //         svgDiv.style("margin-bottom", "0px");
+            //         svgDiv.style("margin-top", "10px");
+            //     } else if (headerSettings.position === ESmallMultiplesHeaderPosition.Bottom) {
+            //         svgDiv.style("margin-top", "0px");
+            //         svgDiv.style("margin-bottom", "10px");
+            //     }
+            // } else {
+            //     svgDiv.style("margin-top", "0px");
+            //     svgDiv.style("margin-bottom", "0px");
+            // }
 
             if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
                 (ele.node() as HTMLDivElement).appendChild(div.node());
