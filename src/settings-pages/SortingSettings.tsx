@@ -5,6 +5,7 @@ import { parseObject, persistProperties } from "../methods/methods";
 import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
 import { AccordionAlt, Column, ConditionalWrapper, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, ISortingProps, ISortingSettings } from "../visual-settings.interface";
+import { Visual } from "../visual";
 
 const SORT_ORDER: ILabelValuePair[] = [
 	{
@@ -253,7 +254,7 @@ const SortingSettings = (props) => {
 
 	const CATEGORY_SORT_ON: ILabelValuePair[] = [
 		{
-			label: shadow.categoryDisplayName,
+			label: (shadow as Visual).isExpandAllApplied ? (shadow.categoryDisplayName as string + " ").concat((shadow as Visual).expandAllCategoriesName.join(" ")) : shadow.categoryDisplayName,
 			value: shadow.categoryDisplayName,
 			isSortByCategory: true,
 			isSortByMeasure: false,
@@ -335,12 +336,13 @@ const SortingSettings = (props) => {
 
 		if (
 			!configValues.category.sortBy ||
-			(!([...shadow.measureNames, ...shadow.sortExtraMeasureNames]).includes(configValues.category.sortBy) && configValues.category.isSortByMeasure)
+			(!CATEGORY_SORT_ON.map(d => d.value).includes(configValues.category.sortBy))
 		) {
 			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 		}
 
-		if (!configValues.subCategory.sortBy) {
+		if (!configValues.subCategory.sortBy ||
+			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
 			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 		}
 	}, []);
