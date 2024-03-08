@@ -8239,7 +8239,6 @@ export class Visual extends Shadow {
 						scale: false,
 					},
 					data: this.getPieChartSeriesDataByCategory(category, isPie2),
-					startAngle: 270
 				},
 			],
 		};
