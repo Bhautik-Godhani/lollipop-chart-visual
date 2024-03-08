@@ -36,7 +36,7 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
@@ -51,6 +51,7 @@ export class Behavior implements IInteractiveBehavior {
 
 		lollipopSelection.on("click", function (e) {
 			onLollipopClick(d3Select(this));
+			legendItems.style("opacity", 1);
 
 			const clickedElement = e.target;
 
@@ -89,31 +90,30 @@ export class Behavior implements IInteractiveBehavior {
 			handleSelection(this, e);
 		});
 
-		// if (legendItems) {
-		//     legendItems.on("click", function (e) {
-		//         const legendData: any = d3Select(this).datum();
+		if (legendItems) {
+			legendItems.on("click", function (e) {
+				const legendData: any = d3Select(this).datum();
+				const categoryData = lollipopSelection
+					.filter((data) => legendData.data.name === data.category)
+					.data();
 
-		//         const categoryData = selection
-		//             .filter((data) => legendData.data.name === data.category)
-		//             .data();
+				const groupByData = lollipopSelection
+					.filter((data) => legendData.data.name === data.category)
+					.data();
 
-		//         const groupByData = selection
-		//             .filter((data) => legendData.data.name === data.groupBy)
-		//             .data();
+				if (!isHasSubcategories) {
+					categoryData.forEach(d => {
+						selectionHandler.handleSelection(d, e.ctrlKey);
+					})
+				} else {
+					groupByData.forEach(() => {
+						selectionHandler.handleSelection(groupByData, e.ctrlKey);
+					})
+				}
 
-		//         if (!isHasSubcategories) {
-		//             categoryData.forEach(d => {
-		//                 selectionHandler.handleSelection(d, e.ctrlKey);
-		//             })
-		//         } else {
-		//             groupByData.forEach(() => {
-		//                 selectionHandler.handleSelection(groupByData, e.ctrlKey);
-		//             })
-		//         }
-
-		//         e.stopPropagation();
-		//     });
-		// }
+				e.stopPropagation();
+			});
+		}
 
 		clearCatcher.on("click", () => {
 			selectionHandler.handleClearSelection();
@@ -122,9 +122,21 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, dataPoints, interactivityService } = this.options;
-
+		const { lollipopSelection, dataPoints, interactivityService, legendItems } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
+
+		if (!hasSelection) {
+			legendItems.style("opacity", 1);
+		} else {
+			legendItems.style("opacity", 0.4);
+		}
+
+		const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
+		selectedDataPoints.forEach(d => {
+			legendItems
+				.filter(function (legendDataPoint) { return legendDataPoint.data.name === d.category })
+				.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
+		});
 
 		const handleOpacity = (dataPoint: ILollipopChartRow) => {
 			interactivityService.applySelectionStateToData([dataPoint] as any);
@@ -137,14 +149,7 @@ export class Behavior implements IInteractiveBehavior {
 				opacity = isHighlight ? 1 : 0.4;
 			} else {
 				opacity = hasSelection ? (selected ? 1 : 0.4) : 1;
-				// return !isClearPreviousSelection && hasSelection ? (selected ? 1 : 0.4) : 1;
 			}
-
-			// if (legendItems) {
-			//     legendItems
-			//         .filter(function (legendDataPoint) { return isHasSubcategories ? legendDataPoint.data.name === dataPoint.groupBy : legendDataPoint.data.name === dataPoint.category })
-			//         .style("opacity", opacity);
-			// }
 
 			return opacity;
 		};
@@ -171,8 +176,7 @@ export const SetAndBindChartBehaviorOptions = (
 		const behaviorOptions: BehaviorOptions = {
 			lollipopSelection: lollipopSelection,
 			lineSelection: lineSelection,
-			// legendItems: self.legends ? self.legends.legendItems : undefined,
-			legendItems: undefined,
+			legendItems: self.legends ? self.legends.legendItems : undefined,
 			dataPoints: nodeData,
 			clearCatcher: self.svg,
 			interactivityService: self.interactivityService,
