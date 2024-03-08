@@ -6065,7 +6065,7 @@ export class Visual extends Shadow {
 								.append("tspan")
 								.attr("x", 0)
 								.attr("dy", (i > 1 ? 1 : i) * xAxisTickHeight)
-								.text(d);
+								.text(!xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d);
 						});
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
