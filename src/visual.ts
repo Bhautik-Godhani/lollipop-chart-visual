@@ -6044,6 +6044,10 @@ export class Visual extends Shadow {
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
 
+				const getFinalTruncatedText = (d: string) => {
+					return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
+				}
+
 				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
@@ -6065,7 +6069,7 @@ export class Visual extends Shadow {
 								.append("tspan")
 								.attr("x", 0)
 								.attr("dy", (i > 1 ? 1 : i) * xAxisTickHeight)
-								.text(!xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d);
+								.text(getFinalTruncatedText(d));
 						});
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
@@ -6088,7 +6092,7 @@ export class Visual extends Shadow {
 
 							ele.attr("transform", `rotate( ${rotateDegree})`);
 						}
-						ele.append("tspan").text(truncatedText);
+						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
 				} else {
 					let text = newText;
@@ -6106,7 +6110,7 @@ export class Visual extends Shadow {
 					}
 
 					const truncatedText = THIS.formatNumber(parseFloat(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString()), THIS.numberSettings, undefined, false, true);
-					ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+					ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 				}
 			});
 	}
@@ -6133,6 +6137,10 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
+
+				const getFinalTruncatedText = (d: string) => {
+					return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
+				}
 
 				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
 					if (yAxisSettings.isAutoDateFormat) {
@@ -6166,10 +6174,10 @@ export class Visual extends Shadow {
 
 					if (!THIS.isHorizontalChart) {
 						const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
-						ele.append("tspan").text(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
-						ele.append("tspan").text(truncatedText);
+						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
 				} else {
 					const textProperties: TextProperties = {
@@ -6181,7 +6189,7 @@ export class Visual extends Shadow {
 					ele.text("");
 
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
-					ele.append("tspan").text(truncatedText);
+					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 				}
 			});
 	}
