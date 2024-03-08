@@ -7607,11 +7607,11 @@ export class Visual extends Shadow {
 						circle1Selection.remove();
 						circle2Selection.remove();
 
-						this.updatePieChart(pie1Selection, false, false);
+						this.enterPieChart(pie1Selection, false, false);
 						this.setPieDataLabelsDisplayStyle();
 
 						if (this.isHasMultiMeasure) {
-							this.updatePieChart(pie2Selection, true, false);
+							this.enterPieChart(pie2Selection, true, false);
 							this.setPieDataLabelsDisplayStyle(true);
 						}
 					}
@@ -7642,11 +7642,11 @@ export class Visual extends Shadow {
 						circle1Selection.remove();
 						circle2Selection.remove();
 
-						this.updatePieChart(pie1Selection, false, false);
+						this.enterPieChart(pie1Selection, false, false);
 						this.setPieDataLabelsDisplayStyle();
 
 						if (this.isHasMultiMeasure) {
-							this.updatePieChart(pie2Selection, true, false);
+							this.enterPieChart(pie2Selection, true, false);
 							this.setPieDataLabelsDisplayStyle(true);
 						}
 					}
@@ -8360,6 +8360,8 @@ export class Visual extends Shadow {
 		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
 		const d = pieViewBoxRadius * 2;
 
+		pieForeignObjectSelection.selectAll("*").remove();
+
 		pieForeignObjectSelection
 			.attr("id", isPie2 ? "pie2ForeignObject" : "pie1ForeignObject")
 			.attr("width", d)
@@ -8372,6 +8374,7 @@ export class Visual extends Shadow {
 				const ele = d3.select(nodes[i]);
 				const ePieChart = echarts.init(ele.node());
 				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
+				ePieChart.resize();
 
 				d.subCategories.forEach(s => {
 					s.defaultValue = isPie2 ? s.value2 : s.value1;
@@ -8491,77 +8494,77 @@ export class Visual extends Shadow {
 		// });
 	}
 
-	updatePieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
-		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
-		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		const valueKey = isPie2 ? "value2" : "value1";
-		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
-		const d = pieViewBoxRadius * 2;
-		pieForeignObjectSelection
-			.attr("width", d)
-			.attr("height", d)
-			.select("#pie")
-			.style("width", "100%")
-			.style("height", "100%")
-			.each((d, i, nodes) => {
-				const ele = d3.select(nodes[i]);
-				const ePieChart = echarts.init(ele.node());
-				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
-				ePieChart.resize();
+	// updatePieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
+	// 	isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
+	// 	const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
+	// 	const valueKey = isPie2 ? "value2" : "value1";
+	// 	const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
+	// 	const d = pieViewBoxRadius * 2;
+	// 	pieForeignObjectSelection
+	// 		.attr("width", d)
+	// 		.attr("height", d)
+	// 		.select("#pie")
+	// 		.style("width", "100%")
+	// 		.style("height", "100%")
+	// 		.each((d, i, nodes) => {
+	// 			const ele = d3.select(nodes[i]);
+	// 			const ePieChart = echarts.init(ele.node());
+	// 			ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
+	// 			ePieChart.resize();
 
-				d.subCategories.forEach(s => {
-					s.defaultValue = isPie2 ? s.value2 : s.value1;
-					s.valueType = d.valueType;
-				})
+	// 			d.subCategories.forEach(s => {
+	// 				s.defaultValue = isPie2 ? s.value2 : s.value1;
+	// 				s.valueType = d.valueType;
+	// 			})
 
-				ele.selectAll("path").data(d.subCategories);
-				ele.selectAll("path").each(function () {
-					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-					d3.select(this).datum((d: any) => {
-						return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
-					})
-				})
+	// 			ele.selectAll("path").data(d.subCategories);
+	// 			ele.selectAll("path").each(function () {
+	// 				const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
+	// 				d3.select(this).datum((d: any) => {
+	// 					return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+	// 				})
+	// 			})
 
-				// ele
-				// 	.selectAll("path")
-				// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.category, pieData.category))
-				// .style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
+	// 			// ele
+	// 			// 	.selectAll("path")
+	// 			// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.category, pieData.category))
+	// 			// .style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
 
-				ele
-					.selectAll(".innerCenterRect")
-					.attr("width", pieRadius + (pieRadius * 30) / 100)
-					.attr("height", pieRadius + (pieRadius * 30) / 100)
-					.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-					.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-					.attr("fill", "#fff");
-			})
+	// 			ele
+	// 				.selectAll(".innerCenterRect")
+	// 				.attr("width", pieRadius + (pieRadius * 30) / 100)
+	// 				.attr("height", pieRadius + (pieRadius * 30) / 100)
+	// 				.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
+	// 				.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
+	// 				.attr("fill", "#fff");
+	// 		})
 
-		pieForeignObjectSelection
-			.transition()
-			.duration(isEnter ? 0 : this.tickDuration)
-			.ease(easeLinear)
-			.attr("x", (d) => {
-				const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
-				if (this.isLeftYAxis) {
-					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
-				} else {
-					return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
-				}
-			})
-			.attr("y", (d) => {
-				const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
-				if (this.isBottomXAxis) {
-					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
-				} else {
-					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
-				}
-			})
-			.on("end", (node, index) => {
-				if (index === this.chartData.length - 1) {
-					this.updateAnnotationNodeElements();
-				}
-			});
-	}
+	// 	pieForeignObjectSelection
+	// 		.transition()
+	// 		.duration(isEnter ? 0 : this.tickDuration)
+	// 		.ease(easeLinear)
+	// 		.attr("x", (d) => {
+	// 			const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
+	// 			if (this.isLeftYAxis) {
+	// 				return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+	// 			} else {
+	// 				return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+	// 			}
+	// 		})
+	// 		.attr("y", (d) => {
+	// 			const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
+	// 			if (this.isBottomXAxis) {
+	// 				return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+	// 			} else {
+	// 				return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+	// 			}
+	// 		})
+	// 		.on("end", (node, index) => {
+	// 			if (index === this.chartData.length - 1) {
+	// 				this.updateAnnotationNodeElements();
+	// 			}
+	// 		});
+	// }
 
 	// Legend
 	setLegendsData(): void {
