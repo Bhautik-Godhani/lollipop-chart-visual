@@ -763,7 +763,6 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
     </AccordionAlt>
 
     {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
-    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
   </>
 }
 
