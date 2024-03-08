@@ -116,7 +116,7 @@ export class NumberFormatting {
 	public show: boolean = true;
 	public decimalSeparator: string = ".";
 	public thousandsSeparator: string = ",";
-	public decimalPlaces: number = 0;
+	public decimalPlaces: number = 1;
 	public scaling: DisplayUnits = DisplayUnits.Auto;
 	public prefix: string = "";
 	public suffix: string = "";

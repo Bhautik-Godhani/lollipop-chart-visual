@@ -4837,7 +4837,7 @@ export class Visual extends Shadow {
 
 			this.newScaleDomainByBrush = newXScaleDomain;
 
-			if (this.newScaleDomainByBrush.length <= xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+			if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
 				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
