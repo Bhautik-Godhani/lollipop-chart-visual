@@ -91,6 +91,7 @@ import {
 	CUT_AND_CLIP_AXIS_SETTINGS,
 	POSITIVE_COLOR,
 	NEGATIVE_COLOR,
+	MonthNames,
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -284,6 +285,7 @@ export class Visual extends Shadow {
 	measureNamesByTotal: { name: string, total: number }[] = [];
 	groupNamesByTotal: { name: string, total: number }[] = [];
 	schemeColors: string[] = [];
+	isMonthCategoryNames: boolean;
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -1044,20 +1046,40 @@ export class Visual extends Shadow {
 		const isMeasure = sortingSettings.isSortByMeasure;
 		const isSortByExternalFields = sortingSettings.isSortByExtraSortField;
 
+		const getMonthIndex = (monthName: string) => {
+			return MonthNames.indexOf(monthName);
+		}
+
 		const sortByName = () => {
 			if (!this.isXIsDateTimeAxis && !this.isXIsNumericAxis) {
-				if (this.isHorizontalChart) {
-					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+				if (this.isMonthCategoryNames) {
+					if (this.isHorizontalChart) {
+						if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+							data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
+						} else {
+							data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
+						}
 					} else {
-						data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+							data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
+						} else {
+							data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
+						}
 					}
 				} else {
-					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+					if (this.isHorizontalChart) {
+						if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+						} else {
+							data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						}
 					} else {
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+						} else {
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						}
 					}
 				}
 			} else if (this.isXIsNumericAxis) {
@@ -1285,6 +1307,8 @@ export class Visual extends Shadow {
 		this.isHasErrorUpperBounds = categoricalUpperBoundFields.length > 0;
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
+
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).join("").includes(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase());
 
 		if (this.isExpandAllApplied) {
 			const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);

@@ -66,6 +66,11 @@ import {
 	IYAxisSettings,
 } from "./visual-settings.interface";
 
+export const MonthNames = [
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December"
+];
+
 export const PIE1_SETTINGS: IPiePropsSettings = {
 	pieSize: PieSize.Auto,
 	maxPieRadius: 40,
