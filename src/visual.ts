@@ -60,6 +60,7 @@ import {
 	EMarkerSettings,
 	ECFBasedOnValueTypes,
 	EPatternByDataTypes,
+	ECutAndClipMarkerPlacementTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -7767,7 +7768,7 @@ export class Visual extends Shadow {
 			this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 		}
 
-		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled ? this.chartData : []);
+		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled && this.cutAndClipAxisSettings.markerPlacement !== ECutAndClipMarkerPlacementTypes.Axis ? this.chartData : []);
 	}
 
 	drawZeroSeparatorLine(): void {

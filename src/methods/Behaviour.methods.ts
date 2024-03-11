@@ -51,7 +51,10 @@ export class Behavior implements IInteractiveBehavior {
 
 		lollipopSelection.on("click", function (e) {
 			onLollipopClick(d3Select(this));
-			legendItems.style("opacity", 1);
+
+			if (legendItems) {
+				legendItems.style("opacity", 1);
+			}
 
 			const clickedElement = e.target;
 
@@ -125,18 +128,20 @@ export class Behavior implements IInteractiveBehavior {
 		const { lollipopSelection, dataPoints, interactivityService, legendItems } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
-		if (!hasSelection) {
-			legendItems.style("opacity", 1);
-		} else {
-			legendItems.style("opacity", 0.4);
-		}
+		if (legendItems) {
+			if (!hasSelection) {
+				legendItems.style("opacity", 1);
+			} else {
+				legendItems.style("opacity", 0.4);
+			}
 
-		const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
-		selectedDataPoints.forEach(d => {
-			legendItems
-				.filter(function (legendDataPoint) { return legendDataPoint.data.name === d.category })
-				.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
-		});
+			const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
+			selectedDataPoints.forEach(d => {
+				legendItems
+					.filter(function (legendDataPoint) { return legendDataPoint.data.name === d.category })
+					.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
+			});
+		}
 
 		const handleOpacity = (dataPoint: ILollipopChartRow) => {
 			interactivityService.applySelectionStateToData([dataPoint] as any);

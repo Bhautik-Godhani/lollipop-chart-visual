@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { CUT_AND_CLIP_AXIS_SETTINGS } from "../constants";
-import { ECutAndClipAxisSettings } from "../enum";
+import { ECutAndClipAxisSettings, ECutAndClipMarkerPlacementTypes } from "../enum";
 import {
   InputControl,
   Row,
@@ -11,9 +11,25 @@ import {
   Footer,
   ColorPicker,
   Quote,
+  SelectInput,
 } from "@truviz/shadow/dist/Components";
-import { ICutAndClipAxisSettings } from "../visual-settings.interface";
+import { ICutAndClipAxisSettings, ILabelValuePair } from "../visual-settings.interface";
 import { CutAndClipAxisPlaceholderIcon } from "./SettingsIcons";
+
+const MARKER_PLACEMENTS: ILabelValuePair[] = [
+  {
+    label: "Both",
+    value: ECutAndClipMarkerPlacementTypes.Both,
+  },
+  {
+    label: "Axis",
+    value: ECutAndClipMarkerPlacementTypes.Axis,
+  },
+  {
+    label: "Categories",
+    value: ECutAndClipMarkerPlacementTypes.Categories,
+  },
+];
 
 const CutAndClipAxisSettings = (props) => {
   const {
@@ -147,6 +163,17 @@ const CutAndClipAxisSettings = (props) => {
                     handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
                     colorPalette={vizOptions.host.colorPalette}
                     size="sm"
+                  />
+                </Column>
+              </Row>
+
+              <Row>
+                <Column>
+                  <SelectInput
+                    label={"Placement"}
+                    value={configValues.markerPlacement}
+                    optionsList={MARKER_PLACEMENTS}
+                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.MarkerPlacement)}
                   />
                 </Column>
               </Row>

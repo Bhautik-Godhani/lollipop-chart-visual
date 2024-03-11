@@ -38,6 +38,7 @@ import {
 	EErrorBarsDirection,
 	EAxisDateFormats,
 	EPatternByDataTypes,
+	ECutAndClipMarkerPlacementTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -553,4 +554,5 @@ export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
 	breakEnd: 0,
 	markerStrokeColor: "rgba(102,102,102,1)",
 	markerBackgroundColor: "rgba(255, 255, 255, 1)",
+	markerPlacement: ECutAndClipMarkerPlacementTypes.Both
 };
