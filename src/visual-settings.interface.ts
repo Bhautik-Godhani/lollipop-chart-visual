@@ -9,6 +9,7 @@ import {
 	ECFApplyOnCategories,
 	ECFRankingTypes,
 	ECFValueTypes,
+	ECutAndClipMarkerPlacementTypes,
 	EDataLabelsBGApplyFor,
 	EDataRolesName,
 	EDynamicDeviationConnectingLineTypes,
@@ -630,4 +631,5 @@ export interface ICutAndClipAxisSettings {
 	breakEnd: number;
 	markerStrokeColor: string;
 	markerBackgroundColor: string;
+	markerPlacement: ECutAndClipMarkerPlacementTypes
 }

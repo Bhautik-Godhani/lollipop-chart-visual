@@ -60,6 +60,7 @@ import {
 	EMarkerSettings,
 	ECFBasedOnValueTypes,
 	EPatternByDataTypes,
+	ECutAndClipMarkerPlacementTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -6988,13 +6989,13 @@ export class Visual extends Shadow {
 			.attr("x2", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
 			.attr("y1", (d: ILollipopChartRow) => {
 				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						return this.getYPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
 						return this.getYPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						const Y1 = this.getYPosition(d.value2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
 						const Y2 = this.getYPosition(d.value1) - THIS.markerMaxSize / 2;
@@ -7019,7 +7020,7 @@ export class Visual extends Shadow {
 			})
 			.attr("y2", (d: ILollipopChartRow) => {
 				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						const Y1 = THIS.getYPosition(d.value1) + THIS.markerMaxSize / 2;
 						const Y2 = THIS.getYPosition(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
@@ -7034,7 +7035,7 @@ export class Visual extends Shadow {
 						const Y2 = THIS.getYPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
-						if (newY2 > Y1) {
+						if (newY2 >= Y1) {
 							return newY2;
 						} else {
 							return Y1;
@@ -7767,7 +7768,7 @@ export class Visual extends Shadow {
 			this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 		}
 
-		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled ? this.chartData : []);
+		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled && this.cutAndClipAxisSettings.markerPlacement !== ECutAndClipMarkerPlacementTypes.Axis ? this.chartData : []);
 	}
 
 	drawZeroSeparatorLine(): void {

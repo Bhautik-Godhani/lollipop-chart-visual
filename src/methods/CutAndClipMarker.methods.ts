@@ -1,3 +1,4 @@
+import { ECutAndClipMarkerPlacementTypes } from "../enum";
 import { ILollipopChartRow } from "../model";
 import { Visual } from "../visual";
 import { Selection } from "d3-selection";
@@ -7,51 +8,54 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
     const width = 12;
     const height = 6;
     self.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
-    const cutAndClipMarkerG = self.axisCutAndClipMarkerG
-        .append("g")
-        .attr("class", "cutAndClipMarkerG")
-        .attr("clip-path", "url(#cutMarkerClipOnAxis)");
-    const beforeCutDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
-    const afterCutDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
-    const secG = cutAndClipMarkerG.append("g");
-    const transX = self.getXPosition(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
 
-    const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
+    if (self.cutAndClipAxisSettings.markerPlacement !== ECutAndClipMarkerPlacementTypes.Categories) {
+        const cutAndClipMarkerG = self.axisCutAndClipMarkerG
+            .append("g")
+            .attr("class", "cutAndClipMarkerG")
+            .attr("clip-path", "url(#cutMarkerClipOnAxis)");
+        const beforeCutDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
+        const afterCutDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
+        const secG = cutAndClipMarkerG.append("g");
+        const transX = self.getXPosition(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
 
-    if (self.isHorizontalChart) {
-        secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : width + width / 4})`);
-    } else {
-        secG.attr(
-            "transform",
-            `translate(${self.isLeftYAxis ? (width / 4) : self.width - width - width / 4}, ${self.getYPosition(self.cutAndClipAxisSettings.breakStart) -
-            (self.isBottomXAxis ? 0 : self.barCutAndClipMarkerLinesGap / 2)
-            })`
-        );
-    }
+        const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
-    if (self.isHorizontalChart) {
-        secG
-            .append("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-            .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
-            .attr("stroke-width", "3px")
-            .attr("stroke-dasharray", `${width} ${height} `)
-            .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
-    } else {
-        secG
-            .append("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-            .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
-            .attr("stroke-width", "3px")
-            .attr("stroke-dasharray", `${width} ${height} `)
-            .attr(
+        if (self.isHorizontalChart) {
+            secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : width + width / 4})`);
+        } else {
+            secG.attr(
                 "transform",
-                `translate(${0}, ${((width - 3) * self.cutAndClipMarkerTilt) / 100}) rotate(${- self.cutAndClipMarkerTilt})`
+                `translate(${self.isLeftYAxis ? (width / 4) : self.width - width - width / 4}, ${self.getYPosition(self.cutAndClipAxisSettings.breakStart) -
+                (self.isBottomXAxis ? 0 : self.barCutAndClipMarkerLinesGap / 2)
+                })`
             );
+        }
+
+        if (self.isHorizontalChart) {
+            secG
+                .append("rect")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
+                .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+                .attr("stroke-width", "3px")
+                .attr("stroke-dasharray", `${width} ${height} `)
+                .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
+        } else {
+            secG
+                .append("rect")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
+                .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+                .attr("stroke-width", "3px")
+                .attr("stroke-dasharray", `${width} ${height} `)
+                .attr(
+                    "transform",
+                    `translate(${0}, ${((width - 3) * self.cutAndClipMarkerTilt) / 100}) rotate(${- self.cutAndClipMarkerTilt})`
+                );
+        }
     }
 }
 

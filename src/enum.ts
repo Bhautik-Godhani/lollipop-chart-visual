@@ -861,6 +861,7 @@ export enum ECutAndClipAxisSettings {
 	BreakEnd = "breakEnd",
 	MarkerStrokeColor = "markerStrokeColor",
 	MarkerBackgroundColor = "markerBackgroundColor",
+	MarkerPlacement = "markerPlacement"
 }
 
 export enum AxisCategoryType {
@@ -894,4 +895,10 @@ export enum ECFBasedOnValueTypes {
 export enum EPatternByDataTypes {
 	ByMeasures = "byMeasures",
 	BySubCategory = "bySubCategory"
+}
+
+export enum ECutAndClipMarkerPlacementTypes {
+	Both = "both",
+	Axis = "axis",
+	Categories = "categories"
 }
