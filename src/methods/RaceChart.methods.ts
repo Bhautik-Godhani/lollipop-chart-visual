@@ -25,7 +25,7 @@ export const StartChartRace = (self: Visual) => {
         setDataWithAllPositiveCategory();
 
         self.raceChartDataLabelOnTick = self.chartData[0].raceChartDataLabel;
-        self.raceChartDataLabelText.text(self.raceChartDataLabelOnTick);
+        RenderRaceChartDataLabel(self);
 
         if (self.raceChartKeysLength === self.tickIndex) {
             self.tickIndex = -2;
@@ -76,19 +76,19 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr("font-size", labelFontSize)
         .text(self.raceChartDataLabelOnTick);
 
-    const getTotalValue = () => {
+    const getTotal1Value = () => {
         if (self.isLollipopTypePie) {
-            if (self.isHasMultiMeasure) {
-                return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => (s.value1 + s.value2))), self.numberSettings, undefined, true, true);
-            } else {
-                return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value1)), self.numberSettings, undefined, true, true);
-            }
+            return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value1)), self.numberSettings, undefined, true, true);
         } else {
-            if (self.isHasMultiMeasure) {
-                return self.formatNumber(sum(self.chartData, d => (d.value1 + d.value2)), self.numberSettings, undefined, true, true);
-            } else {
-                return self.formatNumber(sum(self.chartData, d => d.value1), self.numberSettings, undefined, true, true);
-            }
+            return self.formatNumber(sum(self.chartData, d => d.value1), self.numberSettings, undefined, true, true);
+        }
+    }
+
+    const getTotal2Value = () => {
+        if (self.isLollipopTypePie) {
+            return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value2)), self.numberSettings, undefined, true, true);
+        } else {
+            return self.formatNumber(sum(self.chartData, d => d.value2), self.numberSettings, undefined, true, true);
         }
     }
 
@@ -97,7 +97,16 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr("x", "0")
         .attr("dy", labelFontSize)
         .attr("font-size", labelFontSize / 1.5)
-        .text(`Total : ${getTotalValue()}`);
+        .text(`${self.measure1DisplayName} : ${getTotal1Value()}`);
+
+    if (self.isHasMultiMeasure) {
+        self.raceChartDataLabelText
+            .append("tspan")
+            .attr("x", "0")
+            .attr("dy", labelFontSize)
+            .attr("font-size", labelFontSize / 1.5)
+            .text(`${self.measure2DisplayName} : ${getTotal2Value()}`);
+    }
 
     const textBBox = self.raceChartDataLabelText.node().getBBox();
 
@@ -134,8 +143,8 @@ export const RenderRaceTickerButton = (self: Visual): void => {
             (self.viewPortWidth -
                 self.settingsBtnWidth -
                 self.legendViewPort.width -
-                raceBarDateLabelTextBBox.width / 2 -
-                tickerButtonRadius / 2) +
+                raceBarDateLabelTextBBox.width / 2
+            ) +
             "," +
             (self.height - tickerButtonRadius * 2 - 10 - raceBarDateLabelTextBBox.height) +
             ")"
@@ -164,7 +173,7 @@ export const RenderRaceTickerButton = (self: Visual): void => {
 }
 
 export const GetTickerButtonRadius = (self: Visual): number => {
-    const minRadius = 30;
+    const minRadius = 25;
     return self.raceChartSettings.isTickerButtonAutoRadius
         ? self.width * 0.03 > minRadius
             ? self.width * 0.03
@@ -200,8 +209,8 @@ export const UpdateTickerButton = (self: Visual): void => {
             (self.viewPortWidth -
                 self.settingsBtnWidth -
                 self.legendViewPort.width -
-                raceDateLabelTextBBox.width / 2 -
-                tickerButtonRadius / 2) +
+                raceDateLabelTextBBox.width / 2
+            ) +
             "," +
             (self.height - tickerButtonRadius * 2 - 10 - raceDateLabelTextBBox.height) +
             ")"
