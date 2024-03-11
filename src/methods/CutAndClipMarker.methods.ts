@@ -95,7 +95,7 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
 
 export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartRow[]): void => {
     SetOverlappedAxisTicksPosition(self);
-    const filteredData = barData.filter((d) => d.value1 > self.cutAndClipAxisSettings.breakStart);
+    const filteredData = barData.filter((d) => (self.isHasMultiMeasure ? (d.value1 + d.value2) : d.value1) > self.cutAndClipAxisSettings.breakStart);
     const imageGSelection = self.barCutAndClipMarkersG
         .selectAll(".barCutAndClipMarkersG")
         .data(filteredData, (d) => Math.random());
