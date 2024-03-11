@@ -6859,13 +6859,13 @@ export class Visual extends Shadow {
 			.ease(easeLinear)
 			.attr("x1", (d: ILollipopChartRow) => {
 				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						return this.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 					} else {
 						return this.getXPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 					}
 				} else {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						const Y1 = this.getXPosition(d.value2);
 						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
 						const Y2 = this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
@@ -6890,7 +6890,7 @@ export class Visual extends Shadow {
 			})
 			.attr("x2", (d: ILollipopChartRow) => {
 				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						const Y1 = THIS.getXPosition(d.value1) + THIS.markerMaxSize / 2;
 						const Y2 = THIS.getXPosition(d.value2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
@@ -6912,7 +6912,7 @@ export class Visual extends Shadow {
 						}
 					}
 				} else {
-					if (d.value1 > d.value2) {
+					if (d.value1 >= d.value2) {
 						return this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
 					} else {
 						return this.getXPosition(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
