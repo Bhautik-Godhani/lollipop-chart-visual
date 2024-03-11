@@ -210,7 +210,6 @@ const UIXAxis = (
           <Row appearance="padded">
             <Column>
               <InputControl
-                min={0}
                 type="number"
                 label=""
                 value={xConfigValues.minimumRange}
@@ -242,7 +241,6 @@ const UIXAxis = (
           <Row appearance="padded">
             <Column>
               <InputControl
-                min={0}
                 type="number"
                 label=""
                 value={xConfigValues.maximumRange}
@@ -596,7 +594,6 @@ const UIYAxis = (
           <Row appearance="padded">
             <Column>
               <InputControl
-                min={0}
                 type="number"
                 label=""
                 value={yConfigValues.minimumRange}
@@ -628,7 +625,6 @@ const UIYAxis = (
           <Row appearance="padded">
             <Column>
               <InputControl
-                min={0}
                 type="number"
                 label=""
                 value={yConfigValues.maximumRange}
