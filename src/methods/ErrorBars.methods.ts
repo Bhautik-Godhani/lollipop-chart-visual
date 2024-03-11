@@ -59,28 +59,28 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     const value2 = isBottomXAxis ? max([d.errorBarValue1, d.errorBarValue2]) : min([d.errorBarValue1, d.errorBarValue2]);
 
                     if (self.isHorizontalChart) {
-                        if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
-                            if (isLeftYAxis ? value1 > 0 : value1 < 0) {
+                        if ((value1 > 0 && value1 > value2) || (value1 <= 0 && value1 < value2)) {
+                            if (isLeftYAxis ? value1 > 0 : value1 <= 0) {
                                 return `translate(${self.getXPosition(value1)}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
                             } else {
                                 return `translate(${self.getXPosition(value1) + d.width}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
                             }
                         } else {
-                            if (isLeftYAxis ? value1 > 0 : value1 < 0) {
+                            if (isLeftYAxis ? value1 > 0 : value1 <= 0) {
                                 return `translate(${self.getXPosition(value2)}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
                             } else {
                                 return `translate(${self.getXPosition(value2) + d.width}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2}) rotate(90)`;
                             }
                         }
                     } else {
-                        if ((value1 > 0 && value1 > value2) || (value1 < 0 && value1 < value2)) {
-                            if (isBottomXAxis ? value1 > 0 : value1 < 0) {
+                        if ((value1 > 0 && value1 > value2) || (value1 <= 0 && value1 < value2)) {
+                            if (isBottomXAxis ? value1 > 0 : value1 <= 0) {
                                 return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1)}) rotate(0)`;
                             } else {
                                 return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value1) - d.height}) rotate(0)`;
                             }
                         } else {
-                            if (isBottomXAxis ? value1 > 0 : value1 < 0) {
+                            if (isBottomXAxis ? value1 > 0 : value1 <= 0) {
                                 return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2)}) rotate(0)`;
                             } else {
                                 return `translate(${self.getXPosition(d.category) + self.scaleBandWidth / 2}, ${self.getYPosition(value2) - d.height}) rotate(0)`;
