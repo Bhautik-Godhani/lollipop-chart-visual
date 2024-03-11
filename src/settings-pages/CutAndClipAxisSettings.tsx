@@ -142,7 +142,7 @@ const CutAndClipAxisSettings = (props) => {
               <Row>
                 <Column>
                   <ColorPicker
-                    label={"Marker Background Color"}
+                    label={"Background Color"}
                     color={configValues.markerBackgroundColor}
                     handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
                     colorPalette={vizOptions.host.colorPalette}
