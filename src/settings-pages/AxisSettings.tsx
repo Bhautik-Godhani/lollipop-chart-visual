@@ -1029,17 +1029,17 @@ const XAxisSettings = (props) => {
   }, [xConfigValues.isDisplayTitle]);
 
   React.useEffect(() => {
-    if (xConfigValues.categoryType === AxisCategoryType.Categorical) {
-      setXConfigValues((d) => ({
-        ...d,
-        [EXAxisSettings.IsMinimumRangeEnabled]: false,
-      }));
+    // if (xConfigValues.categoryType === AxisCategoryType.Categorical) {
+    //   setXConfigValues((d) => ({
+    //     ...d,
+    //     [EXAxisSettings.IsMinimumRangeEnabled]: false,
+    //   }));
 
-      setXConfigValues((d) => ({
-        ...d,
-        [EXAxisSettings.IsMaximumRangeEnabled]: false,
-      }));
-    }
+    //   setXConfigValues((d) => ({
+    //     ...d,
+    //     [EXAxisSettings.IsMaximumRangeEnabled]: false,
+    //   }));
+    // }
   }, [xConfigValues.categoryType]);
 
   React.useEffect(() => {
@@ -1055,17 +1055,17 @@ const XAxisSettings = (props) => {
   }, [yConfigValues.isDisplayTitle]);
 
   React.useEffect(() => {
-    if (yConfigValues.categoryType === AxisCategoryType.Categorical) {
-      setYConfigValues((d) => ({
-        ...d,
-        [EXAxisSettings.IsMinimumRangeEnabled]: false,
-      }));
+    // if (yConfigValues.categoryType === AxisCategoryType.Categorical) {
+    //   setYConfigValues((d) => ({
+    //     ...d,
+    //     [EXAxisSettings.IsMinimumRangeEnabled]: false,
+    //   }));
 
-      setYConfigValues((d) => ({
-        ...d,
-        [EXAxisSettings.IsMaximumRangeEnabled]: false,
-      }));
-    }
+    //   setYConfigValues((d) => ({
+    //     ...d,
+    //     [EXAxisSettings.IsMaximumRangeEnabled]: false,
+    //   }));
+    // }
   }, [yConfigValues.categoryType]);
 
   return (
