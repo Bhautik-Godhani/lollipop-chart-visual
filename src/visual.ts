@@ -1651,7 +1651,7 @@ export class Visual extends Shadow {
 		const measureKeys = categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
 
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
-		this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
 		this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
 
