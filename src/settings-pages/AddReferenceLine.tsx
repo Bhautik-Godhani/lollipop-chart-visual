@@ -953,7 +953,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   </>
 }
 
-const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeCurrentSettingHandler, handleChangeContent }) => {
+const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeAddEdit, closeCurrentSettingHandler, handleChangeContent }) => {
   const isAddNew = isEmpty(details);
   const isInitialRender = React.useRef(0);
   const [configValues, setConfigValues] = React.useState<IReferenceLineSettings>(
@@ -1281,9 +1281,11 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
       <PopupModHeader
         title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
         icon={"BACK_BUTTON"}
-        closeSettingsPopup={closeCurrentSettingHandler}
-        onIconClickHandler={() => {
+        closeSettingsPopup={() => {
           closeCurrentSettingHandler();
+        }}
+        onIconClickHandler={() => {
+          closeAddEdit();
           handleChangeContent("homePage");
         }}
       />

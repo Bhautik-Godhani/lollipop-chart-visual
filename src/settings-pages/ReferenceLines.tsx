@@ -388,7 +388,8 @@ const ReferenceLines = (props) => {
           onAdd={onAdd}
           onUpdate={onUpdate}
           index={id}
-          closeCurrentSettingHandler={closeAddEdit}
+          closeAddEdit={closeAddEdit}
+          closeCurrentSettingHandler={closeCurrentSettingHandler}
           vizOptions={vizOptions}
           handleChangeContent={setContentShown}
         />
