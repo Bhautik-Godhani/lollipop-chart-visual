@@ -1671,6 +1671,9 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.categoryColorPairWithIndex = {};
+		this.subCategoryColorPairWithIndex = {};
+
 		// set colors for all pairs
 		this.categoricalDataPairs.forEach((data, i) => {
 			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
@@ -7323,7 +7326,7 @@ export class Visual extends Shadow {
 					if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 						const symbol1 = lollipopG.append("defs")
 							.append("symbol")
-							.attr("id", d => `${d.category}_${marker1.value}_MARKER1`)
+							.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
 							.attr("class", "marker1-symbol")
 							.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
 
@@ -7380,7 +7383,7 @@ export class Visual extends Shadow {
 						if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 							const symbol2 = lollipopG.append("defs")
 								.append("symbol")
-								.attr("id", d => `${d.category}_${marker2.value}_MARKER2`)
+								.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
 								.attr("class", "marker2-symbol")
 								.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
 
@@ -7577,14 +7580,14 @@ export class Visual extends Shadow {
 				// marker 1
 				if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 					marker1SymbolSelection
-						.attr("id", d => `${d.category}_${marker1.value}_MARKER1`)
+						.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
 						.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
 				}
 
 				// marker 2
 				if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 					marker2SymbolSelection
-						.attr("id", d => `${d.category}_${marker2.value}_MARKER2`)
+						.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
 						.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
 				}
 
@@ -7945,7 +7948,7 @@ export class Visual extends Shadow {
 		circleSelection
 			.attr("width", this.circle1Size + (this.marker1OutlineWidth * 2))
 			.attr("height", this.circle1Size + (this.marker1OutlineWidth * 2))
-			.attr("href", d => `#${d.category}_${marker.value}_MARKER1`)
+			.attr("href", d => this.isSmallMultiplesEnabled ? `#${d.category}_${this.currentSmallMultipleIndex}_${marker.value}_MARKER1` : `#${d.category}_${marker.value}_MARKER1`)
 			.style("display", "block")
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
@@ -8005,7 +8008,7 @@ export class Visual extends Shadow {
 		circleSelection
 			.attr("width", this.circle2Size + (this.marker2OutlineWidth * 2))
 			.attr("height", this.circle2Size + (this.marker2OutlineWidth * 2))
-			.attr("href", d => `#${d.category}_${marker.value}_MARKER2`)
+			.attr("href", d => this.isSmallMultiplesEnabled ? `#${d.category}_${this.currentSmallMultipleIndex}_${marker.value}_MARKER2` : `#${d.category}_${marker.value}_MARKER2`)
 			.style("display", (d) => (this.isHasMultiMeasure && d.value2 ? "block" : "none"))
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
