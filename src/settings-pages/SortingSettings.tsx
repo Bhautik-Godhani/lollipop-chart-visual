@@ -343,7 +343,7 @@ const SortingSettings = (props) => {
 
 		if (!configValues.subCategory.sortBy ||
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
-			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 		}
 	}, []);
 

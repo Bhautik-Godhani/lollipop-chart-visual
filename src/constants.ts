@@ -293,9 +293,9 @@ export const SORTING_SETTINGS: ISortingSettings = {
 	subCategory: {
 		enabled: true,
 		sortBy: undefined,
-		sortOrder: ESortOrderTypes.ASC,
-		isSortByCategory: true,
-		isSortByMeasure: false,
+		sortOrder: ESortOrderTypes.DESC,
+		isSortByCategory: false,
+		isSortByMeasure: true,
 		isSortByMultiMeasure: false,
 		isSortByExtraSortField: false,
 	},
