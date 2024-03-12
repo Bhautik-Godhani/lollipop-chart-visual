@@ -8112,9 +8112,9 @@ export class Visual extends Shadow {
 
 			if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
 
-				return `url('#${generatePattern(this.svg, pattern, color)}')`;
+				return { color, pieFill: `url('#${generatePattern(this.svg, pattern, color)}')` };
 			} else {
-				return color;
+				return { color, pieFill: color };
 			}
 		}
 
@@ -8164,9 +8164,9 @@ export class Visual extends Shadow {
 		}
 
 		const data = this.chartData[id].subCategories.map((data) => {
-			const color = getPieFill(data, this.chartData[id]);
-			let color1 = color;
-			let color2 = color;
+			const { color, pieFill } = getPieFill(data, this.chartData[id]);
+			let color1 = pieFill;
+			let color2 = pieFill;
 			const borderColor = color;
 
 			if (marker1Style.isShowMarkerOutline) {
