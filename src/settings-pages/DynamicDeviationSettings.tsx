@@ -265,39 +265,15 @@ const DynamicDeviationSettings = (props) => {
                 />
               </Column>
             </Row>
-
-            <Row>
-              <Column>
-                <ColorPicker
-                  label={"Connector Positive Color"}
-                  color={configValues.connectorPositiveColor}
-                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorPositiveColor)}
-                  colorPalette={vizOptions.host.colorPalette}
-                  size="sm"
-                />
-              </Column>
-            </Row>
-
-            <Row>
-              <Column>
-                <ColorPicker
-                  label={"Connector Negative Color"}
-                  color={configValues.connectorNegativeColor}
-                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorNegativeColor)}
-                  colorPalette={vizOptions.host.colorPalette}
-                  size="sm"
-                />
-              </Column>
-            </Row>
           </AccordionAlt>
 
-          <AccordionAlt title="Connectors"
+          <AccordionAlt title="Deviation Line"
             open={true}
           >
             <Row>
               <Column>
                 <SwitchOption
-                  label="Connector Type"
+                  label="Deviation Type"
                   value={configValues.connectorType}
                   optionsList={[
                     {
@@ -323,7 +299,7 @@ const DynamicDeviationSettings = (props) => {
                 <InputControl
                   min={0}
                   type="number"
-                  label="Connector Width"
+                  label="Width"
                   value={configValues.connectorWidth}
                   handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorWidth)}
                 />
@@ -331,6 +307,34 @@ const DynamicDeviationSettings = (props) => {
               <Column></Column>
             </Row>
 
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Positive Color"}
+                  color={configValues.connectorPositiveColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorPositiveColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Negative Color"}
+                  color={configValues.connectorNegativeColor}
+                  handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectorNegativeColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+          </AccordionAlt>
+
+          <AccordionAlt title="Connector Line"
+            open={true}
+          >
             <Row>
               <Column>
                 <SwitchOption
@@ -347,7 +351,7 @@ const DynamicDeviationSettings = (props) => {
                 <InputControl
                   min={0}
                   type="number"
-                  label="Line Width"
+                  label="Width"
                   value={configValues.connectingLineWidth}
                   handleChange={(value) => handleChange(value, EDynamicDeviationSettings.connectingLineWidth)}
                 />
@@ -355,7 +359,7 @@ const DynamicDeviationSettings = (props) => {
 
               <Column>
                 <ColorPicker
-                  label={"Line Color"}
+                  label={"Color"}
                   color={configValues.connectingLineColor}
                   handleChange={value => handleColor(value, EDynamicDeviationSettings.ConnectingLineColor)}
                   colorPalette={vizOptions.host.colorPalette}
