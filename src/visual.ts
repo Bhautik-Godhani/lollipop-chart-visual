@@ -3261,7 +3261,7 @@ export class Visual extends Shadow {
 			this.margin.left = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.expandAllYScaleGWidth;
 			this.margin.right = this.brushWidth + this.brushMargin + this.brushYAxisTicksMaxWidth;
 		} else if (this.yAxisSettings.position === Position.Right) {
-			this.margin.left = this.yAxisTitleMargin;
+			this.margin.left = 0;
 			this.margin.right = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.brushWidth + this.brushMargin + this.expandAllYScaleGWidth + this.brushYAxisTicksMaxWidth;
 		}
 

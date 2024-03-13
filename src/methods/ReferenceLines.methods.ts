@@ -63,14 +63,14 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
                 return isLine2 ? d.line2Coord.x1 : d.line1Coord.x1;
             } else {
-                return (isLine2 ? d.line2Coord.x1 : d.line1Coord.x1) + self.yAxisStartMargin;
+                return (isLine2 ? d.line2Coord.x1 : d.line1Coord.x1);
             }
         })
         .attr("y1", (d: IReferenceLineSettings) => (isLine2 ? d.line2Coord.y1 : d.line1Coord.y1))
         .attr("x2", (d: IReferenceLineSettings) => isLine2 ? d.line2Coord.x2 : d.line1Coord.x2)
         .attr("y2", (d: IReferenceLineSettings) => {
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
-                return (isLine2 ? d.line2Coord.y2 : d.line1Coord.y2) - self.xAxisStartMargin;
+                return (isLine2 ? d.line2Coord.y2 : d.line1Coord.y2);
             } else {
                 return (isLine2 ? d.line2Coord.y2 : d.line1Coord.y2);
             }
@@ -199,7 +199,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
         })
         .attr("height", (d: IReferenceLineSettings) => {
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
-                return self.height - self.xAxisStartMargin;
+                return self.height - (self.isHorizontalChart ? 0 : self.xAxisStartMargin);
             } else {
                 return Math.abs(d.line1Coord.y1 - d.line2Coord.y1) - +d.lineStyle.lineWidth;
             }
@@ -208,12 +208,12 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
                 return self.width - (self.width - (d.line1Coord.x1 > d.line2Coord.x1 ? d.line2Coord.x1 : d.line1Coord.x1)) + +d.lineStyle.lineWidth / 2;
             } else {
-                return self.yAxisStartMargin;
+                return (self.isLeftYAxis ? self.yAxisStartMargin : 0);
             }
         })
         .attr("y", (d: IReferenceLineSettings) => {
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
-                return 0;
+                return (!self.isBottomXAxis ? self.xAxisStartMargin : 0);
             } else {
                 return ((d.line1Coord.y1 > d.line2Coord.y1) ? d.line2Coord.y1 : d.line1Coord.y1) + +d.lineStyle.lineWidth / 2;
             }
@@ -336,10 +336,10 @@ const getTextX1Y1ForVerticalLine = (self: Visual, d: IReferenceLineSettings, rLi
 };
 
 const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
-    const x1 = 0;
+    const x1 = (self.isLeftYAxis ? self.yAxisStartMargin : 0);
     const y1 =
         self.getYPosition(value) + self.scaleBandWidth / 2;
-    const x2 = self.width;
+    const x2 = self.width - (!self.isLeftYAxis ? self.yAxisStartMargin : 0);
     const y2 =
         self.getYPosition(value) + self.scaleBandWidth / 2;
 
@@ -349,10 +349,10 @@ const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1:
 const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 =
         self.getXPosition(value) + self.scaleBandWidth / 2;
-    const y1 = 0;
+    const y1 = !self.isBottomXAxis ? self.xAxisStartMargin : 0;
     const x2 =
         self.getXPosition(value) + self.scaleBandWidth / 2;
-    const y2 = self.height;
+    const y2 = self.height - (self.isBottomXAxis ? self.xAxisStartMargin : 0);
 
     return { x1, y1, x2, y2 };
 };
