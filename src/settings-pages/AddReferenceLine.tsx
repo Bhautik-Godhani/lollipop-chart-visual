@@ -1136,7 +1136,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     }
 
     if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
-      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+      handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
 
     if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
@@ -1209,14 +1209,14 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   React.useEffect(() => {
     handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
-    if (configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.isValueChanged) {
+    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.isValueChanged) {
       handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
   }, [configValues.lineValue1.computation]);
 
   React.useEffect(() => {
     handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2);
-    if (configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.isValueChanged) {
+    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.isValueChanged) {
       handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
   }, [configValues.lineValue2.computation]);
