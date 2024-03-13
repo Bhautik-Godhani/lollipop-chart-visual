@@ -438,7 +438,8 @@ const MarkerSettings = (props) => {
 				<Row appearance="padded">
 					<Column>
 						<InputControl
-							min={0}
+							min={1}
+							max={50}
 							type="number"
 							label={"Size"}
 							value={configValues[configValues.markerStyleType].markerSize.toString()}

@@ -124,6 +124,7 @@ const LineSettings = (props) => {
 					<Column>
 						<InputControl
 							min={1}
+							max={20}
 							type="number"
 							label="Line Width"
 							value={configValues.lineWidth}
