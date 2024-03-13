@@ -361,7 +361,8 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
-        const domain: string = self.isHorizontalChart ? self.yScale.domain().reverse() : self.xScale.domain();
+        const categories = JSON.parse(JSON.stringify(<string[]>self.categoricalData.categories[self.categoricalCategoriesLastIndex].values));
+        const domain: string[] = self.isHorizontalChart ? categories.reverse() : categories;
         if (rLineValue.rankOrder === Position.Start || rLineValue.rankOrder === Position.Bottom) {
             value = domain[parseInt(rLineValue.rank) - 1];
         } else {
