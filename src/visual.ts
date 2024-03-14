@@ -7367,7 +7367,7 @@ export class Visual extends Shadow {
 
 				// marker 2
 				if (this.isHasMultiMeasure) {
-					if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
+					if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker2Style.markerShapeBase64Url))) {
 						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
 							.classed(this.circleClass, true)
 							.classed(this.imageMarkerClass, true)
@@ -7380,7 +7380,7 @@ export class Visual extends Shadow {
 
 						this.imageMarkerFormatting(imageMarker2Selection, true, true);
 					} else {
-						if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+						if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
 							const symbol2 = lollipopG.append("defs")
 								.append("symbol")
 								.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
