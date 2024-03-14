@@ -157,6 +157,11 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         .attr("stroke", self.DDConnectorFill)
         .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth);
 
+    if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
+        connectorLine
+            .attr("stroke-dasharray", `${self.dynamicDeviationSettings.connectorWidth * 2}, ${self.dynamicDeviationSettings.connectorWidth * 2}`);
+    }
+
     if (isPositiveDeviation) {
         connectorLine
             .attr("x1", self.getXPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
@@ -205,7 +210,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "circle-1")
-            .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
+            .attr("r", dynamicDeviationSettings.connectorWidth * 0.9)
             .attr("transform", `translate(${self.getXPosition(from.value)}, ${start})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
@@ -214,7 +219,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "circle-2")
-            .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
+            .attr("r", dynamicDeviationSettings.connectorWidth * 0.9)
             .attr("transform", `translate(${self.getXPosition(to.value)}, ${start})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
@@ -306,6 +311,11 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         .attr("stroke", self.DDConnectorFill)
         .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth);
 
+    if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
+        connectorLine
+            .attr("stroke-dasharray", `${self.dynamicDeviationSettings.connectorWidth * 2}, ${self.dynamicDeviationSettings.connectorWidth * 2}`);
+    }
+
     if (isPositiveDeviation) {
         connectorLine
             .attr("y1", self.getYPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
@@ -354,7 +364,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "circle-1")
-            .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
+            .attr("r", dynamicDeviationSettings.connectorWidth * 0.9)
             .attr("transform", `translate(${end}, ${self.getYPosition(from.value)})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
@@ -363,7 +373,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "circle-2")
-            .attr("r", dynamicDeviationSettings.connectorWidth * 0.7)
+            .attr("r", dynamicDeviationSettings.connectorWidth * 0.9)
             .attr("transform", `translate(${end}, ${self.getYPosition(to.value)})`)
             .attr("fill", self.DDConnectorFill)
             .attr("stroke", "rgb(102,102,102)")
