@@ -5230,8 +5230,8 @@ export class Visual extends Shadow {
 				const x = XY.x;
 				const y = XY.y;
 				if (
-					((this.yAxisSettings.position === Position.Left) && (this.xAxisSettings.isInvertRange ? d.value1 < d.value2 : d.value1 > d.value2)) ||
-					(this.yAxisSettings.position === Position.Right && (this.xAxisSettings.isInvertRange ? d.value1 > d.value2 : d.value1 < d.value2))
+					((this.yAxisSettings.position === Position.Left) && (this.xAxisSettings.isInvertRange && this.isHasMultiMeasure ? d.value1 < d.value2 : d.value1 > d.value2)) ||
+					(this.yAxisSettings.position === Position.Right && (this.xAxisSettings.isInvertRange && this.isHasMultiMeasure ? d.value1 > d.value2 : d.value1 < d.value2))
 				) {
 
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
@@ -5261,8 +5261,8 @@ export class Visual extends Shadow {
 				const y = XY.y;
 
 				if (
-					(this.xAxisSettings.position === Position.Bottom && (this.yAxisSettings.isInvertRange ? d.value1 < d.value2 : d.value1 > d.value2)) ||
-					(this.xAxisSettings.position === Position.Top && (this.yAxisSettings.isInvertRange ? d.value1 > d.value2 : d.value1 < d.value2))
+					(this.xAxisSettings.position === Position.Bottom && (this.yAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 < d.value2 : d.value1 > d.value2)) ||
+					(this.xAxisSettings.position === Position.Top && (this.yAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 > d.value2 : d.value1 < d.value2))
 				) {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
 						const xPos = x;
