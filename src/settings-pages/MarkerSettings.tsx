@@ -343,9 +343,9 @@ const MarkerSettings = (props) => {
 
 	const resetChanges = () => {
 		if ((shadow as Visual).isHasSubcategories) {
-			setConfigValues({ ...MARKER_SETTINGS, markerType: EMarkerTypes.CHART });
+			setConfigValues({ ...MARKER_SETTINGS, markerType: EMarkerTypes.CHART, isAutoLollipopTypeImage: configValues.isAutoLollipopTypeImage });
 		} else {
-			setConfigValues({ ...MARKER_SETTINGS });
+			setConfigValues({ ...MARKER_SETTINGS, isAutoLollipopTypeImage: configValues.isAutoLollipopTypeImage });
 		}
 	};
 
@@ -369,7 +369,10 @@ const MarkerSettings = (props) => {
 			handleChange(EMarkerTypes.SHAPE, EMarkerSettings.MarkerType, setConfigValues)
 		}
 
-		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && (!configValues[configValues.markerStyleType].selectedImageDataField || !shadow.imagesDataFieldsName.includes(configValues[configValues.markerStyleType].selectedImageDataField)) && shadow.imagesDataFieldsName.length > 0) {
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES
+			&& (!configValues[configValues.markerStyleType].selectedImageDataField
+				|| !shadow.imagesDataFieldsName.includes(configValues[configValues.markerStyleType].selectedImageDataField))
+			&& shadow.imagesDataFieldsName.length > 0) {
 			handleChange(shadow.imagesDataFieldsName[0], EMarkerSettings.SelectedImageDataField, setConfigValues);
 		}
 
