@@ -798,7 +798,8 @@ export enum EDynamicDeviationSettings {
 	IsShowStartIndicator = "isShowStartIndicator",
 	IsBarBorderEnabled = "isBarBorderEnabled",
 	ConnectingLineType = "connectingLineType",
-	LabelPosition = "labelPosition"
+	LabelPosition = "labelPosition",
+	FontStyle = "fontStyle"
 }
 
 export enum EDynamicDeviationDisplayTypes {

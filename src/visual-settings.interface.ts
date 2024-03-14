@@ -599,6 +599,7 @@ export interface IDynamicDeviationSettings {
 	isShowStartIndicator: boolean;
 	isBarBorderEnabled: boolean;
 	labelPosition: Position;
+	fontStyle: EFontStyle[];
 }
 
 export interface ICategoryValuePair {

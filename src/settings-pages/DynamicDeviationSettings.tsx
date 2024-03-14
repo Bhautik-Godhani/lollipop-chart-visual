@@ -2,6 +2,7 @@
 import * as React from "react";
 import { DYNAMIC_DEVIATION_SETTINGS } from "../constants";
 import {
+  EDataLabelsSettings,
   EDynamicDeviationConnectingLineTypes,
   EDynamicDeviationDisplayTypes,
   EDynamicDeviationLabelDisplayTypes,
@@ -23,7 +24,7 @@ import {
   AccordionAlt
 } from "@truviz/shadow/dist/Components";
 import { IDynamicDeviationSettings, ILabelValuePair } from "../visual-settings.interface";
-import { DashedLineIcon, DottedLineIcon, DynamicDeviationArrowIcon, DynamicDeviationBarIcon, DynamicDeviationDotsIcon, DynamicDeviationPlaceholderIcon, SolidLineIcon } from "./SettingsIcons";
+import { BoldIcon, DashedLineIcon, DottedLineIcon, DynamicDeviationArrowIcon, DynamicDeviationBarIcon, DynamicDeviationDotsIcon, DynamicDeviationPlaceholderIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
 import { Visual } from "../visual";
 
 const LINE_TYPES = [
@@ -390,6 +391,31 @@ const DynamicDeviationSettings = (props) => {
                   isFontSelector={true}
                   optionsList={[]}
                   handleChange={value => handleChange(value, EDynamicDeviationSettings.LabelFontFamily)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <SwitchOption
+                  label="Styling"
+                  value={configValues.fontStyle}
+                  optionsList={[
+                    {
+                      label: <BoldIcon style={{ fill: "currentColor" }} />,
+                      value: "bold",
+                    },
+                    {
+                      label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                      value: "italic",
+                    },
+                    {
+                      label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                      value: "underline",
+                    },
+                  ]}
+                  isMultiple
+                  handleChange={(value) => handleChange(value, EDataLabelsSettings.fontStyle)}
                 />
               </Column>
             </Row>

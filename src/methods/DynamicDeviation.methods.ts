@@ -1,6 +1,6 @@
 import { Visual } from "../visual";
 import { create, select as d3Select, Selection } from "d3-selection";
-import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, EDynamicDeviationLabelDisplayTypes, EHighContrastColorType, ELineType } from "../enum";
+import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, EDynamicDeviationLabelDisplayTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
 import DynamicDeviationIcon from "../../assets/icons/DeviationIcon.svg";
 import { ICategoryValuePair } from "../visual-settings.interface";
 import { getSVGTextSize } from "./methods";
@@ -41,6 +41,9 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
         .attr("font-size", self.dynamicDeviationSettings.labelFontSize)
         .attr("display", "block")
         .attr("font-family", self.dynamicDeviationSettings.labelFontFamily)
+        .attr("text-decoration", self.dynamicDeviationSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+        .attr("font-weight", self.dynamicDeviationSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+        .attr("font-style", self.dynamicDeviationSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
         .text(!isBothLabelDisplayType ? getDataLabelValue(dynamicDeviationSettings.labelDisplayType) : "");
 
     if (isBothLabelDisplayType) {
