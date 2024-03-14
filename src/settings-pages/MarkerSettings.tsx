@@ -481,17 +481,19 @@ const MarkerSettings = (props) => {
 								<Column></Column>
 							</Row>
 
-							<Row>
-								<Column>
-									<ColorPicker
-										label="Color"
-										color={configValues[configValues.markerStyleType].outlineColor}
-										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineColor, configValues.markerStyleType, setConfigValues)}
-										colorPalette={vizOptions.host.colorPalette}
-										size="sm"
-									/>
-								</Column>
-							</Row>
+							<ConditionalWrapper visible={!configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}>
+								<Row>
+									<Column>
+										<ColorPicker
+											label="Color"
+											color={configValues[configValues.markerStyleType].outlineColor}
+											handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineColor, configValues.markerStyleType, setConfigValues)}
+											colorPalette={vizOptions.host.colorPalette}
+											size="sm"
+										/>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
 
 							<Row>
 								<Column>
