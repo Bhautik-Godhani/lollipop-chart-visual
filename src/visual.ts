@@ -3646,13 +3646,23 @@ export class Visual extends Shadow {
 		const min2Index = d3.minIndex(this.chartData, (d) => d.value2);
 		const max2Index = d3.maxIndex(this.chartData, (d) => d.value2);
 
+		// this.minCategoryValueDataPair = {
+		// 	category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[min1Index],
+		// 	value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[min1Index], +this.categoricalMeasure2Field.values[min2Index]]) : +this.categoricalMeasure1Field.values[min1Index],
+		// };
+
+		// this.maxCategoryValueDataPair = {
+		// 	category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[max1Index],
+		// 	value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[max1Index], +this.categoricalMeasure2Field.values[max2Index]]) : +this.categoricalMeasure1Field.values[max1Index],
+		// };
+
 		this.minCategoryValueDataPair = {
-			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[min1Index],
+			category: this.chartData[min1Index].category,
 			value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[min1Index], +this.categoricalMeasure2Field.values[min2Index]]) : +this.categoricalMeasure1Field.values[min1Index],
 		};
 
 		this.maxCategoryValueDataPair = {
-			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[max1Index],
+			category: this.chartData[max1Index].category,
 			value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[max1Index], +this.categoricalMeasure2Field.values[max2Index]]) : +this.categoricalMeasure1Field.values[max1Index],
 		};
 
