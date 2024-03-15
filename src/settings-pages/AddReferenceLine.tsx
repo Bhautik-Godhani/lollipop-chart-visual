@@ -344,9 +344,9 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
               <SelectInput
                 label={"Value"}
                 value={lineValues.value}
-                optionsList={shadow.chartData.map(d => ({
-                  label: d.category,
-                  value: d.category
+                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+                  label: d as string,
+                  value: d as string
                 }))}
                 handleChange={value => handleChange(value, "value", type)}
               />
@@ -835,9 +835,9 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <SelectInput
                 label={"Value"}
                 value={configValues.lineValue1.value}
-                optionsList={shadow.chartData.map(d => ({
-                  label: d.category,
-                  value: d.category
+                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+                  label: d as string,
+                  value: d as string
                 }))}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue1)}
               />
@@ -890,9 +890,9 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <SelectInput
                 label={"Value"}
                 value={configValues.lineValue2.value}
-                optionsList={shadow.chartData.map(d => ({
-                  label: d.category,
-                  value: d.category
+                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+                  label: d as string,
+                  value: d as string
                 }))}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
               />
