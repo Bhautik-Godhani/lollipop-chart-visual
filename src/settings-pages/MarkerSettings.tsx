@@ -355,11 +355,11 @@ const MarkerSettings = (props) => {
 
 	const MARKER_STYLE_TYPES: ILabelValuePair[] = [
 		{
-			label: shadow.measure1DisplayName,
+			label: shadow.measure1DisplayName.length > 20 ? shadow.measure1DisplayName.slice(0, 20) + "..." : shadow.measure1DisplayName,
 			value: EMarkerStyleTypes.Marker1Style,
 		},
 		{
-			label: shadow.measure2DisplayName,
+			label: shadow.measure2DisplayName.length > 20 ? shadow.measure2DisplayName.slice(0, 20) + "..." : shadow.measure2DisplayName,
 			value: EMarkerStyleTypes.Marker2Style,
 		},
 	];
