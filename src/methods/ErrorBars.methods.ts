@@ -94,7 +94,21 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
             errorBarG
                 .append("path")
                 .attr("class", "errorBarLine")
-                .attr("fill", barColor)
+                .attr("fill", d => {
+                    const lineColor = self.lineSettings.isApplyMarkerColor ? self.categoryColorPair[d.category].marker1Color : self.lineSettings.lineColor;
+                    let seriesMatchColor;
+                    if (self.isLollipopTypeCircle) {
+                        seriesMatchColor = self.getColor(self.categoryColorPair[d.category] && self.categoryColorPair[d.category].lineColor ? self.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
+                    } else {
+                        if (self.firstCFLine) {
+                            const str = `${d.category}-${self.firstCFLine.staticValue}`;
+                            seriesMatchColor = self.getColor(self.subCategoryColorPair[str] && self.subCategoryColorPair[str].lineColor ? self.subCategoryColorPair[str].lineColor : lineColor, EHighContrastColorType.Foreground);
+                        } else {
+                            seriesMatchColor = self.getColor(self.categoryColorPair[d.category] && self.categoryColorPair[d.category].lineColor ? self.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
+                        }
+                    }
+                    return errorBars.isMatchSeriesColor ? seriesMatchColor : errorBars.barColor;
+                })
                 .attr("stroke", errorBars.borderColor)
                 .attr("stroke-width", errorBars.isBorderEnabled ? errorBars.borderSize : 0)
                 .attr("d", function (d: any) {
