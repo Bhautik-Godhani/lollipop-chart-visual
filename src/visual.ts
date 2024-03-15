@@ -3433,7 +3433,7 @@ export class Visual extends Shadow {
 				}
 
 				return (bound !== undefined && bound !== null)
-					? this.errorBarsSettings.tooltip.labelFormat !== EErrorBarsLabelFormat.RelativePercentage
+					? labelFormat !== EErrorBarsLabelFormat.RelativePercentage
 						? this.formatNumber(+bound, this.numberSettings, undefined, true, true)
 						: bound.toFixed(2) + "%"
 					: undefined;
