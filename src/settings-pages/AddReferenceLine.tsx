@@ -33,7 +33,7 @@ import {
   Label,
 } from "@truviz/shadow/dist/Components";
 import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVerticalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "./SettingsIcons";
-import { ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
+import { ICategoryValuePair, ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { min as d3Min, max as d3Max, mean, median } from "d3-array";
@@ -278,6 +278,19 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     axis: configValues.lineValue1.axis,
   }];
 
+  let categoriesNameList: ILabelValuePair[];
+  if (shadow.isHorizontalChart) {
+    categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+      label: d as string,
+      value: d as string
+    })).reverse();
+  } else {
+    categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+      label: d as string,
+      value: d as string
+    }));
+  }
+
   return <>
     <Row>
       <Column>
@@ -344,10 +357,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
               <SelectInput
                 label={"Value"}
                 value={lineValues.value}
-                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-                  label: d as string,
-                  value: d as string
-                }))}
+                optionsList={categoriesNameList}
                 handleChange={value => handleChange(value, "value", type)}
               />
             </Column>
@@ -778,6 +788,19 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
     },
   ];
 
+  let categoriesNameList: ILabelValuePair[];
+  if (shadow.isHorizontalChart) {
+    categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+      label: d as string,
+      value: d as string
+    })).reverse();
+  } else {
+    categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
+      label: d as string,
+      value: d as string
+    }));
+  }
+
   return <>
     <Row>
       <Column>
@@ -835,10 +858,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <SelectInput
                 label={"Value"}
                 value={configValues.lineValue1.value}
-                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-                  label: d as string,
-                  value: d as string
-                }))}
+                optionsList={categoriesNameList}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue1)}
               />
             </Column>
@@ -890,10 +910,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
               <SelectInput
                 label={"Value"}
                 value={configValues.lineValue2.value}
-                optionsList={shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-                  label: d as string,
-                  value: d as string
-                }))}
+                optionsList={categoriesNameList}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
               />
             </Column>
