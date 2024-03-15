@@ -2162,6 +2162,10 @@ export class Visual extends Shadow {
 		this.vizOptions = vizOptions;
 		this._events.renderingStarted(vizOptions.options);
 
+		if (vizOptions.options.type === 4) {
+			return;
+		}
+
 		try {
 			this.originalCategoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
