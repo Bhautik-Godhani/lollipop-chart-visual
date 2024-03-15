@@ -1,4 +1,4 @@
-import { ECutAndClipMarkerPlacementTypes } from "../enum";
+import { ECutAndClipMarkerPlacementTypes, EHighContrastColorType } from "../enum";
 import { ILollipopChartRow } from "../model";
 import { Visual } from "../visual";
 import { Selection } from "d3-selection";
@@ -37,8 +37,8 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
                 .append("rect")
                 .attr("width", width)
                 .attr("height", height)
-                .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-                .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+                .attr("fill", self.getColor(self.cutAndClipAxisSettings.markerBackgroundColor, EHighContrastColorType.Background))
+                .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
                 .attr("stroke-width", "3px")
                 .attr("stroke-dasharray", `${width} ${height} `)
                 .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
@@ -47,8 +47,8 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
                 .append("rect")
                 .attr("width", width)
                 .attr("height", height)
-                .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-                .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+                .attr("fill", self.getColor(self.cutAndClipAxisSettings.markerBackgroundColor, EHighContrastColorType.Background))
+                .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
                 .attr("stroke-width", "3px")
                 .attr("stroke-dasharray", `${width} ${height} `)
                 .attr(
@@ -129,8 +129,8 @@ export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelect
     rectSelection
         .attr("width", rectHeight)
         .attr("height", self.cutAndClipMarkerWidth)
-        .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-        .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+        .attr("fill", self.getColor(self.cutAndClipAxisSettings.markerBackgroundColor, EHighContrastColorType.Background))
+        .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
         .attr("stroke-width", "3px")
         .attr("stroke-dasharray", `${rectHeight} ${self.cutAndClipMarkerHeight} `)
         .attr("transform", `translate(${rectHeight}, ${- self.cutAndClipMarkerWidth / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
@@ -149,8 +149,8 @@ export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSele
     rectSelection
         .attr("width", rectWidth)
         .attr("height", self.cutAndClipMarkerHeight)
-        .attr("fill", self.cutAndClipAxisSettings.markerBackgroundColor)
-        .attr("stroke", self.cutAndClipAxisSettings.markerStrokeColor)
+        .attr("fill", self.getColor(self.cutAndClipAxisSettings.markerBackgroundColor, EHighContrastColorType.Background))
+        .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
         .attr("stroke-dasharray", `${rectWidth} ${self.cutAndClipMarkerHeight} `)
         .attr("stroke-width", "3px")
         .attr(
