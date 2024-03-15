@@ -263,6 +263,7 @@ const UIColorPaletteTypes = (
 								handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor1, setConfigValues)}
 								colorPalette={vizOptions.host.colorPalette}
 								size="sm"
+								tooltip={shadow.measure1DisplayName}
 							/>
 						</Column>
 					</Row>
@@ -275,6 +276,7 @@ const UIColorPaletteTypes = (
 								handleChange={(value) => handleColorChange(value, EDataColorsSettings.SingleColor2, setConfigValues)}
 								colorPalette={vizOptions.host.colorPalette}
 								size="sm"
+								tooltip={shadow.measure2DisplayName}
 							/>
 						</Column>
 					</Row>
@@ -437,33 +439,37 @@ const DataColors = (props) => {
 
 	return (
 		<>
-			{UIColorPalette(shadow, configValues, setConfigValues)}
-			{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
-
-			<Row>
+			<Row classNames={["data-colors-settings"]} disableTopPadding>
 				<Column>
-					<ToggleButton
-						label={"Customize 'Others' color"}
-						value={configValues.isCustomizeOthersColor}
-						handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
-						appearance="toggle"
-					/>
+					{UIColorPalette(shadow, configValues, setConfigValues)}
+					{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
+
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Customize 'Others' color"}
+								value={configValues.isCustomizeOthersColor}
+								handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
+						<Row appearance="padded">
+							<Column>
+								<ColorPicker
+									label={"Color"}
+									color={configValues.othersColor}
+									handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
+									colorPalette={vizOptions.host.colorPalette}
+									size="sm"
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
 				</Column>
 			</Row>
-
-			<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
-				<Row appearance="padded">
-					<Column>
-						<ColorPicker
-							label={"Color"}
-							color={configValues.othersColor}
-							handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
-							colorPalette={vizOptions.host.colorPalette}
-							size="sm"
-						/>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
