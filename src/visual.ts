@@ -5803,20 +5803,24 @@ export class Visual extends Shadow {
 			});
 
 			if (this.errorBarsSettings.tooltip.isEnabled) {
-				if (this.isHasErrorUpperBounds && (value.tooltipUpperBoundValue !== undefined && value.tooltipUpperBoundValue !== null)) {
-					tooltipData.push({
-						displayName: "Upper",
-						value: value.tooltipUpperBoundValue,
-						color: "transparent",
-					});
+				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
+					if (this.isHasErrorUpperBounds && (value.tooltipUpperBoundValue !== undefined && value.tooltipUpperBoundValue !== null)) {
+						tooltipData.push({
+							displayName: "Upper",
+							value: value.tooltipUpperBoundValue,
+							color: "transparent",
+						});
+					}
 				}
 
-				if (this.isHasErrorLowerBounds && (value.tooltipLowerBoundValue !== undefined && value.tooltipLowerBoundValue !== null)) {
-					tooltipData.push({
-						displayName: "Lower",
-						value: value.tooltipLowerBoundValue,
-						color: "transparent",
-					});
+				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
+					if (this.isHasErrorLowerBounds && (value.tooltipLowerBoundValue !== undefined && value.tooltipLowerBoundValue !== null)) {
+						tooltipData.push({
+							displayName: "Lower",
+							value: value.tooltipLowerBoundValue,
+							color: "transparent",
+						});
+					}
 				}
 			}
 
