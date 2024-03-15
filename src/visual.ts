@@ -657,8 +657,8 @@ export class Visual extends Shadow {
 				sectionName: "visualGeneralSettings",
 				propertyName: "summaryTableToggle",
 			},
-			valueRole: [EDataRolesName.Measure, EDataRolesName.Tooltip, EDataRolesName.ImagesData],
-			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData],
+			valueRole: [EDataRolesName.Measure],
+			measureRole: [EDataRolesName.Category, EDataRolesName.SubCategory, EDataRolesName.RaceChartData, EDataRolesName.ImagesData, EDataRolesName.Tooltip],
 			CFConfig: {
 				isSupportApplyOn: true, fieldsBasedOn: [ECFBasedOnValueTypes.Value, ECFBasedOnValueTypes.Ranking, ECFBasedOnValueTypes.Percentage],
 				isShowBasedOnValueDropDown: true, applyOnCategories: [
@@ -8814,23 +8814,9 @@ export class Visual extends Shadow {
 				allowedAggregations: true,
 			},
 			seedDataFromVisual: seedDataFromVisual,
-			// numberFormatter: (value, field) => {
-			// 	if (this.isHasSubcategories) {
-			// 		field = field.split("_").splice(3).join("_");
-			// 	}
-
-			// 	if (this.imagesDataFieldsName.includes(field)) {
-			// 		return value;
-			// 	}
-
-			// 	if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
-			// 		return this.numberSettings.show
-			// 			? this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter, true, true)
-			// 			: powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
-			// 	} else {
-			// 		return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
-			// 	}
-			// },
+			numberFormatter: (value, field) => {
+				return value;
+			},
 			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
 			viewport: {
 				width: this.vizOptions.options.viewport.width,
