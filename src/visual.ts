@@ -2178,7 +2178,7 @@ export class Visual extends Shadow {
 			this.expandAllXScaleGHeight = 0;
 			this.expandAllYScaleGWidth = 0;
 
-			this.viewPortWidth = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.width));
+			this.viewPortWidth = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.width)) - 10;
 			this.viewPortHeight = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.height));
 
 			const isReturn = this.renderErrorMessages();
