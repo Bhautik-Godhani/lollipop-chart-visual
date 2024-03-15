@@ -30,7 +30,15 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                     .attr("transform", `translate(${self.isBottomXAxis ? self.negativeLogScaleWidth : 0}, 0)`)
                     .call(axisBottom(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
             } else if (self.xAxisSettings.position === Position.Top) {
-                select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90));
+                select(xAxisG).attr("transform", "translate(0," + 0 + ")");
+
+                self.negativeLogXAxisG
+                    .attr("transform", `translate(${self.isBottomXAxis ? 0 : self.positiveLogScaleWidth}, 0)`)
+                    .call(axisTop(self.negativeLogScale).tickValues(negativeTicks).tickFormat(d => "-" + (d === 0.1 ? "isZero" : "") + d));
+
+                self.positiveLogXAxisG
+                    .attr("transform", `translate(${self.isBottomXAxis ? self.negativeLogScaleWidth : 0}, 0)`)
+                    .call(axisTop(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
             }
         } else {
             let positiveTicks: any[] = self.xScale.ticks(width / 90);
@@ -42,7 +50,7 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                 select(xAxisG)
                     .attr("transform", "translate(0," + height + ")")
                     .call(axisBottom(self.xScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
-            } else if (self.yAxisSettings.position === Position.Right) {
+            } else if (self.xAxisSettings.position === Position.Top) {
                 select(xAxisG)
                     .attr("transform", "translate(0," + 0 + ")")
                     .call(axisTop(self.xScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
