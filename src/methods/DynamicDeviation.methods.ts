@@ -493,32 +493,56 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             {
                 const from = self.chartData[0];
                 const to = self.chartData[chartDataLength - 1];
-                RenderDynamicDeviation(
-                    self,
-                    { category: from.category, value: from.value1 },
-                    { category: to.category, value: to.value1 }
-                );
+                if (self.isHorizontalChart) {
+                    RenderDynamicDeviation(
+                        self,
+                        { category: to.category, value: to.value1 },
+                        { category: from.category, value: from.value1 }
+                    );
+                } else {
+                    RenderDynamicDeviation(
+                        self,
+                        { category: from.category, value: from.value1 },
+                        { category: to.category, value: to.value1 }
+                    );
+                }
             }
             break;
         case EDynamicDeviationDisplayTypes.LastToFirst:
             {
                 const from = self.chartData[chartDataLength - 1];
                 const to = self.chartData[0];
-                RenderDynamicDeviation(
-                    self,
-                    { category: from.category, value: from.value1 },
-                    { category: to.category, value: to.value1 }
-                );
+                if (self.isHorizontalChart) {
+                    RenderDynamicDeviation(
+                        self,
+                        { category: to.category, value: to.value1 },
+                        { category: from.category, value: from.value1 }
+                    );
+                } else {
+                    RenderDynamicDeviation(
+                        self,
+                        { category: from.category, value: from.value1 },
+                        { category: to.category, value: to.value1 }
+                    );
+                }
             }
             break;
         case EDynamicDeviationDisplayTypes.FirstToLastActual:
             {
-                RenderDynamicDeviation(self, self.firstCategoryValueDataPair, self.lastCategoryValueDataPair);
+                if (self.isHorizontalChart) {
+                    RenderDynamicDeviation(self, self.lastCategoryValueDataPair, self.firstCategoryValueDataPair);
+                } else {
+                    RenderDynamicDeviation(self, self.firstCategoryValueDataPair, self.lastCategoryValueDataPair);
+                }
             }
             break;
         case EDynamicDeviationDisplayTypes.LastToFirstActual:
             {
-                RenderDynamicDeviation(self, self.lastCategoryValueDataPair, self.firstCategoryValueDataPair);
+                if (self.isHorizontalChart) {
+                    RenderDynamicDeviation(self, self.firstCategoryValueDataPair, self.lastCategoryValueDataPair);
+                } else {
+                    RenderDynamicDeviation(self, self.lastCategoryValueDataPair, self.firstCategoryValueDataPair);
+                }
             }
             break;
         case EDynamicDeviationDisplayTypes.MinToMax:
