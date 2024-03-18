@@ -1054,9 +1054,6 @@ export class Visual extends Shadow {
 				}
 			}
 		}
-
-		console.log(this.categoricalDataPairs);
-
 	}
 
 	sortCategoryDataPairs(
@@ -4805,6 +4802,40 @@ export class Visual extends Shadow {
 			this.brushG.selectAll(".handle").remove();
 		}
 
+		const scrolled = false;
+		d3.select(this.hostContainer).on("wheel", (event, d) => {
+			if (!scrolled) {
+				// scrolled = true;
+				const prevExtent = d3.brushSelection(this.brushG.node() as any);
+				const direction = event.wheelDelta < 0 ? 'down' : 'up';
+				const isBottomDirection = direction === "down";
+				if (this.isHorizontalChart) {
+					if (isBottomDirection) {
+						if (prevExtent![1] as number < this.height) {
+							if ((+prevExtent![1] + heightByExpectedBar) <= this.height) {
+								this.brushG
+									.call(brush.move as any, [+prevExtent![0] + (heightByExpectedBar / expectedBar), +prevExtent![1] + (heightByExpectedBar / expectedBar)]);
+							} else {
+								this.brushG
+									.call(brush.move as any, [this.height - heightByExpectedBar, this.height]);
+							}
+						}
+					} else {
+						if (prevExtent![0] as number > 0) {
+							if (((+prevExtent![0] - heightByExpectedBar) >= 0) && ((+prevExtent![1] - heightByExpectedBar) >= 0)) {
+								this.brushG
+									.call(brush.move as any, [+prevExtent![0] - (heightByExpectedBar / expectedBar), +prevExtent![1] - (heightByExpectedBar / expectedBar)]);
+							} else {
+								this.brushG
+									.call(brush.move as any, [0, heightByExpectedBar]);
+							}
+						}
+					}
+				}
+				// setTimeout(() => { scrolled = false; });
+			}
+		});
+
 		this.brushG.select(".overlay")
 			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
 			.attr("cursor", this.brushAndZoomAreaSettings.enabled ? "crosshair" : "default")
@@ -4983,6 +5014,43 @@ export class Visual extends Shadow {
 			.attr("display", config.isShowHorizontalBrush ? "block" : "none")
 			.call(brush as any)
 			.call(brush.move as any, [0, widthByExpectedBar]);
+
+		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+
+		let scrolled = false;
+		(self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
+			if (!scrolled) {
+				// scrolled = true;
+				const prevExtent = d3.brushSelection(brushG as any);
+				const direction = event.wheelDelta < 0 ? 'down' : 'up';
+				const isRightDirection = direction === "up";
+				if (!self.isHorizontalChart) {
+					const movableWidth = widthByExpectedBar / 2;
+					if (isRightDirection) {
+						if (prevExtent![1] as number < scaleWidth) {
+							if ((+prevExtent![1] + movableWidth) <= scaleWidth) {
+								d3.select(brushG)
+									.call(brush.move as any, [+prevExtent![0] + movableWidth, +prevExtent![1] + movableWidth]);
+							} else {
+								d3.select(brushG)
+									.call(brush.move as any, [scaleWidth - widthByExpectedBar, scaleWidth]);
+							}
+						}
+					} else {
+						if (prevExtent![0] as number > 0) {
+							if (((+prevExtent![0] - movableWidth) >= 0) && ((+prevExtent![1] - movableWidth) >= 0)) {
+								d3.select(brushG)
+									.call(brush.move as any, [+prevExtent![0] - movableWidth, +prevExtent![1] - movableWidth]);
+							} else {
+								d3.select(brushG)
+									.call(brush.move as any, [0, widthByExpectedBar]);
+							}
+						}
+					}
+				}
+				// setTimeout(() => { scrolled = false; });
+			}
+		});
 
 		if (config.isShowHorizontalBrush) {
 			if (this.brushAndZoomAreaSettings.enabled) {
