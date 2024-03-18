@@ -1638,9 +1638,9 @@ export class Visual extends Shadow {
 								d.values[index] = 0;
 							}
 
-							if (role === EDataRolesName.Measure && +d.values[index] < 0) {
-								d.values[index] = 0;
-							}
+							// if (role === EDataRolesName.Measure && +d.values[index] < 0) {
+							// 	d.values[index] = 0;
+							// }
 
 							if (d.source.groupName !== null && d.source.groupName !== undefined && d.source.groupName !== "") {
 								obj[`${role}${d.source.index}${d.source.groupName}`] = d.values[index];
@@ -8302,7 +8302,7 @@ export class Visual extends Shadow {
 			}
 
 			return {
-				value: isPie2 ? data.value2 : data.value1,
+				value: isPie2 ? (data.value2 < 0 ? (data.value2 * -1) : data.value2) : (data.value1 < 0 ? (data.value1 * -1) : data.value1),
 				name: data.category,
 				itemStyle: { ...getItemStyle(borderColor), color: this.getColor(isPie2 ? color2 : color1, EHighContrastColorType.Foreground), className: "pie-slice" },
 			}
