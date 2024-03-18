@@ -303,6 +303,8 @@ export enum ERankingSettings {
 	Count = "count",
 	ShowRemainingAsOthers = "showRemainingAsOthers",
 	OthersColor = "othersColor",
+	Suffix = "suffix",
+	CalcMethod = "calcMethod"
 }
 
 export enum ESortOrderTypes {
@@ -902,4 +904,16 @@ export enum ECutAndClipMarkerPlacementTypes {
 	Both = "both",
 	Axis = "axis",
 	Categories = "categories"
+}
+
+export enum ERankingSuffix {
+	None = "none",
+	OthersAndCategoryName = "others + category name",
+	OthersAndCount = "others + count",
+	Both = "both"
+}
+
+export enum ERankingCalcMethod {
+	Sum = "sum",
+	Average = "average"
 }

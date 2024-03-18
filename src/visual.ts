@@ -61,6 +61,8 @@ import {
 	ECFBasedOnValueTypes,
 	EPatternByDataTypes,
 	ECutAndClipMarkerPlacementTypes,
+	ERankingSuffix,
+	ERankingCalcMethod,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -265,7 +267,8 @@ export class Visual extends Shadow {
 	isSortDataFieldsAdded: boolean;
 	sortFieldsDisplayName: ILabelValuePair[] = [];
 	blankText: string = "(Blank)";
-	othersBarText = "Others";
+	othersLabel = "Others";
+	othersBarText = "";
 	totalLollipopCount: number = 0;
 	firstCFLine: IConditionalFormattingProps;
 	firstCFLabel: IConditionalFormattingProps;
@@ -1019,11 +1022,30 @@ export class Visual extends Shadow {
 
 			const keys = Object.keys(this.categoricalDataPairs[0]).slice(1);
 			if (categoryRankingSettings.showRemainingAsOthers && othersBarData.length) {
+				let othersLabel: string;
+
+				switch (categoryRankingSettings.suffix) {
+					case ERankingSuffix.None:
+						othersLabel = this.othersLabel;
+						break;
+					case ERankingSuffix.OthersAndCategoryName:
+						othersLabel = this.othersLabel + " " + this.categoryDisplayName;
+						break;
+					case ERankingSuffix.OthersAndCount:
+						othersLabel = `${this.othersLabel} (${othersBarData.length})`;
+						break;
+					case ERankingSuffix.Both:
+						othersLabel = `${this.othersLabel} ${this.categoryDisplayName} (${othersBarData.length})`;
+						break;
+				}
+
+				this.othersBarText = othersLabel;
+
 				const othersDataField: any = {
 					category: this.othersBarText,
 				};
 				keys.forEach((key) => {
-					othersDataField[key] = d3.sum(othersBarData, (d) => d[key]);
+					othersDataField[key] = categoryRankingSettings.calcMethod === ERankingCalcMethod.Sum ? d3.sum(othersBarData, (d) => d[key]) : (d3.sum(othersBarData, (d) => d[key]) / othersBarData.length);
 				});
 				if (this.isHorizontalChart) {
 					this.categoricalDataPairs.push(othersDataField);
@@ -1032,6 +1054,9 @@ export class Visual extends Shadow {
 				}
 			}
 		}
+
+		console.log(this.categoricalDataPairs);
+
 	}
 
 	sortCategoryDataPairs(
@@ -3723,6 +3748,15 @@ export class Visual extends Shadow {
 				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
 			}
 		}
+
+		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+			const elementToMove = this.chartData.find(obj => obj.category.includes(this.othersLabel));
+			if (elementToMove) {
+				const index = this.chartData.findIndex(obj => obj.category.includes(this.othersLabel));
+				this.chartData.splice(index, 1);
+				this.chartData.push(elementToMove);
+			}
+		}
 	}
 
 	public configLegend(): void {
@@ -4496,8 +4530,8 @@ export class Visual extends Shadow {
 
 		if (this.rankingSettings.category.enabled) {
 			if (this.rankingSettings.category.showRemainingAsOthers) {
-				this.categoryColorPair[this.othersBarText].marker1Color = this.rankingSettings.category.othersColor;
-				this.categoryColorPair[this.othersBarText].marker2Color = this.rankingSettings.category.othersColor;
+				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.othersColor;
+				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
 			}
 		}
 	}
@@ -8108,7 +8142,7 @@ export class Visual extends Shadow {
 			const valueType = isPie2 ? "value2" : "value1";
 
 			if (d.parentCategory === this.othersBarText) {
-				color = this.rankingSettings.category.othersColor;
+				color = this.dataColorsSettings.othersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = parent[valueType] >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;

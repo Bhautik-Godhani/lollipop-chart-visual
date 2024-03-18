@@ -362,6 +362,7 @@ const DataColors = (props) => {
 	const DATA_COLORS = JSON.parse(JSON.stringify(DATA_COLORS_IMP));
 	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
 	const initialStates: typeof DATA_COLORS = parseObject(_initialStates, DATA_COLORS);
+	const rankingSettings = (shadow as Visual).rankingSettings;
 
 	const MARKER_TYPES: ILabelValuePair[] = [
 		{
@@ -444,29 +445,31 @@ const DataColors = (props) => {
 					{UIColorPalette(shadow, configValues, setConfigValues)}
 					{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 
-					<Row>
-						<Column>
-							<ToggleButton
-								label={"Customize 'Others' color"}
-								value={configValues.isCustomizeOthersColor}
-								handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
-
-					<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
-						<Row appearance="padded">
+					<ConditionalWrapper visible={rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers}>
+						<Row>
 							<Column>
-								<ColorPicker
-									label={"Color"}
-									color={configValues.othersColor}
-									handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
-									colorPalette={vizOptions.host.colorPalette}
-									size="sm"
+								<ToggleButton
+									label={"Customize 'Others' color"}
+									value={configValues.isCustomizeOthersColor}
+									handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
+									appearance="toggle"
 								/>
 							</Column>
 						</Row>
+
+						<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
+							<Row appearance="padded">
+								<Column>
+									<ColorPicker
+										label={"Color"}
+										color={configValues.othersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
 					</ConditionalWrapper>
 				</Column>
 			</Row>

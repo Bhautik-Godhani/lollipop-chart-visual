@@ -8,12 +8,14 @@ import {
 	ConditionalWrapper,
 	Footer,
 	InputControl,
+	RadioOption,
 	Row,
+	SelectInput,
 	SwitchOption,
 	ToggleButton,
 } from "@truviz/shadow/dist/Components";
 import { ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps } from "../visual-settings.interface";
-import { ERankingSettings, ERankingType } from "../enum";
+import { ERankingCalcMethod, ERankingSettings, ERankingSuffix, ERankingType } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { persistProperties } from "../methods/methods";
 
@@ -25,6 +27,36 @@ const RANKING_TYPES: ILabelValuePair[] = [
 	{
 		label: "Bottom N",
 		value: ERankingType.BottomN,
+	},
+];
+
+const SUFFIX_LIST: ILabelValuePair[] = [
+	{
+		value: ERankingSuffix.None,
+		label: "None",
+	},
+	{
+		value: ERankingSuffix.OthersAndCategoryName,
+		label: "Others + Category Name",
+	},
+	{
+		value: ERankingSuffix.OthersAndCount,
+		label: "Others + (Count)",
+	},
+	{
+		value: ERankingSuffix.Both,
+		label: "Both",
+	},
+];
+
+const CALC_METHOD_LIST: ILabelValuePair[] = [
+	{
+		value: ERankingCalcMethod.Sum,
+		label: "Sum",
+	},
+	{
+		value: ERankingCalcMethod.Average,
+		label: "Average",
 	},
 ];
 
@@ -88,7 +120,7 @@ const UIByCategoryRankingSettings = (
 				</Column>
 			</Row>
 
-			{/* {UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)} */}
+			{UIByCategoryRankingOthersSettings(vizOptions, categoryRanking, setConfigValues)}
 		</>
 	);
 };
@@ -112,14 +144,29 @@ const UIByCategoryRankingOthersSettings = (
 			</Row>
 
 			<ConditionalWrapper visible={categoryRanking.showRemainingAsOthers}>
-				<Row>
+				<Row appearance="padded" disableTopPadding>
 					<Column>
-						<ColorPicker
-							label={"'Others' Bar Color"}
-							color={categoryRanking.othersColor}
-							handleChange={(value) => handleColorChange(value, ERankingSettings.OthersColor, ERankingSettings.Category, setConfigValues)}
-							colorPalette={vizOptions.host.colorPalette}
-						/>
+						<Row>
+							<Column>
+								<SelectInput
+									label={"Add Suffix"}
+									value={categoryRanking.suffix}
+									optionsList={SUFFIX_LIST}
+									handleChange={(value) => handleChange(value, ERankingSettings.Suffix, ERankingSettings.Category, setConfigValues)}
+								/>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<RadioOption
+									label="Method"
+									value={categoryRanking.calcMethod}
+									optionsList={CALC_METHOD_LIST}
+									handleChange={(value) => handleChange(value, ERankingSettings.CalcMethod, ERankingSettings.Category, setConfigValues)}
+								/>
+							</Column>
+						</Row>
 					</Column>
 				</Row>
 			</ConditionalWrapper>

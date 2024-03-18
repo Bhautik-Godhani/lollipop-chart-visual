@@ -41,6 +41,8 @@ export class Behavior implements IInteractiveBehavior {
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
 
+			console.log({ data });
+
 			if (visualAnnotations.isAnnotationScreenActivated) {
 				visualAnnotations.onAnnotationNodeClick(event, data);
 			} else {
@@ -103,6 +105,8 @@ export class Behavior implements IInteractiveBehavior {
 				const groupByData = lollipopSelection
 					.filter((data) => legendData.data.name === data.category)
 					.data();
+
+				console.log(groupByData);
 
 				if (!isHasSubcategories) {
 					categoryData.forEach(d => {

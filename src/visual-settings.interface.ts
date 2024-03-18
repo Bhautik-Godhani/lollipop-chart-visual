@@ -31,6 +31,8 @@ import {
 	EMarkerStyleTypes,
 	EMarkerTypes,
 	EPatternByDataTypes,
+	ERankingCalcMethod,
+	ERankingSuffix,
 	ERankingType,
 	EReferenceLineComputation,
 	EReferenceLineNameTypes,
@@ -261,7 +263,7 @@ export interface IDataColorsSettings {
 	negativeColor: string,
 	gradientAppliedToMeasure: EMarkerColorTypes,
 	isCustomizeOthersColor: boolean,
-	othersColor: string
+	othersColor: string;
 }
 
 export interface ICategoryRankingProps {
@@ -270,7 +272,8 @@ export interface ICategoryRankingProps {
 	rankingType: ERankingType;
 	count: number;
 	showRemainingAsOthers: boolean;
-	othersColor: string;
+	suffix: ERankingSuffix;
+	calcMethod: ERankingCalcMethod;
 }
 
 export interface ISubCategoryRankingProps {

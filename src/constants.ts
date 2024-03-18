@@ -39,6 +39,8 @@ import {
 	EAxisDateFormats,
 	EPatternByDataTypes,
 	ECutAndClipMarkerPlacementTypes,
+	ERankingSuffix,
+	ERankingCalcMethod,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -196,7 +198,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	positiveColor: POSITIVE_COLOR,
 	gradientAppliedToMeasure: EMarkerColorTypes.Marker1,
 	isCustomizeOthersColor: false,
-	othersColor: "rgba(84, 84, 84, 1)"
+	othersColor: "rgba(84, 84, 84, 1)",
 };
 
 export const RANKING_SETTINGS: IRankingSettings = {
@@ -206,7 +208,8 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		rankingType: ERankingType.TopN,
 		count: 50,
 		showRemainingAsOthers: false,
-		othersColor: "rgba(84, 84, 84, 1)",
+		suffix: ERankingSuffix.None,
+		calcMethod: ERankingCalcMethod.Sum
 	},
 	subCategory: {
 		enabled: true,
