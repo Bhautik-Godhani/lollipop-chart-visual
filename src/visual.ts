@@ -5017,7 +5017,7 @@ export class Visual extends Shadow {
 
 		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 
-		let scrolled = false;
+		const scrolled = false;
 		(self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
 			if (!scrolled) {
 				// scrolled = true;
