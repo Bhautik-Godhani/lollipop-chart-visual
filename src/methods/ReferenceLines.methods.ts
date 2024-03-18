@@ -335,23 +335,23 @@ const getTextX1Y1ForVerticalLine = (self: Visual, d: IReferenceLineSettings, rLi
     return { textX1, textY1, textAnchor, textAlignment };
 };
 
-const getTextXYForHorizontalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+const getTextXYForHorizontalLine = (self: Visual, value: number | string, rLine: IReferenceLineSettings): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 = (self.isLeftYAxis ? self.yAxisStartMargin : 0);
     const y1 =
-        self.getYPosition(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value) + (rLine.lineValue1.axis === EXYAxisNames.X ? self.scaleBandWidth / 2 : 0);
     const x2 = self.width - (!self.isLeftYAxis ? self.yAxisStartMargin : 0);
     const y2 =
-        self.getYPosition(value) + self.scaleBandWidth / 2;
+        self.getYPosition(value) + (rLine.lineValue1.axis === EXYAxisNames.X ? self.scaleBandWidth / 2 : 0);
 
     return { x1, y1, x2, y2 };
 };
 
-const getTextXYForVerticalLine = (self: Visual, value: number | string): { x1: number, y1: number, x2: number, y2: number } => {
+const getTextXYForVerticalLine = (self: Visual, value: number | string, rLine: IReferenceLineSettings): { x1: number, y1: number, x2: number, y2: number } => {
     const x1 =
-        self.getXPosition(value) + self.scaleBandWidth / 2;
+        self.getXPosition(value) + (rLine.lineValue1.axis === EXYAxisNames.X ? self.scaleBandWidth / 2 : 0);
     const y1 = !self.isBottomXAxis ? self.xAxisStartMargin : 0;
     const x2 =
-        self.getXPosition(value) + self.scaleBandWidth / 2;
+        self.getXPosition(value) + (rLine.lineValue1.axis === EXYAxisNames.X ? self.scaleBandWidth / 2 : 0);
     const y2 = self.height - (self.isBottomXAxis ? self.xAxisStartMargin : 0);
 
     return { x1, y1, x2, y2 };
@@ -377,13 +377,13 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     }
 
     if (self.isHorizontalChart) {
-        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value);
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value, rLine);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
         newY2 = y2;
     } else {
-        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value);
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value, rLine);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
@@ -428,13 +428,13 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     }
 
     if (self.isHorizontalChart) {
-        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value);
+        const { x1, x2, y1, y2 } = getTextXYForVerticalLine(self, value, rLine);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
         newY2 = y2;
     } else {
-        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value);
+        const { x1, x2, y1, y2 } = getTextXYForHorizontalLine(self, value, rLine);
         newX1 = x1;
         newX2 = x2;
         newY1 = y1;
