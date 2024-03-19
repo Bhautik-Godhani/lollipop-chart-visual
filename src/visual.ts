@@ -131,7 +131,7 @@ import {
 import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
-import { EChartsOption } from "echarts";
+import { EChartsOption, number } from "echarts";
 import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
@@ -4243,6 +4243,10 @@ export class Visual extends Shadow {
 
 		this.marker1OutlineWidth = marker1Style.isShowMarkerOutline ? marker1Style.outlineWidth : 0;
 		this.marker2OutlineWidth = marker2Style.isShowMarkerOutline ? marker2Style.outlineWidth : 0;
+
+		if (this.numberSettings.decimalPlaces < 0) {
+			this.numberSettings.decimalPlaces = 0;
+		}
 
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
