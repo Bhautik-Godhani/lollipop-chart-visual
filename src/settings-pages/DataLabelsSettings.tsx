@@ -223,7 +223,7 @@ const UIDataLabelsFontSettings = (
 				</ConditionalWrapper>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+			{/* <ConditionalWrapper visible={shadow.isLollipopTypePie}>
 				<Row>
 					<Column>
 						<InputControl
@@ -244,7 +244,7 @@ const UIDataLabelsFontSettings = (
 						/>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
+			</ConditionalWrapper> */}
 
 			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)}
 
@@ -262,9 +262,9 @@ const UICircleLollipopLabelsSettings = (
 	configValues: IDataLabelsSettings,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
-	return (
-		<ConditionalWrapper visible={shadow.isLollipopTypeCircle}>
-			{/* <ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
+	return (<>
+		{/* <ConditionalWrapper visible={shadow.isLollipopTypeCircle}> */}
+		{/* <ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
 				<Row>
 					<Column>
 						<SelectInput
@@ -277,50 +277,50 @@ const UICircleLollipopLabelsSettings = (
 				</Row>
 			</ConditionalWrapper> */}
 
-			<ConditionalWrapper visible={shadow.referenceLinesData.length > 0}>
-				<Row>
+		<ConditionalWrapper visible={shadow.referenceLinesData.length > 0}>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Show Labels Below Reference Line"}
+						value={configValues.showLabelsBelowReferenceLine}
+						handleChange={() => handleCheckbox(EDataLabelsSettings.showLabelsBelowReferenceLine, setConfigValues)}
+						appearance="checkbox"
+					/>
+				</Column>
+			</Row>
+		</ConditionalWrapper>
+
+		<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Enable Background"}
+						value={configValues.showBackground}
+						handleChange={() => {
+							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
+							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
+						}}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues.showBackground}>
+				<Row appearance="padded">
 					<Column>
-						<ToggleButton
-							label={"Show Labels Below Reference Line"}
-							value={configValues.showLabelsBelowReferenceLine}
-							handleChange={() => handleCheckbox(EDataLabelsSettings.showLabelsBelowReferenceLine, setConfigValues)}
-							appearance="checkbox"
+						<ColorPicker
+							label="Background Color"
+							color={configValues.backgroundColor}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.backgroundColor, setConfigValues)}
+							colorPalette={vizOptions.host.colorPalette}
+							size="sm"
 						/>
 					</Column>
 				</Row>
-			</ConditionalWrapper>
-
-			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Show Background"}
-							value={configValues.showBackground}
-							handleChange={() => {
-								handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
-								handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-							}}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={configValues.showBackground}>
-					<Row appearance="padded">
-						<Column>
-							<ColorPicker
-								label="Background Color"
-								color={configValues.backgroundColor}
-								handleChange={(value) => handleChange(value, EDataLabelsSettings.backgroundColor, setConfigValues)}
-								colorPalette={vizOptions.host.colorPalette}
-								size="sm"
-							/>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
 			</ConditionalWrapper>
 		</ConditionalWrapper>
-	);
+		{/* </ConditionalWrapper> */}
+	</>);
 };
 
 const UIInsideLabelsTextColorSettings = (
@@ -368,7 +368,8 @@ const UIInsideLabelsTextColorSettings = (
 						label={"Enable Background"}
 						value={insideDataLabels.showBackground}
 						handleChange={() => {
-							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues)
+							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
+							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 
 							if (shadow.isPatternApplied) {
 								handleChange(true, EDataLabelsSettings.isShowBGChangedWhenPatternApplied, setConfigValues)
@@ -380,7 +381,7 @@ const UIInsideLabelsTextColorSettings = (
 			</Row>
 
 			<ConditionalWrapper visible={insideDataLabels.showBackground && (insideDataLabels.textColorTypes === EInsideTextColorTypes.FIXED || insideDataLabels.textColorTypes === EInsideTextColorTypes.AUTO)}>
-				<ConditionalWrapper visible={shadow.isPatternApplied && shadow.isHasSubcategories}>
+				<ConditionalWrapper visible={shadow.isPatternApplied}>
 					<Row appearance="padded">
 						<Column>
 							<Row disableTopPadding>
@@ -410,7 +411,7 @@ const UIInsideLabelsTextColorSettings = (
 					</Row>
 				</ConditionalWrapper>
 
-				<ConditionalWrapper visible={(!shadow.isPatternApplied || !shadow.isHasSubcategories)}>
+				<ConditionalWrapper visible={(!shadow.isPatternApplied)}>
 					<Row appearance="padded">
 						<Column>
 							<ColorPicker
@@ -506,24 +507,32 @@ const DataLabelsSettings = (props) => {
 
 	React.useEffect(() => {
 		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !configValues.showBackground) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
 		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
+		if (!shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
 			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, setConfigValues);
+		}
+
+		if (shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
+			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, setConfigValues);
 		}
 	}, []);
 
 	React.useEffect(() => {
 		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
 		if (configValues.placement === DataLabelsPlacement.Outside && !configValues.isShowBackgroundChange && configValues.showBackground) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 			handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
 		}
 
@@ -533,6 +542,7 @@ const DataLabelsSettings = (props) => {
 			}
 
 			if (!configValues.isShowBackgroundChange) {
+				handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
 				handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
 			}
 		}

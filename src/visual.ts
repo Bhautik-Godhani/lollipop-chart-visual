@@ -63,6 +63,7 @@ import {
 	ECutAndClipMarkerPlacementTypes,
 	ERankingSuffix,
 	ERankingCalcMethod,
+	EDataLabelsBGApplyFor,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -1993,8 +1994,13 @@ export class Visual extends Shadow {
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 
 		this.isPatternApplied =
+			this.patternSettings.enabled && this.patternSettings.categoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
 			this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
 			this.isHasMultiMeasure && this.patternSettings.enabled && this.patternSettings.measuresPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
+		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.dataLabelsSettings.isTextColorTypeChanged) {
+			this.dataLabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
+		}
 
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
 			this.markerSettings.markerType = EMarkerTypes.SHAPE;
@@ -5241,29 +5247,58 @@ export class Visual extends Shadow {
 				});
 		}
 
-		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
+		if (labelPlacement === DataLabelsPlacement.Inside) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
-			if (!textShadow.node()) {
-				textShadow = textSelection.clone(true);
-				textShadow.lower();
+
+			if (this.isLollipopTypePie) {
+				textShadow.style("display", "none");
 			}
 
-			textShadow
-				.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
-				.attr("class", "dataLabelTextShadow")
-				.attr("text-anchor", "middle")
-				.attr("dy", "0.35em")
-				.attr("font-size", this.getDataLabelsFontSize(isData2Label))
-				.style("font-family", dataLabelsSettings.fontFamily)
-				.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
-				.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
-				.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-				.attr("stroke", d =>
-					this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
-				.attr("stroke-width", 3)
-				.attr("stroke-linejoin", "round")
-				.style("text-anchor", "middle")
-				.style("display", dataLabelsSettings.showBackground ? "block" : "none");
+			if (this.isLollipopTypeCircle) {
+				if (!textShadow.node()) {
+					textShadow = textSelection.clone(true);
+					textShadow.lower();
+				}
+
+				textShadow
+					.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
+					.attr("class", "dataLabelTextShadow")
+					.attr("text-anchor", "middle")
+					.attr("dy", "0.35em")
+					.attr("font-size", this.getDataLabelsFontSize(isData2Label))
+					.style("font-family", dataLabelsSettings.fontFamily)
+					.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+					.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+					.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+					.attr("stroke", d =>
+						this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+					.attr("stroke-width", 3)
+					.attr("stroke-linejoin", "round")
+					.style("text-anchor", "middle")
+					.style("display", d => {
+						if (dataLabelsSettings.showBackground) {
+							if (this.isPatternApplied && dataLabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST) {
+								if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.ONLY_PATTERNS) {
+									let pattern = d.pattern;
+									if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
+										pattern = isData2Label ? this.patternByMeasures[DataValuesType.Value2] : this.patternByMeasures[DataValuesType.Value1];
+									}
+									if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+										return "block";
+									} else {
+										return "none";
+									}
+								} else if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.All) {
+									return "block"
+								}
+							} else {
+								return "block";
+							}
+						} else {
+							return "none";
+						}
+					});
+			}
 		}
 
 		if (labelPlacement === DataLabelsPlacement.Outside) {
