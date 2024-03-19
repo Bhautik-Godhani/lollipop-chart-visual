@@ -28,7 +28,7 @@
 
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
-import { DisplayUnits, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "./enum";
+import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "./enum";
 
 export class VisualSettings extends DataViewObjectsParser {
 	public license = new License();
@@ -125,9 +125,10 @@ export class NumberFormatting {
 	public millionScalingLabel: string = "M";
 	public billionScalingLabel: string = "B";
 	public trillionScalingLabel: string = "T";
-	public semanticFormatting: boolean = false;
-	public negativeFormat: string = SemanticNegativeNumberFormats.MinusX;
-	public positiveFormat: string = SemanticPositiveNumberFormats.X;
+	public semanticFormatting?: boolean = false;
+	public negativeFormat?: string = SemanticNegativeNumberFormats.MinusX;
+	public positiveFormat?: string = SemanticPositiveNumberFormats.X;
+	public valueType?: EAxisNumberValueType;
 }
 
 export class ShowBucketConfig {

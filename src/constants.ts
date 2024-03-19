@@ -41,6 +41,8 @@ import {
 	ECutAndClipMarkerPlacementTypes,
 	ERankingSuffix,
 	ERankingCalcMethod,
+	EAxisNumberValueType,
+	DisplayUnits,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -249,7 +251,22 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	isInvertRange: false,
 	isAutoDateFormat: true,
 	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
-	customDateFormat: "DD:MM:YYYY hh:mm A"
+	customDateFormat: "DD:MM:YYYY hh:mm A",
+	numberFormatting: {
+		show: true,
+		valueType: EAxisNumberValueType.Absolute,
+		decimalSeparator: ".",
+		thousandsSeparator: ",",
+		decimalPlaces: 1,
+		scaling: DisplayUnits.Auto,
+		prefix: "",
+		suffix: "",
+		scalingLabel: false,
+		thousandScalingLabel: "K",
+		millionScalingLabel: "M",
+		billionScalingLabel: "B",
+		trillionScalingLabel: "T"
+	}
 };
 
 export const Y_AXIS_SETTINGS: IYAxisSettings = {
@@ -280,7 +297,22 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	isInvertRange: false,
 	isAutoDateFormat: true,
 	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
-	customDateFormat: "DD:MM:YYYY hh:mm A"
+	customDateFormat: "DD:MM:YYYY hh:mm A",
+	numberFormatting: {
+		show: true,
+		valueType: EAxisNumberValueType.Absolute,
+		decimalSeparator: ".",
+		thousandsSeparator: ",",
+		decimalPlaces: 1,
+		scaling: DisplayUnits.Auto,
+		prefix: "",
+		suffix: "",
+		scalingLabel: false,
+		thousandScalingLabel: "K",
+		millionScalingLabel: "M",
+		billionScalingLabel: "B",
+		trillionScalingLabel: "T"
+	}
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {

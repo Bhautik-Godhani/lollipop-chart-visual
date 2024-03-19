@@ -1,5 +1,5 @@
 /* eslint-disable no-self-assign */
-import { DisplayUnits, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
+import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import IValueFormatter = valueFormatter.IValueFormatter;
 import { NumberFormatting } from "../settings";
@@ -137,6 +137,10 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
 
     if (typeof number !== "number") {
         return number;
+    }
+
+    if (numberSettings.show && numberSettings.valueType && numberSettings.valueType === EAxisNumberValueType.Percentage) {
+        return (number / 100) + "%";
     }
 
     if (!numberSettings.show) {

@@ -402,7 +402,8 @@ export enum EXAxisSettings {
 	IsInvertRange = "isInvertRange",
 	IsAutoDateFormat = "isAutoDateFormat",
 	DateFormat = "dateFormat",
-	CustomDateFormat = "customDateFormat"
+	CustomDateFormat = "customDateFormat",
+	NumberFormatting = "numberFormatting"
 }
 
 export enum EAxisDateFormats {
@@ -439,7 +440,8 @@ export enum EYAxisSettings {
 	IsInvertRange = "isInvertRange",
 	IsAutoDateFormat = "isAutoDateFormat",
 	DateFormat = "dateFormat",
-	CustomDateFormat = "customDateFormat"
+	CustomDateFormat = "customDateFormat",
+	NumberFormatting = "numberFormatting"
 }
 
 export enum EMarkerSettings {
@@ -916,4 +918,25 @@ export enum ERankingSuffix {
 export enum ERankingCalcMethod {
 	Sum = "sum",
 	Average = "average"
+}
+
+export enum EAxisNumberValueType {
+	Absolute = "absolute",
+	Percentage = "percentage"
+}
+
+export enum EAxisNumberFormatting {
+	Show = "show",
+	ValueType = "valueType",
+	DecimalSeparator = "decimalSeparator",
+	ThousandsSeparator = "thousandsSeparator",
+	DecimalPlaces = "decimalPlaces",
+	Scaling = "scaling",
+	Prefix = "prefix",
+	Suffix = "suffix",
+	ScalingLabel = "scalingLabel",
+	ThousandScalingLabel = "thousandScalingLabel",
+	MillionScalingLabel = "millionScalingLabel",
+	BillionScalingLabel = "billionScalingLabel",
+	TrillionScalingLabel = "trillionScalingLabel"
 }

@@ -200,6 +200,8 @@ export class Visual extends Shadow {
 	public _events: IVisualEventService;
 	public _host: IVisualHost;
 	public formatNumber: (value: number | string, numberSettings: NumberFormatting, numberFormatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean) => string;
+	public axisNumberFormatter: (value: number | string, numberSettings: NumberFormatting) => string;
+
 	public interactivityService: interactivityBaseService.IInteractivityService<any>;
 	public behavior: Behavior;
 	public visualHost: IVisualHost;
@@ -2239,7 +2241,10 @@ export class Visual extends Shadow {
 
 			this.renderContextMenu();
 			this.setHighContrastDetails();
+
 			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
+			this.axisNumberFormatter = (value, numberSettings) => GetFormattedNumber(value, numberSettings, undefined, false, true);
+
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab);
 
 			if (!this.isValidShowBucket) {
@@ -6264,7 +6269,7 @@ export class Visual extends Shadow {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
-					const truncatedText = THIS.formatNumber(parseFloat(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString()), THIS.numberSettings, undefined, false, true);
+					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString()), xAxisSettings.numberFormatting);
 					ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 				}
 			});
@@ -6327,8 +6332,8 @@ export class Visual extends Shadow {
 						fontSize: yAxisSettings.labelFontSize + "px",
 					};
 
-					if (!THIS.isHorizontalChart) {
-						const truncatedText = THIS.formatNumber(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), THIS.numberSettings, undefined, false, true);
+					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
+						const truncatedText = THIS.axisNumberFormatter(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), yAxisSettings.numberFormatting);
 						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);

@@ -4,7 +4,9 @@ import {
 	CircleSize,
 	ColorPaletteType,
 	DataLabelsPlacement,
+	DisplayUnits,
 	EAxisDateFormats,
+	EAxisNumberValueType,
 	EBeforeAfterPosition,
 	ECFApplyOnCategories,
 	ECFRankingTypes,
@@ -50,6 +52,7 @@ import {
 	Position,
 	RankingDataValuesType,
 } from "./enum";
+import { NumberFormatting } from "./settings";
 
 export interface IXAxisSettings {
 	show: boolean,
@@ -81,6 +84,7 @@ export interface IXAxisSettings {
 	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
 	customDateFormat: string;
+	numberFormatting: NumberFormatting;
 }
 
 export interface IYAxisSettings {
@@ -112,6 +116,23 @@ export interface IYAxisSettings {
 	isAutoDateFormat: boolean;
 	dateFormat: EAxisDateFormats;
 	customDateFormat: string;
+	numberFormatting: NumberFormatting;
+}
+
+export interface IAxisNumberFormatting {
+	enabled: boolean;
+	valueType: EAxisNumberValueType;
+	decimalSeparator: string;
+	thousandsSeparator: string;
+	decimalPlaces: number;
+	scaling: DisplayUnits;
+	prefix: string;
+	suffix: string;
+	scalingLabel: boolean;
+	thousandScalingLabel: string;
+	millionScalingLabel: string;
+	billionScalingLabel: string;
+	trillionScalingLabel: string;
 }
 
 export interface ICirclePropsSettings {

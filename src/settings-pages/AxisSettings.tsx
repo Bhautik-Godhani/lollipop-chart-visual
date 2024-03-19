@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP, Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
-import { AxisCategoryType, EAxisDateFormats, EVisualConfig, EVisualSettings, EXAxisSettings, EXYAxisNames, EYAxisSettings, Position } from "../enum";
+import { AxisCategoryType, EAxisDateFormats, EAxisNumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EXYAxisNames, EYAxisSettings, Position } from "../enum";
 import {
   InputControl,
   Row,
@@ -74,6 +74,37 @@ const AXIS_DATE_FORMATS: ILabelValuePair[] = [
   },
 ];
 
+const SCALING_TYPES: ILabelValuePair[] = [
+  {
+    label: "Auto",
+    value: "auto"
+  },
+  {
+    label: "Relative",
+    value: "relative"
+  },
+  {
+    label: "None",
+    value: "none"
+  },
+  {
+    label: "Thousands",
+    value: "thousands"
+  },
+  {
+    label: "Million",
+    value: "million"
+  },
+  {
+    label: "Billion",
+    value: "billion"
+  },
+  {
+    label: "Trillion",
+    value: "trillion"
+  }
+];
+
 const STYLING = [
   {
     label: <BoldIcon style={{ fill: "currentColor" }} />,
@@ -128,6 +159,20 @@ const handleYColor = (rgb, n, setYConfigValues: React.Dispatch<React.SetStateAct
   setYConfigValues((d) => ({
     ...d,
     [n]: rgb,
+  }));
+};
+
+const handleNumberFormattingChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings | IYAxisSettings>>) => {
+  setConfigValues((d) => ({
+    ...d,
+    [EXAxisSettings.NumberFormatting]: { ...d[EXAxisSettings.NumberFormatting], [n]: val, }
+  }));
+};
+
+const handleNumberFormattingCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>) => {
+  setConfigValues((d) => ({
+    ...d,
+    [EXAxisSettings.NumberFormatting]: { ...d[EXAxisSettings.NumberFormatting], [n]: !d[EXAxisSettings.NumberFormatting][n], }
   }));
 };
 
@@ -524,7 +569,154 @@ const UIXAxis = (
           </ConditionalWrapper>
         </ConditionalWrapper>
       </AccordionAlt>
+
+      <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        {UINumberFormatting(xConfigValues, setXConfigValues)}
+      </ConditionalWrapper>
     </ConditionalWrapper >
+  </>
+}
+
+const UINumberFormatting = (
+  configValues: IXAxisSettings | IYAxisSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings | IYAxisSettings>>,
+) => {
+  const numberFormatting = configValues.numberFormatting;
+  return <>
+    <AccordionAlt title="Number Formatting" showToggle={true} toggleValue={numberFormatting.show} onChangeToggle={() => handleNumberFormattingCheckbox(EAxisNumberFormatting.Show, setConfigValues)}>
+      <Row>
+        <Column>
+          <SwitchOption
+            value={numberFormatting.valueType}
+            optionsList={[
+              { label: "Absolute", value: "absolute" },
+              { label: "Percentage", value: "percentage" },
+            ]}
+            handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.ValueType, setConfigValues)}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={numberFormatting.valueType === "absolute"}>
+        <Row>
+          <Column>
+            <InputControl
+              type="text"
+              min={0}
+              label="Decimal Separator"
+              value={numberFormatting.decimalSeparator}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.DecimalSeparator, setConfigValues)}
+            />
+          </Column>
+          <Column>
+            <InputControl
+              type="text"
+              min={0}
+              label="Thousand Separator"
+              value={numberFormatting.thousandsSeparator}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.ThousandsSeparator, setConfigValues)}
+            />
+          </Column>
+        </Row>
+        <Row>
+          <Column>
+            <InputControl
+              type="number"
+              min={0}
+              label="Decimal Places"
+              value={numberFormatting.decimalPlaces}
+              stepValue={1}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.DecimalPlaces, setConfigValues)}
+            />
+          </Column>
+          <Column>
+            <SelectInput
+              label={"Scaling Display"}
+              value={numberFormatting.scaling}
+              optionsList={SCALING_TYPES}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.Scaling, setConfigValues)}
+            />
+          </Column>
+        </Row>
+        <Row>
+          <Column>
+            <InputControl
+              type="text"
+              min={0}
+              label="Prefix"
+              value={numberFormatting.prefix}
+              stepValue={1}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.Prefix, setConfigValues)}
+            />
+          </Column>
+          <Column>
+            <InputControl
+              type="text"
+              min={0}
+              label="Suffix"
+              value={numberFormatting.suffix}
+              stepValue={1}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.Suffix, setConfigValues)}
+            />
+            {/* <SelectInput
+                label={"Suffix"}
+                value={configValues.suffix}
+                optionsList={[]}
+                handleChange={(newValue) =>
+                  handleChange(newValue, "suffix")
+                }
+              /> */}
+          </Column>
+        </Row>
+        <Row>
+          <Column>
+            <ToggleButton
+              label="Customize Styling"
+              value={numberFormatting.scalingLabel}
+              handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.ScalingLabel, setConfigValues)}
+            />
+          </Column>
+        </Row>
+        <ConditionalWrapper visible={numberFormatting.scalingLabel}>
+          <Row>
+            <Column>
+              <InputControl
+                type="text"
+                label="Thousand"
+                value={numberFormatting.thousandScalingLabel}
+                handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.ThousandScalingLabel, setConfigValues)}
+              />
+            </Column>
+            <Column>
+              <InputControl
+                type="text"
+                label="Million"
+                value={numberFormatting.millionScalingLabel}
+                handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.MillionScalingLabel, setConfigValues)}
+              />
+            </Column>
+          </Row>
+          <Row>
+            <Column>
+              <InputControl
+                type="text"
+                label="Billion"
+                value={numberFormatting.billionScalingLabel}
+                handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.BillionScalingLabel, setConfigValues)}
+              />
+            </Column>
+            <Column>
+              <InputControl
+                type="text"
+                label="Trillion"
+                value={numberFormatting.trillionScalingLabel}
+                handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.TrillionScalingLabel, setConfigValues)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+      </ConditionalWrapper>
+    </AccordionAlt>
   </>
 }
 
@@ -909,6 +1101,10 @@ const UIYAxis = (
           </ConditionalWrapper>
         </ConditionalWrapper>
       </AccordionAlt>
+
+      <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        {UINumberFormatting(yConfigValues, setYConfigValues)}
+      </ConditionalWrapper>
     </ConditionalWrapper>
   </>
 }
@@ -1012,6 +1208,8 @@ const XAxisSettings = (props) => {
     ...yInitialStates,
   });
 
+  const [selectedAxisTab, setSelectedAxisTab] = React.useState<EXYAxisNames>(EXYAxisNames.X);
+
   React.useEffect(() => {
     if (xConfigValues.isDisplayTitle) {
       if (xConfigValues.titleName.length === 0) {
@@ -1066,7 +1264,7 @@ const XAxisSettings = (props) => {
 
   return (
     <>
-      <Tabs selected={EXYAxisNames.X}>
+      <Tabs selected={selectedAxisTab} onChange={(val) => setSelectedAxisTab(val)}>
         <Tab title={"X - Axis"} identifier={EXYAxisNames.X}>
           {UIXAxis(vizOptions, shadow, xConfigValues, setXConfigValues, setYConfigValues)}
         </Tab>
