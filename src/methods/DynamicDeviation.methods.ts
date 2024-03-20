@@ -240,8 +240,6 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     const isPositiveDeviation = from.value < to.value;
 
     dataLabelG
-        .transition()
-        .duration(self.tickDuration)
         .attr(
             "transform",
             `translate(${xScaleWidth - dataLabelBBox.width}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2

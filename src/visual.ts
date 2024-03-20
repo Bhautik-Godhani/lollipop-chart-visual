@@ -1854,12 +1854,12 @@ export class Visual extends Shadow {
 
 		this.firstCategoryValueDataPair = {
 			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[0],
-			value: <number>categoricalData.values[0].values[0],
+			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[0]) : <number>categoricalData.values[0].values[0],
 		};
 
 		this.lastCategoryValueDataPair = {
 			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[dataLength - 1],
-			value: <number>categoricalData.values[0].values[dataLength - 1],
+			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[dataLength - 1]) : <number>categoricalData.values[0].values[dataLength - 1],
 		};
 
 		if (this.brushAndZoomAreaSettings.enabled) {
