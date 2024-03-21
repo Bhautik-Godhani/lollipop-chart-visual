@@ -3832,13 +3832,13 @@ export class Visual extends Shadow {
 							}
 						}))
 					} else {
-						legendDataPoints = this.chartData.map(d => ({
+						legendDataPoints = (this.isHorizontalChart ? this.chartData.reverse() : this.chartData).map(d => ({
 							data: {
 								name: d.category.replace(/--\d+/g, ''),
 								color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
 								pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category)
 							}
-						}))
+						}));
 					}
 					break;
 				case ColorPaletteType.PositiveNegative:
