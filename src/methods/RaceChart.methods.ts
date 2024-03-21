@@ -1,4 +1,4 @@
-import { EFontStyle, EHighContrastColorType, EPlayPauseButton } from '../enum';
+import { EFontStyle, EHighContrastColorType, EPlayPauseButton, Position } from '../enum';
 import { Visual } from '../visual';
 import { interval, min, select, sum } from "d3";
 
@@ -95,20 +95,21 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
     self.raceChartDataLabelText
         .append("tspan")
         .attr("x", "0")
-        .attr("dy", labelFontSize)
-        .attr("font-size", labelFontSize / 1.5)
+        .attr("dy", labelFontSize / 1.25)
+        .attr("font-size", labelFontSize / 2)
         .text(`${self.measure1DisplayName} : ${getTotal1Value()}`);
 
     if (self.isHasMultiMeasure) {
         self.raceChartDataLabelText
             .append("tspan")
             .attr("x", "0")
-            .attr("dy", labelFontSize)
-            .attr("font-size", labelFontSize / 1.5)
+            .attr("dy", labelFontSize / 1.5)
+            .attr("font-size", labelFontSize / 2)
             .text(`${self.measure2DisplayName} : ${getTotal2Value()}`);
     }
 
     const textBBox = self.raceChartDataLabelText.node().getBBox();
+    const tickerButtonRadius = GetTickerButtonRadius(self);
 
     self.raceChartDataLabelText
         .attr(
@@ -116,7 +117,9 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             "translate(" +
             (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right - textBBox.width / 2) +
             "," +
-            (self.height - textBBox.height) +
+            (self.raceChartSettings.placement === Position.Bottom ?
+                (self.height - textBBox.height) :
+                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
             ")"
         )
 
@@ -146,7 +149,9 @@ export const RenderRaceTickerButton = (self: Visual): void => {
                 raceBarDateLabelTextBBox.width / 2
             ) +
             "," +
-            (self.height - tickerButtonRadius * 2 - 10 - raceBarDateLabelTextBBox.height) +
+            (self.raceChartSettings.placement === Position.Bottom ?
+                (self.height - tickerButtonRadius * 2 - raceBarDateLabelTextBBox.height) :
+                (self.margin.top + tickerButtonRadius + 10)) +
             ")"
         )
         .on("click", () => {
@@ -212,7 +217,9 @@ export const UpdateTickerButton = (self: Visual): void => {
                 raceDateLabelTextBBox.width / 2
             ) +
             "," +
-            (self.height - tickerButtonRadius * 2 - 10 - raceDateLabelTextBBox.height) +
+            (self.raceChartSettings.placement === Position.Bottom ?
+                (self.height - tickerButtonRadius * 2 - raceDateLabelTextBBox.height) :
+                (self.margin.top + tickerButtonRadius + 10)) +
             ")"
         );
 

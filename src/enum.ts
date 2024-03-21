@@ -480,7 +480,8 @@ export enum ERaceChartSettings {
 	TickerButtonColor = "tickerButtonColor",
 	FontStyles = "fontStyles",
 	IsShowLabelBackground = "isShowLabelBackground",
-	BackgroundColor = "backgroundColor"
+	BackgroundColor = "backgroundColor",
+	Placement = "placement"
 }
 
 export enum EReferenceLinesSettings {

@@ -14,11 +14,22 @@ import {
   AccordionAlt,
   SwitchOption,
 } from "@truviz/shadow/dist/Components";
-import { IRaceChartSettings } from "../visual-settings.interface";
-import { ERaceChartSettings } from "../enum";
+import { ILabelValuePair, IRaceChartSettings } from "../visual-settings.interface";
+import { ERaceChartSettings, Position } from "../enum";
 import { persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
+
+const TEXT_PLACEMENTS: ILabelValuePair[] = [
+  {
+    label: "Bottom",
+    value: Position.Bottom,
+  },
+  {
+    label: "Top",
+    value: Position.Top,
+  },
+];
 
 const RaceChartSettings = (props) => {
   const {
@@ -119,6 +130,17 @@ const RaceChartSettings = (props) => {
               toggleValue={configValues.allowTransition}
               onChangeToggle={(value) => handleChange(value, ERaceChartSettings.AllowTransition)}
             >
+              <Row>
+                <Column>
+                  <SwitchOption
+                    label={"Placement"}
+                    value={configValues.placement}
+                    optionsList={TEXT_PLACEMENTS}
+                    handleChange={(value) => handleChange(value, ERaceChartSettings.Placement)}
+                  />
+                </Column>
+              </Row>
+
               <Row>
                 <Column>
                   <InputControl

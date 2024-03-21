@@ -457,6 +457,7 @@ export interface IRaceChartSettings {
 	fontStyles: EFontStyle[];
 	isShowLabelBackground: boolean;
 	backgroundColor: string;
+	placement: Position;
 }
 
 export interface IReferenceLineValueProps {

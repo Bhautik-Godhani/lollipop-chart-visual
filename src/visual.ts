@@ -496,7 +496,8 @@ export class Visual extends Shadow {
 	raceChartKeyLabelList: { key: string, label: string }[] = [];
 
 	// chart race labels
-	raceChartDataLabelG: any;
+	raceChartDataLabelG: D3Selection<SVGElement>;
+	raceChartContainerG: D3Selection<SVGElement>;
 	raceChartDataLabelText: any;
 	isRaceChartDataLabelDrawn: boolean = false;
 	formatRaceChartDataLabel = d3.timeFormat("%d %b %y");
@@ -672,7 +673,7 @@ export class Visual extends Shadow {
 					{ label: "Line", value: ECFApplyOnCategories.Line },
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
-				showPercentageAllOption: true
+				showPercentageAllOption: true,
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
@@ -934,9 +935,11 @@ export class Visual extends Shadow {
 
 		this.dynamicDeviationG = this.container.append("g").classed("dynamicDeviationG", true);
 
-		this.tickerButtonG = this.svg.append("g").classed("tickerButtonG", true);
+		this.raceChartContainerG = this.svg.append("g").classed("raceChartContainerG", true);
 
-		this.raceChartDataLabelG = this.svg.append("g").classed("raceChartDataLabelG", true);
+		this.tickerButtonG = this.raceChartContainerG.append("g").classed("tickerButtonG", true);
+
+		this.raceChartDataLabelG = this.raceChartContainerG.append("g").classed("raceChartDataLabelG", true);
 
 		echarts.use([PieChart, SVGRenderer]);
 
