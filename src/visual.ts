@@ -1344,7 +1344,7 @@ export class Visual extends Shadow {
 			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
-		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).join("").includes(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase());
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase()) !== -1;
 
 		if (this.isExpandAllApplied) {
 			const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);

@@ -72,7 +72,9 @@ import {
 
 export const MonthNames = [
 	"January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December"
+	"July", "August", "September", "October", "November", "December",
+	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 ];
 
 export const PIE1_SETTINGS: IPiePropsSettings = {
