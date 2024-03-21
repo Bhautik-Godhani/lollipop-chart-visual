@@ -14,7 +14,7 @@ import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { select } from "d3-selection";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
-	if (shadow.chartSettings.isIBCSEnabled) {
+	if (shadow.chartSettings && shadow.chartSettings.isIBCSEnabled) {
 		ApplyBeforeIBCSAppliedSettingsBack(shadow);
 	}
 

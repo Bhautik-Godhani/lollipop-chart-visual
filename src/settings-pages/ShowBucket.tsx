@@ -42,7 +42,7 @@ const UIShowBucketSettings = (
 						type="textarea"
 						value={configValues.message}
 						handleChange={(value: any) => {
-							handleChange(+value, EShowBucketSettings.Message);
+							handleChange(value, EShowBucketSettings.Message);
 						}}
 					/>
 				</Column>
@@ -164,7 +164,12 @@ const ShowCondition = (props) => {
 	}
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		if (shadow.chartSettings) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		closeCurrentSettingHandler();
 	};
 
