@@ -1336,6 +1336,14 @@ export class Visual extends Shadow {
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 
+		if (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isHasSubcategories) {
+			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
+		if (this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isHasSubcategories) {
+			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
 		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).join("").includes(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase());
 
 		if (this.isExpandAllApplied) {

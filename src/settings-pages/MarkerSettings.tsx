@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EMarkerChartTypes, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes } from "../enum";
-import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton, ColorPicker } from "@truviz/shadow/dist/Components";
+import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton, ColorPicker, Quote } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IMarkerSettings } from "../visual-settings.interface";
 import { MARKER_SETTINGS as MARKER_SETTINGS_IMP } from "../constants";
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -170,20 +170,32 @@ const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStat
 							</Tab>
 
 							<Tab title={"Images"} identifier={EMarkerShapeTypes.IMAGES}>
-								<Row>
-									<Column>
-										<SelectInput
-											label={"Image Field"}
-											value={configValues.selectedImageDataField}
-											isFontSelector={false}
-											optionsList={shadow.imagesDataFieldsName.map(d => ({
-												label: d,
-												value: d
-											}))}
-											handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SelectedImageDataField, markerStyleTypes, setConfigValues)}
-										/>
-									</Column>
-								</Row>
+								<ConditionalWrapper visible={shadow.isHasSubcategories}>
+									<Row>
+										<Column>
+											<Quote>
+												<strong>Note: </strong>Please remove the sub-category data to use this feature.
+											</Quote>
+										</Column>
+									</Row>
+								</ConditionalWrapper>
+
+								<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+									<Row>
+										<Column>
+											<SelectInput
+												label={"Image Field"}
+												value={configValues.selectedImageDataField}
+												isFontSelector={false}
+												optionsList={shadow.imagesDataFieldsName.map(d => ({
+													label: d,
+													value: d
+												}))}
+												handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SelectedImageDataField, markerStyleTypes, setConfigValues)}
+											/>
+										</Column>
+									</Row>
+								</ConditionalWrapper>
 							</Tab>
 
 							<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
@@ -380,6 +392,10 @@ const MarkerSettings = (props) => {
 			handleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, setConfigValues);
 		}
 
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length > 0 && shadow.isHasSubcategories) {
+			handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, configValues.markerStyleType, setConfigValues)
+		}
+
 		// if (configValues.marker1Style.size === 0) {
 		// 	handleMarkerStyleChange(shadow.circle1Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
 		// }
@@ -388,6 +404,12 @@ const MarkerSettings = (props) => {
 		// 	handleMarkerStyleChange(shadow.circle2Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
 		// }
 	}, []);
+
+	React.useEffect(() => {
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length > 0 && shadow.isHasSubcategories) {
+			handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, configValues.markerStyleType, setConfigValues)
+		}
+	}, [configValues.markerStyleType]);
 
 	return (
 		<>
@@ -426,31 +448,33 @@ const MarkerSettings = (props) => {
 				{UIMarkerShapeTypes(shadow, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
 			</ConditionalWrapper>
 
-			<Row>
-				<Column>
-					<ToggleButton
-						label={"Auto Marker Size"}
-						value={configValues[configValues.markerStyleType].isAutoMarkerSize}
-						handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsAutoMarkerSize, configValues.markerStyleType, setConfigValues)}
-						appearance="toggle"
-					/>
-				</Column>
-			</Row>
-
-			<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isAutoMarkerSize}>
-				<Row appearance="padded">
+			<ConditionalWrapper visible={!(configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length > 0 && shadow.isHasSubcategories)}>
+				<Row>
 					<Column>
-						<InputControl
-							min={1}
-							max={50}
-							type="number"
-							label={"Size"}
-							value={configValues[configValues.markerStyleType].markerSize.toString()}
-							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
+						<ToggleButton
+							label={"Auto Marker Size"}
+							value={configValues[configValues.markerStyleType].isAutoMarkerSize}
+							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsAutoMarkerSize, configValues.markerStyleType, setConfigValues)}
+							appearance="toggle"
 						/>
 					</Column>
-					<Column></Column>
 				</Row>
+
+				<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isAutoMarkerSize}>
+					<Row appearance="padded">
+						<Column>
+							<InputControl
+								min={1}
+								max={50}
+								type="number"
+								label={"Size"}
+								value={configValues[configValues.markerStyleType].markerSize.toString()}
+								handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
+							/>
+						</Column>
+						<Column></Column>
+					</Row>
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
