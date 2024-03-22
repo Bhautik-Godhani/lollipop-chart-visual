@@ -57,7 +57,7 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
 export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selection<SVGElement>, isLine2: boolean): void => {
     lineSelection
         .attr("class", (d: IReferenceLineSettings) => d.lineStyle.lineStyle)
-        .style("stroke", (d: IReferenceLineSettings) => d.lineStyle.lineColor)
+        .style("stroke", (d: IReferenceLineSettings) => self.getColor(d.lineStyle.lineColor, EHighContrastColorType.Foreground))
         .attr("stroke-width", (d: IReferenceLineSettings) => +d.lineStyle.lineWidth)
         .attr("x1", (d: IReferenceLineSettings) => {
             if ((!self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.X) || (self.isHorizontalChart && d.lineValue1.axis === EXYAxisNames.Y)) {
@@ -157,7 +157,7 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
                     : "0"
                 })`
         )
-        .attr("fill", (d: IReferenceLineSettings) => d.labelStyle.labelColor)
+        .attr("fill", (d: IReferenceLineSettings) => self.getColor(d.labelStyle.labelColor, EHighContrastColorType.Foreground))
         .attr("text-anchor", (d: IReferenceLineSettings) => d.labelStyle.textAnchor)
         .attr("alignment-baseline", (d: IReferenceLineSettings) => d.labelStyle.textAlignment)
         .style("font-size", (d: IReferenceLineSettings) => {
@@ -218,7 +218,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
                 return ((d.line1Coord.y1 > d.line2Coord.y1) ? d.line2Coord.y1 : d.line1Coord.y1) + +d.lineStyle.lineWidth / 2;
             }
         })
-        .attr("fill", (d: IReferenceLineSettings) => d.bandStyle.backgroundColor)
+        .attr("fill", (d: IReferenceLineSettings) => self.getColor(d.bandStyle.backgroundColor, EHighContrastColorType.Background))
         .style("pointer-events", "none");
 }
 
