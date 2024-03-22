@@ -883,6 +883,8 @@ const SmallMultiplesSettings = (props) => {
     ...initialStates,
   });
 
+  const [selectedTab, setSelectedTab] = React.useState<string>("layout");
+
   React.useEffect(() => {
     if (configValues.layoutType !== ESmallMultiplesLayoutType.Grid) {
       setConfigValues((d) => ({
@@ -931,7 +933,7 @@ const SmallMultiplesSettings = (props) => {
       <ConditionalWrapper visible={!configValues.showInfoPage} style={{ width: "300px" }}>
         <Row disableTopPadding>
           <Column>
-            <Tabs selected="layout">
+            <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
               <Tab title="Layout" identifier="layout">
                 {UILayout(isShowGridLayoutOnly, isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
               </Tab>
