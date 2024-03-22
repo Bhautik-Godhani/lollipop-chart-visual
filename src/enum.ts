@@ -571,7 +571,8 @@ export enum EMarkerChartTypes {
 export enum EMarkerDefaultShapes {
 	CIRCLE = "circle",
 	SQUARE = "square",
-	TRIANGLE = "triangle",
+	HTRIANGLE = "horizontal_triangle",
+	VTRIANGLE = "vertical_triangle",
 	DIAMOND = "diamond",
 	HORIZONTAL_LINE = "horizontal_line",
 }

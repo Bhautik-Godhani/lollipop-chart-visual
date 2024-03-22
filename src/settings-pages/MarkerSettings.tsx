@@ -12,26 +12,7 @@ import DonutIcon from "../../assets/icons/donut-icon.svg";
 import RoseIcon from "../../assets/icons/rose-icon.svg";
 import { Visual } from "../visual";
 import { persistProperties } from "../methods/methods";
-import { MarkerCircleIcon, MarkerDiamondIcon, MarkerSquareIcon, MarkerTriangleIcon } from "./SettingsIcons";
-
-const MARKERS_LIST: any[] = [
-	{
-		label: <MarkerCircleIcon fill="currentColor" />,
-		value: EMarkerDefaultShapes.CIRCLE,
-	},
-	{
-		label: <MarkerSquareIcon fill="currentColor" />,
-		value: EMarkerDefaultShapes.SQUARE,
-	},
-	{
-		label: <MarkerTriangleIcon fill="currentColor" />,
-		value: EMarkerDefaultShapes.TRIANGLE,
-	},
-	{
-		label: <MarkerDiamondIcon fill="currentColor" />,
-		value: EMarkerDefaultShapes.DIAMOND,
-	},
-];
+import { MarkerCircleIcon, MarkerDiamondIcon, MarkerHTriangleIcon, MarkerSquareIcon, MarkerVTriangleIcon } from "./SettingsIcons";
 
 const MARKER_TYPES: ILabelValuePair[] = [
 	{
@@ -95,6 +76,24 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 
 const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStates: IMarkerSettings, markerStyleTypes: EMarkerStyleTypes, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
 	const configValues = config[config.markerStyleType];
+	const MARKERS_LIST: any[] = [
+		{
+			label: <MarkerCircleIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.CIRCLE,
+		},
+		{
+			label: <MarkerSquareIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.SQUARE,
+		},
+		{
+			label: shadow.isHorizontalChart ? <MarkerHTriangleIcon fill="currentColor" /> : <MarkerVTriangleIcon fill="currentColor" />,
+			value: shadow.isHorizontalChart ? EMarkerDefaultShapes.HTRIANGLE : EMarkerDefaultShapes.VTRIANGLE,
+		},
+		{
+			label: <MarkerDiamondIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.DIAMOND,
+		},
+	];
 
 	return (
 		<>
@@ -379,6 +378,18 @@ const MarkerSettings = (props) => {
 	React.useEffect(() => {
 		if (configValues.markerType === EMarkerTypes.CHART && !shadow.isHasSubcategories) {
 			handleChange(EMarkerTypes.SHAPE, EMarkerSettings.MarkerType, setConfigValues)
+		}
+
+		if (configValues.markerType === EMarkerTypes.SHAPE
+			&& configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT
+		) {
+			if (configValues[configValues.markerStyleType].dropdownMarkerType === EMarkerDefaultShapes.VTRIANGLE && shadow.isHorizontalChart) {
+				handleMarkerStyleChange(EMarkerDefaultShapes.HTRIANGLE, EMarkerSettings.DropdownMarkerType, configValues.markerStyleType, setConfigValues)
+			}
+
+			if (configValues[configValues.markerStyleType].dropdownMarkerType === EMarkerDefaultShapes.HTRIANGLE && !shadow.isHorizontalChart) {
+				handleMarkerStyleChange(EMarkerDefaultShapes.VTRIANGLE, EMarkerSettings.DropdownMarkerType, configValues.markerStyleType, setConfigValues)
+			}
 		}
 
 		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES

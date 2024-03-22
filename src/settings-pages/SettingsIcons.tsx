@@ -871,9 +871,16 @@ export const MarkerSquareIcon = (props: SVGProps<SVGSVGElement>) => (
 	</svg>
 );
 
-export const MarkerTriangleIcon = (props: SVGProps<SVGSVGElement>) => (
+export const MarkerVTriangleIcon = (props: SVGProps<SVGSVGElement>) => (
 	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
 		<path fill-rule="evenodd" clip-rule="evenodd" d="M15.106 12.4856C15.5058 13.1524 15.0256 14 14.2488 14H2.25135C1.47368 14 0.994307 13.1515 1.39408 12.4856L7.39323 2.48631C7.47982 2.33852 7.60468 2.21573 7.7552 2.13035C7.90572 2.04496 8.07657 2 8.2505 2C8.42443 2 8.59528 2.04496 8.7458 2.13035C8.89632 2.21573 9.02118 2.33852 9.10777 2.48631L15.106 12.4856Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const MarkerHTriangleIcon = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path fill-rule="evenodd" clip-rule="evenodd" d="M3.76442 14.856C3.09763 15.2558 2.25 14.7756 2.25 13.9988L2.25 2.00135C2.25 1.22368 3.09849 0.744307 3.76442 1.14408L13.7637 7.14323C13.9115 7.22982 14.0343 7.35468 14.1197 7.5052C14.205 7.65572 14.25 7.82657 14.25 8.0005C14.25 8.17443 14.205 8.34528 14.1197 8.4958C14.0343 8.64632 13.9115 8.77118 13.7637 8.85777L3.76442 14.856Z"
 			fill={props.fill || "var(--activeSelected)"} />
 	</svg>
 );

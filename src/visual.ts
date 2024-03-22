@@ -4240,6 +4240,33 @@ export class Visual extends Shadow {
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
 
+		const marker1Style = this.markerSettings.marker1Style;
+		const marker2Style = this.markerSettings.marker2Style;
+
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE
+			&& marker1Style.markerShape === EMarkerShapeTypes.DEFAULT
+		) {
+			if (marker1Style.dropdownMarkerType === EMarkerDefaultShapes.VTRIANGLE && this.isHorizontalChart) {
+				this.markerSettings.marker1Style.dropdownMarkerType = EMarkerDefaultShapes.HTRIANGLE;
+			}
+
+			if (marker1Style.dropdownMarkerType === EMarkerDefaultShapes.HTRIANGLE && !this.isHorizontalChart) {
+				this.markerSettings.marker1Style.dropdownMarkerType = EMarkerDefaultShapes.VTRIANGLE;
+			}
+		}
+
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE
+			&& marker2Style.markerShape === EMarkerShapeTypes.DEFAULT
+		) {
+			if (marker2Style.dropdownMarkerType === EMarkerDefaultShapes.VTRIANGLE && this.isHorizontalChart) {
+				this.markerSettings.marker2Style.dropdownMarkerType = EMarkerDefaultShapes.HTRIANGLE;
+			}
+
+			if (marker2Style.dropdownMarkerType === EMarkerDefaultShapes.HTRIANGLE && !this.isHorizontalChart) {
+				this.markerSettings.marker2Style.dropdownMarkerType = EMarkerDefaultShapes.VTRIANGLE;
+			}
+		}
+
 		if (!this.xAxisSettings.show) {
 			this.xAxisSettings.isDisplayLabel = false;
 			this.xAxisSettings.isDisplayTitle = false;
@@ -4273,9 +4300,6 @@ export class Visual extends Shadow {
 		if (this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && this.isLollipopTypePie) {
 			this.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.FirstToLast;
 		}
-
-		const marker1Style = this.markerSettings.marker1Style;
-		const marker2Style = this.markerSettings.marker2Style;
 
 		if (marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT) {
 			marker1Style.isShowMarkerOutline = false;
