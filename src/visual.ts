@@ -6009,7 +6009,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: (typeof value.category === "string" ? value.category.toUpperCase() : value.category).replace(/--\d+/g, ''),
+					value: this.getTooltipCategoryText(value.category),
 					color: "transparent",
 				},
 				{
@@ -6299,7 +6299,7 @@ export class Visual extends Shadow {
 				}
 
 				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart) {
-					if (xAxisSettings.isAutoDateFormat) {
+					if (!xAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
 					} else {
 						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
@@ -6414,7 +6414,7 @@ export class Visual extends Shadow {
 				}
 
 				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
-					if (yAxisSettings.isAutoDateFormat) {
+					if (!yAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
 					} else {
 						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
@@ -8624,6 +8624,24 @@ export class Visual extends Shadow {
 		}
 	}
 
+	getTooltipCategoryText(text: string): string {
+		if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart) {
+			if (!this.xAxisSettings.isAutoDateFormat) {
+				return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
+			} else {
+				return FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+			}
+		} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart) {
+			if (!this.yAxisSettings.isAutoDateFormat) {
+				return FormatAxisDate(this.yAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.yAxisSettings.customDateFormat : this.yAxisSettings.dateFormat, text);
+			} else {
+				return FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+			}
+		} else {
+			return (typeof text === "string" ? text.toUpperCase() : text).replace(/--\d+/g, '');
+		}
+	}
+
 	enterPieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
 		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
 		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
@@ -8698,7 +8716,7 @@ export class Visual extends Shadow {
 					const tooltipData: TooltipData[] = [
 						{
 							displayName: this.categoryDisplayName,
-							value: pieData.parentCategory,
+							value: this.getTooltipCategoryText(pieData.parentCategory),
 							color: "transparent",
 						},
 						{

@@ -537,7 +537,7 @@ const UIXAxis = (
           <ConditionalWrapper visible={!xConfigValues.isAutoDateFormat}>
             <Row appearance="padded">
               <Column>
-                <Row>
+                <Row disableTopPadding>
                   <Column>
                     <SelectInput
                       label={"Date Format"}
@@ -1066,10 +1066,10 @@ const UIYAxis = (
             </Column>
           </Row>
 
-          <ConditionalWrapper visible={yConfigValues.isAutoDateFormat}>
+          <ConditionalWrapper visible={!yConfigValues.isAutoDateFormat}>
             <Row appearance="padded">
               <Column>
-                <Row>
+                <Row disableTopPadding>
                   <Column>
                     <SelectInput
                       label={"Date Format"}
