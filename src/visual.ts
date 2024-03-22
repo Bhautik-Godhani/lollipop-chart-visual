@@ -4725,13 +4725,8 @@ export class Visual extends Shadow {
 				this.isVerticalBrushDisplayed = false;
 				this.brushG.selectAll("*").remove();
 
-				console.log("called");
-
-
 				const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[this.smallMultiplesGridItemId];
-				(this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", () => {
-					console.log("agagag");
-				});
+				(this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", undefined);
 			}
 		}
 	}
