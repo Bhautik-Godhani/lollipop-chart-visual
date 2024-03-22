@@ -3728,6 +3728,15 @@ export class Visual extends Shadow {
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 			}));
 
+		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+			const elementToMove = this.categoryPatterns.find(obj => obj.name.includes(this.othersLabel));
+			if (elementToMove) {
+				const index = this.categoryPatterns.findIndex(obj => obj.name.includes(this.othersLabel));
+				this.categoryPatterns.splice(index, 1);
+				this.categoryPatterns.push(elementToMove);
+			}
+		}
+
 		this.measuresPatterns = this.measureNames
 			.map((d) => {
 				const pattern = this.patternSettings.measuresPatterns.find((p) => p.name === d);
