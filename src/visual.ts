@@ -8998,6 +8998,15 @@ export class Visual extends Shadow {
 			});
 		}
 
+		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+			const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+			if (elementToMove) {
+				const index = seedDataFromVisual.findIndex(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+				seedDataFromVisual.splice(index, elementToMove.length);
+				seedDataFromVisual.push(...elementToMove);
+			}
+		}
+
 		this.summaryTableConfig = {
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
 			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
