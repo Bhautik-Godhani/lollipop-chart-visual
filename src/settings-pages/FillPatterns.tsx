@@ -209,17 +209,21 @@ const FillPatterns = (props) => {
 				</ConditionalWrapper>
 
 				<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
-					{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
-						UICategoryPatterns(shadow, configValues, setConfigValues)
-					)}
+					<Row classNames={["normal-text-overflow"]}>
+						<Column>
+							{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
+								UICategoryPatterns(shadow, configValues, setConfigValues)
+							)}
 
-					{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
-						UISubCategoryPatterns(shadow, configValues, setConfigValues)
-					)}
+							{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
+								UISubCategoryPatterns(shadow, configValues, setConfigValues)
+							)}
 
-					{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
-						UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-					)}
+							{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
+								UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+							)}
+						</Column>
+					</Row>
 				</ConditionalWrapper>
 
 				{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}

@@ -210,7 +210,7 @@ const UIByCategoryColorPalette = (
 				const categoryName = textMeasurementService.getTailoredTextOrDefault(categoryNameProperties, 170);
 
 				return (
-					<Row>
+					<Row classNames={["normal-text-overflow"]}>
 						<Column>
 							<ColorPicker
 								label={categoryName}
