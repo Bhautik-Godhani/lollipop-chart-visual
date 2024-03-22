@@ -2646,29 +2646,35 @@ export class Visual extends Shadow {
 
 				this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-				if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
-					this.drawXYAxis(true, true);
+				// if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
+				this.drawXYAxis(true, true);
 
-					if (this.categoricalCategoriesLastIndex > 0) {
-						if (!this.isHorizontalChart) {
-							RenderExpandAllXAxis(this, this.categoricalData);
-						} else {
-							RenderExpandAllYAxis(this, this.categoricalData);
-						}
-					}
-
-					this.displayBrush(true, true, true, true);
-				} else {
-					this.drawXYAxis(true, true);
-
-					if (this.categoricalCategoriesLastIndex > 0) {
-						if (!this.isHorizontalChart) {
-							RenderExpandAllXAxis(this, this.categoricalData);
-						} else {
-							RenderExpandAllYAxis(this, this.categoricalData);
-						}
+				if (this.categoricalCategoriesLastIndex > 0) {
+					if (!this.isHorizontalChart) {
+						RenderExpandAllXAxis(this, this.categoricalData);
+					} else {
+						RenderExpandAllYAxis(this, this.categoricalData);
 					}
 				}
+
+				if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
+					this.displayBrush(true, true, true, true);
+				} else {
+					d3.select(this.hostContainer).on("wheel", undefined);
+					const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[this.smallMultiplesGridItemId];
+					(this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", undefined);
+				}
+				// } else {
+				// 	this.drawXYAxis(true, true);
+
+				// 	if (this.categoricalCategoriesLastIndex > 0) {
+				// 		if (!this.isHorizontalChart) {
+				// 			RenderExpandAllXAxis(this, this.categoricalData);
+				// 		} else {
+				// 			RenderExpandAllYAxis(this, this.categoricalData);
+				// 		}
+				// 	}
+				// }
 
 				if (this.isExpandAllApplied) {
 					if (!this.isHorizontalChart) {
@@ -4685,6 +4691,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.brushG.selectAll("*").remove();
+				d3.select(this.hostContainer).on("wheel", undefined);
 			}
 		} else {
 			const newWidth = (this.brushScaleBandBandwidth * this.width) / this.brushScaleBand.bandwidth();
@@ -4717,6 +4724,14 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.brushG.selectAll("*").remove();
+
+				console.log("called");
+
+
+				const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[this.smallMultiplesGridItemId];
+				(this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", () => {
+					console.log("agagag");
+				});
 			}
 		}
 	}
@@ -4725,6 +4740,7 @@ export class Visual extends Shadow {
 		categoricalData = JSON.parse(JSON.stringify(categoricalData));
 		const yScaleDomain = this.brushScaleBand.domain();
 		this.brushScaleBand.range(this.yScale.range());
+		let isBrushRendered: boolean = false;
 
 		categoricalData.categories.forEach((d, i) => {
 			if (i < categoricalData.categories.length - 1) {
@@ -4789,7 +4805,10 @@ export class Visual extends Shadow {
 				this.setChartData(categoricalData2);
 
 				this.initAndRenderLollipopChart(this.width * this.yAxisTicksMaxWidthRatio, true, true);
+
+				isBrushRendered = true;
 			} else {
+				isBrushRendered = false;
 				this.isScrollBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
@@ -4829,38 +4848,40 @@ export class Visual extends Shadow {
 		}
 
 		const scrolled = false;
-		d3.select(this.hostContainer).on("wheel", (event, d) => {
-			if (!scrolled) {
-				// scrolled = true;
-				const prevExtent = d3.brushSelection(this.brushG.node() as any);
-				const direction = event.wheelDelta < 0 ? 'down' : 'up';
-				const isBottomDirection = direction === "down";
-				if (this.isHorizontalChart) {
-					if (isBottomDirection) {
-						if (prevExtent![1] as number < this.height) {
-							if ((+prevExtent![1] + heightByExpectedBar) <= this.height) {
-								this.brushG
-									.call(brush.move as any, [+prevExtent![0] + (heightByExpectedBar / expectedBar), +prevExtent![1] + (heightByExpectedBar / expectedBar)]);
-							} else {
-								this.brushG
-									.call(brush.move as any, [this.height - heightByExpectedBar, this.height]);
+		if (this.isScrollBrushDisplayed && isBrushRendered) {
+			d3.select(this.hostContainer).on("wheel", (event, d) => {
+				if (!scrolled && isBrushRendered) {
+					// scrolled = true;
+					const prevExtent = d3.brushSelection(this.brushG.node() as any);
+					const direction = event.wheelDelta < 0 ? 'down' : 'up';
+					const isBottomDirection = direction === "down";
+					if (this.isHorizontalChart) {
+						if (isBottomDirection) {
+							if (prevExtent![1] as number < this.height) {
+								if ((+prevExtent![1] + heightByExpectedBar) <= this.height) {
+									this.brushG
+										.call(brush.move as any, [+prevExtent![0] + (heightByExpectedBar / expectedBar), +prevExtent![1] + (heightByExpectedBar / expectedBar)]);
+								} else {
+									this.brushG
+										.call(brush.move as any, [this.height - heightByExpectedBar, this.height]);
+								}
 							}
-						}
-					} else {
-						if (prevExtent![0] as number > 0) {
-							if (((+prevExtent![0] - heightByExpectedBar) >= 0) && ((+prevExtent![1] - heightByExpectedBar) >= 0)) {
-								this.brushG
-									.call(brush.move as any, [+prevExtent![0] - (heightByExpectedBar / expectedBar), +prevExtent![1] - (heightByExpectedBar / expectedBar)]);
-							} else {
-								this.brushG
-									.call(brush.move as any, [0, heightByExpectedBar]);
+						} else {
+							if (prevExtent![0] as number > 0) {
+								if (((+prevExtent![0] - heightByExpectedBar) >= 0) && ((+prevExtent![1] - heightByExpectedBar) >= 0)) {
+									this.brushG
+										.call(brush.move as any, [+prevExtent![0] - (heightByExpectedBar / expectedBar), +prevExtent![1] - (heightByExpectedBar / expectedBar)]);
+								} else {
+									this.brushG
+										.call(brush.move as any, [0, heightByExpectedBar]);
+								}
 							}
 						}
 					}
+					// setTimeout(() => { scrolled = false; });
 				}
-				// setTimeout(() => { scrolled = false; });
-			}
-		});
+			});
+		}
 
 		this.brushG.select(".overlay")
 			.attr("fill", this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaSettings.trackBackgroundColor : BRUSH_AND_ZOOM_AREA_SETTINGS.trackBackgroundColor)
@@ -4920,6 +4941,7 @@ export class Visual extends Shadow {
 		const totalBarsCount: number = config.totalBarsCount;
 		const scaleWidth: number = config.scaleWidth;
 		let categoricalData: any = JSON.parse(JSON.stringify(config.categoricalData));
+		let isBrushRendered: boolean = false;
 
 		let brushG: SVGElement = config.brushG;
 
@@ -5012,7 +5034,10 @@ export class Visual extends Shadow {
 				} else {
 					this.initAndRenderLollipopChart(scaleWidth, config.isShowXAxis, config.isShowYAxis);
 				}
+
+				isBrushRendered = true;
 			} else {
+				isBrushRendered = false;
 				this.isScrollBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
@@ -5043,40 +5068,45 @@ export class Visual extends Shadow {
 
 		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 
-		const scrolled = false;
-		(self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
-			if (!scrolled) {
-				// scrolled = true;
-				const prevExtent = d3.brushSelection(brushG as any);
-				const direction = event.wheelDelta < 0 ? 'down' : 'up';
-				const isRightDirection = direction === "up";
-				if (!self.isHorizontalChart) {
-					const movableWidth = widthByExpectedBar / 2;
-					if (isRightDirection) {
-						if (prevExtent![1] as number < scaleWidth) {
-							if ((+prevExtent![1] + movableWidth) <= scaleWidth) {
-								d3.select(brushG)
-									.call(brush.move as any, [+prevExtent![0] + movableWidth, +prevExtent![1] + movableWidth]);
-							} else {
-								d3.select(brushG)
-									.call(brush.move as any, [scaleWidth - widthByExpectedBar, scaleWidth]);
+		console.log(isBrushRendered);
+
+
+		let scrolled = false;
+		if (this.isScrollBrushDisplayed && isBrushRendered) {
+			(self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
+				if (!scrolled && isBrushRendered) {
+					scrolled = true;
+					const prevExtent = d3.brushSelection(brushG as any);
+					const direction = event.wheelDelta < 0 ? 'down' : 'up';
+					const isRightDirection = direction === "up";
+					if (!self.isHorizontalChart) {
+						const movableWidth = widthByExpectedBar / 2;
+						if (isRightDirection) {
+							if (prevExtent![1] as number < scaleWidth) {
+								if ((+prevExtent![1] + movableWidth) <= scaleWidth) {
+									d3.select(brushG)
+										.call(brush.move as any, [+prevExtent![0] + movableWidth, +prevExtent![1] + movableWidth]);
+								} else {
+									d3.select(brushG)
+										.call(brush.move as any, [scaleWidth - widthByExpectedBar, scaleWidth]);
+								}
 							}
-						}
-					} else {
-						if (prevExtent![0] as number > 0) {
-							if (((+prevExtent![0] - movableWidth) >= 0) && ((+prevExtent![1] - movableWidth) >= 0)) {
-								d3.select(brushG)
-									.call(brush.move as any, [+prevExtent![0] - movableWidth, +prevExtent![1] - movableWidth]);
-							} else {
-								d3.select(brushG)
-									.call(brush.move as any, [0, widthByExpectedBar]);
+						} else {
+							if (prevExtent![0] as number > 0) {
+								if (((+prevExtent![0] - movableWidth) >= 0) && ((+prevExtent![1] - movableWidth) >= 0)) {
+									d3.select(brushG)
+										.call(brush.move as any, [+prevExtent![0] - movableWidth, +prevExtent![1] - movableWidth]);
+								} else {
+									d3.select(brushG)
+										.call(brush.move as any, [0, widthByExpectedBar]);
+								}
 							}
 						}
 					}
+					setTimeout(() => { scrolled = false; });
 				}
-				// setTimeout(() => { scrolled = false; });
-			}
-		});
+			});
+		}
 
 		if (config.isShowHorizontalBrush) {
 			if (this.brushAndZoomAreaSettings.enabled) {
