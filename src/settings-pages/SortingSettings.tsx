@@ -345,7 +345,7 @@ const SortingSettings = (props) => {
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
 			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 		}
-	}, []);
+	}, [configValues.category.sortBy]);
 
 	return (
 		<>
