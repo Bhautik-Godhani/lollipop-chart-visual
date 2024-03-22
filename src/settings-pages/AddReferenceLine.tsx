@@ -291,6 +291,15 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     }));
   }
 
+  if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
+    const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
+    if (elementToMove) {
+      const index = categoriesNameList.findIndex(obj => obj.value.includes(shadow.othersLabel));
+      categoriesNameList.splice(index, 1);
+      categoriesNameList.push(elementToMove);
+    }
+  }
+
   return <>
     <Row>
       <Column>
@@ -799,6 +808,15 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       label: d as string,
       value: d as string
     }));
+  }
+
+  if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
+    const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
+    if (elementToMove) {
+      const index = categoriesNameList.findIndex(obj => obj.value.includes(shadow.othersLabel));
+      categoriesNameList.splice(index, 1);
+      categoriesNameList.push(elementToMove);
+    }
   }
 
   return <>
