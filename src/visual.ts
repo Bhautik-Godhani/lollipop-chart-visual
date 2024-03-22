@@ -1818,6 +1818,13 @@ export class Visual extends Shadow {
 		// 		});
 		// }
 
+		const min = d3.min(this.categoricalData.values, d => d3.min(d.values, v => <number>v));
+		const max = d3.max(this.categoricalData.values, d => d3.max(d.values, v => <number>v));
+
+		if (!this.dataColorsSettings.isFillTypeChanged && min < 0 && max > 0 && !this.isIBCSEnabled) {
+			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
+		}
+
 		const dataLength = categoricalData.categories[this.categoricalCategoriesLastIndex].values.length;
 
 		this.setBrushScaleBandDomain(categoricalData);
@@ -6927,9 +6934,9 @@ export class Visual extends Shadow {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
-		if (!this.isSmallMultiplesEnabled && !this.dataColorsSettings.isFillTypeChanged && this.minCategoryValueDataPair.value < 0 && this.maxCategoryValueDataPair.value > 0 && !this.isIBCSEnabled) {
-			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
-		}
+		// if (!this.dataColorsSettings.isFillTypeChanged && this.minCategoryValueDataPair.value < 0 && this.maxCategoryValueDataPair.value > 0 && !this.isIBCSEnabled) {
+		// 	this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
+		// }
 
 		if (this.isHorizontalChart) {
 			const xScaleCopy = this.xScale.copy();
@@ -8996,6 +9003,15 @@ export class Visual extends Shadow {
 					seedDataFromVisual.push(obj);
 				});
 			});
+		}
+
+		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+			const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+			if (elementToMove) {
+				const index = seedDataFromVisual.findIndex(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+				seedDataFromVisual.splice(index, elementToMove.length);
+				seedDataFromVisual.push(...elementToMove);
+			}
 		}
 
 		this.summaryTableConfig = {
