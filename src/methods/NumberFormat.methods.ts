@@ -7,6 +7,7 @@ import { NumberFormatting } from "../settings";
 export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, number: number, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
     let formattedNumber: string;
     const numberSettings = numberFormatting;
+    const isScaling = numberSettings.scalingLabel;
     const isSemanticFormat = isUseSematicFormat ? numberSettings.semanticFormatting : false;
 
     if (number < 0) {
@@ -14,25 +15,25 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e3).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.thousandScalingLabel
+                (isScaling ? numberSettings.thousandScalingLabel : "K")
             );
         } else if (number < -1.0e6 && number >= -1.0e9) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e6).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.millionScalingLabel
+                (isScaling ? numberSettings.millionScalingLabel : "M")
             );
         } else if (number < -1.0e9 && number >= -1.0e12) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e9).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.billionScalingLabel
+                (isScaling ? numberSettings.billionScalingLabel : "B")
             );
         } else if (number < -1.0e12) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e12).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.trillionScalingLabel
+                (isScaling ? numberSettings.trillionScalingLabel : "T")
             );
         } else {
             formattedNumber = DecimalSeparator(numberFormatting, +number.toFixed(numberSettings.decimalPlaces));
@@ -45,25 +46,25 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e3).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.thousandScalingLabel
+                (isScaling ? numberSettings.thousandScalingLabel : "K")
             );
         } else if (number > 1.0e6 && number <= 1.0e9) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e6).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.millionScalingLabel
+                (isScaling ? numberSettings.millionScalingLabel : "M")
             );
         } else if (number > 1.0e9 && number <= 1.0e12) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e9).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.billionScalingLabel
+                (isScaling ? numberSettings.billionScalingLabel : "B")
             );
         } else if (number > 1.0e12) {
             formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e12).toFixed(numberSettings.decimalPlaces));
             return (
                 (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
-                numberSettings.trillionScalingLabel
+                (isScaling ? numberSettings.trillionScalingLabel : "T")
             );
         } else {
             formattedNumber = DecimalSeparator(numberFormatting, +number.toFixed(numberSettings.decimalPlaces));

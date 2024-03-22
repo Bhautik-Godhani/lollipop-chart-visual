@@ -671,7 +671,7 @@ const UINumberFormatting = (
         <Row>
           <Column>
             <ToggleButton
-              label="Customize Styling"
+              label="Customize Scaling"
               value={numberFormatting.scalingLabel}
               handleChange={(value) => handleNumberFormattingChange(value, EAxisNumberFormatting.ScalingLabel, setConfigValues)}
             />
