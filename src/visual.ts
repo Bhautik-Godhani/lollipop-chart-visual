@@ -166,7 +166,7 @@ import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
 import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
-import { RenderRaceChartDataLabel, RenderRaceTickerButton, UpdateTickerButton } from "./methods/RaceChart.methods";
+import { RenderRaceChartDataLabel, RenderRaceTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
 import ErrorBarsSettings from "./settings-pages/ErrorBarsSettings";
 import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
@@ -2777,11 +2777,11 @@ export class Visual extends Shadow {
 
 				if (this.isChartIsRaceChart) {
 					RenderRaceChartDataLabel(this);
-					if (!this.isTickerButtonDrawn) {
-						RenderRaceTickerButton(this);
-					} else {
-						UpdateTickerButton(this);
-					}
+					// if (!this.isTickerButtonDrawn) {
+					RenderRaceTickerButton(this);
+					// } else {
+					// 	UpdateTickerButton(this);
+					// }
 				} else {
 					if (this.tickerButtonG) {
 						this.tickerButtonG.selectAll("*").remove();
@@ -6033,7 +6033,7 @@ export class Visual extends Shadow {
 			value.tooltipFields.forEach((data, i: number) => {
 				tooltipData.push({
 					displayName: data.displayName,
-					value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
+					value: value.category === this.othersBarText ? this.othersBarText : typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
 					color: data.color ? data.color : "transparent",
 				});
 			});

@@ -1,6 +1,6 @@
 import { EFontStyle, EHighContrastColorType, EPlayPauseButton, Position } from '../enum';
 import { Visual } from '../visual';
-import { interval, min, select, sum } from "d3";
+import { interval, max, min, select, sum } from "d3";
 
 export const StartChartRace = (self: Visual) => {
     if (self.ticker) {
@@ -111,15 +111,27 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
     const textBBox = self.raceChartDataLabelText.node().getBBox();
     const tickerButtonRadius = GetTickerButtonRadius(self);
 
+    self.raceChartContainerG
+        .attr(
+            "transform",
+            "translate(" +
+            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width) +
+            "," +
+            (self.raceChartSettings.placement === Position.Bottom ?
+                (self.height - (textBBox.height + tickerButtonRadius * 2 + 20)) :
+                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
+            ")"
+        )
+
     self.raceChartDataLabelText
         .attr(
             "transform",
             "translate(" +
-            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right - textBBox.width / 2) +
+            (self.margin.right - max([textBBox.width / 2, tickerButtonRadius])) +
             "," +
             (self.raceChartSettings.placement === Position.Bottom ?
-                (self.height - textBBox.height) :
-                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
+                (tickerButtonRadius * 2 + 20) :
+                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 20)) +
             ")"
         )
 
@@ -136,6 +148,7 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
 }
 
 export const RenderRaceTickerButton = (self: Visual): void => {
+    self.tickerButtonG.selectAll("*").remove();
     const raceBarDateLabelTextBBox = (self.raceChartDataLabelText.node() as SVGSVGElement).getBBox();
     const tickerButtonRadius = GetTickerButtonRadius(self);
     const tickerButton = self.tickerButtonG
@@ -143,15 +156,11 @@ export const RenderRaceTickerButton = (self: Visual): void => {
         .attr(
             "transform",
             "translate(" +
-            (self.viewPortWidth -
-                self.settingsBtnWidth -
-                self.legendViewPort.width -
-                raceBarDateLabelTextBBox.width / 2
-            ) +
+            (-max([raceBarDateLabelTextBBox.width / 2, tickerButtonRadius])) +
             "," +
             (self.raceChartSettings.placement === Position.Bottom ?
-                (self.height - tickerButtonRadius * 2 - raceBarDateLabelTextBBox.height) :
-                (self.margin.top + tickerButtonRadius + 10)) +
+                (0) :
+                (self.margin.top + tickerButtonRadius)) +
             ")"
         )
         .on("click", () => {
@@ -201,30 +210,4 @@ export const RenderTickerButtonPlayPausePath = (self: Visual, buttonType: EPlayP
                 ? "translate(-8.203125, -10.9375) scale(0.01220703125)"
                 : "translate(-9.5703125, -10.9375) scale(0.042724609375)"
         );
-}
-
-export const UpdateTickerButton = (self: Visual): void => {
-    const raceDateLabelTextBBox = (self.raceChartDataLabelText.node() as SVGSVGElement).getBBox();
-    const tickerButtonRadius = GetTickerButtonRadius(self);
-    self.tickerButtonG
-        .attr("id", "tickerButton")
-        .attr(
-            "transform",
-            "translate(" +
-            (self.viewPortWidth -
-                self.settingsBtnWidth -
-                self.legendViewPort.width -
-                raceDateLabelTextBBox.width / 2
-            ) +
-            "," +
-            (self.raceChartSettings.placement === Position.Bottom ?
-                (self.height - tickerButtonRadius * 2 - raceDateLabelTextBBox.height) :
-                (self.margin.top + tickerButtonRadius + 10)) +
-            ")"
-        );
-
-    self.tickerButtonG
-        .select("#tickerCircle")
-        .attr("r", tickerButtonRadius)
-        .attr("fill", self.raceChartSettings.tickerButtonColor);
 }
