@@ -60,7 +60,7 @@ export const SetExpandAllXAxisTickStyle = (self: Visual) => {
 			.attr("font-size", labelFontSize)
 			.attr("display", isDisplayLabel ? "block" : "none")
 			.each((d: string, i, nodes) => {
-				d = d.split("--")[0];
+				d = d.toString().split("--")[0];
 
 				const textProperties: TextProperties = {
 					text: d,
