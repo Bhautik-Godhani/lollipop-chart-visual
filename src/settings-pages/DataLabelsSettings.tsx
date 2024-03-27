@@ -1,8 +1,8 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
-import { EInsideTextColorTypes, IChartSettings, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsMeasureTypes, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { EInsideTextColorTypes, IChartSettings, IDataLabelsProps, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
 	Column,
@@ -67,29 +67,30 @@ const APPLY_FOR_OPTIONS: ILabelValuePair[] = [
 	},
 ];
 
-const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
+const handleChange = (val, n, type: EDataLabelsMeasureTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[n]: val,
+		[type]: { ...d[type], [n]: val }
 	}));
 };
 
-const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
+const handleColor = (rgb, n, type: EDataLabelsMeasureTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[n]: rgb,
+		[type]: { ...d[type], [n]: rgb }
 	}));
 };
 
-const handleCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
+const handleCheckbox = (n, type: EDataLabelsMeasureTypes, setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
-		[n]: !d[n],
+		[type]: { ...d[type], [n]: !d[type][n] }
 	}));
 };
 
 const UIDataLabelsFontFamilyAndStyle = (
-	configValues: IDataLabelsSettings,
+	selectedMeasure: EDataLabelsMeasureTypes,
+	configValues: IDataLabelsProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
 	return (
@@ -101,7 +102,7 @@ const UIDataLabelsFontFamilyAndStyle = (
 						value={configValues.fontFamily}
 						isFontSelector={true}
 						optionsList={[]}
-						handleChange={(value) => handleChange(value, EDataLabelsSettings.fontFamily, setConfigValues)}
+						handleChange={(value) => handleChange(value, EDataLabelsSettings.fontFamily, selectedMeasure, setConfigValues)}
 					/>
 				</Column>
 			</Row>
@@ -125,7 +126,7 @@ const UIDataLabelsFontFamilyAndStyle = (
 							},
 						]}
 						isMultiple
-						handleChange={(value) => handleChange(value, EDataLabelsSettings.fontStyle, setConfigValues)}
+						handleChange={(value) => handleChange(value, EDataLabelsSettings.fontStyle, selectedMeasure, setConfigValues)}
 					/>
 				</Column>
 			</Row>
@@ -136,12 +137,34 @@ const UIDataLabelsFontFamilyAndStyle = (
 const UIDataLabelsFontSettings = (
 	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
-	chartSettings: IChartSettings,
-	configValues: IDataLabelsSettings,
+	selectedMeasure: EDataLabelsMeasureTypes,
+	configValues: IDataLabelsProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
 	return (
 		<>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Best Fit Labels"}
+						value={configValues.isShowBestFitLabels}
+						handleChange={() => handleCheckbox(EDataLabelsSettings.isShowBestFitLabels, selectedMeasure, setConfigValues)}
+						appearance="checkbox"
+					/>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
+					<SwitchOption
+						label={"Placement"}
+						value={configValues.placement}
+						optionsList={LABEL_PLACEMENTS}
+						handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, selectedMeasure, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+
 			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
 				<Row appearance="padded">
 					<Column>
@@ -150,7 +173,7 @@ const UIDataLabelsFontSettings = (
 							type="number"
 							label="Font Size"
 							value={configValues.fontSize}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, setConfigValues)}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, selectedMeasure, setConfigValues)}
 						/>
 					</Column>
 
@@ -158,7 +181,7 @@ const UIDataLabelsFontSettings = (
 						<ColorPicker
 							label="Text Color"
 							color={configValues.color}
-							handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+							handleChange={(value) => handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
 						/>
 					</Column>
@@ -174,7 +197,7 @@ const UIDataLabelsFontSettings = (
 							<ToggleButton
 								label={"Auto Font Size"}
 								value={configValues.isAutoFontSize}
-								handleChange={(value) => handleChange(value, EDataLabelsSettings.isAutoFontSize, setConfigValues)}
+								handleChange={(value) => handleChange(value, EDataLabelsSettings.isAutoFontSize, selectedMeasure, setConfigValues)}
 								appearance="toggle"
 							/>
 						</Column>
@@ -192,7 +215,7 @@ const UIDataLabelsFontSettings = (
 									type="number"
 									label="Font Size"
 									value={configValues.fontSize}
-									handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, setConfigValues)}
+									handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, selectedMeasure, setConfigValues)}
 								/>
 							</Column>
 							<Column>
@@ -200,7 +223,7 @@ const UIDataLabelsFontSettings = (
 									<ColorPicker
 										label="Font Color"
 										color={configValues.color}
-										handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+										handleChange={(value) => handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues)}
 										colorPalette={vizOptions.host.colorPalette}
 									/>
 								</ConditionalWrapper>
@@ -214,7 +237,7 @@ const UIDataLabelsFontSettings = (
 								<ColorPicker
 									label="Font Color"
 									color={configValues.color}
-									handleChange={(value) => handleColor(value, EDataLabelsSettings.color, setConfigValues)}
+									handleChange={(value) => handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues)}
 									colorPalette={vizOptions.host.colorPalette}
 								/>
 							</Column>
@@ -246,10 +269,10 @@ const UIDataLabelsFontSettings = (
 				</Row>
 			</ConditionalWrapper> */}
 
-			{UIDataLabelsFontFamilyAndStyle(configValues, setConfigValues)}
+			{UIDataLabelsFontFamilyAndStyle(selectedMeasure, configValues, setConfigValues)}
 
 			<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Inside && shadow.isLollipopTypeCircle}>
-				{UIInsideLabelsTextColorSettings(shadow, vizOptions, configValues, setConfigValues)}
+				{UIInsideLabelsTextColorSettings(shadow, vizOptions, selectedMeasure, configValues, setConfigValues)}
 			</ConditionalWrapper>
 		</>
 	);
@@ -258,8 +281,8 @@ const UIDataLabelsFontSettings = (
 const UICircleLollipopLabelsSettings = (
 	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
-	chartSettings: IChartSettings,
-	configValues: IDataLabelsSettings,
+	selectedMeasure: EDataLabelsMeasureTypes,
+	configValues: IDataLabelsProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
 	return (<>
@@ -283,7 +306,7 @@ const UICircleLollipopLabelsSettings = (
 					<ToggleButton
 						label={"Show Labels Below Reference Line"}
 						value={configValues.showLabelsBelowReferenceLine}
-						handleChange={() => handleCheckbox(EDataLabelsSettings.showLabelsBelowReferenceLine, setConfigValues)}
+						handleChange={() => handleCheckbox(EDataLabelsSettings.showLabelsBelowReferenceLine, selectedMeasure, setConfigValues)}
 						appearance="checkbox"
 					/>
 				</Column>
@@ -297,8 +320,8 @@ const UICircleLollipopLabelsSettings = (
 						label={"Enable Background"}
 						value={configValues.showBackground}
 						handleChange={() => {
-							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
-							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
+							handleCheckbox(EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
+							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 						}}
 						appearance="toggle"
 					/>
@@ -311,7 +334,7 @@ const UICircleLollipopLabelsSettings = (
 						<ColorPicker
 							label="Background Color"
 							color={configValues.backgroundColor}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.backgroundColor, setConfigValues)}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.backgroundColor, selectedMeasure, setConfigValues)}
 							colorPalette={vizOptions.host.colorPalette}
 							size="sm"
 						/>
@@ -326,7 +349,8 @@ const UICircleLollipopLabelsSettings = (
 const UIInsideLabelsTextColorSettings = (
 	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
-	insideDataLabels: IDataLabelsSettings,
+	selectedMeasure: EDataLabelsMeasureTypes,
+	insideDataLabels: IDataLabelsProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
 	return <>
@@ -337,8 +361,8 @@ const UIInsideLabelsTextColorSettings = (
 					value={insideDataLabels.textColorTypes}
 					optionsList={INSIDE_TEXT_COLOR_TYPES}
 					handleChange={(value) => {
-						handleChange(value, EDataLabelsSettings.textColorTypes, setConfigValues);
-						handleChange(true, EDataLabelsSettings.IsTextColorTypeChanged, setConfigValues);
+						handleChange(value, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
+						handleChange(true, EDataLabelsSettings.IsTextColorTypeChanged, selectedMeasure, setConfigValues);
 					}}
 				/>
 			</Column>
@@ -351,8 +375,8 @@ const UIInsideLabelsTextColorSettings = (
 						label={"Color"}
 						color={insideDataLabels.color}
 						handleChange={(value) => {
-							handleColor(value, EDataLabelsSettings.color, setConfigValues);
-							handleChange(true, EDataLabelsSettings.isColorChanged, setConfigValues);
+							handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+							handleChange(true, EDataLabelsSettings.isColorChanged, selectedMeasure, setConfigValues);
 						}}
 						colorPalette={vizOptions.host.colorPalette}
 						size="sm"
@@ -368,11 +392,11 @@ const UIInsideLabelsTextColorSettings = (
 						label={"Enable Background"}
 						value={insideDataLabels.showBackground}
 						handleChange={() => {
-							handleCheckbox(EDataLabelsSettings.showBackground, setConfigValues);
-							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
+							handleCheckbox(EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
+							handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 
 							if (shadow.isPatternApplied) {
-								handleChange(true, EDataLabelsSettings.isShowBGChangedWhenPatternApplied, setConfigValues)
+								handleChange(true, EDataLabelsSettings.isShowBGChangedWhenPatternApplied, selectedMeasure, setConfigValues)
 							}
 						}}
 						appearance="toggle"
@@ -391,7 +415,7 @@ const UIInsideLabelsTextColorSettings = (
 										value={insideDataLabels.applyFor}
 										optionsList={APPLY_FOR_OPTIONS}
 										width={"full"}
-										handleChange={(value) => handleChange(value, EDataLabelsSettings.applyFor, setConfigValues)}
+										handleChange={(value) => handleChange(value, EDataLabelsSettings.applyFor, selectedMeasure, setConfigValues)}
 									/>
 								</Column>
 							</Row>
@@ -401,7 +425,7 @@ const UIInsideLabelsTextColorSettings = (
 									<ColorPicker
 										label={"Color"}
 										color={insideDataLabels.backgroundColor}
-										handleChange={(value) => handleColor(value, EDataLabelsSettings.applyFor, setConfigValues)}
+										handleChange={(value) => handleColor(value, EDataLabelsSettings.applyFor, selectedMeasure, setConfigValues)}
 										colorPalette={vizOptions.host.colorPalette}
 										size="sm"
 									/>
@@ -417,7 +441,7 @@ const UIInsideLabelsTextColorSettings = (
 							<ColorPicker
 								label={"Color"}
 								color={insideDataLabels.backgroundColor}
-								handleChange={(value) => handleColor(value, EDataLabelsSettings.backgroundColor, setConfigValues)}
+								handleChange={(value) => handleColor(value, EDataLabelsSettings.backgroundColor, selectedMeasure, setConfigValues)}
 								colorPalette={vizOptions.host.colorPalette}
 								size="sm"
 							/>
@@ -477,6 +501,8 @@ const DataLabelsSettings = (props) => {
 		...initialStates,
 	});
 
+	const [selectedMeasure, setSelectedMeasure] = React.useState<EDataLabelsMeasureTypes>(EDataLabelsMeasureTypes.Measure1);
+
 	const chartSettings: IChartSettings = shadow.chartSettings;
 
 	const dataLabelsSettings: IDataLabelsSettings = JSON.parse(
@@ -505,48 +531,61 @@ const DataLabelsSettings = (props) => {
 	// 	}
 	// }
 
+	const measureConfigValues = configValues[selectedMeasure];
+
 	React.useEffect(() => {
-		if (!dataLabelsSettings.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !configValues.showBackground) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		if (!measureConfigValues.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !measureConfigValues.showBackground) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (!shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
-			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, setConfigValues);
+		if (!shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
+			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 
-		if (shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !configValues.isTextColorTypeChanged) {
-			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, setConfigValues);
+		if (shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
+			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 	}, []);
 
 	React.useEffect(() => {
-		if (configValues.placement === DataLabelsPlacement.Inside && !configValues.isShowBackgroundChange && configValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-			handleChange(true, EDataLabelsSettings.showBackground, setConfigValues);
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Outside && !configValues.isShowBackgroundChange && configValues.showBackground) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-			handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
+		if (measureConfigValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
+			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && configValues.textColorTypes === EInsideTextColorTypes.FIXED) {
-			if (!configValues.isColorChanged) {
-				handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, setConfigValues);
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.FIXED) {
+			if (!measureConfigValues.isColorChanged) {
+				handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 			}
 
-			if (!configValues.isShowBackgroundChange) {
-				handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, setConfigValues);
-				handleChange(false, EDataLabelsSettings.showBackground, setConfigValues);
+			if (!measureConfigValues.isShowBackgroundChange) {
+				handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+				handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 			}
 		}
-	}, [configValues.placement, configValues.textColorTypes]);
+	}, [measureConfigValues.placement, measureConfigValues.textColorTypes]);
+
+	const MEASURE_TYPES: ILabelValuePair[] = [
+		{
+			label: shadow.measure1DisplayName,
+			value: EDataLabelsMeasureTypes.Measure1,
+		},
+		{
+			label: shadow.measure2DisplayName,
+			value: EDataLabelsMeasureTypes.Measure2,
+		},
+	];
 
 	return (
 		<>
@@ -555,36 +594,35 @@ const DataLabelsSettings = (props) => {
 					<ToggleButton
 						label={"Show Data Labels"}
 						value={configValues.show}
-						handleChange={() => handleCheckbox(EDataLabelsSettings.show, setConfigValues)}
+						handleChange={(val) => setConfigValues(d => ({
+							...d,
+							[EDataLabelsSettings.show]: val
+						}))}
 					/>
 				</Column>
 			</Row>
 
 			<ConditionalWrapper visible={configValues.show}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Best Fit Labels"}
-							value={configValues.isShowBestFitLabels}
-							handleChange={() => handleCheckbox(EDataLabelsSettings.isShowBestFitLabels, setConfigValues)}
-							appearance="checkbox"
-						/>
-					</Column>
-				</Row>
+				<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+					<Row>
+						<Column>
+							<SwitchOption
+								label={'Select Measure'}
+								value={selectedMeasure}
+								optionsList={MEASURE_TYPES}
+								handleChange={(value) => setSelectedMeasure(value)}
+							/>
+						</Column>
+					</Row>
 
-				<Row>
-					<Column>
-						<SwitchOption
-							label={"Placement"}
-							value={configValues.placement}
-							optionsList={LABEL_PLACEMENTS}
-							handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, setConfigValues)}
-						/>
-					</Column>
-				</Row>
+					{UIDataLabelsFontSettings(shadow, vizOptions, selectedMeasure, measureConfigValues, setConfigValues)}
+					{UICircleLollipopLabelsSettings(shadow, vizOptions, selectedMeasure, measureConfigValues, setConfigValues)}
+				</ConditionalWrapper>
 
-				{UIDataLabelsFontSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
-				{UICircleLollipopLabelsSettings(shadow, vizOptions, chartSettings, configValues, setConfigValues)}
+				<ConditionalWrapper visible={!shadow.isHasMultiMeasure}>
+					{UIDataLabelsFontSettings(shadow, vizOptions, selectedMeasure, configValues.measure1, setConfigValues)}
+					{UICircleLollipopLabelsSettings(shadow, vizOptions, selectedMeasure, configValues.measure1, setConfigValues)}
+				</ConditionalWrapper>
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}

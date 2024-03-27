@@ -587,6 +587,11 @@ export enum EMarkerColorTypes {
 	Marker2 = "marker2Color",
 }
 
+export enum EDataLabelsMeasureTypes {
+	Measure1 = "measure1",
+	Measure2 = "measure2",
+}
+
 export enum EFontStyle {
 	Bold = "bold",
 	Italic = "italic",

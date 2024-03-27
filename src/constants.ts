@@ -134,8 +134,7 @@ export const LINE_SETTINGS: ILineSettings = {
 	isApplyMarkerColor: false
 };
 
-export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
-	show: true,
+const dataLabelsProps = {
 	color: "rgba(93, 93, 93, 1)",
 	borderColor: "rgba(255, 255, 255,1)",
 	borderWidth: 1,
@@ -155,6 +154,12 @@ export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	isShowBestFitLabels: true,
 	isTextColorTypeChanged: false,
 	isShowBackgroundChange: false
+};
+
+export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
+	show: true,
+	measure1: dataLabelsProps,
+	measure2: dataLabelsProps
 };
 
 export const X_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {

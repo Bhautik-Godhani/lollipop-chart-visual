@@ -105,6 +105,7 @@ import {
 	IConditionalFormattingProps,
 	ICutAndClipAxisSettings,
 	IDataColorsSettings,
+	IDataLabelsProps,
 	IDataLabelsSettings,
 	IDynamicDeviationSettings,
 	IErrorBarsMarker,
@@ -609,6 +610,8 @@ export class Visual extends Shadow {
 	chartSettings: IChartSettings;
 	markerSettings: IMarkerSettings;
 	dataLabelsSettings: IDataLabelsSettings;
+	data1LabelsSettings: IDataLabelsProps;
+	data2LabelsSettings: IDataLabelsProps;
 	xAxisSettings: IXAxisSettings;
 	yAxisSettings: IYAxisSettings;
 	lineSettings: ILineSettings;
@@ -2016,8 +2019,12 @@ export class Visual extends Shadow {
 			this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
 			this.isHasMultiMeasure && this.patternSettings.enabled && this.patternSettings.measuresPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
 
-		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.dataLabelsSettings.isTextColorTypeChanged) {
-			this.dataLabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
+		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
+		}
+
+		if (this.isPatternApplied && this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
 		}
 
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
@@ -2789,6 +2796,7 @@ export class Visual extends Shadow {
 
 					if (this.raceChartDataLabelText) {
 						this.raceChartDataLabelText.text("");
+						this.raceChartDataLabelG.selectAll(".label-shadow").remove();
 					}
 
 					this.isTickerButtonDrawn = false;
@@ -4286,12 +4294,19 @@ export class Visual extends Shadow {
 
 		this.schemeColors = JSON.parse(JSON.stringify(this.dataColorsSettings.schemeColors));
 
+		this.data1LabelsSettings = this.dataLabelsSettings.measure1;
+		this.data2LabelsSettings = this.dataLabelsSettings.measure2;
+
 		if (!this.dataColorsSettings.reverse) {
 			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
 		}
 
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.dataLabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.dataLabelsSettings.isTextColorTypeChanged) {
-			this.dataLabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
+		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
+		}
+
+		if (this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
 		this.isBottomXAxis = this.xAxisSettings.position === Position.Bottom;
@@ -5274,30 +5289,31 @@ export class Visual extends Shadow {
 
 	// Data Labels
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
+		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
 		const circleRadius = isData2Label ? this.circle2Size / 2 : this.circle1Size / 2;
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-			return this.dataLabelsSettings.fontSize;
+		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+			return dataLabelsSettings.fontSize;
 		}
-		if (this.dataLabelsSettings.isAutoFontSize) {
+		if (dataLabelsSettings.isAutoFontSize) {
 			const fontSize = circleRadius * 0.7;
-			this.dataLabelsSettings.fontSize = fontSize;
+			dataLabelsSettings.fontSize = fontSize;
 			return fontSize;
 		} else {
-			return this.dataLabelsSettings.fontSize;
+			return dataLabelsSettings.fontSize;
 		}
 	}
 
 	setDataLabelsFormatting(labelSelection: D3Selection<SVGElement>, textSelection: any, isData2Label: boolean = false, labelPlacement: DataLabelsPlacement): void {
-		const dataLabelsSettings = this.dataLabelsSettings;
+		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
 		const key = isData2Label ? "value2" : "value1";
 
-		const isAutoFontColor = this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.AUTO || this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
-		const isAutoBGColor = this.dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
+		const isAutoFontColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.AUTO || dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
+		const isAutoBGColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
 
 		labelSelection
 			.attr("class", "dataLabelG")
 			.attr("display", "block")
-			.attr("opacity", dataLabelsSettings.show ? "1" : "0")
+			.attr("opacity", this.dataLabelsSettings.show ? "1" : "0")
 		// .style("pointer-events", "none");
 
 		textSelection
@@ -5306,15 +5322,15 @@ export class Visual extends Shadow {
 			.attr("dy", "0.35em")
 			.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
 			.style("font-family", dataLabelsSettings.fontFamily)
-			.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
-			.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
-			.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+			.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+			.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+			.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true));
 
 		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
 				.attr("fill", d => {
-					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : this.dataLabelsSettings.color), EHighContrastColorType.Foreground)
+					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color), EHighContrastColorType.Foreground)
 				});
 		} else {
 			textSelection
@@ -5343,11 +5359,11 @@ export class Visual extends Shadow {
 					.attr("dy", "0.35em")
 					.attr("font-size", this.getDataLabelsFontSize(isData2Label))
 					.style("font-family", dataLabelsSettings.fontFamily)
-					.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
-					.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
-					.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+					.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+					.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+					.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 					.attr("stroke", d =>
-						this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+						this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
 					.attr("stroke-width", 3)
 					.attr("stroke-linejoin", "round")
 					.style("text-anchor", "middle")
@@ -5391,10 +5407,10 @@ export class Visual extends Shadow {
 				.attr("dy", "0.35em")
 				.attr("font-size", this.getDataLabelsFontSize(isData2Label))
 				.style("font-family", dataLabelsSettings.fontFamily)
-				.style("text-decoration", this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
-				.style("font-weight", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
-				.style("font-style", this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-				.attr("stroke", this.getColor(this.dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
+				.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+				.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+				.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+				.attr("stroke", this.getColor(dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
 				.attr("stroke-width", 3)
 				.attr("stroke-linejoin", "round")
 				.style("text-anchor", "middle")
@@ -5456,7 +5472,7 @@ export class Visual extends Shadow {
 	}
 
 	transformData1LabelOutside(labelSelection: any, isEnter: boolean): void {
-		const dataLabelsSettings = this.dataLabelsSettings;
+		const dataLabelsSettings = this.data1LabelsSettings;
 		const markerSize = this.isLollipopTypeCircle ? this.circle1Size / 2 : this.pie1Radius;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
@@ -5538,7 +5554,7 @@ export class Visual extends Shadow {
 	}
 
 	transformData2LabelOutside(labelSelection: any, isEnter: boolean): void {
-		const dataLabelsSettings = this.dataLabelsSettings;
+		const dataLabelsSettings = this.data2LabelsSettings;
 		const markerSize = this.isLollipopTypeCircle ? this.circle2Size / 2 : this.pie2Radius;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
@@ -5655,6 +5671,7 @@ export class Visual extends Shadow {
 
 	drawData1Labels(data: ILollipopChartRow[]): void {
 		const THIS = this;
+		const dataLabelsSettings = this.data1LabelsSettings;
 		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
@@ -5671,11 +5688,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = enter.append("g");
 				const textSelection = dataLabelGSelection.append("text");
 
-				if (this.dataLabelsSettings.isShowBestFitLabels) {
+				if (dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -5688,11 +5705,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = update.attr("class", "dataLabelG");
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				if (this.dataLabelsSettings.isShowBestFitLabels) {
+				if (dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -5710,14 +5727,14 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
-				const borderSize = THIS.dataLabelsSettings.showBackground ? 3 : 0;
+				const borderSize = dataLabelsSettings.showBackground ? 3 : 0;
 				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
+						if (dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
 									if (isHideInsideLabel) {
 										if (!isHideOutSideLabel) {
@@ -5753,7 +5770,7 @@ export class Visual extends Shadow {
 									}
 								}
 							} else {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
 									if (isHideInsideLabel) {
 										if (!isHideOutSideLabel) {
@@ -5790,9 +5807,9 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 								if (THIS.isHorizontalChart) {
 									if (THIS.isLeftYAxis) {
 										return d.positions.dataLabel1X < 1 ? 0 : 1;
@@ -5816,6 +5833,7 @@ export class Visual extends Shadow {
 
 	drawData2Labels(data: ILollipopChartRow[]): void {
 		const THIS = this;
+		const dataLabelsSettings = this.data2LabelsSettings;
 		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 
@@ -5832,11 +5850,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = enter.append("g");
 				const textSelection = dataLabelGSelection.append("text");
 
-				if (this.dataLabelsSettings.isShowBestFitLabels) {
+				if (dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -5849,11 +5867,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = update.attr("class", "dataLabelG");
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				if (this.dataLabelsSettings.isShowBestFitLabels) {
+				if (dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -5872,14 +5890,14 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
-				const borderSize = THIS.dataLabelsSettings.showBackground ? 3 : 0;
+				const borderSize = dataLabelsSettings.showBackground ? 3 : 0;
 				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
+						if (dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
 
 									if (isHideInsideLabel) {
@@ -5917,7 +5935,7 @@ export class Visual extends Shadow {
 								}
 							} else {
 								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
 										if (!isHideOutSideLabel) {
 											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
@@ -5953,9 +5971,9 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 								if (THIS.isHorizontalChart) {
 									if (THIS.isLeftYAxis) {
 										return d.positions.dataLabel2X < 1 ? 0 : 1;
@@ -6606,20 +6624,20 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
-		const { fontSize, fontFamily, fontStyle } = this.dataLabelsSettings;
+		const { fontSize, fontFamily, fontStyle } = this.data1LabelsSettings;
 		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
 		const data1Labels = d3.map(this.chartData, d => this.formatNumber(d.value1, this.numberSettings, this.measureNumberFormatter[0], true, true));
 		const data1LabelWidth = getSVGTextSize((data1Labels.find(d => d.length === d3.max(data1Labels, d => d.length))),
-			this.dataLabelsSettings.fontFamily,
-			this.dataLabelsSettings.fontSize,
-			this.dataLabelsSettings.fontStyle[EFontStyle.Bold],
-			this.dataLabelsSettings.fontStyle[EFontStyle.Italic],
-			this.dataLabelsSettings.fontStyle[EFontStyle.UnderLine]).width;
+			fontFamily,
+			fontSize,
+			fontStyle[EFontStyle.Bold],
+			fontStyle[EFontStyle.Italic],
+			fontStyle[EFontStyle.UnderLine]).width;
 
-		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
-		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
-		const outsideDataLabelWidth = (this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth : 0) + this.markerMaxSize;
-		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth + this.markerMaxSize : 0;
+		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
+		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
+		const outsideDataLabelWidth = (this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth : 0) + this.markerMaxSize;
+		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth + this.markerMaxSize : 0;
 
 		if (this.isHorizontalChart) {
 			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth, this.markerMaxSize + outsideDataLabelWidth];
@@ -8454,7 +8472,9 @@ export class Visual extends Shadow {
 
 	getPieDataLabelsFontSize(isPie2: boolean = false): number {
 		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		let autoFontSize = this.dataLabelsSettings.fontSize;
+		const dataLabelsSettings = isPie2 ? this.data2LabelsSettings : this.data1LabelsSettings;
+
+		let autoFontSize = dataLabelsSettings.fontSize;
 		switch (isPie2 ? this.markerSettings.marker2Style.markerChart : this.markerSettings.marker1Style.markerChart) {
 			case EMarkerChartTypes.PIE:
 				autoFontSize = (pieRadius - pieRadius * (this.pieEmphasizeScaleSize / 100)) / 2;
@@ -8469,8 +8489,8 @@ export class Visual extends Shadow {
 				break;
 		}
 
-		if (!this.dataLabelsSettings.isAutoFontSize) {
-			return this.dataLabelsSettings.fontSize;
+		if (!dataLabelsSettings.isAutoFontSize) {
+			return dataLabelsSettings.fontSize;
 		} else {
 			return d3.min([autoFontSize]);
 		}
@@ -8521,6 +8541,7 @@ export class Visual extends Shadow {
 				},
 			],
 		};
+		const dataLabelsSettings = isPie2 ? this.data2LabelsSettings : this.data1LabelsSettings;
 
 		// pieOption.series[0].label = {
 		// 	show: this.dataLabelsSettings.show,
@@ -8538,16 +8559,16 @@ export class Visual extends Shadow {
 		pieOption.series[0].label = {
 			show: false,
 			// show: this.dataLabelsSettings.show && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside,
-			color: this.getColor(this.dataLabelsSettings.color, EHighContrastColorType.Foreground),
-			textBorderColor: this.getColor(this.dataLabelsSettings.borderColor, EHighContrastColorType.Foreground),
-			textBorderWidth: this.dataLabelsSettings.borderWidth,
+			color: this.getColor(dataLabelsSettings.color, EHighContrastColorType.Foreground),
+			textBorderColor: this.getColor(dataLabelsSettings.borderColor, EHighContrastColorType.Foreground),
+			textBorderWidth: dataLabelsSettings.borderWidth,
 			fontSize: this.getPieDataLabelsFontSize(isPie2),
-			fontFamily: this.dataLabelsSettings.fontFamily,
+			fontFamily: dataLabelsSettings.fontFamily,
 			textDecoration: "underline",
 			textStyle: {
-				fontWeight: this.dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "",
-				fontStyle: this.dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "",
-				decoration: this.dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "", // Set text decoration to underline
+				fontWeight: dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "",
+				fontStyle: dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "",
+				decoration: dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "", // Set text decoration to underline
 			},
 			position: "center",
 			formatter: () => {

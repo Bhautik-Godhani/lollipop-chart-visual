@@ -239,8 +239,7 @@ export enum EInsideTextColorTypes {
 	FIXED = "fixed"
 }
 
-export interface IDataLabelsSettings {
-	show: boolean;
+export interface IDataLabelsProps {
 	color: string;
 	borderColor: string;
 	borderWidth: number;
@@ -260,6 +259,12 @@ export interface IDataLabelsSettings {
 	isShowBestFitLabels: boolean;
 	isTextColorTypeChanged: boolean;
 	isShowBackgroundChange: boolean;
+}
+
+export interface IDataLabelsSettings {
+	show: boolean;
+	measure1: IDataLabelsProps;
+	measure2: IDataLabelsProps;
 }
 
 export interface IDataColorsSettings {
