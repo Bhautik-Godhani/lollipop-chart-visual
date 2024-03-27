@@ -64,6 +64,7 @@ import {
 	ERankingSuffix,
 	ERankingCalcMethod,
 	EDataLabelsBGApplyFor,
+	EDataLabelsDisplayTypes,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -142,7 +143,7 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+// import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
@@ -248,6 +249,7 @@ export class Visual extends Shadow {
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
 	public categoricalSmallMultiplesDataField: powerbi.DataViewValueColumn;
+	public categoricalExtraDataLabelsFields: powerbi.DataViewValueColumn[] = [];
 
 	// data
 	isChartInit: boolean = false;
@@ -293,6 +295,8 @@ export class Visual extends Shadow {
 	groupNamesByTotal: { name: string, total: number }[] = [];
 	schemeColors: string[] = [];
 	isMonthCategoryNames: boolean;
+	extraDataLabelsDisplayNames: string[] = [];
+	isHasExtraDataLabels: boolean = false;
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -303,6 +307,7 @@ export class Visual extends Shadow {
 	public tooltipNumberFormatter: IValueFormatter[] = [];
 	public sortValuesNumberFormatter: IValueFormatter[] = [];
 	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
+	public extraDataLabelsNumberFormatter: IValueFormatter[];
 
 	// svg
 	public svg: D3Selection<SVGElement>;
@@ -466,7 +471,8 @@ export class Visual extends Shadow {
 
 	// annotations
 	annotationBarClass: string = "annotation-slice";
-	visualAnnotations: VisualAnnotations;
+	// visualAnnotations: VisualAnnotations;
+	visualAnnotations: any;
 
 	// patterns
 	categoryPatterns: IPatternProps[] = [];
@@ -1322,6 +1328,7 @@ export class Visual extends Shadow {
 		const categoricalImageDataFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ImagesData]);
 		const categoricalUpperBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.UpperBound]);
 		const categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
+		const categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
 		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
 
@@ -1333,11 +1340,13 @@ export class Visual extends Shadow {
 		this.sortExtraMeasureNames = [...new Set(categoricalSortFields.map((d) => d.source.displayName))] as any;
 		this.upperBoundMeasureNames = [...new Set(categoricalUpperBoundFields.map((d) => d.source.displayName))] as any;
 		this.lowerBoundMeasureNames = [...new Set(categoricalLowerBoundFields.map((d) => d.source.displayName))] as any;
+		this.extraDataLabelsDisplayNames = [...new Set(categoricalExtraDataLabelsFields.map((d) => d.source.displayName))] as any;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.isHasErrorLowerBounds = categoricalLowerBoundFields.length > 0;
 		this.isHasErrorUpperBounds = categoricalUpperBoundFields.length > 0;
 		this.isShowErrorBars = this.errorBarsSettings.isEnabled;
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
+		this.isHasExtraDataLabels = categoricalExtraDataLabelsFields.length > 0;
 
 		if (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isHasSubcategories) {
 			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
@@ -1519,7 +1528,7 @@ export class Visual extends Shadow {
 			this.minScaleBandWidth = 50;
 		}
 
-		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields);
+		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalExtraDataLabelsFields);
 
 		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
@@ -2006,18 +2015,39 @@ export class Visual extends Shadow {
 		this.categoricalImagesDataFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ImagesData]);
 		this.categoricalUpperBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.UpperBound]);
 		this.categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
+		this.categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
 		this.categoricalCategoriesLastIndex = this.categoricalCategoriesFields.length - 1;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = !!this.categoricalImagesDataFields;
 		this.measureNames = [...new Set(this.categoricalMeasureFields.map((d) => d.source.displayName))] as any;
 		this.sortExtraMeasureNames = [...new Set(this.categoricalSortFields.map((d) => d.source.displayName))] as any;
+		this.extraDataLabelsDisplayNames = [...new Set(this.categoricalExtraDataLabelsFields.map((d) => d.source.displayName))] as any;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
+		this.isHasExtraDataLabels = this.categoricalExtraDataLabelsFields.length > 0;
 
 		this.isPatternApplied =
 			this.patternSettings.enabled && this.patternSettings.categoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
 			this.isHasSubcategories && this.patternSettings.enabled && this.patternSettings.subCategoryPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "") ||
 			this.isHasMultiMeasure && this.patternSettings.enabled && this.patternSettings.measuresPatterns.some(d => d.patternIdentifier !== "NONE" && d.patternIdentifier !== "");
+
+		if (this.data1LabelsSettings.displayType === EDataLabelsDisplayTypes.CustomLabel && this.isHasExtraDataLabels && (!this.data1LabelsSettings.customLabel ||
+			(!this.extraDataLabelsDisplayNames.includes(this.data1LabelsSettings.customLabel)))) {
+			this.data1LabelsSettings.customLabel = this.extraDataLabelsDisplayNames[0];
+		}
+
+		if (this.data1LabelsSettings.displayType === EDataLabelsDisplayTypes.CustomLabel && !this.isHasExtraDataLabels) {
+			this.data1LabelsSettings.displayType = EDataLabelsDisplayTypes.All;
+		}
+
+		if (this.data2LabelsSettings.displayType === EDataLabelsDisplayTypes.CustomLabel && this.isHasExtraDataLabels && (!this.data2LabelsSettings.customLabel ||
+			(!this.extraDataLabelsDisplayNames.includes(this.data2LabelsSettings.customLabel)))) {
+			this.data2LabelsSettings.customLabel = this.extraDataLabelsDisplayNames[0];
+		}
+
+		if (this.data2LabelsSettings.displayType === EDataLabelsDisplayTypes.CustomLabel && !this.isHasExtraDataLabels) {
+			this.data2LabelsSettings.displayType = EDataLabelsDisplayTypes.All;
+		}
 
 		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
@@ -2040,7 +2070,7 @@ export class Visual extends Shadow {
 			this.minScaleBandWidth = 60;
 		}
 
-		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields);
+		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields, this.categoricalExtraDataLabelsFields);
 
 		this.categoryDisplayName = this.categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = this.categoricalSubCategoryField ? this.categoricalSubCategoryField.displayName : "";
@@ -3536,6 +3566,11 @@ export class Visual extends Shadow {
 
 				const checkIfNaN = (bound) => (isNaN(bound) ? 0 : bound);
 
+				const extraDataLabels = this.categoricalExtraDataLabelsFields.reduce((obj, current) => {
+					obj[current.source.displayName] = current.values[idx];
+					return obj;
+				}, {});
+
 				const obj: ILollipopChartRow = {
 					uid: getUID(cat),
 					category: cat.toString(),
@@ -3555,7 +3590,9 @@ export class Visual extends Shadow {
 					upperBoundValue: 0,
 					tooltipLowerBoundValue: null,
 					tooltipUpperBoundValue: null,
-					boundsTotal: 0
+					boundsTotal: 0,
+					extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
+					extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
 				}
 
 				arr = [...arr, obj];
@@ -3625,7 +3662,9 @@ export class Visual extends Shadow {
 							selected: false,
 							identity: null,
 							isHighlight: false,
-							positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 }
+							positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
+							extraLabel1: "",
+							extraLabel2: ""
 						});
 					}
 				});
@@ -5325,7 +5364,69 @@ export class Visual extends Shadow {
 			.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 			.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
 			.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-			.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true));
+			.text((d: ILollipopChartRow) => {
+				const firstCategory = this.chartData[0].category;
+				const lastCategory = this.chartData[this.chartData.length - 1].category;
+
+				switch (dataLabelsSettings.displayType) {
+					case EDataLabelsDisplayTypes.All:
+						return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true);
+					case EDataLabelsDisplayTypes.FirstLast:
+						if (d.category === firstCategory) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						if (d.category === lastCategory) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						return "";
+					case EDataLabelsDisplayTypes.MinMax:
+						if (d.category === this.minCategoryValueDataPair.category) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						if (d.category === this.maxCategoryValueDataPair.category) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						return "";
+					case EDataLabelsDisplayTypes.LastOnly:
+						if (d.category === lastCategory) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						return "";
+					case EDataLabelsDisplayTypes.MaxOnly:
+						if (d.category === this.maxCategoryValueDataPair.category) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						return "";
+					case EDataLabelsDisplayTypes.FirstLastMinMax:
+						if (d.category === firstCategory) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						if (d.category === lastCategory) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						if (d.category === this.minCategoryValueDataPair.category) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						if (d.category === this.maxCategoryValueDataPair.category) {
+							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+						}
+
+						return "";
+					case EDataLabelsDisplayTypes.CustomLabel:
+						if (this.isHasExtraDataLabels) {
+							return this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel].formatter, true, true);
+						}
+				}
+			});
 
 		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
@@ -9137,7 +9238,7 @@ export class Visual extends Shadow {
 		// }
 	}
 
-	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields): void {
+	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalExtraDataLabelsFields): void {
 		this.measureNumberFormatter = categoricalMeasureFields.map((d) => {
 			return valueFormatter.create({ format: d.source.format });
 		});
@@ -9150,6 +9251,11 @@ export class Visual extends Shadow {
 			return valueFormatter.create({ format: d.source.format });
 		});
 
+		this.extraDataLabelsNumberFormatter = this.categoricalExtraDataLabelsFields
+			.map(d => {
+				return valueFormatter.create({ format: d.source.format });
+			});
+
 		categoricalMeasureFields.forEach((d, i) => {
 			this.allNumberFormatter[d.source.displayName] = { formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure };
 		});
@@ -9157,6 +9263,10 @@ export class Visual extends Shadow {
 		categoricalTooltipFields.forEach((d, i) => {
 			this.allNumberFormatter[d.source.displayName] = { formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip };
 		});
+
+		categoricalExtraDataLabelsFields.forEach((d, i) => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: this.extraDataLabelsNumberFormatter[i], role: EDataRolesName.ExtraDataLabels };
+		})
 
 		categoricalSortFields.forEach((d, i) => {
 			this.allNumberFormatter[d.source.displayName] = { formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort };

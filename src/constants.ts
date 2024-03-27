@@ -43,6 +43,7 @@ import {
 	ERankingCalcMethod,
 	EAxisNumberValueType,
 	DisplayUnits,
+	EDataLabelsDisplayTypes,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -51,6 +52,7 @@ import {
 	ICirclePropsSettings,
 	ICutAndClipAxisSettings,
 	IDataColorsSettings,
+	IDataLabelsProps,
 	IDataLabelsSettings,
 	IDynamicDeviationSettings,
 	IErrorBarsSettings,
@@ -134,7 +136,7 @@ export const LINE_SETTINGS: ILineSettings = {
 	isApplyMarkerColor: false
 };
 
-const dataLabelsProps = {
+const dataLabelsProps: IDataLabelsProps = {
 	color: "rgba(93, 93, 93, 1)",
 	borderColor: "rgba(255, 255, 255,1)",
 	borderWidth: 1,
@@ -153,7 +155,9 @@ const dataLabelsProps = {
 	isShowBGChangedWhenPatternApplied: false,
 	isShowBestFitLabels: true,
 	isTextColorTypeChanged: false,
-	isShowBackgroundChange: false
+	isShowBackgroundChange: false,
+	customLabel: "",
+	displayType: EDataLabelsDisplayTypes.All
 };
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {

@@ -85,6 +85,12 @@
 			"description": "(Optional) Add Base-64 URL field to add images."
 		},
 		{
+			"displayName": "Data Labels",
+			"name": "extraDataLabels",
+			"kind": "Measure",
+			"description": "(Optional) Drag a field to display it as a label. Enable Labels > Display Type > Custom Label."
+		},
+		{
 			"displayName": "Show",
 			"name": "showBucket",
 			"kind": "Measure",
@@ -171,6 +177,11 @@
 							{
 								"bind": {
 									"to": "imagesData"
+								}
+							},
+							{
+								"bind": {
+									"to": "extraDataLabels"
 								}
 							},
 							{

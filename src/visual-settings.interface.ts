@@ -13,6 +13,7 @@ import {
 	ECFValueTypes,
 	ECutAndClipMarkerPlacementTypes,
 	EDataLabelsBGApplyFor,
+	EDataLabelsDisplayTypes,
 	EDataRolesName,
 	EDynamicDeviationConnectingLineTypes,
 	EDynamicDeviationDisplayTypes,
@@ -259,6 +260,8 @@ export interface IDataLabelsProps {
 	isShowBestFitLabels: boolean;
 	isTextColorTypeChanged: boolean;
 	isShowBackgroundChange: boolean;
+	customLabel: string;
+	displayType: EDataLabelsDisplayTypes;
 }
 
 export interface IDataLabelsSettings {

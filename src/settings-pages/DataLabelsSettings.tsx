@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsMeasureTypes, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsDisplayTypes, EDataLabelsMeasureTypes, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { EInsideTextColorTypes, IChartSettings, IDataLabelsProps, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
@@ -29,17 +29,6 @@ const LABEL_PLACEMENTS: ILabelValuePair[] = [
 		value: DataLabelsPlacement.Outside,
 	},
 ];
-
-// const LABEL_ORIENTATIONS: ILabelValuePair[] = [
-// 	{
-// 		label: "Horizontal",
-// 		value: Orientation.Horizontal,
-// 	},
-// 	{
-// 		label: "Vertical",
-// 		value: Orientation.Vertical,
-// 	},
-// ];
 
 const INSIDE_TEXT_COLOR_TYPES: ILabelValuePair[] = [
 	{
@@ -141,6 +130,47 @@ const UIDataLabelsFontSettings = (
 	configValues: IDataLabelsProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IDataLabelsSettings>>
 ) => {
+	const DISPLAY_TYPES: ILabelValuePair[] = [
+		{
+			label: "All",
+			value: EDataLabelsDisplayTypes.All,
+		},
+		{
+			label: "First & Last",
+			value: EDataLabelsDisplayTypes.FirstLast,
+		},
+		{
+			label: "Min & Max",
+			value: EDataLabelsDisplayTypes.MinMax,
+		},
+		{
+			label: "Last Only",
+			value: EDataLabelsDisplayTypes.LastOnly,
+		},
+		{
+			label: "Max Only",
+			value: EDataLabelsDisplayTypes.MaxOnly,
+		},
+		{
+			label: "First, Last, Min & Max",
+			value: EDataLabelsDisplayTypes.FirstLastMinMax,
+		}
+	];
+
+	if (shadow.isHasExtraDataLabels) {
+		DISPLAY_TYPES.push(
+			{
+				label: "Custom Label",
+				value: EDataLabelsDisplayTypes.CustomLabel,
+			}
+		)
+	}
+
+	const CUSTOM_LABELS: ILabelValuePair[] = shadow.extraDataLabelsDisplayNames.map(label => ({
+		value: label,
+		label: label
+	}));
+
 	return (
 		<>
 			<Row>
@@ -164,6 +194,30 @@ const UIDataLabelsFontSettings = (
 					/>
 				</Column>
 			</Row>
+
+			<Row>
+				<Column>
+					<SelectInput
+						label={"Display Type"}
+						value={configValues.displayType}
+						optionsList={DISPLAY_TYPES}
+						handleChange={(value) => handleChange(value, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues.displayType === EDataLabelsDisplayTypes.CustomLabel}>
+				<Row >
+					<Column>
+						<SelectInput
+							label={"Custom Label"}
+							value={configValues.customLabel}
+							optionsList={CUSTOM_LABELS}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.CustomLabel, selectedMeasure, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
 				<Row appearance="padded">
@@ -551,7 +605,27 @@ const DataLabelsSettings = (props) => {
 		if (shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
 			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
+
+		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && shadow.isHasExtraDataLabels && (!measureConfigValues.customLabel ||
+			(!shadow.extraDataLabelsDisplayNames.includes(measureConfigValues.customLabel)))) {
+			handleChange(shadow.extraDataLabelsDisplayNames[0], EDataLabelsSettings.CustomLabel, selectedMeasure, setConfigValues);
+		}
+
+		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels) {
+			handleChange(EDataLabelsDisplayTypes.All, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues);
+		}
 	}, []);
+
+	React.useEffect(() => {
+		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && shadow.isHasExtraDataLabels && (!measureConfigValues.customLabel ||
+			(!shadow.extraDataLabelsDisplayNames.includes(measureConfigValues.customLabel)))) {
+			handleChange(shadow.extraDataLabelsDisplayNames[0], EDataLabelsSettings.CustomLabel, selectedMeasure, setConfigValues);
+		}
+
+		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels) {
+			handleChange(EDataLabelsDisplayTypes.All, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues);
+		}
+	}, [measureConfigValues.displayType]);
 
 	React.useEffect(() => {
 		if (measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {

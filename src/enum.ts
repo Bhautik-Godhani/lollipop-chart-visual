@@ -177,6 +177,7 @@ export enum EDataRolesName {
 	UpperBound = "upperBound",
 	LowerBound = "lowerBound",
 	SmallMultiples = "smallMultiples",
+	ExtraDataLabels = "extraDataLabels",
 }
 
 export enum FontStyle {
@@ -247,7 +248,19 @@ export enum EDataLabelsSettings {
 	isShowBGChangedWhenPatternApplied = "isShowBGChangedWhenPatternApplied",
 	isShowBestFitLabels = "isShowBestFitLabels",
 	IsTextColorTypeChanged = "isTextColorTypeChanged",
-	IsShowBackgroundChange = "isShowBackgroundChange"
+	IsShowBackgroundChange = "isShowBackgroundChange",
+	CustomLabel = "customLabel",
+	DisplayType = "displayType"
+}
+
+export enum EDataLabelsDisplayTypes {
+	All = "all",
+	FirstLast = "first-last",
+	MinMax = "min-max",
+	LastOnly = "last-only",
+	MaxOnly = "max-only",
+	FirstLastMinMax = "first-last-min-max",
+	CustomLabel = "custom-label"
 }
 
 export enum EGridLinesSettings {
