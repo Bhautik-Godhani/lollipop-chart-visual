@@ -683,6 +683,7 @@ export class Visual extends Shadow {
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
 				showPercentageAllOption: true,
+				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "Test" }
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
@@ -3144,79 +3145,7 @@ export class Visual extends Shadow {
 				}
 			});
 
-			// BY PERCENTAGE
-			const isPercentageMatch = (c, percentage: number): boolean => {
-				switch (c.operator) {
-					case "===":
-						return percentage === c.staticPercentValue;
-					case "!==":
-						return percentage !== c.staticPercentValue;
-					case "<":
-						return percentage < c.staticPercentValue;
-					case ">":
-						return percentage > c.staticPercentValue;
-					case "<=":
-						return percentage <= c.staticPercentValue;
-					case ">=":
-						return percentage >= c.staticPercentValue;
-					case "<>":
-						return percentage > 0 ? percentage >= c.staticPercentValue && percentage <= c.secondaryStaticPercentValue : percentage <= c.staticPercentValue && percentage >= c.secondaryStaticPercentValue;
-				}
-			}
 
-			const value1Total = d3.sum(chartData, d => d.value1);
-			const value2Total = d3.sum(chartData, d => d.value2);
-
-			this.chartData.forEach((d: ILollipopChartRow) => {
-				const percentage1 = (d.value1 / value1Total) * 100;
-
-				this.conditionalFormattingConditions.forEach((c) => {
-					if (c.valueType === ECFValueTypes.Percentage) {
-						if (this.isLollipopTypeCircle) {
-							if (isPercentageMatch(c, percentage1)) {
-								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-									this.categoryColorPair[d.category].marker1Color = c.color;
-									this.CFCategoryColorPair[d.category].marker1Color = true;
-								}
-							}
-
-							if (this.isHasMultiMeasure) {
-								const percentage2 = (d.value2 / value2Total) * 100;
-								if (isPercentageMatch(c, percentage2)) {
-									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-										this.categoryColorPair[d.category].marker2Color = c.color;
-										this.CFCategoryColorPair[d.category].marker2Color = true;
-									}
-								}
-							}
-						} else {
-							const value1Total = d3.sum(d.subCategories, d => d.value1);
-							const value2Total = d3.sum(d.subCategories, d => d.value2);
-
-							d.subCategories.forEach(s => {
-								const percentage1 = (s.value1 / value1Total) * 100;
-
-								if (isPercentageMatch(c, percentage1)) {
-									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-										this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
-										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
-									}
-								}
-
-								if (this.isHasMultiMeasure) {
-									const percentage2 = (s.value2 / value2Total) * 100;
-									if (isPercentageMatch(c, percentage2)) {
-										if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-											this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
-											this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
-										}
-									}
-								}
-							})
-						}
-					}
-				});
-			});
 
 			// if (this.isLollipopTypeCircle) {
 			// 	const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
@@ -3271,6 +3200,80 @@ export class Visual extends Shadow {
 			// 		}
 			// 	});
 			// }
+		});
+
+		// BY PERCENTAGE
+		const isPercentageMatch = (c: IConditionalFormattingProps, percentage: number): boolean => {
+			switch (c.operator) {
+				case "===":
+					return +percentage.toFixed(0) === +c.percentValue.toFixed(0);
+				case "!==":
+					return +percentage.toFixed(0) !== +c.percentValue.toFixed(0);
+				case "<":
+					return percentage < c.percentValue;
+				case ">":
+					return percentage > c.percentValue;
+				case "<=":
+					return percentage <= c.percentValue;
+				case ">=":
+					return percentage >= c.percentValue;
+				case "<>":
+					return percentage > 0 ? percentage >= c.staticPercentValue && percentage <= c.secondaryStaticPercentValue : percentage <= c.staticPercentValue && percentage >= c.secondaryStaticPercentValue;
+			}
+		}
+
+		const value1Total = d3.sum(chartData, d => d.value1);
+		const value2Total = d3.sum(chartData, d => d.value2);
+
+		this.chartData.forEach((d: ILollipopChartRow) => {
+			const percentage1 = (d.value1 / value1Total) * 100;
+
+			this.conditionalFormattingConditions.forEach((c) => {
+				if (c.valueType === ECFValueTypes.Percentage) {
+					if (this.isLollipopTypeCircle) {
+						if (isPercentageMatch(c, percentage1)) {
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+								this.categoryColorPair[d.category].marker1Color = c.color;
+								this.CFCategoryColorPair[d.category].marker1Color = true;
+							}
+						}
+
+						if (this.isHasMultiMeasure) {
+							const percentage2 = (d.value2 / value2Total) * 100;
+							if (isPercentageMatch(c, percentage2)) {
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+									this.categoryColorPair[d.category].marker2Color = c.color;
+									this.CFCategoryColorPair[d.category].marker2Color = true;
+								}
+							}
+						}
+					} else {
+						const value1Total = d3.sum(d.subCategories, d => d.value1);
+						const value2Total = d3.sum(d.subCategories, d => d.value2);
+
+						d.subCategories.forEach(s => {
+							const percentage1 = (s.value1 / value1Total) * 100;
+
+							if (isPercentageMatch(c, percentage1)) {
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+									this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
+									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
+								}
+							}
+
+							if (this.isHasMultiMeasure) {
+								const percentage2 = (s.value2 / value2Total) * 100;
+								if (isPercentageMatch(c, percentage2)) {
+									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+										this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
+									}
+								}
+							}
+						})
+					}
+				}
+			});
 		});
 
 		this.firstCFLine = this.conditionalFormattingConditions.filter(d => d.sourceName === this.subCategoryDisplayName).find(d => d.applyOnCategories.includes(ECFApplyOnCategories.Line));

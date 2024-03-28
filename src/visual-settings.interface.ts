@@ -446,6 +446,7 @@ export interface IConditionalFormattingProps {
 	valueType: ECFValueTypes,
 	rankingType: ECFRankingTypes,
 	staticRankingValue: number,
+	percentValue: number,
 	staticPercentValue: number,
 	secondaryStaticPercentValue: number
 }
