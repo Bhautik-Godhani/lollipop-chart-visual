@@ -1,10 +1,11 @@
 /* eslint-disable max-lines-per-function */
 import { create, select } from "d3-selection";
 import { Visual } from "../visual";
-import { group } from "d3-array";
+import { Primitive, group, sum } from "d3-array";
 import { getSVGTextSize } from "./methods";
 import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
 import { RenderConnectingLine } from "./ConnectingLine.methods";
+import { ERankingCalcMethod, ERankingType } from "../enum";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
@@ -89,25 +90,85 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             const smallMultipleIndex = gridItemId;
             self.currentSmallMultipleIndex = gridItemId;
-
+            const isOthersSM = config.categories[smallMultipleIndex].includes(self.othersLabel);
             const clonedCategoricalData: powerbi.DataViewCategorical = JSON.parse(JSON.stringify(self.originalCategoricalData));
-            const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
 
-            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+            self.isCurrentSmallMultipleIsOthers = false;
 
-            clonedCategoricalData.categories.forEach((d) => {
-                d.values = dataValuesIndexes.map((valueIndex) => {
-                    const id = +valueIndex.split("-")[1];
-                    return d.values[id];
+            if (isOthersSM) {
+                self.isCurrentSmallMultipleIsOthers = true;
+                const SMRaking = self.rankingSettings.smallMultiples;
+                let othersSMData: any[];
+
+                if (SMRaking.enabled) {
+                    if (SMRaking.rankingType === ERankingType.TopN) {
+                        if (self.isHorizontalChart) {
+                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+                                othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+                            }
+                        } else {
+                            othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+                        }
+                    }
+                    if (SMRaking.rankingType === ERankingType.BottomN) {
+                        if (self.isHorizontalChart) {
+                            othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+                        } else {
+                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+                                othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+                            }
+                        }
+                    }
+                }
+
+                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
+                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+                clonedCategoricalData.categories.forEach((d) => {
+                    d.values = dataValuesIndexes.map((valueIndex) => {
+                        const id = +valueIndex.split("-")[1];
+                        return d.values[id];
+                    });
                 });
-            });
 
-            clonedCategoricalData.values.forEach((d) => {
-                d.values = dataValuesIndexes.map((valueIndex) => {
-                    const id = +valueIndex.split("-")[1];
-                    return d.values[id];
+                clonedCategoricalData.values.forEach((d) => {
+                    const values: Primitive[][] = [];
+
+                    othersSMData.forEach(o => {
+                        const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
+                        const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+
+                        const values1 = dataValuesIndexes.map((valueIndex) => {
+                            const id = +valueIndex.split("-")[1];
+                            return d.values[id];
+                        });
+
+                        values.push(values1);
+                    });
+
+                    d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
                 });
-            });
+
+                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+            } else {
+                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
+                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+
+                clonedCategoricalData.categories.forEach((d) => {
+                    d.values = dataValuesIndexes.map((valueIndex) => {
+                        const id = +valueIndex.split("-")[1];
+                        return d.values[id];
+                    });
+                });
+
+                clonedCategoricalData.values.forEach((d) => {
+                    d.values = dataValuesIndexes.map((valueIndex) => {
+                        const id = +valueIndex.split("-")[1];
+                        return d.values[id];
+                    });
+                });
+
+                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+            }
 
             // const initialChartDataByBrushScaleBand = self.setInitialChartData(
             //     clonedCategoricalData,
@@ -117,8 +178,6 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             //     newItemHeight
             // );
             // self.categoricalData = initialChartDataByBrushScaleBand;
-
-            self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
 
             const svg = create("svg");
             svg.classed("small-multiple-chart", true);
@@ -343,7 +402,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.lollipopG = lollipopG as any;
 
-            const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[smallMultiplesDataPair.category];
+            const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]];
 
             self.xAxisG = select(smallMultiplesGridItemContent.xAxisG);
             self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);

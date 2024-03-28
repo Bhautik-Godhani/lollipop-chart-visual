@@ -297,7 +297,6 @@ export interface IDataColorsSettings {
 
 export interface ICategoryRankingProps {
 	enabled: boolean;
-	valueType: RankingDataValuesType;
 	rankingType: ERankingType;
 	count: number;
 	showRemainingAsOthers: boolean;
@@ -316,6 +315,7 @@ export interface ISubCategoryRankingProps {
 export interface IRankingSettings {
 	category: ICategoryRankingProps;
 	subCategory: ISubCategoryRankingProps;
+	smallMultiples: ICategoryRankingProps;
 }
 
 export interface ILabelValuePair {

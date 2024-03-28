@@ -217,10 +217,9 @@ export const DATA_COLORS: IDataColorsSettings = {
 export const RANKING_SETTINGS: IRankingSettings = {
 	category: {
 		enabled: true,
-		valueType: RankingDataValuesType.Value1,
 		rankingType: ERankingType.TopN,
 		count: 50,
-		showRemainingAsOthers: false,
+		showRemainingAsOthers: true,
 		suffix: ERankingSuffix.None,
 		calcMethod: ERankingCalcMethod.Sum
 	},
@@ -231,6 +230,14 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		showRemainingAsOthers: false,
 		othersColor: "rgba(84, 84, 84, 1)",
 	},
+	smallMultiples: {
+		enabled: true,
+		rankingType: ERankingType.TopN,
+		count: 10,
+		showRemainingAsOthers: true,
+		suffix: ERankingSuffix.None,
+		calcMethod: ERankingCalcMethod.Sum
+	}
 };
 
 export const X_AXIS_SETTINGS: IXAxisSettings = {

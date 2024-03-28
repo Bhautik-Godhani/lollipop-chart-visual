@@ -117,6 +117,9 @@
 					},
 					"showBucket": {
 						"max": 1
+					},
+					"smallMultiples": {
+						"max": 1
 					}
 				}
 			],

@@ -609,6 +609,7 @@ export class Visual extends Shadow {
 	smallMultiplesDataPairs: any[] = [];
 	smallMultiplesGridItemContent: { [index: string]: ISmallMultiplesGridItemContent } = {};
 	currentSmallMultipleIndex: number = 0;
+	isCurrentSmallMultipleIsOthers: boolean = false;
 	isSMUniformXAxis: boolean;
 
 	// settings
@@ -2504,9 +2505,9 @@ export class Visual extends Shadow {
 
 			// SMALL MULTIPLE VISUAL
 			if (this.isSmallMultiplesEnabled) {
-				if (this.isHasSmallMultiplesData) {
-					this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
-				}
+				// if (this.isHasSmallMultiplesData) {
+				// 	this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
+				// }
 
 				this.setMargins();
 
@@ -2522,15 +2523,82 @@ export class Visual extends Shadow {
 
 				this.smallMultiplesDataPairs = GetSmallMultiplesDataPairsByItem(this);
 
+				if (this.isHasSmallMultiplesData) {
+					this.smallMultiplesCategories = this.smallMultiplesDataPairs.map(d => d.category);
+				}
+
+				let smallMultiplesCategories = JSON.parse(JSON.stringify(this.smallMultiplesCategories));
+				const SMRanking = this.rankingSettings.smallMultiples;
+				let othersSMData;
+
+				if (SMRanking.enabled) {
+					if (SMRanking.rankingType === ERankingType.TopN) {
+						if (this.isHorizontalChart) {
+							if (SMRanking.count <= smallMultiplesCategories.length) {
+								othersSMData = smallMultiplesCategories.slice(SMRanking.count, smallMultiplesCategories.length);
+								smallMultiplesCategories = smallMultiplesCategories.slice(0, SMRanking.count);
+							}
+						} else {
+							othersSMData = smallMultiplesCategories.slice(SMRanking.count, smallMultiplesCategories.length);
+							smallMultiplesCategories = smallMultiplesCategories.slice(0, SMRanking.count);
+						}
+					}
+					if (SMRanking.rankingType === ERankingType.BottomN) {
+						if (this.isHorizontalChart) {
+							othersSMData = smallMultiplesCategories.slice(0, smallMultiplesCategories.length - SMRanking.count);
+							smallMultiplesCategories = smallMultiplesCategories.slice(
+								smallMultiplesCategories.length - SMRanking.count,
+								smallMultiplesCategories.length
+							);
+						} else {
+							if (SMRanking.count <= smallMultiplesCategories.length) {
+								othersSMData = smallMultiplesCategories.slice(0, smallMultiplesCategories.length - SMRanking.count);
+								smallMultiplesCategories = smallMultiplesCategories.slice(
+									smallMultiplesCategories.length - SMRanking.count,
+									smallMultiplesCategories.length
+								);
+							}
+						}
+					}
+
+					if (SMRanking.showRemainingAsOthers && othersSMData.length) {
+						let othersLabel: string;
+
+						switch (SMRanking.suffix) {
+							case ERankingSuffix.None:
+								othersLabel = this.othersLabel;
+								break;
+							case ERankingSuffix.OthersAndCategoryName:
+								othersLabel = this.othersLabel + " " + this.smallMultiplesCategoricalDataSourceName;
+								break;
+							case ERankingSuffix.OthersAndCount:
+								othersLabel = `${this.othersLabel} (${othersSMData.length})`;
+								break;
+							case ERankingSuffix.Both:
+								othersLabel = `${this.othersLabel} ${this.smallMultiplesCategoricalDataSourceName} (${othersSMData.length})`;
+								break;
+						}
+
+						this.othersBarText = othersLabel;
+
+						const othersDataField: any = this.othersBarText;
+						if (this.isHorizontalChart) {
+							smallMultiplesCategories.push(othersDataField);
+						} else {
+							smallMultiplesCategories.push(othersDataField);
+						}
+					}
+				}
+
 				const settings: ISmallMultiplesGridLayoutSettings = {
 					...this.smallMultiplesSettings,
 					hostContainerId: "smallMultipleHostContainer",
 					containerWidth: vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width,
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
-					categories: this.smallMultiplesCategories,
+					categories: smallMultiplesCategories,
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					onCellRendered: (category, index, ele) => {
-						DrawSmallMultipleBarChart(this, settings, this.smallMultiplesCategories.findIndex(d => d === category), ele);
+						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), ele);
 
 						if (index === this.smallMultiplesCategories.length - 1) {
 							this.configLegend();
@@ -4651,10 +4719,21 @@ export class Visual extends Shadow {
 			this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
 		});
 
+		if (this.isCurrentSmallMultipleIsOthers) {
+			const othersColor = this.dataColorsSettings.othersColor;
+			this.categoricalDataPairs.forEach((d) => {
+				this.categoryColorPair[d.category].marker1Color = othersColor;
+				this.categoryColorPair[d.category].marker2Color = othersColor;
+				this.categoryColorPair[d.category].lineColor = othersColor;
+				this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
+			});
+		}
+
 		if (this.rankingSettings.category.enabled) {
 			if (this.rankingSettings.category.showRemainingAsOthers) {
 				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.othersColor;
 				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
+				this.categoryColorPair[this.othersBarText].lineColor = this.dataColorsSettings.othersColor;
 			}
 		}
 	}
@@ -5156,9 +5235,6 @@ export class Visual extends Shadow {
 			.call(brush.move as any, [0, widthByExpectedBar]);
 
 		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
-
-		console.log(isBrushRendered);
-
 
 		let scrolled = false;
 		if (this.isScrollBrushDisplayed && isBrushRendered) {
@@ -8448,7 +8524,7 @@ export class Visual extends Shadow {
 			let color;
 			const valueType = isPie2 ? "value2" : "value1";
 
-			if (d.parentCategory === this.othersBarText) {
+			if ((d.parentCategory === this.othersBarText) || this.isCurrentSmallMultipleIsOthers) {
 				color = this.dataColorsSettings.othersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
