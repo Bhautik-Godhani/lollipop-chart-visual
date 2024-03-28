@@ -143,7 +143,7 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
-// import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";
@@ -471,8 +471,7 @@ export class Visual extends Shadow {
 
 	// annotations
 	annotationBarClass: string = "annotation-slice";
-	// visualAnnotations: VisualAnnotations;
-	visualAnnotations: any;
+	visualAnnotations: VisualAnnotations;
 
 	// patterns
 	categoryPatterns: IPatternProps[] = [];
@@ -4719,7 +4718,7 @@ export class Visual extends Shadow {
 			this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
 		});
 
-		if (this.isCurrentSmallMultipleIsOthers) {
+		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers) {
 			const othersColor = this.dataColorsSettings.othersColor;
 			this.categoricalDataPairs.forEach((d) => {
 				this.categoryColorPair[d.category].marker1Color = othersColor;
@@ -4730,7 +4729,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.rankingSettings.category.enabled) {
-			if (this.rankingSettings.category.showRemainingAsOthers) {
+			if (this.rankingSettings.category.showRemainingAsOthers && this.categoryColorPair[this.othersBarText]) {
 				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.othersColor;
 				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
 				this.categoryColorPair[this.othersBarText].lineColor = this.dataColorsSettings.othersColor;
@@ -6454,7 +6453,8 @@ export class Visual extends Shadow {
 
 		this.xAxisG
 			.selectAll("text")
-			.attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
+			.attr("dx", "0")
+			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", isApplyTilt ? "-0.5em" : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
 			.attr("y", () => {
 				if (this.isHorizontalChart) {
@@ -6473,9 +6473,23 @@ export class Visual extends Shadow {
 			.style("font-style", this.xAxisSettings.labelStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			.attr("text-anchor", () => {
 				if (this.isBottomXAxis) {
-					return isApplyTilt ? "end" : "middle";
+					let rotateDegree = 0;
+					if (xAxisSettings.isLabelAutoTilt) {
+						rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
+					} else {
+						rotateDegree = xAxisSettings.labelTilt;
+					}
+
+					return isApplyTilt && rotateDegree !== 0 ? rotateDegree > 0 ? "start" : "end" : "middle";
 				} else {
-					return isApplyTilt ? "end" : "middle";
+					let rotateDegree = 0;
+					if (xAxisSettings.isLabelAutoTilt) {
+						rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
+					} else {
+						rotateDegree = -xAxisSettings.labelTilt;
+					}
+
+					return isApplyTilt && rotateDegree !== 0 ? rotateDegree > 0 ? "end" : "start" : "middle";
 				}
 			})
 			// .attr("transform", () => {
@@ -6544,7 +6558,7 @@ export class Visual extends Shadow {
 							if (xAxisSettings.isLabelAutoTilt) {
 								rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
 							} else {
-								rotateDegree = -xAxisSettings.labelTilt;
+								rotateDegree = xAxisSettings.labelTilt;
 							}
 
 							ele.attr("transform", `rotate( ${rotateDegree})`);
@@ -6553,7 +6567,7 @@ export class Visual extends Shadow {
 							if (xAxisSettings.isLabelAutoTilt) {
 								rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
 							} else {
-								rotateDegree = xAxisSettings.labelTilt;
+								rotateDegree = -xAxisSettings.labelTilt;
 							}
 
 							ele.attr("transform", `rotate( ${rotateDegree})`);
@@ -8374,8 +8388,8 @@ export class Visual extends Shadow {
 	}
 
 	updateAnnotationNodeElements(): void {
-		// this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
-		// this.visualAnnotations.renderAnnotations();
+		this.visualAnnotations.updateNodeElements(this.isLollipopTypePie ? d3.selectAll(".pie-slice") : d3.selectAll(".lollipop-circle"));
+		this.visualAnnotations.renderAnnotations();
 	}
 
 	setCircle1Formatting(circleSelection: D3Selection<any>, marker: IMarkerData, isEnter: boolean): void {

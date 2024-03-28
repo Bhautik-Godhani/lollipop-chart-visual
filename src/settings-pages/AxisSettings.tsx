@@ -482,9 +482,9 @@ const UIXAxis = (
             <Row appearance="padded">
               <Column>
                 <InputControl
-                  min={30}
+                  min={-90}
                   max={90}
-                  label="Tilt Angle"
+                  label="Tilt Angle (-90 to 90)"
                   type="number"
                   value={xConfigValues.labelTilt.toString()}
                   handleChange={(value: any) => handleXChange(value, EXAxisSettings.LabelTilt, setXConfigValues)}
