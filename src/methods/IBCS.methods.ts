@@ -168,7 +168,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                         [ELineSettings.lineColor]: (self.chartSettings.theme === EIBCSThemes.DefaultVertical || self.chartSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
                         [ELineSettings.lineWidth]: 4,
                         [ELineSettings.lineType]: ELineType.Solid,
-                        [ELineSettings.isApplyMarkerColor]: true
+                        [ELineSettings.isApplyMarkerColor]: (self.chartSettings.theme === EIBCSThemes.Diverging1Vertical || self.chartSettings.theme === EIBCSThemes.Diverging1Horizontal) ? false : true
                     }),
                 },
                 selector: null,
