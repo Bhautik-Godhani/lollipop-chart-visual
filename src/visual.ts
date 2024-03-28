@@ -6228,9 +6228,19 @@ export class Visual extends Shadow {
 			}
 
 			value.tooltipFields.forEach((data, i: number) => {
+				let text = data.value;
+
+				if (value.category === this.othersBarText) {
+					text = this.othersBarText;
+				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
+					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
+				} else {
+					text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
+				}
+
 				tooltipData.push({
 					displayName: data.displayName,
-					value: value.category === this.othersBarText ? this.othersBarText : typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
+					value: text,
 					color: data.color ? data.color : "transparent",
 				});
 			});
@@ -6257,35 +6267,6 @@ export class Visual extends Shadow {
 				}
 			}
 
-			return tooltipData;
-		};
-
-		const getClevelandTooltipData = (value: ILollipopChartRow): VisualTooltipDataItem[] => {
-			const tooltipData: TooltipData[] = [
-				{
-					displayName: this.categoryDisplayName,
-					value: typeof value.category === "string" ? value.category.toUpperCase() : value.category,
-					color: "transparent",
-				},
-				{
-					displayName: this.measure1DisplayName,
-					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: this.categoryColorPair[value.category].marker1Color,
-				},
-				{
-					displayName: this.measure2DisplayName,
-					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: this.categoryColorPair[value.category].marker2Color,
-				},
-			];
-
-			value.tooltipFields.forEach((data, i: number) => {
-				tooltipData.push({
-					displayName: data.displayName,
-					value: typeof data.value === "number" ? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]) : data.value,
-					color: data.color ? data.color : "transparent",
-				});
-			});
 			return tooltipData;
 		};
 	}

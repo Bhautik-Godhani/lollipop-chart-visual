@@ -294,7 +294,7 @@ export const hexToRGB = (hex: string, alpha: number): string => {
 };
 
 export const powerBiNumberFormat = (
-	number: number,
+	number: number | string | Date,
 	formatter: IValueFormatter,
 ): string => {
 	return formatter.format(number);
