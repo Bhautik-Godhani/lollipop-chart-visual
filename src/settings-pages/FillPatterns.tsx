@@ -53,6 +53,9 @@ const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setC
 
 					if (e.value === "image") {
 						patterns[index] = { name: category.name, patternIdentifier: e.d, isImagePattern: true, dimensions: { width: e.w, height: e.h } };
+					} else {
+						patterns[index].isImagePattern = false;
+						patterns[index].dimensions = { width: undefined, height: undefined };
 					}
 
 					setConfigValues((d) => ({
