@@ -3744,7 +3744,7 @@ export class Visual extends Shadow {
 		}
 
 		if (!this.isHasSubcategories) {
-			this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
+			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
 				const selectionId = this.vizOptions.host
 					.createSelectionIdBuilder()
 					.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
@@ -3758,7 +3758,7 @@ export class Visual extends Shadow {
 		} else {
 			const categoricalData = this.vizOptions.options.dataViews[0];
 			const series: any[] = categoricalData.categorical.values.grouped();
-			this.categoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
+			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
 				const selectionId = this.vizOptions.host
 					.createSelectionIdBuilder()
 					.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
