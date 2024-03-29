@@ -6267,6 +6267,16 @@ export class Visual extends Shadow {
 						});
 					}
 				}
+
+				if (value.isHighlight) {
+					tooltipData.push({
+						displayName: "Highlighted",
+						value: isCircle1
+							? numberFormatter(value.value1, this.measureNumberFormatter[0])
+							: numberFormatter(value.value2, this.measureNumberFormatter[1]),
+						color: "transparent",
+					});
+				}
 			}
 
 			return tooltipData;
