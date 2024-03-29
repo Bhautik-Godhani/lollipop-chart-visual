@@ -160,7 +160,7 @@ const UIDataLabelsFontSettings = (
 	if (shadow.isHasExtraDataLabels) {
 		DISPLAY_TYPES.push(
 			{
-				label: "Custom Label",
+				label: "Custom Label (Field)",
 				value: EDataLabelsDisplayTypes.CustomLabel,
 			}
 		)
@@ -198,7 +198,7 @@ const UIDataLabelsFontSettings = (
 			<Row>
 				<Column>
 					<SelectInput
-						label={"Display Type"}
+						label={"Display Style"}
 						value={configValues.displayType}
 						optionsList={DISPLAY_TYPES}
 						handleChange={(value) => handleChange(value, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues)}
