@@ -2713,9 +2713,9 @@ export class Visual extends Shadow {
 
 				this.setColorsByDataColorsSettings();
 
-				if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
-					this.setRemainingAsOthersDataColor();
-				}
+				// if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
+				// 	this.setRemainingAsOthersDataColor();
+				// }
 
 				if (this.conditionalFormattingConditions.length) {
 					this.setConditionalFormattingColor();
@@ -4501,73 +4501,6 @@ export class Visual extends Shadow {
 		// }
 	}
 
-	setRemainingAsOthersDataColor(): void {
-		// const rankingSettings = this.rankingSettings.category;
-		// const subCategoriesRanking = this.rankingSettings.subCategory;
-		// if (rankingSettings.showRemainingAsOthers) {
-		// 	if (rankingSettings.rankingType === ERankingType.TopN) {
-		// 		this.chartData.forEach((d, i) => {
-		// 			if (i + 1 > rankingSettings.count) {
-		// 				d.styles.circle1.fillColor = rankingSettings.othersColor;
-		// 				d.styles.circle1.strokeColor = rankingSettings.othersColor;
-		// 				d.styles.circle2.fillColor = rankingSettings.othersColor;
-		// 				d.styles.circle2.strokeColor = rankingSettings.othersColor;
-		// 				d.styles.line.color = rankingSettings.othersColor;
-		// 				d.subCategories.forEach((s) => {
-		// 					s.styles.pie1.color = rankingSettings.othersColor;
-		// 					s.styles.pie2.color = rankingSettings.othersColor;
-		// 				});
-		// 			}
-		// 		});
-		// 	}
-		// 	if (rankingSettings.rankingType === ERankingType.BottomN) {
-		// 		if (rankingSettings.count <= this.chartData.length) {
-		// 			this.chartData.forEach((d, i) => {
-		// 				if (i < this.chartData.length - rankingSettings.count) {
-		// 					d.styles.circle1.fillColor = rankingSettings.othersColor;
-		// 					d.styles.circle1.strokeColor = rankingSettings.othersColor;
-		// 					d.styles.circle2.fillColor = rankingSettings.othersColor;
-		// 					d.styles.circle2.strokeColor = rankingSettings.othersColor;
-		// 					d.styles.line.color = rankingSettings.othersColor;
-		// 					d.subCategories.forEach((s) => {
-		// 						s.styles.pie1.color = rankingSettings.othersColor;
-		// 						s.styles.pie2.color = rankingSettings.othersColor;
-		// 					});
-		// 				}
-		// 			});
-		// 		}
-		// 	}
-		// }
-		// if (rankingSettings.isSubcategoriesRanking && subCategoriesRanking.showRemainingAsOthers) {
-		// 	if (isLollipopTypePie) {
-		// 		if (rankingSettings.subCategoriesRanking.filterType === RankingFilterType.TopN) {
-		// 			this.chartData.forEach((data, i1) => {
-		// 				if (i1 + 1 <= rankingSettings.count) {
-		// 					data.subCategories.forEach((d, i2) => {
-		// 						if (i2 + 1 > subCategoriesRanking.count) {
-		// 							d.styles.pie1.color = subCategoriesRanking.pieSliceColor;
-		// 							d.styles.pie2.color = subCategoriesRanking.pieSliceColor;
-		// 						}
-		// 					});
-		// 				}
-		// 			});
-		// 		}
-		// 		if (rankingSettings.subCategoriesRanking.filterType === RankingFilterType.BottomN) {
-		// 			this.chartData.forEach((data, i1) => {
-		// 				if (i1 > this.chartData.length - rankingSettings.count) {
-		// 					data.subCategories.forEach((d, i2) => {
-		// 						if (i2 < data.subCategories.length - subCategoriesRanking.count) {
-		// 							d.styles.pie1.color = subCategoriesRanking.pieSliceColor;
-		// 							d.styles.pie2.color = subCategoriesRanking.pieSliceColor;
-		// 						}
-		// 					});
-		// 				}
-		// 			});
-		// 		}
-		// 	}
-		// }
-	}
-
 	setColorsByDataColorsSettings(): void {
 		if (this.isLollipopTypeCircle) {
 			this.setCircleColors();
@@ -4723,21 +4656,19 @@ export class Visual extends Shadow {
 			this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
 		});
 
-		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers) {
+		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
 			const othersColor = this.dataColorsSettings.othersColor;
 			this.categoricalDataPairs.forEach((d) => {
 				this.categoryColorPair[d.category].marker1Color = othersColor;
 				this.categoryColorPair[d.category].marker2Color = othersColor;
-				this.categoryColorPair[d.category].lineColor = othersColor;
 				this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
 			});
 		}
 
 		if (this.rankingSettings.category.enabled) {
-			if (this.rankingSettings.category.showRemainingAsOthers && this.categoryColorPair[this.othersBarText]) {
+			if (this.rankingSettings.category.showRemainingAsOthers && this.categoryColorPair[this.othersBarText] && this.dataColorsSettings.isCustomizeOthersColor) {
 				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.othersColor;
 				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
-				this.categoryColorPair[this.othersBarText].lineColor = this.dataColorsSettings.othersColor;
 			}
 		}
 	}
@@ -5067,9 +4998,9 @@ export class Visual extends Shadow {
 	}
 
 	initAndRenderLollipopChart(scaleWidth: number, isShowXAxis: boolean, isShowYAxis: boolean): void {
-		if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
-			this.setRemainingAsOthersDataColor();
-		}
+		// if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
+		// 	this.setRemainingAsOthersDataColor();
+		// }
 
 		if (this.conditionalFormattingConditions.length) {
 			this.setConditionalFormattingColor();
@@ -8534,7 +8465,7 @@ export class Visual extends Shadow {
 			let color;
 			const valueType = isPie2 ? "value2" : "value1";
 
-			if ((d.parentCategory === this.othersBarText) || this.isCurrentSmallMultipleIsOthers) {
+			if (((d.parentCategory === this.othersBarText) || this.isCurrentSmallMultipleIsOthers) && this.dataColorsSettings.isCustomizeOthersColor) {
 				color = this.dataColorsSettings.othersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;

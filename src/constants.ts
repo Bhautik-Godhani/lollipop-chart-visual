@@ -210,7 +210,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	negativeColor: NEGATIVE_COLOR,
 	positiveColor: POSITIVE_COLOR,
 	gradientAppliedToMeasure: EMarkerColorTypes.Marker1,
-	isCustomizeOthersColor: false,
+	isCustomizeOthersColor: true,
 	othersColor: "rgba(84, 84, 84, 1)",
 };
 
