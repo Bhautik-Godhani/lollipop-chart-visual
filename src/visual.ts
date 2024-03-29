@@ -5246,7 +5246,7 @@ export class Visual extends Shadow {
 				if (!scrolled && isBrushRendered) {
 					scrolled = true;
 					const prevExtent = d3.brushSelection(brushG as any);
-					const direction = event.wheelDelta < 0 ? 'down' : 'up';
+					const direction = event.wheelDelta < 0 ? 'up' : 'down';
 					const isRightDirection = direction === "up";
 					if (!self.isHorizontalChart) {
 						const movableWidth = widthByExpectedBar / 2;
