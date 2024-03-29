@@ -1349,11 +1349,13 @@ export class Visual extends Shadow {
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 		this.isHasExtraDataLabels = categoricalExtraDataLabelsFields.length > 0;
 
-		if (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isHasSubcategories) {
+		if ((this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
+			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
 			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
-		if (this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isHasSubcategories) {
+		if ((this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
+			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
 			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
