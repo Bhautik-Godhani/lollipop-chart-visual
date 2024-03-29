@@ -101,7 +101,7 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
                 props.onCellRendered(d.category, i, entry.target as HTMLDivElement);
               }
 
-              if (settings.categories[settings.categories.length - 1] === d.i) {
+              if (settings.categories[settings.categories.length - 1] === d.category) {
                 props.onRenderingFinished();
               }
             }}
