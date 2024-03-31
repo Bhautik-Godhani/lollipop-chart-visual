@@ -5455,7 +5455,7 @@ export class Visual extends Shadow {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
 
 			if (this.isLollipopTypePie) {
-				textShadow.style("display", "none");
+				// textShadow.style("display", "none");
 			}
 
 			if (this.isLollipopTypeCircle) {
@@ -5469,7 +5469,7 @@ export class Visual extends Shadow {
 					.attr("class", "dataLabelTextShadow")
 					.attr("text-anchor", "middle")
 					.attr("dy", "0.35em")
-					// .attr("font-size", this.getDataLabelsFontSize(isData2Label))
+					.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
 					.style("font-family", dataLabelsSettings.fontFamily)
 					.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 					.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
@@ -5517,7 +5517,7 @@ export class Visual extends Shadow {
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.35em")
-				// .attr("font-size", this.getDataLabelsFontSize(isData2Label))
+				.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
 				.style("font-family", dataLabelsSettings.fontFamily)
 				.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 				.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")

@@ -367,7 +367,7 @@ const UICircleLollipopLabelsSettings = (
 			</Row>
 		</ConditionalWrapper>
 
-		<ConditionalWrapper visible={configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
+		<ConditionalWrapper visible={shadow.isLollipopTypePie || configValues[EDataLabelsSettings.placement] === DataLabelsPlacement.Outside}>
 			<Row>
 				<Column>
 					<ToggleButton
