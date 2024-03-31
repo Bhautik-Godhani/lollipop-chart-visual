@@ -5558,32 +5558,33 @@ export class Visual extends Shadow {
 			// }
 		} else {
 			// if (this.isLollipopTypeCircle) {
-			if (d.value1 >= d.value2 || !this.isHasMultiMeasure) {
+			if ((this.xAxisSettings.position === Position.Bottom && d.value1 < d.value2) ||
+				(this.xAxisSettings.position === Position.Top && d.value1 > d.value2)) {
 				x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
 				y = this.getYPosition(isPie2 ? d.value2 : d.value1)
 				// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
-				if (this.isBottomXAxis) {
-					y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				} else {
-					y = y - (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				}
+				// if (this.isBottomXAxis) {
+				y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
+				// } else {
+				// 	y = y - (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
+				// }
 			} else {
 				x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
 				y = this.getYPosition(isPie2 ? d.value2 : d.value1)
 				// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
 
-				if (this.isBottomXAxis) {
-					y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				} else {
-					y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				}
+				// if (this.isBottomXAxis) {
+				y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
+				// } else {
+				// 	y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
+				// }
 			}
 			// }
 		}
 		return { x, y };
 	}
 
-	transformData1LabelOutside(labelSelection: any, isEnter: boolean): void {
+	transformData1LabelOutside(labelSelection: any, isEnter: boolean, isBestFitOutside: boolean = false): void {
 		const dataLabelsSettings = this.data1LabelsSettings;
 		const markerSize = this.isLollipopTypeCircle ? this.circle1Size / 2 : this.pie1Radius;
 
@@ -5665,7 +5666,7 @@ export class Visual extends Shadow {
 			});
 	}
 
-	transformData2LabelOutside(labelSelection: any, isEnter: boolean): void {
+	transformData2LabelOutside(labelSelection: any, isEnter: boolean, isBestFitOutside: boolean = false): void {
 		const dataLabelsSettings = this.data2LabelsSettings;
 		const markerSize = this.isLollipopTypeCircle ? this.circle2Size / 2 : this.pie2Radius;
 
@@ -5691,7 +5692,7 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
-						const xPos = x - bBox.width / 2 - markerSize - labelDistance;
+						const xPos = isBestFitOutside ? x + bBox.width / 2 + markerSize + labelDistance : x - bBox.width / 2 - markerSize - labelDistance;
 						const yPos = y;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
@@ -5721,6 +5722,7 @@ export class Visual extends Shadow {
 				} else {
 					if (dataLabelsSettings.orientation === Orientation.Horizontal) {
 						const xPos = x;
+						// const yPos = isBestFitOutside ? y - markerSize - labelDistance : y + markerSize + labelDistance;
 						const yPos = y + markerSize + labelDistance;
 						return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 					} else {
@@ -5899,21 +5901,21 @@ export class Visual extends Shadow {
 								} else {
 									if (THIS.isBottomXAxis) {
 										if (d.positions.dataLabel1Y + getBBox.height > THIS.height) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, false);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside);
+											THIS.transformData1LabelOutside(ele, false, true);
+											// }
 										}
 									} else {
 										if (d.positions.dataLabel1Y <= getBBox.height) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, false);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside);
+											THIS.transformData1LabelOutside(ele, false, true);
+											// }
 										}
 									}
 								}
@@ -6013,12 +6015,12 @@ export class Visual extends Shadow {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
 
 									if (isHideInsideLabel) {
-										if (!isHideOutSideLabel) {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
-											THIS.transformData2LabelOutside(ele, false);
-										} else {
-											return 0;
-										}
+										// if (!isHideOutSideLabel) {
+										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+										THIS.transformData2LabelOutside(ele, false, true);
+										// } else {
+										// 	return 0;
+										// }
 									} else {
 										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
 										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
@@ -6027,21 +6029,21 @@ export class Visual extends Shadow {
 								} else {
 									if (THIS.isLeftYAxis) {
 										if (d.positions.dataLabel2X <= getBBox.width) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, true);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false, true);
+											// }
 										}
 									} else {
 										if (d.positions.dataLabel2X + getBBox.width > THIS.width) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, true);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false, true);
+											// }
 										}
 									}
 								}
@@ -6049,12 +6051,12 @@ export class Visual extends Shadow {
 								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
-										if (!isHideOutSideLabel) {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
-											THIS.transformData2LabelOutside(ele, false);
-										} else {
-											return 0;
-										}
+										// if (!isHideOutSideLabel) {
+										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+										THIS.transformData2LabelOutside(ele, false, true);
+										// } else {
+										// 	return 0;
+										// }
 									} else {
 										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
 										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
@@ -6063,21 +6065,21 @@ export class Visual extends Shadow {
 								} else {
 									if (THIS.isBottomXAxis) {
 										if (d.positions.dataLabel2Y + getBBox.height > THIS.height) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, true);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false, true);
+											// }
 										}
 									} else {
 										if (d.positions.dataLabel2Y <= getBBox.height) {
-											if (isHideInsideLabel) {
-												return 0;
-											} else {
-												THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
-												THIS.transformDataLabelInside(ele, false, true);
-											}
+											// if (isHideInsideLabel) {
+											// 	return 0;
+											// } else {
+											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
+											THIS.transformData2LabelOutside(ele, false, true);
+											// }
 										}
 									}
 								}

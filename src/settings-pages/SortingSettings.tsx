@@ -327,6 +327,20 @@ const SortingSettings = (props) => {
 	}
 
 	React.useEffect(() => {
+		if (
+			!configValues.category.sortBy ||
+			(!CATEGORY_SORT_ON.map(d => d.value).includes(configValues.category.sortBy))
+		) {
+			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+		}
+
+		if (!configValues.subCategory.sortBy ||
+			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
+			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+		}
+	}, []);
+
+	React.useEffect(() => {
 		if (configValues.category.isSortByExtraSortField && !shadow.sortFieldsDisplayName.find((d) => d.label === configValues.category.sortBy)) {
 			handleChange(ESortByTypes.VALUE, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 			handleChange(false, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
