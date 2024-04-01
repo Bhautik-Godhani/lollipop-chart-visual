@@ -255,7 +255,7 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	labelFontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	labelFontSize: 12,
 	isLabelAutoTilt: true,
-	labelTilt: 30,
+	labelTilt: 0,
 	labelCharLimit: 20,
 	labelStyling: [],
 	isShowAxisLine: false,
