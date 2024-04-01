@@ -1636,7 +1636,7 @@ export class Visual extends Shadow {
 
 			raceBarKeys = raceBarKeys.filter((item, i, ar) => ar.indexOf(item) === i && item);
 			const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
-			const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 1);
+			const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 0);
 			this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
 
 			if (this.isChartIsRaceChart) {
@@ -1706,6 +1706,9 @@ export class Visual extends Shadow {
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
 		this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
+
+		console.log("categoricalDataPairs", this.categoricalDataPairs);
+
 
 		this.setCategoricalDataPairsByRanking();
 
@@ -3649,8 +3652,8 @@ export class Visual extends Shadow {
 					category: cat.toString(),
 					raceChartKey,
 					raceChartDataLabel,
-					value1: value1,
-					value2: value2,
+					value1: value1 ? value1 : 0,
+					value2: value2 ? value2 : 0,
 					imageDataUrl1: this.isHasImagesData && this.isShowImageMarker1 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex1].values[idx] : null,
 					imageDataUrl2: this.isHasImagesData && this.isShowImageMarker2 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex2].values[idx] : null,
 					identity: undefined,
