@@ -308,6 +308,7 @@ export class Visual extends Shadow {
 	public sortValuesNumberFormatter: IValueFormatter[] = [];
 	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
 	public extraDataLabelsNumberFormatter: IValueFormatter[];
+	public valueFormatter: IValueFormatter = valueFormatter;
 
 	// svg
 	public svg: D3Selection<SVGElement>;
@@ -9198,6 +9199,7 @@ export class Visual extends Shadow {
 		}
 
 		this.summaryTableConfig = {
+			shadow: this,
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
 			excludeDataRolesFromTable: [EDataRolesName.SubCategory],
 			excludeNegativeDataBy: "cell",

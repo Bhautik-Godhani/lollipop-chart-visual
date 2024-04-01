@@ -219,7 +219,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		enabled: true,
 		rankingType: ERankingType.TopN,
 		count: 50,
-		showRemainingAsOthers: true,
+		showRemainingAsOthers: false,
 		suffix: ERankingSuffix.None,
 		calcMethod: ERankingCalcMethod.Sum
 	},
@@ -234,7 +234,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		enabled: true,
 		rankingType: ERankingType.TopN,
 		count: 10,
-		showRemainingAsOthers: true,
+		showRemainingAsOthers: false,
 		suffix: ERankingSuffix.None,
 		calcMethod: ERankingCalcMethod.Sum
 	}
