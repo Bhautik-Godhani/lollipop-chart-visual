@@ -791,21 +791,21 @@ const UIBorderAndShadow1 = (vizOptions: ShadowUpdateOptions,
     <Row>
       <Column>
         <InputControl
-          min={0}
+          min={-Infinity}
           type="number"
           label="X - Direction"
           value={configValues.shadow.horizontalOffset?.toString()}
-          handleChange={(value) => handleShadowChange(+value, ESmallMultiplesSettings.HorizontalOffset, setConfigValues)}
+          handleChange={(value) => handleShadowChange(value, ESmallMultiplesSettings.HorizontalOffset, setConfigValues)}
         />
       </Column>
 
       <Column>
         <InputControl
-          min={0}
+          min={-Infinity}
           type="number"
           label="Y - Direction"
           value={configValues.shadow.verticalOffset?.toString()}
-          handleChange={(value) => handleShadowChange(+value, ESmallMultiplesSettings.VerticalOffset, setConfigValues)}
+          handleChange={(value) => handleShadowChange(value, ESmallMultiplesSettings.VerticalOffset, setConfigValues)}
         />
       </Column>
     </Row>
@@ -856,6 +856,8 @@ const SmallMultiplesSettings = (props) => {
   let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
   const isShowGridLayoutOnly = shadow.config.smallMultiplesConfig.showGridLayoutOnly;
+  const isShowInfoPage = shadow.config.smallMultiplesConfig.showInfoPage;
+  const infoMessage = shadow.config.smallMultiplesConfig.infoMessage;
   const isShowXYAxisSettings = shadow.config.smallMultiplesConfig.showXYAxisSettings;
 
   try {
@@ -918,17 +920,17 @@ const SmallMultiplesSettings = (props) => {
 
   return (
     <>
-      <ConditionalWrapper visible={configValues.showInfoPage}>
+      <ConditionalWrapper visible={isShowInfoPage}>
         <Row>
           <Column>
             <Quote>
-              <strong>Note: </strong> {configValues.infoMessage}
+              <strong>Note: </strong> {infoMessage}
             </Quote>
           </Column>
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={!configValues.showInfoPage} style={{ width: "300px" }}>
+      <ConditionalWrapper visible={!isShowInfoPage} style={{ width: "300px" }}>
         <Row disableTopPadding>
           <Column>
             <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
