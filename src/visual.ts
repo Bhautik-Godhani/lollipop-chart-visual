@@ -3839,12 +3839,12 @@ export class Visual extends Shadow {
 
 		this.minCategoryValueDataPair = {
 			category: this.chartData[min1Index].category,
-			value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[min1Index], +this.categoricalMeasure2Field.values[min2Index]]) : +this.categoricalMeasure1Field.values[min1Index],
+			value: this.isHasMultiMeasure ? d3.sum([+this.chartData[min1Index].value1, +this.chartData[min2Index].value2]) : +this.chartData[min1Index].value1,
 		};
 
 		this.maxCategoryValueDataPair = {
 			category: this.chartData[max1Index].category,
-			value: this.isHasMultiMeasure ? d3.sum([+this.categoricalMeasure1Field.values[max1Index], +this.categoricalMeasure2Field.values[max2Index]]) : +this.categoricalMeasure1Field.values[max1Index],
+			value: this.isHasMultiMeasure ? d3.sum([+this.chartData[max1Index].value1, +this.chartData[max2Index].value2]) : +this.chartData[max1Index].value1,
 		};
 
 		this.categoryPatterns = this.chartData
