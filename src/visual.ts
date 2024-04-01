@@ -2021,6 +2021,14 @@ export class Visual extends Shadow {
 		this.categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
 		this.categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
+		categoricalData.categories.forEach(d => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
+		});
+
+		categoricalData.values.forEach(d => {
+			this.allNumberFormatter[d.source.displayName] = { formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
+		});
+
 		this.categoricalCategoriesLastIndex = this.categoricalCategoriesFields.length - 1;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = !!this.categoricalImagesDataFields;
@@ -9272,7 +9280,9 @@ export class Visual extends Shadow {
 			},
 			seedDataFromVisual: seedDataFromVisual,
 			numberFormatter: (value, field) => {
-				return value;
+				return this.numberSettings.show ?
+					this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field].formatter, false, false) :
+					powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
 			},
 			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
 			viewport: {
@@ -9337,22 +9347,6 @@ export class Visual extends Shadow {
 			.map(d => {
 				return valueFormatter.create({ format: d.source.format });
 			});
-
-		categoricalMeasureFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.measureNumberFormatter[i], role: EDataRolesName.Measure };
-		});
-
-		categoricalTooltipFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.tooltipNumberFormatter[i], role: EDataRolesName.Tooltip };
-		});
-
-		categoricalExtraDataLabelsFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.extraDataLabelsNumberFormatter[i], role: EDataRolesName.ExtraDataLabels };
-		})
-
-		categoricalSortFields.forEach((d, i) => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: this.sortValuesNumberFormatter[i], role: EDataRolesName.Sort };
-		});
 	}
 
 	setBrushXAxisTicksMaxHeight(): void {
