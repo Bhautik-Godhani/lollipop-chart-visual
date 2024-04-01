@@ -1707,9 +1707,6 @@ export class Visual extends Shadow {
 
 		this.defaultSortCategoryDataPairs(this.categoricalDataPairs, measureKeys, categoricalMeasureFields);
 
-		console.log("categoricalDataPairs", this.categoricalDataPairs);
-
-
 		this.setCategoricalDataPairsByRanking();
 
 		if (this.sortingSettings.category.enabled) {

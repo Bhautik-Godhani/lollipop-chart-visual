@@ -855,8 +855,6 @@ const SmallMultiplesSettings = (props) => {
   } = props;
   let initialStates = vizOptions.formatTab[sectionName][propertyName];
 
-  console.log(shadow);
-
   const isShowGridLayoutOnly = shadow.config.smallMultiplesConfig.showGridLayoutOnly;
   const isShowXYAxisSettings = shadow.config.smallMultiplesConfig.showXYAxisSettings;
 
