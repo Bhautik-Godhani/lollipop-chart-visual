@@ -1166,12 +1166,14 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
       }
     }
 
+    const chartData = shadow.isHorizontalChart ? shadow.chartData.reverse() : shadow.chartData;
+
     if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
-      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+      handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
 
     if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
-      handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+      handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
 
     if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
