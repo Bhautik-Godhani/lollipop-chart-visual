@@ -286,8 +286,8 @@ export class Visual extends Shadow {
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	isHasPositiveValue: boolean;
-	CFCategoryColorPair: { [category: string]: { marker1Color: boolean, marker2Color: boolean } } = {};
-	CFSubCategoryColorPair: { [subCategory: string]: { marker1Color: boolean, marker2Color: boolean } } = {};
+	CFCategoryColorPair: { [category: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
+	CFSubCategoryColorPair: { [subCategory: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
 	isHasNegativeValue: boolean;
 	markerMaxSize: number = 0;
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
@@ -3011,21 +3011,25 @@ export class Visual extends Shadow {
 					// 	this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 					// } else {
 
-					this.CFCategoryColorPair[d.category].marker1Color = true;
-					this.CFCategoryColorPair[d.category].marker2Color = true;
-
 					if (conditionalFormattingResult.markerColor) {
 						this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
 						this.categoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
+
+						this.CFCategoryColorPair[d.category].isMarker1Color = true;
+						this.CFCategoryColorPair[d.category].isMarker2Color = true;
 					}
 
 					// }
 					if (conditionalFormattingResult.lineColor) {
 						this.categoryColorPair[d.category].lineColor = conditionalFormattingResult.lineColor;
+
+						this.CFCategoryColorPair[d.category].isLineColor = true;
 					}
 
 					if (conditionalFormattingResult.labelColor) {
 						this.categoryColorPair[d.category].labelColor = conditionalFormattingResult.labelColor;
+
+						this.CFCategoryColorPair[d.category].isLabelColor = true;
 					}
 				} else {
 					// this.categoryColorPair[d.category].lineColor = undefined;
@@ -3041,21 +3045,25 @@ export class Visual extends Shadow {
 						// 	this.subCategoryColorPair[d.category].marker2Color = conditionalFormattingResult.markerColor;
 						// } else {
 
-						this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
-						this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
-
 						if (conditionalFormattingResult.markerColor) {
 							this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = conditionalFormattingResult.markerColor;
 							this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = conditionalFormattingResult.markerColor;
+
+							this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker1Color = true;
+							this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker2Color = true;
 						}
 
 						// }
 						if (conditionalFormattingResult.lineColor) {
 							this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = conditionalFormattingResult.lineColor;
+
+							this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
 						}
 
 						if (conditionalFormattingResult.labelColor) {
 							this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = conditionalFormattingResult.labelColor;
+
+							this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLabelColor = true;
 						}
 					} else {
 						// this.subCategoryColorPair[d.category].lineColor = undefined;
@@ -3073,36 +3081,45 @@ export class Visual extends Shadow {
 					if (c.valueType === ECFValueTypes.Ranking) {
 						if (c.rankingType === ECFRankingTypes.TopN) {
 							if (i < c.staticRankingValue) {
-								this.CFCategoryColorPair[d.category].marker1Color = true;
-								this.CFCategoryColorPair[d.category].marker2Color = true;
 
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker1Color = c.color;
 									this.categoryColorPair[d.category].marker2Color = c.color;
+
+									this.CFCategoryColorPair[d.category].isMarker1Color = true;
+									this.CFCategoryColorPair[d.category].isMarker2Color = true;
 								}
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
 									this.categoryColorPair[d.category].lineColor = c.color;
+
+									this.CFCategoryColorPair[d.category].isLineColor = true;
 								}
 
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
 									this.categoryColorPair[d.category].labelColor = c.color;
+
+									this.CFCategoryColorPair[d.category].isLabelColor = true;
 								}
 							}
 						} else if (c.rankingType === ECFRankingTypes.BottomN) {
-							this.CFCategoryColorPair[d.category].marker1Color = true;
-							this.CFCategoryColorPair[d.category].marker2Color = true;
-
 							if (i > ((chartData.length - 1) - c.staticRankingValue)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker1Color = c.color;
 									this.categoryColorPair[d.category].marker2Color = c.color;
+
+									this.CFCategoryColorPair[d.category].isMarker1Color = true;
+									this.CFCategoryColorPair[d.category].isMarker2Color = true;
 								}
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
 									this.categoryColorPair[d.category].lineColor = c.color;
+
+									this.CFCategoryColorPair[d.category].isLineColor = true;
 								}
 
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
 									this.categoryColorPair[d.category].labelColor = c.color;
+
+									this.CFCategoryColorPair[d.category].isLabelColor = true;
 								}
 							}
 						}
@@ -3237,7 +3254,17 @@ export class Visual extends Shadow {
 						if (isPercentageMatch(c, percentage1)) {
 							if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 								this.categoryColorPair[d.category].marker1Color = c.color;
-								this.CFCategoryColorPair[d.category].marker1Color = true;
+								this.CFCategoryColorPair[d.category].isMarker1Color = true;
+							}
+
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+								this.categoryColorPair[d.category].lineColor = c.color;
+								this.CFCategoryColorPair[d.category].isLineColor = true;
+							}
+
+							if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+								this.categoryColorPair[d.category].labelColor = c.color;
+								this.CFCategoryColorPair[d.category].isLabelColor = true;
 							}
 						}
 
@@ -3246,7 +3273,17 @@ export class Visual extends Shadow {
 							if (isPercentageMatch(c, percentage2)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.categoryColorPair[d.category].marker2Color = c.color;
-									this.CFCategoryColorPair[d.category].marker2Color = true;
+									this.CFCategoryColorPair[d.category].isMarker2Color = true;
+								}
+
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+									this.categoryColorPair[d.category].lineColor = c.color;
+									this.CFCategoryColorPair[d.category].isLineColor = true;
+								}
+
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+									this.categoryColorPair[d.category].labelColor = c.color;
+									this.CFCategoryColorPair[d.category].isLabelColor = true;
 								}
 							}
 						}
@@ -3260,7 +3297,17 @@ export class Visual extends Shadow {
 							if (isPercentageMatch(c, percentage1)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
-									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker1Color = true;
+									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker1Color = true;
+								}
+
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+									this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
+									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
+								}
+
+								if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+									this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
+									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLabelColor = true;
 								}
 							}
 
@@ -3269,7 +3316,17 @@ export class Visual extends Shadow {
 								if (isPercentageMatch(c, percentage2)) {
 									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 										this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
-										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].marker2Color = true;
+										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker2Color = true;
+									}
+
+									if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+										this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
+										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
+									}
+
+									if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+										this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
+										this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLabelColor = true;
 									}
 								}
 							}
@@ -4654,7 +4711,7 @@ export class Visual extends Shadow {
 
 		this.categoricalDataPairs.forEach((d, i) => {
 			this.categoryColorPair[d.category] = this.categoryColorPairWithIndex[`${i}-${d.category}`];
-			this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
+			this.CFCategoryColorPair[d.category] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 		});
 
 		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
@@ -4662,7 +4719,7 @@ export class Visual extends Shadow {
 			this.categoricalDataPairs.forEach((d) => {
 				this.categoryColorPair[d.category].marker1Color = othersColor;
 				this.categoryColorPair[d.category].marker2Color = othersColor;
-				this.CFCategoryColorPair[d.category] = { marker1Color: false, marker2Color: false };
+				this.CFCategoryColorPair[d.category] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 			});
 		}
 
@@ -4775,7 +4832,7 @@ export class Visual extends Shadow {
 		this.categoricalDataPairs.forEach(d => {
 			this.subCategoriesName.forEach((c, i) => {
 				this.subCategoryColorPair[`${d.category}-${c}`] = this.subCategoryColorPairWithIndex[`${i}-${d.category}-${c}`];
-				this.CFSubCategoryColorPair[`${d.category}-${c}`] = { marker1Color: false, marker2Color: false };
+				this.CFSubCategoryColorPair[`${d.category}-${c}`] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 			});
 		});
 	}
@@ -5443,7 +5500,11 @@ export class Visual extends Shadow {
 		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
 				.attr("fill", d => {
-					return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color), EHighContrastColorType.Foreground)
+					if (this.CFCategoryColorPair[d.category].isLabelColor) {
+						return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
+					} else {
+						return this.getColor(isAutoFontColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true) : (this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color), EHighContrastColorType.Foreground)
+					}
 				});
 		} else {
 			textSelection
@@ -6134,8 +6195,8 @@ export class Visual extends Shadow {
 		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean): VisualTooltipDataItem[] => {
-			const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].marker1Color;
-			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].marker2Color;
+			const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].isMarker1Color;
+			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].isMarker2Color;
 			const posNegColor1 = value.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 			const posNegColor2 = value.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
@@ -7348,7 +7409,7 @@ export class Visual extends Shadow {
 	}
 
 	getLineStroke(d: ILollipopChartRow): string {
-		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical && (!this.CFCategoryColorPair[d.category].marker1Color && !this.CFCategoryColorPair[d.category].marker2Color)) {
+		if (this.isIBCSEnabled && this.selectedIBCSTheme !== EIBCSThemes.DefaultHorizontal && this.selectedIBCSTheme !== EIBCSThemes.DefaultVertical && (!this.CFCategoryColorPair[d.category].isMarker1Color && !this.CFCategoryColorPair[d.category].isMarker2Color)) {
 			if (!this.isHasMultiMeasure) {
 				if (d.value1 >= 0) {
 					return this.getColor(POSITIVE_COLOR, EHighContrastColorType.Foreground);
@@ -8261,7 +8322,7 @@ export class Visual extends Shadow {
 			.each((d: ILollipopChartRow, i: number, nodes) => {
 				const ele = d3.select(nodes[i]);
 				let fill: string;
-				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].marker1Color;
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
@@ -8362,7 +8423,7 @@ export class Visual extends Shadow {
 			.each((d: ILollipopChartRow, i: number, nodes) => {
 				const ele = d3.select(nodes[i]);
 				let fill: string;
-				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].marker2Color;
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker2Color;
 				const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker2Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
