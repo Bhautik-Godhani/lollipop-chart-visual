@@ -1507,9 +1507,6 @@ export class Visual extends Shadow {
 			this.isHasErrorLowerBounds = true;
 		}
 
-		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
-		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
-
 		if (this.isHasMultiMeasure) {
 			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
 		} else {
@@ -2072,9 +2069,6 @@ export class Visual extends Shadow {
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
 			this.markerSettings.markerType = EMarkerTypes.SHAPE;
 		}
-
-		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE;
-		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART;
 
 		if (this.isLollipopTypeCircle) {
 			this.minScaleBandWidth = 40;
@@ -4507,6 +4501,9 @@ export class Visual extends Shadow {
 		if (this.numberSettings.decimalPlaces < 0) {
 			this.numberSettings.decimalPlaces = 0;
 		}
+
+		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE || (this.isHasMultiMeasure ? false : marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT);
+		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART && (this.isHasMultiMeasure ? true : marker1Style.markerShape === EMarkerShapeTypes.DEFAULT);
 
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
@@ -7696,7 +7693,7 @@ export class Visual extends Shadow {
 
 		// marker 1
 		const marker1Style = this.markerSettings.marker1Style;
-		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+		if (marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
 			const markerShapeValue = marker1Style.markerShapeValue;
 			marker1 = {
 				label: marker1Style.markerShapeValue.iconName,
@@ -7711,7 +7708,7 @@ export class Visual extends Shadow {
 
 		// marker 2
 		const marker2Style = this.markerSettings.marker2Style;
-		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+		if (marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
 			const markerShapeValue = marker2Style.markerShapeValue;
 			marker2 = {
 				label: marker2Style.markerShapeValue.iconName,
