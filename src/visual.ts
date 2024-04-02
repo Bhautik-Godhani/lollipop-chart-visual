@@ -684,7 +684,7 @@ export class Visual extends Shadow {
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
 				showPercentageAllOption: true,
-				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "Test" }
+				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." }
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
