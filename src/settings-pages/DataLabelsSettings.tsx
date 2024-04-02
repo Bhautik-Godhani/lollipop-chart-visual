@@ -9,6 +9,7 @@ import {
 	ConditionalWrapper,
 	Footer,
 	InputControl,
+	Quote,
 	Row,
 	SelectInput,
 	SwitchOption,
@@ -154,17 +155,12 @@ const UIDataLabelsFontSettings = (
 		{
 			label: "First, Last, Min & Max",
 			value: EDataLabelsDisplayTypes.FirstLastMinMax,
+		},
+		{
+			label: "Custom Label (Field)",
+			value: EDataLabelsDisplayTypes.CustomLabel,
 		}
 	];
-
-	if (shadow.isHasExtraDataLabels) {
-		DISPLAY_TYPES.push(
-			{
-				label: "Custom Label (Field)",
-				value: EDataLabelsDisplayTypes.CustomLabel,
-			}
-		)
-	}
 
 	const CUSTOM_LABELS: ILabelValuePair[] = shadow.extraDataLabelsDisplayNames.map(label => ({
 		value: label,
@@ -205,6 +201,16 @@ const UIDataLabelsFontSettings = (
 					/>
 				</Column>
 			</Row>
+
+			<ConditionalWrapper visible={configValues.displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels}>
+				<Row>
+					<Column>
+						<Quote>
+							<strong>Note: </strong>Please fill data to "Data Labels" data field to use custom label display style.
+						</Quote>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={configValues.displayType === EDataLabelsDisplayTypes.CustomLabel}>
 				<Row >
@@ -622,9 +628,9 @@ const DataLabelsSettings = (props) => {
 			handleChange(shadow.extraDataLabelsDisplayNames[0], EDataLabelsSettings.CustomLabel, selectedMeasure, setConfigValues);
 		}
 
-		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels) {
-			handleChange(EDataLabelsDisplayTypes.All, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues);
-		}
+		// if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels) {
+		// 	handleChange(EDataLabelsDisplayTypes.All, EDataLabelsSettings.DisplayType, selectedMeasure, setConfigValues);
+		// }
 	}, [measureConfigValues.displayType]);
 
 	React.useEffect(() => {
@@ -699,7 +705,17 @@ const DataLabelsSettings = (props) => {
 				</ConditionalWrapper>
 			</ConditionalWrapper>
 
-			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+			<Footer
+				cancelButtonHandler={closeCurrentSettingHandler}
+				saveButtonConfig={{
+					isDisabled: configValues[selectedMeasure].displayType === EDataLabelsDisplayTypes.CustomLabel && !shadow.isHasExtraDataLabels,
+					text: "APPLY",
+					handler: applyChanges,
+				}}
+				resetButtonHandler={resetChanges}
+			/>
+
+			{/* {UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)} */}
 		</>
 	);
 };
