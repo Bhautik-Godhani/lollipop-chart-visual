@@ -31,6 +31,8 @@ export interface ILollipopChartRow {
 	labelLowerBoundValue?: string;
 	extraLabel1: string;
 	extraLabel2: string;
+	data1Label: string;
+	data2Label: string;
 }
 
 export interface IChartSubCategory {

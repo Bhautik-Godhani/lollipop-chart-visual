@@ -3725,6 +3725,8 @@ export class Visual extends Shadow {
 					boundsTotal: 0,
 					extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
 					extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
+					data1Label: "",
+					data2Label: ""
 				}
 
 				arr = [...arr, obj];
@@ -3796,7 +3798,9 @@ export class Visual extends Shadow {
 							isHighlight: false,
 							positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
 							extraLabel1: "",
-							extraLabel2: ""
+							extraLabel2: "",
+							data1Label: "",
+							data2Label: ""
 						});
 					}
 				});
@@ -3977,6 +3981,86 @@ export class Visual extends Shadow {
 				this.chartData.push(elementToMove);
 			}
 		}
+
+		const getDataLabel = (d: ILollipopChartRow, isData2Label: boolean) => {
+			const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
+			const key = isData2Label ? "value2" : "value1";
+			const firstCategory = this.chartData[0].category;
+			const lastCategory = this.chartData[this.chartData.length - 1].category;
+			let label = "";
+
+			switch (dataLabelsSettings.displayType) {
+				case EDataLabelsDisplayTypes.All:
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true);
+					break;
+
+				case EDataLabelsDisplayTypes.FirstLast:
+					if (d.category === firstCategory) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					if (d.category === lastCategory) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+					break;
+
+				case EDataLabelsDisplayTypes.MinMax:
+					if (d.category === this.minCategoryValueDataPair.category) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					if (d.category === this.maxCategoryValueDataPair.category) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					break;
+
+				case EDataLabelsDisplayTypes.LastOnly:
+					if (d.category === lastCategory) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					break;
+
+				case EDataLabelsDisplayTypes.MaxOnly:
+					if (d.category === this.maxCategoryValueDataPair.category) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					break;
+
+				case EDataLabelsDisplayTypes.FirstLastMinMax:
+					if (d.category === firstCategory) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					if (d.category === lastCategory) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					if (d.category === this.minCategoryValueDataPair.category) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+
+					if (d.category === this.maxCategoryValueDataPair.category) {
+						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+					}
+					break;
+
+				case EDataLabelsDisplayTypes.CustomLabel:
+					if (this.isHasExtraDataLabels) {
+						label = this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel].formatter, true, true);
+					}
+					break;
+			}
+
+			return label;
+		}
+
+		this.chartData.forEach(d => {
+			d.data1Label = getDataLabel(d, false);
+			d.data2Label = getDataLabel(d, true);
+		})
 	}
 
 	public configLegend(): void {
@@ -5438,69 +5522,7 @@ export class Visual extends Shadow {
 			.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 			.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
 			.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-			.text((d: ILollipopChartRow) => {
-				const firstCategory = this.chartData[0].category;
-				const lastCategory = this.chartData[this.chartData.length - 1].category;
-
-				switch (dataLabelsSettings.displayType) {
-					case EDataLabelsDisplayTypes.All:
-						return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true);
-					case EDataLabelsDisplayTypes.FirstLast:
-						if (d.category === firstCategory) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						if (d.category === lastCategory) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						return "";
-					case EDataLabelsDisplayTypes.MinMax:
-						if (d.category === this.minCategoryValueDataPair.category) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						if (d.category === this.maxCategoryValueDataPair.category) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						return "";
-					case EDataLabelsDisplayTypes.LastOnly:
-						if (d.category === lastCategory) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						return "";
-					case EDataLabelsDisplayTypes.MaxOnly:
-						if (d.category === this.maxCategoryValueDataPair.category) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						return "";
-					case EDataLabelsDisplayTypes.FirstLastMinMax:
-						if (d.category === firstCategory) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						if (d.category === lastCategory) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						if (d.category === this.minCategoryValueDataPair.category) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						if (d.category === this.maxCategoryValueDataPair.category) {
-							return this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-						}
-
-						return "";
-					case EDataLabelsDisplayTypes.CustomLabel:
-						if (this.isHasExtraDataLabels) {
-							return this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel].formatter, true, true);
-						}
-				}
-			});
+			.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label);
 
 		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
@@ -5532,7 +5554,7 @@ export class Visual extends Shadow {
 				}
 
 				textShadow
-					.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
+					.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label)
 					.attr("class", "dataLabelTextShadow")
 					.attr("text-anchor", "middle")
 					.attr("dy", "0.35em")
@@ -5574,13 +5596,14 @@ export class Visual extends Shadow {
 
 		if (labelPlacement === DataLabelsPlacement.Outside) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
+
 			if (!textShadow.node()) {
 				textShadow = textSelection.clone(true);
 				textShadow.lower();
 			}
 
 			textShadow
-				.text((d) => this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true))
+				.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label)
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.35em")
