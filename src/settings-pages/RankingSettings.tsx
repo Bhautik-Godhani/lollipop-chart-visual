@@ -333,22 +333,24 @@ const Ranking = (props) => {
 				</AccordionAlt>
 			</ConditionalWrapper> */}
 
-			<AccordionAlt title="By Small Multiples">
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Enable"}
-							value={SMRanking.enabled}
-							handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SmallMultiples, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
+			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
+				<AccordionAlt title="By Small Multiples">
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Enable"}
+								value={SMRanking.enabled}
+								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SmallMultiples, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
 
-				<ConditionalWrapper visible={SMRanking.enabled}>
-					{UIByCategoryRankingSettings(ERankingSettings.SmallMultiples, SMRanking, setConfigValues)}
-				</ConditionalWrapper>
-			</AccordionAlt>
+					<ConditionalWrapper visible={SMRanking.enabled}>
+						{UIByCategoryRankingSettings(ERankingSettings.SmallMultiples, SMRanking, setConfigValues)}
+					</ConditionalWrapper>
+				</AccordionAlt>
+			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
