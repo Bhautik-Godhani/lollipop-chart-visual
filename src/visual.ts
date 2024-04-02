@@ -6235,12 +6235,9 @@ export class Visual extends Shadow {
 					color: "transparent",
 				},
 				{
-					displayName: isCircle1 ? this.measure1DisplayName : this.measure2DisplayName,
-					value: isCircle1
-						? numberFormatter(value.value1, this.measureNumberFormatter[0])
-						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: isCircle1 ? (isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color) :
-						(isPosNegColorScheme2 ? posNegColor2 : this.categoryColorPair[value.category].marker2Color),
+					displayName: this.measure1DisplayName,
+					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
+					color: (isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
 				},
 			];
 
@@ -8944,6 +8941,11 @@ export class Visual extends Shadow {
 				};
 
 				const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
+					const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
+					const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker2Color;
+					const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+					const posNegColor2 = pieData.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+
 					const tooltipData: TooltipData[] = [
 						{
 							displayName: this.categoryDisplayName,
@@ -8956,11 +8958,19 @@ export class Visual extends Shadow {
 							color: "transparent",
 						},
 						{
-							displayName: pieData.valueType === DataValuesType.Value2 ? this.measure2DisplayName : this.measure1DisplayName,
-							value: numberFormatter(pieData[valueKey], isPie2 ? this.measureNumberFormatter[1] : this.measureNumberFormatter[0]),
-							color: pieData.valueType === DataValuesType.Value2 ? this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color,
-						},
+							displayName: this.measure1DisplayName,
+							value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
+							color: (isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+						}
 					];
+
+					if (this.isHasMultiMeasure) {
+						tooltipData.push({
+							displayName: this.measure2DisplayName,
+							value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+							color: (isPosNegColorScheme2 ? posNegColor2 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
+						})
+					}
 
 					pieData.tooltipFields.forEach((data) => {
 						tooltipData.push({
