@@ -2312,7 +2312,7 @@ export class Visual extends Shadow {
 			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
 			this.axisNumberFormatter = (value, numberSettings) => GetFormattedNumber(value, numberSettings, undefined, false, true);
 
-			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab);
+			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab).reverse();
 
 			if (!this.isValidShowBucket) {
 				return;
@@ -2765,6 +2765,10 @@ export class Visual extends Shadow {
 
 				// if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
 				this.drawXYAxis(true, true);
+
+				if (this.chartSettings.theme && (!this.chartSettings.isIBCSEnabled || (this.chartSettings.prevTheme !== this.chartSettings.theme)) && ((this.chartSettings.prevTheme !== this.chartSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
+					return;
+				}
 
 				if (this.categoricalCategoriesLastIndex > 0) {
 					if (!this.isHorizontalChart) {
