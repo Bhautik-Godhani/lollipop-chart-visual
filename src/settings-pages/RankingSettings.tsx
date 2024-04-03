@@ -12,9 +12,10 @@ import {
 	SwitchOption,
 	ToggleButton,
 } from "@truviz/shadow/dist/Components";
-import { ICategoryRankingProps, ILabelValuePair, IRankingSettings } from "../visual-settings.interface";
+import { ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps } from "../visual-settings.interface";
 import { ERankingCalcMethod, ERankingSettings, ERankingSuffix, ERankingType } from "../enum";
 import { persistProperties } from "../methods/methods";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const RANKING_TYPES: ILabelValuePair[] = [
 	{
@@ -171,43 +172,43 @@ const UIByCategoryRankingOthersSettings = (
 	);
 };
 
-// const UIByGroupRankingSettings = (
-// 	vizOptions: ShadowUpdateOptions,
-// 	groupByRanking: ISubCategoryRankingProps,
-// 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
-// ) => {
-// 	return (
-// 		<>
-// 			<Row appearance="padded">
-// 				<Column>
-// 					<Row>
-// 						<Column>
-// 							<SwitchOption
-// 								value={groupByRanking.rankingType}
-// 								optionsList={RANKING_TYPES}
-// 								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
-// 							/>
-// 						</Column>
-// 					</Row>
+const UIByGroupRankingSettings = (
+	vizOptions: ShadowUpdateOptions,
+	groupByRanking: ISubCategoryRankingProps,
+	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+) => {
+	return (
+		<>
+			<Row appearance="padded">
+				<Column>
+					<Row>
+						<Column>
+							<SwitchOption
+								value={groupByRanking.rankingType}
+								optionsList={RANKING_TYPES}
+								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
+							/>
+						</Column>
+					</Row>
 
-// 					<Row style={{ width: "50%" }}>
-// 						<Column>
-// 							<InputControl
-// 								min={1}
-// 								type="number"
-// 								label="Count"
-// 								value={groupByRanking.count}
-// 								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
-// 							/>
-// 						</Column>
-// 					</Row>
-// 				</Column>
-// 			</Row>
+					<Row style={{ width: "50%" }}>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Count"
+								value={groupByRanking.count}
+								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+				</Column>
+			</Row>
 
-// 			{/* {UIByGroupRankingOthersSettings(vizOptions, groupByRanking, setConfigValues)} */}
-// 		</>
-// 	);
-// };
+			{/* {UIByGroupRankingOthersSettings(vizOptions, groupByRanking, setConfigValues)} */}
+		</>
+	);
+};
 
 // const UIByGroupRankingOthersSettings = (
 // 	vizOptions: ShadowUpdateOptions,
@@ -314,7 +315,7 @@ const Ranking = (props) => {
 				</ConditionalWrapper>
 			</AccordionAlt>
 
-			{/* <ConditionalWrapper visible={shadow.isHasSubcategories}>
+			<ConditionalWrapper visible={shadow.isHasSubcategories}>
 				<AccordionAlt title="By Sub-category">
 					<Row>
 						<Column>
@@ -331,7 +332,7 @@ const Ranking = (props) => {
 						{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
 					</ConditionalWrapper>
 				</AccordionAlt>
-			</ConditionalWrapper> */}
+			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
 				<AccordionAlt title="By Small Multiples">
