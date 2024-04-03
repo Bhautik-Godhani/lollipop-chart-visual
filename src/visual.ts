@@ -4503,6 +4503,10 @@ export class Visual extends Shadow {
 	}
 
 	changeVisualSettings(): void {
+		if (this.lineSettings.isApplyMarkerColor && this.isLollipopTypePie) {
+			this.lineSettings.isApplyMarkerColor = false;
+		}
+
 		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;

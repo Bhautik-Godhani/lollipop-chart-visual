@@ -100,6 +100,12 @@ const LineSettings = (props) => {
 		configValues[ELineSettings.lineColor] = "rgb(150,150,150,60)";
 	}
 
+	React.useEffect(() => {
+		if (configValues.isApplyMarkerColor && shadow.isLollipopTypePie) {
+			handleChange(false, ELineSettings.isApplyMarkerColor)
+		}
+	}, []);
+
 	return (
 		<>
 			<Row>
@@ -134,18 +140,34 @@ const LineSettings = (props) => {
 					<Column></Column>
 				</Row>
 
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Same color as Marker"}
-							value={configValues.isApplyMarkerColor}
-							handleChange={() => handleCheckbox(ELineSettings.isApplyMarkerColor)}
-							appearance="checkbox"
-						/>
-					</Column>
-				</Row>
+				<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Same color as Marker"}
+								value={configValues.isApplyMarkerColor}
+								handleChange={() => handleCheckbox(ELineSettings.isApplyMarkerColor)}
+								appearance="checkbox"
+							/>
+						</Column>
+					</Row>
 
-				<ConditionalWrapper visible={!configValues.isApplyMarkerColor}>
+					<ConditionalWrapper visible={!configValues.isApplyMarkerColor}>
+						<Row>
+							<Column>
+								<ColorPicker
+									label="Color"
+									color={configValues.lineColor}
+									handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+									colorPalette={vizOptions.host.colorPalette}
+									size="sm"
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={shadow.isHasSubcategories}>
 					<Row>
 						<Column>
 							<ColorPicker
