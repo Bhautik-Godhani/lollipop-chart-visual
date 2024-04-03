@@ -5556,51 +5556,56 @@ export class Visual extends Shadow {
 				// textShadow.style("display", "none");
 			}
 
-			if (this.isLollipopTypeCircle) {
-				if (!textShadow.node()) {
-					textShadow = textSelection.clone(true);
-					textShadow.lower();
-				}
+			// if (this.isLollipopTypeCircle) {
+			if (!textShadow.node()) {
+				textShadow = textSelection.clone(true);
+				textShadow.lower();
+			}
 
-				textShadow
-					.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label)
-					.attr("class", "dataLabelTextShadow")
-					.attr("text-anchor", "middle")
-					.attr("dy", "0.35em")
-					.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
-					.style("font-family", dataLabelsSettings.fontFamily)
-					.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
-					.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
-					.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
-					.attr("stroke", d =>
-						this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : dataLabelsSettings.backgroundColor, EHighContrastColorType.Background))
-					.attr("stroke-width", 3)
-					.attr("stroke-linejoin", "round")
-					.style("text-anchor", "middle")
-					.style("display", d => {
-						if (dataLabelsSettings.showBackground) {
-							if (this.isPatternApplied && dataLabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST) {
-								if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.ONLY_PATTERNS) {
-									let pattern = d.pattern;
-									if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
-										pattern = isData2Label ? this.patternByMeasures[DataValuesType.Value2] : this.patternByMeasures[DataValuesType.Value1];
-									}
-									if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
-										return "block";
-									} else {
-										return "none";
-									}
-								} else if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.All) {
-									return "block"
+			textShadow
+				.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label)
+				.attr("class", "dataLabelTextShadow")
+				.attr("text-anchor", "middle")
+				.attr("dy", "0.35em")
+				.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
+				.style("font-family", dataLabelsSettings.fontFamily)
+				.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
+				.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
+				.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
+				.attr("stroke", d => {
+					if (this.isLollipopTypeCircle) {
+						return this.getColor(isAutoBGColor ? invertColorByBrightness(rgbaToHex(this.categoryColorPair[d.category][isData2Label ? "marker2Color" : "marker1Color"]), true, true) : dataLabelsSettings.backgroundColor, EHighContrastColorType.Background);
+					} else {
+						return this.getColor(dataLabelsSettings.backgroundColor, EHighContrastColorType.Background);
+					}
+				})
+				.attr("stroke-width", 3)
+				.attr("stroke-linejoin", "round")
+				.style("text-anchor", "middle")
+				.style("display", d => {
+					if (dataLabelsSettings.showBackground) {
+						if (this.isPatternApplied && dataLabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST) {
+							if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.ONLY_PATTERNS) {
+								let pattern = d.pattern;
+								if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
+									pattern = isData2Label ? this.patternByMeasures[DataValuesType.Value2] : this.patternByMeasures[DataValuesType.Value1];
 								}
-							} else {
-								return "block";
+								if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
+									return "block";
+								} else {
+									return "none";
+								}
+							} else if (dataLabelsSettings.applyFor === EDataLabelsBGApplyFor.All) {
+								return "block"
 							}
 						} else {
-							return "none";
+							return "block";
 						}
-					});
-			}
+					} else {
+						return "none";
+					}
+				});
+			// }
 		}
 
 		if (labelPlacement === DataLabelsPlacement.Outside) {
