@@ -140,7 +140,7 @@ const LineSettings = (props) => {
 					<Column></Column>
 				</Row>
 
-				<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+				<ConditionalWrapper visible={!shadow.isLollipopTypePie}>
 					<Row>
 						<Column>
 							<ToggleButton
@@ -167,7 +167,7 @@ const LineSettings = (props) => {
 					</ConditionalWrapper>
 				</ConditionalWrapper>
 
-				<ConditionalWrapper visible={shadow.isHasSubcategories}>
+				<ConditionalWrapper visible={shadow.isLollipopTypePie}>
 					<Row>
 						<Column>
 							<ColorPicker
