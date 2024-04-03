@@ -13,6 +13,7 @@ import RoseIcon from "../../assets/icons/rose-icon.svg";
 import { Visual } from "../visual";
 import { persistProperties } from "../methods/methods";
 import { MarkerCircleIcon, MarkerDiamondIcon, MarkerHTriangleIcon, MarkerSquareIcon, MarkerVTriangleIcon } from "./SettingsIcons";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const MARKER_TYPES: ILabelValuePair[] = [
 	{
@@ -74,7 +75,7 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 	);
 };
 
-const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStates: IMarkerSettings, markerStyleTypes: EMarkerStyleTypes, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, config: IMarkerSettings, initialStates: IMarkerSettings, markerStyleTypes: EMarkerStyleTypes, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
 	const configValues = config[config.markerStyleType];
 	const MARKERS_LIST: any[] = [
 		{
@@ -155,24 +156,37 @@ const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStat
 									</Column>
 								</Row>
 							</ConditionalWrapper>
+
+							{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
 						</Tab>
 
 						<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
 							<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
+							{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
 						</Tab>
 
-						<Tab title={"Images"} disabled={!shadow.isHasImagesData} identifier={EMarkerShapeTypes.IMAGES}>
-							<ConditionalWrapper visible={shadow.isHasSubcategories}>
+						<Tab title={"Images"} identifier={EMarkerShapeTypes.IMAGES}>
+							<ConditionalWrapper visible={!shadow.isHasImagesData}>
 								<Row>
 									<Column>
 										<Quote>
-											<strong>Note: </strong>Please remove the sub-category data to use this feature.
+											<strong>Note: </strong>Please fill the "Images Data" data field to use this feature.
 										</Quote>
 									</Column>
 								</Row>
 							</ConditionalWrapper>
 
-							<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+							<ConditionalWrapper visible={shadow.isHasImagesData && shadow.isLollipopTypePie}>
+								<Row>
+									<Column>
+										<Quote>
+											<strong>Note: </strong>This feature not supports the "Pie/Donut/Rose Chart Markers". Please select the another marker type to use this feature.
+										</Quote>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
+
+							<ConditionalWrapper visible={shadow.isHasImagesData && !shadow.isLollipopTypePie}>
 								<Row>
 									<Column>
 										<SelectInput
@@ -187,11 +201,26 @@ const UIMarkerShapeTypes = (shadow: Visual, config: IMarkerSettings, initialStat
 										/>
 									</Column>
 								</Row>
+
+								{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
 							</ConditionalWrapper>
 						</Tab>
 
-						<Tab title={"Upload"} disabled={shadow.isLollipopTypePie} identifier={EMarkerShapeTypes.UPLOAD_ICON}>
-							<UploadTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} />
+						<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>
+							<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+								<Row>
+									<Column>
+										<Quote>
+											<strong>Note: </strong>This feature not supports the "Pie/Donut/Rose Chart Markers". Please select the another marker type to use this feature.
+										</Quote>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
+
+							<ConditionalWrapper visible={!shadow.isLollipopTypePie}>
+								<UploadTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} />
+								{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
+							</ConditionalWrapper>
 						</Tab>
 					</Tabs>
 				</Column>
@@ -242,6 +271,107 @@ const UploadTab = ({ configValues, markerStyleTypes, setConfigValues }) => (
 		</Column>
 	</Row>
 );
+
+const UIMarkerSizeSettings = (shadow: Visual, vizOptions: ShadowUpdateOptions, configValues: IMarkerSettings, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+	return <>
+		<ConditionalWrapper visible={!(configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length > 0 && shadow.isHasSubcategories)}>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Auto Marker Size"}
+						value={configValues[configValues.markerStyleType].isAutoMarkerSize}
+						handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsAutoMarkerSize, configValues.markerStyleType, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isAutoMarkerSize}>
+				<Row appearance="padded">
+					<Column>
+						<InputControl
+							min={1}
+							max={50}
+							type="number"
+							label={"Size"}
+							value={configValues[configValues.markerStyleType].markerSize.toString()}
+							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
+						/>
+					</Column>
+					<Column></Column>
+				</Row>
+			</ConditionalWrapper>
+		</ConditionalWrapper>
+
+		<ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
+			<Row>
+				<Column>
+					<ToggleButton
+						label={"Marker Outline"}
+						value={configValues[configValues.markerStyleType].isShowMarkerOutline}
+						handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsShowMarkerOutline, configValues.markerStyleType, setConfigValues)}
+						appearance="toggle"
+					/>
+				</Column>
+			</Row>
+
+			<ConditionalWrapper visible={configValues[configValues.markerStyleType].isShowMarkerOutline}>
+				<Row appearance="padded">
+					<Column>
+						<Row>
+							<Column>
+								<InputControl
+									min={0}
+									type="number"
+									label={"Width"}
+									value={configValues[configValues.markerStyleType].outlineWidth}
+									handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineWidth, configValues.markerStyleType, setConfigValues)}
+								/>
+							</Column>
+							<Column></Column>
+						</Row>
+
+						<ConditionalWrapper visible={!configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}>
+							<Row>
+								<Column>
+									<ColorPicker
+										label="Color"
+										color={configValues[configValues.markerStyleType].outlineColor}
+										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineColor, configValues.markerStyleType, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
+
+						<Row>
+							<Column>
+								<ToggleButton
+									label={"Same color as Marker"}
+									value={configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}
+									handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SameOutlineAsMarkerColor, configValues.markerStyleType, setConfigValues)}
+									appearance="checkbox"
+								/>
+							</Column>
+						</Row>
+
+						<Row>
+							<Column>
+								<ToggleButton
+									label={"Show outline only"}
+									value={configValues[configValues.markerStyleType].showOutlineOnly}
+									handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.ShowOutlineOnly, configValues.markerStyleType, setConfigValues)}
+									appearance="checkbox"
+								/>
+							</Column>
+						</Row>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+		</ConditionalWrapper>
+	</>
+}
 
 const MarkerSettings = (props) => {
 	const {
@@ -359,7 +489,7 @@ const MarkerSettings = (props) => {
 					</Row>
 				</ConditionalWrapper>
 
-				{UIMarkerShapeTypes(shadow, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
+				{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
 			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={shadow.isHasSubcategories}>
@@ -377,104 +507,7 @@ const MarkerSettings = (props) => {
 				</ConditionalWrapper>
 				<></>
 
-				{UIMarkerShapeTypes(shadow, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
-			</ConditionalWrapper>
-
-			<ConditionalWrapper visible={!(configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.IMAGES && shadow.imagesDataFieldsName.length > 0 && shadow.isHasSubcategories)}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Auto Marker Size"}
-							value={configValues[configValues.markerStyleType].isAutoMarkerSize}
-							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsAutoMarkerSize, configValues.markerStyleType, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={!configValues[configValues.markerStyleType].isAutoMarkerSize}>
-					<Row appearance="padded">
-						<Column>
-							<InputControl
-								min={1}
-								max={50}
-								type="number"
-								label={"Size"}
-								value={configValues[configValues.markerStyleType].markerSize.toString()}
-								handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerSize, configValues.markerStyleType, setConfigValues)}
-							/>
-						</Column>
-						<Column></Column>
-					</Row>
-				</ConditionalWrapper>
-			</ConditionalWrapper>
-
-			<ConditionalWrapper visible={configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT}>
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Marker Outline"}
-							value={configValues[configValues.markerStyleType].isShowMarkerOutline}
-							handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.IsShowMarkerOutline, configValues.markerStyleType, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={configValues[configValues.markerStyleType].isShowMarkerOutline}>
-					<Row appearance="padded">
-						<Column>
-							<Row>
-								<Column>
-									<InputControl
-										min={0}
-										type="number"
-										label={"Width"}
-										value={configValues[configValues.markerStyleType].outlineWidth}
-										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineWidth, configValues.markerStyleType, setConfigValues)}
-									/>
-								</Column>
-								<Column></Column>
-							</Row>
-
-							<ConditionalWrapper visible={!configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}>
-								<Row>
-									<Column>
-										<ColorPicker
-											label="Color"
-											color={configValues[configValues.markerStyleType].outlineColor}
-											handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.OutlineColor, configValues.markerStyleType, setConfigValues)}
-											colorPalette={vizOptions.host.colorPalette}
-											size="sm"
-										/>
-									</Column>
-								</Row>
-							</ConditionalWrapper>
-
-							<Row>
-								<Column>
-									<ToggleButton
-										label={"Same color as Marker"}
-										value={configValues[configValues.markerStyleType].sameOutlineAsMarkerColor}
-										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.SameOutlineAsMarkerColor, configValues.markerStyleType, setConfigValues)}
-										appearance="checkbox"
-									/>
-								</Column>
-							</Row>
-
-							<Row>
-								<Column>
-									<ToggleButton
-										label={"Show outline only"}
-										value={configValues[configValues.markerStyleType].showOutlineOnly}
-										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.ShowOutlineOnly, configValues.markerStyleType, setConfigValues)}
-										appearance="checkbox"
-									/>
-								</Column>
-							</Row>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
+				{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
