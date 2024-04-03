@@ -2609,22 +2609,16 @@ export class Visual extends Shadow {
 							this.configLegend();
 
 							if (this.isLollipopTypeCircle) {
-								this.categoriesColorList = this.chartData.map(d => ({
-									name: d.category,
-									marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
-								}));
-							}
+								this.categoriesColorList = this.chartData.map(d => {
+									const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+									const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+									const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+									const obj = {
+										name: d.category,
+										marker: color,
+									}
 
-							if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
-								this.subCategoriesColorList = [];
-								this.chartData.forEach(c => {
-									c.subCategories.forEach(d => {
-										const obj = {
-											name: `${c.category}-${d.category}`,
-											marker: this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color ? this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color : this.colorPalette.getColor(d.category).value,
-										}
-										this.subCategoriesColorList.push(obj);
-									});
+									return obj;
 								});
 							}
 						}
@@ -2725,10 +2719,17 @@ export class Visual extends Shadow {
 				}
 
 				if (this.isLollipopTypeCircle) {
-					this.categoriesColorList = this.chartData.map(d => ({
-						name: d.category,
-						marker: this.categoryColorPair[d.category].marker1Color ? this.categoryColorPair[d.category].marker1Color : this.colorPalette.getColor(d.category).value,
-					}));
+					this.categoriesColorList = this.chartData.map(d => {
+						const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+						const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+						const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+						const obj = {
+							name: d.category,
+							marker: color,
+						}
+
+						return obj;
+					});
 				}
 
 				if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
