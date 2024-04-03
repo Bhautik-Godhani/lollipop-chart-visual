@@ -6261,12 +6261,12 @@ export class Visual extends Shadow {
 			value.tooltipFields.forEach((data, i: number) => {
 				let text = data.value;
 
-				if (value.category === this.othersBarText) {
+				if (this.categoricalTooltipFields[i].source.type.text && value.category === this.othersBarText) {
 					text = this.othersBarText;
 				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
 					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
 				} else {
-					text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
+					text = numberFormatter(+data.value, this.tooltipNumberFormatter[i]);
 				}
 
 				tooltipData.push({
