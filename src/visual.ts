@@ -1578,8 +1578,9 @@ export class Visual extends Shadow {
 			this.sortingSettings.category.sortBy = this.measure1DisplayName;
 		}
 
-		if (!this.sortingSettings.subCategory.sortBy) {
-			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+		if (!this.sortingSettings.subCategory.sortBy ||
+			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
+			this.sortingSettings.subCategory.sortBy = this.measure1DisplayName;
 		}
 
 		this.measureNamesByTotal = [];
