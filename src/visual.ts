@@ -1007,21 +1007,28 @@ export class Visual extends Shadow {
 	setCategoricalDataPairsByRanking(): void {
 		const categoryRankingSettings = this.rankingSettings.category;
 		let othersBarData: any[] = [];
+		let othersStartIndex: number = 0;
+
+		const clonedCategoricalDataPairs = JSON.parse(JSON.stringify(this.categoricalDataPairs));
+
 		if (categoryRankingSettings.enabled) {
 			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
 				if (this.isHorizontalChart) {
 					if (categoryRankingSettings.count <= this.categoricalDataPairs.length) {
 						othersBarData = this.categoricalDataPairs.slice(categoryRankingSettings.count, this.categoricalDataPairs.length);
+						othersStartIndex = categoryRankingSettings.count;
 						this.categoricalDataPairs = this.categoricalDataPairs.slice(0, categoryRankingSettings.count);
 					}
 				} else {
 					othersBarData = this.categoricalDataPairs.slice(categoryRankingSettings.count, this.categoricalDataPairs.length);
+					othersStartIndex = categoryRankingSettings.count;
 					this.categoricalDataPairs = this.categoricalDataPairs.slice(0, categoryRankingSettings.count);
 				}
 			}
 			if (categoryRankingSettings.rankingType === ERankingType.BottomN) {
 				if (this.isHorizontalChart) {
 					othersBarData = this.categoricalDataPairs.slice(0, this.categoricalDataPairs.length - categoryRankingSettings.count);
+					othersStartIndex = 0;
 					this.categoricalDataPairs = this.categoricalDataPairs.slice(
 						this.categoricalDataPairs.length - categoryRankingSettings.count,
 						this.categoricalDataPairs.length
@@ -1029,6 +1036,7 @@ export class Visual extends Shadow {
 				} else {
 					if (categoryRankingSettings.count <= this.categoricalDataPairs.length) {
 						othersBarData = this.categoricalDataPairs.slice(0, this.categoricalDataPairs.length - categoryRankingSettings.count);
+						othersStartIndex = 0;
 						this.categoricalDataPairs = this.categoricalDataPairs.slice(
 							this.categoricalDataPairs.length - categoryRankingSettings.count,
 							this.categoricalDataPairs.length
@@ -1064,6 +1072,12 @@ export class Visual extends Shadow {
 				keys.forEach((key) => {
 					othersDataField[key] = categoryRankingSettings.calcMethod === ERankingCalcMethod.Sum ? d3.sum(othersBarData, (d) => d[key]) : (d3.sum(othersBarData, (d) => d[key]) / othersBarData.length);
 				});
+
+				this.categoricalImagesDataFields.forEach(d => {
+					const id = `${EDataRolesName.ImagesData}${d.source.index}`;
+					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
+				});
+
 				if (this.isHorizontalChart) {
 					this.categoricalDataPairs.push(othersDataField);
 				} else {
