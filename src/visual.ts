@@ -5703,8 +5703,8 @@ export class Visual extends Shadow {
 				const x = XY.x;
 				const y = XY.y;
 				if (
-					((this.yAxisSettings.position === Position.Left) && (this.xAxisSettings.isInvertRange && this.isHasMultiMeasure ? d.value1 <= d.value2 : d.value1 >= d.value2)) ||
-					(this.yAxisSettings.position === Position.Right && (this.xAxisSettings.isInvertRange && this.isHasMultiMeasure ? d.value1 >= d.value2 : d.value1 <= d.value2))
+					((this.yAxisSettings.position === Position.Left) && (this.xAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 <= d.value2 : d.value1 >= d.value2)) ||
+					(this.yAxisSettings.position === Position.Right && (this.xAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 >= d.value2 : d.value1 <= d.value2))
 				) {
 					const xPos = isBestFitOutside ? x - bBox.width / 2 - markerSize - labelDistance : x + bBox.width / 2 + markerSize + labelDistance;
 					const yPos = y;
