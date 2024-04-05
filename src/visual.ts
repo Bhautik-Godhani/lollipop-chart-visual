@@ -369,6 +369,10 @@ export class Visual extends Shadow {
 	public isXIsNumericAxis: boolean;
 	public isXIsDateTimeAxis: boolean;
 	public isXIsContinuousAxis: boolean;
+	public circleXScaleDiffs: number[] = [];
+	public pieXScaleDiffs: number[] = [];
+	public maxCircleXScaleDiff: number = 0;
+	public maxPieXScaleDiff: number = 0;
 
 	// yAxis
 	public yAxisG: D3Selection<SVGElement>;
@@ -389,6 +393,10 @@ export class Visual extends Shadow {
 	public isYIsNumericAxis: boolean;
 	public isYIsDateTimeAxis: boolean;
 	public isYIsContinuousAxis: boolean;
+	public circleYScaleDiffs: number[] = [];
+	public pieYScaleDiffs: number[] = [];
+	public maxCircleYScaleDiff: number = 0;
+	public maxPieYScaleDiff: number = 0;
 
 	// EXPAND ALL
 	public expandAllXAxisG: D3Selection<SVGElement>;
@@ -2287,6 +2295,15 @@ export class Visual extends Shadow {
 			this.categoricalCategoriesLastIndex = 0;
 			this.expandAllXScaleGHeight = 0;
 			this.expandAllYScaleGWidth = 0;
+			this.circleXScaleDiffs = [];
+			this.circleYScaleDiffs = [];
+			this.pieYScaleDiffs = [];
+			this.pieYScaleDiffs = [];
+
+			this.maxCircleXScaleDiff = 0;
+			this.maxCircleYScaleDiff = 0;
+			this.maxPieXScaleDiff = 0;
+			this.maxPieYScaleDiff = 0;
 
 			this.viewPortWidth = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.width)) - 10;
 			this.viewPortHeight = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.height));
@@ -6876,7 +6893,7 @@ export class Visual extends Shadow {
 		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth + this.markerMaxSize : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth, this.markerMaxSize + outsideDataLabelWidth];
+			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff, this.markerMaxSize + outsideDataLabelWidth];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
@@ -6908,7 +6925,7 @@ export class Visual extends Shadow {
 				}
 			}
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + negDataLabelHeight, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
@@ -7241,6 +7258,89 @@ export class Visual extends Shadow {
 		}
 
 		this.setMargins();
+
+		this.chartData.forEach(d => {
+			const test = (isCircle2) => {
+				if (this.isLollipopTypeCircle) {
+					if (!this.isHorizontalChart) {
+						const cy = this.yScale(isCircle2 ? d.value2 : d.value1);
+						if (this.isBottomXAxis) {
+							const isLessSpace = (this.height - this.yAxisStartMargin - cy) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+							if (isLessSpace) {
+								this.circleYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+							}
+						} else {
+							const isLessSpace = (cy - this.yAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+							if (isLessSpace) {
+								this.circleYScaleDiffs.push(Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+							}
+						}
+					} else {
+						const cx = this.xScale(isCircle2 ? d.value2 : d.value1);
+						if (!this.isLeftYAxis) {
+							const isLessSpace = (this.width - this.xAxisStartMargin - cx) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+							if (isLessSpace) {
+								this.circleXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+							}
+						} else {
+							const isLessSpace = (cx - this.xAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+							if (isLessSpace) {
+								this.circleXScaleDiffs.push(Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+							}
+						}
+					}
+				} else {
+					if (!this.isHorizontalChart) {
+						const y = this.yScale(isCircle2 ? d.value2 : d.value1);
+						if (this.isBottomXAxis) {
+							const isLessSpace = (this.height - this.yAxisStartMargin - y) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+							if (isLessSpace) {
+								this.pieYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - y) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+							}
+						} else {
+							const isLessSpace = (y - this.yAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+							if (isLessSpace) {
+								this.pieYScaleDiffs.push(Math.abs((y - this.yAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+							}
+						}
+					} else {
+						const x = this.xScale(isCircle2 ? d.value2 : d.value1);
+						if (this.isLeftYAxis) {
+							const isLessSpace = (x - this.xAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+							if (isLessSpace) {
+								this.pieXScaleDiffs.push(Math.abs((x - this.xAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+							}
+						} else {
+							const isLessSpace = (this.width - this.xAxisStartMargin - x) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+							if (isLessSpace) {
+								this.pieXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - x) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+							}
+						}
+					}
+				}
+			}
+
+			if (this.isHasMultiMeasure) {
+				test(false);
+				test(true);
+			} else {
+				test(false);
+			}
+		});
+
+		if (this.isLollipopTypeCircle) {
+			if (!this.isHorizontalChart) {
+				this.maxCircleYScaleDiff = d3.max(this.circleYScaleDiffs) ? d3.max(this.circleYScaleDiffs) : 0;
+			} else {
+				this.maxCircleXScaleDiff = d3.max(this.circleXScaleDiffs) ? d3.max(this.circleXScaleDiffs) : 0;
+			}
+		} else {
+			if (!this.isHorizontalChart) {
+				this.maxPieYScaleDiff = d3.max(this.pieYScaleDiffs) ? d3.max(this.pieYScaleDiffs) : 0;
+			} else {
+				this.maxPieXScaleDiff = d3.max(this.pieXScaleDiffs) ? d3.max(this.pieXScaleDiffs) : 0;
+			}
+		}
 
 		this.setXYAxisRange(this.width, this.height);
 
@@ -8349,26 +8449,6 @@ export class Visual extends Shadow {
 		}
 	}
 
-	getOverflowCircleCXDiff(x: number): number {
-		let diff = 0;
-		if (this.yAxisSettings.position === Position.Left) {
-			diff = x <= this.circle1Size ? this.circle1Size - x : 0;
-		} else {
-			diff = this.width - x <= this.circle1Size ? this.circle1Size - (this.width - x) : 0;
-		}
-		return diff;
-	}
-
-	getOverflowCircleCYDiff(y: number): number {
-		let diff = 0;
-		if (this.xAxisSettings.position === Position.Bottom) {
-			diff = this.height - y <= this.circle1Size ? this.circle1Size - (this.height - y) : 0;
-		} else {
-			diff = y <= this.circle1Size ? this.circle1Size - y : 0;
-		}
-		return diff;
-	}
-
 	setPath1Formatting(circleSelection: any): void {
 		const marker1Style = this.markerSettings.marker1Style;
 		circleSelection
@@ -8400,14 +8480,18 @@ export class Visual extends Shadow {
 		if (!this.isLeftYAxis) {
 			const isLessSpace = (this.width - this.xAxisStartMargin - cx) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
 			if (isLessSpace) {
-				return Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+				// this.circleXScaleDiff.push(Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+				return 0;
+				// return Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
 			} else {
 				return 0;
 			}
 		} else {
 			const isLessSpace = (cx - this.xAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
 			if (isLessSpace) {
-				return Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+				// this.circleXScaleDiff.push(Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+				return 0;
+				// return Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
 			} else {
 				return 0;
 			}
@@ -8418,14 +8502,18 @@ export class Visual extends Shadow {
 		if (this.isBottomXAxis) {
 			const isLessSpace = (this.height - this.yAxisStartMargin - cy) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
 			if (isLessSpace) {
-				return Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+				// this.circleYScaleDiff.push(Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+				return 0;
+				// return Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
 			} else {
 				return 0;
 			}
 		} else {
 			const isLessSpace = (cy - this.yAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
 			if (isLessSpace) {
-				return Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
+				// this.circleYScaleDiff.push(Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+				return 0;
+				// return Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2));
 			} else {
 				return 0;
 			}
@@ -8849,14 +8937,18 @@ export class Visual extends Shadow {
 		if (this.isLeftYAxis) {
 			const isLessSpace = (x - this.xAxisStartMargin) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
 			if (isLessSpace) {
-				return Math.abs((x - this.xAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+				// this.pieXScaleDiff.push(Math.abs((x - this.xAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius)));
+				return 0;
+				// return Math.abs((x - this.xAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
 			} else {
 				return 0;
 			}
 		} else {
 			const isLessSpace = (this.width - this.xAxisStartMargin - x) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
 			if (isLessSpace) {
-				return Math.abs((this.width - this.xAxisStartMargin - x) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+				// this.pieXScaleDiff.push(Math.abs((this.width - this.xAxisStartMargin - x) - (isPie2 ? this.pie2Radius : this.pie1Radius)));
+				return 0;
+				// return Math.abs((this.width - this.xAxisStartMargin - x) - (isPie2 ? this.pie2Radius : this.pie1Radius));
 			} else {
 				return 0;
 			}
@@ -8867,14 +8959,18 @@ export class Visual extends Shadow {
 		if (this.isBottomXAxis) {
 			const isLessSpace = (this.height - this.yAxisStartMargin - y) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
 			if (isLessSpace) {
-				return Math.abs((this.height - this.yAxisStartMargin - y) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+				// this.pieYScaleDiff.push(Math.abs((this.height - this.yAxisStartMargin - y) - (isPie2 ? this.pie2Radius : this.pie1Radius)));
+				return 0;
+				// return Math.abs((this.height - this.yAxisStartMargin - y) - (isPie2 ? this.pie2Radius : this.pie1Radius));
 			} else {
 				return 0;
 			}
 		} else {
 			const isLessSpace = (y - this.yAxisStartMargin) <= (isPie2 ? this.pie2Radius : this.pie1Radius);
 			if (isLessSpace) {
-				return Math.abs((y - this.yAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
+				// this.pieYScaleDiff.push(Math.abs((y - this.yAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius)));
+				return 0;
+				// return Math.abs((y - this.yAxisStartMargin) - (isPie2 ? this.pie2Radius : this.pie1Radius));
 			} else {
 				return 0;
 			}
