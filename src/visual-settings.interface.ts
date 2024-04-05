@@ -250,14 +250,12 @@ export interface IDataLabelsProps {
 	showBackground: boolean;
 	backgroundColor: string;
 	fontStyle: EFontStyle[];
-	placement: DataLabelsPlacement;
 	isAutoFontSize: boolean;
 	showLabelsBelowReferenceLine: boolean;
 	isColorChanged: boolean;
 	textColorTypes: EInsideTextColorTypes;
 	applyFor: EDataLabelsBGApplyFor,
 	isShowBGChangedWhenPatternApplied: boolean;
-	isShowBestFitLabels: boolean;
 	isTextColorTypeChanged: boolean;
 	isShowBackgroundChange: boolean;
 	customLabel: string;
@@ -266,6 +264,8 @@ export interface IDataLabelsProps {
 
 export interface IDataLabelsSettings {
 	show: boolean;
+	isShowBestFitLabels: boolean;
+	placement: DataLabelsPlacement;
 	measure1: IDataLabelsProps;
 	measure2: IDataLabelsProps;
 }

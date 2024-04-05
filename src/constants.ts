@@ -146,14 +146,12 @@ const dataLabelsProps: IDataLabelsProps = {
 	showBackground: false,
 	backgroundColor: "rgba(93, 93, 93, 1)",
 	fontStyle: [],
-	placement: DataLabelsPlacement.Outside,
 	isAutoFontSize: true,
 	showLabelsBelowReferenceLine: false,
 	isColorChanged: false,
 	textColorTypes: EInsideTextColorTypes.CONTRAST,
 	applyFor: EDataLabelsBGApplyFor.ONLY_PATTERNS,
 	isShowBGChangedWhenPatternApplied: false,
-	isShowBestFitLabels: true,
 	isTextColorTypeChanged: false,
 	isShowBackgroundChange: false,
 	customLabel: "",
@@ -162,6 +160,8 @@ const dataLabelsProps: IDataLabelsProps = {
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	show: true,
+	isShowBestFitLabels: true,
+	placement: DataLabelsPlacement.Outside,
 	measure1: dataLabelsProps,
 	measure2: dataLabelsProps
 };

@@ -2081,11 +2081,11 @@ export class Visual extends Shadow {
 			this.data2LabelsSettings.displayType = EDataLabelsDisplayTypes.All;
 		}
 
-		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
 		}
 
-		if (this.isPatternApplied && this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
 			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
 		}
 
@@ -4597,11 +4597,11 @@ export class Visual extends Shadow {
 			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
 		}
 
-		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
-		if (this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
 			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
@@ -5529,7 +5529,7 @@ export class Visual extends Shadow {
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
 		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
 		const circleRadius = isData2Label ? this.circle2Size / 2 : this.circle1Size / 2;
-		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			return dataLabelsSettings.fontSize;
 		}
 		if (dataLabelsSettings.isAutoFontSize) {
@@ -5671,51 +5671,23 @@ export class Visual extends Shadow {
 		let y = 0;
 
 		if (this.isHorizontalChart) {
-			// if (this.isLollipopTypeCircle) {
 			if (d.value1 >= d.value2 || !this.isHasMultiMeasure) {
 				x = this.getXPosition(isPie2 ? d.value2 : d.value1);
 				y = this.getYPosition(d.category) + this.scaleBandWidth / 2;
-
-				if (this.isLeftYAxis) {
-					x = x + (this.isLollipopTypeCircle ? this.getCircleXScaleDiff(x, isPie2) : this.getPieXScaleDiff(x, isPie2));
-				} else {
-					x = x - (this.isLollipopTypeCircle ? this.getCircleXScaleDiff(x, isPie2) : this.getPieXScaleDiff(x, isPie2));
-				}
 			} else {
 				x = this.getXPosition(isPie2 ? d.value2 : d.value1);
 				y = this.getYPosition(d.category) + this.scaleBandWidth / 2;
-
-				if (this.isLeftYAxis) {
-					x = x + (this.isLollipopTypeCircle ? this.getCircleXScaleDiff(x, isPie2) : this.getPieXScaleDiff(x, isPie2));
-				} else {
-					x = x - (this.isLollipopTypeCircle ? this.getCircleXScaleDiff(x, isPie2) : this.getPieXScaleDiff(x, isPie2));
-				}
 			}
-			// }
 		} else {
-			// if (this.isLollipopTypeCircle) {
 			if ((this.xAxisSettings.position === Position.Bottom && d.value1 < d.value2) ||
 				(this.xAxisSettings.position === Position.Top && d.value1 > d.value2)) {
 				x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
 				y = this.getYPosition(isPie2 ? d.value2 : d.value1)
-				// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
-				// if (this.isBottomXAxis) {
-				y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				// } else {
-				// 	y = y - (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				// }
 			} else {
 				x = this.getXPosition(d.category) + this.scaleBandWidth / 2;
 				y = this.getYPosition(isPie2 ? d.value2 : d.value1)
-				// y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) - this.getCircleYScaleDiff(y, isPie2);
 
-				// if (this.isBottomXAxis) {
-				y = y - (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				// } else {
-				// 	y = y + (isPie2 ? -this.circle2Size / 2 : this.circle2Size / 2) + (this.isLollipopTypeCircle ? this.getCircleYScaleDiff(y, isPie2) : this.getPieYScaleDiff(y, isPie2));
-				// }
 			}
-			// }
 		}
 		return { x, y };
 	}
@@ -5753,11 +5725,13 @@ export class Visual extends Shadow {
 					(this.xAxisSettings.position === Position.Top && (this.yAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 > d.value2 : d.value1 < d.value2))
 				) {
 					const xPos = x;
-					const yPos = isBestFitOutside ? y + markerSize + labelDistance : y - markerSize - labelDistance;
+					const yPos = y - markerSize - labelDistance;
+					// const yPos = isBestFitOutside ? y + markerSize + labelDistance : y - markerSize - labelDistance;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				} else {
 					const xPos = x;
-					const yPos = isBestFitOutside ? y - markerSize - labelDistance : y + markerSize + labelDistance;
+					const yPos = y + markerSize + labelDistance;
+					// const yPos = isBestFitOutside ? y - markerSize - labelDistance : y + markerSize + labelDistance;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				}
 			}
@@ -5792,11 +5766,13 @@ export class Visual extends Shadow {
 					(this.yAxisSettings.position === Position.Left && d.value1 < d.value2) ||
 					(this.yAxisSettings.position === Position.Right && d.value1 > d.value2)
 				) {
-					const xPos = isBestFitOutside ? x - bBox.width / 2 - markerSize - labelDistance : x + bBox.width / 2 + markerSize + labelDistance;
+					const xPos = x + bBox.width / 2 + markerSize + labelDistance;
+					// const xPos = isBestFitOutside ? x - bBox.width / 2 - markerSize - labelDistance : x + bBox.width / 2 + markerSize + labelDistance;
 					const yPos = y;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				} else {
-					const xPos = isBestFitOutside ? x + bBox.width / 2 + markerSize + labelDistance : x - bBox.width / 2 - markerSize - labelDistance;
+					const xPos = x - bBox.width / 2 - markerSize - labelDistance;
+					// const xPos = isBestFitOutside ? x + bBox.width / 2 + markerSize + labelDistance : x - bBox.width / 2 - markerSize - labelDistance;
 					const yPos = y;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				}
@@ -5810,11 +5786,13 @@ export class Visual extends Shadow {
 					(this.xAxisSettings.position === Position.Top && d.value1 > d.value2)
 				) {
 					const xPos = x;
-					const yPos = isBestFitOutside ? y + markerSize + labelDistance : y - markerSize - labelDistance;
+					const yPos = y - markerSize - labelDistance;
+					// const yPos = isBestFitOutside ? y + markerSize + labelDistance : y - markerSize - labelDistance;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				} else {
 					const xPos = x;
-					const yPos = isBestFitOutside ? y - markerSize - labelDistance : y + markerSize + labelDistance;
+					const yPos = y + markerSize + labelDistance;
+					// const yPos = isBestFitOutside ? y - markerSize - labelDistance : y + markerSize + labelDistance;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				}
 			}
@@ -5886,11 +5864,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = enter.append("g");
 				const textSelection = dataLabelGSelection.append("text");
 
-				if (dataLabelsSettings.isShowBestFitLabels) {
+				if (this.dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -5903,11 +5881,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = update.attr("class", "dataLabelG");
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				if (dataLabelsSettings.isShowBestFitLabels) {
+				if (this.dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -5930,9 +5908,9 @@ export class Visual extends Shadow {
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (dataLabelsSettings.isShowBestFitLabels) {
+						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
@@ -5968,12 +5946,12 @@ export class Visual extends Shadow {
 									}
 								}
 							} else {
-								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside);
-										THIS.transformData1LabelOutside(ele, false);
+										THIS.transformData1LabelOutside(ele, false, true);
 										// } else {
 										// 	return 0;
 										// }
@@ -6005,9 +5983,9 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 								if (THIS.isHorizontalChart) {
 									if (THIS.isLeftYAxis) {
 										return d.positions.dataLabel1X < 1 ? 0 : 1;
@@ -6048,11 +6026,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = enter.append("g");
 				const textSelection = dataLabelGSelection.append("text");
 
-				if (dataLabelsSettings.isShowBestFitLabels) {
+				if (this.dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -6065,11 +6043,11 @@ export class Visual extends Shadow {
 				const dataLabelGSelection = update.attr("class", "dataLabelG");
 				const textSelection = dataLabelGSelection.select(".dataLabelText");
 
-				if (dataLabelsSettings.isShowBestFitLabels) {
+				if (this.dataLabelsSettings.isShowBestFitLabels) {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -6093,9 +6071,9 @@ export class Visual extends Shadow {
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (dataLabelsSettings.isShowBestFitLabels) {
+						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
 
 									if (isHideInsideLabel) {
@@ -6133,7 +6111,7 @@ export class Visual extends Shadow {
 								}
 							} else {
 								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
-								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
@@ -6169,9 +6147,9 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 								if (THIS.isHorizontalChart) {
 									if (THIS.isLeftYAxis) {
 										return d.positions.dataLabel2X < 1 ? 0 : 1;
@@ -6835,10 +6813,11 @@ export class Visual extends Shadow {
 			fontStyle[EFontStyle.Italic],
 			fontStyle[EFontStyle.UnderLine]).width;
 
-		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
-		const outsideDataLabelHeight = this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? dataLabelHeight : 0;
-		const outsideDataLabelWidth = (this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth : 0) + this.markerMaxSize;
-		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && this.data1LabelsSettings.placement === DataLabelsPlacement.Outside ? data1LabelWidth + this.markerMaxSize : 0;
+		const isOutsideLabel = this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || this.dataLabelsSettings.isShowBestFitLabels;
+		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
+		const outsideDataLabelHeight = this.dataLabelsSettings.show && isOutsideLabel ? dataLabelHeight : 0;
+		const outsideDataLabelWidth = (this.dataLabelsSettings.show && isOutsideLabel ? data1LabelWidth : 0) + this.markerMaxSize;
+		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? data1LabelWidth + this.markerMaxSize : 0;
 
 		if (this.isHorizontalChart) {
 			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff, this.markerMaxSize + outsideDataLabelWidth];
