@@ -180,6 +180,7 @@ const UIXAxis = (
   vizOptions: ShadowUpdateOptions,
   shadow: Visual,
   xConfigValues: IXAxisSettings,
+  yConfigValues: IYAxisSettings,
   setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>,
   setYConfigValues: React.Dispatch<React.SetStateAction<IYAxisSettings>>
 ) => {
@@ -365,8 +366,14 @@ const UIXAxis = (
             <InputControl
               label="Title Name"
               type="text"
-              value={xConfigValues.titleName}
-              handleChange={(value: any) => handleXChange(value, EXAxisSettings.TitleName, setXConfigValues)}
+              value={shadow.isHorizontalChart ? yConfigValues.titleName : xConfigValues.titleName}
+              handleChange={(value: any) => {
+                if (shadow.isHorizontalChart) {
+                  handleYChange(value, EXAxisSettings.TitleName, setYConfigValues);
+                } else {
+                  handleXChange(value, EXAxisSettings.TitleName, setXConfigValues);
+                }
+              }}
             />
           </Column>
         </Row>
@@ -725,6 +732,7 @@ const UINumberFormatting = (
 const UIYAxis = (
   vizOptions: ShadowUpdateOptions,
   shadow: Visual,
+  xConfigValues: IXAxisSettings,
   yConfigValues: IYAxisSettings,
   setYConfigValues: React.Dispatch<React.SetStateAction<IYAxisSettings>>,
   setXConfigValues: React.Dispatch<React.SetStateAction<IXAxisSettings>>,
@@ -899,8 +907,14 @@ const UIYAxis = (
               <InputControl
                 label="Title Name"
                 type="text"
-                value={yConfigValues.titleName}
-                handleChange={(value: any) => handleYChange(value, EYAxisSettings.TitleName, setYConfigValues)}
+                value={shadow.isHorizontalChart ? xConfigValues.titleName : yConfigValues.titleName}
+                handleChange={(value: any) => {
+                  if (shadow.isHorizontalChart) {
+                    handleXChange(value, EYAxisSettings.TitleName, setXConfigValues);
+                  } else {
+                    handleYChange(value, EYAxisSettings.TitleName, setYConfigValues);
+                  }
+                }}
               />
             </Column>
           </Row>
@@ -1270,10 +1284,10 @@ const XAxisSettings = (props) => {
     <>
       <Tabs selected={selectedAxisTab} onChange={(val) => setSelectedAxisTab(val)}>
         <Tab title={"X - Axis"} identifier={EXYAxisNames.X}>
-          {UIXAxis(vizOptions, shadow, xConfigValues, setXConfigValues, setYConfigValues)}
+          {UIXAxis(vizOptions, shadow, xConfigValues, yConfigValues, setXConfigValues, setYConfigValues)}
         </Tab>
         <Tab title={"Y - Axis"} identifier={EXYAxisNames.Y}>
-          {UIYAxis(vizOptions, shadow, yConfigValues, setYConfigValues, setXConfigValues)}
+          {UIYAxis(vizOptions, shadow, xConfigValues, yConfigValues, setYConfigValues, setXConfigValues)}
         </Tab>
       </Tabs >
 
