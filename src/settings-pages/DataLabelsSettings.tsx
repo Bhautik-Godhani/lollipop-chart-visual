@@ -212,10 +212,7 @@ const UIDataLabelsFontSettings = (
 							type="number"
 							label="Font Size"
 							value={configValues.fontSize}
-							handleChange={(value) => setConfigValues(d => ({
-								...d,
-								[EDataLabelsSettings.fontSize]: value
-							}))}
+							handleChange={(value) => handleChange(value, EDataLabelsSettings.fontSize, selectedMeasure, setConfigValues)}
 						/>
 					</Column>
 
@@ -578,12 +575,12 @@ const DataLabelsSettings = (props) => {
 
 	React.useEffect(() => {
 		if (!measureConfigValues.isShowBGChangedWhenPatternApplied && shadow.isPatternApplied && !measureConfigValues.showBackground) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
 		if (configValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
@@ -618,12 +615,12 @@ const DataLabelsSettings = (props) => {
 
 	React.useEffect(() => {
 		if (configValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
 		if (configValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
-			handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
@@ -633,7 +630,7 @@ const DataLabelsSettings = (props) => {
 			}
 
 			if (!measureConfigValues.isShowBackgroundChange) {
-				handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
+				// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 				handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 			}
 		}

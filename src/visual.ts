@@ -5565,7 +5565,7 @@ export class Visual extends Shadow {
 			.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label);
 
-		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
+		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
 				.attr("fill", d => {
 					if (this.CFCategoryColorPair[d.category].isLabelColor) {
