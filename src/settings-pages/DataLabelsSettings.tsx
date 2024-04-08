@@ -634,7 +634,29 @@ const DataLabelsSettings = (props) => {
 				handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 			}
 		}
+
+		if (configValues.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypePie && !measureConfigValues.isColorChanged) {
+			handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+		}
+
+		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+		}
 	}, [configValues.placement, measureConfigValues.textColorTypes]);
+
+	React.useEffect(() => {
+		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(93, 93, 93, 1)" && measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+			handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+		}
+
+		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+		}
+
+		if (configValues.placement === DataLabelsPlacement.Inside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+		}
+	}, [configValues.placement, measureConfigValues.showBackground]);
 
 	const MEASURE_TYPES: ILabelValuePair[] = [
 		{

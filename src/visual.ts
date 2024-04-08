@@ -5920,8 +5920,8 @@ export class Visual extends Shadow {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, false, DataLabelsPlacement.Inside);
-										THIS.transformDataLabelInside(dataLabelGSelection, false, false);
+										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(ele, false, false);
 										return 1;
 									}
 								} else {
@@ -5956,8 +5956,8 @@ export class Visual extends Shadow {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, false, DataLabelsPlacement.Inside);
-										THIS.transformDataLabelInside(dataLabelGSelection, false, false);
+										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(ele, false, false);
 										return 1;
 									}
 								} else {
@@ -6084,8 +6084,8 @@ export class Visual extends Shadow {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
-										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
+										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(ele, false, true);
 										return 1;
 									}
 								} else {
@@ -6120,8 +6120,8 @@ export class Visual extends Shadow {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(dataLabelGSelection, textEle, true, DataLabelsPlacement.Inside);
-										THIS.transformDataLabelInside(dataLabelGSelection, false, true);
+										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside);
+										THIS.transformDataLabelInside(ele, false, true);
 										return 1;
 									}
 								} else {
@@ -9046,17 +9046,17 @@ export class Visual extends Shadow {
 			.attr("x", (d) => {
 				const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
 				if (this.isLeftYAxis) {
-					return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+					return (this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius) - 1;
 				} else {
-					return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
+					return (this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius) - 1;
 				}
 			})
 			.attr("y", (d) => {
 				const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
 				if (this.isBottomXAxis) {
-					return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+					return (!this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius) - 1;
 				} else {
-					return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
+					return (!this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius) - 1;
 				}
 			})
 			.on("end", (node, index) => {
