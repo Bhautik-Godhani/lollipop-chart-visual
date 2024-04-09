@@ -1,11 +1,12 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
-import { ELineSettings, ELineType } from "../enum";
+import { ColorPaletteType, ELineSettings, ELineType } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { persistProperties } from "../methods/methods";
+import { Visual } from "../visual";
 
 const LINE_TYPES = [
 	{
@@ -102,7 +103,11 @@ const LineSettings = (props) => {
 
 	React.useEffect(() => {
 		if (configValues.isApplyMarkerColor && shadow.isLollipopTypePie) {
-			handleChange(false, ELineSettings.isApplyMarkerColor)
+			if (shadow.isLollipopTypePie) {
+				if (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) {
+					handleChange(false, ELineSettings.isApplyMarkerColor);
+				}
+			}
 		}
 	}, []);
 
@@ -140,7 +145,7 @@ const LineSettings = (props) => {
 					<Column></Column>
 				</Row>
 
-				<ConditionalWrapper visible={!shadow.isLollipopTypePie}>
+				<ConditionalWrapper visible={shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true}>
 					<Row>
 						<Column>
 							<ToggleButton
@@ -167,7 +172,7 @@ const LineSettings = (props) => {
 					</ConditionalWrapper>
 				</ConditionalWrapper>
 
-				<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+				<ConditionalWrapper visible={shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
 					<Row>
 						<Column>
 							<ColorPicker

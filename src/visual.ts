@@ -1382,6 +1382,14 @@ export class Visual extends Shadow {
 			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
+		const dataColorsSettings = this.dataColorsSettings;
+
+		if (this.lineSettings.isApplyMarkerColor && this.isLollipopTypePie) {
+			if (this.isHasMultiMeasure || (!this.isHasMultiMeasure && dataColorsSettings.fillType !== ColorPaletteType.Single)) {
+				this.lineSettings.isApplyMarkerColor = false;
+			}
+		}
+
 		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase()) !== -1;
 
 		if (this.isExpandAllApplied) {
@@ -4536,10 +4544,6 @@ export class Visual extends Shadow {
 	}
 
 	changeVisualSettings(): void {
-		if (this.lineSettings.isApplyMarkerColor && this.isLollipopTypePie) {
-			this.lineSettings.isApplyMarkerColor = false;
-		}
-
 		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
@@ -7507,10 +7511,12 @@ export class Visual extends Shadow {
 				}
 			}
 		} else {
-			const lineColor = this.lineSettings.isApplyMarkerColor ? this.categoryColorPair[d.category].marker1Color : this.lineSettings.lineColor;
 			if (this.isLollipopTypeCircle) {
+				const lineColor = this.lineSettings.isApplyMarkerColor ? this.categoryColorPair[d.category].marker1Color : this.lineSettings.lineColor;
 				return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
 			} else {
+				const str = `${d.category}-${d.subCategories[0].category}`;
+				const lineColor = this.lineSettings.isApplyMarkerColor ? this.subCategoryColorPair[str].marker1Color : this.lineSettings.lineColor;
 				if (this.firstCFLine) {
 					const str = `${d.category}-${this.firstCFLine.staticValue}`;
 					return this.getColor(this.subCategoryColorPair[str] && this.subCategoryColorPair[str].lineColor ? this.subCategoryColorPair[str].lineColor : lineColor, EHighContrastColorType.Foreground);
