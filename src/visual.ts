@@ -5538,7 +5538,7 @@ export class Visual extends Shadow {
 		}
 		if (dataLabelsSettings.isAutoFontSize) {
 			const fontSize = circleRadius * 0.7;
-			dataLabelsSettings.fontSize = fontSize;
+			// dataLabelsSettings.fontSize = fontSize;
 			return fontSize;
 		} else {
 			return dataLabelsSettings.fontSize;
@@ -5547,10 +5547,49 @@ export class Visual extends Shadow {
 
 	setDataLabelsFormatting(labelSelection: D3Selection<SVGElement>, textSelection: any, isData2Label: boolean = false, labelPlacement: DataLabelsPlacement): void {
 		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
-		const key = isData2Label ? "value2" : "value1";
+
+		if (labelPlacement === DataLabelsPlacement.Outside && dataLabelsSettings.color === "rgba(93, 93, 93, 1)" && dataLabelsSettings.showBackground && !dataLabelsSettings.isColorChanged) {
+			dataLabelsSettings.color = "rgba(255, 255, 255, 1)";
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Outside && dataLabelsSettings.color === "rgba(255, 255, 255, 1)" && !dataLabelsSettings.showBackground && !dataLabelsSettings.isColorChanged) {
+			dataLabelsSettings.color = "rgba(93, 93, 93, 1)";
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Inside && dataLabelsSettings.color === "rgba(255, 255, 255, 1)" && !dataLabelsSettings.showBackground && !dataLabelsSettings.isColorChanged) {
+			dataLabelsSettings.color = "rgba(93, 93, 93, 1)";
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Inside && !dataLabelsSettings.isShowBackgroundChange && dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+			dataLabelsSettings.showBackground = true;
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Outside && !dataLabelsSettings.isShowBackgroundChange && dataLabelsSettings.showBackground) {
+			dataLabelsSettings.showBackground = false;
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Inside && dataLabelsSettings.textColorTypes === EInsideTextColorTypes.FIXED) {
+			if (!dataLabelsSettings.isColorChanged) {
+				dataLabelsSettings.color = "rgba(255, 255, 255, 1)";
+			}
+
+			if (!dataLabelsSettings.isShowBackgroundChange) {
+				dataLabelsSettings.showBackground = false;
+			}
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypePie && !dataLabelsSettings.isColorChanged) {
+			dataLabelsSettings.color = "rgba(255, 255, 255, 1)";
+		}
+
+		if (labelPlacement === DataLabelsPlacement.Outside && dataLabelsSettings.color === "rgba(255, 255, 255, 1)" && !dataLabelsSettings.showBackground && !dataLabelsSettings.isColorChanged) {
+			dataLabelsSettings.color = "rgba(93, 93, 93, 1)";
+		}
 
 		const isAutoFontColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.AUTO || dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
 		const isAutoBGColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
+
+		const fontSize = labelPlacement === DataLabelsPlacement.Inside ? this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label) : dataLabelsSettings.fontSize;
 
 		labelSelection
 			.attr("class", "dataLabelG")
@@ -5562,14 +5601,14 @@ export class Visual extends Shadow {
 			.classed("dataLabelText", true)
 			.attr("text-anchor", "middle")
 			.attr("dy", "0.35em")
-			.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
+			.attr("font-size", fontSize)
 			.style("font-family", dataLabelsSettings.fontFamily)
 			.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 			.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
 			.style("font-style", dataLabelsSettings.fontStyle.includes(EFontStyle.Italic) ? "italic" : "")
 			.text((d: ILollipopChartRow) => isData2Label ? d.data2Label : d.data1Label);
 
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
+		if (labelPlacement === DataLabelsPlacement.Inside && this.isLollipopTypeCircle) {
 			textSelection
 				.attr("fill", d => {
 					if (this.CFCategoryColorPair[d.category].isLabelColor) {
@@ -5603,7 +5642,7 @@ export class Visual extends Shadow {
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.35em")
-				.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
+				.attr("font-size", fontSize)
 				.style("font-family", dataLabelsSettings.fontFamily)
 				.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 				.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
@@ -5657,7 +5696,7 @@ export class Visual extends Shadow {
 				.attr("class", "dataLabelTextShadow")
 				.attr("text-anchor", "middle")
 				.attr("dy", "0.35em")
-				.attr("font-size", this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label))
+				.attr("font-size", fontSize)
 				.style("font-family", dataLabelsSettings.fontFamily)
 				.style("text-decoration", dataLabelsSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
 				.style("font-weight", dataLabelsSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
