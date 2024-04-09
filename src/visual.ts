@@ -6233,7 +6233,11 @@ export class Visual extends Shadow {
 				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
 					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
 				} else {
-					text = numberFormatter(+data.value, this.tooltipNumberFormatter[i]);
+					if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
+						text = numberFormatter(+data.value, this.tooltipNumberFormatter[i]);
+					} else {
+						text = data.value;
+					}
 				}
 
 				tooltipData.push({
