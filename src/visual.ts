@@ -9369,7 +9369,7 @@ export class Visual extends Shadow {
 			seedDataFromVisual: seedDataFromVisual,
 			numberFormatter: (value, field) => {
 				return this.numberSettings.show ?
-					this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field].formatter : undefined, false, false) :
+					this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field].formatter : undefined, false, true) :
 					powerBiNumberFormat(value, this.allNumberFormatter[field] ? this.allNumberFormatter[field].formatter : undefined);
 			},
 			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
