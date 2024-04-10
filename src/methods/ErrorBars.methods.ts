@@ -285,7 +285,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     .attr("stroke", self.getColor(errorLabels.backgroundColor, EHighContrastColorType.Background))
                     .attr("stroke-width", 3)
                     .attr("stroke-linejoin", "round")
-                    .attr("opacity", errorLabels.showBackground ? "1" : "0");
+                    .attr("opacity", errorLabels.isEnabled && errorLabels.showBackground ? "1" : "0");
             }
 
             return errorBarG;
