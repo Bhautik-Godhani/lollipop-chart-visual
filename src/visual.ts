@@ -3004,19 +3004,6 @@ export class Visual extends Shadow {
 				// createPatternsDefs(this, this.svg);
 				// createMarkerDefs(this, this.svg);
 				// this.createErrorBarsMarkerDefs();
-
-				RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
-
-				const onLollipopClick = (ele: D3Selection<SVGElement>) => {
-					this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
-				}
-
-				if (!this.isLollipopTypePie) {
-					SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), onLollipopClick);
-				} else {
-					SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
-				}
-				this.behavior.renderSelection(this.interactivityService.hasSelection());
 			}
 
 			// createPatternsDefs(this, this.svg);
@@ -8369,6 +8356,19 @@ export class Visual extends Shadow {
 		}
 
 		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled && this.cutAndClipAxisSettings.markerPlacement !== ECutAndClipMarkerPlacementTypes.Axis ? this.chartData : []);
+
+		RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+
+		const onLollipopClick = (ele: D3Selection<SVGElement>) => {
+			this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
+		}
+
+		if (!this.isLollipopTypePie) {
+			SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), onLollipopClick);
+		} else {
+			SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
+		}
+		this.behavior.renderSelection(this.interactivityService.hasSelection());
 	}
 
 	drawZeroSeparatorLine(): void {
