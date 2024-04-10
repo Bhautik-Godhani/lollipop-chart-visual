@@ -2987,7 +2987,6 @@ export class Visual extends Shadow {
 				}
 
 				// this.displayBrush();
-				this.drawTooltip();
 
 				if (this.xAxisSettings.isShowAxisLine) {
 					this.drawXAxisLine();
@@ -3710,6 +3709,9 @@ export class Visual extends Shadow {
 				labelLowerBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, false) : '0',
 			};
 		}
+
+		console.log(this.raceChartKeyLabelList);
+
 
 		let idx = 0;
 		const data: ILollipopChartRow[] = this.categoriesName.reduce((arr, cat) => {
@@ -8369,6 +8371,8 @@ export class Visual extends Shadow {
 			SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
 		}
 		this.behavior.renderSelection(this.interactivityService.hasSelection());
+
+		this.drawTooltip();
 	}
 
 	drawZeroSeparatorLine(): void {
