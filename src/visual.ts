@@ -1086,6 +1086,11 @@ export class Visual extends Shadow {
 					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
 				});
 
+				this.categoricalExtraDataLabelsFields.forEach(d => {
+					const id = `${EDataRolesName.ExtraDataLabels}${d.source.index}`;
+					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
+				});
+
 				if (this.isHorizontalChart) {
 					this.categoricalDataPairs.push(othersDataField);
 				} else {
