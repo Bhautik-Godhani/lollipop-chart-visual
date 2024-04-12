@@ -2679,7 +2679,7 @@ export class Visual extends Shadow {
 						this.categoricalData = this.clonedCategoricalData;
 						this.setChartData(this.categoricalData);
 
-						const { xAxisG, yAxisG } = this.drawXYAxis(true, true);
+						const { xAxisG, yAxisG } = this.drawXYAxis(true, true, false);
 
 						return { xAxisNode: xAxisG.node(), yAxisNode: yAxisG.node(), xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
 					},
@@ -3714,9 +3714,6 @@ export class Visual extends Shadow {
 				labelLowerBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, false) : '0',
 			};
 		}
-
-		console.log(this.raceChartKeyLabelList);
-
 
 		let idx = 0;
 		const data: ILollipopChartRow[] = this.categoriesName.reduce((arr, cat) => {
@@ -7193,7 +7190,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	drawXYAxis(isShowXAxis: boolean, isShowYAxis: boolean): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
+	drawXYAxis(isShowXAxis: boolean, isShowYAxis: boolean, isSetXYScaleDiffs: boolean = true): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
@@ -7227,86 +7224,88 @@ export class Visual extends Shadow {
 
 		this.setMargins();
 
-		this.chartData.forEach(d => {
-			const test = (isCircle2) => {
-				if (this.isLollipopTypeCircle) {
-					if (!this.isHorizontalChart) {
-						const cy = this.yScale(isCircle2 ? d.value2 : d.value1);
-						if (this.isBottomXAxis) {
-							const isLessSpace = (this.height - this.yAxisStartMargin - cy) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
-							if (isLessSpace) {
-								this.circleYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+		if (isSetXYScaleDiffs) {
+			this.chartData.forEach(d => {
+				const test = (isCircle2) => {
+					if (this.isLollipopTypeCircle) {
+						if (!this.isHorizontalChart) {
+							const cy = this.yScale(isCircle2 ? d.value2 : d.value1);
+							if (this.isBottomXAxis) {
+								const isLessSpace = (this.height - this.yAxisStartMargin - cy) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+								if (isLessSpace) {
+									this.circleYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - cy) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+								}
+							} else {
+								const isLessSpace = (cy - this.yAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+								if (isLessSpace) {
+									this.circleYScaleDiffs.push(Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+								}
 							}
 						} else {
-							const isLessSpace = (cy - this.yAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
-							if (isLessSpace) {
-								this.circleYScaleDiffs.push(Math.abs((cy - this.yAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+							const cx = this.xScale(isCircle2 ? d.value2 : d.value1);
+							if (!this.isLeftYAxis) {
+								const isLessSpace = (this.width - this.xAxisStartMargin - cx) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+								if (isLessSpace) {
+									this.circleXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+								}
+							} else {
+								const isLessSpace = (cx - this.xAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
+								if (isLessSpace) {
+									this.circleXScaleDiffs.push(Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+								}
 							}
 						}
 					} else {
-						const cx = this.xScale(isCircle2 ? d.value2 : d.value1);
-						if (!this.isLeftYAxis) {
-							const isLessSpace = (this.width - this.xAxisStartMargin - cx) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
-							if (isLessSpace) {
-								this.circleXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - cx) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
+						if (!this.isHorizontalChart) {
+							const y = this.yScale(isCircle2 ? d.value2 : d.value1);
+							if (this.isBottomXAxis) {
+								const isLessSpace = (this.height - this.yAxisStartMargin - y) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+								if (isLessSpace) {
+									this.pieYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - y) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+								}
+							} else {
+								const isLessSpace = (y - this.yAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+								if (isLessSpace) {
+									this.pieYScaleDiffs.push(Math.abs((y - this.yAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+								}
 							}
 						} else {
-							const isLessSpace = (cx - this.xAxisStartMargin) <= (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2);
-							if (isLessSpace) {
-								this.circleXScaleDiffs.push(Math.abs((cx - this.xAxisStartMargin) - (isCircle2 ? this.circle2Size / 2 : this.circle1Size / 2)));
-							}
-						}
-					}
-				} else {
-					if (!this.isHorizontalChart) {
-						const y = this.yScale(isCircle2 ? d.value2 : d.value1);
-						if (this.isBottomXAxis) {
-							const isLessSpace = (this.height - this.yAxisStartMargin - y) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
-							if (isLessSpace) {
-								this.pieYScaleDiffs.push(Math.abs((this.height - this.yAxisStartMargin - y) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
-							}
-						} else {
-							const isLessSpace = (y - this.yAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
-							if (isLessSpace) {
-								this.pieYScaleDiffs.push(Math.abs((y - this.yAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
-							}
-						}
-					} else {
-						const x = this.xScale(isCircle2 ? d.value2 : d.value1);
-						if (this.isLeftYAxis) {
-							const isLessSpace = (x - this.xAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
-							if (isLessSpace) {
-								this.pieXScaleDiffs.push(Math.abs((x - this.xAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
-							}
-						} else {
-							const isLessSpace = (this.width - this.xAxisStartMargin - x) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
-							if (isLessSpace) {
-								this.pieXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - x) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+							const x = this.xScale(isCircle2 ? d.value2 : d.value1);
+							if (this.isLeftYAxis) {
+								const isLessSpace = (x - this.xAxisStartMargin) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+								if (isLessSpace) {
+									this.pieXScaleDiffs.push(Math.abs((x - this.xAxisStartMargin) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+								}
+							} else {
+								const isLessSpace = (this.width - this.xAxisStartMargin - x) <= (isCircle2 ? this.pie2Radius : this.pie1Radius);
+								if (isLessSpace) {
+									this.pieXScaleDiffs.push(Math.abs((this.width - this.xAxisStartMargin - x) - (isCircle2 ? this.pie2Radius : this.pie1Radius)));
+								}
 							}
 						}
 					}
 				}
-			}
 
-			if (this.isHasMultiMeasure) {
-				test(false);
-				test(true);
-			} else {
-				test(false);
-			}
-		});
+				if (this.isHasMultiMeasure) {
+					test(false);
+					test(true);
+				} else {
+					test(false);
+				}
+			});
 
-		if (this.isLollipopTypeCircle) {
-			if (!this.isHorizontalChart) {
-				this.maxCircleYScaleDiff = d3.max(this.circleYScaleDiffs) ? d3.max(this.circleYScaleDiffs) : 0;
+			if (this.isLollipopTypeCircle) {
+				if (!this.isHorizontalChart) {
+					this.maxCircleYScaleDiff = d3.max(this.circleYScaleDiffs) ? d3.max(this.circleYScaleDiffs) : 0;
+				} else {
+					this.maxCircleXScaleDiff = d3.max(this.circleXScaleDiffs) ? d3.max(this.circleXScaleDiffs) : 0;
+				}
 			} else {
-				this.maxCircleXScaleDiff = d3.max(this.circleXScaleDiffs) ? d3.max(this.circleXScaleDiffs) : 0;
-			}
-		} else {
-			if (!this.isHorizontalChart) {
-				this.maxPieYScaleDiff = d3.max(this.pieYScaleDiffs) ? d3.max(this.pieYScaleDiffs) : 0;
-			} else {
-				this.maxPieXScaleDiff = d3.max(this.pieXScaleDiffs) ? d3.max(this.pieXScaleDiffs) : 0;
+				if (!this.isHorizontalChart) {
+					this.maxPieYScaleDiff = d3.max(this.pieYScaleDiffs) ? d3.max(this.pieYScaleDiffs) : 0;
+				} else {
+					this.maxPieXScaleDiff = d3.max(this.pieXScaleDiffs) ? d3.max(this.pieXScaleDiffs) : 0;
+				}
 			}
 		}
 
