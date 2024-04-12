@@ -2312,6 +2312,8 @@ export class Visual extends Shadow {
 			this.circleYScaleDiffs = [];
 			this.pieYScaleDiffs = [];
 			this.pieYScaleDiffs = [];
+			this.smallMultiplesGridItemContent = {};
+			this.smallMultiplesGridItemId = undefined;
 
 			this.maxCircleXScaleDiff = 0;
 			this.maxCircleYScaleDiff = 0;
@@ -2332,7 +2334,14 @@ export class Visual extends Shadow {
 
 			this.handleShowBucket();
 
+			const categoricalSmallMultiplesField = this.categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
+
 			if (!this.isChartInit) {
+				this.initChart();
+			}
+
+			if (this.isSmallMultiplesEnabled && !categoricalSmallMultiplesField) {
+				d3.select(this.chartContainer).selectAll("*").remove();
 				this.initChart();
 			}
 
