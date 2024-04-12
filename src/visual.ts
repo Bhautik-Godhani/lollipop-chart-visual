@@ -1119,63 +1119,63 @@ export class Visual extends Shadow {
 		const sortByName = () => {
 			if (!this.isXIsDateTimeAxis && !this.isXIsNumericAxis) {
 				if (this.isMonthCategoryNames) {
-					if (this.isHorizontalChart) {
-						if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-							data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
-						} else {
-							data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
-						}
+					// if (this.isHorizontalChart) {
+					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+					// 		data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
+					// 	} else {
+					// 		data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
+					// 	}
+					// } else {
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
 					} else {
-						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-							data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
-						} else {
-							data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
-						}
+						data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
 					}
+					// }
 				} else {
-					if (this.isHorizontalChart) {
-						if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
-						} else {
-							data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
-						}
+					// if (this.isHorizontalChart) {
+					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+					// 	} else {
+					// 		data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+					// 	}
+					// } else {
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
 					} else {
-						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
-						} else {
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
-						}
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
 					}
+					// }
 				}
 			} else if (this.isXIsNumericAxis) {
-				if (this.isHorizontalChart) {
-					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-						data.sort((a, b) => a[categoryKey] - b[categoryKey]);
-					} else {
-						data.sort((a, b) => b[categoryKey] - a[categoryKey]);
-					}
+				// if (this.isHorizontalChart) {
+				// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+				// 		data.sort((a, b) => a[categoryKey] - b[categoryKey]);
+				// 	} else {
+				// 		data.sort((a, b) => b[categoryKey] - a[categoryKey]);
+				// 	}
+				// } else {
+				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+					data.sort((a, b) => a[categoryKey] - b[categoryKey]);
 				} else {
-					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => a[categoryKey] - b[categoryKey]);
-					} else {
-						data.sort((a, b) => b[categoryKey] - a[categoryKey]);
-					}
+					data.sort((a, b) => b[categoryKey] - a[categoryKey]);
 				}
+				// }
 			} else if (this.isXIsDateTimeAxis) {
-				if (this.isHorizontalChart) {
-					if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-						data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
-					} else {
-						data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
-					}
+				// if (this.isHorizontalChart) {
+				// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+				// 		data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
+				// 	} else {
+				// 		data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
+				// 	}
+				// } else {
+				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+					data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
 				} else {
-					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
-					} else {
-						data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
-					}
+					data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
 				}
+				// }
 			}
 		};
 
@@ -1183,27 +1183,27 @@ export class Visual extends Shadow {
 			const index = measureValues.find((d) => d.source.displayName === sortingSettings.sortBy).source.index;
 			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
 
-			if (this.isHorizontalChart) {
-				if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-					data.sort((a, b) => {
-						return a[measureIndex] - b[measureIndex];
-					});
-				} else {
-					data.sort((a, b) => {
-						return b[measureIndex] - a[measureIndex];
-					});
-				}
+			// if (this.isHorizontalChart) {
+			// 	if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+			// 		data.sort((a, b) => {
+			// 			return a[measureIndex] - b[measureIndex];
+			// 		});
+			// 	} else {
+			// 		data.sort((a, b) => {
+			// 			return b[measureIndex] - a[measureIndex];
+			// 		});
+			// 	}
+			// } else {
+			if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+				data.sort((a, b) => {
+					return a[measureIndex] - b[measureIndex];
+				});
 			} else {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-					data.sort((a, b) => {
-						return a[measureIndex] - b[measureIndex];
-					});
-				} else {
-					data.sort((a, b) => {
-						return b[measureIndex] - a[measureIndex];
-					});
-				}
+				data.sort((a, b) => {
+					return b[measureIndex] - a[measureIndex];
+				});
 			}
+			// }
 		};
 
 		const sortByMultiMeasure = (measureKeys: string[]) => {
@@ -1213,23 +1213,23 @@ export class Visual extends Shadow {
 					return value;
 				}, 0);
 
-			if (this.isHorizontalChart) {
-				if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-					data.sort((a, b) => {
-						return this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b);
-					});
-				} else {
-					data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
-				}
+			// if (this.isHorizontalChart) {
+			// 	if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+			// 		data.sort((a, b) => {
+			// 			return this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b);
+			// 		});
+			// 	} else {
+			// 		data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
+			// 	}
+			// } else {
+			if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+				data.sort((a, b) => {
+					return this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b);
+				});
 			} else {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-					data.sort((a, b) => {
-						return this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b);
-					});
-				} else {
-					data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
-				}
+				data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
 			}
+			// }
 		};
 
 		// Axis Settings
@@ -3963,15 +3963,6 @@ export class Visual extends Shadow {
 				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 			}));
 
-		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
-			const elementToMove = this.categoryPatterns.find(obj => obj.name.includes(this.othersLabel));
-			if (elementToMove) {
-				const index = this.categoryPatterns.findIndex(obj => obj.name.includes(this.othersLabel));
-				this.categoryPatterns.splice(index, 1);
-				this.categoryPatterns.push(elementToMove);
-			}
-		}
-
 		this.measuresPatterns = this.measureNames
 			.map((d) => {
 				const pattern = this.patternSettings.measuresPatterns.find((p) => p.name === d);
@@ -4018,14 +4009,12 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
-			const elementToMove = this.chartData.find(obj => obj.category.includes(this.othersLabel));
-			if (elementToMove) {
-				const index = this.chartData.findIndex(obj => obj.category.includes(this.othersLabel));
-				this.chartData.splice(index, 1);
-				this.chartData.push(elementToMove);
-			}
+		const chartData = JSON.parse(JSON.stringify(this.chartData));
+		if (this.isHorizontalChart) {
+			this.chartData = chartData.reverse();
 		}
+
+		this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
 		const getDataLabel = (d: ILollipopChartRow, isData2Label: boolean) => {
 			const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
@@ -4108,6 +4097,23 @@ export class Visual extends Shadow {
 		})
 	}
 
+	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
+		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+			const elementToMove = data.find(obj => (isHasCategories ? obj[categoryName] : obj).includes(this.othersLabel));
+			if (elementToMove) {
+				const index = data.findIndex(obj => (isHasCategories ? obj[categoryName] : obj).includes(this.othersLabel));
+				data.splice(index, 1);
+				if (this.isHorizontalChart) {
+					data.unshift(elementToMove);
+				} else {
+					data.push(elementToMove);
+				}
+			}
+		}
+
+		return data;
+	}
+
 	public configLegend(): void {
 		if (this.legendSettings.show) {
 			d3.select("div.legend-wrapper").attr("display", "block");
@@ -4170,7 +4176,8 @@ export class Visual extends Shadow {
 							}
 						}))
 					} else {
-						legendDataPoints = (this.isHorizontalChart ? this.chartData.reverse() : this.chartData).map(d => ({
+						const chartData = JSON.parse(JSON.stringify(this.chartData));
+						legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
 							data: {
 								name: d.category.replace(/--\d+/g, ''),
 								color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
@@ -4707,7 +4714,7 @@ export class Visual extends Shadow {
 		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
 		const colorIdxRangeScale = d3.scaleLinear()
 			.domain([0, keys.length - 1])
-			.range(!this.isHorizontalChart ? [1, 0] : [0, 1]);
+			.range([1, 0]);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(keys.length / marker.schemeColors.length);
@@ -9366,7 +9373,7 @@ export class Visual extends Shadow {
 	}
 
 	setSummaryTableConfig(): void {
-		const seedDataFromVisual = [];
+		let seedDataFromVisual = [];
 
 		if (!this.isHasSubcategories) {
 			this.categoricalData.categories[0].values.forEach((d, i) => {
@@ -9406,14 +9413,20 @@ export class Visual extends Shadow {
 			});
 		}
 
-		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
-			const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
-			if (elementToMove) {
-				const index = seedDataFromVisual.findIndex(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
-				seedDataFromVisual.splice(index, elementToMove.length);
-				seedDataFromVisual.push(...elementToMove);
-			}
-		}
+		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName);
+
+		// if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+		// 	const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+		// 	if (elementToMove) {
+		// 		const index = seedDataFromVisual.findIndex(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
+		// 		seedDataFromVisual.splice(index, elementToMove.length);
+		// 		if (this.isHorizontalChart) {
+		// 			seedDataFromVisual.unshift(...elementToMove);
+		// 		} else {
+		// 			seedDataFromVisual.push(...elementToMove);
+		// 		}
+		// 	}
+		// }
 
 		this.summaryTableConfig = {
 			shadow: this,
