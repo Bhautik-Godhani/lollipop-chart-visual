@@ -413,8 +413,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             } else {
                 self.drawXYAxis(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
                 // self.drawXYAxis(true, true);
-                self.margin.left = 0;
-                self.margin.bottom = 0;
+                // self.margin.left = 0;
+                // self.margin.bottom = 0;
                 self.drawLollipopChart();
             }
 

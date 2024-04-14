@@ -6896,15 +6896,19 @@ export class Visual extends Shadow {
 				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
 			}
 		} else {
-			if (this.isSmallMultiplesEnabled) {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [0, xScaleWidth] : [xScaleWidth, 0]);
+			// if (this.isSmallMultiplesEnabled) {
+			// 	if (this.isXIsContinuousAxis) {
+			// 		this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
+			// 	} else {
+			// 		this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+			// 	}
+			// } else {
+			if (this.isXIsContinuousAxis || this.isSmallMultiplesEnabled) {
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
 			} else {
-				if (this.isXIsContinuousAxis) {
-					this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
-				} else {
-					this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
-				}
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
 			}
+			// }
 
 			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
 			if (this.isShowPositiveNegativeLogScale) {
