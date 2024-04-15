@@ -5756,11 +5756,13 @@ export class Visual extends Shadow {
 					((this.yAxisSettings.position === Position.Left) && (this.xAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 <= d.value2 : d.value1 >= d.value2)) ||
 					(this.yAxisSettings.position === Position.Right && (this.xAxisSettings.isInvertRange && !this.isHasMultiMeasure ? d.value1 >= d.value2 : d.value1 <= d.value2))
 				) {
-					const xPos = isBestFitOutside ? x - bBox.width / 2 - markerSize - labelDistance : x + bBox.width / 2 + markerSize + labelDistance;
+					// const xPos = isBestFitOutside ? x - bBox.width / 2 - markerSize - labelDistance : x + bBox.width / 2 + markerSize + labelDistance;
+					const xPos = x + bBox.width / 2 + markerSize + labelDistance;
 					const yPos = y;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				} else {
-					const xPos = isBestFitOutside ? x + bBox.width / 2 + markerSize + labelDistance : x - bBox.width / 2 - markerSize - labelDistance;
+					// const xPos = isBestFitOutside ? x + bBox.width / 2 + markerSize + labelDistance : x - bBox.width / 2 - markerSize - labelDistance;
+					const xPos = x - bBox.width / 2 - markerSize - labelDistance;
 					const yPos = y;
 					return { translate: `translate(${xPos}, ${yPos}), rotate(${0})`, x: xPos, y: yPos };
 				}
@@ -6857,24 +6859,46 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
-		const { fontSize, fontFamily, fontStyle } = this.data1LabelsSettings;
-		const dataLabelHeight = getSVGTextSize('100K', fontFamily, fontSize, fontStyle[EFontStyle.Bold], fontStyle[EFontStyle.Italic], fontStyle[EFontStyle.UnderLine]).height;
+		const { fontSize: font1Size, fontFamily: font1Family, fontStyle: font1Style } = this.data1LabelsSettings;
+		const { fontSize: font2Size, fontFamily: font2Family, fontStyle: font2Style } = this.data2LabelsSettings;
+
+		const data1LabelHeight = getSVGTextSize('100K', font1Family, font1Size, font1Style[EFontStyle.Bold], font1Style[EFontStyle.Italic], font1Style[EFontStyle.UnderLine]).height;
 		const data1Labels = d3.map(this.chartData, d => this.formatNumber(d.value1, this.numberSettings, this.measureNumberFormatter[0], true, true));
 		const data1LabelWidth = getSVGTextSize((data1Labels.find(d => d.length === d3.max(data1Labels, d => d.length))),
-			fontFamily,
-			fontSize,
-			fontStyle[EFontStyle.Bold],
-			fontStyle[EFontStyle.Italic],
-			fontStyle[EFontStyle.UnderLine]).width;
+			font1Family,
+			font1Size,
+			font1Style[EFontStyle.Bold],
+			font1Style[EFontStyle.Italic],
+			font1Style[EFontStyle.UnderLine]).width;
 
-		const isOutsideLabel = this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || this.dataLabelsSettings.isShowBestFitLabels;
+		let dataLabelHeight = data1LabelHeight;
+		let dataLabelWidth = data1LabelWidth;
+
+		if (this.isHasMultiMeasure) {
+			const data2LabelHeight = getSVGTextSize('100K', font2Family, font2Size, font2Style[EFontStyle.Bold], font2Style[EFontStyle.Italic], font2Style[EFontStyle.UnderLine]).height;
+			const data2Labels = d3.map(this.chartData, d => this.formatNumber(d.value2, this.numberSettings, this.measureNumberFormatter[0], true, true));
+			const data2LabelWidth = getSVGTextSize((data2Labels.find(d => d.length === d3.max(data2Labels, d => d.length))),
+				font2Family,
+				font2Size,
+				font2Style[EFontStyle.Bold],
+				font2Style[EFontStyle.Italic],
+				font2Style[EFontStyle.UnderLine]).width;
+
+			dataLabelHeight = d3.max([data2LabelHeight, data1LabelHeight]);
+			dataLabelWidth = d3.max([data1LabelWidth, data2LabelWidth]);
+		}
+
+		const isOutsideLabel = this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || (this.dataLabelsSettings.isShowBestFitLabels && this.isHasMultiMeasure);
+		const isBottomOutsideLabel = (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || this.dataLabelsSettings.isShowBestFitLabels) && this.isHasMultiMeasure;
 		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
-		const outsideDataLabelHeight = this.dataLabelsSettings.show && isOutsideLabel ? dataLabelHeight : 0;
-		const outsideDataLabelWidth = (this.dataLabelsSettings.show && isOutsideLabel ? data1LabelWidth : 0) + this.markerMaxSize;
-		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? data1LabelWidth + this.markerMaxSize : 0;
+		const outsideDataLabelHeight = (this.dataLabelsSettings.show && isOutsideLabel ? dataLabelHeight : 0) + this.markerMaxSize / 4;
+		const outsideDataLabelWidth = (this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth : 0) + this.markerMaxSize / 4;
+		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth + (this.markerMaxSize / 2) : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff, xScaleWidth - outsideDataLabelWidth] : [xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff, this.markerMaxSize + outsideDataLabelWidth];
+			const xAxisRange = this.yAxisSettings.position === Position.Left ?
+				[this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), xScaleWidth - (this.markerMaxSize / 2) - outsideDataLabelWidth] :
+				[xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), (this.markerMaxSize) + outsideDataLabelWidth];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
@@ -6910,7 +6934,10 @@ export class Visual extends Shadow {
 			}
 			// }
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff, this.markerMaxSize + outsideDataLabelHeight] : [this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff, yScaleHeight - outsideDataLabelHeight - this.markerMaxSize];
+			const yAxisRange = this.xAxisSettings.position === Position.Bottom ?
+				[yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), (this.markerMaxSize / 2) + outsideDataLabelHeight] :
+				[this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), yScaleHeight - (this.markerMaxSize / 2) - outsideDataLabelHeight];
+
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
 
