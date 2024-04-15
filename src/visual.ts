@@ -6555,7 +6555,7 @@ export class Visual extends Shadow {
 					if (!xAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
 					} else {
-						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 					}
 				}
 
@@ -6670,7 +6670,7 @@ export class Visual extends Shadow {
 					if (!yAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
 					} else {
-						text = FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 					}
 				}
 
@@ -9013,13 +9013,13 @@ export class Visual extends Shadow {
 			if (!this.xAxisSettings.isAutoDateFormat) {
 				return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
 			} else {
-				return FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 			}
 		} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart) {
 			if (!this.yAxisSettings.isAutoDateFormat) {
 				return FormatAxisDate(this.yAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.yAxisSettings.customDateFormat : this.yAxisSettings.dateFormat, text);
 			} else {
-				return FormatAxisDate("DD:MM:YYYY hh:mm A", text);
+				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 			}
 		} else {
 			return (typeof text === "string" ? text.toUpperCase() : text).replace(/--\d+/g, '');
