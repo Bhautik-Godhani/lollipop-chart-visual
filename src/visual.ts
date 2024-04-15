@@ -9411,7 +9411,11 @@ export class Visual extends Shadow {
 				const obj = {};
 
 				this.categoricalData.categories.forEach(c => {
-					obj[c.source.displayName] = c.values[i] ? c.values[i] : 0;
+					let text = c.values[i] ? c.values[i] : 0;
+					if (text.toString().split("--").length > 1) {
+						text = text.toString().split("--")[0];
+					}
+					obj[c.source.displayName] = text;
 				});
 
 				this.categoricalData.values.forEach(v => {
@@ -9428,7 +9432,11 @@ export class Visual extends Shadow {
 					const obj = {};
 
 					this.categoricalData.categories.forEach(c => {
-						obj[c.source.displayName] = c.values[i] ? c.values[i] : 0;
+						let text = c.values[i] ? c.values[i] : 0;
+						if (text.toString().split("--").length > 1) {
+							text = text.toString().split("--")[0];
+						}
+						obj[c.source.displayName] = text;
 					});
 
 					obj[this.categoricalSubCategoryField.displayName] = g;
@@ -9458,6 +9466,9 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// }
+
+		console.log(seedDataFromVisual);
+
 
 		this.summaryTableConfig = {
 			shadow: this,
