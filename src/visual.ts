@@ -8784,13 +8784,13 @@ export class Visual extends Shadow {
 
 			if (marker1Style.isShowMarkerOutline) {
 				if (marker1Style.showOutlineOnly) {
-					color1 = "transparent";
+					color1 = "#ffffff";
 				}
 			}
 
 			if (marker2Style.isShowMarkerOutline) {
 				if (marker2Style.showOutlineOnly) {
-					color2 = "transparent";
+					color2 = "#ffffff";
 				}
 			}
 
