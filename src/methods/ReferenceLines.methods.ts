@@ -1,6 +1,6 @@
 import { Visual } from "../visual";
 import { select, Selection } from "d3-selection";
-import { min as d3Min, max as d3Max, mean, median } from "d3-array";
+import { min as d3Min, max as d3Max, mean, median, max, min } from "d3-array";
 import { EBeforeAfterPosition, EFontStyle, EHighContrastColorType, ELCRPosition, ELineType, EReferenceLineComputation, EReferenceLineNameTypes, EReferenceLinesType, EReferenceLineType, EReferenceType, EXYAxisNames, Position } from "../enum";
 import { scaleLinear } from "d3";
 import crypto from "crypto";
@@ -161,9 +161,7 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
         .attr("text-anchor", (d: IReferenceLineSettings) => d.labelStyle.textAnchor)
         .attr("alignment-baseline", (d: IReferenceLineSettings) => d.labelStyle.textAlignment)
         .style("font-size", (d: IReferenceLineSettings) => {
-            const labelFontSizeFn = scaleLinear().range([8, 40]).domain([10, 2000]);
-            const calcFontSize = d.labelStyle.autoFontSize ? labelFontSizeFn(self.chartContainer.clientWidth) : d.labelStyle.labelFontSize;
-            return calcFontSize + "px";
+            return d.labelStyle.labelFontSize + "px";
         })
         .style("font-family", (d: IReferenceLineSettings) => d.labelStyle.labelFontFamily)
         .style("font-weight", (d: IReferenceLineSettings) => (d.labelStyle.styling.includes(EFontStyle.Bold) ? "bold" : "normal"))
@@ -225,13 +223,13 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
 const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
     if (rLine.labelPosition === EBeforeAfterPosition.After) {
-        if ((x1 + 20 + labelTextBBox.height) > self.width) {
+        if ((max([d.line1Coord.x1, d.line2Coord.x1]) + 20 + labelTextBBox.height) > self.width) {
             rLine.labelPosition = EBeforeAfterPosition.Before;
         }
     }
 
     if (rLine.labelPosition === EBeforeAfterPosition.Before) {
-        if (labelTextBBox.height > (x1 - 10 + self.margin.left)) {
+        if ((min([d.line1Coord.x1, d.line2Coord.x1]) - 10) <= labelTextBBox.height) {
             rLine.labelPosition = EBeforeAfterPosition.After;
         }
     }
@@ -585,7 +583,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
     return self.referenceLinesSettings.reduce(
         (arr: IReferenceLineSettings[], rLine: IReferenceLineSettings) => {
-            const labelFontSizeFn = scaleLinear().range([8, 40]).domain([10, 2000]);
+            const labelFontSizeFn = scaleLinear().range([8, 22]).domain([10, self.chartContainer.clientWidth]);
             const calcFontSize = rLine.labelStyle.autoFontSize ? labelFontSizeFn(self.chartContainer.clientWidth) : rLine.labelStyle.labelFontSize;
 
             rLine.labelStyle.labelFontSize = calcFontSize.toString();
