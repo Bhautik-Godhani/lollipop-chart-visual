@@ -588,6 +588,8 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             const labelFontSizeFn = scaleLinear().range([8, 40]).domain([10, 2000]);
             const calcFontSize = rLine.labelStyle.autoFontSize ? labelFontSizeFn(self.chartContainer.clientWidth) : rLine.labelStyle.labelFontSize;
 
+            rLine.labelStyle.labelFontSize = calcFontSize.toString();
+
             setData(rLine, false);
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
@@ -597,7 +599,6 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
             rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
 
-            rLine.labelStyle.labelFontSize = calcFontSize.toString();
             rLine.labelText = getLabelText(self, rLine);
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
