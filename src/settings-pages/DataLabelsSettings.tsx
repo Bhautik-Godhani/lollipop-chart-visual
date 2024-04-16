@@ -599,8 +599,8 @@ const DataLabelsSettings = (props) => {
 			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 
-		if (shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
-			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
+		if (shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isTextColorTypeChanged) {
+			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 
 		if (measureConfigValues.displayType === EDataLabelsDisplayTypes.CustomLabel && shadow.isHasExtraDataLabels && (!measureConfigValues.customLabel ||

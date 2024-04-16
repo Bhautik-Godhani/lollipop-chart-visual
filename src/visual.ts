@@ -2115,12 +2115,12 @@ export class Visual extends Shadow {
 			this.data2LabelsSettings.displayType = EDataLabelsDisplayTypes.All;
 		}
 
-		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
-			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
+		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && !this.data1LabelsSettings.isTextColorTypeChanged) {
+			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
-		if (this.isPatternApplied && this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
-			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
+		if (this.isPatternApplied && this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && !this.data2LabelsSettings.isTextColorTypeChanged) {
+			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
 		if (this.markerSettings.markerType === EMarkerTypes.CHART && !this.isHasSubcategories) {
