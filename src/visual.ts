@@ -2115,11 +2115,11 @@ export class Visual extends Shadow {
 			this.data2LabelsSettings.displayType = EDataLabelsDisplayTypes.All;
 		}
 
-		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+		if (this.isPatternApplied && this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
 		}
 
-		if (this.isPatternApplied && this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+		if (this.isPatternApplied && this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
 			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.FIXED;
 		}
 
@@ -4659,11 +4659,11 @@ export class Visual extends Shadow {
 			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
 		}
 
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
+		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
+		if (this.data2LabelsSettings.placement === DataLabelsPlacement.Inside && this.data2LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data2LabelsSettings.isTextColorTypeChanged) {
 			this.data2LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
 		}
 
@@ -5591,7 +5591,7 @@ export class Visual extends Shadow {
 	getDataLabelsFontSize(isData2Label: boolean = false): number {
 		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
 		const circleRadius = isData2Label ? this.circle2Size / 2 : this.circle1Size / 2;
-		if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+		if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 			return dataLabelsSettings.fontSize;
 		}
 		if (dataLabelsSettings.isAutoFontSize) {
@@ -5971,7 +5971,7 @@ export class Visual extends Shadow {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -5988,7 +5988,7 @@ export class Visual extends Shadow {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 					this.transformData1LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, false, DataLabelsPlacement.Outside);
 						this.transformData1LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -6013,7 +6013,7 @@ export class Visual extends Shadow {
 					.attr("opacity", (d: ILollipopChartRow) => {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
@@ -6049,7 +6049,7 @@ export class Visual extends Shadow {
 									}
 								}
 							} else {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
@@ -6086,22 +6086,22 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-								if (THIS.isHorizontalChart) {
-									if (THIS.isLeftYAxis) {
-										return d.positions.dataLabel1X < 1 ? 0 : 1;
-									} else {
-										return d.positions.dataLabel1X + getBBox.width > THIS.width ? 0 : 1;
-									}
-								} else {
-									if (THIS.isBottomXAxis) {
-										return d.positions.dataLabel1Y + getBBox.height > THIS.height ? 0 : 1;
-									} else {
-										return d.positions.dataLabel1Y < 1 ? 0 : 1;
-									}
-								}
+							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+								// if (THIS.isHorizontalChart) {
+								// 	if (THIS.isLeftYAxis) {
+								// 		return d.positions.dataLabel1X < 1 ? 0 : 1;
+								// 	} else {
+								// 		return d.positions.dataLabel1X + getBBox.width > THIS.width ? 0 : 1;
+								// 	}
+								// } else {
+								// 	if (THIS.isBottomXAxis) {
+								// 		return d.positions.dataLabel1Y + getBBox.height > THIS.height ? 0 : 1;
+								// 	} else {
+								// 		return d.positions.dataLabel1Y < 1 ? 0 : 1;
+								// 	}
+								// }
 							}
 						}
 
@@ -6133,7 +6133,7 @@ export class Visual extends Shadow {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, true);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, true);
 					} else {
@@ -6150,7 +6150,7 @@ export class Visual extends Shadow {
 					this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 					this.transformData2LabelOutside(dataLabelGSelection, false);
 				} else {
-					if (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+					if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
 						this.setDataLabelsFormatting(dataLabelGSelection, textSelection, true, DataLabelsPlacement.Outside);
 						this.transformData2LabelOutside(dataLabelGSelection, false);
 					} else {
@@ -6176,7 +6176,7 @@ export class Visual extends Shadow {
 					.attr("opacity", (d: ILollipopChartRow) => {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
 
 									if (isHideInsideLabel) {
@@ -6214,7 +6214,7 @@ export class Visual extends Shadow {
 								}
 							} else {
 								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
-								if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside);
@@ -6250,22 +6250,22 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
+							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (THIS.dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-								if (THIS.isHorizontalChart) {
-									if (THIS.isLeftYAxis) {
-										return d.positions.dataLabel2X < 1 ? 0 : 1;
-									} else {
-										return 1;
-									}
-								} else {
-									if (THIS.isBottomXAxis) {
-										return d.positions.dataLabel2Y + getBBox.height > THIS.height ? 0 : 1;
-									} else {
-										return d.positions.dataLabel2Y < 1 ? 0 : 1;
-									}
-								}
+							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
+								// if (THIS.isHorizontalChart) {
+								// 	if (THIS.isLeftYAxis) {
+								// 		return d.positions.dataLabel2X < 1 ? 0 : 1;
+								// 	} else {
+								// 		return 1;
+								// 	}
+								// } else {
+								// 	if (THIS.isBottomXAxis) {
+								// 		return d.positions.dataLabel2Y + getBBox.height > THIS.height ? 0 : 1;
+								// 	} else {
+								// 		return d.positions.dataLabel2Y < 1 ? 0 : 1;
+								// 	}
+								// }
 							}
 						}
 
@@ -6919,8 +6919,8 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
-		const { fontSize: font1Size, fontFamily: font1Family, fontStyle: font1Style } = this.data1LabelsSettings;
-		const { fontSize: font2Size, fontFamily: font2Family, fontStyle: font2Style } = this.data2LabelsSettings;
+		const { fontSize: font1Size, fontFamily: font1Family, fontStyle: font1Style, placement: label1Placement } = this.data1LabelsSettings;
+		const { fontSize: font2Size, fontFamily: font2Family, fontStyle: font2Style, placement: label2Placement } = this.data2LabelsSettings;
 
 		const data1LabelHeight = getSVGTextSize('100K', font1Family, font1Size, font1Style[EFontStyle.Bold], font1Style[EFontStyle.Italic], font1Style[EFontStyle.UnderLine]).height;
 		const data1Labels = d3.map(this.chartData, d => this.formatNumber(d.value1, this.numberSettings, this.measureNumberFormatter[0], true, true));
@@ -6948,9 +6948,9 @@ export class Visual extends Shadow {
 			dataLabelWidth = d3.max([data1LabelWidth, data2LabelWidth]);
 		}
 
-		const isOutsideLabel = this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || (this.dataLabelsSettings.isShowBestFitLabels && this.isHasMultiMeasure);
-		const isBottomOutsideLabel = (this.dataLabelsSettings.placement === DataLabelsPlacement.Outside || this.dataLabelsSettings.isShowBestFitLabels) && this.isHasMultiMeasure;
-		const negDataLabelHeight = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
+		const isOutsideLabel = ((label1Placement === DataLabelsPlacement.Outside || (this.isHasMultiMeasure ? label2Placement === DataLabelsPlacement.Outside : false))) || (this.dataLabelsSettings.isShowBestFitLabels && this.isHasMultiMeasure);
+		const isBottomOutsideLabel = ((label1Placement === DataLabelsPlacement.Outside || (this.isHasMultiMeasure ? label2Placement === DataLabelsPlacement.Outside : false)) && (this.isHasMultiMeasure || this.isHasNegativeValue)) || (this.dataLabelsSettings.isShowBestFitLabels && this.isHasMultiMeasure);
+		const negDataLabelHeight = (!isBottomOutsideLabel && this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel) ? (this.isHorizontalChart ? dataLabelHeight * 2 : dataLabelHeight) + this.markerMaxSize : 0;
 		const outsideDataLabelHeight = (this.dataLabelsSettings.show && isOutsideLabel ? dataLabelHeight : 0) + this.markerMaxSize / 4;
 		const outsideDataLabelWidth = (this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth : 0) + this.markerMaxSize / 4;
 		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth + (this.markerMaxSize / 2) : 0;
@@ -9538,9 +9538,6 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// }
-
-		console.log(seedDataFromVisual);
-
 
 		this.summaryTableConfig = {
 			shadow: this,

@@ -245,6 +245,7 @@ export interface IDataLabelsProps {
 	borderColor: string;
 	borderWidth: number;
 	orientation: Orientation;
+	placement: DataLabelsPlacement;
 	fontSize: number;
 	fontFamily: string;
 	showBackground: boolean;
@@ -265,7 +266,6 @@ export interface IDataLabelsProps {
 export interface IDataLabelsSettings {
 	show: boolean;
 	isShowBestFitLabels: boolean;
-	placement: DataLabelsPlacement;
 	measure1: IDataLabelsProps;
 	measure2: IDataLabelsProps;
 }

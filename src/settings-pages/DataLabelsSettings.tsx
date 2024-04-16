@@ -172,6 +172,17 @@ const UIDataLabelsFontSettings = (
 		<>
 			<Row>
 				<Column>
+					<SwitchOption
+						label={"Placement"}
+						value={configValues.placement}
+						optionsList={LABEL_PLACEMENTS}
+						handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, selectedMeasure, setConfigValues)}
+					/>
+				</Column>
+			</Row>
+
+			<Row>
+				<Column>
 					<SelectInput
 						label={"Display Style"}
 						value={configValues.displayType}
@@ -204,7 +215,7 @@ const UIDataLabelsFontSettings = (
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && config.placement === DataLabelsPlacement.Outside}>
+			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
 				<Row appearance="padded">
 					<Column>
 						<InputControl
@@ -229,7 +240,7 @@ const UIDataLabelsFontSettings = (
 
 			<ConditionalWrapper visible={shadow.isLollipopTypeCircle || shadow.isLollipopTypePie}>
 				<ConditionalWrapper
-					visible={config.placement === DataLabelsPlacement.Inside || shadow.isLollipopTypePie}
+					visible={configValues.placement === DataLabelsPlacement.Inside || shadow.isLollipopTypePie}
 				>
 					<Row>
 						<Column>
@@ -310,7 +321,7 @@ const UIDataLabelsFontSettings = (
 
 			{UIDataLabelsFontFamilyAndStyle(selectedMeasure, configValues, setConfigValues)}
 
-			<ConditionalWrapper visible={config.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypeCircle}>
+			<ConditionalWrapper visible={configValues.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypeCircle}>
 				{UIInsideLabelsTextColorSettings(shadow, vizOptions, selectedMeasure, configValues, setConfigValues)}
 			</ConditionalWrapper>
 		</>
@@ -353,7 +364,7 @@ const UICircleLollipopLabelsSettings = (
 			</Row>
 		</ConditionalWrapper>
 
-		<ConditionalWrapper visible={shadow.isLollipopTypePie || config.placement === DataLabelsPlacement.Outside}>
+		<ConditionalWrapper visible={shadow.isLollipopTypePie || configValues.placement === DataLabelsPlacement.Outside}>
 			<Row>
 				<Column>
 					<ToggleButton
@@ -579,16 +590,16 @@ const DataLabelsSettings = (props) => {
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
 			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (!shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
+		if (!shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes !== EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
 			handleChange(EInsideTextColorTypes.CONTRAST, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 
-		if (shadow.isPatternApplied && configValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
+		if (shadow.isPatternApplied && measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST && !measureConfigValues.isTextColorTypeChanged) {
 			handleChange(EInsideTextColorTypes.FIXED, EDataLabelsSettings.textColorTypes, selectedMeasure, setConfigValues);
 		}
 
@@ -614,17 +625,17 @@ const DataLabelsSettings = (props) => {
 	}, [measureConfigValues.displayType]);
 
 	React.useEffect(() => {
-		if (configValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.textColorTypes === EInsideTextColorTypes.CONTRAST) {
 			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
 			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.FIXED) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.textColorTypes === EInsideTextColorTypes.FIXED) {
 			if (!measureConfigValues.isColorChanged) {
 				handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 			}
@@ -635,28 +646,28 @@ const DataLabelsSettings = (props) => {
 			}
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypePie && !measureConfigValues.isColorChanged) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypePie && !measureConfigValues.isColorChanged) {
 			handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
 			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 		}
-	}, [configValues.placement, measureConfigValues.textColorTypes]);
+	}, [measureConfigValues.placement, measureConfigValues.textColorTypes]);
 
 	React.useEffect(() => {
-		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(93, 93, 93, 1)" && measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(93, 93, 93, 1)" && measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
 			handleChange("rgba(255, 255, 255, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Outside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
 			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 		}
 
-		if (configValues.placement === DataLabelsPlacement.Inside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
+		if (measureConfigValues.placement === DataLabelsPlacement.Inside && measureConfigValues.color === "rgba(255, 255, 255, 1)" && !measureConfigValues.showBackground && !measureConfigValues.isColorChanged) {
 			handleChange("rgba(93, 93, 93, 1)", EDataLabelsSettings.color, selectedMeasure, setConfigValues);
 		}
-	}, [configValues.placement, measureConfigValues.showBackground]);
+	}, [measureConfigValues.placement, measureConfigValues.showBackground]);
 
 	const MEASURE_TYPES: ILabelValuePair[] = [
 		{
@@ -695,20 +706,6 @@ const DataLabelsSettings = (props) => {
 								[EDataLabelsSettings.isShowBestFitLabels]: val
 							}))}
 							appearance="checkbox"
-						/>
-					</Column>
-				</Row>
-
-				<Row>
-					<Column>
-						<SwitchOption
-							label={"Placement"}
-							value={configValues.placement}
-							optionsList={LABEL_PLACEMENTS}
-							handleChange={(value) => setConfigValues(d => ({
-								...d,
-								[EDataLabelsSettings.placement]: value
-							}))}
 						/>
 					</Column>
 				</Row>

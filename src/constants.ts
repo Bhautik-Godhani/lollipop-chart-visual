@@ -141,6 +141,7 @@ const dataLabelsProps: IDataLabelsProps = {
 	borderColor: "rgba(255, 255, 255,1)",
 	borderWidth: 1,
 	orientation: Orientation.Horizontal,
+	placement: DataLabelsPlacement.Outside,
 	fontSize: 12,
 	fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 	showBackground: false,
@@ -161,7 +162,6 @@ const dataLabelsProps: IDataLabelsProps = {
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
 	show: true,
 	isShowBestFitLabels: true,
-	placement: DataLabelsPlacement.Outside,
 	measure1: dataLabelsProps,
 	measure2: dataLabelsProps
 };
