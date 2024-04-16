@@ -166,7 +166,7 @@ import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -190,6 +190,7 @@ import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
+import ImportExport from "./settings-pages/ImportExport";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -849,6 +850,13 @@ export class Visual extends Shadow {
 					propertyName: "showBucket",
 					Component: () => ShowCondition,
 					icon: ShowConditionIcon
+				},
+				{
+					name: "Import/Export",
+					sectionName: "config",
+					propertyName: "importExportTheme",
+					Component: () => ImportExport,
+					icon: ImportExportIcon
 				},
 			],
 		});

@@ -6,6 +6,7 @@ export class Enumeration {
 		return [
 			getLicenseSelection(),
 			getVisualGeneralSettingsSelection(),
+			getConfigSelection(),
 			getChartConfigSelection(),
 			getMarkerConfigSelection(),
 			getDataColorsConfigSelection(),
@@ -76,6 +77,19 @@ function getVisualGeneralSettingsSelection(): EnumerateSectionType {
 			{
 				name: "advancedSettingsToggle",
 				isShow: true,
+			},
+		],
+	};
+}
+
+function getConfigSelection(): EnumerateSectionType {
+	return {
+		name: "config",
+		isShow: false,
+		properties: [
+			{
+				name: "importExportTheme",
+				isShow: false,
 			},
 		],
 	};

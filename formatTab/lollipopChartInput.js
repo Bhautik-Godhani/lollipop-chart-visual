@@ -3,6 +3,7 @@ const visualPath = "../";
 const sectionKVPair = [
 	{ license: "PowerVIZ License" },
 	{ visualGeneralSettings: "Visual General Settings" },
+	{ Config: "Config" },
 	{ chartConfig: "Chart Configuration" },
 	{ markerConfig: "Marker Configuration" },
 	{ dataColorsConfig: "DataColors Configuration" },
@@ -80,6 +81,15 @@ const formatTab = {
 			type: "bool",
 			description: "",
 			defaultValue: "true",
+		},
+	],
+	config: [
+		{
+			technicalName: "importExportTheme",
+			displayName: "Import/Export",
+			type: "text",
+			description: "",
+			defaultValue: "",
 		},
 	],
 	markerConfig: [

@@ -262,6 +262,18 @@
 				}
 			}
 		},
+		"config": {
+			"displayName": "Config",
+			"properties": {
+				"importExportTheme": {
+					"displayName": "Import/Export",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				}
+			}
+		},
 		"chartConfig": {
 			"displayName": "Chart Configuration",
 			"properties": {

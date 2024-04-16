@@ -33,6 +33,7 @@ import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, Sema
 export class VisualSettings extends DataViewObjectsParser {
 	public license = new License();
 	public visualGeneralSettings = new VisualGeneralSettings();
+	public config = new Config();
 	public chartConfig = new ChartConfig();
 	public markerConfig = new MarkerConfig();
 	public dataColorsConfig = new DataColorsConfig();
@@ -70,6 +71,9 @@ export class VisualGeneralSettings {
 	public summaryTableToggle: boolean = true;
 	public annotationsToggle: boolean = true;
 	public advancedSettingsToggle: boolean = true;
+}
+export class Config {
+	public importExportTheme: string = '';
 }
 export class ChartConfig {
 	public chartSettings: string = "{}";
