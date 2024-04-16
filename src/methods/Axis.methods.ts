@@ -6,14 +6,28 @@ import * as moment from "moment";
 
 export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } => {
     const values = self.chartData.reduce((arr, d) => {
-        return self.errorBarsSettings.isEnabled ? [...arr, d.value1, d.value2, d.upperBoundValue, d.lowerBoundValue] : [...arr, d.value1, d.value2];
+        return self.errorBarsSettings.isEnabled ?
+            (self.isRenderBothErrorBars ?
+                [...arr, d.value1, d.value2, d.errorBar1.upperBoundValue, d.errorBar2.upperBoundValue, d.errorBar1.lowerBoundValue, d.errorBar2.lowerBoundValue] :
+                [...arr, d.value1, d.value2, d.errorBar1.upperBoundValue, d.errorBar1.lowerBoundValue]) :
+            [...arr, d.value1, d.value2];
     }, []);
 
+    const errorBarValues = [...self.chartData.map((d) => d.errorBar1.upperBoundValue), ...self.chartData.map((d) => d.errorBar1.lowerBoundValue)];
+
+    if (self.isRenderBothErrorBars) {
+        errorBarValues.push(...self.chartData.map((d) => d.errorBar2.upperBoundValue), ...self.chartData.map((d) => d.errorBar2.lowerBoundValue))
+    }
+
     let min = +D3Min(self.isHasMultiMeasure ? values.map((val) => val) :
-        self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
+        self.errorBarsSettings.isEnabled ?
+            [...self.chartData.map((d) => d.value1), ...errorBarValues] :
+            self.chartData.map((d) => d.value1));
 
     let max = +D3Max(self.isHasMultiMeasure ? values.map((val) => val) :
-        self.errorBarsSettings.isEnabled ? [...self.chartData.map((d) => d.value1), ...self.chartData.map((d) => d.upperBoundValue), ...self.chartData.map((d) => d.lowerBoundValue)] : self.chartData.map((d) => d.value1));
+        self.errorBarsSettings.isEnabled ?
+            [...self.chartData.map((d) => d.value1), ...errorBarValues] :
+            self.chartData.map((d) => d.value1));
 
     if (self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
         min = +self.originalCategoricalData.values[0].minLocal;

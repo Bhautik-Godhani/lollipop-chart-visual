@@ -22,6 +22,16 @@ export interface ILollipopChartRow {
 	raceChartKey?: string;
 	raceChartDataLabel?: string;
 	positions: { dataLabel1X: number, dataLabel1Y: number, dataLabel2X: number, dataLabel2Y: number };
+	errorBar?: IErrorBarValue;
+	errorBar1: IErrorBarValue;
+	errorBar2: IErrorBarValue;
+	extraLabel1: string;
+	extraLabel2: string;
+	data1Label: string;
+	data2Label: string;
+}
+
+export interface IErrorBarValue {
 	upperBoundValue?: number;
 	lowerBoundValue?: number;
 	boundsTotal?: number;
@@ -29,10 +39,6 @@ export interface ILollipopChartRow {
 	tooltipLowerBoundValue?: string;
 	labelUpperBoundValue?: string;
 	labelLowerBoundValue?: string;
-	extraLabel1: string;
-	extraLabel2: string;
-	data1Label: string;
-	data2Label: string;
 }
 
 export interface IChartSubCategory {

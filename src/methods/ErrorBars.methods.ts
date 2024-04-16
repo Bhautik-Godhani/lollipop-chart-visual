@@ -10,22 +10,24 @@ export const getErrorBarLine = (self: Visual, width: number, height: number) => 
     return `M${width},${height}L-${width},${height}L-${width},0L${width},0Z`;
 }
 
-export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]) => {
+export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[], isValue2: boolean) => {
     const { errorBars, errorLabels } = self.errorBarsSettings;
     const isBottomXAxis = (self.isBottomXAxis && !self.yAxisSettings.isInvertRange) || (!self.isBottomXAxis && self.yAxisSettings.isInvertRange);
     const isLeftYAxis = (self.isLeftYAxis && !self.xAxisSettings.isInvertRange) || (!self.isLeftYAxis && self.xAxisSettings.isInvertRange);
 
-    self.errorBarsLinesG.selectAll("*").remove();
-
     const errorBarGSelection = self.errorBarsLinesG
-        .selectAll(".errorBarG")
-        .data(errorBarsData, (d: ILollipopChartRow, i) => d.boundsTotal + i);
+        .selectAll(isValue2 ? ".errorBar2G" : ".errorBar1G")
+        .data(errorBarsData, (d: ILollipopChartRow, i) => (isValue2 ? d.errorBar2.boundsTotal : d.errorBar1.boundsTotal) + i);
 
     (errorBarGSelection as any).join(
         (enter) => {
             const errorBarG = enter.append("g")
-                .attr("class", "errorBarG")
-                .each(function (d) {
+                .attr("class", isValue2 ? "errorBar2G" : "errorBar1G")
+                .each(function (d: ILollipopChartRow) {
+                    select(this).datum({ ...d, errorBar: isValue2 ? d.errorBar2 : d.errorBar1 });
+                })
+                .each(function (d: ILollipopChartRow) {
+                    const errorBarValue = d.errorBar;
                     const isValue2 = self.isHasMultiMeasure && self.errorBarsSettings.measurement.applySettingsToMeasure === self.measure2DisplayName;
                     let width = 0;
                     let height = 0;
@@ -33,17 +35,17 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                     let value2 = 0;
 
                     if (self.isHasErrorUpperBounds && self.isHasErrorLowerBounds) {
-                        value1 = d.upperBoundValue;
+                        value1 = errorBarValue.upperBoundValue;
                     } else {
                         value1 = isValue2 ? d.value2 : d.value1;
                     }
 
                     if (self.isHasErrorUpperBounds && !self.isHasErrorLowerBounds) {
-                        value2 = d.upperBoundValue;
+                        value2 = errorBarValue.upperBoundValue;
                     } else if (!self.isHasErrorUpperBounds && self.isHasErrorLowerBounds) {
-                        value2 = d.lowerBoundValue;
+                        value2 = errorBarValue.lowerBoundValue;
                     } else {
-                        value2 = d.lowerBoundValue;
+                        value2 = errorBarValue.lowerBoundValue;
                     }
 
                     if (!self.isHorizontalChart) {
@@ -177,11 +179,11 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 .attr("class", "errorBarUpperBoundLabelG");
 
             const errorBarUpperBoundLabel = errorBarUpperBoundLabelG.append("text")
-                .text(d => {
+                .text((d: ILollipopChartRow) => {
                     if (isBottomXAxis || isLeftYAxis) {
-                        return d.lowerBoundValue < d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                        return d.errorBar.lowerBoundValue < d.errorBar.upperBoundValue ? d.errorBar.labelUpperBoundValue : d.errorBar.labelLowerBoundValue;
                     } else {
-                        return d.lowerBoundValue > d.upperBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                        return d.errorBar.lowerBoundValue > d.errorBar.upperBoundValue ? d.errorBar.labelUpperBoundValue : d.errorBar.labelLowerBoundValue;
                     }
                 })
                 .attr("dy", "0.15em")
@@ -215,9 +217,9 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 })
                 .attr("display", d => {
                     if (isBottomXAxis || isLeftYAxis) {
-                        return d.lowerBoundValue < d.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                        return d.errorBar.lowerBoundValue < d.errorBar.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
                     } else {
-                        return d.lowerBoundValue > d.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                        return d.errorBar.lowerBoundValue > d.errorBar.upperBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
                     }
                 });
 
@@ -236,9 +238,9 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
             const errorBarLowerBoundLabel = errorBarLowerBoundLabelG.append("text")
                 .text(d => {
                     if (isBottomXAxis || isLeftYAxis) {
-                        return d.upperBoundValue < d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                        return d.errorBar.upperBoundValue < d.errorBar.lowerBoundValue ? d.errorBar.labelUpperBoundValue : d.errorBar.labelLowerBoundValue;
                     } else {
-                        return d.upperBoundValue > d.lowerBoundValue ? d.labelUpperBoundValue : d.labelLowerBoundValue;
+                        return d.errorBar.upperBoundValue > d.errorBar.lowerBoundValue ? d.errorBar.labelUpperBoundValue : d.errorBar.labelLowerBoundValue;
                     }
                 })
                 .attr("dy", "0.15em")
@@ -273,9 +275,9 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
                 })
                 .attr("display", d => {
                     if (isBottomXAxis || isLeftYAxis) {
-                        return d.upperBoundValue < d.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                        return d.errorBar.upperBoundValue < d.errorBar.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
                     } else {
-                        return d.upperBoundValue > d.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
+                        return d.errorBar.upperBoundValue > d.errorBar.lowerBoundValue ? self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Minus ? "none" : "block" : self.errorBarsSettings.measurement.direction === EErrorBarsDirection.Plus ? "none" : "block";
                     }
                 });
 
@@ -293,11 +295,15 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
     );
 }
 
-export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]): void => {
+export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[], isBand2: boolean): void => {
     const { errorBand } = self.errorBarsSettings;
 
-    self.errorBarsAreaPath
+    const valueKey = isBand2 ? "errorBar2" : "errorBar1";
+
+    const path: any = self.errorBarsAreaPath
+        .append("path")
         .datum(errorBarsData)
+        .attr("class", isBand2 ? "errorBarsArea2" : "errorBarsArea1")
         .attr("class", errorBand.lineStyle)
         .attr("fill", errorBand.fillType !== EErrorBandFillTypes.Line ? errorBand.fillColor : "transparent")
         .attr("stroke", errorBand.lineColor)
@@ -310,22 +316,22 @@ export const RenderErrorBand = (self: Visual, errorBarsData: ILollipopChartRow[]
         );
 
     if (self.isHorizontalChart) {
-        self.errorBarsAreaPath
+        path
             .attr(
                 "d",
                 area()
                     .y((d: any) => self.getYPosition(d.category) + self.scaleBandWidth / 2)
-                    .x0((d: any) => self.getXPosition(d.lowerBoundValue ? d.lowerBoundValue : 0))
-                    .x1((d: any) => self.getXPosition(d.upperBoundValue ? d.upperBoundValue : 0))
+                    .x0((d: any) => self.getXPosition(d[valueKey].lowerBoundValue ? d[valueKey].lowerBoundValue : 0))
+                    .x1((d: any) => self.getXPosition(d[valueKey].upperBoundValue ? d[valueKey].upperBoundValue : 0))
             );
     } else {
-        self.errorBarsAreaPath
+        path
             .attr(
                 "d",
                 area()
                     .x((d: any) => self.getXPosition(d.category) + self.scaleBandWidth / 2)
-                    .y0((d: any) => self.getYPosition(d.lowerBoundValue ? d.lowerBoundValue : 0))
-                    .y1((d: any) => self.getYPosition(d.upperBoundValue ? d.upperBoundValue : 0))
+                    .y0((d: any) => self.getYPosition(d[valueKey].lowerBoundValue ? d[valueKey].lowerBoundValue : 0))
+                    .y1((d: any) => self.getYPosition(d[valueKey].upperBoundValue ? d[valueKey].upperBoundValue : 0))
             );
     }
 }

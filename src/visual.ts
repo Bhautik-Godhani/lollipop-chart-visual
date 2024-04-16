@@ -20,7 +20,7 @@ import IValueFormatter = valueFormatter.IValueFormatter;
 import * as d3 from "d3";
 import 'd3-transition';
 import { easeLinear } from "d3";
-import { IBrushLollipopChartData, IChartSubCategory, ILollipopChartRow, TooltipData } from "./model";
+import { IBrushLollipopChartData, IChartSubCategory, IErrorBarValue, ILollipopChartRow, TooltipData } from "./model";
 import {
 	CircleType,
 	ColorPaletteType,
@@ -538,6 +538,7 @@ export class Visual extends Shadow {
 	errorBarsMarkerDef: D3Selection<SVGElement>;
 	errorBarsMarker: D3Selection<SVGElement>;
 	errorBarsMarkerPath: D3Selection<SVGElement>;
+	isRenderBothErrorBars: boolean;
 
 	// IBCS
 	selectedIBCSTheme: EIBCSThemes;
@@ -926,7 +927,7 @@ export class Visual extends Shadow {
 
 		this.errorBarsAreaG = this.errorBarsContainer.append("g").classed("errorBarsAreaG", true);
 
-		this.errorBarsAreaPath = this.errorBarsAreaG.append("path").attr("class", "errorBarsArea");
+		this.errorBarsAreaPath = this.errorBarsAreaG.append("g").attr("class", "errorBarsAreaG");
 
 		this.errorBarsLinesDashG = this.errorBarsContainer.append("g").classed("errorBarsLinesDashG", true);
 
@@ -1397,6 +1398,8 @@ export class Visual extends Shadow {
 
 		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase()) !== -1;
 
+		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
+
 		if (this.isExpandAllApplied) {
 			const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);
 			const categoriesName = categoricalCategoriesFields[this.categoricalCategoriesLastIndex].values
@@ -1594,6 +1597,16 @@ export class Visual extends Shadow {
 
 		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : undefined;
 		this.measure2DisplayName = this.isHasMultiMeasure && categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : undefined;
+
+		const errorBarValues = [this.measure1DisplayName];
+
+		if (this.isHasMultiMeasure) {
+			errorBarValues.push(this.measure2DisplayName, "Both");
+		}
+
+		if (!errorBarValues.includes(this.errorBarsSettings.measurement.applySettingsToMeasure)) {
+			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
+		}
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
@@ -3763,11 +3776,20 @@ export class Visual extends Shadow {
 					tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 					subCategories: this.isHasSubcategories ? getSubCategoryData(idx, <string>cat) : [],
 					positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
-					lowerBoundValue: 0,
-					upperBoundValue: 0,
-					tooltipLowerBoundValue: null,
-					tooltipUpperBoundValue: null,
-					boundsTotal: 0,
+					errorBar1: {
+						lowerBoundValue: 0,
+						upperBoundValue: 0,
+						tooltipLowerBoundValue: null,
+						tooltipUpperBoundValue: null,
+						boundsTotal: 0,
+					},
+					errorBar2: {
+						lowerBoundValue: 0,
+						upperBoundValue: 0,
+						tooltipLowerBoundValue: null,
+						tooltipUpperBoundValue: null,
+						boundsTotal: 0,
+					},
 					extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
 					extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
 					data1Label: "",
@@ -3793,19 +3815,38 @@ export class Visual extends Shadow {
 		}
 
 		data.forEach((d, i) => {
-			const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-			const value1 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value1) : d.value1;
-			const value2 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value2) : d.value2;
-			const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1, data);
-
 			if (this.errorBarsSettings.isEnabled) {
-				d.upperBoundValue = upperBoundValue;
-				d.tooltipUpperBoundValue = tooltipUpperBoundValue;
-				d.lowerBoundValue = lowerBoundValue;
-				d.tooltipLowerBoundValue = tooltipLowerBoundValue;
-				d.boundsTotal = lowerBoundValue + upperBoundValue;
-				d.labelUpperBoundValue = labelUpperBoundValue;
-				d.labelLowerBoundValue = labelLowerBoundValue;
+				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+				const value1 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value1) : d.value1;
+				const value2 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value2) : d.value2;
+				const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1, data);
+
+				const obj: IErrorBarValue = {};
+				obj.upperBoundValue = upperBoundValue;
+				obj.tooltipUpperBoundValue = tooltipUpperBoundValue;
+				obj.lowerBoundValue = lowerBoundValue;
+				obj.tooltipLowerBoundValue = tooltipLowerBoundValue;
+				obj.boundsTotal = lowerBoundValue + upperBoundValue;
+				obj.labelUpperBoundValue = labelUpperBoundValue;
+				obj.labelLowerBoundValue = labelLowerBoundValue;
+
+				d.errorBar1 = obj;
+
+				// 	ERROR BAR 2
+				if (this.isRenderBothErrorBars) {
+					const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value1 : value2, data);
+
+					const obj: IErrorBarValue = {};
+					obj.upperBoundValue = upperBoundValue;
+					obj.tooltipUpperBoundValue = tooltipUpperBoundValue;
+					obj.lowerBoundValue = lowerBoundValue;
+					obj.tooltipLowerBoundValue = tooltipLowerBoundValue;
+					obj.boundsTotal = lowerBoundValue + upperBoundValue;
+					obj.labelUpperBoundValue = labelUpperBoundValue;
+					obj.labelLowerBoundValue = labelLowerBoundValue;
+
+					d.errorBar2 = obj;
+				}
 			}
 		});
 
@@ -3842,6 +3883,8 @@ export class Visual extends Shadow {
 							identity: null,
 							isHighlight: false,
 							positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
+							errorBar1: undefined,
+							errorBar2: undefined,
 							extraLabel1: "",
 							extraLabel2: "",
 							data1Label: "",
@@ -6237,10 +6280,18 @@ export class Visual extends Shadow {
 		);
 
 		this.tooltipServiceWrapper.addTooltip(
-			d3.select(this.chartContainer).selectAll(".errorBarG"),
+			d3.select(this.chartContainer).selectAll(".errorBar1G"),
 			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
 			(datapoint: any) => datapoint.identity
 		);
+
+		if (this.isRenderBothErrorBars) {
+			this.tooltipServiceWrapper.addTooltip(
+				d3.select(this.chartContainer).selectAll(".errorBar2G"),
+				(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+				(datapoint: any) => datapoint.identity
+			);
+		}
 
 		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
 			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
@@ -6296,21 +6347,22 @@ export class Visual extends Shadow {
 			});
 
 			if (this.errorBarsSettings.tooltip.isEnabled) {
+				const errorBar1 = value.errorBar1;
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-					if (this.isHasErrorUpperBounds && (value.tooltipUpperBoundValue !== undefined && value.tooltipUpperBoundValue !== null)) {
+					if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
 						tooltipData.push({
 							displayName: "Upper",
-							value: value.tooltipUpperBoundValue,
+							value: errorBar1.tooltipUpperBoundValue,
 							color: "transparent",
 						});
 					}
 				}
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-					if (this.isHasErrorLowerBounds && (value.tooltipLowerBoundValue !== undefined && value.tooltipLowerBoundValue !== null)) {
+					if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
 						tooltipData.push({
 							displayName: "Lower",
-							value: value.tooltipLowerBoundValue,
+							value: errorBar1.tooltipLowerBoundValue,
 							color: "transparent",
 						});
 					}
@@ -8351,12 +8403,24 @@ export class Visual extends Shadow {
 			this.drawData2Labels([]);
 		}
 
-		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : []);
-		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : []);
+		this.errorBarsLinesG.selectAll("*").remove();
+		this.errorBarsAreaPath.selectAll("*").remove();
+
+		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : [], false);
+
+		if (this.isRenderBothErrorBars) {
+			RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : [], true);
+		}
+
+		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : [], false);
+
+		if (this.isRenderBothErrorBars) {
+			RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : [], true);
+		}
 
 		if (this.errorBarsSettings.measurement.calcType === EErrorBarsCalcTypes.ByField && !this.isHasErrorLowerBounds && !this.isHasErrorUpperBounds) {
-			RenderErrorBars(this, []);
-			RenderErrorBand(this, []);
+			RenderErrorBars(this, [], false);
+			RenderErrorBand(this, [], false);
 		}
 
 		if (this.chartSettings.isShowZeroBaseLine) {

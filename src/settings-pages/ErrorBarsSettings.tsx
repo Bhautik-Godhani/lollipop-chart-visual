@@ -265,8 +265,23 @@ const ErrorBarsSettings = (props) => {
   const UPPER_BOUND_LIST: ILabelValuePair[] = (shadow as Visual).upperBoundMeasureNames.map(d => ({ label: d, value: d }));
   const LOWER_BOUND_LIST: ILabelValuePair[] = (shadow as Visual).lowerBoundMeasureNames.map(d => ({ label: d, value: d }));
 
+  if (shadow.isHasMultiMeasure) {
+    MEASURES_LIST.unshift({
+      label: "Both",
+      value: "Both"
+    });
+  }
+
   React.useEffect(() => {
     if (!configValues.measurement.applySettingsToMeasure) {
+      handleChange(MEASURES_LIST[0].value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement);
+    }
+
+    if (configValues.measurement.applySettingsToMeasure === "Both" && !shadow.isHasMultiMeasure) {
+      handleChange(MEASURES_LIST[0].value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement);
+    }
+
+    if (!MEASURES_LIST.map(d => d.value).includes(configValues.measurement.applySettingsToMeasure)) {
       handleChange(MEASURES_LIST[0].value, EErrorBarsSettings.ApplySettingsToMeasure, EErrorBarsSettings.Measurement);
     }
 
