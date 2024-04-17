@@ -1192,27 +1192,27 @@ export class Visual extends Shadow {
 			const index = measureValues.find((d) => d.source.displayName === sortingSettings.sortBy).source.index;
 			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
 
-			// if (this.isHorizontalChart) {
-			// 	if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-			// 		data.sort((a, b) => {
-			// 			return a[measureIndex] - b[measureIndex];
-			// 		});
-			// 	} else {
-			// 		data.sort((a, b) => {
-			// 			return b[measureIndex] - a[measureIndex];
-			// 		});
-			// 	}
-			// } else {
-			if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-				data.sort((a, b) => {
-					return a[measureIndex] - b[measureIndex];
-				});
+			if (this.isHorizontalChart) {
+				// if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+				// 	data.sort((a, b) => {
+				// 		return a[measureIndex] - b[measureIndex];
+				// 	});
+				// } else {
+				// 	data.sort((a, b) => {
+				// 		return b[measureIndex] - a[measureIndex];
+				// 	});
+				// }
 			} else {
-				data.sort((a, b) => {
-					return b[measureIndex] - a[measureIndex];
-				});
+				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+					data.sort((a, b) => {
+						return a[measureIndex] - b[measureIndex];
+					});
+				} else {
+					data.sort((a, b) => {
+						return b[measureIndex] - a[measureIndex];
+					});
+				}
 			}
-			// }
 		};
 
 		const sortByMultiMeasure = (measureKeys: string[]) => {
@@ -1775,6 +1775,11 @@ export class Visual extends Shadow {
 				const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
 				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
 			}
+		}
+
+		const clonedCategoricalPair = JSON.parse(JSON.stringify(this.categoricalDataPairs));
+		if (this.isHorizontalChart) {
+			this.categoricalDataPairs = clonedCategoricalPair.reverse();
 		}
 
 		this.categoryColorPairWithIndex = {};
@@ -4060,10 +4065,10 @@ export class Visual extends Shadow {
 			}
 		}
 
-		const chartData = JSON.parse(JSON.stringify(this.chartData));
-		if (this.isHorizontalChart) {
-			this.chartData = chartData.reverse();
-		}
+		// const chartData = JSON.parse(JSON.stringify(this.chartData));
+		// if (this.isHorizontalChart) {
+		// 	this.chartData = chartData.reverse();
+		// }
 
 		this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
@@ -4765,7 +4770,7 @@ export class Visual extends Shadow {
 		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
 		const colorIdxRangeScale = d3.scaleLinear()
 			.domain([0, keys.length - 1])
-			.range([1, 0]);
+			.range(this.isHorizontalChart ? [0, 1] : [1, 0]);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(keys.length / marker.schemeColors.length);

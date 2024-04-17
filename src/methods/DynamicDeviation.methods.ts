@@ -83,13 +83,27 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
     const labelToConnectorDistance = getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
-    const start = dataLabelBBox.height + labelToConnectorDistance;
     const isPositiveDeviation = from.value < to.value;
+
+    const fromCategoryYPos = self.getYPosition(from.category);
+    const toCategoryYPos = self.getYPosition(to.category);
+    const isFromCategoryYPosTrue = fromCategoryYPos !== undefined;
+    const isToCategoryYPosTrue = toCategoryYPos !== undefined;
+    const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? self.height : 0);
+    const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? 0 : self.height);
+
+    let dataLabelYPos = 0;
+    if (end < (dataLabelBBox.height + labelToConnectorDistance)) {
+        dataLabelYPos = end + labelToConnectorDistance;
+    } else {
+        dataLabelYPos = end - labelToConnectorDistance;
+    }
 
     dataLabelG.attr(
         "transform",
-        `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${labelToConnectorDistance})`
-    );
+        `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${dataLabelYPos})`
+    )
+        .attr("display", isToCategoryYPosTrue ? "block" : "none");
 
     self.dynamicDeviationG
         .append("line")
@@ -98,7 +112,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         .attr("x1", self.getXPosition(from.value))
         .attr("x2", self.getXPosition(from.value))
         .attr("y1", start)
-        .attr("y2", (self.getYPosition(from.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("y2", end)
         .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
         .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
         .attr(
@@ -108,43 +122,43 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 : `${8}, ${8}`
         );
 
-    self.dynamicDeviationG
-        .append("line")
-        .attr("class", self.dynamicDeviationSettings.connectingLineType)
-        .classed("connecting-line-2", true)
-        .attr("x1", self.getXPosition(to.value))
-        .attr("x2", self.getXPosition(to.value))
-        .attr("y1", start)
-        .attr("y2", (self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
-        .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
-        .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
-        .attr(
-            "stroke-dasharray",
-            self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
-                ? `0, ${8} `
-                : `${8}, ${8}`
-        );
+    // self.dynamicDeviationG
+    //     .append("line")
+    //     .attr("class", self.dynamicDeviationSettings.connectingLineType)
+    //     .classed("connecting-line-2", true)
+    //     .attr("x1", self.getXPosition(to.value))
+    //     .attr("x2", self.getXPosition(to.value))
+    //     .attr("y1", start)
+    //     .attr("y2", (self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
+    //     .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
+    //     .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
+    //     .attr(
+    //         "stroke-dasharray",
+    //         self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
+    //             ? `0, ${8} `
+    //             : `${8}, ${8}`
+    //     );
 
     if (dynamicDeviationSettings.isShowStartIndicator) {
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-1")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.getXPosition(from.value) ?? 0}, ${(self.getYPosition(from.category) ?? 0) + self.scaleBandWidth / 2})`)
+            .attr("transform", `translate(${self.getXPosition(from.value) ?? 0}, ${start})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
-            .attr("opacity", self.getXPosition(from.value) && self.getYPosition(from.category) ? 1 : 0);
+            .attr("opacity", self.getXPosition(from.value) && isFromCategoryYPosTrue ? 1 : 0);
 
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.getXPosition(to.value) ?? 0}, ${(self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2})`)
+            .attr("transform", `translate(${self.getXPosition(to.value) ?? 0}, ${end})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
-            .attr("opacity", self.getXPosition(to.value) && self.getYPosition(to.category) ? 1 : 0);
+            .attr("opacity", self.getXPosition(to.value) && isToCategoryYPosTrue ? 1 : 0);
     }
 
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
@@ -152,10 +166,11 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const connectorLine = self.dynamicDeviationG
         .append("line")
         .attr("class", "connector")
-        .attr("y1", start)
-        .attr("y2", start)
+        .attr("y1", end)
+        .attr("y2", end)
         .attr("stroke", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-        .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth);
+        .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth)
+        .attr("display", isToCategoryYPosTrue ? "block" : "none");
 
     if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
         connectorLine
@@ -179,8 +194,10 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .append("polygon")
                 .attr("class", "arrow-down")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${self.getXPosition(to.value) - w}, ${start + (w * 3) / 2}) rotate(270)`)
-                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground));
+                .attr("transform", `translate(${self.getXPosition(to.value) - w}, ${end + (w * 3) / 2}) rotate(270)`)
+                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
+                .attr("display", isToCategoryYPosTrue ? "block" : "none");
+
             connectorLine
                 .attr("x1", self.getXPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
                 .attr("x2", self.getXPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 + w);
@@ -192,8 +209,10 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .append("polygon")
                 .attr("class", "arrow-up")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
-                .attr("transform", `translate(${self.getXPosition(to.value) + w}, ${start - (w * 3) / 2}) rotate(90)`)
-                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground));
+                .attr("transform", `translate(${self.getXPosition(to.value) + w}, ${end - (w * 3) / 2}) rotate(90)`)
+                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
+                .attr("display", isToCategoryYPosTrue ? "block" : "none");
+
             connectorLine
                 .attr("x1", self.getXPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
                 .attr("x2", self.getXPosition(to.value) - w);
@@ -236,21 +255,33 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         dynamicDeviationSpace = self.width * 0.05;
     }
     const xScaleWidth = Math.abs(self.xScale.range()[0] - self.xScale.range()[1]) - dataLabelBBox.width;
-    const end = xScaleWidth - dataLabelBBox.width - labelToConnectorDistance;
+    const fromCategoryXPos = self.getXPosition(from.category);
+    const toCategoryXPos = self.getXPosition(to.category);
+    const isFromCategoryXPosTrue = fromCategoryXPos !== undefined;
+    const isToCategoryXPosTrue = toCategoryXPos !== undefined;
     const isPositiveDeviation = from.value < to.value;
+    const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? self.width : 0);
+    const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? 0 : self.width);
+
+    let dataLabelXPos = 0;
+    if ((end + dataLabelBBox.width + labelToConnectorDistance) > self.width) {
+        dataLabelXPos = end - dataLabelBBox.width - labelToConnectorDistance;
+    } else {
+        dataLabelXPos = end + labelToConnectorDistance;
+    }
 
     dataLabelG
         .attr(
             "transform",
-            `translate(${xScaleWidth - dataLabelBBox.width}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2
-            })`
-        );
+            `translate(${dataLabelXPos}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2
+            })`)
+        .attr("display", isToCategoryXPosTrue ? "block" : "none");
 
     self.dynamicDeviationG
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-1", true)
-        .attr("x1", (self.getXPosition(from.category) ?? 0) + self.scaleBandWidth / 2)
+        .attr("x1", start)
         .attr("x2", end)
         .attr("y1", self.getYPosition(from.value))
         .attr("y2", self.getYPosition(from.value))
@@ -263,43 +294,43 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 : `${8}, ${8}`
         );
 
-    self.dynamicDeviationG
-        .append("line")
-        .attr("class", self.dynamicDeviationSettings.connectingLineType)
-        .classed("connecting-line-2", true)
-        .attr("x1", (self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
-        .attr("x2", end)
-        .attr("y1", self.getYPosition(to.value))
-        .attr("y2", self.getYPosition(to.value))
-        .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
-        .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
-        .attr(
-            "stroke-dasharray",
-            self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
-                ? `0, ${8} `
-                : `${8}, ${8}`
-        );
+    // self.dynamicDeviationG
+    //     .append("line")
+    //     .attr("class", self.dynamicDeviationSettings.connectingLineType)
+    //     .classed("connecting-line-2", true)
+    //     .attr("x1", (self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
+    //     .attr("x2", end)
+    //     .attr("y1", self.getYPosition(to.value))
+    //     .attr("y2", self.getYPosition(to.value))
+    //     .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
+    //     .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
+    //     .attr(
+    //         "stroke-dasharray",
+    //         self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
+    //             ? `0, ${8} `
+    //             : `${8}, ${8}`
+    //     );
 
     if (dynamicDeviationSettings.isShowStartIndicator) {
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-1")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${(self.getXPosition(from.category) ?? 0) + self.scaleBandWidth / 2}, ${self.getYPosition(from.value) ?? 0})`)
+            .attr("transform", `translate(${start}, ${self.getYPosition(from.value) ?? 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
-            .attr("opacity", self.getXPosition(from.category) && self.getYPosition(from.value) ? 1 : 0);
+            .attr("opacity", isFromCategoryXPosTrue && self.getYPosition(from.value) ? 1 : 0);
 
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${(self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2}, ${self.getYPosition(to.value) ?? 0})`)
+            .attr("transform", `translate(${end}, ${self.getYPosition(to.value) ?? 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
-            .attr("opacity", self.getXPosition(to.category) && self.getYPosition(to.value) ? 1 : 0);
+            .attr("opacity", isToCategoryXPosTrue && self.getYPosition(to.value) ? 1 : 0);
     }
 
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
@@ -310,7 +341,8 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         .attr("x1", end)
         .attr("x2", end)
         .attr("stroke", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-        .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth);
+        .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth)
+        .attr("display", isToCategoryXPosTrue ? "block" : "none");
 
     if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
         connectorLine
@@ -335,7 +367,9 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .attr("class", "arrow-up")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${end - (w * 3) / 2}, ${self.getYPosition(to.value) - w})`)
-                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground));
+                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
+                .attr("display", isToCategoryXPosTrue ? "block" : "none");
+
             connectorLine
                 .attr("y1", self.getYPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
                 .attr("y2", self.getYPosition(to.value) + w * 2);
@@ -348,7 +382,9 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .attr("class", "arrow-down")
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${end + (w * 3) / 2}, ${self.getYPosition(to.value) + w}) rotate(180)`)
-                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground));
+                .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
+                .attr("display", isToCategoryXPosTrue ? "block" : "none");
+
             connectorLine
                 .attr("y1", self.getYPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
                 .attr("y2", self.getYPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2 - w * 2);
@@ -469,7 +505,8 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.CustomRange:
             {
-                const chartData = self.isHorizontalChart ? self.chartData.reverse() : self.chartData;
+                const clonedChartData = JSON.parse(JSON.stringify(self.chartData));
+                const chartData = self.isHorizontalChart ? clonedChartData.reverse() : self.chartData;
                 const fromIndex =
                     dynamicDeviationSettings.fromIndex <= chartDataLength
                         ? dynamicDeviationSettings.fromIndex - 1
@@ -550,8 +587,9 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.PenultimateToLast:
             {
-                const from = self.chartData[chartDataLength - 2];
-                const to = self.chartData[chartDataLength - 1];
+                const chartData = self.isHorizontalChart ? JSON.parse(JSON.stringify(self.chartData)).reverse() : self.chartData;
+                const from = chartData[chartDataLength - 2];
+                const to = chartData[chartDataLength - 1];
                 RenderDynamicDeviation(
                     self,
                     { category: from.category, value: from.value1 },
