@@ -435,7 +435,8 @@ export interface ISinglePatternProps {
 
 export interface IConditionalFormattingProps {
 	applyTo: "measure" | "category",
-	categoryType?: { [EDataRolesName.Category]: boolean, [EDataRolesName.SubCategory]: boolean },
+	categoryType1?: { [EDataRolesName.Category]: boolean, [EDataRolesName.SubCategory]: boolean },
+	categoryType?: string,
 	measureType?: { [EDataRolesName.Measure]: boolean, [EDataRolesName.Measure1]: boolean, [EDataRolesName.Measure2]: boolean, [EDataRolesName.Tooltip]: boolean },
 	color: string,
 	operator: string,

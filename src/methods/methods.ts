@@ -455,7 +455,7 @@ export const parseConditionalFormatting = (SETTINGS) => {
 	return [];
 };
 
-export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[])
+export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, sValue1: number, sValue2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[])
 	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
 	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
 		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
@@ -527,10 +527,11 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 
 				if (el.applyTo === "measure") {
 					if (el.measureType.measure) {
+						const isSubcategory = subCategory && el.categoryType === EDataRolesName.SubCategory;
 						if (el.measureType.measure1) {
-							(isMeasureMatch(result, el, value1, el.sourceName, EDataRolesName.Measure1));
+							(isMeasureMatch(result, el, isSubcategory ? sValue1 : value1, el.sourceName, EDataRolesName.Measure1));
 						} else if (el.measureType.measure2) {
-							isMeasureMatch(result, el, value2, el.sourceName, EDataRolesName.Measure2);
+							isMeasureMatch(result, el, isSubcategory ? sValue2 : value2, el.sourceName, EDataRolesName.Measure2);
 						}
 					} else if (el.measureType.tooltip) {
 						const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
@@ -542,7 +543,7 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 				} else if (el.applyTo === "category") {
 					const v = el.staticValue;
 					const color = el.color;
-					category = el.categoryType.category ? category : subCategory;
+					category = el.categoryType1.category ? category : subCategory;
 					let match: boolean;
 
 					if (!result.match) {

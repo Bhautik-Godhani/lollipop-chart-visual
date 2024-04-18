@@ -191,6 +191,7 @@ import { COLORBREWER } from "./color-schemes";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
 import ImportExport from "./settings-pages/ImportExport";
+import ConditionalFormatting from "./ConditionalFormatting/ConditionalFormatting";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -694,7 +695,12 @@ export class Visual extends Shadow {
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
 				showPercentageAllOption: true,
-				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." }
+				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." },
+				isShowCategoriesTypeDropdown: true,
+				categoriesList: [
+					{ label: "Category", value: EDataRolesName.Category },
+					{ label: "Sub category", value: EDataRolesName.SubCategory },
+				]
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
@@ -834,8 +840,9 @@ export class Visual extends Shadow {
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
-					Component: Components.ConditionalFormatting,
-					icon: ConditionalFormattingIcon
+					Component: () => ConditionalFormatting,
+					icon: ConditionalFormattingIcon,
+					displayHeader: false
 				},
 				{
 					name: "Grid Lines",
@@ -2394,6 +2401,9 @@ export class Visual extends Shadow {
 
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab).reverse();
 
+			console.log("conditionalFormattingConditions", this.conditionalFormattingConditions);
+
+
 			if (!this.isValidShowBucket) {
 				return;
 			}
@@ -2573,6 +2583,14 @@ export class Visual extends Shadow {
 
 			this.conditionalFormattingConditions
 				.forEach((cf: IConditionalFormattingProps) => {
+					if (this.isLollipopTypePie) {
+						cf.applyOnCategories = cf.applyOnCategories.filter(c => c === ECFApplyOnCategories.Marker);
+					}
+
+					if (this.isLollipopTypeCircle) {
+						cf.categoryType = EDataRolesName.Category;
+					}
+
 					if (cf.applyTo === "measure") {
 						if (cf.valueType === ECFValueTypes.Value) {
 							const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
@@ -2584,7 +2602,7 @@ export class Visual extends Shadow {
 							};
 						}
 					} else if (cf.applyTo === "category") {
-						cf.categoryType = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
+						cf.categoryType1 = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
 					}
 				});
 
@@ -3076,7 +3094,7 @@ export class Visual extends Shadow {
 		// BY VALUE
 		this.chartData.forEach((d) => {
 			if (this.isLollipopTypeCircle) {
-				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, d.tooltipFields, this.conditionalFormattingConditions);
+				const conditionalFormattingResult = isConditionMatch(d.category, undefined, d.value1, d.value2, undefined, undefined, d.tooltipFields, this.conditionalFormattingConditions);
 				if (conditionalFormattingResult.match) {
 					// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
 					// 	this.categoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
@@ -3110,7 +3128,7 @@ export class Visual extends Shadow {
 				}
 			} else {
 				d.subCategories.forEach((s) => {
-					const conditionalFormattingResult = isConditionMatch(d.category, s.category, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
+					const conditionalFormattingResult = isConditionMatch(d.category, s.category, d.value1, d.value2, s.value1, s.value2, s.tooltipFields, this.conditionalFormattingConditions);
 					if (conditionalFormattingResult.match) {
 						// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
 						// 	this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
@@ -4696,6 +4714,12 @@ export class Visual extends Shadow {
 
 		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE || (this.isHasMultiMeasure ? false : marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT);
 		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART && (this.isHasMultiMeasure ? true : marker1Style.markerShape === EMarkerShapeTypes.DEFAULT);
+
+		if (this.isLollipopTypeCircle) {
+			this.config.CFConfig.isShowCategoriesTypeDropdown = false;
+		} else {
+			this.config.CFConfig.isShowCategoriesTypeDropdown = true;
+		}
 
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
