@@ -2401,9 +2401,6 @@ export class Visual extends Shadow {
 
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab).reverse();
 
-			console.log("conditionalFormattingConditions", this.conditionalFormattingConditions);
-
-
 			if (!this.isValidShowBucket) {
 				return;
 			}

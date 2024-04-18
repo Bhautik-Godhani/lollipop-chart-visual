@@ -1002,7 +1002,13 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     value: "",
     rank: "",
   });
-  const defaultSettings = REFERENCE_LINES_SETTINGS;
+  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : JSON.parse(JSON.stringify(details));
+
+  if (details.referenceType === EReferenceType.REFERENCE_BAND) {
+    defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
+  } else {
+    defaultSettings.referenceType = EReferenceType.REFERENCE_LINE;
+  }
 
   React.useEffect(() => {
     if (configValues.lineValue1.type === "value") {

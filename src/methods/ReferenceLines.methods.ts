@@ -30,6 +30,11 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
                 referenceLinesG = self.container.append("g").lower().datum(d).attr("class", "referenceLinesG");
             }
 
+            if (d && d.referenceType === EReferenceType.REFERENCE_BAND && d.bandStyle.isShowBackgroundColor) {
+                const bandRect = referenceLinesG.append("rect").attr("class", "referenceBand");
+                FormattingReferenceLineLayers(self, bandRect);
+            }
+
             const lines = referenceLinesG.append("line").attr("id", "referenceLine1").attr("class", "referenceLine");
             FormattingReferenceLines(self, lines, false);
 
@@ -46,10 +51,6 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
                 texts.attr("display", "none");
             }
 
-            if (d && d.referenceType === EReferenceType.REFERENCE_BAND && d.bandStyle.isShowBackgroundColor) {
-                const bandRect = referenceLinesG.append("rect").attr("class", "referenceBand");
-                FormattingReferenceLineLayers(self, bandRect);
-            }
         })
     }
 }
