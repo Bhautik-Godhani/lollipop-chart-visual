@@ -6581,6 +6581,8 @@ export class Visual extends Shadow {
 			xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length);
 		}
 
+		const ticks = [];
+
 		this.xAxisG
 			.selectAll("text")
 			.attr("dx", "0")
@@ -6632,6 +6634,12 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
+
+				if (ticks.includes(text)) {
+					ele.attr("opacity", "0");
+				}
+
+				ticks.push(text);
 
 				if (text.includes("--")) {
 					text = text.split("--")[0];
@@ -6712,14 +6720,14 @@ export class Visual extends Shadow {
 					const isDecimalNumber = text.includes(".");
 
 					if (isDecimalNumber) {
-						text = text.split(".")[0];
+						// text = text.split(".")[0];
 					}
 
 					if (isNegativeNumber) {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
-					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString()), xAxisSettings.numberFormatting);
+					const truncatedText = THIS.axisNumberFormatter(parseFloat(xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit)).toString(), xAxisSettings.numberFormatting);
 					ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 				}
 			});
@@ -6727,6 +6735,7 @@ export class Visual extends Shadow {
 
 	setYAxisTickStyle(): void {
 		const THIS = this;
+		const ticks = [];
 		const yAxisSettings = this.yAxisSettings;
 		this.yAxisG
 			.selectAll("text")
@@ -6748,6 +6757,12 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				let text = ele.text();
 
+				if (ticks.includes(text)) {
+					ele.attr("opacity", "0");
+				}
+
+				ticks.push(text);
+
 				const getFinalTruncatedText = (d: string) => {
 					return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
@@ -6767,7 +6782,7 @@ export class Visual extends Shadow {
 					const isDecimalNumber = text.includes(".");
 
 					if (isDecimalNumber) {
-						text = text.split(".")[0];
+						// text = text.split(".")[0];
 					}
 
 					if (isNegativeNumber) {
@@ -6783,7 +6798,7 @@ export class Visual extends Shadow {
 					};
 
 					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
-						const truncatedText = THIS.axisNumberFormatter(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)), yAxisSettings.numberFormatting);
+						const truncatedText = THIS.axisNumberFormatter(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit), yAxisSettings.numberFormatting);
 						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
