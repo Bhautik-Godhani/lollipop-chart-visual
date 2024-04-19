@@ -6332,8 +6332,12 @@ export class Visual extends Shadow {
 		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean): VisualTooltipDataItem[] => {
-			const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].isMarker1Color;
-			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[value.category].isMarker2Color;
+			const isPosNegColorScheme1 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative &&
+				(this.isLollipopTypeCircle ? !this.CFCategoryColorPair[value.category].isMarker1Color : true);
+
+			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative &&
+				(this.isLollipopTypeCircle ? !this.CFCategoryColorPair[value.category].isMarker2Color : true);
+
 			const posNegColor1 = value.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 			const posNegColor2 = value.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
@@ -6346,7 +6350,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: (isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
+					color: (value.category.includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
 				},
 			];
 
@@ -9231,7 +9235,7 @@ export class Visual extends Shadow {
 						{
 							displayName: this.measure1DisplayName,
 							value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-							color: (isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+							color: (pieData.parentCategory.includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
 						}
 					];
 
@@ -9241,6 +9245,61 @@ export class Visual extends Shadow {
 							value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
 							color: (isPosNegColorScheme2 ? posNegColor2 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
 						})
+					}
+
+					pieData.tooltipFields.forEach((data, i: number) => {
+						let text = data.value;
+
+						if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
+							text = this.othersBarText;
+						} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
+							text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
+						} else {
+							if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
+								text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
+							} else {
+								text = data.value;
+							}
+						}
+
+						tooltipData.push({
+							displayName: data.displayName,
+							value: text,
+							color: data.color ? data.color : "transparent",
+						});
+					});
+
+					if (this.errorBarsSettings.tooltip.isEnabled) {
+						const errorBar1 = d.errorBar1;
+						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
+							if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
+								tooltipData.push({
+									displayName: "Upper",
+									value: errorBar1.tooltipUpperBoundValue,
+									color: "transparent",
+								});
+							}
+						}
+
+						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
+							if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
+								tooltipData.push({
+									displayName: "Lower",
+									value: errorBar1.tooltipLowerBoundValue,
+									color: "transparent",
+								});
+							}
+						}
+
+						if (d.isHighlight) {
+							tooltipData.push({
+								displayName: "Highlighted",
+								value: !isPie2
+									? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
+									: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+								color: "transparent",
+							});
+						}
 					}
 
 					pieData.tooltipFields.forEach((data) => {
