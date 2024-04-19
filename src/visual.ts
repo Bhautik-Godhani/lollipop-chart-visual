@@ -5673,7 +5673,7 @@ export class Visual extends Shadow {
 		const isAutoFontColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.AUTO || dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
 		const isAutoBGColor = dataLabelsSettings.textColorTypes === EInsideTextColorTypes.CONTRAST;
 
-		const fontSize = (isBestFitPlacement ? labelPlacement : dataLabelsSettings.placement === DataLabelsPlacement.Inside) ? this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label) : dataLabelsSettings.fontSize;
+		const fontSize = ((isBestFitPlacement ? labelPlacement : dataLabelsSettings.placement) === DataLabelsPlacement.Inside) ? this.isLollipopTypeCircle ? this.getDataLabelsFontSize(isData2Label) : this.getPieDataLabelsFontSize(isData2Label) : dataLabelsSettings.fontSize;
 
 		labelSelection
 			.attr("class", "dataLabelG")
