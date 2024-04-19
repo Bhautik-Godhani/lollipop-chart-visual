@@ -2981,9 +2981,9 @@ export class Visual extends Shadow {
 				this.drawXGridLines();
 				this.drawYGridLines();
 
-				this.drawLollipopChart();
-
 				this.configLegend();
+
+				this.drawLollipopChart();
 
 				if (this.isChartIsRaceChart) {
 					RenderRaceChartDataLabel(this);
@@ -5178,10 +5178,11 @@ export class Visual extends Shadow {
 					}
 				});
 
-				this.configLegend();
 				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
+
+				this.configLegend();
 
 				this.initAndRenderLollipopChart(this.width * this.yAxisTicksMaxWidthRatio, true, true);
 
@@ -5394,10 +5395,11 @@ export class Visual extends Shadow {
 					}
 				});
 
-				this.configLegend();
 				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
+
+				this.configLegend();
 
 				if (smallMultiplesGridItemContent) {
 					if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
