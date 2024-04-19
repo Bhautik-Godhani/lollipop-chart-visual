@@ -4170,9 +4170,9 @@ export class Visual extends Shadow {
 
 	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
 		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
-			const elementToMove = data.find(obj => (isHasCategories ? obj[categoryName] : obj).includes(this.othersLabel));
+			const elementToMove = data.find(obj => (isHasCategories ? obj[categoryName] : obj).toString().includes(this.othersLabel));
 			if (elementToMove) {
-				const index = data.findIndex(obj => (isHasCategories ? obj[categoryName] : obj).includes(this.othersLabel));
+				const index = data.findIndex(obj => (isHasCategories ? obj[categoryName] : obj).toString().includes(this.othersLabel));
 				data.splice(index, 1);
 				if (this.isHorizontalChart) {
 					data.unshift(elementToMove);
@@ -6350,7 +6350,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: (value.category.includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
+					color: (value.category.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
 				},
 			];
 
@@ -9141,7 +9141,7 @@ export class Visual extends Shadow {
 				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 			}
 		} else {
-			return (typeof text === "string" ? text.toUpperCase() : text).replace(/--\d+/g, '');
+			return (typeof text === "string" ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
 		}
 	}
 
@@ -9235,7 +9235,7 @@ export class Visual extends Shadow {
 						{
 							displayName: this.measure1DisplayName,
 							value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-							color: (pieData.parentCategory.includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+							color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
 						}
 					];
 
