@@ -584,7 +584,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
     return self.referenceLinesSettings.reduce(
         (arr: IReferenceLineSettings[], rLine: IReferenceLineSettings) => {
-            const labelFontSizeFn = scaleLinear().range([8, 22]).domain([10, self.chartContainer.clientWidth]);
+            const labelFontSizeFn = scaleLinear().range([8, 20]).domain([10, self.chartContainer.clientWidth]);
             const calcFontSize = rLine.labelStyle.autoFontSize ? labelFontSizeFn(self.chartContainer.clientWidth) : rLine.labelStyle.labelFontSize;
 
             rLine.labelStyle.labelFontSize = calcFontSize.toString();
