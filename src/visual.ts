@@ -4026,6 +4026,33 @@ export class Visual extends Shadow {
 			value: this.isHasMultiMeasure ? d3.sum([+this.chartData[max1Index].value1, +this.chartData[max2Index].value2]) : +this.chartData[max1Index].value1,
 		};
 
+		if (this.isXIsContinuousAxis && !this.isHorizontalChart) {
+			if (this.xAxisSettings.isMinimumRangeEnabled && this.xAxisSettings.minimumRange) {
+				this.chartData = this.chartData.filter(d => +d.category >= this.xAxisSettings.minimumRange);
+			}
+
+			if (this.xAxisSettings.isMaximumRangeEnabled && this.xAxisSettings.maximumRange) {
+				this.chartData = this.chartData.filter(d => +d.category <= this.xAxisSettings.maximumRange);
+			}
+		}
+
+		if (this.isYIsContinuousAxis && this.isHorizontalChart) {
+			if (this.yAxisSettings.isMinimumRangeEnabled && this.yAxisSettings.minimumRange) {
+				this.chartData = this.chartData.filter(d => +d.category >= this.yAxisSettings.minimumRange);
+			}
+
+			if (this.yAxisSettings.isMaximumRangeEnabled && this.yAxisSettings.maximumRange) {
+				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
+			}
+		}
+
+		// const chartData = JSON.parse(JSON.stringify(this.chartData));
+		// if (this.isHorizontalChart) {
+		// 	this.chartData = chartData.reverse();
+		// }
+
+		this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
+
 		this.categoryPatterns = this.chartData
 			.map((d) => ({
 				name: d.category.replace(/--\d+/g, ''),
@@ -4059,33 +4086,6 @@ export class Visual extends Shadow {
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
 		}
-
-		if (this.isXIsContinuousAxis && !this.isHorizontalChart) {
-			if (this.xAxisSettings.isMinimumRangeEnabled && this.xAxisSettings.minimumRange) {
-				this.chartData = this.chartData.filter(d => +d.category >= this.xAxisSettings.minimumRange);
-			}
-
-			if (this.xAxisSettings.isMaximumRangeEnabled && this.xAxisSettings.maximumRange) {
-				this.chartData = this.chartData.filter(d => +d.category <= this.xAxisSettings.maximumRange);
-			}
-		}
-
-		if (this.isYIsContinuousAxis && this.isHorizontalChart) {
-			if (this.yAxisSettings.isMinimumRangeEnabled && this.yAxisSettings.minimumRange) {
-				this.chartData = this.chartData.filter(d => +d.category >= this.yAxisSettings.minimumRange);
-			}
-
-			if (this.yAxisSettings.isMaximumRangeEnabled && this.yAxisSettings.maximumRange) {
-				this.chartData = this.chartData.filter(d => +d.category <= this.yAxisSettings.maximumRange);
-			}
-		}
-
-		// const chartData = JSON.parse(JSON.stringify(this.chartData));
-		// if (this.isHorizontalChart) {
-		// 	this.chartData = chartData.reverse();
-		// }
-
-		this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
 		const getDataLabel = (d: ILollipopChartRow, isData2Label: boolean) => {
 			const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
