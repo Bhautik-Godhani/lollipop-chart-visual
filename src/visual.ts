@@ -7707,7 +7707,7 @@ export class Visual extends Shadow {
 				const lineColor = this.lineSettings.isApplyMarkerColor ? this.categoryColorPair[d.category].marker1Color : this.lineSettings.lineColor;
 				return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
 			} else {
-				const str = `${d.category}-${d.subCategories[0].category}`;
+				const str = `${d.category}-${(d.subCategories ? d.subCategories[0] : this.chartData[0].subCategories[0]).category}`;
 				const lineColor = this.lineSettings.isApplyMarkerColor ? this.subCategoryColorPair[str].marker1Color : this.lineSettings.lineColor;
 				if (this.firstCFLine) {
 					const str = `${d.category}-${this.firstCFLine.staticValue}`;
