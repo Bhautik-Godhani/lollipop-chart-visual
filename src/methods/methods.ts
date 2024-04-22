@@ -132,7 +132,7 @@ export const GetWordsSplitByWidth = (text: string, textProperties: TextPropertie
 		return textMeasurementService.getTailoredTextOrDefault(text, maxWidth);
 	};
 
-	return wordBreaker.splitByWidth(text, textProperties, calcTextWidth, maxWidth, maxLines, textTruncator);
+	return wordBreaker.splitByWidth(text.toString(), textProperties, calcTextWidth, maxWidth, maxLines, textTruncator);
 };
 
 const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
