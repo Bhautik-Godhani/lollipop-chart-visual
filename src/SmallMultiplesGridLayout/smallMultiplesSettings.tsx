@@ -9,14 +9,17 @@ const LAYOUT_TYPES: ILabelValuePair[] = [
   {
     value: ESmallMultiplesLayoutType.Grid,
     label: "Grid",
+    tooltip: "Panel of equal size split into rows and columns."
   },
   {
     value: ESmallMultiplesLayoutType.ScaledRows,
     label: "Scaled Rows",
+    tooltip: "Rows are scaled into varying heights based on the top performer among the rows."
   },
   {
     value: ESmallMultiplesLayoutType.RankedPanels,
     label: "Ranked Panels",
+    tooltip: "Panels are sized differently based on Ranked values."
   },
 ];
 

@@ -118,4 +118,5 @@ export interface IAxisConfig {
 export interface ILabelValuePair {
     label: string;
     value: string;
+    tooltip?: string;
 }
