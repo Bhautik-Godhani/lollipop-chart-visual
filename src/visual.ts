@@ -6649,6 +6649,10 @@ export class Visual extends Shadow {
 
 				ticks.push(text);
 
+				if (text.includes("isZero")) {
+					text = "0";
+				}
+
 				if (text.includes("--")) {
 					text = text.split("--")[0];
 				}
@@ -6764,6 +6768,10 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
+
+				if (text.includes("isZero")) {
+					text = "0";
+				}
 
 				if (text.includes("--")) {
 					text = text.split("--")[0];
