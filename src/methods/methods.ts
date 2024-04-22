@@ -297,7 +297,7 @@ export const powerBiNumberFormat = (
 	number: number | string | Date,
 	formatter: IValueFormatter,
 ): string => {
-	return formatter.format(number);
+	return formatter ? formatter.format(number) : number.toString();
 }
 
 export const generateSecureRandomBytes = (length) => {
