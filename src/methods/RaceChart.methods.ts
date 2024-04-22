@@ -14,7 +14,7 @@ export const StartChartRace = (self: Visual) => {
             self.chartData = self.raceChartData.filter((d) => d.raceChartKey === self.raceChartKeyOnTick);
 
             if (self.chartData.length > 0) {
-                self.initAndRenderLollipopChart(self.width, true, true);
+                self.initAndRenderLollipopChart(self.categoricalData, self.width, self.height, true, true);
 
                 if (self.brushAndZoomAreaSettings.enabled) {
                     self.drawBrushLollipopChart(self.clonedCategoricalData);

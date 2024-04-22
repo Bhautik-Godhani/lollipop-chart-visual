@@ -411,7 +411,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             if (self.isScrollBrushDisplayed) {
                 self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, true, config.xAxisType === ESmallMultiplesAxisType.Individual, true);
             } else {
-                self.drawXYAxis(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+                self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
                 // self.drawXYAxis(true, true);
                 // self.margin.left = 0;
                 // self.margin.bottom = 0;
