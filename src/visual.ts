@@ -16,6 +16,7 @@ import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IValueFormatter = valueFormatter.IValueFormatter;
+import IDownloadService = powerbi.extensibility.IDownloadService;
 
 import * as d3 from "d3";
 import 'd3-transition';
@@ -210,6 +211,7 @@ export class Visual extends Shadow {
 	public interactivityService: interactivityBaseService.IInteractivityService<any>;
 	public behavior: Behavior;
 	public visualHost: IVisualHost;
+	private downloadService: IDownloadService;
 
 	// props
 	public width: number;
@@ -878,6 +880,7 @@ export class Visual extends Shadow {
 		this.selectionManager = options.host.createSelectionManager();
 		this.interactivityService = interactivitySelectionService.createInteractivitySelectionService(this._host) as any;
 		this.behavior = new Behavior();
+		this.downloadService = options.host.downloadService;
 		// this.initChart();
 	}
 

@@ -1,9 +1,11 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { get, isEmpty } from "lodash";
+import { get, isEmpty, merge } from "lodash";
 import copy from "copy-to-clipboard";
 import { Button, Column, ConditionalWrapper, Footer, IconButton, InputControl, Label, Quote, RadioOption, Row, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { CopyExportIcon, GreenCheckmark, ImportSuccessfulUploadIcon, ImportUploadClose, ImportUploadIcon } from "./SettingsIcons";
 import TooltipElement from "@truviz/shadow/dist/Components/Label/TooltipElement";
+import { EVisualConfig, EVisualSettings } from "../enum";
 
 const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConfig: { sectionName, propertyName } }) => {
   const [notification, setNotification] = React.useState("");
@@ -30,25 +32,104 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
     applyThemeJson(event.target.result);
   };
 
+  const configs = {
+    [EVisualSettings.BrushAndZoomAreaSettings]: EVisualConfig.BrushAndZoomAreaConfig,
+    [EVisualSettings.ChartSettings]: EVisualConfig.ChartConfig,
+    [EVisualSettings.CutAndClipAxisSettings]: EVisualConfig.CutAndClipAxisConfig,
+    [EVisualSettings.DataColorsSettings]: EVisualConfig.DataColorsConfig,
+    [EVisualSettings.DataLabelsSettings]: EVisualConfig.DataLabelsConfig,
+    [EVisualSettings.DynamicDeviationSettings]: EVisualConfig.DynamicDeviationConfig,
+    [EVisualSettings.ErrorBarsSettings]: EVisualConfig.ErrorBarsConfig,
+    [EVisualSettings.GridLinesSettings]: EVisualConfig.GridLinesConfig,
+    [EVisualSettings.IBCSSettings]: EVisualConfig.IBCSConfig,
+    [EVisualSettings.LineSettings]: EVisualConfig.LineConfig,
+    [EVisualSettings.MarkerSettings]: EVisualConfig.MarkerConfig,
+    [EVisualSettings.PatternSettings]: EVisualConfig.PatternConfig,
+    [EVisualSettings.RaceChartSettings]: EVisualConfig.RaceChartConfig,
+    [EVisualSettings.RankingSettings]: EVisualConfig.RankingConfig,
+    [EVisualSettings.ReferenceLinesSettings]: EVisualConfig.ReferenceLinesConfig,
+    [EVisualSettings.ShowBucketFormatting]: EVisualConfig.ShowBucketConfig,
+    [EVisualSettings.SmallMultiplesSettings]: EVisualConfig.SmallMultiplesConfig,
+    [EVisualSettings.Sorting]: EVisualConfig.SortingConfig,
+    [EVisualSettings.XAxisSettings]: EVisualConfig.XAxisConfig,
+    [EVisualSettings.YAxisSettings]: EVisualConfig.YAxisConfig
+  };
+
+  const formatTab = vizOptions.formatTab;
+
+  const getConfig = () => {
+    return {
+      [EVisualSettings.BrushAndZoomAreaSettings]: JSON.parse(formatTab[EVisualConfig.BrushAndZoomAreaConfig][EVisualSettings.BrushAndZoomAreaSettings]),
+      [EVisualSettings.ChartSettings]: JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]),
+      [EVisualSettings.CutAndClipAxisSettings]: JSON.parse(formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]),
+      [EVisualSettings.DataColorsSettings]: JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]),
+      [EVisualSettings.DataLabelsSettings]: JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]),
+      [EVisualSettings.DynamicDeviationSettings]: JSON.parse(formatTab[EVisualConfig.DynamicDeviationConfig][EVisualSettings.DynamicDeviationSettings]),
+      [EVisualSettings.ErrorBarsSettings]: JSON.parse(formatTab[EVisualConfig.ErrorBarsConfig][EVisualSettings.ErrorBarsSettings]),
+      [EVisualSettings.GridLinesSettings]: JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EVisualSettings.GridLinesSettings]),
+      [EVisualSettings.LineSettings]: JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]),
+      [EVisualSettings.MarkerSettings]: JSON.parse(formatTab[EVisualConfig.MarkerConfig][EVisualSettings.MarkerSettings]),
+      [EVisualSettings.PatternSettings]: JSON.parse(formatTab[EVisualConfig.PatternConfig][EVisualSettings.PatternSettings]),
+      [EVisualSettings.RaceChartSettings]: JSON.parse(formatTab[EVisualConfig.RaceChartConfig][EVisualSettings.RaceChartSettings]),
+      [EVisualSettings.RankingSettings]: JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]),
+      [EVisualSettings.ReferenceLinesSettings]: JSON.parse(formatTab[EVisualConfig.ReferenceLinesConfig][EVisualSettings.ReferenceLinesSettings]),
+      [EVisualSettings.ShowBucketFormatting]: JSON.parse(formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]),
+      [EVisualSettings.SmallMultiplesSettings]: JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]),
+      [EVisualSettings.Sorting]: JSON.parse(formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]),
+      [EVisualSettings.XAxisSettings]: JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]),
+      [EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings])
+    }
+    // get(vizOptions, `formatTab.${EVisualConfig.BrushAndZoomAreaConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.ChartConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.CutAndClipAxisConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.DataColorsConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.DataLabelsConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.DynamicDeviationConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.ErrorBarsConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.GridLinesConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.IBCSConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.LineConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.MarkerConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.PatternConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.RaceChartConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.RankingConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.ReferenceLinesConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.ShowBucketConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.SortingConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.XAxisConfig}`),
+    //   get(vizOptions, `formatTab.${EVisualConfig.YAxisConfig}`));
+  }
+
   const urlData = React.useMemo(() => {
-    const config = get(vizOptions, "formatTab.config") || {};
+    const config = getConfig();
     var jsonse = JSON.stringify(config);
     var blob = new Blob([jsonse], { type: "application/json" });
     return URL.createObjectURL(blob);
   }, [vizOptions.formatTab]);
 
   const jsonString = React.useMemo(() => {
-    const config = get(vizOptions, "formatTab.config") || {};
+    const config = getConfig();
     return JSON.stringify(config);
   }, [vizOptions.formatTab]);
 
   const applyThemeJson = json => {
     try {
       const obj = typeof json === "object" ? json : JSON.parse(json);
-      const keys = Object.keys(get(vizOptions, "formatTab.config") || {});
+      const keys = Object.keys(getConfig());
       keys.forEach(el => {
         if (obj.hasOwnProperty(el)) {
-          shadow.persistProperties("config", el, obj[el]);
+          shadow.visualHost.persistProperties({
+            merge: [
+              {
+                objectName: configs[el],
+                properties: {
+                  [el]: JSON.stringify(obj[el]),
+                },
+                selector: null,
+              },
+            ],
+          });
+          // shadow.persistProperties("config", el, obj[el]);
         }
         else {
           throw "Invalid JSON file"
@@ -66,13 +147,13 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
   };
 
   const copyTheme = () => {
-    const config = get(vizOptions, "formatTab.config") || {};
+    const config = getConfig();
     copy(JSON.stringify(config));
     setCopyThemeText("Copied");
   };
 
   const downloadTheme = () => {
-    const config = get(vizOptions, "formatTab.config") || {};
+    const config = getConfig();
 
     shadow.downloadService.exportVisualsContentExtended(JSON.stringify(config), "Theme.json", "json", "xlsx file").then((result) => {
       if (!result.downloadCompleted) {
