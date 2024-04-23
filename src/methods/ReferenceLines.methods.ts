@@ -589,6 +589,8 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
             rLine.labelStyle.labelFontSize = calcFontSize.toString();
 
+            rLine.labelText = getLabelText(self, rLine);
+
             setData(rLine, false);
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
@@ -597,8 +599,6 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
             rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
             rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
-
-            rLine.labelText = getLabelText(self, rLine);
 
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
                 if (rLine.lineValue1.axis === EXYAxisNames.X) {
