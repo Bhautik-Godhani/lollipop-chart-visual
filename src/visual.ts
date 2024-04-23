@@ -2707,8 +2707,9 @@ export class Visual extends Shadow {
 							this.configLegend();
 
 							if (this.isLollipopTypeCircle) {
-								this.categoriesColorList = this.chartData.map(d => {
-									const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+								this.categoriesColorList.push(...this.categoricalDataPairs.map(d => {
+									// const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+									const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 									const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 									const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 									const obj = {
@@ -2717,7 +2718,7 @@ export class Visual extends Shadow {
 									}
 
 									return obj;
-								});
+								}));
 							}
 						}
 					},
@@ -4876,6 +4877,9 @@ export class Visual extends Shadow {
 								const color = categoryColors[data.category]["markerColor"];
 								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
 								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
+							} else {
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
 							}
 						});
 					}
@@ -4952,6 +4956,8 @@ export class Visual extends Shadow {
 				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
 			}
 		}
+
+		console.log(this.categoryColorPair, this.categoryColorPairWithIndex);
 	}
 
 	setPieColors(): void {

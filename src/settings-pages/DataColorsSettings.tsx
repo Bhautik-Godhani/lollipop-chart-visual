@@ -432,8 +432,8 @@ const DataColors = (props) => {
 				return {
 					...d,
 					[EDataColorsSettings.CategoryColors]: shadow.isLollipopTypeCircle
-						? [...shadow.categoriesColorList]
-						: [...shadow.subCategoriesColorList],
+						? [...shadow.categoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
+						: [...shadow.subCategoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i),
 				};
 			});
 	}, [configValues.fillType]);
