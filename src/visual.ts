@@ -7034,7 +7034,8 @@ export class Visual extends Shadow {
 		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth + (this.markerMaxSize / 2) : 0;
 
 		if (this.isHorizontalChart) {
-			const xAxisRange = this.yAxisSettings.position === Position.Left ?
+			const xAxisRange = ((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
+				|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange)) ?
 				[this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), xScaleWidth - (this.markerMaxSize / 2) - outsideDataLabelWidth] :
 				[xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), (this.markerMaxSize) + outsideDataLabelWidth];
 
@@ -7072,7 +7073,8 @@ export class Visual extends Shadow {
 			}
 			// }
 
-			const yAxisRange = this.xAxisSettings.position === Position.Bottom ?
+			const yAxisRange = ((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+				|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange)) ?
 				[yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), (this.markerMaxSize / 2) + outsideDataLabelHeight] :
 				[this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), yScaleHeight - (this.markerMaxSize / 2) - outsideDataLabelHeight];
 
@@ -7089,15 +7091,15 @@ export class Visual extends Shadow {
 			}
 		}
 
-		const xScaleRange = this.xScale.range();
-		if (this.xAxisSettings.isInvertRange) {
-			this.xScale.range(xScaleRange.reverse());
-		}
+		// const xScaleRange = this.xScale.range();
+		// if (this.xAxisSettings.isInvertRange) {
+		// 	this.xScale.range(xScaleRange.reverse());
+		// }
 
-		const yScaleRange = this.yScale.range();
-		if (this.yAxisSettings.isInvertRange) {
-			this.yScale.range(yScaleRange.reverse());
-		}
+		// const yScaleRange = this.yScale.range();
+		// if (this.yAxisSettings.isInvertRange) {
+		// 	this.yScale.range(yScaleRange.reverse());
+		// }
 	}
 
 	drawXAxisLine(): void {
