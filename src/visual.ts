@@ -5718,11 +5718,16 @@ export class Visual extends Shadow {
 		} else {
 			textSelection
 				.attr("fill", d => {
-					const str = `${d.category}-${(d.subCategories ? d.subCategories[0] : this.chartData[0].subCategories[0]).category}`;
-					if (this.CFSubCategoryColorPair[str].isLabelColor) {
-						return this.getColor(this.subCategoryColorPair[str] && this.subCategoryColorPair[str].labelColor ? this.subCategoryColorPair[str].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
+					const color = this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
+					if (this.isLollipopTypePie) {
+						const str = `${d.category}-${((d.subCategories && d.subCategories.length) ? d.subCategories[0] : this.chartData[0].subCategories[0]).category}`;
+						if (str && this.CFSubCategoryColorPair[str].isLabelColor) {
+							return this.getColor(this.subCategoryColorPair[str] && this.subCategoryColorPair[str].labelColor ? this.subCategoryColorPair[str].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
+						} else {
+							return color;
+						}
 					} else {
-						return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].labelColor ? this.categoryColorPair[d.category].labelColor : dataLabelsSettings.color, EHighContrastColorType.Foreground);
+						return color;
 					}
 				});
 		}
