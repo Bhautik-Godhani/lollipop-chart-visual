@@ -292,7 +292,7 @@ export const GetSmallMultiplesLayoutProps = (
 
     const layoutProps: ISmallMultiplesLayoutProps = {
         className: layoutClassName,
-        rowHeight: height,
+        rowHeight: height - 5,
         items: config.categories.length,
         cols: columns,
         layouts: layout,
