@@ -5423,7 +5423,27 @@ export class Visual extends Shadow {
 						this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
 					}
 
-					this.lollipopG = d3.select(smallMultiplesGridItemContent.lollipopG);
+					this.lollipopG = smallMultiplesGridItemContent.lollipopG;
+					this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
+					this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
+					this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
+					this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
+					this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
+					this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
+					this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
+					this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
+					this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
+					this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
+					this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
+					this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
+					this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
+					this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
+					this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
+					this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
+					this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
+					this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
+					this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+
 					this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 				} else {
 					this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);

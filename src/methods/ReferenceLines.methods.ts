@@ -18,16 +18,16 @@ export const RenderReferenceLines = (self: Visual, referenceLinesData: IReferenc
         (d) => d.line1Coord.x1 >= 0 && d.line1Coord.x2 >= 0 && d.line1Coord.y1 >= 0 && d.line1Coord.y2 >= 0 && d.labelCoord.textX1 >= 0 && d.labelCoord.textY1 >= 0
     );
 
-    self.container.selectAll(".referenceLinesG").remove();
+    self.referenceLinesContainerG.selectAll(".referenceLinesG").remove();
 
     if (data && data.length > 0) {
         data.forEach(d => {
             let referenceLinesG;
 
             if (d.lineStyle.linePlacement === EReferenceLineType.FRONT) {
-                referenceLinesG = self.container.append("g").raise().datum(d).attr("class", "referenceLinesG");
+                referenceLinesG = self.referenceLinesContainerG.append("g").raise().datum(d).attr("class", "referenceLinesG");
             } else if (d.lineStyle.linePlacement === EReferenceLineType.BEHIND) {
-                referenceLinesG = self.container.append("g").lower().datum(d).attr("class", "referenceLinesG");
+                referenceLinesG = self.referenceLinesContainerG.append("g").lower().datum(d).attr("class", "referenceLinesG");
             }
 
             if (d && d.referenceType === EReferenceType.REFERENCE_BAND && d.bandStyle.isShowBackgroundColor) {

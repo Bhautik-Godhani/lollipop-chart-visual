@@ -1,5 +1,5 @@
 import { ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, EFontStyle } from "./SmallMultiples.enum";
-
+type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 export interface ISmallMultiplesGridLayoutSettings {
     showInfoPage: boolean;
     infoMessage: string;
@@ -93,7 +93,7 @@ export interface ISmallMultiplesGridItemContent {
     svg: SVGElement,
     xAxisG: SVGElement,
     yAxisG: SVGElement,
-    lollipopG: SVGElement | null,
+    lollipopG: D3Selection<SVGElement>,
     brush: any,
     brushG: SVGElement | null,
     brushScaleBand: any,
@@ -102,7 +102,26 @@ export interface ISmallMultiplesGridItemContent {
     categoricalData: any,
     categoricalDataPairs: any[],
     chartData: any,
-    brushNumber?: number
+    brushNumber?: number,
+    dataLabels1G: D3Selection<SVGElement>;
+    dataLabels2G: D3Selection<SVGElement>;
+    referenceLineLayersG: D3Selection<SVGElement>;
+    referenceLinesContainerG: D3Selection<SVGElement>;
+    xGridLinesG: D3Selection<SVGElement>;
+    yGridLinesG: D3Selection<SVGElement>;
+    dynamicDeviationG: D3Selection<SVGElement>;
+    zeroSeparatorLine: D3Selection<SVGElement>;
+    connectingLineG: D3Selection<SVGElement>;
+    errorBarsContainer: D3Selection<SVGElement>;
+    errorBarsMarkerDefsG: D3Selection<SVGElement>;
+    errorBarsAreaG: D3Selection<SVGElement>;
+    errorBarsAreaPath: D3Selection<SVGElement>;
+    errorBarsLinesDashG: D3Selection<SVGElement>;
+    errorBarsLinesG: D3Selection<SVGElement>;
+    errorBarsMarkersG: D3Selection<SVGElement>;
+    errorBarsMarkerDef: D3Selection<SVGElement>;
+    errorBarsMarker: D3Selection<SVGElement>;
+    errorBarsMarkerPath: D3Selection<SVGElement>;
 }
 
 export interface IAxisConfig {

@@ -345,7 +345,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 svg: svg.node(),
                 xScale: self.xScale,
                 yScale: self.yScale,
-                lollipopG: lollipopG.node() as any,
+                lollipopG: lollipopG as any,
                 brushScaleBand: self.brushScaleBand,
                 xAxisG: xAxisG.node() as any,
                 yAxisG: yAxisG.node() as any,
@@ -354,6 +354,25 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 brushG: brushG.node() as any,
                 categoricalDataPairs: self.categoricalDataPairs,
                 chartData: self.chartData,
+                dataLabels1G: dataLabels1G as any,
+                dataLabels2G: dataLabels2G as any,
+                referenceLineLayersG: referenceLineLayersG as any,
+                referenceLinesContainerG: referenceLinesContainerG as any,
+                xGridLinesG: xGridLinesG as any,
+                yGridLinesG: yGridLinesG as any,
+                dynamicDeviationG: dynamicDeviationG as any,
+                zeroSeparatorLine: zeroSeparatorLine as any,
+                connectingLineG: connectingLineG as any,
+                errorBarsContainer: errorBarsContainer as any,
+                errorBarsMarkerDefsG: errorBarsMarkerDefsG as any,
+                errorBarsAreaG: errorBarsAreaG as any,
+                errorBarsAreaPath: errorBarsAreaPath as any,
+                errorBarsLinesDashG: errorBarsLinesDashG as any,
+                errorBarsLinesG: errorBarsLinesG as any,
+                errorBarsMarkersG: errorBarsMarkersG as any,
+                errorBarsMarkerDef: errorBarsMarkerDef as any,
+                errorBarsMarker: errorBarsMarker as any,
+                errorBarsMarkerPath: errorBarsMarkerPath as any
             };
 
             self.svg = svg;
@@ -406,7 +425,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.xAxisG = select(smallMultiplesGridItemContent.xAxisG);
             self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);
-            self.lollipopG = select(smallMultiplesGridItemContent.lollipopG);
+            self.lollipopG = smallMultiplesGridItemContent.lollipopG;
 
             if (self.isScrollBrushDisplayed) {
                 self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, true, config.xAxisType === ESmallMultiplesAxisType.Individual, true);
