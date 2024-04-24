@@ -1,11 +1,11 @@
 import { Visual } from '../visual';
 import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
-import { selectAll } from 'd3-selection';
+import { select, selectAll } from 'd3-selection';
 import { DataValuesType } from '../enum';
 
 export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: Visual, d: any) => any): void => {
     self.visualAnnotations = new VisualAnnotations({
-        rootElement: self.svg,
+        rootElement: self.isSmallMultiplesEnabled ? select("#smallMultiplesContainerSVG") : self.svg,
         nodeElements: self.isLollipopTypePie ? selectAll(".pie-slice") : selectAll(".lollipop-circle"),
         arcMethod: null,
         shadow: self as any,
@@ -18,6 +18,7 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
         offsetValues: [0, 0],
         isNodeCentricAnnotation: true,
         isClickNodeFromOutside: true,
+        isHighchart: false,
     });
     self.visualAnnotations.initializeAnnotations();
     self.behavior.setVisualAnnotations(self.visualAnnotations);
@@ -25,7 +26,7 @@ export const RenderLollipopAnnotations = (self: Visual, cbGetDataPoint: (self: V
 
 export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
     const dataPoint = {
-        name: d.category + "-" + d.parentCategory + "-" + d.valueType,
+        name: d.category + "-" + d.parentCategory + "-" + d.valueType + "-" + self.currentSmallMultipleIndex,
         width: self.isLollipopTypePie ? d.sliceWidth : self.circle1Size,
         height: self.isLollipopTypePie ? d.sliceHeight : self.circle2Size,
         originalValue: d.defaultValue,

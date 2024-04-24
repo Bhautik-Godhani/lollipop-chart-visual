@@ -2764,6 +2764,8 @@ export class Visual extends Shadow {
 						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
 					},
 					onRenderingFinished: () => {
+						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+
 						const onLollipopClick = (ele: D3Selection<SVGElement>) => {
 							this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
 						}
@@ -2775,7 +2777,6 @@ export class Visual extends Shadow {
 						}
 						this.behavior.renderSelection(this.interactivityService.hasSelection());
 
-						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 						this.drawTooltip();
 					}
 				};
