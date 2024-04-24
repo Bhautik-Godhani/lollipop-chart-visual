@@ -252,7 +252,7 @@ export class Visual extends Shadow {
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
-	public categoricalSmallMultiplesDataField: powerbi.DataViewValueColumn;
+	public categoricalSmallMultiplesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalExtraDataLabelsFields: powerbi.DataViewValueColumn[] = [];
 
 	// data
@@ -1368,7 +1368,7 @@ export class Visual extends Shadow {
 	): powerbi.DataViewCategorical {
 		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 		const categoricalRaceBarValues = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
-		const categoricalSmallMultiplesField = categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
+		const categoricalSmallMultiplesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		const categoricalSubCategoryField = categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		const categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		const categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
@@ -1717,8 +1717,10 @@ export class Visual extends Shadow {
 					hasZero: false,
 				};
 
-				if (categoricalSmallMultiplesField) {
-					obj['smallMultipleCategory'] = categoricalSmallMultiplesField.values[index];
+				if (categoricalSmallMultiplesFields.length) {
+					categoricalSmallMultiplesFields.forEach(d => {
+						obj[`smallMultipleCategory-${d.source.index}`] = d.values[index];
+					});
 				}
 
 				this.expandAllCategoriesName.forEach((d, i) => {
@@ -1820,9 +1822,9 @@ export class Visual extends Shadow {
 					const index = +key.toString().split("-")[1];
 					categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
 
-					if (categoricalSmallMultiplesField) {
-						categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
-					}
+					// if (categoricalSmallMultiplesFields.length) {
+					// 	categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+					// }
 
 					if (this.isChartIsRaceChart) {
 						categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
@@ -1852,7 +1854,7 @@ export class Visual extends Shadow {
 				}
 
 				if (d.source.roles[EDataRolesName.SmallMultiples]) {
-					d.values = this.categoricalDataPairs.map((pair) => pair.smallMultipleCategory);
+					d.values = this.categoricalDataPairs.map((pair) => pair[`smallMultipleCategory-${d.source.index}`]);
 				}
 			});
 
@@ -2080,7 +2082,7 @@ export class Visual extends Shadow {
 	public setCategoricalDataFields(categoricalData: powerbi.DataViewCategorical): void {
 		this.categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
 		this.categoricalRaceChartDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
-		this.categoricalSmallMultiplesDataField = categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
+		this.categoricalSmallMultiplesDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		this.categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		this.categoricalTooltipFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Tooltip]);
@@ -2209,7 +2211,7 @@ export class Visual extends Shadow {
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = this.categoricalImagesDataFields.length > 0;
-		this.isHasSmallMultiplesData = !!this.categoricalSmallMultiplesDataField;
+		this.isHasSmallMultiplesData = this.categoricalSmallMultiplesDataFields.length > 0;
 		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
@@ -2623,7 +2625,7 @@ export class Visual extends Shadow {
 
 				this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-				this.smallMultiplesCategoricalDataSourceName = this.categoricalSmallMultiplesDataField.source.displayName;
+				this.smallMultiplesCategoricalDataSourceName = this.categoricalSmallMultiplesDataFields.map(d => d.source.displayName).join(" ");
 
 				this.smallMultiplesDataPairs = GetSmallMultiplesDataPairsByItem(this);
 
@@ -4957,8 +4959,6 @@ export class Visual extends Shadow {
 				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
 			}
 		}
-
-		console.log(this.categoryColorPair, this.categoryColorPairWithIndex);
 	}
 
 	setPieColors(): void {

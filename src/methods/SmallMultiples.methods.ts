@@ -90,7 +90,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             const smallMultipleIndex = gridItemId;
             self.currentSmallMultipleIndex = gridItemId;
-            const isOthersSM = config.categories[smallMultipleIndex].includes(self.othersLabel);
+            const isOthersSM = config.categories[smallMultipleIndex].toString().includes(self.othersLabel);
             const clonedCategoricalData: powerbi.DataViewCategorical = JSON.parse(JSON.stringify(self.originalCategoricalData));
 
             self.isCurrentSmallMultipleIsOthers = false;
@@ -472,13 +472,16 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 };
 
 export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
-    const clonedCategoricalData: powerbi.DataViewCategorical = JSON.parse(JSON.stringify(self.categoricalData));
-    const categoricalSmallMultiplesDataField = self.categoricalSmallMultiplesDataField;
-    const categoricalDataPairsForGrouping = categoricalSmallMultiplesDataField.values.reduce((arr: any, category: string, index: number) => {
+    const categoricalSmallMultiplesDataFields = self.categoricalSmallMultiplesDataFields;
+    let categoricalSmallMultiplesValues = [];
+    const categoricalDataPairsForGrouping = categoricalSmallMultiplesDataFields[0].values.reduce((arr: any, c: string, index: number) => {
+        const category = categoricalSmallMultiplesDataFields.map(d => d.values[index]).join("-");
+        categoricalSmallMultiplesValues.push(category);
         const obj = { category: category, total: 0, [`index-${index}`]: index };
         return [...arr, obj];
     }, []);
-    let categoricalSmallMultiplesValues = categoricalSmallMultiplesDataField.values.filter((item, i, ar) => ar.indexOf(item) === i);
+
+    categoricalSmallMultiplesValues = categoricalSmallMultiplesValues.filter((item, i, ar) => ar.indexOf(item) === i);
 
     if (!categoricalSmallMultiplesValues) {
         categoricalSmallMultiplesValues = [];
