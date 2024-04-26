@@ -2779,6 +2779,9 @@ export class Visual extends Shadow {
 					}
 				};
 
+				this.categoriesColorList = [];
+				this.subCategoriesColorList = [];
+
 				DrawSmallMultiplesGridLayout(settings);
 			} else {
 				this.sortSubcategoryData(clonedCategoricalData);
