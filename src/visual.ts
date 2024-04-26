@@ -945,8 +945,6 @@ export class Visual extends Shadow {
 
 		this.errorBarsAreaG = this.errorBarsContainer.append("g").classed("errorBarsAreaG", true);
 
-		this.errorBarsAreaPath = this.errorBarsAreaG.append("g").attr("class", "errorBarsAreaG");
-
 		this.errorBarsLinesDashG = this.errorBarsContainer.append("g").classed("errorBarsLinesDashG", true);
 
 		this.errorBarsLinesG = this.errorBarsContainer.append("g").classed("errorBarsLinesG", true);
@@ -8551,9 +8549,6 @@ export class Visual extends Shadow {
 			this.drawData1Labels([]);
 			this.drawData2Labels([]);
 		}
-
-		this.errorBarsLinesG.selectAll("*").remove();
-		this.errorBarsAreaPath.selectAll("*").remove();
 
 		RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : [], false);
 
