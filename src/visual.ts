@@ -854,18 +854,18 @@ export class Visual extends Shadow {
 					icon: GridIcon
 				},
 				{
-					name: Components.ShowCondition,
-					sectionName: "showBucketConfig",
-					propertyName: "showBucket",
-					Component: () => ShowCondition,
-					icon: ShowConditionIcon
-				},
-				{
 					name: "Import/Export",
 					sectionName: "config",
 					propertyName: "importExportTheme",
 					Component: () => ImportExport,
 					icon: ImportExportIcon
+				},
+				{
+					name: Components.ShowCondition,
+					sectionName: "showBucketConfig",
+					propertyName: "showBucket",
+					Component: () => ShowCondition,
+					icon: ShowConditionIcon
 				},
 			],
 		});
