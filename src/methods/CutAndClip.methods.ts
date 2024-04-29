@@ -64,9 +64,9 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
     const width = xScaleWidth;
     const height = yScaleHeight;
     const beforeCutLinearScaleArea =
-        ((yScaleHeight) * beforeCutAreaInPercentage) / 100;
+        ((!self.isHorizontalChart ? yScaleHeight : xScaleWidth) * beforeCutAreaInPercentage) / 100;
     const afterCutLinearScaleArea =
-        ((yScaleHeight) * afterCutAreaInPercentage) / 100;
+        ((!self.isHorizontalChart ? yScaleHeight : xScaleWidth) * afterCutAreaInPercentage) / 100;
     self.beforeCutLinearScaleArea = beforeCutLinearScaleArea;
     self.afterCutLinearScaleArea = afterCutLinearScaleArea;
     const { labelFontSize, labelFontFamily, labelStyling } = self.yAxisSettings;
@@ -126,17 +126,17 @@ export const CallLinearCutScaleOnAxisGroup = (self: Visual): void => {
         if (self.xAxisSettings.position === Position.Bottom) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 45));
+                .call(axisBottom(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 45));
+                .call(axisBottom(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
         } else if (self.xAxisSettings.position === Position.Top) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 45));
+                .call(axisTop(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 45));
+                .call(axisTop(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {

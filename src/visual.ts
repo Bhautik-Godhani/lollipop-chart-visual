@@ -8014,7 +8014,7 @@ export class Visual extends Shadow {
 				RenderDynamicDeviation(this, THIS.fromCategoryValueDataPair, THIS.toCategoryValueDataPair);
 				d3.select(".dynamic-deviation-button").classed("selected", false);
 				THIS.isDynamicDeviationButtonSelected = false;
-				THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "auto");
+				THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "unset");
 
 				if (!THIS.isDeviationCreatedAfterButtonClicked && THIS.dynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) {
 					THIS.isDeviationCreatedAfterButtonClicked = true;
@@ -8619,7 +8619,7 @@ export class Visual extends Shadow {
 		if (this.dynamicDeviationSettings.isEnabled && !this.isHasMultiMeasure) {
 			SetDynamicDeviationDataAndDrawLines(this);
 		} else {
-			this.lollipopG.selectAll(".lollipop-group").style("cursor", "auto");
+			this.lollipopG.selectAll(".lollipop-group").style("cursor", "unset");
 			RemoveDynamicDeviation(this);
 		}
 
