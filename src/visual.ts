@@ -2226,6 +2226,10 @@ export class Visual extends Shadow {
 			this.imagesDataFieldsName = [...new Set(this.categoricalImagesDataFields.map(d => d.source.displayName))];
 		}
 
+		if (this.isSmallMultiplesEnabled) {
+			this.brushAndZoomAreaSettings.enabled = false;
+		}
+
 		// if (this.isHasSmallMultiplesData) {
 		// 	this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
 		// }
