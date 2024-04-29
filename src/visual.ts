@@ -9741,6 +9741,11 @@ export class Visual extends Shadow {
 
 		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName);
 
+		if (this.isHorizontalChart) {
+			const clonedData = JSON.parse(JSON.stringify(seedDataFromVisual));
+			seedDataFromVisual = clonedData.reverse();
+		}
+
 		// if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
 		// 	const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
 		// 	if (elementToMove) {
