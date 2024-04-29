@@ -582,7 +582,7 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.MinToMax:
             {
-                RenderDynamicDeviation(self, self.maxCategoryValueDataPair, self.minCategoryValueDataPair);
+                RenderDynamicDeviation(self, self.minCategoryValueDataPair, self.maxCategoryValueDataPair);
             }
             break;
         case EDynamicDeviationDisplayTypes.PenultimateToLast:

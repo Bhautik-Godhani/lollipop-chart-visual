@@ -1313,12 +1313,16 @@ export class Visual extends Shadow {
 	getXPosition(value: number | string): number {
 		const xPosition = this.xScale(this.xAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
-		if (xPosition > this.xScaleMaxRange) {
-			return this.xScaleMaxRange;
-		}
+		if (this.isXIsDateTimeAxis && this.isXIsContinuousAxis) {
+			return this.xScale(new Date(value));
+		} else {
+			if (xPosition > this.xScaleMaxRange) {
+				return this.xScaleMaxRange;
+			}
 
-		if (xPosition < this.xScaleMinRange) {
-			return this.xScaleMinRange;
+			if (xPosition < this.xScaleMinRange) {
+				return this.xScaleMinRange;
+			}
 		}
 
 		return xPosition;
@@ -1327,12 +1331,16 @@ export class Visual extends Shadow {
 	getYPosition(value: number | string): number {
 		const yPosition = this.yScale(this.yAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
-		if (yPosition > this.yScaleMaxRange) {
-			return this.yScaleMaxRange;
-		}
+		if (this.isYIsDateTimeAxis && this.isYIsContinuousAxis) {
+			return this.yScale(new Date(value));
+		} else {
+			if (yPosition > this.yScaleMaxRange) {
+				return this.yScaleMaxRange;
+			}
 
-		if (yPosition < this.yScaleMinRange) {
-			return this.yScaleMinRange;
+			if (yPosition < this.yScaleMinRange) {
+				return this.yScaleMinRange;
+			}
 		}
 
 		return yPosition;
@@ -6597,7 +6605,7 @@ export class Visual extends Shadow {
 		let xAxisTickHeight: number = 0;
 		let xAxisMaxWordHeight: number = 1;
 
-		if (!this.isHorizontalChart && !THIS.isXIsContinuousAxis) {
+		if ((!this.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 			const xAxisDomain: string[] = this.xScale.domain();
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
@@ -6685,8 +6693,10 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
 
-				if (ticks.includes(text)) {
-					ele.attr("opacity", "0");
+				if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
+					if (ticks.includes(text)) {
+						ele.attr("opacity", "0");
+					}
 				}
 
 				ticks.push(text);
@@ -6720,7 +6730,7 @@ export class Visual extends Shadow {
 					return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
 
-				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) {
+				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
 						if (!THIS.isBottomXAxis) {
@@ -6819,8 +6829,10 @@ export class Visual extends Shadow {
 					text = text.split("--")[0];
 				}
 
-				if (ticks.includes(text) && THIS.isYIsContinuousAxis) {
-					ele.attr("opacity", "0");
+				if (THIS.isYIsNumericAxis && THIS.isYIsContinuousAxis) {
+					if (ticks.includes(text)) {
+						ele.attr("opacity", "0");
+					}
 				}
 
 				ticks.push(text);
@@ -6942,8 +6954,17 @@ export class Visual extends Shadow {
 				}
 			}
 
-			this.xScale = d3.scaleLinear();
-			this.xScale.domain([min, max]);
+			if ((this.isXIsDateTimeAxis && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
+				const dates = this.chartData.map((d) => d.category);
+				const minDate = d3.min(dates, d => d);
+				const maxDate = d3.max(dates, d => d);
+
+				this.xScale = d3.scaleTime();
+				this.xScale.domain([new Date(minDate), new Date(maxDate)]);
+			} else {
+				this.xScale = d3.scaleLinear();
+				this.xScale.domain([min, max]);
+			}
 		} else {
 			this.xScale = d3.scaleBand();
 			this.xScale.domain(this.chartData.map((d) => d.category));
