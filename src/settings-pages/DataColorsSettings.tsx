@@ -203,7 +203,7 @@ const UIByCategoryColorPalette = (
 		<ConditionalWrapper visible={!shadow.isHasMultiMeasure && shadow.isLollipopTypeCircle && values.fillType === ColorPaletteType.ByCategory}>
 			{values.categoryColors.map((categoryColor, ci) => {
 				const categoryNameProperties = {
-					text: categoryColor.name,
+					text: shadow.getTooltipCategoryText(categoryColor.name, false),
 					fontFamily: "sans-serif",
 					fontSize: 11.5 + "px",
 				};

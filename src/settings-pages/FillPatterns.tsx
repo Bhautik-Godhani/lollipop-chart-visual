@@ -45,7 +45,7 @@ const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setC
 	return <>{
 		configValues.categoryPatterns.map((category, index) => (
 			<PatternPicker
-				label={category.name}
+				label={shadow.getTooltipCategoryText(category.name, false)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				handleChange={(e: IPatternData) => {
 					const patterns = [...configValues.categoryPatterns];
@@ -72,7 +72,7 @@ const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, s
 	return <>
 		{configValues.subCategoryPatterns.map((category, index) => (
 			<PatternPicker
-				label={category.name}
+				label={shadow.getTooltipCategoryText(category.name, false)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				handleChange={(e: IPatternData) => {
 					const patterns = [...configValues.subCategoryPatterns];
@@ -96,7 +96,7 @@ const UIMultipleMeasuresPatterns = (shadow: Visual, configValues: IPatternSettin
 	return <>
 		{configValues.measuresPatterns.map((category, index) => (
 			<PatternPicker
-				label={category.name}
+				label={shadow.getTooltipCategoryText(category.name, false)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				handleChange={(e: IPatternData) => {
 					const patterns = [...configValues.measuresPatterns];

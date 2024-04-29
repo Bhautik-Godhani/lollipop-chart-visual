@@ -9248,7 +9248,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	getTooltipCategoryText(text: string): string {
+	getTooltipCategoryText(text: string, toUpperCase: boolean = true): string {
 		if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart) {
 			if (!this.xAxisSettings.isAutoDateFormat) {
 				return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
@@ -9262,7 +9262,7 @@ export class Visual extends Shadow {
 				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 			}
 		} else {
-			return (typeof text === "string" ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
+			return ((typeof text === "string" && toUpperCase) ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
 		}
 	}
 
