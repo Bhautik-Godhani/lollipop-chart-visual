@@ -6371,7 +6371,7 @@ export class Visual extends Shadow {
 
 		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
-			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, false, false)),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
 			(datapoint: any) => datapoint.identity
 		);
 
@@ -6384,7 +6384,7 @@ export class Visual extends Shadow {
 		if (this.isRenderBothErrorBars) {
 			this.tooltipServiceWrapper.addTooltip(
 				d3.select(this.chartContainer).selectAll(".errorBar2G"),
-				(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+				(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
 				(datapoint: any) => datapoint.identity
 			);
 		}
@@ -6448,11 +6448,13 @@ export class Visual extends Shadow {
 
 			if (this.errorBarsSettings.tooltip.isEnabled) {
 				const errorBar1 = value.errorBar1;
+				const errorBar2 = value.errorBar2;
+
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
 					if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
 						tooltipData.push({
 							displayName: "Upper",
-							value: errorBar1.tooltipUpperBoundValue,
+							value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
 							color: "transparent",
 						});
 					}
@@ -6462,7 +6464,7 @@ export class Visual extends Shadow {
 					if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
 						tooltipData.push({
 							displayName: "Lower",
-							value: errorBar1.tooltipLowerBoundValue,
+							value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
 							color: "transparent",
 						});
 					}
@@ -9396,11 +9398,13 @@ export class Visual extends Shadow {
 
 					if (this.errorBarsSettings.tooltip.isEnabled) {
 						const errorBar1 = d.errorBar1;
+						const errorBar2 = d.errorBar2;
+
 						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
 							if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
 								tooltipData.push({
 									displayName: "Upper",
-									value: errorBar1.tooltipUpperBoundValue,
+									value: isPie2 ? errorBar2.tooltipUpperBoundValue : errorBar1.tooltipUpperBoundValue,
 									color: "transparent",
 								});
 							}
@@ -9410,7 +9414,7 @@ export class Visual extends Shadow {
 							if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
 								tooltipData.push({
 									displayName: "Lower",
-									value: errorBar1.tooltipLowerBoundValue,
+									value: isPie2 ? errorBar2.tooltipLowerBoundValue : errorBar1.tooltipLowerBoundValue,
 									color: "transparent",
 								});
 							}
