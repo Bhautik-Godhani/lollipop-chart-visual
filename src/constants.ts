@@ -156,7 +156,7 @@ const dataLabelsProps: IDataLabelsProps = {
 	isTextColorTypeChanged: false,
 	isShowBackgroundChange: false,
 	customLabel: "",
-	displayType: EDataLabelsDisplayTypes.All
+	displayType: EDataLabelsDisplayTypes.FirstLastMinMax
 };
 
 export const DATA_LABELS_SETTINGS: IDataLabelsSettings = {
