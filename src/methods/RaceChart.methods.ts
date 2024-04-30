@@ -130,8 +130,8 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             (self.margin.right - max([textBBox.width / 2, tickerButtonRadius])) +
             "," +
             (self.raceChartSettings.placement === Position.Bottom ?
-                (tickerButtonRadius * 2 + 20) :
-                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 20)) +
+                (tickerButtonRadius * 2) :
+                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius)) +
             ")"
         )
 
