@@ -6402,7 +6402,7 @@ export class Visual extends Shadow {
 			const tooltipData: TooltipData[] = [
 				{
 					displayName: this.categoryDisplayName,
-					value: this.getTooltipCategoryText(value.category),
+					value: this.getTooltipCategoryText(value.category).toString(),
 					color: "transparent",
 				},
 				{
@@ -9345,12 +9345,12 @@ export class Visual extends Shadow {
 					const tooltipData: TooltipData[] = [
 						{
 							displayName: this.categoryDisplayName,
-							value: this.getTooltipCategoryText(pieData.parentCategory),
+							value: this.getTooltipCategoryText(pieData.parentCategory).toString(),
 							color: "transparent",
 						},
 						{
 							displayName: this.subCategoryDisplayName,
-							value: pieData.category,
+							value: pieData.category.toString(),
 							color: "transparent",
 						},
 						{
