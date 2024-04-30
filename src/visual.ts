@@ -9713,7 +9713,7 @@ export class Visual extends Shadow {
 					if (text.toString().split("--").length > 1) {
 						text = text.toString().split("--")[0];
 					}
-					obj[c.source.displayName] = text;
+					obj[c.source.displayName] = this.getTooltipCategoryText(<string>text, false);
 				});
 
 				this.categoricalData.values.forEach(v => {
@@ -9734,7 +9734,7 @@ export class Visual extends Shadow {
 						if (text.toString().split("--").length > 1) {
 							text = text.toString().split("--")[0];
 						}
-						obj[c.source.displayName] = text;
+						obj[c.source.displayName] = this.getTooltipCategoryText(<string>text, false);
 					});
 
 					obj[this.categoricalSubCategoryField.displayName] = g;
@@ -9756,6 +9756,10 @@ export class Visual extends Shadow {
 			const clonedData = JSON.parse(JSON.stringify(seedDataFromVisual));
 			seedDataFromVisual = clonedData.reverse();
 		}
+
+		seedDataFromVisual.forEach(d => {
+			d[this.categoryDisplayName] = this.getTooltipCategoryText(d[this.categoryDisplayName], false);
+		})
 
 		// if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
 		// 	const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));

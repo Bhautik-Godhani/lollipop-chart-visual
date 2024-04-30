@@ -133,11 +133,16 @@ export const GetSemanticFormattedNumber = (numberFormatting: NumberFormatting, n
     return formattedNumber;
 }
 
+const isValidDate = (dateString) => {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
+}
+
 export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, formatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
     const numberSettings = numberFormatting;
 
     if (typeof number !== "number") {
-        return number;
+        return formatter ? formatter.format(number) : number.toString();
     }
 
     if (numberSettings.show && numberSettings.valueType && numberSettings.valueType === EAxisNumberValueType.Percentage) {
@@ -145,11 +150,7 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
     }
 
     if (!numberSettings.show) {
-        if (formatter) {
-            return formatter.format(number);
-        } else {
-            return number.toString();
-        }
+        return formatter ? formatter.format(number) : number.toString();
     }
 
     let formattedNumber: string | number = "0";
