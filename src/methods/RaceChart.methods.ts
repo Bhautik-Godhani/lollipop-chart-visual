@@ -38,6 +38,7 @@ export const StartChartRace = (self: Visual) => {
 }
 
 export const RenderRaceChartDataLabel = (self: Visual): void => {
+    self.raceChartDataLabelG.selectAll("*").remove();
     if (!self.isRaceChartDataLabelDrawn) {
         self.raceChartDataLabelText = self.raceChartDataLabelG.append("text").attr("class", "raceBarDataLabel");
     }

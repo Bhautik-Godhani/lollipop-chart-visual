@@ -2362,6 +2362,7 @@ export class Visual extends Shadow {
 			this.pieYScaleDiffs = [];
 			this.smallMultiplesGridItemContent = {};
 			this.smallMultiplesGridItemId = undefined;
+			this.isRaceChartDataLabelDrawn = false;
 
 			this.maxCircleXScaleDiff = 0;
 			this.maxCircleYScaleDiff = 0;
