@@ -2794,6 +2794,8 @@ export class Visual extends Shadow {
 				this.categoriesColorList = [];
 				this.subCategoriesColorList = [];
 
+				this.setSummaryTableConfig();
+
 				DrawSmallMultiplesGridLayout(settings);
 			} else {
 				this.sortSubcategoryData(clonedCategoricalData);
