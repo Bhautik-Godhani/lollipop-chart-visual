@@ -7904,7 +7904,7 @@ export class Visual extends Shadow {
 							return Y1;
 						}
 					} else {
-						const Y1 = THIS.getYPosition(d.value2) + THIS.markerMaxSize / 2;
+						const Y1 = THIS.getYPosition(d.value2) + (THIS.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
 						const Y2 = THIS.getYPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
 						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
 
