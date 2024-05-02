@@ -361,9 +361,9 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
         const categories = JSON.parse(JSON.stringify(<string[]>self.categoricalData.categories[self.categoricalCategoriesLastIndex].values));
-        let domain: string[] = self.isHorizontalChart ? categories.reverse() : categories;
+        const domain: string[] = self.isHorizontalChart ? categories.reverse() : categories;
 
-        domain = self.elementToMoveOthers(domain, false, undefined);
+        // domain = self.elementToMoveOthers(domain, false, undefined);
 
         // if (self.rankingSettings.category.enabled && self.rankingSettings.category.showRemainingAsOthers) {
         //     const elementToMove = domain.find(obj => obj.includes(self.othersLabel));
@@ -422,11 +422,11 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
-        let domain: string[] = self.isHorizontalChart
+        const domain: string[] = self.isHorizontalChart
             ? self.xScale.ticks(self.width / 90)
             : self.yScale.ticks(self.height / 90);
 
-        domain = self.elementToMoveOthers(domain, false, undefined);
+        // domain = self.elementToMoveOthers(domain, false, undefined);
 
         // if (self.rankingSettings.category.enabled && self.rankingSettings.category.showRemainingAsOthers) {
         //     const elementToMove = domain.find(obj => obj.includes(self.othersLabel));

@@ -1794,6 +1794,8 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category");
+
 		const clonedCategoricalPair = JSON.parse(JSON.stringify(this.categoricalDataPairs));
 		if (this.isHorizontalChart) {
 			this.categoricalDataPairs = clonedCategoricalPair.reverse();
@@ -2713,7 +2715,6 @@ export class Visual extends Shadow {
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
 					categories: smallMultiplesCategories,
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
-					yAxisType: ESmallMultiplesAxisType.Uniform,
 					onCellRendered: (category, index, ele) => {
 						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), ele);
 
@@ -4077,7 +4078,7 @@ export class Visual extends Shadow {
 		// 	this.chartData = chartData.reverse();
 		// }
 
-		this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
+		// this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
 		this.categoryPatterns = this.chartData
 			.map((d) => ({

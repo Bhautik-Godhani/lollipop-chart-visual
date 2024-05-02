@@ -1,4 +1,4 @@
-import { max as D3Max, min as D3Min } from "d3-array";
+import { max as D3Max, min as D3Min, sum } from "d3-array";
 import { Visual } from "../visual";
 import { ESmallMultiplesAxisType } from "@truviz/shadow/dist/Components";
 import { AxisCategoryType, EAxisDateFormats } from "../enum";
@@ -29,9 +29,9 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
             [...self.chartData.map((d) => d.value1), ...errorBarValues] :
             self.chartData.map((d) => d.value1));
 
-    if (self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
-        min = +self.originalCategoricalData.values[0].minLocal;
-        max = +self.originalCategoricalData.values[0].maxLocal;
+    if (self.isSmallMultiplesEnabled && self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
+        min = self.isHasSubcategories ? D3Min(self.originalCategoricalData.values.grouped(), d => D3Min(d.values, v => sum(v.values, t => <number>t))) : +self.originalCategoricalData.values[0].minLocal;
+        max = self.isHasSubcategories ? D3Max(self.originalCategoricalData.values.grouped(), d => D3Max(d.values, v => sum(v.values, t => <number>t))) : +self.originalCategoricalData.values[0].maxLocal;
     }
 
     if (min > 0) {

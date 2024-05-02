@@ -291,7 +291,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     }));
   }
 
-  categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
+  // categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
 
   // if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
   //   const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
@@ -812,7 +812,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
     }));
   }
 
-  categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
+  // categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
 
   // if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
   //   const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
