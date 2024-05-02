@@ -458,7 +458,7 @@ export const RenderSmallMultiplesUniformYAxis = (
             }
 
             if (uniformRightYAxis) {
-                uniformRightYAxis.style("transform", `translate(${config.containerWidth + smallMultiplesLayoutScrollbarWidth}px, ${-hyperListMainContainer.node().scrollTop}px)`);
+                uniformRightYAxis.style("transform", `translate(${config.containerWidth - yAxisGNodeWidth}px, ${-hyperListMainContainer.node().scrollTop}px)`);
             }
         });
 

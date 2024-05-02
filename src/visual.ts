@@ -708,7 +708,6 @@ export class Visual extends Shadow {
 				...SMALL_MULTIPLES_SETTINGS,
 				showGridLayoutOnly: false,
 				showXYAxisSettings: true,
-				background: { ...SMALL_MULTIPLES_SETTINGS.background, alternateColor: "rgba(227, 227, 227, 1)" },
 			},
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
 			components: [
