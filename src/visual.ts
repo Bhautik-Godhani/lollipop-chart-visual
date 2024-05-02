@@ -6452,21 +6452,25 @@ export class Visual extends Shadow {
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
 					if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
-						tooltipData.push({
-							displayName: "Upper",
-							value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
-							color: "transparent",
-						});
+						if ((isCircle1 && errorBar1.tooltipUpperBoundValue) || (isCircle1 && errorBar2.tooltipUpperBoundValue)) {
+							tooltipData.push({
+								displayName: "Upper",
+								value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
+								color: "transparent",
+							});
+						}
 					}
 				}
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
 					if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
-						tooltipData.push({
-							displayName: "Lower",
-							value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
-							color: "transparent",
-						});
+						if ((isCircle1 && errorBar1.tooltipLowerBoundValue) || (isCircle1 && errorBar2.tooltipLowerBoundValue)) {
+							tooltipData.push({
+								displayName: "Lower",
+								value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
+								color: "transparent",
+							});
+						}
 					}
 				}
 
