@@ -428,7 +428,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.lollipopG = smallMultiplesGridItemContent.lollipopG;
 
             if (self.isScrollBrushDisplayed) {
-                self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, true, config.xAxisType === ESmallMultiplesAxisType.Individual, true);
+                self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
             } else {
                 self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
                 // self.drawXYAxis(true, true);
