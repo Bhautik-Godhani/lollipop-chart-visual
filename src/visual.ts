@@ -9920,7 +9920,7 @@ export class Visual extends Shadow {
 			.attr("fill", this.xAxisSettings.labelColor)
 			.style("font-family", this.xAxisSettings.labelFontFamily)
 			.attr("font-size", this.xAxisSettings.labelFontSize)
-			.attr("display", this.xAxisSettings.isDisplayLabel ? "block" : "none")
+			.attr("display", this.brushAndZoomAreaSettings.isShowAxis ? "block" : "none")
 			.attr("text-anchor", "end")
 			.attr("transform", `rotate( ${-90})`);
 	}
