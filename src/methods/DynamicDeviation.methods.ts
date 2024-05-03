@@ -525,16 +525,10 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             {
                 const clonedChartData = JSON.parse(JSON.stringify(self.chartData));
                 const chartData = self.isHorizontalChart ? clonedChartData.reverse() : self.chartData;
-                const fromIndex =
-                    dynamicDeviationSettings.fromIndex <= chartDataLength
-                        ? dynamicDeviationSettings.fromIndex - 1
-                        : chartDataLength - 1;
-                const toIndex =
-                    dynamicDeviationSettings.toIndex <= chartDataLength
-                        ? dynamicDeviationSettings.toIndex - 1
-                        : chartDataLength - 1;
-                const from = chartData[fromIndex];
-                const to = chartData[toIndex];
+                const fromIndex = dynamicDeviationSettings.fromIndex - 1;
+                const toIndex = dynamicDeviationSettings.toIndex - 1
+                const from = dynamicDeviationSettings.fromIndex <= chartDataLength ? chartData[fromIndex] : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
+                const to = dynamicDeviationSettings.toIndex <= chartDataLength ? chartData[toIndex] : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
                 RenderDynamicDeviation(
                     self,
                     { category: from.category, value: from.value1 },

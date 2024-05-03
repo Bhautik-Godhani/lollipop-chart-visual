@@ -235,7 +235,7 @@ const DynamicDeviationSettings = (props) => {
                 <Column>
                   <InputControl
                     min={0}
-                    max={(shadow as Visual).chartData.length}
+                    max={(shadow as Visual).categoricalDataPairs.length}
                     type="number"
                     label="From Index"
                     value={configValues.fromIndex}
@@ -246,7 +246,7 @@ const DynamicDeviationSettings = (props) => {
                 <Column>
                   <InputControl
                     min={0}
-                    max={(shadow as Visual).chartData.length}
+                    max={(shadow as Visual).categoricalDataPairs.length}
                     type="number"
                     label="To Index"
                     value={configValues.toIndex}
