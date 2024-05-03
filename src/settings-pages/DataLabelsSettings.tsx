@@ -231,7 +231,10 @@ const UIDataLabelsFontSettings = (
 						<ColorPicker
 							label="Text Color"
 							color={configValues.color}
-							handleChange={(value) => handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues)}
+							handleChange={(value) => {
+								handleColor(value, EDataLabelsSettings.color, selectedMeasure, setConfigValues);
+								handleChange(true, EDataLabelsSettings.isColorChanged, selectedMeasure, setConfigValues);
+							}}
 							colorPalette={vizOptions.host.colorPalette}
 						/>
 					</Column>
