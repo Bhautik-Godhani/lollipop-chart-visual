@@ -6631,8 +6631,8 @@ export class Visual extends Shadow {
 				return GetWordsSplitByWidth(newText, textProperties, this.scaleBandWidth, 3);
 			});
 
-			isApplyTilt = xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
-				(this.markerMaxSize > this.scaleBandWidth) || !xAxisSettings.isLabelAutoTilt;
+			isApplyTilt = (xAxisSettings.isLabelAutoTilt && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
+				(this.markerMaxSize > this.scaleBandWidth))) || (!xAxisSettings.isLabelAutoTilt && xAxisSettings.labelTilt !== 0);
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
 				const textProperties: TextProperties = {
 					text: d + "ab",
@@ -6655,16 +6655,35 @@ export class Visual extends Shadow {
 
 		const ticks = [];
 
+		const posTiltDx = d3.scaleLinear().domain([30, 90]).range([0.35, -0.5]);
+		const negTiltDx = d3.scaleLinear().domain([-30, -90]).range([0.35, -0.5]);
+
+		let rotateDegree = 0;
+		if (THIS.isBottomXAxis) {
+			if (xAxisSettings.isLabelAutoTilt) {
+				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
+			} else {
+				rotateDegree = xAxisSettings.labelTilt;
+			}
+		} else {
+			if (xAxisSettings.isLabelAutoTilt) {
+				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
+			} else {
+				rotateDegree = -xAxisSettings.labelTilt;
+			}
+		}
+
 		this.xAxisG
 			.selectAll("text")
 			.attr("dx", "0")
 			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
-			.attr("dy", isApplyTilt ? "-0.5em" : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
+			.attr("dy", isApplyTilt ? ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em")) : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
 			.attr("y", () => {
+				const y = isApplyTilt ? 9 : 13;
 				if (this.isHorizontalChart) {
-					return this.isBottomXAxis ? 9 : 0;
+					return this.isBottomXAxis ? y : 0;
 				} else {
-					return this.isBottomXAxis ? 9 : 9;
+					return this.isBottomXAxis ? y : y;
 				}
 			})
 			// .attr("dy", isApplyTilt ? "0" : "0.35em")
@@ -6677,22 +6696,8 @@ export class Visual extends Shadow {
 			.style("font-style", this.xAxisSettings.labelStyling.includes(EFontStyle.Italic) ? "italic" : "")
 			.attr("text-anchor", () => {
 				if (this.isBottomXAxis) {
-					let rotateDegree = 0;
-					if (xAxisSettings.isLabelAutoTilt) {
-						rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
-					} else {
-						rotateDegree = xAxisSettings.labelTilt;
-					}
-
 					return isApplyTilt && rotateDegree !== 0 ? rotateDegree > 0 ? "start" : "end" : "middle";
 				} else {
-					let rotateDegree = 0;
-					if (xAxisSettings.isLabelAutoTilt) {
-						rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
-					} else {
-						rotateDegree = -xAxisSettings.labelTilt;
-					}
-
 					return isApplyTilt && rotateDegree !== 0 ? rotateDegree > 0 ? "end" : "start" : "middle";
 				}
 			})
@@ -6771,22 +6776,8 @@ export class Visual extends Shadow {
 						} else {
 							const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
 							if (THIS.isBottomXAxis) {
-								let rotateDegree = 0;
-								if (xAxisSettings.isLabelAutoTilt) {
-									rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
-								} else {
-									rotateDegree = xAxisSettings.labelTilt;
-								}
-
 								ele.attr("transform", `rotate( ${rotateDegree})`);
 							} else {
-								let rotateDegree = 0;
-								if (xAxisSettings.isLabelAutoTilt) {
-									rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
-								} else {
-									rotateDegree = -xAxisSettings.labelTilt;
-								}
-
 								ele.attr("transform", `rotate( ${rotateDegree})`);
 							}
 							ele.append("tspan").text(getFinalTruncatedText(truncatedText));
