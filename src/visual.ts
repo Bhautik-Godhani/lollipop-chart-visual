@@ -8667,7 +8667,7 @@ export class Visual extends Shadow {
 		}
 
 		if (!this.isLollipopTypePie) {
-			SetAndBindChartBehaviorOptions(this, this.lollipopSelection, d3.selectAll(".lollipop-line"), onLollipopClick);
+			SetAndBindChartBehaviorOptions(this, d3.selectAll(".lollipop-group"), d3.selectAll(".lollipop-line"), onLollipopClick);
 		} else {
 			SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
 		}

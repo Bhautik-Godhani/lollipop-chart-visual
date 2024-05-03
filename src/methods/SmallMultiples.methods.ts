@@ -165,6 +165,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                         const id = +valueIndex.split("-")[1];
                         return d.values[id];
                     });
+
+                    d.highlights = dataValuesIndexes.map((valueIndex) => {
+                        const id = +valueIndex.split("-")[1];
+                        return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+                    });
                 });
 
                 self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
