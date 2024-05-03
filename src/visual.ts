@@ -2814,7 +2814,7 @@ export class Visual extends Shadow {
 				this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
 
 				if (this.isHorizontalBrushDisplayed) {
-					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? this.brushAndZoomAreaHeight : 10;
+					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? (this.brushAndZoomAreaHeight + 2) : 10;
 				}
 
 				if (this.isVerticalBrushDisplayed) {
@@ -5481,7 +5481,7 @@ export class Visual extends Shadow {
 			.brushX()
 			.extent([
 				[0, 0],
-				[this.width, this.brushHeight],
+				[this.width, this.brushHeight - (this.brushAndZoomAreaSettings.enabled ? 2 : 0)],
 			])
 			.on("brush", brushed);
 
@@ -5492,7 +5492,7 @@ export class Visual extends Shadow {
 		widthByExpectedBar = widthByExpectedBar > this.width ? this.width : widthByExpectedBar;
 
 		d3.select(brushG)
-			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos - this.brushXAxisTicksMaxHeight})`)
+			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos - this.brushXAxisTicksMaxHeight - ((this.brushAndZoomAreaSettings.enabled ? 2 : 0))})`)
 			.attr("display", config.isShowHorizontalBrush ? "block" : "none")
 			.call(brush as any)
 			.call(brush.move as any, [0, widthByExpectedBar]);
