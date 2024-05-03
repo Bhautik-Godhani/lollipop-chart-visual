@@ -6679,7 +6679,7 @@ export class Visual extends Shadow {
 			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", isApplyTilt ? ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em")) : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
 			.attr("y", () => {
-				const y = isApplyTilt ? 9 : 13;
+				const y = isApplyTilt ? 9 : 12;
 				if (this.isHorizontalChart) {
 					return this.isBottomXAxis ? y : 0;
 				} else {

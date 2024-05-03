@@ -1231,11 +1231,11 @@ const XAxisSettings = (props) => {
   React.useEffect(() => {
     if (xConfigValues.isDisplayTitle) {
       if (xConfigValues.titleName.length === 0) {
-        if (shadow.isHasMultiMeasure) {
-          handleXChange(shadow.measureNames.join(" and "), EXAxisSettings.TitleName, setXConfigValues);
-        } else {
-          handleXChange(shadow.categoryDisplayName, EXAxisSettings.TitleName, setXConfigValues);
-        }
+        // if (shadow.isHasMultiMeasure) {
+        //   handleXChange(shadow.measureNames.join(" and "), EXAxisSettings.TitleName, setXConfigValues);
+        // } else {
+        handleXChange(shadow.categoryDisplayName, EXAxisSettings.TitleName, setXConfigValues);
+        // }
       }
     }
   }, [xConfigValues.isDisplayTitle]);
@@ -1257,11 +1257,11 @@ const XAxisSettings = (props) => {
   React.useEffect(() => {
     if (yConfigValues.isDisplayTitle) {
       if (yConfigValues.titleName.length === 0) {
-        if (shadow.isHasMultiMeasure) {
-          handleYChange(shadow.categoryDisplayName, EYAxisSettings.TitleName, setYConfigValues);
-        } else {
-          handleYChange(shadow.measureNames.join(" and "), EYAxisSettings.TitleName, setYConfigValues);
-        }
+        // if (shadow.isHasMultiMeasure) {
+        //   handleYChange(shadow.categoryDisplayName, EYAxisSettings.TitleName, setYConfigValues);
+        // } else {
+        handleYChange(shadow.measureNames.join(" and "), EYAxisSettings.TitleName, setYConfigValues);
+        // }
       }
     }
   }, [yConfigValues.isDisplayTitle]);
