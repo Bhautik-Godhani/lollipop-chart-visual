@@ -8618,6 +8618,8 @@ export class Visual extends Shadow {
 
 		if (this.isRenderBothErrorBars) {
 			RenderErrorBars(this, this.isShowErrorBars && this.errorBarsSettings.errorBars.isEnabled ? this.chartData : [], true);
+		} else {
+			RenderErrorBars(this, [], true);
 		}
 
 		RenderErrorBand(this, this.isShowErrorBars && this.errorBarsSettings.errorBand.isEnabled ? this.chartData : [], false);
