@@ -697,7 +697,9 @@ export class Visual extends Shadow {
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
 				showPercentageAllOption: true,
-				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." },
+				isShowPercentageNote: true,
+				percentageNote: "It computes the percentage of total and stay between 0 to 100.",
+				// messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." },
 				isShowCategoriesTypeDropdown: true,
 				categoriesList: [
 					{ label: "Category", value: EDataRolesName.Category },
@@ -9787,6 +9789,11 @@ export class Visual extends Shadow {
 			},
 			seedDataFromVisual: seedDataFromVisual,
 			numberFormatter: (value, field) => {
+				if (field.includes("pivot")) {
+					const splitBy_ = field.split("_");
+					field = splitBy_[splitBy_.length - 1];
+				}
+
 				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
 					return this.numberSettings.show ?
 						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field].formatter : undefined, false, true) :
