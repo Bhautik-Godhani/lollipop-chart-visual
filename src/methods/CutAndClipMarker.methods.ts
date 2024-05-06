@@ -41,7 +41,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
                 .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
                 .attr("stroke-width", "3px")
                 .attr("stroke-dasharray", `${width} ${height} `)
-                .attr("transform", `translate(${height + width}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
+                .attr("transform", `translate(${self.isLeftYAxis ? height + width : -(height + width)}, ${- (height + width) / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
         } else {
             secG
                 .append("rect")
@@ -76,15 +76,21 @@ export const GetIsCutAndClipAxisEnabled = (self: Visual): boolean => {
 const SetOverlappedAxisTicksPosition = (self: Visual): void => {
     if (!self.isHorizontalChart) {
         if (self.isBottomXAxis) {
-            self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "1.32em");
-            self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "0em");
+            const ticks: D3Selection<SVGElement> = self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text");
+            if (ticks.nodes().length > 1) {
+                self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "1.32em");
+            }
+            self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "0.32em");
         } else {
             self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "1.32em");
-            self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "0em");
+            self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "0.32em");
         }
     } else {
         if (self.isLeftYAxis) {
-            self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "end");
+            const ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
+            if (ticks.nodes().length > 1) {
+                self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "end");
+            }
             self.afterCutLinearXAxisG.select(".tick").select("text").attr("dx", "0.32em").attr("text-anchor", "start");
         } else {
             self.afterCutLinearXAxisG.select(".tick").select("text").attr("dx", "-0.32em").attr("text-anchor", "end");
@@ -119,7 +125,9 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
 
 export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
     const beforeCutScaleDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
-    const transX = self.getXPosition(self.isLeftYAxis ? beforeCutScaleDomain[1] : beforeCutScaleDomain[1]);
+    const afterCutScaleDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
+
+    const transX = self.getXPosition(self.isLeftYAxis ? beforeCutScaleDomain[1] : afterCutScaleDomain[0]);
     const rectHeight = 20;
 
     imageGSelection.attr("transform", (d) => {
@@ -133,7 +141,7 @@ export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelect
         .attr("stroke", self.getColor(self.cutAndClipAxisSettings.markerStrokeColor, EHighContrastColorType.Foreground))
         .attr("stroke-width", "3px")
         .attr("stroke-dasharray", `${rectHeight} ${self.cutAndClipMarkerHeight} `)
-        .attr("transform", `translate(${rectHeight}, ${- self.cutAndClipMarkerWidth / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
+        .attr("transform", `translate(${self.isLeftYAxis ? rectHeight : -rectHeight}, ${- self.cutAndClipMarkerWidth / 2}) rotate(${90 + self.cutAndClipMarkerTilt})`);
 }
 
 export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {

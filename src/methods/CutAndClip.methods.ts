@@ -72,37 +72,41 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
     const { labelFontSize, labelFontFamily, labelStyling } = self.yAxisSettings;
     const yAxisLabelHeight = getSVGTextSize('100K', labelFontFamily, labelFontSize, labelStyling[EFontStyle.Bold], labelStyling[EFontStyle.Italic], labelStyling[EFontStyle.UnderLine]).height;
 
+    const { startDiff, endDiff } = self.getStartEndAxisRangeDiff();
+
     if (self.isHorizontalChart) {
-        if (self.isLeftYAxis) {
+        if ((self.isLeftYAxis && !self.xAxisSettings.isInvertRange)
+            || (!self.isLeftYAxis && self.xAxisSettings.isInvertRange)) {
             self.beforeCutLinearScale.range([
-                self.xAxisStartMargin,
+                self.xAxisStartMargin + startDiff,
                 beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap,
             ]);
 
-            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, xScaleWidth]);
+            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, xScaleWidth + endDiff]);
         } else {
             self.afterCutLinearScale.range([
                 width - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap,
-                0,
+                (self.markerMaxSize) + endDiff,
             ]);
 
             self.beforeCutLinearScale.range([
-                xScaleWidth - self.xAxisStartMargin,
+                xScaleWidth - self.xAxisStartMargin - self.xAxisStartMargin + startDiff,
                 width - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
         }
     } else {
-        if (self.isBottomXAxis) {
+        if ((self.isBottomXAxis && !self.yAxisSettings.isInvertRange)
+            || (!self.isBottomXAxis && self.yAxisSettings.isInvertRange)) {
             self.beforeCutLinearScale.range([
-                height - self.yAxisStartMargin,
+                height - self.yAxisStartMargin + startDiff,
                 height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
 
-            self.afterCutLinearScale.range([height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap, yAxisLabelHeight / 2]);
+            self.afterCutLinearScale.range([height - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap, (self.markerMaxSize / 2) + endDiff]);
         } else {
-            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, height - yAxisLabelHeight / 2]);
+            self.afterCutLinearScale.range([beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2, height - yAxisLabelHeight / 2 - (self.markerMaxSize / 2) - endDiff]);
 
-            self.beforeCutLinearScale.range([self.yAxisStartMargin, beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap]);
+            self.beforeCutLinearScale.range([self.yAxisStartMargin + startDiff, beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap]);
         }
     }
 }

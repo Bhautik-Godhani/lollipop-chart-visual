@@ -7053,7 +7053,10 @@ export class Visual extends Shadow {
 		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 	}
 
-	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
+	getStartEndAxisRangeDiff(): { startDiff: number, endDiff: number } {
+		let startDiff = 0;
+		let endDiff = 0;
+
 		const { fontSize: font1Size, fontFamily: font1Family, fontStyle: font1Style, placement: label1Placement } = this.data1LabelsSettings;
 		const { fontSize: font2Size, fontFamily: font2Family, fontStyle: font2Style, placement: label2Placement } = this.data2LabelsSettings;
 
@@ -7093,10 +7096,36 @@ export class Visual extends Shadow {
 		const negDataLabelWidth = this.isHasNegativeValue && this.dataLabelsSettings.show && isOutsideLabel ? dataLabelWidth + (this.markerMaxSize / 2) : 0;
 
 		if (this.isHorizontalChart) {
+			if ((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
+				|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange)) {
+				startDiff = negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0);
+				endDiff = -outsideDataLabelWidth;
+			} else {
+				startDiff = -(negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0));
+				endDiff = outsideDataLabelWidth;
+			}
+		} else {
+			if ((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+				|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange)) {
+				startDiff = -(negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0));
+				endDiff = outsideDataLabelHeight
+			} else {
+				startDiff = negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0)
+				endDiff = -outsideDataLabelHeight
+			}
+		}
+
+		return { startDiff, endDiff };
+	}
+
+	setXYAxisRange(xScaleWidth: number, yScaleHeight: number): void {
+		const { startDiff, endDiff } = this.getStartEndAxisRangeDiff();
+
+		if (this.isHorizontalChart) {
 			const xAxisRange = ((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
 				|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange)) ?
-				[this.xAxisStartMargin + negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), xScaleWidth - (this.markerMaxSize / 2) - outsideDataLabelWidth] :
-				[xScaleWidth - this.xAxisStartMargin - negDataLabelWidth - this.maxCircleXScaleDiff - this.maxPieXScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0), (this.markerMaxSize) + outsideDataLabelWidth];
+				[this.xAxisStartMargin + startDiff, xScaleWidth - (this.markerMaxSize / 2) + endDiff] :
+				[xScaleWidth - this.xAxisStartMargin + startDiff, (this.markerMaxSize) + endDiff];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const width = this.axisDomainMaxValue * Math.abs(xAxisRange[0] - xAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
@@ -7134,8 +7163,8 @@ export class Visual extends Shadow {
 
 			const yAxisRange = ((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
 				|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange)) ?
-				[yScaleHeight - this.yAxisStartMargin - negDataLabelHeight - this.maxCircleYScaleDiff - this.maxPieYScaleDiff - ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), (this.markerMaxSize / 2) + outsideDataLabelHeight] :
-				[this.yAxisStartMargin + negDataLabelHeight + this.maxCircleYScaleDiff + this.maxPieYScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelHeight : 0), yScaleHeight - (this.markerMaxSize / 2) - outsideDataLabelHeight];
+				[yScaleHeight - this.yAxisStartMargin + startDiff, (this.markerMaxSize / 2) + endDiff] :
+				[this.yAxisStartMargin + startDiff, yScaleHeight - (this.markerMaxSize / 2) - endDiff];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
