@@ -9092,7 +9092,7 @@ export class Visual extends Shadow {
 			}
 		});
 
-		return data;
+		return data.filter(d => d.value !== 0);
 	}
 
 	getPieSliceClass(category: string, subCategory: string): string {
