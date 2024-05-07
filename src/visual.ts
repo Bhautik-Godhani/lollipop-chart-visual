@@ -1914,8 +1914,10 @@ export class Visual extends Shadow {
 		// 		});
 		// }
 
-		const min = d3.min(this.categoricalData.values, d => d3.min(d.values, v => <number>v));
-		const max = d3.max(this.categoricalData.values, d => d3.max(d.values, v => <number>v));
+		const categoricalDataValues = this.categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
+
+		const min = d3.min(categoricalDataValues, d => d3.min(d.values, v => <number>v));
+		const max = d3.max(categoricalDataValues, d => d3.max(d.values, v => <number>v));
 
 		if (!this.dataColorsSettings.isFillTypeChanged && min < 0 && max > 0 && !this.isIBCSEnabled) {
 			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
