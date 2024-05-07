@@ -234,7 +234,7 @@ const DynamicDeviationSettings = (props) => {
               <Row>
                 <Column>
                   <InputControl
-                    min={0}
+                    min={1}
                     max={(shadow as Visual).categoricalDataPairs.length}
                     type="number"
                     label="From Index"
@@ -245,7 +245,7 @@ const DynamicDeviationSettings = (props) => {
 
                 <Column>
                   <InputControl
-                    min={0}
+                    min={1}
                     max={(shadow as Visual).categoricalDataPairs.length}
                     type="number"
                     label="To Index"

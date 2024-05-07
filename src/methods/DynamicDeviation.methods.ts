@@ -129,7 +129,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
                 ? `0, ${8} `
                 : `${8}, ${8}`
-        );
+        )
 
     // self.dynamicDeviationG
     //     .append("line")
@@ -310,7 +310,8 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
                 ? `0, ${8} `
                 : `${8}, ${8}`
-        );
+        )
+        .attr("display", !fromCategoryXPos && !toCategoryXPos ? "none" : "block");
 
     // self.dynamicDeviationG
     //     .append("line")
@@ -523,12 +524,14 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.CustomRange:
             {
-                const clonedChartData = JSON.parse(JSON.stringify(self.chartData));
-                const chartData = self.isHorizontalChart ? clonedChartData.reverse() : self.chartData;
-                const fromIndex = dynamicDeviationSettings.fromIndex - 1;
-                const toIndex = dynamicDeviationSettings.toIndex - 1
-                const from = dynamicDeviationSettings.fromIndex <= chartDataLength ? chartData[fromIndex] : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
-                const to = dynamicDeviationSettings.toIndex <= chartDataLength ? chartData[toIndex] : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
+                const clonedCategoricalDataPairs = JSON.parse(JSON.stringify(self.categoricalDataPairs));
+                const categoricalDataPairs = self.isHorizontalChart ? clonedCategoricalDataPairs.reverse() : clonedCategoricalDataPairs;
+                const fromIndex = categoricalDataPairs[dynamicDeviationSettings.fromIndex - 1];
+                const toIndex = categoricalDataPairs[dynamicDeviationSettings.toIndex - 1];
+                const measureKey = Object.keys(categoricalDataPairs[0]).find(d => d.includes("measure"));
+                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
+                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
+
                 RenderDynamicDeviation(
                     self,
                     { category: from.category, value: from.value1 },
