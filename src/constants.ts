@@ -171,14 +171,14 @@ export const X_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {
 	show: false,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
-	lineColor: "rgba(151,151,151,1)",
+	lineColor: "rgba(198, 194, 190, 1)",
 };
 
 export const Y_GRID_LINES_SETTINGS: IGridLinesPropsSettings = {
-	show: false,
+	show: true,
 	lineType: ELineType.Dotted,
 	lineWidth: 1,
-	lineColor: "rgba(151,151,151,1)",
+	lineColor: "rgba(198, 194, 190, 1)",
 };
 
 export const GRID_LINES_SETTINGS: IGridLinesSettings = {
