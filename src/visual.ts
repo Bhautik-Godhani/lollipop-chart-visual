@@ -6451,40 +6451,57 @@ export class Visual extends Shadow {
 			if (this.errorBarsSettings.tooltip.isEnabled) {
 				const errorBar1 = value.errorBar1;
 				const errorBar2 = value.errorBar2;
+				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-					if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
-						if ((isCircle1 && errorBar1.tooltipUpperBoundValue) || (isCircle1 && errorBar2.tooltipUpperBoundValue)) {
+					if (this.isHasErrorUpperBounds) {
+						if (this.isRenderBothErrorBars) {
 							tooltipData.push({
 								displayName: "Upper",
 								value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
 								color: "transparent",
 							});
+						} else {
+							if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
+								tooltipData.push({
+									displayName: "Upper",
+									value: errorBar1.tooltipUpperBoundValue,
+									color: "transparent",
+								});
+							}
 						}
 					}
 				}
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-					if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
-						if ((isCircle1 && errorBar1.tooltipLowerBoundValue) || (isCircle1 && errorBar2.tooltipLowerBoundValue)) {
+					if (this.isHasErrorLowerBounds) {
+						if (this.isRenderBothErrorBars) {
 							tooltipData.push({
 								displayName: "Lower",
 								value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
 								color: "transparent",
 							});
+						} else {
+							if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
+								tooltipData.push({
+									displayName: "Lower",
+									value: errorBar1.tooltipLowerBoundValue,
+									color: "transparent",
+								});
+							}
 						}
 					}
 				}
+			}
 
-				if (value.isHighlight) {
-					tooltipData.push({
-						displayName: "Highlighted",
-						value: isCircle1
-							? numberFormatter(value.value1, this.measureNumberFormatter[0])
-							: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-						color: "transparent",
-					});
-				}
+			if (value.isHighlight) {
+				tooltipData.push({
+					displayName: "Highlighted",
+					value: isCircle1
+						? numberFormatter(value.value1, this.measureNumberFormatter[0])
+						: numberFormatter(value.value2, this.measureNumberFormatter[1]),
+					color: "transparent",
+				});
 			}
 
 			return tooltipData;
@@ -9427,36 +9444,57 @@ export class Visual extends Shadow {
 					if (this.errorBarsSettings.tooltip.isEnabled) {
 						const errorBar1 = d.errorBar1;
 						const errorBar2 = d.errorBar2;
+						const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
 
 						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-							if (this.isHasErrorUpperBounds && (errorBar1.tooltipUpperBoundValue !== undefined && errorBar1.tooltipUpperBoundValue !== null)) {
-								tooltipData.push({
-									displayName: "Upper",
-									value: isPie2 ? errorBar2.tooltipUpperBoundValue : errorBar1.tooltipUpperBoundValue,
-									color: "transparent",
-								});
+							if (this.isHasErrorUpperBounds) {
+								if (this.isRenderBothErrorBars) {
+									tooltipData.push({
+										displayName: "Upper",
+										value: !isPie2 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
+										color: "transparent",
+									});
+								} else {
+									if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+										tooltipData.push({
+											displayName: "Upper",
+											value: errorBar1.tooltipUpperBoundValue,
+											color: "transparent",
+										});
+									}
+								}
 							}
 						}
 
 						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-							if (this.isHasErrorLowerBounds && (errorBar1.tooltipLowerBoundValue !== undefined && errorBar1.tooltipLowerBoundValue !== null)) {
-								tooltipData.push({
-									displayName: "Lower",
-									value: isPie2 ? errorBar2.tooltipLowerBoundValue : errorBar1.tooltipLowerBoundValue,
-									color: "transparent",
-								});
+							if (this.isHasErrorLowerBounds) {
+								if (this.isRenderBothErrorBars) {
+									tooltipData.push({
+										displayName: "Lower",
+										value: !isPie2 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
+										color: "transparent",
+									});
+								} else {
+									if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+										tooltipData.push({
+											displayName: "Lower",
+											value: errorBar1.tooltipLowerBoundValue,
+											color: "transparent",
+										});
+									}
+								}
 							}
 						}
+					}
 
-						if (d.isHighlight) {
-							tooltipData.push({
-								displayName: "Highlighted",
-								value: !isPie2
-									? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
-									: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-								color: "transparent",
-							});
-						}
+					if (d.isHighlight) {
+						tooltipData.push({
+							displayName: "Highlighted",
+							value: !isPie2
+								? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
+								: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+							color: "transparent",
+						});
 					}
 
 					pieData.tooltipFields.forEach((data) => {
