@@ -1,7 +1,6 @@
 /* eslint-disable no-self-assign */
 import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-import IValueFormatter = valueFormatter.IValueFormatter;
+import { IValueFormatter } from "../model";
 import { NumberFormatting } from "../settings";
 
 export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, number: number, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
@@ -138,8 +137,18 @@ const isValidDate = (dateString) => {
     return !isNaN(date.getTime());
 }
 
-export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, formatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
+export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, valueFormatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
     const numberSettings = numberFormatting;
+    const formatter = valueFormatter ? valueFormatter.formatter : undefined;
+    let isPercentageNumber: boolean;
+
+    if (valueFormatter && number && valueFormatter.format.includes("%")) {
+        isPercentageNumber = true;
+
+        if (!numberSettings.show) {
+            number = parseFloat(number.toString()) / 100;
+        }
+    }
 
     if (typeof number !== "number") {
         return formatter ? formatter.format(number) : number.toString();
@@ -153,7 +162,7 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
         return formatter ? formatter.format(number) : number.toString();
     }
 
-    let formattedNumber: string | number = "0";
+    let formattedNumber: string | number = number;
     switch (numberSettings.scaling) {
         case DisplayUnits.Auto: {
             formattedNumber = GetAutoUnitFormattedNumber(numberFormatting, number, isUseSematicFormat, isMinThousandsLimit);
@@ -218,7 +227,7 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
         }
     }
 
-    return numberSettings.prefix + "" + formattedNumber + "" + numberSettings.suffix;
+    return numberSettings.prefix + "" + (isPercentageNumber ? formattedNumber.toString().concat("%") : formattedNumber) + "" + numberSettings.suffix;
 }
 
 export const extractDigitsFromString = (str) => {

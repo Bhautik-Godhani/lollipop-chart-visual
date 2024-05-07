@@ -1,7 +1,8 @@
 import powerbi from "powerbi-visuals-api";
 import ISelectionId = powerbi.visuals.ISelectionId;
-import { DataValuesType } from "./enum";
+import { DataValuesType, EDataRolesName } from "./enum";
 import { IPatternProps } from "./visual-settings.interface";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 
 export interface ILollipopChartRow {
 	uid: string;
@@ -82,4 +83,10 @@ export interface IBrushLollipopChartData {
 			fillColor: string
 		}
 	}
+}
+
+export interface IValueFormatter {
+	format: string;
+	formatter: valueFormatter.IValueFormatter;
+	role?: EDataRolesName;
 }

@@ -15,13 +15,12 @@ import IColorPalette = powerbi.extensibility.IColorPalette;
 import IVisualEventService = powerbi.extensibility.IVisualEventService;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import IValueFormatter = valueFormatter.IValueFormatter;
 import IDownloadService = powerbi.extensibility.IDownloadService;
 
 import * as d3 from "d3";
 import 'd3-transition';
 import { easeLinear } from "d3";
-import { IBrushLollipopChartData, IChartSubCategory, IErrorBarValue, ILollipopChartRow, TooltipData } from "./model";
+import { IBrushLollipopChartData, IChartSubCategory, IErrorBarValue, ILollipopChartRow, IValueFormatter, TooltipData } from "./model";
 import {
 	CircleType,
 	ColorPaletteType,
@@ -310,9 +309,9 @@ export class Visual extends Shadow {
 	public measureNumberFormatter: IValueFormatter[] = [];
 	public tooltipNumberFormatter: IValueFormatter[] = [];
 	public sortValuesNumberFormatter: IValueFormatter[] = [];
-	public allNumberFormatter: { [name: string]: { formatter: IValueFormatter; role: EDataRolesName } } = {};
+	public allNumberFormatter: { [name: string]: IValueFormatter } = {};
 	public extraDataLabelsNumberFormatter: IValueFormatter[];
-	public valueFormatter: IValueFormatter = valueFormatter;
+	public valueFormatter: valueFormatter.IValueFormatter = valueFormatter;
 
 	// svg
 	public svg: D3Selection<SVGElement>;
@@ -2104,11 +2103,11 @@ export class Visual extends Shadow {
 		this.categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
 		categoricalData.categories.forEach(d => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
+			this.allNumberFormatter[d.source.displayName] = { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
 		});
 
 		categoricalData.values.forEach(d => {
-			this.allNumberFormatter[d.source.displayName] = { formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
+			this.allNumberFormatter[d.source.displayName] = { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
 		});
 
 		this.categoricalCategoriesLastIndex = this.categoricalCategoriesFields.length - 1;
@@ -3809,11 +3808,16 @@ export class Visual extends Shadow {
 				const selectedImageDataFieldIndex1 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker1Style.selectedImageDataField);
 				const selectedImageDataFieldIndex2 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker2Style.selectedImageDataField);
 
-				const value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
-				const value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
-				const isValue2 = this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+				let value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
+				let value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
 
-				const checkIfNaN = (bound) => (isNaN(bound) ? 0 : bound);
+				if (this.categoricalMeasure1Field.source.format.includes("%")) {
+					value1 = value1 * 100;
+				}
+
+				if (this.isHasMultiMeasure && this.categoricalMeasure2Field.source.format.includes("%")) {
+					value2 = value2 * 100;
+				}
 
 				const extraDataLabels = this.categoricalExtraDataLabelsFields.reduce((obj, current) => {
 					obj[current.source.displayName] = current.values[idx];
@@ -4124,10 +4128,11 @@ export class Visual extends Shadow {
 			const firstCategory = this.chartData[0].category;
 			const lastCategory = this.chartData[this.chartData.length - 1].category;
 			let label = "";
+			const measureNumberFormatter = this.measureNumberFormatter[isData2Label ? 1 : 0];
 
 			switch (dataLabelsSettings.displayType) {
 				case EDataLabelsDisplayTypes.All:
-					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true);
+					label = this.formatNumber(d[key], this.numberSettings, measureNumberFormatter, true, true);
 					break;
 
 				case EDataLabelsDisplayTypes.FirstLast:
@@ -4185,7 +4190,7 @@ export class Visual extends Shadow {
 
 				case EDataLabelsDisplayTypes.CustomLabel:
 					if (this.isHasExtraDataLabels) {
-						label = this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel].formatter, true, true);
+						label = this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel], true, true);
 					}
 					break;
 			}
@@ -9867,10 +9872,10 @@ export class Visual extends Shadow {
 
 				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
 					return this.numberSettings.show ?
-						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field].formatter : undefined, false, true) :
-						powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field] : undefined, false, true) :
+						powerBiNumberFormat(value, this.allNumberFormatter[field]);
 				} else {
-					return powerBiNumberFormat(value, this.allNumberFormatter[field].formatter);
+					return powerBiNumberFormat(value, this.allNumberFormatter[field]);
 				}
 			},
 			themeValue: this.vizOptions.formatTab["visualGeneralSettings"]["darkMode"],
@@ -9921,20 +9926,20 @@ export class Visual extends Shadow {
 
 	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalExtraDataLabelsFields): void {
 		this.measureNumberFormatter = categoricalMeasureFields.map((d) => {
-			return valueFormatter.create({ format: d.source.format });
+			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 		});
 
 		this.tooltipNumberFormatter = categoricalTooltipFields.map((d) => {
-			return valueFormatter.create({ format: d.source.format });
+			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 		});
 
 		this.sortValuesNumberFormatter = categoricalSortFields.map((d) => {
-			return valueFormatter.create({ format: d.source.format });
+			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 		});
 
 		this.extraDataLabelsNumberFormatter = this.categoricalExtraDataLabelsFields
 			.map(d => {
-				return valueFormatter.create({ format: d.source.format });
+				return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 			});
 	}
 

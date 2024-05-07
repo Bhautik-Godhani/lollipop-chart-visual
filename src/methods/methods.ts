@@ -1,13 +1,11 @@
 /* eslint-disable max-lines-per-function */
 import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
-import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
-import IValueFormatter = valueFormatter.IValueFormatter;
 import { PATTERNS } from "./patterns";
 import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
-import { TooltipData } from "../model";
+import { IValueFormatter, TooltipData } from "../model";
 import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
@@ -295,8 +293,14 @@ export const hexToRGB = (hex: string, alpha: number): string => {
 
 export const powerBiNumberFormat = (
 	number: number | string | Date,
-	formatter: IValueFormatter,
+	valueFormatter: IValueFormatter,
 ): string => {
+	const formatter = valueFormatter ? valueFormatter.formatter : undefined;
+
+	if (valueFormatter && number && valueFormatter.format.includes("%")) {
+		number = parseFloat(number.toString()) / 100;
+	}
+
 	return formatter ? formatter.format(number) : number.toString();
 }
 
