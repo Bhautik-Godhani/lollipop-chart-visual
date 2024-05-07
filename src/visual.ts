@@ -1201,27 +1201,27 @@ export class Visual extends Shadow {
 			const index = measureValues.find((d) => d.source.displayName === sortingSettings.sortBy).source.index;
 			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
 
-			if (this.isHorizontalChart) {
-				// if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-				// 	data.sort((a, b) => {
-				// 		return a[measureIndex] - b[measureIndex];
-				// 	});
-				// } else {
-				// 	data.sort((a, b) => {
-				// 		return b[measureIndex] - a[measureIndex];
-				// 	});
-				// }
+			// if (this.isHorizontalChart) {
+			// if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+			// 	data.sort((a, b) => {
+			// 		return a[measureIndex] - b[measureIndex];
+			// 	});
+			// } else {
+			// 	data.sort((a, b) => {
+			// 		return b[measureIndex] - a[measureIndex];
+			// 	});
+			// }
+			// } else {
+			if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+				data.sort((a, b) => {
+					return a[measureIndex] - b[measureIndex];
+				});
 			} else {
-				if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-					data.sort((a, b) => {
-						return a[measureIndex] - b[measureIndex];
-					});
-				} else {
-					data.sort((a, b) => {
-						return b[measureIndex] - a[measureIndex];
-					});
-				}
+				data.sort((a, b) => {
+					return b[measureIndex] - a[measureIndex];
+				});
 			}
+			// }
 		};
 
 		const sortByMultiMeasure = (measureKeys: string[]) => {

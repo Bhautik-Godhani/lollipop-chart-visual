@@ -237,6 +237,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             const yAxisLineG = create("svg:g").classed("yAxisLineG", true);
 
             svg.node().append(container.node());
+            container.node().append(xAxisLineG.node());
+            container.node().append(yAxisLineG.node());
+            container.node().append(xGridLinesG.node());
+            container.node().append(yGridLinesG.node());
+            container.node().append(zeroSeparatorLine.node());
             container.node().append(lollipopG.node());
             container.node().append(xAxisG.node());
             container.node().append(yAxisG.node());
@@ -244,15 +249,10 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             container.node().append(dataLabels2G.node());
             container.node().append(referenceLineLayersG.node());
             container.node().append(referenceLinesContainerG.node());
-            container.node().append(xGridLinesG.node());
-            container.node().append(yGridLinesG.node());
             container.node().append(dynamicDeviationG.node());
-            container.node().append(zeroSeparatorLine.node());
             container.node().append(connectingLineG.node());
             container.node().append(xAxisTitleG.node());
             container.node().append(yAxisTitleG.node());
-            container.node().append(xAxisLineG.node());
-            container.node().append(yAxisLineG.node());
 
             // error bars
             container.node().append(errorBarsContainer.node());
