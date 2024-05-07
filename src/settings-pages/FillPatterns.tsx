@@ -212,7 +212,7 @@ const FillPatterns = (props) => {
 				</ConditionalWrapper>
 
 				<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
-					<Row classNames={["normal-text-overflow"]}>
+					<Row disableTopPadding classNames={["normal-text-overflow"]}>
 						<Column>
 							{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
 								UICategoryPatterns(shadow, configValues, setConfigValues)
