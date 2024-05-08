@@ -447,6 +447,7 @@ export const RACE_CHART_SETTINGS: IRaceChartSettings = {
 };
 
 export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
+	uid: new Date().getTime().toString(),
 	referenceType: EReferenceType.REFERENCE_LINE,
 	lineValue1: {
 		axis: EXYAxisNames.X,

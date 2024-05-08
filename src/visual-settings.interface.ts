@@ -528,6 +528,7 @@ export interface IReferenceLabelCoord {
 }
 
 export interface IReferenceLineSettings {
+	uid: string;
 	referenceType: EReferenceType;
 	lineValue1: IReferenceLineValueProps;
 	lineValue2: IReferenceLineValueProps;

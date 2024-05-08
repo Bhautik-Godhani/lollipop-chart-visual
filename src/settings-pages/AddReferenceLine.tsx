@@ -291,17 +291,6 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     }));
   }
 
-  // categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
-
-  // if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
-  //   const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
-  //   if (elementToMove) {
-  //     const index = categoriesNameList.findIndex(obj => obj.value.includes(shadow.othersLabel));
-  //     categoriesNameList.splice(index, 1);
-  //     categoriesNameList.push(elementToMove);
-  //   }
-  // }
-
   return <>
     <Row>
       <Column>
@@ -812,17 +801,6 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
     }));
   }
 
-  // categoriesNameList = shadow.elementToMoveOthers(categoriesNameList, true, "value");
-
-  // if (shadow.rankingSettings.category.enabled && shadow.rankingSettings.category.showRemainingAsOthers) {
-  //   const elementToMove = categoriesNameList.find(obj => obj.value.includes(shadow.othersLabel));
-  //   if (elementToMove) {
-  //     const index = categoriesNameList.findIndex(obj => obj.value.includes(shadow.othersLabel));
-  //     categoriesNameList.splice(index, 1);
-  //     categoriesNameList.push(elementToMove);
-  //   }
-  // }
-
   return <>
     <Row>
       <Column>
@@ -1002,7 +980,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     value: "",
     rank: "",
   });
-  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : JSON.parse(JSON.stringify(details));
+  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : JSON.parse(JSON.stringify(details ? details : {}));
 
   if (details.referenceType === EReferenceType.REFERENCE_BAND) {
     defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
@@ -1317,7 +1295,6 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
   React.useEffect(() => {
     setLineValue(true);
   }, [configValues.lineValue2]);
-
 
   const resetChanges = () => {
     setConfigValues(() => defaultSettings);

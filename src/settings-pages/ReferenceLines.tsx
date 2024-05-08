@@ -40,7 +40,7 @@ const ReferenceLines = (props) => {
     _initialStates = DEFAULT_VALUE;
   }
 
-  const [initialStates, setInitialStates] = React.useState((shadow as Visual).referenceLinesData);
+  const [initialStates, setInitialStates] = React.useState<IReferenceLineSettings[]>((shadow as Visual).referenceLinesData);
 
   const applyChanges = (configValues) => {
     persistProperties(shadow, sectionName, propertyName, configValues);
@@ -70,8 +70,9 @@ const ReferenceLines = (props) => {
     setIsDetailsOpen(false);
   };
 
-  const onAdd = (details) => {
-    details.referenceType = selectedLineType;
+  const onAdd = (details: IReferenceLineSettings) => {
+    details.uid = new Date().getTime().toString();
+    details.referenceType = selectedLineType as any;
     initialStates.push(details);
     setInitialStates([...initialStates]);
     applyChanges(initialStates);
@@ -176,6 +177,7 @@ const ReferenceLines = (props) => {
   }, []);
 
   const filteredInitialStates = selectedLineType !== ELineTypeTabs.All ? initialStates.filter(d => d.referenceType === (selectedLineType as any)) : initialStates;
+  const details: IReferenceLineSettings = typeof id === "number" ? filteredInitialStates[id] : {} as any;
 
   return (
     <>
@@ -383,11 +385,11 @@ const ReferenceLines = (props) => {
       <ConditionalWrapper visible={contentShown === "form"}>
         <AddReferenceLine
           shadow={shadow}
-          details={typeof id === "number" ? filteredInitialStates[id] : {}}
-          isLineUI={isEmpty(typeof id === "number" ? filteredInitialStates[id] : {}) ? selectedLineType === ELineTypeTabs.Line : filteredInitialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
+          details={details}
+          isLineUI={isEmpty(details) ? selectedLineType === ELineTypeTabs.Line : filteredInitialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
           onAdd={onAdd}
           onUpdate={onUpdate}
-          index={id}
+          index={isEmpty(details) ? id : initialStates.findIndex(d => d.uid === details.uid)}
           closeAddEdit={closeAddEdit}
           closeCurrentSettingHandler={closeCurrentSettingHandler}
           vizOptions={vizOptions}
