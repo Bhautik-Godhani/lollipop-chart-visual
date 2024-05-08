@@ -142,7 +142,7 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
     const formatter = valueFormatter ? valueFormatter.formatter : undefined;
     let isPercentageNumber: boolean;
 
-    if (valueFormatter && number && valueFormatter.format.includes("%")) {
+    if (valueFormatter && number && valueFormatter.format && valueFormatter.format.includes("%")) {
         isPercentageNumber = true;
 
         if (!numberSettings.show) {

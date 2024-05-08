@@ -227,7 +227,7 @@ export const RANKING_SETTINGS: IRankingSettings = {
 	subCategory: {
 		enabled: true,
 		rankingType: ERankingType.TopN,
-		count: 50,
+		count: 10,
 		showRemainingAsOthers: false,
 		othersColor: "rgba(84, 84, 84, 1)",
 	},

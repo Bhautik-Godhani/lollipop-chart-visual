@@ -3811,11 +3811,11 @@ export class Visual extends Shadow {
 				let value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
 				let value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
 
-				if (this.categoricalMeasure1Field.source.format.includes("%")) {
+				if (this.categoricalMeasure1Field.source.format && this.categoricalMeasure1Field.source.format.includes("%")) {
 					value1 = value1 * 100;
 				}
 
-				if (this.isHasMultiMeasure && this.categoricalMeasure2Field.source.format.includes("%")) {
+				if (this.isHasMultiMeasure && this.categoricalMeasure2Field.source.format && this.categoricalMeasure2Field.source.format.includes("%")) {
 					value2 = value2 * 100;
 				}
 
