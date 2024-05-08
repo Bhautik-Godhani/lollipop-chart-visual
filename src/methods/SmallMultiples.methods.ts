@@ -499,7 +499,7 @@ export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
     const categoricalSmallMultiplesDataFields = self.categoricalSmallMultiplesDataFields;
     let categoricalSmallMultiplesValues = [];
     const categoricalDataPairsForGrouping = categoricalSmallMultiplesDataFields[0].values.reduce((arr: any, c: string, index: number) => {
-        const category = categoricalSmallMultiplesDataFields.map(d => d.values[index]).join("-");
+        const category = categoricalSmallMultiplesDataFields.map(d => d.values[index]).join(", ");
         categoricalSmallMultiplesValues.push(category);
         const obj = { category: category, total: 0, [`index-${index}`]: index };
         return [...arr, obj];
