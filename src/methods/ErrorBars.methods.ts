@@ -198,7 +198,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
         errorBarUpperBoundLabel
             .text((d: ILollipopChartRow) => getErrorBarUpperBoundLabel(d))
-            .attr("dy", "0.15em")
+            // .attr("dy", "0.15em")
             .attr("fill", errorLabels.color)
             .style("font-size", errorLabels.fontSize)
             .style("font-family", errorLabels.fontFamily)
@@ -225,17 +225,17 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
             .ease(easeLinear)
             .attr("transform", (d: any) => {
                 if (self.isHorizontalChart) {
-                    if (d.transX >= errorLabels.fontSize) {
-                        return `translate(${0}, ${errorLabels.fontSize})`;
+                    if (d.transX >= errorBars.markerSize) {
+                        return `translate(${0}, ${errorBars.markerSize})`;
                     } else {
-                        return `translate(${0}, ${-errorLabels.fontSize})`;
+                        return `translate(${0}, ${-errorBars.markerSize})`;
                     }
                 } else {
                     const y = d.transY;
-                    if (y <= errorLabels.fontSize) {
-                        return `translate(${0}, ${errorLabels.fontSize})`;
+                    if (y <= errorBars.markerSize) {
+                        return `translate(${0}, ${errorBars.markerSize})`;
                     } else {
-                        return `translate(${0}, ${-errorLabels.fontSize})`;
+                        return `translate(${0}, ${-errorBars.markerSize})`;
                     }
                 }
             })
@@ -269,7 +269,7 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
 
         errorBarLowerBoundLabel
             .text(d => getErrorBarLowerBoundLabel(d))
-            .attr("dy", "0.15em")
+            .attr("dy", "0.7em")
             .attr("fill", errorLabels.color)
             .style("font-size", errorLabels.fontSize)
             .style("font-family", errorLabels.fontFamily)
@@ -296,17 +296,17 @@ export const RenderErrorBars = (self: Visual, errorBarsData: ILollipopChartRow[]
             .ease(easeLinear)
             .attr("transform", (d: any) => {
                 if (self.isHorizontalChart) {
-                    if ((d.transX - d.width) <= errorLabels.fontSize) {
-                        return `translate(${0}, ${d.width - errorLabels.fontSize})`;
+                    if ((d.transX - d.width) <= errorBars.markerSize) {
+                        return `translate(${0}, ${d.width - errorBars.markerSize})`;
                     } else {
-                        return `translate(${0}, ${d.width + errorLabels.fontSize})`;
+                        return `translate(${0}, ${d.width + errorBars.markerSize})`;
                     }
                 } else {
-                    const y = d.transY + d.height + errorLabels.fontSize;
+                    const y = d.transY + d.height + errorBars.markerSize;
                     if (y >= self.height) {
-                        return `translate(${0}, ${d.height - errorLabels.fontSize})`;
+                        return `translate(${0}, ${d.height - errorBars.markerSize})`;
                     } else {
-                        return `translate(${0}, ${d.height + errorLabels.fontSize})`;
+                        return `translate(${0}, ${d.height + errorBars.markerSize})`;
                     }
 
                 }
