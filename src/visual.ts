@@ -4211,7 +4211,7 @@ export class Visual extends Shadow {
 				const index = data.findIndex(obj => (isHasCategories ? obj[categoryName] : obj).toString().includes(this.othersLabel));
 				data.splice(index, 1);
 				if (this.isHorizontalChart) {
-					data.unshift(elementToMove);
+					data.push(elementToMove);
 				} else {
 					data.push(elementToMove);
 				}
@@ -6738,94 +6738,93 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
 
-				if (!text.includes(THIS.othersLabel)) {
-					if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
-						if (ticks.includes(text)) {
-							ele.attr("opacity", "0");
-						}
+				// if (!text.includes(THIS.othersLabel)) {}
+				if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
+					if (ticks.includes(text)) {
+						ele.attr("opacity", "0");
 					}
+				}
 
-					ticks.push(text);
+				ticks.push(text);
 
-					if (text.includes("isZero")) {
-						text = "0";
-					}
+				if (text.includes("isZero")) {
+					text = "0";
+				}
 
-					if (text.includes("--")) {
-						text = text.split("--")[0];
-					}
+				if (text.includes("--")) {
+					text = text.split("--")[0];
+				}
 
-					if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart) {
-						if (!xAxisSettings.isAutoDateFormat) {
-							text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
-						} else {
-							text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
-						}
-					}
-
-					const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
-					ele.text("");
-
-					const textProperties: TextProperties = {
-						text: newText,
-						fontFamily: xAxisSettings.labelFontFamily,
-						fontSize: xAxisSettings.labelFontSize + "px",
-					};
-
-					const getFinalTruncatedText = (d: string) => {
-						return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
-					}
-
-					if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
-						if (!isApplyTilt) {
-							ele.attr("transform", `rotate(0)`);
-							if (!THIS.isBottomXAxis) {
-								ele.attr("y", () => {
-									if (xAxisMaxWordHeight === 1) {
-										return 0;
-									} else if (xAxisMaxWordHeight === 2) {
-										return -16
-									} else if (xAxisMaxWordHeight === 3) {
-										return -32;
-									}
-								});
-							}
-
-							const words: string[] = GetWordsSplitByWidth(newText, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
-							words.forEach((d, i) => {
-								ele
-									.append("tspan")
-									.attr("x", 0)
-									.attr("dy", (i > 1 ? 1 : i) * xAxisTickHeight)
-									.text(getFinalTruncatedText(d));
-							});
-						} else {
-							const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
-							if (THIS.isBottomXAxis) {
-								ele.attr("transform", `rotate( ${rotateDegree})`);
-							} else {
-								ele.attr("transform", `rotate( ${rotateDegree})`);
-							}
-							ele.append("tspan").text(getFinalTruncatedText(truncatedText));
-						}
+				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart) {
+					if (!xAxisSettings.isAutoDateFormat) {
+						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
 					} else {
-						let text = newText;
-						const firstChar = text.charAt(0);
-						const unicodeValue = firstChar.charCodeAt(0);
-						const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
-						const isDecimalNumber = text.includes(".");
-
-						if (isDecimalNumber) {
-							// text = text.split(".")[0];
-						}
-
-						if (isNegativeNumber) {
-							text = (extractDigitsFromString(text.substring(1)) * -1).toString();
-						}
-
-						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting);
-						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
+						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 					}
+				}
+
+				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
+				ele.text("");
+
+				const textProperties: TextProperties = {
+					text: newText,
+					fontFamily: xAxisSettings.labelFontFamily,
+					fontSize: xAxisSettings.labelFontSize + "px",
+				};
+
+				const getFinalTruncatedText = (d: string) => {
+					return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
+				}
+
+				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
+					if (!isApplyTilt) {
+						ele.attr("transform", `rotate(0)`);
+						if (!THIS.isBottomXAxis) {
+							ele.attr("y", () => {
+								if (xAxisMaxWordHeight === 1) {
+									return 0;
+								} else if (xAxisMaxWordHeight === 2) {
+									return -16
+								} else if (xAxisMaxWordHeight === 3) {
+									return -32;
+								}
+							});
+						}
+
+						const words: string[] = GetWordsSplitByWidth(newText, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
+						words.forEach((d, i) => {
+							ele
+								.append("tspan")
+								.attr("x", 0)
+								.attr("dy", (i > 1 ? 1 : i) * xAxisTickHeight)
+								.text(getFinalTruncatedText(d));
+						});
+					} else {
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
+						if (THIS.isBottomXAxis) {
+							ele.attr("transform", `rotate( ${rotateDegree})`);
+						} else {
+							ele.attr("transform", `rotate( ${rotateDegree})`);
+						}
+						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
+					}
+				} else {
+					let text = newText;
+					const firstChar = text.charAt(0);
+					const unicodeValue = firstChar.charCodeAt(0);
+					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
+					const isDecimalNumber = text.includes(".");
+
+					if (isDecimalNumber) {
+						// text = text.split(".")[0];
+					}
+
+					if (isNegativeNumber) {
+						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
+					}
+
+					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting);
+					ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 				}
 			});
 	}
@@ -6854,76 +6853,75 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				let text = ele.text();
 
-				if (!text.includes(THIS.othersLabel)) {
-					if (text.includes("isZero")) {
-						text = "0";
+				// if (!text.includes(THIS.othersLabel)) { }
+				if (text.includes("isZero")) {
+					text = "0";
+				}
+
+				if (text.includes("--")) {
+					text = text.split("--")[0];
+				}
+
+				if (THIS.isYIsNumericAxis && THIS.isYIsContinuousAxis) {
+					if (ticks.includes(text)) {
+						ele.attr("opacity", "0");
 					}
+				}
 
-					if (text.includes("--")) {
-						text = text.split("--")[0];
-					}
+				ticks.push(text);
 
-					if (THIS.isYIsNumericAxis && THIS.isYIsContinuousAxis) {
-						if (ticks.includes(text)) {
-							ele.attr("opacity", "0");
-						}
-					}
+				const getFinalTruncatedText = (d: string) => {
+					return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
+				}
 
-					ticks.push(text);
-
-					const getFinalTruncatedText = (d: string) => {
-						return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
-					}
-
-					if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
-						if (!yAxisSettings.isAutoDateFormat) {
-							text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
-						} else {
-							text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
-						}
-					}
-
-					if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
-						const firstChar = text.charAt(0);
-						const unicodeValue = firstChar.charCodeAt(0);
-						const isNegativeNumber = (unicodeValue === 8722 || text.includes("-")) && extractDigitsFromString(text);
-						const isDecimalNumber = text.includes(".");
-
-						if (isDecimalNumber) {
-							// text = text.split(".")[0];
-						}
-
-						if (isNegativeNumber) {
-							text = (extractDigitsFromString(text.substring(1)) * -1).toString();
-						}
-
-						ele.text("");
-
-						const textProperties: TextProperties = {
-							text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
-							fontFamily: yAxisSettings.labelFontFamily,
-							fontSize: yAxisSettings.labelFontSize + "px",
-						};
-
-						if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
-							const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting);
-							ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
-						} else {
-							const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
-							ele.append("tspan").text(getFinalTruncatedText(truncatedText));
-						}
+				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
+					if (!yAxisSettings.isAutoDateFormat) {
+						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
 					} else {
-						const textProperties: TextProperties = {
-							text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
-							fontFamily: yAxisSettings.labelFontFamily,
-							fontSize: yAxisSettings.labelFontSize + "px",
-						};
+						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+					}
+				}
 
-						ele.text("");
+				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
+					const firstChar = text.charAt(0);
+					const unicodeValue = firstChar.charCodeAt(0);
+					const isNegativeNumber = (unicodeValue === 8722 || text.includes("-")) && extractDigitsFromString(text);
+					const isDecimalNumber = text.includes(".");
 
+					if (isDecimalNumber) {
+						// text = text.split(".")[0];
+					}
+
+					if (isNegativeNumber) {
+						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
+					}
+
+					ele.text("");
+
+					const textProperties: TextProperties = {
+						text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
+						fontFamily: yAxisSettings.labelFontFamily,
+						fontSize: yAxisSettings.labelFontSize + "px",
+					};
+
+					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
+						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting);
+						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
+					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
+				} else {
+					const textProperties: TextProperties = {
+						text: yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit),
+						fontFamily: yAxisSettings.labelFontFamily,
+						fontSize: yAxisSettings.labelFontSize + "px",
+					};
+
+					ele.text("");
+
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
+					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 				}
 			});
 	}
