@@ -384,7 +384,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.container = container;
             self.viewPortWidth = newItemWidth;
             self.viewPortHeight = newItemHeight;
-            self.width = newItemWidth - self.margin.left;
+            self.width = newItemWidth;
             self.height = newItemHeight - self.margin.bottom;
             self.settingsBtnWidth = 0;
             self.settingsBtnHeight = 0;
@@ -432,13 +432,25 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);
             self.lollipopG = smallMultiplesGridItemContent.lollipopG;
 
+            self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+
+            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].xScale = self.xScale;
+            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].yScale = self.yScale;
+
+            let isDisplayBrushCalled: boolean = false;
+
             if (self.isScrollBrushDisplayed) {
                 self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+                isDisplayBrushCalled = true;
             } else {
-                self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+                // self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
                 // self.drawXYAxis(true, true);
                 // self.margin.left = 0;
                 // self.margin.bottom = 0;
+                self.drawLollipopChart();
+            }
+
+            if (isDisplayBrushCalled && !self.isScrollBrushDisplayed) {
                 self.drawLollipopChart();
             }
 
