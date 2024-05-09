@@ -77,7 +77,8 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     if (isUniformXScale) {
         setTimeout(() => {
-            RenderSmallMultiplesUniformXAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, columns, itemWidth, itemHeight, hyperListMainContainer, xAxisGNode, uniformBottomXAxis, uniformTopXAxis, isUniformXScale);
+            const { xAxisNodeHeight, yAxisNodeWidth } = config.getUniformXAxisAndBrushNode(undefined, undefined);
+            RenderSmallMultiplesUniformXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, xAxisGNode, uniformBottomXAxis, uniformTopXAxis, isUniformXScale);
         }, 100);
     }
 
@@ -470,14 +471,14 @@ export const RenderSmallMultiplesUniformYAxis = (
 
             const height = (itemHeight - config.outerSpacing / 2)
             svg.style("height", height + "px");
-            svg.style("transform", `translate(${0}px ,${i * height + ((i + 1) * config.outerSpacing)}px)`);
+            svg.attr("transform", `translate(${0}, ${i * height + ((i + 1) * config.outerSpacing)})`);
 
             const g = d3.create("svg:g");
 
             if (config.header.position === ESmallMultiplesHeaderPosition.Top) {
-                g.style("transform", `translate(${yAxisGNodeWidth}px, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? 10 : 0}px)`);
+                g.attr("transform", `translate(${yAxisGNodeWidth}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? 10 : 0})`);
             } else {
-                g.style("transform", `translate(${yAxisGNodeWidth}px, ${0}px)`);
+                g.attr("transform", `translate(${yAxisGNodeWidth}, ${0})`);
             }
 
             yAxisGNode.style("display", "block");
@@ -534,19 +535,19 @@ export const GetSmallMultiplesUniformRightYAxis = (config: ISmallMultiplesGridLa
 }
 
 export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, itemWidth: number, itemHeight: number): { xAxisGNode: D3Selection<SVGElement>; yAxisGNode: D3Selection<SVGElement>, xAxisGNodeHeight: number; yAxisGNodeWidth: number } => {
-    const { xAxisNode, yAxisNode, xAxisNodeHeight, yAxisNodeWidth } = config.getXYAxisNodeElementAndMeasures(itemWidth, itemHeight);
+    const { xAxisNode, xAxisNodeHeight } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight);
+    const { yAxisNode, yAxisNodeWidth } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight);
+
     const xAxisGNode = d3.select(xAxisNode.cloneNode(true));
     const yAxisGNode = d3.select(yAxisNode.cloneNode(true));
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
-
-    xAxisGNode.style("transform", "translate(0px, 0px)");
 
     if (!isUniformXScale) {
         xAxisGNode.selectAll("text").attr("y", 0);
         xAxisGNode.selectAll("tspan").attr("y", 0);
     }
 
-    return { xAxisGNode, yAxisGNode, xAxisGNodeHeight: xAxisNodeHeight, yAxisGNodeWidth: yAxisNodeWidth };
+    return { xAxisGNode, yAxisGNode, xAxisGNodeHeight: xAxisNodeHeight + 12, yAxisGNodeWidth: yAxisNodeWidth };
 };
 
 export const CreateSmallMultiplesUniformAxis = (
@@ -630,6 +631,10 @@ export const RenderSmallMultiplesUniformXAxis = (
     uniformTopXAxis: D3Selection<HTMLElement>,
     isUniformXScale: boolean
 ): void => {
+    const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
+    itemWidth = bBox.width;
+    itemHeight = bBox.height;
+
     if (isUniformXScale) {
         if (uniformBottomXAxis) {
             uniformBottomXAxis.selectAll(".x-axis-col-svg").remove();
@@ -652,21 +657,20 @@ export const RenderSmallMultiplesUniformXAxis = (
             axisSVG.style("height", xAxisGNodeHeight + "px");
 
             const g = d3.create("svg:g");
-            g.attr("transform", `translate(${yAxisGNodeWidth + config.innerSpacing}px, 0px)`);
 
             axisSVG.node().append(g.node());
-
-            g.node().append(xAxisGNode.node().cloneNode(true));
 
             const uniformBrushSVG = RenderSmallMultiplesUniformXAxisBrush(i, itemWidth, itemHeight, xAxisGNodeHeight);
 
             if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
-                g.style("transform", `translate(${yAxisGNodeWidth}px, ${10}px)`);
-                xAxisGNode.style("transform", `translate(${yAxisGNodeWidth}px, ${10}px)`);
+                g.attr("transform", `translate(${yAxisGNodeWidth}, ${5})`);
+                xAxisGNode.attr("transform", `translate(${0}, ${5})`);
             } else {
-                g.style("transform", `translate(${yAxisGNodeWidth}px, ${0}px)`);
-                xAxisGNode.style("transform", `translate(${0}px, ${0}px)`);
+                g.attr("transform", `translate(${yAxisGNodeWidth}, ${5})`);
+                xAxisGNode.attr("transform", `translate(${0}, ${5})`);
             }
+
+            g.node().append(xAxisGNode.node().cloneNode(true));
 
             uniformAxisContainer.node().appendChild(axisSVG.node());
             uniformAxisContainer.node().appendChild(uniformBrushSVG.node());
@@ -687,7 +691,7 @@ export const RenderSmallMultiplesUniformXAxisBrush = (colIndex: number, scaleWid
     brushSVG.classed("uniformXAxisBrush", true);
     brushSVG.style("width", scaleWidth + "px");
     brushSVG.style("height", 18 + "px");
-    brushSVG.style("transform", `translate(${0}px, ${xAxisGNodeHeight - 18}px)`);
+    brushSVG.attr("transform", `translate(${0}, ${xAxisGNodeHeight - 18})`);
 
     const brushG = d3.create("svg:g");
     brushG.classed("brush", true);
@@ -699,6 +703,7 @@ export const RenderSmallMultiplesUniformXAxisBrush = (colIndex: number, scaleWid
 
 export const GetSmallMultiplesUniformBottomXAxis = (config: ISmallMultiplesGridLayoutSettings, xAxisGNodeHeight: number, yAxisGNodeWidth: number): D3Selection<HTMLElement> => {
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+    const isFrozenRightYAxis = config.yAxisPosition === ESmallMultiplesYAxisPosition.FrozenRightColumn;
 
     const uniformXAxis = d3.create("div");
     uniformXAxis.attr("id", "uniformBottomXAxis");
@@ -708,7 +713,7 @@ export const GetSmallMultiplesUniformBottomXAxis = (config: ISmallMultiplesGridL
     uniformXAxis.style("transform", "translate(" + 0 + "px" + "," + (config.containerHeight - xAxisGNodeHeight) + "px" + ")");
 
     if (isUniformYScale) {
-        uniformXAxis.style("transform", "translate(" + yAxisGNodeWidth + "px" + "," + (config.containerHeight - xAxisGNodeHeight) + "px" + ")");
+        uniformXAxis.style("transform", "translate(" + (isFrozenRightYAxis ? 0 : yAxisGNodeWidth) + "px" + "," + (config.containerHeight - xAxisGNodeHeight) + "px" + ")");
         uniformXAxis.style("width", `calc(100% - ${yAxisGNodeWidth}px)`);
     }
 

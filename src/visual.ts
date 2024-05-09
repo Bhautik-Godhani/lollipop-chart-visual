@@ -2740,7 +2740,7 @@ export class Visual extends Shadow {
 							}
 						}
 					},
-					getXYAxisNodeElementAndMeasures: (width, height) => {
+					getXAxisNodeElementAndMeasures: (width, height) => {
 						this.viewPortWidth = width;
 						this.viewPortHeight = height;
 						this.width = width;
@@ -2748,35 +2748,50 @@ export class Visual extends Shadow {
 						this.settingsBtnWidth = 0;
 						this.settingsBtnHeight = 0;
 
-						this.categoricalData = this.clonedCategoricalData;
 						this.setChartData(this.categoricalData);
 
-						const { xAxisG, yAxisG } = this.drawXYAxis(this.categoricalData, true, true, false);
+						const { xAxisG } = this.drawXYAxis(this.categoricalData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 
-						return { xAxisNode: xAxisG.node(), yAxisNode: yAxisG.node(), xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
+						const xAxisNodeHeight = this.xScaleGHeight;
+
+						return { xAxisNode: xAxisG.node(), xAxisNodeHeight };
+					},
+					getYAxisNodeElementAndMeasures: (width, height) => {
+						this.viewPortWidth = width;
+						this.viewPortHeight = height;
+						this.width = width;
+						this.height = height;
+						this.settingsBtnWidth = 0;
+						this.settingsBtnHeight = 0;
+
+						this.setChartData(this.categoricalData);
+
+						const { yAxisG } = this.drawXYAxis(this.categoricalData, false, true, false);
+
+						return { yAxisNode: yAxisG.node(), yAxisNodeWidth: this.yScaleGWidth };
 					},
 					getUniformXAxisAndBrushNode: (xAxisNode, brushNode) => {
-						this.xAxisG = d3.select(xAxisNode);
-						this.brushG = d3.select(brushNode);
+						// this.xAxisG = d3.select(xAxisNode);
+						// this.brushG = d3.select(brushNode);
 
-						const config: IBrushConfig = {
-							brushG: brushNode,
-							brushXPos: 0,
-							brushYPos: 0,
-							barDistance: this.brushScaleBandBandwidth,
-							totalBarsCount: this.totalLollipopCount,
-							scaleWidth: this.width,
-							scaleHeight: this.height,
-							smallMultiplesGridItemId: this.smallMultiplesGridItemId,
-							categoricalData: this.categoricalData,
-							isShowXAxis: true,
-							isShowYAxis: true,
-							isShowHorizontalBrush: true
-						};
+						// const config: IBrushConfig = {
+						// 	brushG: brushNode,
+						// 	brushXPos: 0,
+						// 	brushYPos: 0,
+						// 	barDistance: this.brushScaleBandBandwidth,
+						// 	totalBarsCount: this.totalLollipopCount,
+						// 	scaleWidth: this.width,
+						// 	scaleHeight: this.height,
+						// 	smallMultiplesGridItemId: this.smallMultiplesGridItemId,
+						// 	categoricalData: this.categoricalData,
+						// 	isShowXAxis: true,
+						// 	isShowYAxis: true,
+						// 	isShowHorizontalBrush: true
+						// };
 
-						this.drawHorizontalBrush(this, config);
+						// this.drawHorizontalBrush(this, config);
 
-						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.yScaleGWidth };
+						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.margin.left };
 					},
 					onRenderingFinished: () => {
 						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));

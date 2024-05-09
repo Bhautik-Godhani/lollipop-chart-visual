@@ -353,7 +353,8 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
   },
   onCellRendered: undefined,
   getUniformXAxisAndBrushNode: undefined,
-  getXYAxisNodeElementAndMeasures: undefined,
+  getXAxisNodeElementAndMeasures: undefined,
+  getYAxisNodeElementAndMeasures: undefined,
   onRenderingFinished: undefined
 };
 
