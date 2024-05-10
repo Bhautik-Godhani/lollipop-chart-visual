@@ -9890,6 +9890,8 @@ export class Visual extends Shadow {
 		// 	}
 		// }
 
+		const tooltipFields = this.categoricalTooltipFields.map(d => d.source.displayName);
+
 		this.summaryTableConfig = {
 			shadow: this,
 			categoricalGroupedDatarole: EDataRolesName.SubCategory,
@@ -9908,7 +9910,7 @@ export class Visual extends Shadow {
 					field = splitBy_[splitBy_.length - 1];
 				}
 
-				if (this.allNumberFormatter[field].role === EDataRolesName.Measure) {
+				if (!tooltipFields.includes(field)) {
 					return this.numberSettings.show ?
 						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field] : undefined, false, true) :
 						powerBiNumberFormat(value, this.allNumberFormatter[field]);
