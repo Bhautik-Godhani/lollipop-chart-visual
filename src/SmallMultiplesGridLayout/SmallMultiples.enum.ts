@@ -115,14 +115,12 @@ export enum ESmallMultiplesXAxisPosition {
     All = "all",
     FrozenTopColumn = "frozenTopColumn",
     FrozenBottomColumn = "frozenBottomColumn",
-    FrozenTopAndBottomColumn = "frozenTopAndBottomColumn"
 }
 
 export enum ESmallMultiplesYAxisPosition {
     All = "all",
     FrozenLeftColumn = "frozenLeftColumn",
     FrozenRightColumn = "frozenRightColumn",
-    FrozenLeftAndRightColumn = "frozenLeftAndRightColumn"
 }
 
 export enum EFontStyle {

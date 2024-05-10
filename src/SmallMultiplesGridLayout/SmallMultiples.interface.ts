@@ -56,7 +56,7 @@ export interface ISmallMultiplesGridLayoutSettings {
     },
     onCellRendered: (category: string, gridItemIndex: number, elementRef: HTMLDivElement) => void,
     getUniformXAxisAndBrushNode: (xAxisNode: SVGElement, brushNode: SVGElement) => { xAxisNodeHeight: number, yAxisNodeWidth: number },
-    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number) => { xAxisNode: any; xAxisNodeHeight: number; },
+    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isBottomXAxis: boolean) => { xAxisNode: any; xAxisNodeHeight: number; },
     getYAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number) => { yAxisNode: any, yAxisNodeWidth: number },
     onRenderingFinished: () => void,
 }

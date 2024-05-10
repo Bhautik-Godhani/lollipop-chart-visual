@@ -21,6 +21,7 @@ import { persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
+import { ESmallMultiplesAxisType, ESmallMultiplesXAxisPosition } from "../SmallMultiplesGridLayout";
 
 const X_AXIS_POSITION: ILabelValuePair[] = [
   {
@@ -1227,6 +1228,12 @@ const XAxisSettings = (props) => {
   });
 
   const [selectedAxisTab, setSelectedAxisTab] = React.useState<EXYAxisNames>(EXYAxisNames.X);
+
+  React.useEffect(() => {
+    if (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && shadow.smallMultiplesSettings.xAxisPosition === ESmallMultiplesXAxisPosition.FrozenTopColumn) {
+      handleXChange(Position.Top, EXAxisSettings.Position, setXConfigValues);
+    }
+  }, [xConfigValues.isDisplayTitle]);
 
   React.useEffect(() => {
     if (xConfigValues.isDisplayTitle) {

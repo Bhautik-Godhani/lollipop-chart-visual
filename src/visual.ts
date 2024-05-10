@@ -188,7 +188,7 @@ import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMu
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";
-import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
+import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ESmallMultiplesXAxisPosition, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
 import ImportExport from "./settings-pages/ImportExport";
 import ConditionalFormatting from "./ConditionalFormatting/ConditionalFormatting";
@@ -2740,21 +2740,32 @@ export class Visual extends Shadow {
 							}
 						}
 					},
-					getXAxisNodeElementAndMeasures: (width, height) => {
+					getXAxisNodeElementAndMeasures: (width, height, isBottomXAxis) => {
 						this.viewPortWidth = width;
 						this.viewPortHeight = height;
 						this.width = width;
 						this.height = height;
 						this.settingsBtnWidth = 0;
 						this.settingsBtnHeight = 0;
+						let isAxisPositionChanged: boolean;
+
+						if (!isBottomXAxis) {
+							this.xAxisSettings.position = Position.Top;
+							this.isBottomXAxis = false;
+							isAxisPositionChanged = true;
+						}
 
 						this.setChartData(this.categoricalData);
 
 						const { xAxisG } = this.drawXYAxis(this.categoricalData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 
-						const xAxisNodeHeight = this.xScaleGHeight;
+						if (isAxisPositionChanged) {
+							this.xAxisSettings.position = Position.Bottom;
+							this.isBottomXAxis = true;
+							isAxisPositionChanged = false;
+						}
 
-						return { xAxisNode: xAxisG.node(), xAxisNodeHeight };
+						return { xAxisNode: xAxisG.node().cloneNode(true), xAxisNodeHeight: xAxisG.node().getBoundingClientRect().height };
 					},
 					getYAxisNodeElementAndMeasures: (width, height) => {
 						this.viewPortWidth = width;
@@ -2766,7 +2777,7 @@ export class Visual extends Shadow {
 
 						this.setChartData(this.categoricalData);
 
-						const { yAxisG } = this.drawXYAxis(this.categoricalData, false, true, false);
+						const { yAxisG } = this.drawXYAxis(this.categoricalData, true, true, false);
 
 						return { yAxisNode: yAxisG.node(), yAxisNodeWidth: this.yScaleGWidth };
 					},
@@ -2790,6 +2801,8 @@ export class Visual extends Shadow {
 						// };
 
 						// this.drawHorizontalBrush(this, config);
+
+						console.log(this.xScaleGHeight,);
 
 						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.margin.left };
 					},
@@ -4673,6 +4686,10 @@ export class Visual extends Shadow {
 	}
 
 	changeVisualSettings(): void {
+		if (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && this.smallMultiplesSettings.xAxisPosition === ESmallMultiplesXAxisPosition.FrozenTopColumn) {
+			this.xAxisSettings.position = Position.Top;
+		}
+
 		this.isHorizontalChart = this.chartSettings.orientation === Orientation.Horizontal;
 		this.xGridSettings = this.gridSettings.xGridLines;
 		this.yGridSettings = this.gridSettings.yGridLines;
