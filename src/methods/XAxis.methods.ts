@@ -2,6 +2,7 @@ import { select } from "d3-selection";
 import { Position } from "../enum";
 import { Visual } from "../visual";
 import { axisBottom, axisTop } from "d3-axis";
+import { timeFormat } from "d3";
 
 export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: number, xAxisG: SVGElement): void => {
     if (self.isHorizontalChart && (self.isLogarithmScale || self.isShowPositiveNegativeLogScale)) {
@@ -61,9 +62,23 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         if (self.xAxisSettings.position === Position.Bottom) {
             select(xAxisG)
                 .attr("transform", "translate(0," + height + ")")
-                .call(axisBottom(self.xScale).ticks(width / 90));
+                .call(axisBottom(self.xScale).ticks(width / 90)
+                    .tickFormat(d => {
+                        if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis) {
+                            return timeFormat("%b %Y")(new Date(d.toString()));
+                        } else {
+                            return d.toString();
+                        }
+                    }));
         } else if (self.xAxisSettings.position === Position.Top) {
-            select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90));
+            select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90)
+                .tickFormat(d => {
+                    if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis) {
+                        return timeFormat("%b %Y")(new Date(d.toString()));
+                    } else {
+                        return d.toString();
+                    }
+                }));
         }
     }
 }

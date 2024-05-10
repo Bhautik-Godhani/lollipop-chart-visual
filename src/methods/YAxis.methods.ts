@@ -2,6 +2,7 @@ import { select } from "d3-selection";
 import { Position } from "../enum";
 import { Visual } from "../visual";
 import { axisLeft, axisRight } from "d3-axis";
+import { timeFormat } from "d3";
 
 export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: number, yAxisG: SVGElement): void => {
     if (!self.isHorizontalChart && (self.isLogarithmScale || self.isShowPositiveNegativeLogScale)) {
@@ -55,11 +56,24 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {
-            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale).ticks(height / 90));
+            select(yAxisG).attr("transform", `translate(0, 0)`).call(axisLeft(self.yScale).ticks(height / 90)
+                .tickFormat(d => {
+                    if (self.isYIsDateTimeAxis && self.isYIsContinuousAxis) {
+                        return timeFormat("%b %Y")(new Date(d.toString()));
+                    } else {
+                        return d.toString();
+                    }
+                }));
         } else if (self.yAxisSettings.position === Position.Right) {
             select(yAxisG)
-                .attr("transform", `translate(${width}, 0)`)
-                .call(axisRight(self.yScale).ticks(height / 90));
+                .attr("transform", `translate(${width}, 0)`).call(axisRight(self.yScale).ticks(height / 90)
+                    .tickFormat(d => {
+                        if (self.isYIsDateTimeAxis && self.isYIsContinuousAxis) {
+                            return timeFormat("%b %Y")(new Date(d.toString()));
+                        } else {
+                            return d.toString();
+                        }
+                    }));
         }
     }
 }
