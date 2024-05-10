@@ -4155,87 +4155,6 @@ export class Visual extends Shadow {
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
 		}
-
-		const getDataLabel = (d: ILollipopChartRow, isData2Label: boolean) => {
-			const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
-			const key = isData2Label ? "value2" : "value1";
-			const firstCategory = this.chartData[0].category;
-			const lastCategory = this.chartData[this.chartData.length - 1].category;
-			let label = "";
-			const measureNumberFormatter = this.measureNumberFormatter[isData2Label ? 1 : 0];
-
-			switch (dataLabelsSettings.displayType) {
-				case EDataLabelsDisplayTypes.All:
-					label = this.formatNumber(d[key], this.numberSettings, measureNumberFormatter, true, true);
-					break;
-
-				case EDataLabelsDisplayTypes.FirstLast:
-					if (d.category === firstCategory) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					if (d.category === lastCategory) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-					break;
-
-				case EDataLabelsDisplayTypes.MinMax:
-					if (d.category === this.minCategoryValueDataPair.category) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					if (d.category === this.maxCategoryValueDataPair.category) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					break;
-
-				case EDataLabelsDisplayTypes.LastOnly:
-					if (d.category === lastCategory) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					break;
-
-				case EDataLabelsDisplayTypes.MaxOnly:
-					if (d.category === this.maxCategoryValueDataPair.category) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					break;
-
-				case EDataLabelsDisplayTypes.FirstLastMinMax:
-					if (d.category === firstCategory) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					if (d.category === lastCategory) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					if (d.category === this.minCategoryValueDataPair.category) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-
-					if (d.category === this.maxCategoryValueDataPair.category) {
-						label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
-					}
-					break;
-
-				case EDataLabelsDisplayTypes.CustomLabel:
-					if (this.isHasExtraDataLabels) {
-						label = this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel], true, true);
-					}
-					break;
-			}
-
-			return label;
-		}
-
-		this.chartData.forEach(d => {
-			d.data1Label = getDataLabel(d, false);
-			d.data2Label = getDataLabel(d, true);
-		})
 	}
 
 	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
@@ -7047,30 +6966,6 @@ export class Visual extends Shadow {
 	setYAxisDomain(): void {
 		const { min, max } = GetAxisDomainMinMax(this);
 
-		if (this.numberSettings.scaling === DisplayUnits.Relative) {
-			if (min < 0 && max < 0) {
-				if ((min >= -1.0e6)) {
-					this.numberSettings.scaling = DisplayUnits.Thousands;
-				} else if (min < -1.0e6 && min >= -1.0e9) {
-					this.numberSettings.scaling = DisplayUnits.Millions;
-				} else if (min < -1.0e9 && min >= -1.0e12) {
-					this.numberSettings.scaling = DisplayUnits.Billions;
-				} else if (min < -1.0e12) {
-					this.numberSettings.scaling = DisplayUnits.Trillions;
-				}
-			} else {
-				if ((max <= 1.0e6)) {
-					this.numberSettings.scaling = DisplayUnits.Thousands;
-				} else if (max > 1.0e6 && max <= 1.0e9) {
-					this.numberSettings.scaling = DisplayUnits.Millions;
-				} else if (max > 1.0e9 && max <= 1.0e12) {
-					this.numberSettings.scaling = DisplayUnits.Billions;
-				} else if (max > 1.0e12) {
-					this.numberSettings.scaling = DisplayUnits.Trillions;
-				}
-			}
-		}
-
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
 
@@ -8153,8 +8048,87 @@ export class Visual extends Shadow {
 		}
 	}
 
+	getDataLabel = (d: ILollipopChartRow, isData2Label: boolean) => {
+		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
+		const key = isData2Label ? "value2" : "value1";
+		const firstCategory = this.chartData[0].category;
+		const lastCategory = this.chartData[this.chartData.length - 1].category;
+		let label = "";
+		const measureNumberFormatter = this.measureNumberFormatter[isData2Label ? 1 : 0];
+
+		switch (dataLabelsSettings.displayType) {
+			case EDataLabelsDisplayTypes.All:
+				label = this.formatNumber(d[key], this.numberSettings, measureNumberFormatter, true, true);
+				break;
+
+			case EDataLabelsDisplayTypes.FirstLast:
+				if (d.category === firstCategory) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				if (d.category === lastCategory) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+				break;
+
+			case EDataLabelsDisplayTypes.MinMax:
+				if (d.category === this.minCategoryValueDataPair.category) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				if (d.category === this.maxCategoryValueDataPair.category) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				break;
+
+			case EDataLabelsDisplayTypes.LastOnly:
+				if (d.category === lastCategory) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				break;
+
+			case EDataLabelsDisplayTypes.MaxOnly:
+				if (d.category === this.maxCategoryValueDataPair.category) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				break;
+
+			case EDataLabelsDisplayTypes.FirstLastMinMax:
+				if (d.category === firstCategory) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				if (d.category === lastCategory) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				if (d.category === this.minCategoryValueDataPair.category) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+
+				if (d.category === this.maxCategoryValueDataPair.category) {
+					label = this.formatNumber(d[key], this.numberSettings, this.measureNumberFormatter[isData2Label ? 1 : 0], true, true)
+				}
+				break;
+
+			case EDataLabelsDisplayTypes.CustomLabel:
+				if (this.isHasExtraDataLabels) {
+					label = this.formatNumber(isData2Label ? d.extraLabel2 : d.extraLabel1, this.numberSettings, this.allNumberFormatter[dataLabelsSettings.customLabel], true, true);
+				}
+				break;
+		}
+
+		return label;
+	}
+
 	drawLollipopChart(): void {
 		this.chartData.forEach(d => {
+			d.data1Label = this.getDataLabel(d, false);
+			d.data2Label = this.getDataLabel(d, true);
+
 			if (!this.isHasMultiMeasure) {
 				if (!this.isHorizontalChart) {
 					d.value2 = 0;
@@ -8162,7 +8136,7 @@ export class Visual extends Shadow {
 					d.value2 = 0;
 				}
 			}
-		});
+		})
 
 		if (this.isLollipopTypeCircle) {
 			this.setCircle1Radius();
