@@ -1111,7 +1111,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     }));
   };
 
-  if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+  if ((shadow.isHorizontalChart && configValues.lineValue1.axis === EXYAxisNames.X) || (!shadow.isHorizontalChart && configValues.lineValue1.axis === EXYAxisNames.Y)) {
     ALIGNMENT_OPTIONS = [
       {
         value: "left",
