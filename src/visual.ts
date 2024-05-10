@@ -2802,8 +2802,6 @@ export class Visual extends Shadow {
 
 						// this.drawHorizontalBrush(this, config);
 
-						console.log(this.xScaleGHeight,);
-
 						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.margin.left };
 					},
 					onRenderingFinished: () => {
@@ -6769,6 +6767,7 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
+				const isOthersTick = text.includes(THIS.othersLabel);
 
 				// if (!text.includes(THIS.othersLabel)) {}
 				if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
@@ -6787,7 +6786,7 @@ export class Visual extends Shadow {
 					text = text.split("--")[0];
 				}
 
-				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart) {
+				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart && !isOthersTick) {
 					if (!xAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
 					} else {
@@ -6884,6 +6883,7 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
+				const isOthersTick = text.includes(THIS.othersLabel);
 
 				// if (!text.includes(THIS.othersLabel)) { }
 				if (text.includes("isZero")) {
@@ -6906,7 +6906,7 @@ export class Visual extends Shadow {
 					return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
 
-				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart) {
+				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart && !isOthersTick) {
 					if (!yAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
 					} else {
@@ -9337,13 +9337,14 @@ export class Visual extends Shadow {
 	}
 
 	getTooltipCategoryText(text: string, toUpperCase: boolean = true): string {
-		if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart) {
+		const isOthersTick = text.includes(this.othersLabel);
+		if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart && !isOthersTick) {
 			if (!this.xAxisSettings.isAutoDateFormat) {
 				return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
 			} else {
 				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 			}
-		} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart) {
+		} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart && !isOthersTick) {
 			if (!this.yAxisSettings.isAutoDateFormat) {
 				return FormatAxisDate(this.yAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.yAxisSettings.customDateFormat : this.yAxisSettings.dateFormat, text);
 			} else {
