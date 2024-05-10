@@ -300,6 +300,7 @@ export class Visual extends Shadow {
 	isMonthCategoryNames: boolean;
 	extraDataLabelsDisplayNames: string[] = [];
 	isHasExtraDataLabels: boolean = false;
+	isHasGlobalMinValue: boolean;
 
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
@@ -2840,6 +2841,12 @@ export class Visual extends Shadow {
 					vizOptions.options.viewport.height
 				);
 
+				if (this.isHasSubcategories) {
+					this.isHasGlobalMinValue = d3.min(this.originalCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]), d => d3.min(d.values as number[], i => i)) < 0;
+				} else {
+					this.isHasGlobalMinValue = d3.min(this.originalCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]), d => d.minLocal as number) < 0;
+				}
+
 				this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
 
 				if (this.isHorizontalBrushDisplayed) {
@@ -4330,7 +4337,7 @@ export class Visual extends Shadow {
 						},
 					]
 
-					if (this.isHasNegativeValue) {
+					if (this.isHasGlobalMinValue) {
 						legendDataPoints.push({
 							data: {
 								name: "Negative",
@@ -4399,7 +4406,7 @@ export class Visual extends Shadow {
 						},
 					]
 
-					if (this.isHasNegativeValue) {
+					if (this.isHasGlobalMinValue) {
 						legendDataPoints.push(
 							{
 								data: {
