@@ -99,10 +99,10 @@ const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
 
     if (d.referenceType === EReferenceType.REFERENCE_BAND) {
         labelValue = isValue1TypeNumber ?
-            GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) + " - " + GetFormattedNumber(+d.lineValue2.value, self.numberSettings, undefined, true, true) :
+            GetFormattedNumber(self, +d.lineValue1.value, self.numberSettings, undefined, true, true) + " - " + GetFormattedNumber(self, +d.lineValue2.value, self.numberSettings, undefined, true, true) :
             d.lineValue1.value + " - " + d.lineValue2.value;
     } else {
-        labelValue = isValue1TypeNumber ? GetFormattedNumber(+d.lineValue1.value, self.numberSettings, undefined, true, true) : d.lineValue1.value;
+        labelValue = isValue1TypeNumber ? GetFormattedNumber(self, +d.lineValue1.value, self.numberSettings, undefined, true, true) : d.lineValue1.value;
     }
 
     switch (d.labelStyle.labelNameType) {

@@ -1,7 +1,76 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable no-self-assign */
 import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { IValueFormatter } from "../model";
 import { NumberFormatting } from "../settings";
+import { Visual } from "../visual";
+
+export const getNumberDisplayUnit = (number: number, isMinThousandsLimit: boolean): DisplayUnits => {
+    if (number < 0) {
+        if (isMinThousandsLimit ? (number < -1.0e3 && number >= -1.0e6) : (number >= -1.0e6)) {
+            return DisplayUnits.Thousands;
+        } else if (number < -1.0e6 && number >= -1.0e9) {
+            return DisplayUnits.Millions;
+        } else if (number < -1.0e9 && number >= -1.0e12) {
+            return DisplayUnits.Billions;
+        } else if (number < -1.0e12) {
+            return DisplayUnits.Trillions
+        } else {
+            return DisplayUnits.None
+        }
+    } else {
+        if (isMinThousandsLimit ? (number > 1.0e3 && number <= 1.0e6) : (number <= 1.0e6)) {
+            return DisplayUnits.Thousands;
+        } else if (number > 1.0e6 && number <= 1.0e9) {
+            return DisplayUnits.Millions;
+        } else if (number > 1.0e9 && number <= 1.0e12) {
+            return DisplayUnits.Billions;
+        } else if (number > 1.0e12) {
+            return DisplayUnits.Trillions;
+        } else {
+            return DisplayUnits.None;
+        }
+    }
+}
+
+export const GetInvertAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, displayUnit: DisplayUnits, number: number, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
+    let formattedNumber: string;
+    const numberSettings = numberFormatting;
+    const isScaling = numberSettings.scalingLabel;
+    const isSemanticFormat = isUseSematicFormat ? numberSettings.semanticFormatting : false;
+
+    switch (displayUnit) {
+        case DisplayUnits.None:
+            formattedNumber = DecimalSeparator(numberFormatting, +number.toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber).toString()
+            );
+        case DisplayUnits.Thousands:
+            formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e3).toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
+                (isScaling ? numberSettings.thousandScalingLabel : "K")
+            );
+        case DisplayUnits.Millions:
+            formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e6).toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
+                (isScaling ? numberSettings.millionScalingLabel : "M")
+            );
+        case DisplayUnits.Billions:
+            formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e9).toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
+                (isScaling ? numberSettings.billionScalingLabel : "B")
+            );
+        case DisplayUnits.Trillions:
+            formattedNumber = DecimalSeparator(numberFormatting, +(number / 1.0e12).toFixed(numberSettings.decimalPlaces));
+            return (
+                (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, formattedNumber, number) : formattedNumber) +
+                (isScaling ? numberSettings.trillionScalingLabel : "T")
+            );
+    }
+}
 
 export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, number: number, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
     let formattedNumber: string;
@@ -72,8 +141,6 @@ export const GetAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, n
             );
         }
     }
-
-    return (isSemanticFormat ? GetSemanticFormattedNumber(numberFormatting, number.toString(), number).toString() : number.toString());
 }
 
 export const ThousandsSeparator = (numberSettings: NumberFormatting, number: number): string => {
@@ -137,7 +204,7 @@ const isValidDate = (dateString) => {
     return !isNaN(date.getTime());
 }
 
-export const GetFormattedNumber = (number: number | string, numberFormatting: NumberFormatting, valueFormatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
+export const GetFormattedNumber = (self: Visual, number: number | string, numberFormatting: NumberFormatting, valueFormatter: IValueFormatter, isUseSematicFormat: boolean, isMinThousandsLimit: boolean = false): string => {
     const numberSettings = numberFormatting;
     const formatter = valueFormatter ? valueFormatter.formatter : undefined;
     let isPercentageNumber: boolean;
@@ -165,6 +232,10 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
     let formattedNumber: string | number = number;
     switch (numberSettings.scaling) {
         case DisplayUnits.Auto: {
+            formattedNumber = GetInvertAutoUnitFormattedNumber(numberFormatting, self.axisDomainMaxValueDisplayUnit, number, isUseSematicFormat, isMinThousandsLimit);
+            break;
+        }
+        case DisplayUnits.Relative: {
             formattedNumber = GetAutoUnitFormattedNumber(numberFormatting, number, isUseSematicFormat, isMinThousandsLimit);
             break;
         }
@@ -193,12 +264,16 @@ export const GetFormattedNumber = (number: number | string, numberFormatting: Nu
         }
     }
 
-    if (isUseSematicFormat && numberSettings.scaling !== DisplayUnits.Auto) {
+    if (isUseSematicFormat && !(numberSettings.scaling === DisplayUnits.Auto || numberSettings.scaling === DisplayUnits.Relative)) {
         formattedNumber = GetSemanticFormattedNumber(numberFormatting, formattedNumber, number);
     }
 
     switch (numberSettings.scaling) {
         case DisplayUnits.Auto: {
+            formattedNumber = formattedNumber;
+            break;
+        }
+        case DisplayUnits.Relative: {
             formattedNumber = formattedNumber;
             break;
         }

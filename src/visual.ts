@@ -174,7 +174,7 @@ import ErrorBarsSettings from "./settings-pages/ErrorBarsSettings";
 import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
 import { ErrorBarsMarkers } from "./error-bars-markers";
 import { ApplyIBCSTheme } from "./methods/IBCS.methods";
-import { GetFormattedNumber, extractDigitsFromString } from "./methods/NumberFormat.methods";
+import { GetFormattedNumber, extractDigitsFromString, getNumberDisplayUnit } from "./methods/NumberFormat.methods";
 import DynamicDeviationSettings from "./settings-pages/DynamicDeviationSettings";
 import { RemoveDynamicDeviation, RenderDynamicDeviation, SetDynamicDeviationDataAndDrawLines } from "./methods/DynamicDeviation.methods";
 import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
@@ -610,6 +610,7 @@ export class Visual extends Shadow {
 	isLinearScale: boolean;
 	axisDomainMinValue: number = 0;
 	axisDomainMaxValue: number = 0;
+	axisDomainMaxValueDisplayUnit: DisplayUnits;
 	positiveLogScaleTicks: number[] = [];
 	negativeLogScaleTicks: number[] = [];
 
@@ -2417,8 +2418,8 @@ export class Visual extends Shadow {
 			this.renderContextMenu();
 			this.setHighContrastDetails();
 
-			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
-			this.axisNumberFormatter = (value, numberSettings) => GetFormattedNumber(value, numberSettings, undefined, false, true);
+			this.formatNumber = (value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit) => GetFormattedNumber(this, value, numberSettings, numberFormatter, isUseSematicFormat, isMinThousandsLimit);
+			this.axisNumberFormatter = (value, numberSettings) => GetFormattedNumber(this, value, numberSettings, undefined, false, true);
 
 			this.conditionalFormattingConditions = parseConditionalFormatting(vizOptions.formatTab).reverse();
 
@@ -7073,6 +7074,8 @@ export class Visual extends Shadow {
 		this.axisDomainMinValue = min;
 		this.axisDomainMaxValue = max;
 
+		this.axisDomainMaxValueDisplayUnit = getNumberDisplayUnit(this.axisDomainMaxValue, true);
+
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
@@ -9344,21 +9347,26 @@ export class Visual extends Shadow {
 	}
 
 	getTooltipCategoryText(text: string, toUpperCase: boolean = true): string {
-		const isOthersTick = text.includes(this.othersLabel);
-		if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart && !isOthersTick) {
-			if (!this.xAxisSettings.isAutoDateFormat) {
-				return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
+		if (text) {
+			text = text.toString();
+			const isOthersTick = text.toString().includes(this.othersLabel);
+			if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart && !isOthersTick) {
+				if (!this.xAxisSettings.isAutoDateFormat) {
+					return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
+				} else {
+					return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+				}
+			} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart && !isOthersTick) {
+				if (!this.yAxisSettings.isAutoDateFormat) {
+					return FormatAxisDate(this.yAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.yAxisSettings.customDateFormat : this.yAxisSettings.dateFormat, text);
+				} else {
+					return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+				}
 			} else {
-				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
-			}
-		} else if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart && !isOthersTick) {
-			if (!this.yAxisSettings.isAutoDateFormat) {
-				return FormatAxisDate(this.yAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.yAxisSettings.customDateFormat : this.yAxisSettings.dateFormat, text);
-			} else {
-				return valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+				return ((typeof text === "string" && toUpperCase) ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
 			}
 		} else {
-			return ((typeof text === "string" && toUpperCase) ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
+			return "";
 		}
 	}
 

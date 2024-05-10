@@ -118,9 +118,9 @@ const ReferenceLines = (props) => {
 
       if (row.referenceType === EReferenceType.REFERENCE_BAND) {
         text = `Band on ${getAxisName(row.lineValue1.axis)} ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
-        to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(+row.lineValue2.value, shadow.numberSettings, undefined, true, true) : row.lineValue2.value}`}`;
+        to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(shadow, +row.lineValue2.value, shadow.numberSettings, undefined, true, true) : row.lineValue2.value}`}`;
       } else {
-        text = `Line on ${getAxisName(row.lineValue1.axis)} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(+row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value}`}`;
+        text = `Line on ${getAxisName(row.lineValue1.axis)} ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value}`}`;
       }
 
       return {
