@@ -37,10 +37,10 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 headerSettings.fontSize,
                 headerSettings.fontStyles[EFontStyle.Bold],
                 headerSettings.fontStyles[EFontStyle.Italic],
-                headerSettings.fontStyles[EFontStyle.UnderLine]);
+                headerSettings.fontStyles[EFontStyle.UnderLine]).height + 5;
 
             const newItemWidth = hostElementsBBox.width - (config.innerSpacing * 2);
-            let newItemHeight = hostElementsBBox.height - (config.innerSpacing * 2) - panelTitleSize.height;
+            let newItemHeight = hostElementsBBox.height - (config.innerSpacing * 2) - panelTitleSize;
 
             if (newItemWidth <= 0 || newItemHeight <= 0) {
                 return;
@@ -63,7 +63,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 svgDiv.style("margin-bottom", "0px");
             }
 
-            svgDiv.style("height", `calc(${100}% - ${svgDivMargin + (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0)}px)`);
+            svgDiv.style("height", `calc(${100}% - ${svgDivMargin + (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize : 0)}px)`);
 
             // svgDiv.style("height", `calc(${100}% - ${headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0}px)`);
 
@@ -384,8 +384,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.container = container;
             self.viewPortWidth = newItemWidth;
             self.viewPortHeight = newItemHeight;
-            self.width = newItemWidth;
-            self.height = newItemHeight - self.margin.bottom;
+            // self.width = newItemWidth;
+            // self.height = newItemHeight;
             self.settingsBtnWidth = 0;
             self.settingsBtnHeight = 0;
             // self.xAxisG = xAxisG as any;

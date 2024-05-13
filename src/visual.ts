@@ -1588,7 +1588,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isLollipopTypeCircle) {
-			this.minScaleBandWidth = 25;
+			this.minScaleBandWidth = 35;
 		} else {
 			this.minScaleBandWidth = 50;
 		}
@@ -5054,7 +5054,7 @@ export class Visual extends Shadow {
 	setChartWidthHeight(): void {
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
 		this.height =
-			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
+			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
 	}
 
 	displayBrush(isShowXAxis: boolean, isShowYAxis: boolean, isShowHorizontalBrush: boolean, isShowVerticalBrush: boolean): void {
@@ -5081,7 +5081,7 @@ export class Visual extends Shadow {
 				this.isVerticalBrushDisplayed = false;
 
 				const brushXPos = this.margin.left ? this.margin.left : 0;
-				const brushYPos = this.viewPortHeight - this.brushHeight - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight;
+				const brushYPos = this.viewPortHeight - this.brushHeight - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
 
 				const config: IBrushConfig = {
 					brushG: this.brushG.node(),
@@ -7233,9 +7233,9 @@ export class Visual extends Shadow {
 		lineSelection
 			.attr("class", this.xGridSettings.lineType)
 			.classed("grid-line", true)
-			.attr("x1", (d) => this.getXPosition(d) + this.scaleBandWidth / 2)
-			.attr("x2", (d) => this.getXPosition(d) + this.scaleBandWidth / 2)
-			.attr("y1", this.margin.top)
+			.attr("x1", (d) => this.getXPosition(d) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
+			.attr("x2", (d) => this.getXPosition(d) + (!this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
+			.attr("y1", 0)
 			.attr("y2", this.height)
 			.attr("stroke", this.xGridSettings.lineColor)
 			.attr("stroke-width", this.xGridSettings.lineWidth)
@@ -7253,10 +7253,10 @@ export class Visual extends Shadow {
 		lineSelection
 			.attr("class", this.yGridSettings.lineType)
 			.classed("grid-line", true)
-			.attr("x1", 0)
+			.attr("x1", this.xAxisStartMargin)
 			.attr("x2", this.width)
-			.attr("y1", (d) => this.getYPosition(d))
-			.attr("y2", (d) => this.getYPosition(d))
+			.attr("y1", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
+			.attr("y2", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
 			.attr("stroke", this.yGridSettings.lineColor)
 			.attr("stroke-width", this.yGridSettings.lineWidth)
 			.attr("opacity", 1)
@@ -7457,6 +7457,9 @@ export class Visual extends Shadow {
 		}
 
 		this.setMargins();
+
+		this.circleYScaleDiffs = [];
+		this.circleXScaleDiffs = [];
 
 		if (isSetXYScaleDiffs) {
 			this.chartData.forEach(d => {
@@ -8744,16 +8747,19 @@ export class Visual extends Shadow {
 			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
 			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
 
+		const xAxisRange = this.xScale.range();
+		const yAxisRange = this.yScale.range();
+
 		if (this.isHorizontalChart) {
 			this.zeroSeparatorLine
 				.attr("x1", this.getXPosition(0))
 				.attr("x2", this.getXPosition(0))
-				.attr("y1", this.height)
-				.attr("y2", 0);
+				.attr("y1", yAxisRange[1])
+				.attr("y2", yAxisRange[0]);
 		} else {
 			this.zeroSeparatorLine
-				.attr("x1", 0)
-				.attr("x2", this.width)
+				.attr("x1", xAxisRange[0])
+				.attr("x2", xAxisRange[1])
 				.attr("y1", this.getYPosition(0))
 				.attr("y2", this.getYPosition(0));
 		}
