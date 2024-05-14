@@ -2574,10 +2574,25 @@ export class Visual extends Shadow {
 			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
 			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.yAxisSettings;
 
-			this.xAxisTitleSize = this.xAxisSettings.isDisplayTitle
+			let isDisplayXTitle: boolean;
+			if (this.isSmallMultiplesEnabled) {
+				isDisplayXTitle = this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual && this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
+			} else {
+				isDisplayXTitle = this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
+			}
+
+			this.xAxisTitleSize = isDisplayXTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
 				: { width: 0, height: 0 };
-			this.yAxisTitleSize = this.yAxisSettings.isDisplayTitle
+
+			let isDisplayYTitle: boolean;
+			if (this.isSmallMultiplesEnabled) {
+				isDisplayYTitle = this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual && this.yAxisSettings.show && this.yAxisSettings.isDisplayTitle;
+			} else {
+				isDisplayYTitle = this.yAxisSettings.show && this.yAxisSettings.isDisplayTitle;
+			}
+
+			this.yAxisTitleSize = isDisplayYTitle
 				? getSVGTextSize("Title", yAxisTitleFontFamily, yAxisTitleFontSize)
 				: { width: 0, height: 0 };
 
@@ -2759,6 +2774,10 @@ export class Visual extends Shadow {
 
 						this.setChartData(this.categoricalData);
 
+						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+							this.drawXYAxisTitle();
+						}
+
 						const { xAxisG } = this.drawXYAxis(this.categoricalData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 
 						if (isAxisPositionChanged) {
@@ -2767,7 +2786,12 @@ export class Visual extends Shadow {
 							isAxisPositionChanged = false;
 						}
 
-						return { xAxisNode: xAxisG.node().cloneNode(true), xAxisNodeHeight: xAxisG.node().getBoundingClientRect().height };
+						return {
+							xAxisNode: xAxisG.node().cloneNode(true),
+							xAxisNodeHeight: xAxisG.node().getBoundingClientRect().height,
+							xAxisTitleG: this.xAxisTitleG.node().cloneNode(true),
+							xAxisTitleHeight: this.xAxisTitleG.node().getBoundingClientRect().height
+						};
 					},
 					getYAxisNodeElementAndMeasures: (width, height) => {
 						this.viewPortWidth = width;
@@ -2779,9 +2803,18 @@ export class Visual extends Shadow {
 
 						this.setChartData(this.categoricalData);
 
+						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+							this.drawXYAxisTitle();
+						}
+
 						const { yAxisG } = this.drawXYAxis(this.categoricalData, true, true, false);
 
-						return { yAxisNode: yAxisG.node(), yAxisNodeWidth: this.yScaleGWidth };
+						return {
+							yAxisNode: yAxisG.node(),
+							yAxisNodeWidth: this.yScaleGWidth,
+							yAxisTitleG: this.yAxisTitleG.node().cloneNode(true),
+							yAxisTitleWidth: this.yAxisTitleG.node().getBoundingClientRect().width
+						};
 					},
 					getUniformXAxisAndBrushNode: (xAxisNode, brushNode) => {
 						// this.xAxisG = d3.select(xAxisNode);

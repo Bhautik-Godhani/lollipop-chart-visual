@@ -398,12 +398,18 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.dynamicDeviationG = dynamicDeviationG as any;
             self.zeroSeparatorLine = zeroSeparatorLine as any;
             self.connectingLineG = connectingLineG as any;
-            self.xAxisTitleG = xAxisTitleG as any;
-            self.yAxisTitleG = yAxisTitleG as any;
             self.xAxisLineG = xAxisLineG as any;
             self.yAxisLineG = yAxisLineG as any;
-            self.xAxisTitleText = xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
-            self.yAxisTitleText = yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
+
+            if (!isUniformXScale) {
+                self.xAxisTitleG = xAxisTitleG as any;
+                self.xAxisTitleText = xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
+            }
+
+            if (!isUniformYScale) {
+                self.yAxisTitleG = yAxisTitleG as any;
+                self.yAxisTitleText = yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
+            }
 
             self.errorBarsContainer = errorBarsContainer as any;
             self.errorBarsMarkerDefsG = errorBarsMarkerDefsG as any;
