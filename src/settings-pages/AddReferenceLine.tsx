@@ -1156,11 +1156,11 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
     const chartData = shadow.isHorizontalChart ? shadow.chartData.reverse() : shadow.chartData;
 
-    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
       handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
 
-    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
       handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
 
@@ -1187,7 +1187,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   // line value 1
   React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue1.value) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
       handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
     }
 
@@ -1202,7 +1202,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   // line value 2
   React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.X && !configValues.lineValue2.value) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
       handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
     }
 
