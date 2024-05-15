@@ -661,9 +661,45 @@ export class Visual extends Shadow {
 		title: "Lollipop Chart",
 		versionInfo: "1.0.0.0",
 		description:
-			"A lollipop chart shows the different stages of a process and how data moves through them. It uses connected segments to create a funnel shape. It helps to analyze the flow of data, like leads or customers, and see how they move through each stage of the process.",
-		sliderImages: [],
-		learnMoreLink: "https://powerviz.ai/funnel-chart",
+			"The Powerviz lollipop chart is an advanced chart that is a bar chart, where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart consists of vertical and horizontal style, IBCS templates, small multiples, race chart, etc. ​",
+		sliderImages: [
+			{
+				imageUrl: require("../assets/landing-pages/page1.svg"),
+				imageTitle: "Fully customizable & feature rich Lollipop Chart",
+				imageDescription: "Create an advanced modern-looking and insightful Lollipop Chart.",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page2.svg"),
+				imageTitle: "Chart Style",
+				imageDescription: "Easily switch between Vertical and Horizontal chart style.",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page3.svg"),
+				imageTitle: "Small Multiples",
+				imageDescription: "Split your visual into multiple smaller visuals based on the field selected.",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page4.svg"),
+				imageTitle: "Race Chart",
+				imageDescription: "Visualize changes in trend over the time ",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page5.svg"),
+				imageTitle: "Dynamic Deviation",
+				imageDescription: "Analyze the variance between two measures using this feature.",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page6.svg"),
+				imageTitle: "Reference Line/Band",
+				imageDescription: "Add a Reference line or Band to highlight or compare the data against a range of data.",
+			},
+			{
+				imageUrl: require("../assets/landing-pages/page7.svg"),
+				imageTitle: "Many More",
+				imageDescription: "Analyze and customize Lollipop chart with extra features available.",
+			},
+		],
+		learnMoreLink: "https://powerviz.ai/lollipop-chart",
 	};
 
 	constructor(options: VisualConstructorOptions) {
