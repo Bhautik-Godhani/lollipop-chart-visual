@@ -2618,6 +2618,11 @@ export class Visual extends Shadow {
 				isDisplayXTitle = this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
 			}
 
+			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
+			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
+
+			this.setCategoricalDataFields(this.categoricalData);
+
 			this.xAxisTitleSize = isDisplayXTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
 				: { width: 0, height: 0 };
@@ -2632,11 +2637,6 @@ export class Visual extends Shadow {
 			this.yAxisTitleSize = isDisplayYTitle
 				? getSVGTextSize("Title", yAxisTitleFontFamily, yAxisTitleFontSize)
 				: { width: 0, height: 0 };
-
-			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
-			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
-
-			this.setCategoricalDataFields(this.categoricalData);
 
 			if (this.isSmallMultiplesEnabled && this.isHasSmallMultiplesData) {
 				this.config.smallMultiplesConfig.showInfoPage = false;
