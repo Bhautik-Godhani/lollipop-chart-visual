@@ -192,6 +192,7 @@ import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ESmallMultiplesX
 import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
 import ImportExport from "./settings-pages/ImportExport";
 import ConditionalFormatting from "./ConditionalFormatting/ConditionalFormatting";
+import { ECFCategoriesType } from "@truviz/shadow/dist/Components/ConditionalFormatting/ConditionalFormatting.enum";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -734,13 +735,12 @@ export class Visual extends Shadow {
 					{ label: "Labels", value: ECFApplyOnCategories.Labels },
 				],
 				showPercentageAllOption: true,
-				isShowPercentageNote: true,
-				percentageNote: "It computes the percentage of total and stay between 0 to 100.",
-				// messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." },
+				messageNoteBasedOnField: { fieldName: ECFBasedOnValueTypes.Percentage, note: "It computes the percentage of total and stay between 0 to 100." },
 				isShowCategoriesTypeDropdown: true,
+				isLollipopVisual: true,
 				categoriesList: [
-					{ label: "Category", value: EDataRolesName.Category },
-					{ label: "Sub category", value: EDataRolesName.SubCategory },
+					{ label: "Category", value: ECFCategoriesType.Category },
+					{ label: "Sub category", value: ECFCategoriesType.SubCategory },
 				]
 			},
 			smallMultiplesConfig: {
@@ -749,6 +749,7 @@ export class Visual extends Shadow {
 				showXYAxisSettings: true,
 			},
 			categoricalGroupByRole: [EDataRolesName.SubCategory],
+			isShowComponentsFilterSearchBox: true,
 			components: [
 				{
 					name: "Chart Options",
@@ -880,7 +881,7 @@ export class Visual extends Shadow {
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
-					Component: () => ConditionalFormatting,
+					Component: Components.ConditionalFormatting,
 					icon: ConditionalFormattingIcon,
 					displayHeader: false
 				},

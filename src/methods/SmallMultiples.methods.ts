@@ -3,9 +3,10 @@ import { create, select } from "d3-selection";
 import { Visual } from "../visual";
 import { Primitive, group, sum } from "d3-array";
 import { getSVGTextSize } from "./methods";
-import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ISmallMultiplesGridLayoutSettings } from "@truviz/shadow/dist/Components";
+import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition } from "@truviz/shadow/dist/Components";
 import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { ERankingCalcMethod, ERankingType } from "../enum";
+import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
