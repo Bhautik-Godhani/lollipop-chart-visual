@@ -8817,8 +8817,19 @@ export class Visual extends Shadow {
 			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
 			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
 
-		const xAxisRange = this.xScale.range();
-		const yAxisRange = this.yScale.range();
+		let xAxisRange: number[];
+		if (this.isCutAndClipAxisEnabled) {
+			xAxisRange = this.beforeCutLinearScale.range();
+		} else {
+			xAxisRange = this.xScale.range();
+		}
+
+		let yAxisRange: number[];
+		if (this.isCutAndClipAxisEnabled) {
+			yAxisRange = this.beforeCutLinearScale.range();
+		} else {
+			yAxisRange = this.yScale.range();
+		}
 
 		if (this.isHorizontalChart) {
 			this.zeroSeparatorLine
