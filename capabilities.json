@@ -110,7 +110,7 @@
 			"conditions": [
 				{
 					"measure": {
-						"max": 2
+						"max": 1
 					},
 					"subCategory": {
 						"max": 1
