@@ -297,7 +297,7 @@ export const powerBiNumberFormat = (
 ): string => {
 	const formatter = valueFormatter ? valueFormatter.formatter : undefined;
 
-	if (valueFormatter && number && valueFormatter.format.includes("%")) {
+	if (valueFormatter && number && valueFormatter.format && valueFormatter.format.includes("%")) {
 		number = parseFloat(number.toString()) / 100;
 	}
 
