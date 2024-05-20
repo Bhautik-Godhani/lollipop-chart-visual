@@ -286,7 +286,7 @@ const UIGeneralChartSettings = (
 								value={configValues.lollipopWidth ? configValues.lollipopWidth : Math.ceil(shadow.scaleBandWidth)}
 								handleChange={(value) => handleChange(value, EChartSettings.lollipopWidth, setConfigValues)}
 								isViewEditable
-								stepValue={1}
+								stepValue={5}
 							></RangeSlider>
 						</Column>
 					</Row>

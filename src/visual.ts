@@ -6804,7 +6804,7 @@ export class Visual extends Shadow {
 					return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
 
-				if (!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
+				if ((!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
 						if (!THIS.isBottomXAxis) {
@@ -7885,8 +7885,15 @@ export class Visual extends Shadow {
 			}
 		} else {
 			if (this.isLollipopTypeCircle) {
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const lineColor = this.lineSettings.isApplyMarkerColor ? this.categoryColorPair[d.category].marker1Color : this.lineSettings.lineColor;
-				return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
+
+				if (isPosNegColorScheme && this.lineSettings.isApplyMarkerColor) {
+					return this.getColor(posNegColor, EHighContrastColorType.Foreground);
+				} else {
+					return this.getColor(this.categoryColorPair[d.category] && this.categoryColorPair[d.category].lineColor ? this.categoryColorPair[d.category].lineColor : lineColor, EHighContrastColorType.Foreground);
+				}
 			} else {
 				const str = `${d.category}-${(d.subCategories ? d.subCategories[0] : this.chartData[0].subCategories[0]).category}`;
 				const lineColor = this.lineSettings.isApplyMarkerColor ? this.subCategoryColorPair[str].marker1Color : this.lineSettings.lineColor;
