@@ -287,24 +287,24 @@ const SortingSettings = (props) => {
 			isSortByMeasure: false,
 			isSortByExtraSortField: false,
 		},
-		{
-			label: shadow.measure1DisplayName,
-			value: shadow.measure1DisplayName,
-			isSortByCategory: false,
-			isSortByMeasure: true,
-			isSortByExtraSortField: false,
-		},
+		// {
+		// 	label: shadow.measure1DisplayName,
+		// 	value: shadow.measure1DisplayName,
+		// 	isSortByCategory: false,
+		// 	isSortByMeasure: true,
+		// 	isSortByExtraSortField: false,
+		// },
 	];
 
-	if (shadow.isHasMultiMeasure) {
-		GROUP_BY_SORT_ON.push({
-			label: shadow.measure2DisplayName,
-			value: shadow.measure2DisplayName,
-			isSortByCategory: false,
-			isSortByMeasure: true,
-			isSortByExtraSortField: false,
-		});
-	}
+	// if (shadow.isHasMultiMeasure) {
+	// 	GROUP_BY_SORT_ON.push({
+	// 		label: shadow.measure2DisplayName,
+	// 		value: shadow.measure2DisplayName,
+	// 		isSortByCategory: false,
+	// 		isSortByMeasure: true,
+	// 		isSortByExtraSortField: false,
+	// 	});
+	// }
 
 	if (shadow.isSortDataFieldsAdded) {
 		(shadow.sortFieldsDisplayName as ILabelValuePair[]).forEach((d) => {
@@ -336,7 +336,7 @@ const SortingSettings = (props) => {
 
 		if (!configValues.subCategory.sortBy ||
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
-			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 		}
 	}, []);
 
@@ -357,7 +357,7 @@ const SortingSettings = (props) => {
 
 		if (!configValues.subCategory.sortBy ||
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) {
-			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 		}
 	}, [configValues.category.sortBy]);
 
