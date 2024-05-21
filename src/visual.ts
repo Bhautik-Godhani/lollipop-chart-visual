@@ -662,7 +662,7 @@ export class Visual extends Shadow {
 		title: "Lollipop Chart",
 		versionInfo: "1.0.0.0",
 		description:
-			"The Powerviz lollipop chart is an advanced chart that is a bar chart, where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart consists of vertical and horizontal style, IBCS templates, small multiples, race chart, etc. ​",
+			"The Powerviz Lollipop chart is an advanced chart that is a bar chart where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart includes vertical and horizontal styles, IBCS templates, small multiples, race charts, etc.​",
 		sliderImages: [
 			{
 				imageUrl: require("../assets/landing-pages/page1.svg"),
