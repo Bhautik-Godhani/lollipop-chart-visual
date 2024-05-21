@@ -980,14 +980,6 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     value: "",
     rank: "",
   });
-  const defaultSettings = isAddNew ? REFERENCE_LINES_SETTINGS : JSON.parse(JSON.stringify(details ? details : {}));
-
-  if (details.referenceType === EReferenceType.REFERENCE_BAND) {
-    defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
-  } else {
-    defaultSettings.referenceType = EReferenceType.REFERENCE_LINE;
-  }
-
   React.useEffect(() => {
     if (configValues.lineValue1.type === "value") {
       setErros((s) => ({
@@ -1297,6 +1289,46 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
   }, [configValues.lineValue2]);
 
   const resetChanges = () => {
+    const defaultSettings = JSON.parse(JSON.stringify(REFERENCE_LINES_SETTINGS));
+
+    if (!isAddNew) {
+      defaultSettings.uid = details.uid;
+    }
+
+    if (isAddNew ? !isLineUI : details.referenceType === EReferenceType.REFERENCE_BAND) {
+      defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
+    } else {
+      defaultSettings.referenceType = EReferenceType.REFERENCE_LINE;
+    }
+
+    if (!defaultSettings.lineValue1.measureName) {
+      if (configValues.lineValue1.axis === EXYAxisNames.X) {
+        defaultSettings.lineValue1.measureName = shadow.categoryDisplayName;
+      }
+      if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+        defaultSettings.lineValue1.measureName = shadow.measure1DisplayName;
+      }
+    }
+
+    if (!defaultSettings.lineValue2.measureName) {
+      if (configValues.lineValue2.axis === EXYAxisNames.X) {
+        defaultSettings.lineValue2.measureName = shadow.categoryDisplayName;
+      }
+      if (configValues.lineValue2.axis === EXYAxisNames.Y) {
+        defaultSettings.lineValue2.measureName = shadow.measure1DisplayName;
+      }
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue1.value || defaultSettings.lineValue1.value === "0")) {
+      defaultSettings.lineValue1.value = shadow.chartData[0].category;
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue2.value || defaultSettings.lineValue2.value === "0")) {
+      defaultSettings.lineValue2.value = shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category;
+    }
+
+    defaultSettings.labelStyle.styling = [];
+
     setConfigValues(() => defaultSettings);
   };
 
