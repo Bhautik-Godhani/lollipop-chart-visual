@@ -696,7 +696,7 @@ export class Visual extends Shadow {
 			},
 			{
 				imageUrl: require("../assets/landing-pages/page7.svg"),
-				imageTitle: "Many More",
+				imageTitle: "And Many More Features",
 				imageDescription: "Analyze and customize Lollipop chart with extra features available.",
 			},
 		],
