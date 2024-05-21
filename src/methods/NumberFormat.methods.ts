@@ -232,11 +232,11 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
     let formattedNumber: string | number = number;
     switch (numberSettings.scaling) {
         case DisplayUnits.Auto: {
-            formattedNumber = GetInvertAutoUnitFormattedNumber(numberFormatting, self.axisDomainMaxValueDisplayUnit, number, isUseSematicFormat, isMinThousandsLimit);
+            formattedNumber = GetAutoUnitFormattedNumber(numberFormatting, number, isUseSematicFormat, isMinThousandsLimit);
             break;
         }
         case DisplayUnits.Relative: {
-            formattedNumber = GetAutoUnitFormattedNumber(numberFormatting, number, isUseSematicFormat, isMinThousandsLimit);
+            formattedNumber = GetInvertAutoUnitFormattedNumber(numberFormatting, self.axisDomainMaxValueDisplayUnit, number, isUseSematicFormat, isMinThousandsLimit);
             break;
         }
         case DisplayUnits.None: {
