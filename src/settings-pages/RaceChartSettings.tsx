@@ -104,7 +104,7 @@ const RaceChartSettings = (props) => {
             <Column>
               <Quote>
                 <strong>Note: </strong>This option allows you render chart based on race keys by given time interval. To enable this option, add a
-                categories data by which you want to play race.
+                categorical data by which you want to play race.
               </Quote>
             </Column>
           </Row>
