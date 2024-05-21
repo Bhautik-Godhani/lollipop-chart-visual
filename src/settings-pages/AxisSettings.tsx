@@ -1289,14 +1289,16 @@ const XAxisSettings = (props) => {
 
   return (
     <>
-      <Tabs selected={selectedAxisTab} onChange={(val) => setSelectedAxisTab(val)}>
-        <Tab title={"X - Axis"} identifier={EXYAxisNames.X}>
-          {UIXAxis(vizOptions, shadow, xConfigValues, yConfigValues, setXConfigValues, setYConfigValues)}
-        </Tab>
-        <Tab title={"Y - Axis"} identifier={EXYAxisNames.Y}>
-          {UIYAxis(vizOptions, shadow, xConfigValues, yConfigValues, setYConfigValues, setXConfigValues)}
-        </Tab>
-      </Tabs >
+      <div className={"sticky-tabs axis-tabs"} >
+        <Tabs selected={selectedAxisTab} onChange={(val) => setSelectedAxisTab(val)}>
+          <Tab title={"X - Axis"} identifier={EXYAxisNames.X}>
+            {UIXAxis(vizOptions, shadow, xConfigValues, yConfigValues, setXConfigValues, setYConfigValues)}
+          </Tab>
+          <Tab title={"Y - Axis"} identifier={EXYAxisNames.Y}>
+            {UIYAxis(vizOptions, shadow, xConfigValues, yConfigValues, setYConfigValues, setXConfigValues)}
+          </Tab>
+        </Tabs >
+      </div>
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
