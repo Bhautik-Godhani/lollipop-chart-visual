@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
-import { AboveAlignmentIcon, BoldIcon, BottomAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
+import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
 import { AccordionAlt, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Quote, Row, SelectInput, SwitchOption, Tab, Tabs, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
@@ -100,7 +100,7 @@ const HEADER_ALIGNMENT = [
     value: "left",
   },
   {
-    label: <LeftAlignmentIcon fill="currentColor" />,
+    label: <CenterHorizontalAlignmentIcon fill="currentColor" />,
     value: "center",
   },
   {
@@ -111,7 +111,7 @@ const HEADER_ALIGNMENT = [
 
 const HEADER_POSITION = [
   {
-    label: <AboveAlignmentIcon fill="currentColor" />,
+    label: <TopAlignmentIcon fill="currentColor" />,
     value: "top",
   },
   {
