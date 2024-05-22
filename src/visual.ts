@@ -1460,7 +1460,9 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0].toString().toLowerCase()) !== -1;
+		const firstVal = categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0] ? categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0] : categoricalCategoriesFields[categoricalCategoriesLastIndex].values[1] ? categoricalCategoriesFields[categoricalCategoriesLastIndex].values[1] : "";
+
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>firstVal.toString().toLowerCase()) !== -1;
 
 		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
 
