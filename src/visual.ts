@@ -7193,7 +7193,7 @@ export class Visual extends Shadow {
 			const yAxisRange = ((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
 				|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange)) ?
 				[yScaleHeight - this.yAxisStartMargin + startDiff, (this.markerMaxSize / 2) + endDiff] :
-				[this.yAxisStartMargin + startDiff, yScaleHeight - (this.markerMaxSize / 2) - endDiff];
+				[this.yAxisStartMargin + startDiff, yScaleHeight - (this.markerMaxSize / 2) + endDiff];
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
