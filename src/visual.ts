@@ -3888,7 +3888,7 @@ export class Visual extends Shadow {
 
 				return (bound !== undefined && bound !== null)
 					? labelFormat !== EErrorBarsLabelFormat.RelativePercentage
-						? this.formatNumber(+bound, this.numberSettings, undefined, true, true)
+						? this.formatNumber(+bound, this.numberSettings, this.measureNumberFormatter[0], true, true)
 						: bound.toFixed(2) + "%"
 					: undefined;
 			};
