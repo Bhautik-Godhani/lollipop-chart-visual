@@ -422,9 +422,22 @@ export enum EXAxisSettings {
 
 export enum EAxisDateFormats {
 	Custom = "custom",
-	DDMMYYYY = "DD:MM:YYYY",
-	DDMMYYYYHHMM = "DD:MM:YYYY HH:mm",
-	DDMMYYYYHHMMAMPM = "DD:MM:YYYY hh:mm A"
+	"DD-MM-YY" = "DD-MM-YY",
+	"DD-MM-YYYY" = "DD-MM-YYYY",
+	"DD:MM:YY" = "DD:MM:YY",
+	"DD/MM/YY" = "DD/MM/YY",
+	"D-M-YY" = "D-M-YY",
+	"D.M.Y" = "D.M.Y",
+	"YYYY-MM-DD" = "YYYY-MM-DD",
+	"MMMM, YYYY" = "MMMM, YYYY",
+	"D, MMMM" = "D, MMMM",
+	"YYYY" = "YYYY",
+	"dddd, MMMM DD, YYYY" = "dddd, MMMM DD, YYYY",
+	"DD-MM-YYYY hh:mm AM/PM" = "DD-MM-YYYY hh:mm A",
+	"DD-MM-YY hh(24):mm" = "DD-MM-YY HH:mm",
+	"DD-MM-YYYY hh(24):mm" = "DD-MM-YYYY HH:mm",
+	"DD-MM-YY hh:mm AM/PM" = "DD-MM-YY hh:mm A",
+	"DD-MM-YY hh:mm:ss AM/PM" = "DD-MM-YY hh:mm:ss A"
 }
 
 export enum EYAxisSettings {

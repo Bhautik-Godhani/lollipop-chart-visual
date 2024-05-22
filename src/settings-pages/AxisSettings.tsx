@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP, Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
+import { AXIS_DATE_FORMATS, X_AXIS_SETTINGS as X_AXIS_SETTINGS_IMP, Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import { AxisCategoryType, EAxisDateFormats, EAxisNumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EXYAxisNames, EYAxisSettings, Position } from "../enum";
 import {
   InputControl,
@@ -53,25 +53,6 @@ const AXIS_MODE: ILabelValuePair[] = [
   {
     label: "Categorical",
     value: AxisCategoryType.Categorical,
-  },
-];
-
-const AXIS_DATE_FORMATS: ILabelValuePair[] = [
-  {
-    label: "Custom",
-    value: EAxisDateFormats.Custom,
-  },
-  {
-    label: "DD:MM:YYYY",
-    value: EAxisDateFormats.DDMMYYYY,
-  },
-  {
-    label: "DD:MM:YYYY hh:mm",
-    value: EAxisDateFormats.DDMMYYYYHHMM,
-  },
-  {
-    label: "DD:MM:YYYY hh:mm AM/PM",
-    value: EAxisDateFormats.DDMMYYYYHHMMAMPM,
   },
 ];
 
@@ -538,7 +519,10 @@ const UIXAxis = (
               <ToggleButton
                 label={"Auto Date Format"}
                 value={xConfigValues.isAutoDateFormat}
-                handleChange={() => handleXCheckbox(EXAxisSettings.IsAutoDateFormat, setXConfigValues)}
+                handleChange={() => {
+                  handleXCheckbox(EXAxisSettings.IsAutoDateFormat, setXConfigValues);
+                  handleYCheckbox(EYAxisSettings.IsAutoDateFormat, setYConfigValues);
+                }}
                 appearance="toggle"
               />
             </Column>
@@ -1079,7 +1063,10 @@ const UIYAxis = (
               <ToggleButton
                 label={"Auto Date Format"}
                 value={yConfigValues.isAutoDateFormat}
-                handleChange={() => handleYCheckbox(EXAxisSettings.IsAutoDateFormat, setYConfigValues)}
+                handleChange={() => {
+                  handleYCheckbox(EYAxisSettings.IsAutoDateFormat, setYConfigValues);
+                  handleXCheckbox(EXAxisSettings.IsAutoDateFormat, setXConfigValues);
+                }}
                 appearance="toggle"
               />
             </Column>

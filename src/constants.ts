@@ -59,6 +59,7 @@ import {
 	IErrorBarsSettings,
 	IGridLinesPropsSettings,
 	IGridLinesSettings,
+	ILabelValuePair,
 	ILineSettings,
 	IMarkerSettings,
 	IPatternSettings,
@@ -269,8 +270,8 @@ export const X_AXIS_SETTINGS: IXAxisSettings = {
 	minimumRange: 0,
 	isInvertRange: false,
 	isAutoDateFormat: true,
-	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
-	customDateFormat: "DD:MM:YYYY hh:mm A",
+	dateFormat: EAxisDateFormats["dddd, MMMM DD, YYYY"],
+	customDateFormat: EAxisDateFormats["dddd, MMMM DD, YYYY"],
 	numberFormatting: {
 		show: true,
 		valueType: EAxisNumberValueType.Absolute,
@@ -315,8 +316,8 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 	minimumRange: 0,
 	isInvertRange: false,
 	isAutoDateFormat: true,
-	dateFormat: EAxisDateFormats.DDMMYYYYHHMMAMPM,
-	customDateFormat: "DD:MM:YYYY hh:mm A",
+	dateFormat: EAxisDateFormats["dddd, MMMM DD, YYYY"],
+	customDateFormat: EAxisDateFormats["dddd, MMMM DD, YYYY"],
 	numberFormatting: {
 		show: true,
 		valueType: EAxisNumberValueType.Absolute,
@@ -618,3 +619,74 @@ export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
 	markerBackgroundColor: "rgba(255, 255, 255, 1)",
 	markerPlacement: ECutAndClipMarkerPlacementTypes.Both
 };
+
+export const AXIS_DATE_FORMATS: ILabelValuePair[] = [
+	{
+		label: "Custom",
+		value: EAxisDateFormats.Custom,
+	},
+	{
+		label: "DD-MM-YY",
+		value: EAxisDateFormats["DD-MM-YY"],
+	},
+	{
+		label: "DD-MM-YYYY",
+		value: EAxisDateFormats["DD-MM-YYYY"],
+	},
+	{
+		label: "DD:MM:YY",
+		value: EAxisDateFormats["DD:MM:YY"],
+	},
+	{
+		label: "DD/MM/YY",
+		value: EAxisDateFormats["DD/MM/YY"],
+	},
+	{
+		label: "D-M-YY",
+		value: EAxisDateFormats["D-M-YY"],
+	},
+	{
+		label: "D.M.Y",
+		value: EAxisDateFormats["D.M.Y"],
+	},
+	{
+		label: "YYYY-MM-DD",
+		value: EAxisDateFormats["YYYY-MM-DD"],
+	},
+	{
+		label: "MMMM, YYYY",
+		value: EAxisDateFormats["MMMM, YYYY"],
+	},
+	{
+		label: "D, MMMM",
+		value: EAxisDateFormats["D, MMMM"],
+	},
+	{
+		label: "YYYY",
+		value: EAxisDateFormats.YYYY,
+	},
+	{
+		label: "dddd, MMMM DD, YYYY",
+		value: EAxisDateFormats["dddd, MMMM DD, YYYY"]
+	},
+	{
+		label: "DD-MM-YYYY hh:mm AM/PM",
+		value: EAxisDateFormats["DD-MM-YYYY hh:mm AM/PM"],
+	},
+	{
+		label: "DD-MM-YY hh(24):mm",
+		value: EAxisDateFormats["DD-MM-YY hh(24):mm"],
+	},
+	{
+		label: "DD-MM-YYYY hh(24):mm",
+		value: EAxisDateFormats["DD-MM-YYYY hh(24):mm"],
+	},
+	{
+		label: "DD-MM-YY hh:mm AM/PM",
+		value: EAxisDateFormats["DD-MM-YY hh:mm AM/PM"],
+	},
+	{
+		label: "DD-MM-YY hh:mm:ss AM/PM",
+		value: EAxisDateFormats["DD-MM-YY hh:mm:ss AM/PM"],
+	},
+];

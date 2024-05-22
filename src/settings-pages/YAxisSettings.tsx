@@ -1,9 +1,8 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
+import { AXIS_DATE_FORMATS, Y_AXIS_SETTINGS as Y_AXIS_SETTINGS_IMP } from "../constants";
 import {
   AxisCategoryType,
-  EAxisDateFormats,
   EVisualConfig,
   EVisualSettings,
   EXAxisSettings,
@@ -32,21 +31,6 @@ const AXIS_MODE: ILabelValuePair[] = [
   {
     label: "Categorical",
     value: AxisCategoryType.Categorical,
-  },
-];
-
-const AXIS_DATE_FORMATS: ILabelValuePair[] = [
-  {
-    label: "DD:MM:YYYY",
-    value: EAxisDateFormats.DDMMYYYY,
-  },
-  {
-    label: "DD:MM:YYYY hh:mm",
-    value: EAxisDateFormats.DDMMYYYYHHMM,
-  },
-  {
-    label: "DD:MM:YYYY hh:mm AM/PM",
-    value: EAxisDateFormats.DDMMYYYYHHMMAMPM,
   },
 ];
 
