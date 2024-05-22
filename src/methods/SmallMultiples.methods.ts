@@ -326,7 +326,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 textEle.classed("text-ellipsis", false);
             }
 
-            const total = self.chartData.reduce((count, cur) => count + cur.value1, 0);
+            const total = config.gridDataItemsTotals[smallMultipleIndex];
 
             const categoryName = config.categories[smallMultipleIndex];
             const categoryTotal = self.formatNumber(total, self.numberSettings, self.measureNumberFormatter[0], true, true);
