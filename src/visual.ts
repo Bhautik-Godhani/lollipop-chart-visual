@@ -10087,6 +10087,16 @@ export class Visual extends Shadow {
 			fontSize: this.xAxisSettings.labelFontSize + "px",
 		};
 		const brushXAxisTicks = brushScaleDomain.map((text) => {
+			text = (typeof text === "string" && this.isExpandAllApplied ? text.toString().split("--")[0] : text) as string;
+
+			if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart) {
+				if (!this.xAxisSettings.isAutoDateFormat) {
+					text = FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
+				} else {
+					text = valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+				}
+			}
+
 			return textMeasurementService.getTailoredTextOrDefault({ ...textProperties, text }, 100);
 		});
 		const brushXAxisTicksWidth = brushXAxisTicks.map((d) => {
@@ -10121,7 +10131,16 @@ export class Visual extends Shadow {
 					.axisBottom(this.brushScaleBand)
 					.ticks(this.width / 90)
 					.tickFormat((d) => {
-						const text = (typeof d === "string" && this.isExpandAllApplied ? d.toString().split("--")[0] : d) as string;
+						let text = (typeof d === "string" && this.isExpandAllApplied ? d.toString().split("--")[0] : d) as string;
+
+						if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart) {
+							if (!this.xAxisSettings.isAutoDateFormat) {
+								text = FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
+							} else {
+								text = valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+							}
+						}
+
 						const textProperties: TextProperties = {
 							text,
 							fontFamily: this.xAxisSettings.labelFontFamily,
