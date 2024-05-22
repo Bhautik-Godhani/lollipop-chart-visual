@@ -2612,17 +2612,17 @@ export class Visual extends Shadow {
 			const { titleFontSize: xAxisTitleFontSize, titleFontFamily: xAxisTitleFontFamily } = this.xAxisSettings;
 			const { titleFontSize: yAxisTitleFontSize, titleFontFamily: yAxisTitleFontFamily } = this.yAxisSettings;
 
+			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
+			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
+
+			this.setCategoricalDataFields(this.categoricalData);
+
 			let isDisplayXTitle: boolean;
 			if (this.isSmallMultiplesEnabled) {
 				isDisplayXTitle = this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual && this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
 			} else {
 				isDisplayXTitle = this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
 			}
-
-			this.xAxisTitleMargin = this.xAxisSettings.isDisplayTitle ? 10 : 0;
-			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
-
-			this.setCategoricalDataFields(this.categoricalData);
 
 			this.xAxisTitleSize = isDisplayXTitle
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
