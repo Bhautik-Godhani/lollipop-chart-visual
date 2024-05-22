@@ -181,7 +181,7 @@ export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selec
         .lower()
         .attr("class", "title-shadow")
         .attr("stroke", (d: IReferenceLineSettings) => self.getColor(d.labelStyle.labelBackgroundColor, EHighContrastColorType.Background))
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 3)
         .attr("stroke-linejoin", "round")
         .attr("opacity", (d: IReferenceLineSettings) => d.labelStyle.isShowLabelBackground ? "1" : "0");
 }

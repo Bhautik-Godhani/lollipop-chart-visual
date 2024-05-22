@@ -25,7 +25,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
             if (isPositiveDeviation) {
                 return ((to.value * 100) / from.value).toFixed(2) + "%";
             } else {
-                return (100 - (to.value * 100) / from.value).toFixed(2) + "%";
+                return -(100 - (to.value * 100) / from.value).toFixed(2) + "%";
             }
         }
     };
@@ -64,7 +64,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
         .lower()
         .attr("class", "title-shadow")
         .attr("stroke", self.getColor(self.dynamicDeviationSettings.backgroundColor, EHighContrastColorType.Background))
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 3)
         .attr("stroke-linejoin", "round")
         .attr("opacity", self.dynamicDeviationSettings.isShowLabelBackground ? "1" : "0");
 
