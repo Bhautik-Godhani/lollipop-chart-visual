@@ -937,7 +937,7 @@ const SmallMultiplesSettings = (props) => {
       <ConditionalWrapper visible={!isShowInfoPage} style={{ width: "300px" }}>
         <Row disableTopPadding>
           <Column>
-            <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
+            <Tabs selected={selectedTab} isEqualWidthTabs={true} onChange={(val) => setSelectedTab(val)}>
               <Tab title="Layout" identifier="layout">
                 {UILayout(isShowGridLayoutOnly, isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
               </Tab>
