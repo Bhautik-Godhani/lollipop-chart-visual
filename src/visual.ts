@@ -96,6 +96,7 @@ import {
 	POSITIVE_COLOR,
 	NEGATIVE_COLOR,
 	MonthNames,
+	SMALL_MULTIPLES_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -184,7 +185,6 @@ import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
 import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
-import { SMALL_MULTIPLES_SETTINGS } from "@truviz/shadow/dist/Components/SmallMultiplesGridLayout/smallMultiplesSettings";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";

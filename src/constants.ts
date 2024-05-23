@@ -73,6 +73,7 @@ import {
 	IXAxisSettings,
 	IYAxisSettings,
 } from "./visual-settings.interface";
+import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 
 export const MonthNames = [
 	"January", "February", "March", "April", "May", "June",
@@ -690,3 +691,64 @@ export const AXIS_DATE_FORMATS: ILabelValuePair[] = [
 		value: EAxisDateFormats["DD-MM-YY hh:mm:ss AM/PM"],
 	},
 ];
+
+export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
+	showInfoPage: false,
+	infoMessage: "",
+	hostContainerId: "",
+	categories: [],
+	containerWidth: 0,
+	containerHeight: 0,
+	layoutType: ESmallMultiplesLayoutType.Grid,
+	displayType: ESmallMultiplesDisplayType.Fixed,
+	viewType: ESmallMultiplesViewType.Scroll,
+	rows: 2,
+	columns: 2,
+	gridDataItemsTotals: [],
+	outerSpacing: 10,
+	innerSpacing: 10,
+	xAxisType: ESmallMultiplesAxisType.Individual,
+	yAxisType: ESmallMultiplesAxisType.Uniform,
+	xAxisPosition: ESmallMultiplesXAxisPosition.FrozenBottomColumn,
+	yAxisPosition: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
+	showGridLayoutOnly: false,
+	showXYAxisSettings: true,
+	header: {
+		displayType: ESmallMultiplesHeaderDisplayType.TitleAndTotalValue,
+		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
+		fontSize: 12,
+		fontColor: "rgba(102,102,102,1)",
+		fontStyles: [],
+		alignment: ESmallMultiplesHeaderAlignment.Left,
+		position: ESmallMultiplesHeaderPosition.Top,
+		isTextWrapEnabled: true
+	},
+	background: {
+		type: ESmallMultiplesBackgroundType.AlternateColumns,
+		panelColor: "rgba(255,255,255,1)",
+		alternateColor: "rgba(245, 245, 245, 1)",
+		transparency: 100
+	},
+	border: {
+		isShowBorder: false,
+		style: ELineType.Solid,
+		width: 1,
+		radius: 0,
+		color: "rgba(0, 0, 0, 1)"
+	},
+	shadow: {
+		type: ESmallMultiplesShadowType.Simple,
+		verticalOffset: 3,
+		horizontalOffset: 3,
+		blur: 7,
+		spread: 0,
+		color: "rgba(0, 0, 0, 0.24)",
+		inset: false,
+		isEnabled: true
+	},
+	onCellRendered: undefined,
+	getUniformXAxisAndBrushNode: undefined,
+	getXAxisNodeElementAndMeasures: undefined,
+	getYAxisNodeElementAndMeasures: undefined,
+	onRenderingFinished: undefined,
+};
