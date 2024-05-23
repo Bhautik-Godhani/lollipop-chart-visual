@@ -2810,7 +2810,7 @@ export class Visual extends Shadow {
 						this.settingsBtnHeight = 0;
 						let isAxisPositionChanged: boolean;
 
-						if (!isBottomXAxis) {
+						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && !isBottomXAxis) {
 							this.xAxisSettings.position = Position.Top;
 							this.isBottomXAxis = false;
 							isAxisPositionChanged = true;
