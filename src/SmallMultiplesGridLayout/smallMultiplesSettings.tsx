@@ -897,7 +897,7 @@ const SmallMultiplesSettings = (props) => {
         [ESmallMultiplesSettings.yAxisType]: ESmallMultiplesAxisType.Individual,
       }));
     }
-  }, []);
+  }, [configValues.layoutType, configValues.xAxisType, configValues.yAxisType]);
 
   React.useEffect(() => {
     if (configValues.layoutType !== ESmallMultiplesLayoutType.Grid && configValues.displayType === ESmallMultiplesDisplayType.Fluid) {
