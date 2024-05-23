@@ -1412,8 +1412,10 @@ export class Visual extends Shadow {
 		width: number,
 		height: number
 	): powerbi.DataViewCategorical {
-		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
-		const categoricalRaceBarValues = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
+		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
+			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
+		const categoricalRaceBarValues = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData])
+			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 		const categoricalSmallMultiplesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		const categoricalSubCategoryField = categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		const categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
@@ -2132,8 +2134,10 @@ export class Visual extends Shadow {
 	}
 
 	public setCategoricalDataFields(categoricalData: powerbi.DataViewCategorical): void {
-		this.categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
-		this.categoricalRaceChartDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData]);
+		this.categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
+			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
+		this.categoricalRaceChartDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData])
+			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 		this.categoricalSmallMultiplesDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 		this.categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 		this.categoricalMeasureFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
@@ -8913,6 +8917,7 @@ export class Visual extends Shadow {
 			.each((d: ILollipopChartRow, i: number, nodes) => {
 				const ele = d3.select(nodes[i]);
 				let fill: string;
+				let isHasPattern: boolean;
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
@@ -8922,13 +8927,20 @@ export class Visual extends Shadow {
 				}
 				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					fill = `url('#${generatePattern(this.svg, pattern, color)}')`;
+					isHasPattern = true;
 				} else {
 					fill = color;
 				}
 
-				ele
-					.attr("fill", marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly ? "rgba(255, 255, 255, 1)" : fill)
-					.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+				if (marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly) {
+					ele
+						.attr("fill", !isHasPattern ? "rgba(255, 255, 255, 1)" : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
+						.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+				} else {
+					ele
+						.attr("fill", fill)
+						.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+				}
 			}
 			);
 	}
@@ -9022,6 +9034,7 @@ export class Visual extends Shadow {
 			.each((d: ILollipopChartRow, i: number, nodes) => {
 				const ele = d3.select(nodes[i]);
 				let fill: string;
+				let isHasPattern: boolean;
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker2Color;
 				const posNegColor = d.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker2Color : null), EHighContrastColorType.Foreground);
@@ -9031,13 +9044,20 @@ export class Visual extends Shadow {
 				}
 				if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
 					fill = `url('#${generatePattern(this.svg, pattern, color)}')`;
+					isHasPattern = true;
 				} else {
 					fill = color;
 				}
 
-				ele
-					.attr("fill", marker2Style.isShowMarkerOutline && marker2Style.showOutlineOnly ? "rgba(255, 255, 255, 1)" : fill)
-					.attr("stroke", marker2Style.sameOutlineAsMarkerColor ? color : marker2Style.outlineColor)
+				if (marker2Style.isShowMarkerOutline && marker2Style.showOutlineOnly) {
+					ele
+						.attr("fill", !isHasPattern ? "rgba(255, 255, 255, 1)" : `url('#${generatePattern(this.svg, pattern, marker2Style.sameOutlineAsMarkerColor ? color : marker2Style.outlineColor)}')`)
+						.attr("stroke", marker2Style.sameOutlineAsMarkerColor ? color : marker2Style.outlineColor)
+				} else {
+					ele
+						.attr("fill", fill)
+						.attr("stroke", marker2Style.sameOutlineAsMarkerColor ? color : marker2Style.outlineColor)
+				}
 			}
 			);
 	}
@@ -9127,6 +9147,7 @@ export class Visual extends Shadow {
 		const getPieFill = (d: IChartSubCategory, parent: ILollipopChartRow) => {
 			let color;
 			const valueType = isPie2 ? "value2" : "value1";
+			let isHasPattern: boolean;
 
 			if (((d.parentCategory === this.othersBarText) || this.isCurrentSmallMultipleIsOthers) && this.dataColorsSettings.isCustomizeOthersColor) {
 				color = this.dataColorsSettings.othersColor;
@@ -9150,10 +9171,10 @@ export class Visual extends Shadow {
 			}
 
 			if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
-
-				return { color, pieFill: `url('#${generatePattern(this.svg, pattern, color)}')` };
+				isHasPattern = true;
+				return { color, pieFill: `url('#${generatePattern(this.svg, pattern, color)}')`, isHasPattern, pattern };
 			} else {
-				return { color, pieFill: color };
+				return { color, pieFill: color, isHasPattern, pattern };
 			}
 		}
 
@@ -9203,20 +9224,28 @@ export class Visual extends Shadow {
 		}
 
 		const data = this.chartData[id].subCategories.map((data) => {
-			const { color, pieFill } = getPieFill(data, this.chartData[id]);
+			const { color, pieFill, isHasPattern, pattern } = getPieFill(data, this.chartData[id]);
 			let color1 = pieFill;
 			let color2 = pieFill;
 			const borderColor = color;
 
 			if (marker1Style.isShowMarkerOutline) {
 				if (marker1Style.showOutlineOnly) {
-					color1 = "#ffffff";
+					if (isHasPattern) {
+						color1 = `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`;
+					} else {
+						color1 = "#ffffff";
+					}
 				}
 			}
 
 			if (marker2Style.isShowMarkerOutline) {
 				if (marker2Style.showOutlineOnly) {
-					color2 = "#ffffff";
+					if (isHasPattern) {
+						color2 = `url('#${generatePattern(this.svg, pattern, marker2Style.sameOutlineAsMarkerColor ? color : marker2Style.outlineColor)}')`;
+					} else {
+						color2 = "#ffffff";
+					}
 				}
 			}
 
