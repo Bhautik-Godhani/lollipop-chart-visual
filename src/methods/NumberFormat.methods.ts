@@ -199,7 +199,7 @@ export const GetSemanticFormattedNumber = (numberFormatting: NumberFormatting, n
     return formattedNumber;
 }
 
-const isValidDate = (dateString) => {
+export const isValidDate = (dateString) => {
     const date = new Date(dateString);
     return !isNaN(date.getTime());
 }

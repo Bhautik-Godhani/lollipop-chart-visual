@@ -2921,7 +2921,7 @@ export class Visual extends Shadow {
 					this.isHasGlobalMinValue = d3.min(this.originalCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]), d => d.minLocal as number) < 0;
 				}
 
-				this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
+				// this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
 
 				if (this.isHorizontalBrushDisplayed) {
 					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? (this.brushAndZoomAreaHeight + 2) : 10;
@@ -6957,8 +6957,6 @@ export class Visual extends Shadow {
 						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : THIS.numberSettings);
 						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 					} else {
-						console.log(THIS.viewPortWidth, THIS.yAxisTicksMaxWidthRatio);
-
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
@@ -6970,9 +6968,6 @@ export class Visual extends Shadow {
 					};
 
 					ele.text("");
-
-					console.log(THIS.viewPortWidth, THIS.yAxisTicksMaxWidthRatio);
-
 
 					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
