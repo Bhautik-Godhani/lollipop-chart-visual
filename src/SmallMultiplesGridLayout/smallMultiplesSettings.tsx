@@ -126,8 +126,12 @@ const BACKGROUND_TYPES: ILabelValuePair[] = [
     label: "All",
   },
   {
-    value: ESmallMultiplesBackgroundType.AlternateItem,
-    label: "Alternate Item",
+    value: ESmallMultiplesBackgroundType.AlternateColumns,
+    label: "Alternate Columns",
+  },
+  {
+    value: ESmallMultiplesBackgroundType.AlternateRows,
+    label: "Alternate Rows",
   }
 ];
 
@@ -649,7 +653,7 @@ const UIBackground = (vizOptions: ShadowUpdateOptions,
     <AccordionAlt title="Background" open={true}>
       <Row>
         <Column>
-          <SwitchOption
+          <SelectInput
             label="Position"
             value={configValues.background.type}
             optionsList={BACKGROUND_TYPES}
