@@ -394,7 +394,7 @@ export class Visual extends Shadow {
 	public categoryLabelHeight: number;
 	public categoryLabelMargin: number = 10;
 	public yAxisStartMargin: number = 10;
-	public yAxisTicksMaxWidthRatio: number = 0.1;
+	public yAxisTicksMaxWidthRatio: number = 0.3;
 	public isYIsNumericAxis: boolean;
 	public isYIsDateTimeAxis: boolean;
 	public isYIsContinuousAxis: boolean;
@@ -2349,7 +2349,7 @@ export class Visual extends Shadow {
 
 				const text = new Array(this.expandAllYAxisMaxCharsLength).fill("A").join("");
 				const textWidth = getSVGTextSize(text, labelFontFamily, labelFontSize).width;
-				const expandAllYScaleGWidth = this.width * this.yAxisTicksMaxWidthRatio;
+				const expandAllYScaleGWidth = this.viewPortWidth * this.yAxisTicksMaxWidthRatio;
 
 				if (expandAllYScaleGWidth > 25 && expandAllYScaleGWidth < textWidth) {
 					this.expandAllYScaleGWidth = expandAllYScaleGWidth * this.expandAllCategoriesName.length;
@@ -5270,7 +5270,7 @@ export class Visual extends Shadow {
 
 				this.configLegend();
 
-				this.initAndRenderLollipopChart(categoricalData2, this.width * this.yAxisTicksMaxWidthRatio, this.height, true, true);
+				this.initAndRenderLollipopChart(categoricalData2, this.viewPortWidth * this.yAxisTicksMaxWidthRatio, this.height, true, true);
 
 				isBrushRendered = true;
 			} else {
@@ -6957,7 +6957,9 @@ export class Visual extends Shadow {
 						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : THIS.numberSettings);
 						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
 					} else {
-						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
+						console.log(THIS.viewPortWidth, THIS.yAxisTicksMaxWidthRatio);
+
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
 				} else {
@@ -6969,7 +6971,10 @@ export class Visual extends Shadow {
 
 					ele.text("");
 
-					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.width * THIS.yAxisTicksMaxWidthRatio);
+					console.log(THIS.viewPortWidth, THIS.yAxisTicksMaxWidthRatio);
+
+
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 				}
 			});
