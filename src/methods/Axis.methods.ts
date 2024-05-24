@@ -30,8 +30,9 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
             self.chartData.map((d) => d.value1));
 
     if (self.isSmallMultiplesEnabled && self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
-        min = self.isHasSubcategories ? D3Min(self.originalCategoricalData.values.grouped(), d => D3Min(d.values, v => sum(v.values, t => <number>t))) : +self.originalCategoricalData.values[0].minLocal;
-        max = self.isHasSubcategories ? D3Max(self.originalCategoricalData.values.grouped(), d => D3Max(d.values, v => sum(v.values, t => <number>t))) : +self.originalCategoricalData.values[0].maxLocal;
+        const values = self.originalCategoricalData.values;
+        min = self.isHasSubcategories ? D3Min(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : +self.originalCategoricalData.values[0].minLocal;
+        max = self.isHasSubcategories ? D3Max(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : +self.originalCategoricalData.values[0].maxLocal;
     }
 
     if (min > 0) {
