@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { EFontStyle, EHighContrastColorType, EPlayPauseButton, Position } from '../enum';
 import { Visual } from '../visual';
 import { interval, max, min, select, sum } from "d3";
@@ -77,7 +78,12 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .append("tspan")
         .attr("x", "0")
         .attr("font-size", labelFontSize)
-        .text(self.raceChartDataLabelOnTick);
+        .text(self.raceChartDataLabelOnTick.split("--").map((d, i) => {
+            if (self.categoricalRaceChartDataFields[i].source.type.dateTime) {
+                d = new Date(d) as any;
+            }
+            return self.raceBarLabelsFormatter[i].formatter.format(d);
+        }).join(" "));
 
     const getTotal1Value = () => {
         if (self.isLollipopTypePie) {

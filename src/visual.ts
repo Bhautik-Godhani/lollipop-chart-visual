@@ -311,6 +311,7 @@ export class Visual extends Shadow {
 	public measureNumberFormatter: IValueFormatter[] = [];
 	public tooltipNumberFormatter: IValueFormatter[] = [];
 	public sortValuesNumberFormatter: IValueFormatter[] = [];
+	public raceBarLabelsFormatter: IValueFormatter[] = [];
 	public allNumberFormatter: { [name: string]: IValueFormatter } = {};
 	public extraDataLabelsNumberFormatter: IValueFormatter[];
 	public valueFormatter: valueFormatter.IValueFormatter = valueFormatter;
@@ -1635,7 +1636,7 @@ export class Visual extends Shadow {
 			this.minScaleBandWidth = 50;
 		}
 
-		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalExtraDataLabelsFields);
+		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues);
 
 		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
@@ -2214,7 +2215,7 @@ export class Visual extends Shadow {
 			this.minScaleBandWidth = 60;
 		}
 
-		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields, this.categoricalExtraDataLabelsFields);
+		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields, this.categoricalRaceChartDataFields);
 
 		this.categoryDisplayName = this.categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = this.categoricalSubCategoryField ? this.categoricalSubCategoryField.displayName : "";
@@ -2296,7 +2297,7 @@ export class Visual extends Shadow {
 			this.raceChartKeyLabelList =
 				this.categoricalRaceChartDataFields[0].values.reduce((arr, cur, index) => {
 					const values = this.categoricalRaceChartDataFields.map((r) => r.values[index]);
-					const key = values.join("-");
+					const key = values.join("--");
 					const label = values.join(" ");
 					arr = [...arr, { key, label }];
 					return arr;
@@ -10098,7 +10099,7 @@ export class Visual extends Shadow {
 		// }
 	}
 
-	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalExtraDataLabelsFields): void {
+	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues): void {
 		this.measureNumberFormatter = categoricalMeasureFields.map((d) => {
 			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 		});
@@ -10108,6 +10109,10 @@ export class Visual extends Shadow {
 		});
 
 		this.sortValuesNumberFormatter = categoricalSortFields.map((d) => {
+			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
+		});
+
+		this.raceBarLabelsFormatter = categoricalRaceBarValues.map((d) => {
 			return { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }) } as IValueFormatter;
 		});
 
