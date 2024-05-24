@@ -1877,11 +1877,15 @@ export class Visual extends Shadow {
 
 		if (this.isChartIsRaceChart) {
 			let iterator: number = 0;
+			const categoricalCategories = [];
+			const categoricalValues: { values: number[], highlights: number[] }[] = [];
+
 			this.categoricalDataPairs.forEach((dataPair) => {
 				const keys = Object.keys(dataPair).splice(1);
 				keys.forEach((key) => {
 					const index = +key.toString().split("-")[1];
-					categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+					// categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+					categoricalCategories.push(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index]);
 
 					// if (categoricalSmallMultiplesFields.length) {
 					// 	categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
@@ -1893,16 +1897,32 @@ export class Visual extends Shadow {
 						});
 					}
 
+					const values = [];
+					const highlights = [];
+
 					categoricalData.values.forEach((categoricalValue, i: number) => {
-						categoricalValue.values[iterator] = clonedCategoricalData.values[i].values[index];
+						values.push(clonedCategoricalData.values[i].values[index]);
+						// categoricalValue.values[iterator] = clonedCategoricalData.values[i].values[index];
 
 						if (categoricalValue.highlights) {
-							categoricalValue.highlights[iterator] = clonedCategoricalData.values[i].highlights[index];
+							highlights.push(clonedCategoricalData.values[i].highlights[index]);
+							// categoricalValue.highlights[iterator] = clonedCategoricalData.values[i].highlights[index];
 						}
 					});
 
+					categoricalValues.push({ values, highlights });
+
 					iterator++;
 				});
+			});
+
+			categoricalData.categories[this.categoricalCategoriesLastIndex].values = categoricalCategories;
+			categoricalData.values.forEach((categoricalValue, i: number) => {
+				categoricalValue.values = categoricalValues.map(d => d.values[i]);
+
+				if (categoricalValue.highlights) {
+					categoricalValue.highlights = categoricalValues.map(d => d.highlights[i]);
+				}
 			});
 		} else {
 			categoricalData.categories.forEach((d, i) => {
