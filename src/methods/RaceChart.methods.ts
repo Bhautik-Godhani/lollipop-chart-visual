@@ -24,15 +24,17 @@ export const StartChartRace = (self: Visual) => {
 
         setDataWithAllPositiveCategory();
 
-        self.raceChartDataLabelOnTick = self.chartData[0].raceChartDataLabel;
-        RenderRaceChartDataLabel(self);
+        if (self.chartData.length > 0) {
+            self.raceChartDataLabelOnTick = self.chartData[0].raceChartDataLabel;
+            RenderRaceChartDataLabel(self);
 
-        if (self.raceChartKeysLength === self.tickIndex) {
-            self.tickIndex = -2;
-            setDataWithAllPositiveCategory();
-            self.ticker.stop();
-            self.isRacePlaying = false;
-            RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
+            if (self.raceChartKeysLength === self.tickIndex) {
+                self.tickIndex = -2;
+                setDataWithAllPositiveCategory();
+                self.ticker.stop();
+                self.isRacePlaying = false;
+                RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
+            }
         }
     }, self.raceChartSettings.dataChangeInterval);
 }
@@ -165,13 +167,15 @@ export const RenderRaceTickerButton = (self: Visual): void => {
             ")"
         )
         .on("click", () => {
-            self.isRacePlaying = !self.isRacePlaying;
-            RenderTickerButtonPlayPausePath(self, self.isRacePlaying ? EPlayPauseButton.Pause : EPlayPauseButton.Play);
+            if (self.raceChartKeysList.length > 1) {
+                self.isRacePlaying = !self.isRacePlaying;
+                RenderTickerButtonPlayPausePath(self, self.isRacePlaying ? EPlayPauseButton.Pause : EPlayPauseButton.Play);
 
-            if (!self.isRacePlaying) {
-                self.ticker.stop();
-            } else {
-                StartChartRace(self);
+                if (!self.isRacePlaying) {
+                    self.ticker.stop();
+                } else {
+                    StartChartRace(self);
+                }
             }
         });
 

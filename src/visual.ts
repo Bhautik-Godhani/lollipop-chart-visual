@@ -1728,7 +1728,11 @@ export class Visual extends Shadow {
 
 		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
 
-		if (categoricalRaceBarValues.length > 0 && this.raceChartSettings.isEnabled) {
+		if (this.isChartRacePossible && categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
+			this.isChartRacePossible = false;
+		}
+
+		if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
 			let raceBarKeys = [];
 			const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
 				(arr, category: string, index: number) => {
@@ -1752,6 +1756,10 @@ export class Visual extends Shadow {
 			const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
 			const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 0);
 			this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
+
+			if (categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
+				this.isChartIsRaceChart = false;
+			}
 
 			if (this.isChartIsRaceChart) {
 				const categoricalDataPairsGroup = d3.group(categoricalDataPairsForGrouping, (d: any) => d.category);
@@ -2534,7 +2542,8 @@ export class Visual extends Shadow {
 			}
 
 			const clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
-			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category]);
+			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
+				.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 			this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
 
 			if (this.isExpandAllApplied) {
