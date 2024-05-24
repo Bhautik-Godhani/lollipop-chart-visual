@@ -27,7 +27,6 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): voi
 				.attr("transform", "translate(0," + i * expandAxisGHeight + ")")
 				.call(
 					axisBottom(self[`${category}Scale`])
-						.ticks(width / 90)
 				);
 
 			SetExpandAllXAxisTickStyle(self);
@@ -38,7 +37,6 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): voi
 				.attr("transform", "translate(0," + (-(((self.expandAllCategoriesName.length - 1) - i) * expandAxisGHeight)) + ")")
 				.call(
 					axisTop(self[`${category}Scale`])
-						.ticks(width / 90)
 				);
 
 			SetExpandAllXAxisTickStyle(self);
@@ -93,7 +91,6 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 				.attr("transform", `translate(${(i + 1) * self.expandAllYScaleGWidth / self.expandAllCategoriesName.length}, ${0})`)
 				.call(
 					axisLeft(self[`${category}Scale`])
-						.ticks(expandAllScaleWidth / 90)
 						.tickFormat((d: string) => d.toString().split("--")[0]) as any
 				);
 
@@ -105,7 +102,6 @@ export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth
 				.attr("transform", `translate(${(i + 1) * self.expandAllYScaleGWidth / self.expandAllCategoriesName.length}, ${0})`)
 				.call(
 					axisLeft(self[`${category}Scale`])
-						.ticks(expandAllScaleWidth / 90)
 						.tickFormat((d: string) => d.toString().split("--")[0]) as any
 				);
 

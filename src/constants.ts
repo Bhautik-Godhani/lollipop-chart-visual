@@ -618,7 +618,7 @@ export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
 	breakEnd: 0,
 	markerStrokeColor: "rgba(102,102,102,1)",
 	markerBackgroundColor: "rgba(255, 255, 255, 1)",
-	markerPlacement: ECutAndClipMarkerPlacementTypes.Both
+	markerPlacement: ECutAndClipMarkerPlacementTypes.Categories
 };
 
 export const AXIS_DATE_FORMATS: ILabelValuePair[] = [

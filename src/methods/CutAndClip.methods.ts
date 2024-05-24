@@ -130,33 +130,33 @@ export const CallLinearCutScaleOnAxisGroup = (self: Visual): void => {
         if (self.xAxisSettings.position === Position.Bottom) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisBottom(self.beforeCutLinearScale));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, ${0})`)
-                .call(axisBottom(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisBottom(self.afterCutLinearScale));
         } else if (self.xAxisSettings.position === Position.Top) {
             self.beforeCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisTop(self.beforeCutLinearScale));
             self.afterCutLinearXAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisTop(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisTop(self.afterCutLinearScale));
         }
     } else {
         if (self.yAxisSettings.position === Position.Left) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisLeft(self.beforeCutLinearScale));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(0, 0)`)
-                .call(axisLeft(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisLeft(self.afterCutLinearScale));
         } else if (self.yAxisSettings.position === Position.Right) {
             self.beforeCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.beforeCutLinearScale).ticks(self.beforeCutLinearScaleArea / 90));
+                .call(axisRight(self.beforeCutLinearScale));
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
-                .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 90));
+                .call(axisRight(self.afterCutLinearScale));
         }
     }
 }
