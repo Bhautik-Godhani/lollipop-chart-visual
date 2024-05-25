@@ -60,8 +60,6 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
 
   const getBoxShadow = () => {
     switch (shadowSettings.type) {
-      case ESmallMultiplesShadowType.None:
-        return null;
       case ESmallMultiplesShadowType.Simple:
         return `${shadowSettings.color} 0px 3px 8px`;
       case ESmallMultiplesShadowType.StandOut:
@@ -91,7 +89,7 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
               borderColor: borderSettings.color,
               borderRadius: borderSettings.isShowBorder ? borderSettings.radius : 0,
               boxSizing: "border-box",
-              boxShadow: getBoxShadow(),
+              boxShadow: shadowSettings.isEnabled ? getBoxShadow() : null,
               padding: `${props.containerPadding[1]}px ${props.containerPadding[0]}px`,
               height: '100%'
             }}

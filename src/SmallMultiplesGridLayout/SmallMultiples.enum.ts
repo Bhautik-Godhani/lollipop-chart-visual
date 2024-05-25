@@ -71,7 +71,6 @@ export enum ESmallMultiplesBackgroundType {
 }
 
 export enum ESmallMultiplesShadowType {
-    None = "none",
     Simple = "shadow",
     StandOut = "standOut",
     Custom = "custom"
