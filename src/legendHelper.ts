@@ -2,6 +2,8 @@
 import * as d3 from "d3";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import { generatePattern } from "./methods/methods";
+import { Visual } from "./visual";
+import { EMarkerShapeTypes } from "./enum";
 
 // export interface LegendDataPoint {
 //   label: string;
@@ -95,13 +97,14 @@ export const renderLegendTitle = (shadow, legendTitle, legendFormattingOptions, 
 }
 
 export const renderLegends = (
-    shadow,
+    self: Visual,
     mainContainer: HTMLElement,
     bottomSpace: number,
     legendTitle: string,
     legendsData, //: LegendDataPoint[],
     legendFormattingOptions,
     isPatternEnabled,
+    isShowImageMarker
 ) => {
     initializeLegends(mainContainer, legendFormattingOptions);
 
@@ -111,7 +114,7 @@ export const renderLegends = (
 
     let labelOffsetX = 0, labelOffsetY = 10, legendTitleElement;
     if (legendFormattingOptions.showTitle) {
-        legendTitleElement = renderLegendTitle(shadow, legendTitle, legendFormattingOptions, circleRadius);
+        legendTitleElement = renderLegendTitle(self, legendTitle, legendFormattingOptions, circleRadius);
 
         labelOffsetX = legendTitleElement.node().getBBox().width + 5;
         labelOffsetY = legendTitleElement.node().getBBox().height + 5;
@@ -121,17 +124,34 @@ export const renderLegends = (
 
     const legendItems = legendItemsGroup.selectAll(".legendItem").data(legendsData).enter().append("g").attr("class", "legendItem").attr("transform", (d, i) => getTranslateValues(i, legendFormattingOptions));
 
-    legendItems
-        .append("circle")
-        .attr("cx", () => circleRadius)
-        .attr("cy", () => circleRadius)
-        .attr("r", () => circleRadius)
-        .attr("fill", d => {
-            if (isPatternEnabled && d.data.pattern && d.data.pattern.patternIdentifier !== "" && d.data.pattern.patternIdentifier !== "NONE") {
-                return `url('#${generatePattern(legend, d.data.pattern, d.data.color, true)}')`;
-            }
-            return d.data.color;
-        });
+    if (!isShowImageMarker) {
+        legendItems
+            .append("circle")
+            .attr("cx", () => circleRadius)
+            .attr("cy", () => circleRadius)
+            .attr("r", () => circleRadius)
+            .attr("fill", d => {
+                if (isPatternEnabled && d.data.pattern && d.data.pattern.patternIdentifier !== "" && d.data.pattern.patternIdentifier !== "NONE") {
+                    return `url('#${generatePattern(legend, d.data.pattern, d.data.color, true)}')`;
+                }
+                return d.data.color;
+            });
+    } else {
+        legendItems.append("svg:image")
+            .attr("width", circleRadius * 2)
+            .attr("height", circleRadius * 2)
+            .attr("xlink:href", (d) => {
+                if (self.isHasImagesData && self.isShowImageMarker1 && d.data.imageUrl) {
+                    return d.data.imageUrl;
+                }
+
+                if (self.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && self.markerSettings.marker1Style.markerShapeBase64Url) {
+                    return self.markerSettings.marker1Style.markerShapeBase64Url;
+                }
+            })
+    }
+
+    console.log(isShowImageMarker);
 
     legendItems
         .append("text")

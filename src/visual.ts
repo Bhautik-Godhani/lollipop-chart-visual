@@ -4296,84 +4296,103 @@ export class Visual extends Shadow {
 	}
 
 	public drawLegend() {
-		let legendDataPoints: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
+		let legendDataPoints: { data: { name: string, color: string, pattern: IPatternProps, imageUrl: string } }[] = [];
 
 		if (this.isLollipopTypeCircle) {
-			switch (this.dataColorsSettings.fillType) {
-				case ColorPaletteType.Single:
-					if (!this.isHasMultiMeasure) {
-						legendDataPoints = [{
-							data: {
-								name: this.measure1DisplayName,
-								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-								pattern: undefined
-							}
-						}]
-					} else {
-						legendDataPoints = [
-							{
+			if (!this.isShowImageMarker1) {
+				switch (this.dataColorsSettings.fillType) {
+					case ColorPaletteType.Single:
+						if (!this.isHasMultiMeasure) {
+							legendDataPoints = [{
 								data: {
 									name: this.measure1DisplayName,
 									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value1]
+									pattern: undefined,
+									imageUrl: undefined
+								}
+							}]
+						} else {
+							legendDataPoints = [
+								{
+									data: {
+										name: this.measure1DisplayName,
+										color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+										pattern: this.patternByMeasures[DataValuesType.Value1],
+										imageUrl: undefined
+									},
 								},
-							},
+								{
+									data: {
+										name: this.measure2DisplayName,
+										color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
+										pattern: this.patternByMeasures[DataValuesType.Value2],
+										imageUrl: undefined
+									},
+								}
+							]
+						}
+						break;
+					case ColorPaletteType.PowerBi:
+					case ColorPaletteType.Diverging:
+					case ColorPaletteType.Qualitative:
+					case ColorPaletteType.Sequential:
+					case ColorPaletteType.ByCategory:
+					case ColorPaletteType.Gradient:
+						if (this.isHasMultiMeasure) {
+							legendDataPoints = this.measureNames.map((d, i) => ({
+								data: {
+									name: d,
+									color: this.getColor(this.categoryColorPair[this.chartData[0].category][`marker${i + 1}Color`], EHighContrastColorType.Foreground),
+									pattern: this.patternByMeasures[`value${i + 1}`],
+									imageUrl: undefined
+								}
+							}))
+						} else {
+							const chartData = JSON.parse(JSON.stringify(this.chartData));
+							legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
+								data: {
+									name: d.category.replace(/--\d+/g, ''),
+									color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
+									pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category),
+									imageUrl: undefined
+								}
+							}));
+						}
+						break;
+					case ColorPaletteType.PositiveNegative:
+						legendDataPoints = [
 							{
 								data: {
-									name: this.measure2DisplayName,
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value2]
+									name: "Positive",
+									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
+									pattern: undefined,
+									imageUrl: undefined
 								},
-							}
+							},
 						]
-					}
-					break;
-				case ColorPaletteType.PowerBi:
-				case ColorPaletteType.Diverging:
-				case ColorPaletteType.Qualitative:
-				case ColorPaletteType.Sequential:
-				case ColorPaletteType.ByCategory:
-				case ColorPaletteType.Gradient:
-					if (this.isHasMultiMeasure) {
-						legendDataPoints = this.measureNames.map((d, i) => ({
-							data: {
-								name: d,
-								color: this.getColor(this.categoryColorPair[this.chartData[0].category][`marker${i + 1}Color`], EHighContrastColorType.Foreground),
-								pattern: this.patternByMeasures[`value${i + 1}`]
-							}
-						}))
-					} else {
-						const chartData = JSON.parse(JSON.stringify(this.chartData));
-						legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
-							data: {
-								name: d.category.replace(/--\d+/g, ''),
-								color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
-								pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category)
-							}
-						}));
-					}
-					break;
-				case ColorPaletteType.PositiveNegative:
-					legendDataPoints = [
-						{
-							data: {
-								name: "Positive",
-								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
-								pattern: undefined
-							},
-						},
-					]
 
-					if (this.isHasGlobalMinValue) {
-						legendDataPoints.push({
-							data: {
-								name: "Negative",
-								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
-								pattern: undefined
-							},
-						})
+						if (this.isHasGlobalMinValue) {
+							legendDataPoints.push({
+								data: {
+									name: "Negative",
+									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
+									pattern: undefined,
+									imageUrl: undefined
+								},
+							})
+						}
+						break;
+				}
+			} else {
+				const chartData: ILollipopChartRow[] = JSON.parse(JSON.stringify(this.chartData));
+				legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
+					data: {
+						name: d.category.replace(/--\d+/g, ''),
+						color: undefined,
+						pattern: undefined,
+						imageUrl: d.imageDataUrl1
 					}
-					break;
+				}));
 			}
 		}
 
@@ -4385,7 +4404,8 @@ export class Visual extends Shadow {
 							data: {
 								name: this.measure1DisplayName,
 								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-								pattern: this.chartData[0].subCategories[0].pattern
+								pattern: this.chartData[0].subCategories[0].pattern,
+								imageUrl: undefined
 							}
 						}]
 					} else {
@@ -4394,14 +4414,16 @@ export class Visual extends Shadow {
 								data: {
 									name: this.measure1DisplayName,
 									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value1]
+									pattern: this.patternByMeasures[DataValuesType.Value1],
+									imageUrl: undefined
 								},
 							},
 							{
 								data: {
 									name: this.measure2DisplayName,
 									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value2]
+									pattern: this.patternByMeasures[DataValuesType.Value2],
+									imageUrl: undefined
 								},
 							}
 						]
@@ -4418,7 +4440,8 @@ export class Visual extends Shadow {
 						data: {
 							name: d,
 							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
-							pattern: this.subCategoryPatterns.find(s => s.name === d)
+							pattern: this.subCategoryPatterns.find(s => s.name === d),
+							imageUrl: undefined
 						}
 					}))
 					break;
@@ -4428,7 +4451,8 @@ export class Visual extends Shadow {
 							data: {
 								name: "Positive",
 								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
-								pattern: undefined
+								pattern: undefined,
+								imageUrl: undefined
 							},
 						},
 					]
@@ -4439,7 +4463,8 @@ export class Visual extends Shadow {
 								data: {
 									name: "Negative",
 									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
-									pattern: undefined
+									pattern: undefined,
+									imageUrl: undefined
 								},
 							})
 					}
@@ -4458,6 +4483,7 @@ export class Visual extends Shadow {
 				legendDataPoints,
 				this.legendSettings,
 				this.patternSettings.enabled,
+				this.isShowImageMarker1
 			);
 
 			this.updateChartDimensions(this.legends.legendWrapper);
@@ -9820,39 +9846,6 @@ export class Visual extends Shadow {
 	// 			}
 	// 		});
 	// }
-
-	// Legend
-	setLegendsData(): void {
-		let legend1DataPoints: { data: { name: string, color: string, pattern: IPatternProps } }[] = [];
-
-		if (this.isLollipopTypeCircle) {
-			legend1DataPoints = [{
-				data: {
-					name: this.measure1DisplayName,
-					color: "",
-					pattern: undefined
-				}
-			},
-			{
-				data: {
-					name: this.measure2DisplayName,
-					color: "",
-					pattern: undefined
-				}
-			}
-			];
-		} else {
-			legend1DataPoints = this.subCategoriesName.map((name) => ({
-				data: {
-					name: name,
-					color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${name}`].marker1Color, EHighContrastColorType.Foreground),
-					pattern: this.subCategoryPatterns.find(d => d.name === name)
-				}
-			}));
-		}
-
-		this.legendData = legend1DataPoints;
-	}
 
 	handleShowBucket(): void {
 		const showBucketConfig = JSON.parse(this.vizOptions.formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]);
