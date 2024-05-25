@@ -408,12 +408,14 @@ const UILayout = (
       </Column>
 
       <Column>
-        <SelectInput
-          label={"View Type"}
-          value={configValues.viewType}
-          optionsList={VIEW_TYPES}
-          handleChange={(value) => handleChange(value, ESmallMultiplesSettings.ViewType, setConfigValues)}
-        />
+        <ConditionalWrapper visible={configValues.layoutType === ESmallMultiplesLayoutType.Grid}>
+          <SelectInput
+            label={"View Type"}
+            value={configValues.viewType}
+            optionsList={VIEW_TYPES}
+            handleChange={(value) => handleChange(value, ESmallMultiplesSettings.ViewType, setConfigValues)}
+          />
+        </ConditionalWrapper>
       </Column>
     </Row>
 
