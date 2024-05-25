@@ -631,7 +631,7 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
         </Column>
       </Row>
 
-      <Row>
+      {/* <Row>
         <Column>
           <ToggleButton
             label={"Text Wrap"}
@@ -640,7 +640,7 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
             appearance="checkbox"
           />
         </Column>
-      </Row>
+      </Row> */}
     </ConditionalWrapper>
     {/* </AccordionAlt> */}
   </>

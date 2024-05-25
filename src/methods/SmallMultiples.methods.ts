@@ -320,11 +320,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 textEle.style("display", "none");
             }
 
-            if (self.smallMultiplesSettings.header.isTextWrapEnabled) {
-                textEle.classed("text-ellipsis", true);
-            } else {
-                textEle.classed("text-ellipsis", false);
-            }
+            // if (self.smallMultiplesSettings.header.isTextWrapEnabled) {
+            textEle.classed("text-ellipsis", true);
+            // } else {
+            //     textEle.classed("text-ellipsis", false);
+            // }
 
             const total = config.gridDataItemsTotals[smallMultipleIndex];
 
@@ -335,15 +335,19 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             switch (headerSettings.displayType) {
                 case ESmallMultiplesHeaderDisplayType.None:
                     textEle.text("");
+                    textEle.attr("title", "");
                     break;
                 case ESmallMultiplesHeaderDisplayType.TitleAndTotalValue:
                     textEle.text(categoryName + " : " + categoryTotal);
+                    textEle.attr("title", categoryName + " : " + categoryTotal);
                     break;
                 case ESmallMultiplesHeaderDisplayType.TitleAndAverageValue:
                     textEle.text(categoryName + " : " + categoryAvg);
+                    textEle.attr("title", categoryName + " : " + categoryAvg);
                     break;
                 case ESmallMultiplesHeaderDisplayType.TitleOnly:
                     textEle.text(categoryName);
+                    textEle.attr("title", categoryName);
                     break;
             }
 
