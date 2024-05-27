@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ConditionRecord from "./ConditionRecord";
-import { isEmpty } from "lodash";
+import { cloneDeep, isEmpty } from "lodash";
 import { Breadcrumb, Column, Footer, InputControl, Label, PopupModHeader, Row, ToggleButton } from "@truviz/shadow/dist/Components";
 import { EditIcon } from "../settings-pages/SettingsIcons";
 import { ILabelValuePair } from "../visual-settings.interface";
@@ -49,7 +49,7 @@ const GetCFormattingFormUI = (
                     label={d.label}
                     value={ruleDetails.applyOnCategories.includes(d.value)}
                     handleChange={() => {
-                      const newRuleDetails = JSON.parse(JSON.stringify(ruleDetails));
+                      const newRuleDetails = cloneDeep(ruleDetails);
                       const isCategoryAlreadyAdded: boolean = ruleDetails.applyOnCategories.includes(d.value);
 
                       if (!isCategoryAlreadyAdded) {

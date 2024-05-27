@@ -5,6 +5,7 @@ import { CopyIcon, DeleteIcon, EditIcon, PlusIcon, SixDot } from "../settings-pa
 import { Button, Column, PopupModHeader, Row, SwitchOption } from "@truviz/shadow/dist/Components";
 import { categoryComparisionOptions, measureComparisionOptions } from "@truviz/shadow/dist/Components/Editor/constants";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
+import { cloneDeep } from "lodash";
 
 const GetActionMenuUI = (
   index: number,
@@ -37,7 +38,7 @@ const GetActionMenuUI = (
         e.stopPropagation();
         setActiveMenuRowIndex(-1);
         setRules((d) => {
-          return [...d, JSON.parse(JSON.stringify(rule))];
+          return [...d, cloneDeep(rule)];
         });
       }}>
         <CopyIcon
@@ -58,7 +59,7 @@ const GetActionMenuUI = (
         Delete
       </div>
     </div>
-  </div>
+  </div >
 }
 
 const RulesList = ({

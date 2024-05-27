@@ -7,6 +7,7 @@ import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, 
 import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { ERankingCalcMethod, ERankingType } from "../enum";
 import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
+import { cloneDeep } from "lodash";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
@@ -92,7 +93,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             const smallMultipleIndex = gridItemId;
             self.currentSmallMultipleIndex = gridItemId;
             const isOthersSM = config.categories[smallMultipleIndex].toString().includes(self.othersLabel);
-            const clonedCategoricalData: powerbi.DataViewCategorical = JSON.parse(JSON.stringify(self.originalCategoricalData));
+            const clonedCategoricalData: powerbi.DataViewCategorical = cloneDeep(self.originalCategoricalData);
 
             self.isCurrentSmallMultipleIsOthers = false;
 
@@ -272,10 +273,9 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.brushG = brushG as any;
 
-            const clonedCategoricalData2 = JSON.parse(JSON.stringify(self.categoricalData));
             const initialChartDataByBrushScaleBand = self.setInitialChartData(
                 clonedCategoricalData,
-                JSON.parse(JSON.stringify(clonedCategoricalData)),
+                cloneDeep(clonedCategoricalData),
                 self.categoricalMetadata,
                 newItemWidth,
                 newItemHeight

@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineValueProps } from "../visual-settings.interface";
 import { calculateStandardDeviation, GetSVGTextSize2 } from "./methods";
 import { GetFormattedNumber } from "./NumberFormat.methods";
+import { cloneDeep } from "lodash";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const generateSecureRandomBytes = (length) => {
@@ -360,7 +361,7 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     let newX1, newX2, newY1, newY2, newTextX1, newTextY1, newTextAnchor, newTextAlignment;
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
-        const categories = JSON.parse(JSON.stringify(<string[]>self.categoricalData.categories[self.categoricalCategoriesLastIndex].values));
+        const categories = cloneDeep(<string[]>self.categoricalData.categories[self.categoricalCategoriesLastIndex].values);
         const domain: string[] = self.isHorizontalChart ? categories.reverse() : categories;
 
         // domain = self.elementToMoveOthers(domain, false, undefined);
@@ -603,7 +604,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
                 if (rLine.lineValue1.axis === EXYAxisNames.X) {
                     if ((rLine.line1Coord.x1 > rLine.line2Coord.x1 && !self.isHorizontalChart) || (rLine.line1Coord.y1 > rLine.line2Coord.y1 && self.isHorizontalChart)) {
-                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
                         // rLine.line1Coord = rLine.line2Coord;
                         // rLine.line2Coord = clonedRLine.line1Coord;
                         switch (rLine.labelStyle.labelPosition) {
@@ -621,7 +622,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                                 break;
                         }
                     } else {
-                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
                         // rLine.line1Coord = rLine.line2Coord;
                         // rLine.line2Coord = clonedRLine.line1Coord;
                         switch (rLine.labelStyle.labelPosition) {
@@ -643,7 +644,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
 
                 if (rLine.lineValue1.axis === EXYAxisNames.Y) {
                     if ((rLine.line1Coord.y1 > rLine.line2Coord.y1 && !self.isHorizontalChart) || (rLine.line1Coord.x1 > rLine.line2Coord.x1 && self.isHorizontalChart)) {
-                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
                         // rLine.line1Coord = rLine.line2Coord;
                         // rLine.line2Coord = clonedRLine.line1Coord;
                         switch (rLine.labelStyle.labelPosition) {
@@ -661,7 +662,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                                 break;
                         }
                     } else {
-                        // const clonedRLine: IReferenceLineSettings = JSON.parse(JSON.stringify(rLine));
+                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
                         // rLine.line1Coord = rLine.line2Coord;
                         // rLine.line2Coord = clonedRLine.line1Coord;
 

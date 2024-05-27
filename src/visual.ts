@@ -193,6 +193,7 @@ import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSet
 import ImportExport from "./settings-pages/ImportExport";
 import ConditionalFormatting from "./ConditionalFormatting/ConditionalFormatting";
 import { ECFCategoriesType } from "@truviz/shadow/dist/Components/ConditionalFormatting/ConditionalFormatting.enum";
+import { cloneDeep } from "lodash";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -1075,7 +1076,7 @@ export class Visual extends Shadow {
 		let othersBarData: any[] = [];
 		let othersStartIndex: number = 0;
 
-		const clonedCategoricalDataPairs = JSON.parse(JSON.stringify(this.categoricalDataPairs));
+		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 
 		if (categoryRankingSettings.enabled) {
 			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
@@ -1850,7 +1851,7 @@ export class Visual extends Shadow {
 
 		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category");
 
-		const clonedCategoricalPair = JSON.parse(JSON.stringify(this.categoricalDataPairs));
+		const clonedCategoricalPair = cloneDeep(this.categoricalDataPairs);
 		if (this.isHorizontalChart) {
 			this.categoricalDataPairs = clonedCategoricalPair.reverse();
 		}
@@ -2150,7 +2151,7 @@ export class Visual extends Shadow {
 				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 			);
 
-			const categoricalData2 = JSON.parse(JSON.stringify(categoricalData));
+			const categoricalData2 = cloneDeep(categoricalData);
 
 			categoricalData2.categories.forEach((d, i) => {
 				d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
@@ -2436,7 +2437,7 @@ export class Visual extends Shadow {
 
 		try {
 			this.originalCategoricalData = this.vizOptions.options.dataViews[0].categorical as any;
-			this.clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
+			this.clonedCategoricalData = cloneDeep(this.vizOptions.options.dataViews[0].categorical);
 			this.categoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.categoricalMetadata = this.vizOptions.options.dataViews[0].metadata;
 			this.isInFocusMode = vizOptions.options.isInFocus;
@@ -2462,8 +2463,8 @@ export class Visual extends Shadow {
 			this.maxPieXScaleDiff = 0;
 			this.maxPieYScaleDiff = 0;
 
-			this.viewPortWidth = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.width)) - 10;
-			this.viewPortHeight = JSON.parse(JSON.stringify(this.vizOptions.options.viewport.height));
+			this.viewPortWidth = cloneDeep(this.vizOptions.options.viewport.width) - 10;
+			this.viewPortHeight = cloneDeep(this.vizOptions.options.viewport.height);
 
 			const isReturn = this.renderErrorMessages();
 
@@ -2576,7 +2577,7 @@ export class Visual extends Shadow {
 				this.brushAndZoomAreaHeight = 0;
 			}
 
-			const clonedCategoricalData = JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].categorical));
+			const clonedCategoricalData = cloneDeep(this.vizOptions.options.dataViews[0].categorical);
 			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
 				.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 			this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
@@ -2753,7 +2754,7 @@ export class Visual extends Shadow {
 					this.smallMultiplesCategories = this.smallMultiplesDataPairs.map(d => d.category);
 				}
 
-				let smallMultiplesCategories = JSON.parse(JSON.stringify(this.smallMultiplesCategories));
+				let smallMultiplesCategories = cloneDeep(this.smallMultiplesCategories);
 				const SMRanking = this.rankingSettings.smallMultiples;
 				let othersSMData;
 
@@ -2958,7 +2959,7 @@ export class Visual extends Shadow {
 				this.categoricalData = this.setInitialChartData(
 					clonedCategoricalData,
 					clonedCategoricalData,
-					JSON.parse(JSON.stringify(this.vizOptions.options.dataViews[0].metadata)),
+					cloneDeep(this.vizOptions.options.dataViews[0].metadata),
 					vizOptions.options.viewport.width,
 					vizOptions.options.viewport.height
 				);
@@ -3347,7 +3348,7 @@ export class Visual extends Shadow {
 		});
 
 		// BY RANKING
-		const chartData: ILollipopChartRow[] = JSON.parse(JSON.stringify(this.chartData)).sort((a: ILollipopChartRow, b: ILollipopChartRow) => (b.value1 + b.value2) - (a.value1 + a.value2));
+		const chartData: ILollipopChartRow[] = cloneDeep(this.chartData).sort((a: ILollipopChartRow, b: ILollipopChartRow) => (b.value1 + b.value2) - (a.value1 + a.value2));
 		chartData.forEach((d: ILollipopChartRow, i) => {
 			this.conditionalFormattingConditions.forEach((c) => {
 				if (this.isLollipopTypeCircle) {
@@ -3655,7 +3656,7 @@ export class Visual extends Shadow {
 					}
 				}
 			} else {
-				const categoricalDataValues: powerbi.DataViewValueColumn[] = JSON.parse(JSON.stringify(categoricalData.values));
+				const categoricalDataValues: powerbi.DataViewValueColumn[] = cloneDeep(categoricalData.values);
 				const displayNames = categoricalDataValues.map((d) => d.source.displayName);
 
 				if (displayNames.includes(sortBy)) {
@@ -4154,7 +4155,7 @@ export class Visual extends Shadow {
 		this.setSelectionIds(data);
 
 		if (this.isChartIsRaceChart) {
-			this.raceChartData = JSON.parse(JSON.stringify(data));
+			this.raceChartData = cloneDeep(data);
 			this.raceChartData = this.categoriesName.reduce((acc, category) => {
 				this.raceChartKeysList.forEach((key) => {
 					acc = [...acc, this.raceChartData.find((d) => d.category === category && d.raceChartKey === key)];
@@ -4236,7 +4237,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		// const chartData = JSON.parse(JSON.stringify(this.chartData));
+		// const chartData = cloneDeep(this.chartData));
 		// if (this.isHorizontalChart) {
 		// 	this.chartData = chartData.reverse();
 		// }
@@ -4362,7 +4363,7 @@ export class Visual extends Shadow {
 								}
 							}))
 						} else {
-							const chartData = JSON.parse(JSON.stringify(this.chartData));
+							const chartData = cloneDeep(this.chartData);
 							legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
 								data: {
 									name: d.category.replace(/--\d+/g, ''),
@@ -4398,7 +4399,7 @@ export class Visual extends Shadow {
 						break;
 				}
 			} else {
-				const chartData: ILollipopChartRow[] = JSON.parse(JSON.stringify(this.chartData));
+				const chartData: ILollipopChartRow[] = cloneDeep(this.chartData);
 				legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
 					data: {
 						name: d.category.replace(/--\d+/g, ''),
@@ -4618,9 +4619,9 @@ export class Visual extends Shadow {
 			...SMConfig,
 		};
 
-		this.legendSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.Legend]));
-		this.numberSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.NumberFormatting]));
-		this.footerSettings = JSON.parse(JSON.stringify(formatTab[EVisualSettings.Footer]));
+		this.legendSettings = cloneDeep(formatTab[EVisualSettings.Legend]);
+		this.numberSettings = cloneDeep(formatTab[EVisualSettings.NumberFormatting]);
+		this.footerSettings = cloneDeep(formatTab[EVisualSettings.Footer]);
 
 		const xAxisConfig = JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]);
 		this.xAxisSettings = {
@@ -4663,7 +4664,7 @@ export class Visual extends Shadow {
 			this.dataColorsSettings.schemeColors = COLORBREWER[this.dataColorsSettings.fillType][this.dataColorsSettings.colorScheme];
 		}
 
-		const clonedRankingSettings = JSON.parse(JSON.stringify(this.rankingSettings ? this.rankingSettings : {}));
+		const clonedRankingSettings = cloneDeep(this.rankingSettings ? this.rankingSettings : {});
 		const rankingConfig = JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]);
 		this.rankingSettings = {
 			...RANKING_SETTINGS,
@@ -4812,13 +4813,13 @@ export class Visual extends Shadow {
 			this.yAxisSettings.isDisplayLabel = false;
 		}
 
-		this.schemeColors = JSON.parse(JSON.stringify(this.dataColorsSettings.schemeColors));
+		this.schemeColors = cloneDeep(this.dataColorsSettings.schemeColors);
 
 		this.data1LabelsSettings = this.dataLabelsSettings.measure1;
 		this.data2LabelsSettings = this.dataLabelsSettings.measure2;
 
 		if (!this.dataColorsSettings.reverse) {
-			this.dataColorsSettings.schemeColors = JSON.parse(JSON.stringify(this.schemeColors.reverse()));
+			this.dataColorsSettings.schemeColors = cloneDeep(this.schemeColors.reverse());
 		}
 
 		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
@@ -5276,7 +5277,7 @@ export class Visual extends Shadow {
 	}
 
 	drawVerticalBrush(categoricalData: powerbi.DataViewCategorical, barDistance: number, totalBarsCount: number): void {
-		categoricalData = JSON.parse(JSON.stringify(categoricalData));
+		categoricalData = cloneDeep(categoricalData);
 		const yScaleDomain = this.brushScaleBand.domain();
 		this.brushScaleBand.range(this.yScale.range());
 		let isBrushRendered: boolean = false;
@@ -5324,7 +5325,7 @@ export class Visual extends Shadow {
 					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 				);
 
-				const categoricalData2 = JSON.parse(JSON.stringify(categoricalData));
+				const categoricalData2 = cloneDeep(categoricalData);
 
 				categoricalData2.categories.forEach((d, i) => {
 					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
@@ -5480,7 +5481,7 @@ export class Visual extends Shadow {
 		const barDistance: number = config.barDistance;
 		const totalBarsCount: number = config.totalBarsCount;
 		const scaleWidth: number = config.scaleWidth;
-		let categoricalData: any = JSON.parse(JSON.stringify(config.categoricalData));
+		let categoricalData: any = cloneDeep(config.categoricalData);
 		let isBrushRendered: boolean = false;
 
 		let brushG: SVGElement = config.brushG;
@@ -5507,7 +5508,7 @@ export class Visual extends Shadow {
 
 			const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
 			const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
-			categoricalData = smallMultiplesGridItemContent ? JSON.parse(JSON.stringify(smallMultiplesGridItemContent.categoricalData)) : JSON.parse(JSON.stringify(config.categoricalData));
+			categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 			this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
 
 			this.brushScaleBand.range(xScale.range());
@@ -5541,7 +5542,7 @@ export class Visual extends Shadow {
 					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 				);
 
-				const categoricalData2 = JSON.parse(JSON.stringify(categoricalData));
+				const categoricalData2 = cloneDeep(categoricalData);
 
 				categoricalData2.categories.forEach((d, i) => {
 					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
@@ -10031,7 +10032,7 @@ export class Visual extends Shadow {
 		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName);
 
 		if (this.isHorizontalChart) {
-			const clonedData = JSON.parse(JSON.stringify(seedDataFromVisual));
+			const clonedData = cloneDeep(seedDataFromVisual);
 			seedDataFromVisual = clonedData.reverse();
 		}
 

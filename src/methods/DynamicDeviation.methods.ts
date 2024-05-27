@@ -4,6 +4,7 @@ import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, ED
 import DynamicDeviationIcon from "../../assets/icons/DeviationIcon.svg";
 import { ICategoryValuePair } from "../visual-settings.interface";
 import { getSVGTextSize } from "./methods";
+import { cloneDeep } from "lodash";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair): void => {
@@ -524,7 +525,7 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.CustomRange:
             {
-                const clonedCategoricalDataPairs = JSON.parse(JSON.stringify(self.categoricalDataPairs));
+                const clonedCategoricalDataPairs = cloneDeep(self.categoricalDataPairs);
                 const categoricalDataPairs = self.isHorizontalChart ? clonedCategoricalDataPairs.reverse() : clonedCategoricalDataPairs;
                 const fromIndex = categoricalDataPairs[dynamicDeviationSettings.fromIndex - 1];
                 const toIndex = categoricalDataPairs[dynamicDeviationSettings.toIndex - 1];
@@ -602,7 +603,7 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.PenultimateToLast:
             {
-                const chartData = self.isHorizontalChart ? JSON.parse(JSON.stringify(self.chartData)).reverse() : self.chartData;
+                const chartData = self.isHorizontalChart ? cloneDeep(self.chartData).reverse() : self.chartData;
                 const from = chartData[chartDataLength - 2];
                 const to = chartData[chartDataLength - 1];
                 RenderDynamicDeviation(
