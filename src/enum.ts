@@ -311,6 +311,7 @@ export enum EDataColorsSettings {
 export enum ERankingSettings {
 	Category = "category",
 	SubCategory = "subCategory",
+	RaceChartData = "raceChartData",
 	SmallMultiples = "smallMultiples",
 	Enabled = "enabled",
 	RankingType = "rankingType",

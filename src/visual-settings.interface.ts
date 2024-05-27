@@ -316,6 +316,7 @@ export interface IRankingSettings {
 	category: ICategoryRankingProps;
 	subCategory: ISubCategoryRankingProps;
 	smallMultiples: ICategoryRankingProps;
+	raceChartData: ICategoryRankingProps;
 }
 
 export interface ILabelValuePair {

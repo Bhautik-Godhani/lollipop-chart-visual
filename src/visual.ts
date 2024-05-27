@@ -1765,7 +1765,7 @@ export class Visual extends Shadow {
 			if (this.isChartIsRaceChart) {
 				const categoricalDataPairsGroup = d3.group(categoricalDataPairsForGrouping, (d: any) => d.category);
 				this.categoricalDataPairs = categories.map((category) =>
-					Object.assign({}, ...categoricalDataPairsGroup.get(category))
+					Object.assign({}, ...(this.rankingSettings.raceChartData.enabled ? categoricalDataPairsGroup.get(category).slice(0, this.rankingSettings.raceChartData.count) : categoricalDataPairsGroup.get(category)))
 				);
 			}
 		} else {
@@ -1877,7 +1877,7 @@ export class Visual extends Shadow {
 
 		if (this.isChartIsRaceChart) {
 			let iterator: number = 0;
-			const categoricalCategories = [];
+			const categoricalCategories: { categories: string[] }[] = [];
 			const categoricalValues: { values: number[], highlights: number[] }[] = [];
 
 			this.categoricalDataPairs.forEach((dataPair) => {
@@ -1885,17 +1885,23 @@ export class Visual extends Shadow {
 				keys.forEach((key) => {
 					const index = +key.toString().split("-")[1];
 					// categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
-					categoricalCategories.push(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index]);
+					// categoricalCategories.push(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index]);
 
 					// if (categoricalSmallMultiplesFields.length) {
 					// 	categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
 					// }
 
-					if (this.isChartIsRaceChart) {
-						categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
-							categoricalRaceBarValue.values[iterator] = clonedCategoricalRaceBarValues[i].values[index];
-						});
-					}
+					const categories = []
+
+					categoricalData.categories.forEach((categoricalValue, i: number) => {
+						categories.push(clonedCategoricalData.categories[i].values[index]);
+					});
+
+					categoricalCategories.push({ categories });
+
+					categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
+						categoricalRaceBarValue.values[iterator] = clonedCategoricalRaceBarValues[i].values[index];
+					});
 
 					const values = [];
 					const highlights = [];
@@ -1916,7 +1922,10 @@ export class Visual extends Shadow {
 				});
 			});
 
-			categoricalData.categories[this.categoricalCategoriesLastIndex].values = categoricalCategories;
+			categoricalData.categories.forEach((categoricalValue, i: number) => {
+				categoricalValue.values = categoricalCategories.map(d => d.categories[i]);
+			});
+
 			categoricalData.values.forEach((categoricalValue, i: number) => {
 				categoricalValue.values = categoricalValues.map(d => d.values[i]);
 
@@ -2321,8 +2330,13 @@ export class Visual extends Shadow {
 					const label = values.join(" ");
 					arr = [...arr, { key, label }];
 					return arr;
-				}, [])
-					.filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
+				}, []);
+
+			if (this.rankingSettings.raceChartData.enabled) {
+				this.raceChartKeyLabelList = this.raceChartKeyLabelList.slice(0, this.rankingSettings.raceChartData.count);
+			}
+
+			// .filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
 		}
 
 		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
@@ -6710,7 +6724,7 @@ export class Visual extends Shadow {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
-			this.scaleBandWidth = 0;
+			this.scaleBandWidth = this.markerMaxSize;
 		} else {
 			this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 		}

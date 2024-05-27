@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { RANKING_SETTINGS as RANKING_SETTINGS_IMP } from "../constants";
 import {
@@ -210,6 +211,32 @@ const UIByGroupRankingSettings = (
 	);
 };
 
+const UIByRaceChartRankingSettings = (
+	vizOptions: ShadowUpdateOptions,
+	raceChartRanking: ICategoryRankingProps,
+	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
+) => {
+	return (
+		<>
+			<Row appearance="padded">
+				<Column>
+					<Row style={{ width: "50%" }}>
+						<Column>
+							<InputControl
+								min={1}
+								type="number"
+								label="Count"
+								value={raceChartRanking.count}
+								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.RaceChartData, setConfigValues)}
+							/>
+						</Column>
+					</Row>
+				</Column>
+			</Row>
+		</>
+	);
+};
+
 // const UIByGroupRankingOthersSettings = (
 // 	vizOptions: ShadowUpdateOptions,
 // 	groupByRanking: IRankingProps,
@@ -294,6 +321,7 @@ const Ranking = (props) => {
 
 	const categoryRanking = configValues.category;
 	const groupByRanking = configValues.subCategory;
+	const raceChartRanking = configValues.raceChartData;
 	const SMRanking = configValues.smallMultiples;
 
 	return (
@@ -330,6 +358,25 @@ const Ranking = (props) => {
 
 					<ConditionalWrapper visible={groupByRanking.enabled}>
 						{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
+					</ConditionalWrapper>
+				</AccordionAlt>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={shadow.isChartIsRaceChart}>
+				<AccordionAlt title="By Race Chart Category">
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Enable"}
+								value={raceChartRanking.enabled}
+								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.RaceChartData, setConfigValues)}
+								appearance="toggle"
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={raceChartRanking.enabled}>
+						{UIByRaceChartRankingSettings(vizOptions, raceChartRanking, setConfigValues)}
 					</ConditionalWrapper>
 				</AccordionAlt>
 			</ConditionalWrapper>

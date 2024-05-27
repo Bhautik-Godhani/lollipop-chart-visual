@@ -240,6 +240,14 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		showRemainingAsOthers: false,
 		suffix: ERankingSuffix.None,
 		calcMethod: ERankingCalcMethod.Sum
+	},
+	raceChartData: {
+		enabled: true,
+		rankingType: ERankingType.TopN,
+		count: 20,
+		showRemainingAsOthers: false,
+		suffix: ERankingSuffix.None,
+		calcMethod: ERankingCalcMethod.Sum
 	}
 };
 
