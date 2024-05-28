@@ -10109,6 +10109,10 @@ export class Visual extends Shadow {
 				}
 
 				if (!tooltipFields.includes(field)) {
+					if (this.allNumberFormatter[field] && number && this.allNumberFormatter[field].format && this.allNumberFormatter[field].format.includes("%")) {
+						value = value * 100;
+					}
+
 					return this.numberSettings.show ?
 						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field] : undefined, false, true) :
 						powerBiNumberFormat(value, this.allNumberFormatter[field]);
