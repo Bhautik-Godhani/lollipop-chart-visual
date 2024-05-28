@@ -277,6 +277,7 @@ export class Visual extends Shadow {
 	isHasImagesData: boolean;
 	isSortDataFieldsAdded: boolean;
 	sortFieldsDisplayName: ILabelValuePair[] = [];
+	tooltipFieldsDisplayName: ILabelValuePair[] = [];
 	blankText: string = "(Blank)";
 	othersLabel = "Others";
 	othersBarText = "";
@@ -1164,6 +1165,7 @@ export class Visual extends Shadow {
 		categoryKey: string,
 		measureKeys: string[],
 		sortKeys: string[],
+		externalFieldSortKey: EDataRolesName,
 		categoricalMeasureFields: powerbi.DataViewValueColumn[],
 		categoricalSortFields: powerbi.DataViewValueColumn[]
 	): void {
@@ -1240,7 +1242,7 @@ export class Visual extends Shadow {
 
 		const sortByMeasure = (measureValues: powerbi.DataViewValueColumn[]) => {
 			const index = measureValues.find((d) => d.source.displayName === sortingSettings.sortBy).source.index;
-			const measureIndex = isSortByExternalFields ? `${EDataRolesName.Sort}${index}` : `${EDataRolesName.Measure}${index}`;
+			const measureIndex = isSortByExternalFields ? `${externalFieldSortKey}${index}` : `${EDataRolesName.Measure}${index}`;
 
 			// if (this.isHorizontalChart) {
 			// if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
@@ -1651,10 +1653,23 @@ export class Visual extends Shadow {
 			.filter((d) => d && d !== null && d !== undefined && d !== "")
 			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-		this.isSortDataFieldsAdded = categoricalSortFields.length > 0;
+		this.isSortDataFieldsAdded = categoricalSortFields.length > 0 || categoricalTooltipFields.length > 0;
 		this.sortFieldsDisplayName =
 			categoricalSortFields.length > 0
 				? categoricalSortFields
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
+
+		this.tooltipFieldsDisplayName =
+			categoricalTooltipFields.length > 0
+				? categoricalTooltipFields
 					.map((d) => ({
 						label: d.source.displayName,
 						value: d.source.displayName,
@@ -1680,7 +1695,7 @@ export class Visual extends Shadow {
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
-			!this.sortFieldsDisplayName.find((d) => d.label === this.sortingSettings.category.sortBy)
+			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
 		) {
 			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
 			this.sortingSettings.category.isSortByCategory = false;
@@ -1697,7 +1712,7 @@ export class Visual extends Shadow {
 		}
 
 		if (!this.sortingSettings.subCategory.sortBy ||
-			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
+			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
 			this.sortingSettings.subCategory.sortBy = this.measure1DisplayName;
 		}
 
@@ -1836,16 +1851,19 @@ export class Visual extends Shadow {
 		this.setCategoricalDataPairsByRanking();
 
 		if (this.sortingSettings.category.enabled) {
-			const sortField = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+			const sortFields = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+			const sortByTooltipFields = categoricalTooltipFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+			const isSortByTooltipField = sortFields.length === 0 && sortByTooltipFields.length > 0;
+			const externalFieldSortKey = isSortByTooltipField ? EDataRolesName.Tooltip : EDataRolesName.Sort;
 
 			if (!this.isHasSubcategories) {
 				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index);
-				const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index);
-				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
+				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index) : sortFields.map((d) => EDataRolesName.Sort + d.source.index);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
 			} else {
 				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
-				const sortKeys = sortField.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
-				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, categoricalMeasureFields, categoricalSortFields);
+				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index + d.source.groupName) : sortFields.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
 			}
 		}
 
@@ -2255,10 +2273,23 @@ export class Visual extends Shadow {
 			.filter((d) => d && d !== null && d !== undefined && d !== "")
 			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-		this.isSortDataFieldsAdded = this.categoricalSortFields.length > 0;
+		this.isSortDataFieldsAdded = this.categoricalSortFields.length > 0 || this.categoricalTooltipFields.length > 0;
 		this.sortFieldsDisplayName =
 			this.categoricalSortFields.length > 0
 				? this.categoricalSortFields
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
+
+		this.tooltipFieldsDisplayName =
+			this.categoricalTooltipFields.length > 0
+				? this.categoricalTooltipFields
 					.map((d) => ({
 						label: d.source.displayName,
 						value: d.source.displayName,
@@ -2274,7 +2305,7 @@ export class Visual extends Shadow {
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
-			!this.sortFieldsDisplayName.find((d) => d.label === this.sortingSettings.category.sortBy)
+			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
 		) {
 			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
 			this.sortingSettings.category.isSortByCategory = false;

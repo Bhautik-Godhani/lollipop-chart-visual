@@ -316,13 +316,25 @@ const SortingSettings = (props) => {
 				isSortByExtraSortField: d.isSortByExtraSortField,
 			});
 
-			GROUP_BY_SORT_ON.push({
-				label: d.label,
-				value: d.value,
-				isSortByCategory: d.isSortByCategory,
-				isSortByMeasure: d.isSortByMeasure,
-				isSortByExtraSortField: d.isSortByExtraSortField,
-			});
+			// GROUP_BY_SORT_ON.push({
+			// 	label: d.label,
+			// 	value: d.value,
+			// 	isSortByCategory: d.isSortByCategory,
+			// 	isSortByMeasure: d.isSortByMeasure,
+			// 	isSortByExtraSortField: d.isSortByExtraSortField,
+			// });
+		});
+
+		(shadow.tooltipFieldsDisplayName as ILabelValuePair[]).forEach((d) => {
+			if (!CATEGORY_SORT_ON.find(c => c.value === d.value)) {
+				CATEGORY_SORT_ON.push({
+					label: d.label,
+					value: d.value,
+					isSortByCategory: d.isSortByCategory,
+					isSortByMeasure: d.isSortByMeasure,
+					isSortByExtraSortField: d.isSortByExtraSortField,
+				});
+			}
 		});
 	}
 
@@ -341,7 +353,7 @@ const SortingSettings = (props) => {
 	}, []);
 
 	React.useEffect(() => {
-		if (configValues.category.isSortByExtraSortField && !shadow.sortFieldsDisplayName.find((d) => d.label === configValues.category.sortBy)) {
+		if (configValues.category.isSortByExtraSortField && ![...shadow.sortFieldsDisplayName, ...shadow.tooltipFieldsDisplayName].find((d) => d.label === configValues.category.sortBy)) {
 			handleChange(ESortByTypes.VALUE, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 			handleChange(false, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
 			handleChange(true, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
