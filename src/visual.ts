@@ -4861,6 +4861,10 @@ export class Visual extends Shadow {
 			this.config.CFConfig.isShowCategoriesTypeDropdown = true;
 		}
 
+		if (this.isShowImageMarker1 || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			this.lineSettings.isApplyMarkerColor = false;
+		}
+
 		// if (this.rankingSettings.isRankingEnabled) {
 		// 	this.setChartDataByRanking();
 		// }

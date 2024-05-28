@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
-import { ColorPaletteType, ELineSettings, ELineType } from "../enum";
+import { ColorPaletteType, ELineSettings, ELineType, EMarkerShapeTypes } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
@@ -109,6 +109,10 @@ const LineSettings = (props) => {
 				}
 			}
 		}
+
+		if (shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			handleChange(false, ELineSettings.isApplyMarkerColor);
+		}
 	}, []);
 
 	return (
@@ -145,7 +149,7 @@ const LineSettings = (props) => {
 					<Column></Column>
 				</Row>
 
-				<ConditionalWrapper visible={shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true}>
+				<ConditionalWrapper visible={!shadow.isShowImageMarker1 && shadow.markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.UPLOAD_ICON && (shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true)}>
 					<Row>
 						<Column>
 							<ToggleButton
@@ -172,7 +176,7 @@ const LineSettings = (props) => {
 					</ConditionalWrapper>
 				</ConditionalWrapper>
 
-				<ConditionalWrapper visible={shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
+				<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
 					<Row>
 						<Column>
 							<ColorPicker
