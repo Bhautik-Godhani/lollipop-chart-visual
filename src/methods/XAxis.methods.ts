@@ -7,12 +7,12 @@ import { timeFormat } from "d3";
 export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: number, xAxisG: SVGElement): void => {
     if (self.isHorizontalChart && (self.isLogarithmScale || self.isShowPositiveNegativeLogScale)) {
         if (self.isShowPositiveNegativeLogScale) {
-            let positiveTicks: any[] = self.positiveLogScale.ticks();
+            let positiveTicks: any[] = self.positiveLogScale.ticks(self.positiveLogScaleWidth / 90);
             positiveTicks = positiveTicks.filter(function (d) {
                 return d === Math.pow(10, Math.round(Math.log10(d)));
             });
 
-            let negativeTicks: any[] = self.negativeLogScale.ticks();
+            let negativeTicks: any[] = self.negativeLogScale.ticks(self.negativeLogScaleWidth / 90);
             negativeTicks = negativeTicks.filter(function (d) {
                 return d === Math.pow(10, Math.round(Math.log10(d))) && d !== 0.1;
             });
@@ -42,7 +42,7 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                     .call(axisTop(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
             }
         } else {
-            let positiveTicks: any[] = self.xScale.ticks();
+            let positiveTicks: any[] = self.xScale.ticks(width / 90);
             positiveTicks = positiveTicks.filter(function (d) {
                 return d === Math.pow(10, Math.round(Math.log10(d)));
             });
@@ -62,7 +62,7 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         if (self.xAxisSettings.position === Position.Bottom) {
             select(xAxisG)
                 .attr("transform", "translate(0," + height + ")")
-                .call(axisBottom(self.xScale)
+                .call(axisBottom(self.xScale).ticks(width / 90)
                     .tickFormat(d => {
                         const isOthersTick = d.toString().includes(self.othersLabel);
                         if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis && !isOthersTick) {
@@ -72,7 +72,7 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                         }
                     }));
         } else if (self.xAxisSettings.position === Position.Top) {
-            select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale)
+            select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90)
                 .tickFormat(d => {
                     const isOthersTick = d.toString().includes(self.othersLabel);
                     if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis && !isOthersTick) {

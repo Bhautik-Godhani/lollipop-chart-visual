@@ -424,8 +424,8 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
 
     if (rLineValue.type === EReferenceLinesType.Ranking) {
         const domain: string[] = self.isHorizontalChart
-            ? self.xScale.ticks()
-            : self.yScale.ticks();
+            ? self.xScale.ticks(self.width / 90)
+            : self.yScale.ticks(self.height / 90);
 
         // domain = self.elementToMoveOthers(domain, false, undefined);
 

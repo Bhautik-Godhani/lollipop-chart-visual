@@ -7476,8 +7476,8 @@ export class Visual extends Shadow {
 		if (this.isHorizontalChart) {
 			if (this.isCutAndClipAxisEnabled) {
 				xScaleTicks = [
-					...this.afterCutLinearScale.ticks(),
-					...this.beforeCutLinearScale.ticks(),
+					...this.afterCutLinearScale.ticks(this.afterCutLinearScaleArea / 90),
+					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 90),
 				];
 			} else if (this.isLogarithmScale) {
 				xScaleTicks = [
@@ -7485,7 +7485,7 @@ export class Visual extends Shadow {
 					...this.negativeLogScaleTicks,
 				];
 			} else {
-				xScaleTicks = isLinearScale ? this.xScale.ticks() : this.xScale.domain();
+				xScaleTicks = isLinearScale ? this.xScale.ticks(this.width / 90) : this.xScale.domain();
 			}
 		} else {
 			xScaleTicks = this.xScale.domain();
@@ -7510,8 +7510,8 @@ export class Visual extends Shadow {
 		if (!this.isHorizontalChart) {
 			if (this.isCutAndClipAxisEnabled) {
 				yScaleTicks = [
-					...this.afterCutLinearScale.ticks(),
-					...this.beforeCutLinearScale.ticks(),
+					...this.afterCutLinearScale.ticks(this.afterCutLinearScaleArea / 90),
+					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 90),
 				];
 			} else if (this.axisByBarOrientation.isLogarithmScale) {
 				yScaleTicks = [
@@ -7519,7 +7519,7 @@ export class Visual extends Shadow {
 					...this.negativeLogScaleTicks,
 				];
 			} else {
-				yScaleTicks = this.yScale.ticks();
+				yScaleTicks = this.yScale.ticks(this.height / 90);
 			}
 		} else {
 			yScaleTicks = this.yScale.domain();
@@ -10278,6 +10278,7 @@ export class Visual extends Shadow {
 			.call(
 				d3
 					.axisRight(this.brushScaleBand)
+					.ticks(this.height / 90)
 					.tickFormat((d) => {
 						const text = (typeof d === "string" && this.isExpandAllApplied ? d.toString().split("--")[0] : d) as string;
 						const textProperties: TextProperties = {
