@@ -150,8 +150,8 @@ export const GetGridLayoutRowsColumnsCount = (
     const maxColumns = 6;
 
     //  FLUID LAYOUT
-    const minItemWidth = 200;
-    const minItemHeight = 200;
+    const minItemWidth = 150;
+    const minItemHeight = 150;
     const fluidColumnsCount = Math.floor(config.containerWidth / config.categories.length) > minItemWidth ? config.categories.length : Math.floor(config.containerWidth / minItemWidth);
     const fluidRowsCount = Math.floor(config.containerHeight / Math.ceil(config.categories.length / fluidColumnsCount)) > minItemHeight ? Math.ceil(config.categories.length / fluidColumnsCount) : Math.floor(config.containerHeight / minItemHeight);
 
@@ -290,6 +290,7 @@ export const GetSmallMultiplesLayoutProps = (
     const layoutClassName = "small-multiples-layout";
     const layoutWidth = config.containerWidth;
     const layoutRowHeight = itemHeight;
+    const dynamicRow = config.categories.length / columns;
 
     const measureBeforeMount = false;
     const orientation = Orientation.Vertical;
@@ -300,7 +301,7 @@ export const GetSmallMultiplesLayoutProps = (
     } else if (config.layoutType === ESmallMultiplesLayoutType.RankedPanels) {
         height = layoutRowHeight / 6;
     } else if (config.layoutType === ESmallMultiplesLayoutType.ScaledRows) {
-        height = layoutRowHeight / 6;
+        height = layoutRowHeight / 6 < 50 ? 50 : layoutRowHeight / 6;
     }
 
     const layoutProps: ISmallMultiplesLayoutProps = {
@@ -338,6 +339,9 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
     const cellsHeightByRows: number[] = [];
     while (clonedCellsHeightByScale.length) cellsHeightByRows.push(clonedCellsHeightByScale.splice(0, columns));
 
+    console.log(cellsHeightByRows);
+
+
     // SCALED ROWS
     const getRankedScale = (value: number, min: number, max: number, minHeight: number, maxHeight: number) => {
         let rankedScale: any;
@@ -355,7 +359,7 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
         return rankedScale(value);
     };
 
-    const minScaledRowHeight = 3;
+    const minScaledRowHeight = 4;
     const maxScaledRowHeight = 6;
     const totalValuesByRow: number[] = [];
     for (let i = 0; i < Math.ceil(config.categories.length / columns); i++) {
@@ -382,6 +386,8 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
     } else if (config.layoutType === ESmallMultiplesLayoutType.ScaledRows) {
         for (let i = 0; i < totalRows; i++) {
             const height = getRankedScale(totalValuesByRow[i], scaledRowsMin, scaledRowsMax, minScaledRowHeight, maxScaledRowHeight); // scaled rows
+            console.log(height);
+
             for (let j = 0; j < columns; j++) {
                 const randomBytes = generateSecureRandomBytes(16).toString("hex");
                 const category = config.categories[iterator];

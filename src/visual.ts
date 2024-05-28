@@ -669,37 +669,37 @@ export class Visual extends Shadow {
 			"The Powerviz Lollipop chart is an advanced chart that is a bar chart where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart includes vertical and horizontal styles, IBCS templates, small multiples, race charts, etc.​",
 		sliderImages: [
 			{
-				imageUrl: require("../assets/landing-pages/page1.svg"),
+				imageUrl: require("../assets/landing-pages-2/page1.png"),
 				imageTitle: "Fully customizable & feature rich Lollipop Chart",
 				imageDescription: "Create an advanced modern-looking and insightful Lollipop Chart.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page2.svg"),
+				imageUrl: require("../assets/landing-pages-2/page2.png"),
 				imageTitle: "Chart Style",
 				imageDescription: "Easily switch between Vertical and Horizontal chart style.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page3.svg"),
+				imageUrl: require("../assets/landing-pages-2/page3.png"),
 				imageTitle: "Small Multiples",
 				imageDescription: "Split your visual into multiple smaller visuals based on the field selected.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page4.svg"),
+				imageUrl: require("../assets/landing-pages-2/page4.png"),
 				imageTitle: "Race Chart",
 				imageDescription: "Visualize changes in trend over the time ",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page5.svg"),
+				imageUrl: require("../assets/landing-pages-2/page5.png"),
 				imageTitle: "Dynamic Deviation",
 				imageDescription: "Analyze the variance between two measures using this feature.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page6.svg"),
+				imageUrl: require("../assets/landing-pages-2/page6.png"),
 				imageTitle: "Reference Line/Band",
 				imageDescription: "Add a Reference line or Band to highlight or compare the data against a range of data.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages/page7.svg"),
+				imageUrl: require("../assets/landing-pages-2/page7.png"),
 				imageTitle: "And Many More Features",
 				imageDescription: "Analyze and customize Lollipop chart with extra features available.",
 			},
