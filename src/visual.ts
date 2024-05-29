@@ -9667,8 +9667,15 @@ export class Visual extends Shadow {
 				// 	.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
 				// 	.attr("fill", "#fff");
 
+				const isSingleCategoryPie = ele.selectAll("path").nodes().length === 0;
+				const tooltipEle = !isSingleCategoryPie ? ele.selectAll("path") : ele;
+
+				if (isSingleCategoryPie) {
+					ele.datum(d.subCategories.find(d => d.value1 > 0))
+				}
+
 				this.tooltipServiceWrapper.addTooltip(
-					ele.selectAll("path"),
+					tooltipEle,
 					(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
 					(datapoint: IChartSubCategory) => datapoint.identity
 				);
