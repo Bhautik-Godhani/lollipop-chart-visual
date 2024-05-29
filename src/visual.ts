@@ -1792,6 +1792,16 @@ export class Visual extends Shadow {
 					hasZero: false,
 				};
 
+				if (this.isHorizontalChart) {
+					if (this.isYIsDateTimeAxis) {
+						obj.category = obj.category.toString();
+					}
+				} else {
+					if (this.isXIsDateTimeAxis) {
+						obj.category = obj.category.toString();
+					}
+				}
+
 				if (categoricalSmallMultiplesFields.length) {
 					categoricalSmallMultiplesFields.forEach(d => {
 						obj[`smallMultipleCategory-${d.source.index}`] = d.values[index];
