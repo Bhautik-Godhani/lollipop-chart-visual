@@ -179,16 +179,18 @@ const UIXAxis = (
     </Row>
 
     <ConditionalWrapper visible={xConfigValues.show}>
-      <Row>
-        <Column>
-          <SwitchOption
-            label="Position"
-            value={xConfigValues.position}
-            optionsList={X_AXIS_POSITION}
-            handleChange={value => handleXChange(value, EXAxisSettings.Position, setXConfigValues)}
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Position"
+              value={xConfigValues.position}
+              optionsList={X_AXIS_POSITION}
+              handleChange={value => handleXChange(value, EXAxisSettings.Position, setXConfigValues)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <ConditionalWrapper visible={!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
         <Row>
@@ -735,16 +737,18 @@ const UIYAxis = (
     </Row>
 
     <ConditionalWrapper visible={yConfigValues.show}>
-      <Row>
-        <Column>
-          <SwitchOption
-            label="Position"
-            value={yConfigValues.position}
-            optionsList={Y_AXIS_POSITION}
-            handleChange={value => handleYChange(value, EYAxisSettings.Position, setYConfigValues)}
-          />
-        </Column>
-      </Row>
+      <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Position"
+              value={yConfigValues.position}
+              optionsList={Y_AXIS_POSITION}
+              handleChange={value => handleYChange(value, EYAxisSettings.Position, setYConfigValues)}
+            />
+          </Column>
+        </Row>
+      </ConditionalWrapper>
 
       <ConditionalWrapper visible={shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
         <Row>
