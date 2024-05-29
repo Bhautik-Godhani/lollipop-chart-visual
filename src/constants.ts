@@ -560,7 +560,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 		fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
 		color: "rgba(255,255,255,1)",
 		showBackground: true,
-		backgroundColor: "rgba(0,0,0,1)",
+		backgroundColor: "rgba(133, 127, 127, 1)",
 		fontStyle: [],
 		labelFormat: EErrorBarsLabelFormat.Absolute
 	},
