@@ -732,7 +732,7 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
 		isTextWrapEnabled: true
 	},
 	background: {
-		type: ESmallMultiplesBackgroundType.AlternateColumns,
+		type: ESmallMultiplesBackgroundType.All,
 		panelColor: "rgba(255,255,255,1)",
 		alternateColor: "rgba(245, 245, 245, 1)",
 		transparency: 100
