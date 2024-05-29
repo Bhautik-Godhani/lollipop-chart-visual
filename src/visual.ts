@@ -4801,7 +4801,7 @@ export class Visual extends Shadow {
 		const marker1Style = this.markerSettings.marker1Style;
 		const marker2Style = this.markerSettings.marker2Style;
 
-		this.isShowMarker1OutlineColor = marker1Style.isShowMarkerOutline && !marker1Style.sameOutlineAsMarkerColor;
+		this.isShowMarker1OutlineColor = marker1Style.isShowMarkerOutline && !marker1Style.sameOutlineAsMarkerColor && marker1Style.showOutlineOnly;
 
 		if (this.markerSettings.markerType === EMarkerTypes.SHAPE
 			&& marker1Style.markerShape === EMarkerShapeTypes.DEFAULT
@@ -4990,7 +4990,7 @@ export class Visual extends Shadow {
 		const markerSeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings);
 
 		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
-			if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor) {
+			if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor && this.markerSettings.marker1Style.showOutlineOnly) {
 				this.categoricalDataPairs.forEach((data, i) => {
 					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
 					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
