@@ -4837,6 +4837,10 @@ export class Visual extends Shadow {
 			}
 		}
 
+		if (marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && !marker1Style.markerShapeBase64Url) {
+			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
 		if (!this.xAxisSettings.show) {
 			this.xAxisSettings.isDisplayLabel = false;
 			this.xAxisSettings.isDisplayTitle = false;

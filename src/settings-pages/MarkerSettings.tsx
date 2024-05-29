@@ -267,6 +267,16 @@ const UploadTab = ({ configValues, markerStyleTypes, setConfigValues }) => (
 						}
 					}));
 				}}
+				onUploadedFileCleared={() => {
+					setConfigValues((d) => ({
+						...d,
+						[markerStyleTypes]: {
+							...d[markerStyleTypes],
+							[EMarkerSettings.MarkerShapeBase64Url]: undefined,
+							// [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+						}
+					}))
+				}}
 			/>
 		</Column>
 	</Row>
@@ -395,6 +405,10 @@ const MarkerSettings = (props) => {
 	}
 
 	const applyChanges = () => {
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.UPLOAD_ICON && !configValues[configValues.markerStyleType].markerShapeBase64Url) {
+			configValues[configValues.markerStyleType].markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
 		persistProperties(shadow, sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
@@ -455,6 +469,10 @@ const MarkerSettings = (props) => {
 		}
 
 		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.UPLOAD_ICON && shadow.isLollipopTypePie) {
+			handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, configValues.markerStyleType, setConfigValues)
+		}
+
+		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.UPLOAD_ICON && !configValues[configValues.markerStyleType].markerShapeBase64Url) {
 			handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, configValues.markerStyleType, setConfigValues)
 		}
 
