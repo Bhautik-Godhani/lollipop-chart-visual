@@ -24,7 +24,7 @@ export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): voi
 	self.expandAllCategoriesName.forEach((category: string, i: number) => {
 		if (self.isBottomXAxis) {
 			select(`.${category}ScaleG`)
-				.attr("transform", "translate(0," + i * expandAxisGHeight + ")")
+				.attr("transform", "translate(0," + (self.expandAllCategoriesName.length - 1 - i) * expandAxisGHeight + ")")
 				.call(
 					axisBottom(self[`${category}Scale`])
 						.ticks(width / 90)

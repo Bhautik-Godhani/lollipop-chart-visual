@@ -2642,7 +2642,7 @@ export class Visual extends Shadow {
 				this.expandAllCategoriesName = categoricalCategoriesFields
 					.map((d) => d.source.displayName)
 					.slice(0, categoricalCategoriesFields.length - 1)
-					.reverse();
+				// .reverse();
 			}
 
 			this.expandAllCode();
@@ -6858,13 +6858,13 @@ export class Visual extends Shadow {
 		let rotateDegree = 0;
 		if (THIS.isBottomXAxis) {
 			if (xAxisSettings.isLabelAutoTilt) {
-				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? -90 : -35;
+				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? -90 : -35;
 			} else {
 				rotateDegree = xAxisSettings.labelTilt;
 			}
 		} else {
 			if (xAxisSettings.isLabelAutoTilt) {
-				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) || THIS.isExpandAllApplied ? 90 : 35;
+				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? 90 : 35;
 			} else {
 				rotateDegree = -xAxisSettings.labelTilt;
 			}
@@ -7834,7 +7834,7 @@ export class Visual extends Shadow {
 				if (this.isLeftYAxis) {
 					this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
 				} else {
-					this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
+					this.expandAllYAxisG.style("transform", "translate(" + (this.width - this.yAxisTitleSize.width - this.yAxisStartMargin - this.brushWidth) + "px" + "," + 0 + "px" + ")");
 				}
 				CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
 			}
