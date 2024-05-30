@@ -42,6 +42,18 @@ const handleCategoryChange = (rgb, i, setConfigValues: React.Dispatch<React.SetS
 	});
 };
 
+const handleSubCategoryChange = (rgb, i, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
+	setConfigValues((d) => {
+		const bySubCategory = [...d.subCategoryColors];
+		bySubCategory[i].marker = rgb;
+		const newState = {
+			...d,
+			[EDataColorsSettings.SubCategoryColors]: bySubCategory,
+		};
+		return newState;
+	});
+};
+
 const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	let colorPaletteDropdownList = [
 		{
@@ -91,6 +103,43 @@ const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setCo
 			{
 				label: "By Category",
 				value: ColorPaletteType.ByCategory,
+			},
+			{
+				label: "Sequential",
+				value: ColorPaletteType.Sequential,
+			},
+			{
+				label: "Diverging",
+				value: ColorPaletteType.Diverging,
+			},
+			{
+				label: "Qualitative",
+				value: ColorPaletteType.Qualitative,
+			},
+			{
+				label: "Positive/Negative",
+				value: ColorPaletteType.PositiveNegative,
+			}
+		];
+	}
+
+	if (!shadow.isHasMultiMeasure && shadow.isLollipopTypePie) {
+		colorPaletteDropdownList = [
+			{
+				label: "Single",
+				value: ColorPaletteType.Single,
+			},
+			{
+				label: "Power BI Theme",
+				value: ColorPaletteType.PowerBi,
+			},
+			{
+				label: "Gradient",
+				value: ColorPaletteType.Gradient,
+			},
+			{
+				label: "By Sub-category",
+				value: ColorPaletteType.BySubCategory,
 			},
 			{
 				label: "Sequential",
@@ -229,6 +278,43 @@ const UIByCategoryColorPalette = (
 	);
 };
 
+const UIBySubCategoryColorPalette = (
+	shadow: Visual,
+	vizOptions: ShadowUpdateOptions,
+	configValues: IDataColorsSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>
+) => {
+	const values = configValues;
+	return (
+		<ConditionalWrapper visible={!shadow.isHasMultiMeasure && shadow.isLollipopTypePie && values.fillType === ColorPaletteType.BySubCategory}>
+			{values.subCategoryColors.map((categoryColor, ci) => {
+				const categoryNameProperties = {
+					text: shadow.getTooltipCategoryText(categoryColor.name, false),
+					fontFamily: "sans-serif",
+					fontSize: 11.5 + "px",
+				};
+				const categoryName = textMeasurementService.getTailoredTextOrDefault(categoryNameProperties, 170);
+
+				return (
+					<Row classNames={["normal-text-overflow"]}>
+						<Column>
+							<ColorPicker
+								label={categoryName}
+								color={categoryColor.marker}
+								handleChange={(value) => {
+									return handleSubCategoryChange(value, ci, setConfigValues)
+								}}
+								colorPalette={vizOptions.host.colorPalette}
+								size="sm"
+							/>
+						</Column>
+					</Row>
+				);
+			})}
+		</ConditionalWrapper>
+	);
+};
+
 const UIColorPaletteTypes = (
 	shadow: Visual,
 	configValues: IDataColorsSettings,
@@ -284,6 +370,7 @@ const UIColorPaletteTypes = (
 			</ConditionalWrapper>
 
 			{UIByCategoryColorPalette(shadow, vizOptions, configValues, setConfigValues)}
+			{UIBySubCategoryColorPalette(shadow, vizOptions, configValues, setConfigValues)}
 			{UIGradientColorPalette(shadow, vizOptions, configValues, setConfigValues)}
 
 			<ConditionalWrapper
@@ -392,6 +479,13 @@ const DataColors = (props) => {
 			}));
 		}
 
+		if ((shadow.isHasMultiMeasure || shadow.isLollipopTypeCircle) && configValues.fillType === ColorPaletteType.BySubCategory) {
+			setConfigValues((d) => ({
+				...d,
+				[EDataColorsSettings.FillType]: ColorPaletteType.Single,
+			}));
+		}
+
 		// if (configValues.fillType === ColorPaletteType.Gradient && shadow.isLollipopTypePie && shadow.isHasSubcategories && shadow.isHasMultiMeasure) {
 		// 	setConfigValues((d) => ({
 		// 		...d,
@@ -427,15 +521,21 @@ const DataColors = (props) => {
 	};
 
 	React.useEffect(() => {
-		if (configValues.fillType === ColorPaletteType.ByCategory)
-			setConfigValues((d) => {
-				return {
-					...d,
-					[EDataColorsSettings.CategoryColors]: shadow.isLollipopTypeCircle
-						? [...shadow.categoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
-						: [...shadow.subCategoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i),
-				};
-			});
+		// if (configValues.fillType === ColorPaletteType.ByCategory)
+		setConfigValues((d) => {
+			return {
+				...d,
+				[EDataColorsSettings.CategoryColors]: [...shadow.categoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
+			};
+		});
+
+		// if (configValues.fillType === ColorPaletteType.BySubCategory)
+		setConfigValues((d) => {
+			return {
+				...d,
+				[EDataColorsSettings.SubCategoryColors]: [...shadow.subCategoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i),
+			};
+		});
 	}, [configValues.fillType]);
 
 	return (

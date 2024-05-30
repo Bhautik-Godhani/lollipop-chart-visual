@@ -281,6 +281,7 @@ export interface IDataColorsSettings {
 	singleColor2?: string,
 	gradientColors?: string[],
 	categoryColors?: { name: string, marker: string }[],
+	subCategoryColors?: { name: string, marker: string }[],
 	numberOfClasses: number,
 	schemeColors: string[],
 	colorBlindSafe: boolean,

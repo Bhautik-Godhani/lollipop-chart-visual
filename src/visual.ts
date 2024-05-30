@@ -3054,14 +3054,17 @@ export class Visual extends Shadow {
 
 				if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
 					this.subCategoriesColorList = [];
-					this.chartData.forEach(c => {
-						c.subCategories.forEach(d => {
-							const obj = {
-								name: `${c.category}-${d.category}`,
-								marker: this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color ? this.subCategoryColorPair[`${c.category}-${d.category}`].marker1Color : this.colorPalette.getColor(d.category).value,
-							}
-							this.subCategoriesColorList.push(obj);
-						});
+
+					this.subCategoriesColorList = this.chartData[0].subCategories.map(s => {
+						const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
+						const posNegColor = s.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+						const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.subCategoryColorPair[`${s.parentCategory}-${s.category}`] ? this.subCategoryColorPair[`${s.parentCategory}-${s.category}`].marker1Color : null), EHighContrastColorType.Foreground);
+						const obj = {
+							name: s.category,
+							marker: color,
+						}
+
+						return obj;
 					});
 				}
 
@@ -4490,6 +4493,7 @@ export class Visual extends Shadow {
 				case ColorPaletteType.Qualitative:
 				case ColorPaletteType.Sequential:
 				case ColorPaletteType.ByCategory:
+				case ColorPaletteType.BySubCategory:
 				case ColorPaletteType.Gradient:
 					// only this needs to be change for pattern
 					legendDataPoints = this.subCategoriesName.map((d, i) => ({
@@ -5231,6 +5235,25 @@ export class Visual extends Shadow {
 									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = categoryColors[data][EMarkerColorTypes.Marker1];
 								}
 							});
+							break;
+						}
+						case ColorPaletteType.BySubCategory: {
+							const subCategoryColors = marker.subCategoryColors.reduce((obj, cur) => {
+								obj[cur.name] = { markerColor: cur.marker };
+								return obj;
+							}, {});
+							this.categoricalDataPairs.forEach(d => {
+								this.subCategoriesName.forEach((s, i) => {
+									if (subCategoryColors[s]) {
+										const color = subCategoryColors[s]["markerColor"];
+										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = color;
+										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = color;
+									} else {
+										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
+										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
+									}
+								});
+							})
 							break;
 						}
 						case ColorPaletteType.Sequential:
