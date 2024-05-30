@@ -9661,7 +9661,7 @@ export class Visual extends Shadow {
 			.style("height", "100%")
 			.each((d: ILollipopChartRow, i, nodes) => {
 				const ele = d3.select(nodes[i]);
-				const ePieChart = echarts.init(ele.node());
+				const ePieChart = echarts.init(ele.node(), null, { renderer: "svg" });
 				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
 				ePieChart.resize();
 
