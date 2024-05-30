@@ -717,7 +717,6 @@ const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, han
       }}
       saveButtonConfig={{ isDisabled: false, text: isAddNew ? "APPLY" : "APPLY", handler: handleAdd }}
       resetButtonHandler={resetChanges}
-      disableTopPadding
     />
   );
 };
