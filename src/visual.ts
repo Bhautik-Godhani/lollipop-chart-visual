@@ -6995,8 +6995,14 @@ export class Visual extends Shadow {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
 					}
 
+					let isPercentageNumber = false;
+					if (THIS.measureNumberFormatter[0].format && THIS.measureNumberFormatter[0].format.includes("%")) {
+						isPercentageNumber = true;
+					}
+
 					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
-					ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
+					const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+					ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 				}
 			});
 	}
@@ -7077,9 +7083,15 @@ export class Visual extends Shadow {
 						fontSize: yAxisSettings.labelFontSize + "px",
 					};
 
+					let isPercentageNumber = false;
+					if (THIS.measureNumberFormatter[0].format && THIS.measureNumberFormatter[0].format.includes("%")) {
+						isPercentageNumber = true;
+					}
+
 					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
 						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : THIS.numberSettings);
-						ele.append("tspan").text(getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText)));
+						const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+						ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
