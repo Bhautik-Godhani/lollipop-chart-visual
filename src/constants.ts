@@ -716,7 +716,7 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
 	gridDataItemsTotals: [],
 	outerSpacing: 10,
 	innerSpacing: 10,
-	xAxisType: ESmallMultiplesAxisType.Individual,
+	xAxisType: ESmallMultiplesAxisType.Uniform,
 	yAxisType: ESmallMultiplesAxisType.Uniform,
 	xAxisPosition: ESmallMultiplesXAxisPosition.FrozenBottomColumn,
 	yAxisPosition: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
