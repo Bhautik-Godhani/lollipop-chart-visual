@@ -26,7 +26,7 @@ const MARKER_PLACEMENTS: ILabelValuePair[] = [
     value: ECutAndClipMarkerPlacementTypes.Axis,
   },
   {
-    label: "Categories",
+    label: "Category",
     value: ECutAndClipMarkerPlacementTypes.Categories,
   },
 ];
