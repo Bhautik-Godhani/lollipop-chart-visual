@@ -93,29 +93,25 @@ const UIByCategoryRankingSettings = (
 ) => {
 	return (
 		<>
-			<Row appearance="padded">
+			<Row>
 				<Column>
-					<Row>
-						<Column>
-							<SwitchOption
-								value={categoryRanking.rankingType}
-								optionsList={RANKING_TYPES}
-								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, type, setConfigValues)}
-							/>
-						</Column>
-					</Row>
+					<SwitchOption
+						value={categoryRanking.rankingType}
+						optionsList={RANKING_TYPES}
+						handleChange={(value) => handleChange(value, ERankingSettings.RankingType, type, setConfigValues)}
+					/>
+				</Column>
+			</Row>
 
-					<Row style={{ width: "50%" }}>
-						<Column>
-							<InputControl
-								min={1}
-								type="number"
-								label="Count"
-								value={categoryRanking.count}
-								handleChange={(value) => handleChange(value, ERankingSettings.Count, type, setConfigValues)}
-							/>
-						</Column>
-					</Row>
+			<Row style={{ width: "50%" }}>
+				<Column>
+					<InputControl
+						min={1}
+						type="number"
+						label="Count"
+						value={categoryRanking.count}
+						handleChange={(value) => handleChange(value, ERankingSettings.Count, type, setConfigValues)}
+					/>
 				</Column>
 			</Row>
 
@@ -180,32 +176,27 @@ const UIByGroupRankingSettings = (
 ) => {
 	return (
 		<>
-			<Row appearance="padded">
+			<Row>
 				<Column>
-					<Row>
-						<Column>
-							<SwitchOption
-								value={groupByRanking.rankingType}
-								optionsList={RANKING_TYPES}
-								handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
-							/>
-						</Column>
-					</Row>
-
-					<Row style={{ width: "50%" }}>
-						<Column>
-							<InputControl
-								min={1}
-								type="number"
-								label="Count"
-								value={groupByRanking.count}
-								handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
-							/>
-						</Column>
-					</Row>
+					<SwitchOption
+						value={groupByRanking.rankingType}
+						optionsList={RANKING_TYPES}
+						handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
+					/>
 				</Column>
 			</Row>
 
+			<Row style={{ width: "50%" }}>
+				<Column>
+					<InputControl
+						min={1}
+						type="number"
+						label="Count"
+						value={groupByRanking.count}
+						handleChange={(value) => handleChange(value, ERankingSettings.Count, ERankingSettings.SubCategory, setConfigValues)}
+					/>
+				</Column>
+			</Row>
 			{/* {UIByGroupRankingOthersSettings(vizOptions, groupByRanking, setConfigValues)} */}
 		</>
 	);
@@ -326,77 +317,46 @@ const Ranking = (props) => {
 
 	return (
 		<>
-			<AccordionAlt title="By Category">
-				<Row>
-					<Column>
-						<ToggleButton
-							label={"Enable"}
-							value={categoryRanking.enabled}
-							handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.Category, setConfigValues)}
-							appearance="toggle"
-						/>
-					</Column>
-				</Row>
-
-				<ConditionalWrapper visible={categoryRanking.enabled}>
-					{UIByCategoryRankingSettings(ERankingSettings.Category, categoryRanking, setConfigValues)}
-				</ConditionalWrapper>
+			<AccordionAlt
+				title="By Category"
+				showToggle={true}
+				toggleValue={categoryRanking.enabled}
+				onChangeToggle={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.Category, setConfigValues)}
+			>
+				{UIByCategoryRankingSettings(ERankingSettings.Category, categoryRanking, setConfigValues)}
 			</AccordionAlt>
 
 			<ConditionalWrapper visible={shadow.isHasSubcategories}>
-				<AccordionAlt title="By Sub-category">
-					<Row>
-						<Column>
-							<ToggleButton
-								label={"Enable"}
-								value={groupByRanking.enabled}
-								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SubCategory, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
-
-					<ConditionalWrapper visible={groupByRanking.enabled}>
-						{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
-					</ConditionalWrapper>
+				<AccordionAlt
+					title="By Sub-category"
+					showToggle={true}
+					toggleValue={groupByRanking.enabled}
+					onChangeToggle={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SubCategory, setConfigValues)}
+				>
+					{UIByGroupRankingSettings(vizOptions, groupByRanking, setConfigValues)}
 				</AccordionAlt>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={shadow.isChartIsRaceChart}>
-				<AccordionAlt title="By Race Chart Category">
-					<Row>
-						<Column>
-							<ToggleButton
-								label={"Enable"}
-								value={raceChartRanking.enabled}
-								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.RaceChartData, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
-
-					<ConditionalWrapper visible={raceChartRanking.enabled}>
-						{UIByRaceChartRankingSettings(vizOptions, raceChartRanking, setConfigValues)}
-					</ConditionalWrapper>
+			<ConditionalWrapper
+				visible={shadow.isChartIsRaceChart}>
+				<AccordionAlt
+					title="By Race Chart Category"
+					showToggle={true}
+					toggleValue={raceChartRanking.enabled}
+					onChangeToggle={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.RaceChartData, setConfigValues)}
+				>
+					{UIByRaceChartRankingSettings(vizOptions, raceChartRanking, setConfigValues)}
 				</AccordionAlt>
 			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
-				<AccordionAlt title="By Small Multiples">
-					<Row>
-						<Column>
-							<ToggleButton
-								label={"Enable"}
-								value={SMRanking.enabled}
-								handleChange={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SmallMultiples, setConfigValues)}
-								appearance="toggle"
-							/>
-						</Column>
-					</Row>
-
-					<ConditionalWrapper visible={SMRanking.enabled}>
-						{UIByCategoryRankingSettings(ERankingSettings.SmallMultiples, SMRanking, setConfigValues)}
-					</ConditionalWrapper>
+				<AccordionAlt
+					title="By Small Multiples"
+					showToggle={true}
+					toggleValue={SMRanking.enabled}
+					onChangeToggle={() => handleCheckbox(ERankingSettings.Enabled, ERankingSettings.SmallMultiples, setConfigValues)}
+				>
+					{UIByCategoryRankingSettings(ERankingSettings.SmallMultiples, SMRanking, setConfigValues)}
 				</AccordionAlt>
 			</ConditionalWrapper>
 

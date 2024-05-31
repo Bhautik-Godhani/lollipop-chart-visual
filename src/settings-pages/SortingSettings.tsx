@@ -47,49 +47,30 @@ const UICategorySortingSettings = (
 		<>
 			<Row>
 				<Column>
-					<ToggleButton
-						label={"Enable"}
-						value={categorySettings.enabled}
-						handleChange={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.Category, setConfigValues)}
-						appearance="toggle"
+					<SelectInput
+						label={"Sort By Field"}
+						value={categorySettings.sortBy}
+						optionsList={CATEGORY_SORT_ON}
+						handleChange={(value, obj) => {
+							handleChange(value, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+							handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
+							handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
+							handleChange(obj.isSortByExtraSortField, ESortingSettings.IsSortByExtraSortField, ESortingSettings.Category, setConfigValues);
+						}}
 					/>
 				</Column>
 			</Row>
 
-			<ConditionalWrapper visible={categorySettings.enabled}>
-				<Row appearance="padded">
-					<Column>
-						<ConditionalWrapper visible={categorySettings.enabled}>
-							<Row>
-								<Column>
-									<SelectInput
-										label={"Sort By Field"}
-										value={categorySettings.sortBy}
-										optionsList={CATEGORY_SORT_ON}
-										handleChange={(value, obj) => {
-											handleChange(value, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
-											handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
-											handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
-											handleChange(obj.isSortByExtraSortField, ESortingSettings.IsSortByExtraSortField, ESortingSettings.Category, setConfigValues);
-										}}
-									/>
-								</Column>
-							</Row>
-
-							<Row>
-								<Column>
-									<RadioOption
-										label="Order By"
-										value={categorySettings.sortOrder}
-										optionsList={SORT_ORDER}
-										handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues)}
-									/>
-								</Column>
-							</Row>
-						</ConditionalWrapper>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
+			<Row>
+				<Column>
+					<RadioOption
+						label="Order By"
+						value={categorySettings.sortOrder}
+						optionsList={SORT_ORDER}
+						handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues)}
+					/>
+				</Column>
+			</Row>
 		</>
 	);
 };
@@ -103,54 +84,35 @@ const UIGroupBySortingSettings = (
 		<>
 			<Row>
 				<Column>
-					<ToggleButton
-						label={"Enable"}
-						value={groupBySettings.enabled}
-						handleChange={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SubCategory, setConfigValues)}
-						appearance="toggle"
+					<SelectInput
+						label={"Sort By Field"}
+						value={groupBySettings.sortBy}
+						optionsList={GROUP_BY_SORT_ON}
+						handleChange={(value, obj) => {
+							handleChange(value, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+							handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.SubCategory, setConfigValues);
+							handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.SubCategory, setConfigValues);
+							handleChange(
+								obj.isSortByExtraSortField,
+								ESortingSettings.IsSortByExtraSortField,
+								ESortingSettings.SubCategory,
+								setConfigValues
+							);
+						}}
 					/>
 				</Column>
 			</Row>
 
-			<ConditionalWrapper visible={groupBySettings.enabled}>
-				<Row appearance="padded">
-					<Column>
-						<ConditionalWrapper visible={groupBySettings.enabled}>
-							<Row>
-								<Column>
-									<SelectInput
-										label={"Sort By Field"}
-										value={groupBySettings.sortBy}
-										optionsList={GROUP_BY_SORT_ON}
-										handleChange={(value, obj) => {
-											handleChange(value, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
-											handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.SubCategory, setConfigValues);
-											handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.SubCategory, setConfigValues);
-											handleChange(
-												obj.isSortByExtraSortField,
-												ESortingSettings.IsSortByExtraSortField,
-												ESortingSettings.SubCategory,
-												setConfigValues
-											);
-										}}
-									/>
-								</Column>
-							</Row>
-
-							<Row>
-								<Column>
-									<RadioOption
-										label="Order By"
-										value={groupBySettings.sortOrder}
-										optionsList={SORT_ORDER}
-										handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SubCategory, setConfigValues)}
-									/>
-								</Column>
-							</Row>
-						</ConditionalWrapper>
-					</Column>
-				</Row>
-			</ConditionalWrapper>
+			<Row>
+				<Column>
+					<RadioOption
+						label="Order By"
+						value={groupBySettings.sortOrder}
+						optionsList={SORT_ORDER}
+						handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SubCategory, setConfigValues)}
+					/>
+				</Column>
+			</Row>
 		</>
 	);
 };
@@ -376,11 +338,21 @@ const SortingSettings = (props) => {
 	return (
 		<>
 			<ConditionalWrapper visible={shadow.isHasSubcategories}>
-				<AccordionAlt title="By Category">
+				<AccordionAlt
+					title="By Category"
+					showToggle={true}
+					toggleValue={categorySettings.enabled}
+					onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.Category, setConfigValues)}
+				>
 					{UICategorySortingSettings(categorySettings, CATEGORY_SORT_ON, setConfigValues)}
 				</AccordionAlt>
 
-				<AccordionAlt title="By Sub-category">
+				<AccordionAlt
+					title="By Sub-category"
+					showToggle={true}
+					toggleValue={groupBySettings.enabled}
+					onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SubCategory, setConfigValues)}
+				>
 					{UIGroupBySortingSettings(groupBySettings, GROUP_BY_SORT_ON, setConfigValues)}
 				</AccordionAlt>
 			</ConditionalWrapper>

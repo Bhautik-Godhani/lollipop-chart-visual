@@ -2478,13 +2478,15 @@ export class Visual extends Shadow {
 		}
 
 		try {
-			this.vizOptions.options.dataViews[0].categorical.values.forEach(d => {
-				if (Object.keys(d.source).includes("groupName")) {
-					if (!d.source.groupName) {
-						d.source.groupName = this.blankText;
+			if (this.vizOptions.options.dataViews[0].categorical && this.vizOptions.options.dataViews[0].categorical.values) {
+				this.vizOptions.options.dataViews[0].categorical.values.forEach(d => {
+					if (Object.keys(d.source).includes("groupName")) {
+						if (!d.source.groupName) {
+							d.source.groupName = this.blankText;
+						}
 					}
-				}
-			})
+				})
+			}
 
 			this.originalCategoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.clonedCategoricalData = cloneDeep(this.vizOptions.options.dataViews[0].categorical);
