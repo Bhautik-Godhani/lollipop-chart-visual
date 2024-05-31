@@ -116,25 +116,29 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
     try {
       const obj = typeof json === "object" ? json : JSON.parse(json);
       const keys = Object.keys(getConfig());
+      const mergeObject = [];
       keys.forEach(el => {
         if (obj.hasOwnProperty(el)) {
-          shadow.visualHost.persistProperties({
-            merge: [
-              {
-                objectName: configs[el],
-                properties: {
-                  [el]: JSON.stringify(obj[el]),
-                },
-                selector: null,
-              },
-            ],
-          });
+          mergeObject.push({
+            objectName: configs[el],
+            properties: {
+              [el]: JSON.stringify(obj[el]),
+            },
+            selector: null,
+          })
           // shadow.persistProperties("config", el, obj[el]);
         }
         else {
           throw "Invalid JSON file"
         }
       });
+
+      if (mergeObject.length > 0) {
+        shadow.visualHost.persistProperties({
+          merge: mergeObject,
+        });
+      }
+
       initNotification("Theme applied successfully");
       shadow.persistProperties(sectionName, propertyName, "THEME_APPLIED");
       closeCurrentSettingHandler();
