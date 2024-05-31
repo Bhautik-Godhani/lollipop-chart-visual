@@ -1984,6 +1984,7 @@ export class Visual extends Shadow {
 						d.highlights = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${d.source.groupName}Highlight`]);
 					} else {
 						d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${this.blankText}`]);
+						d.highlights = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}${this.blankText}Highlight`]);
 					}
 				} else {
 					d.values = this.categoricalDataPairs.map((pair) => pair[`${Object.keys(d.source.roles)[0]}${d.source.index}`]);
@@ -2477,6 +2478,14 @@ export class Visual extends Shadow {
 		}
 
 		try {
+			this.vizOptions.options.dataViews[0].categorical.values.forEach(d => {
+				if (Object.keys(d.source).includes("groupName")) {
+					if (!d.source.groupName) {
+						d.source.groupName = this.blankText;
+					}
+				}
+			})
+
 			this.originalCategoricalData = this.vizOptions.options.dataViews[0].categorical as any;
 			this.clonedCategoricalData = cloneDeep(this.vizOptions.options.dataViews[0].categorical);
 			this.categoricalData = this.vizOptions.options.dataViews[0].categorical as any;
@@ -9670,12 +9679,12 @@ export class Visual extends Shadow {
 					s.valueType = d.valueType;
 				})
 
-				ele.selectAll("path").data(d.subCategories);
+				// ele.selectAll("path").data(d.subCategories);
 
 				ele.selectAll("path").each(function () {
 					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-					d3.select(this).datum((d: any) => {
-						return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+					d3.select(this).datum((datum: any, i: number) => {
+						return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
 					})
 				})
 
@@ -9702,15 +9711,15 @@ export class Visual extends Shadow {
 				// 	.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
 				// 	.attr("fill", "#fff");
 
-				const isSingleCategoryPie = ele.selectAll("path").nodes().length === 0;
-				const tooltipEle = !isSingleCategoryPie ? ele.selectAll("path") : ele;
+				// const isSingleCategoryPie = ele.selectAll(".pie-slice").nodes().length === 1;
+				// const tooltipEle = !isSingleCategoryPie ? ele.selectAll(".pie-slice") : ele;
 
-				if (isSingleCategoryPie) {
-					ele.datum(d.subCategories.find(d => d.value1 > 0))
-				}
+				// if (isSingleCategoryPie) {
+				// 	ele.datum(d.subCategories.find(d => d.value1 > 0))
+				// }
 
 				this.tooltipServiceWrapper.addTooltip(
-					tooltipEle,
+					ele.selectAll(".pie-slice"),
 					(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
 					(datapoint: IChartSubCategory) => datapoint.identity
 				);
