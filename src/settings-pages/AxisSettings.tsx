@@ -25,22 +25,22 @@ import { ESmallMultiplesAxisType, ESmallMultiplesXAxisPosition } from "../SmallM
 
 const X_AXIS_POSITION: ILabelValuePair[] = [
   {
-    label: "TOP",
+    label: "Top",
     value: Position.Top,
   },
   {
-    label: "BOTTOM",
+    label: "Bottom",
     value: Position.Bottom,
   }
 ];
 
 const Y_AXIS_POSITION: ILabelValuePair[] = [
   {
-    label: "LEFT",
+    label: "Left",
     value: Position.Left,
   },
   {
-    label: "RIGHT",
+    label: "Right",
     value: Position.Right,
   },
 ];
