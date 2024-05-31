@@ -106,6 +106,7 @@ const CutAndClipAxisSettings = (props) => {
               value={configValues.isEnabled}
               handleChange={() => handleCheckbox(ECutAndClipAxisSettings.IsEnabled)}
               appearance="toggle"
+              tooltip="Shortening the chart's axis by removing less important parts to make the data easier to see, usually shown with a break mark."
             />
           </Column>
         </Row>
