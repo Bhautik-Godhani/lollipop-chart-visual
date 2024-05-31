@@ -40,7 +40,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
         .attr("text-anchor", "start")
         .attr("dy", "0.02em")
         .attr("font-size", self.dynamicDeviationSettings.labelFontSize)
-        .attr("display", "block")
+        .attr("display", self.dynamicDeviationSettings.isShowDataLabel ? "block" : "none")
         .attr("font-family", self.dynamicDeviationSettings.labelFontFamily)
         .attr("text-decoration", self.dynamicDeviationSettings.fontStyle.includes(EFontStyle.UnderLine) ? "underline" : "")
         .attr("font-weight", self.dynamicDeviationSettings.fontStyle.includes(EFontStyle.Bold) ? "bold" : "")
@@ -119,6 +119,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         .append("line")
         .attr("class", self.dynamicDeviationSettings.connectingLineType)
         .classed("connecting-line-1", true)
+        .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
         .attr("x1", self.getXPosition(isToGreaterThenFrom ? to.value : from.value))
         .attr("x2", self.getXPosition(isToGreaterThenFrom ? to.value : from.value))
         .attr("y1", start)
@@ -179,6 +180,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-1")
+            .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
             .attr("transform", `translate(${self.getXPosition(from.value) ?? 0}, ${start})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
@@ -189,6 +191,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
+            .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
             .attr("transform", `translate(${self.getXPosition(to.value) ?? 0}, ${end})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
@@ -312,7 +315,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 ? `0, ${8} `
                 : `${8}, ${8}`
         )
-        .attr("display", !fromCategoryXPos && !toCategoryXPos ? "none" : "block");
+        .attr("display", (!fromCategoryXPos && !toCategoryXPos) || !self.dynamicDeviationSettings.isShowConnectorLine ? "none" : "block");
 
     // self.dynamicDeviationG
     //     .append("line")
@@ -361,6 +364,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-1")
+            .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
             .attr("transform", `translate(${start}, ${self.getYPosition(from.value) ?? 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
@@ -371,6 +375,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         self.dynamicDeviationG
             .append("circle")
             .attr("class", "connecting-circle-2")
+            .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
             .attr("transform", `translate(${end}, ${self.getYPosition(to.value) ?? 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))

@@ -599,7 +599,9 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	isShowStartIndicator: true,
 	isBarBorderEnabled: true,
 	connectingLineType: ELineType.Solid,
-	labelPosition: Position.Right
+	labelPosition: Position.Right,
+	isShowDataLabel: true,
+	isShowConnectorLine: true
 };
 
 export const TREND_LINES_SETTINGS: ITrendLinesSettings = {

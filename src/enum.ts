@@ -840,7 +840,9 @@ export enum EDynamicDeviationSettings {
 	IsBarBorderEnabled = "isBarBorderEnabled",
 	ConnectingLineType = "connectingLineType",
 	LabelPosition = "labelPosition",
-	FontStyle = "fontStyle"
+	FontStyle = "fontStyle",
+	IsShowConnectorLine = "isShowConnectorLine",
+	IsShowDataLabel = "isShowDataLabel"
 }
 
 export enum EDynamicDeviationDisplayTypes {

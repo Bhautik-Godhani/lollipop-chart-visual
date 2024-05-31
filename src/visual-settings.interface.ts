@@ -627,6 +627,8 @@ export interface IDynamicDeviationSettings {
 	backgroundColor: string;
 	backgroundColorTransparency: number;
 	connectorType: EDynamicDeviationConnectingLineTypes;
+	isShowConnectorLine: boolean;
+	isShowDataLabel: boolean;
 	isAutoConnectorColor: boolean;
 	connectorPositiveColor: string;
 	connectorNegativeColor: string;

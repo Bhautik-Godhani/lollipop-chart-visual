@@ -335,6 +335,9 @@ const DynamicDeviationSettings = (props) => {
 
           <AccordionAlt title="Connector Line"
             open={true}
+            showToggle={true}
+            toggleValue={configValues.isShowConnectorLine}
+            onChangeToggle={() => handleCheckbox(EDynamicDeviationSettings.IsShowConnectorLine)}
           >
             <Row>
               <Column>
@@ -371,6 +374,9 @@ const DynamicDeviationSettings = (props) => {
 
           <AccordionAlt title="Label Styles"
             open={true}
+            showToggle={true}
+            toggleValue={configValues.isShowDataLabel}
+            onChangeToggle={() => handleCheckbox(EDynamicDeviationSettings.IsShowDataLabel)}
           >
             <Row>
               <Column>
