@@ -8,7 +8,7 @@ export const PATTERNS = [
     fill: false,
   },
   {
-    patternName: "CIRCLES",
+    patternName: "CIRCLE",
     d: "M 5 5 m -4 0 a 4 4 0 1 1 8 0 a 4 4 0 1 1 -8 0",
     w: 12,
     h: 12,
@@ -16,7 +16,7 @@ export const PATTERNS = [
     fill: false,
   },
   {
-    patternName: "SQUARES",
+    patternName: "SQUARE",
     d: "M 3 3 L 8 3 L 8 8 L 3 8 Z",
     w: 10,
     h: 10,
@@ -57,7 +57,7 @@ export const PATTERNS = [
     stroke: false,
   },
   {
-    patternName: "DOTS",
+    patternName: "DOT",
     d: "M 2, 4 a 2,2 0 1,1 4,0 a 2,2 0 1,1 -4,0",
     w: 5,
     h: 5,
@@ -65,7 +65,7 @@ export const PATTERNS = [
     stroke: false,
   },
   {
-    patternName: "FILLED_SQUARES",
+    patternName: "FILLED_SQUARE",
     d: "M 3 3 L 8 3 L 8 8 L 3 8 Z",
     w: 10,
     h: 10,
@@ -113,7 +113,7 @@ export const PATTERNS = [
     stroke: true,
   },
   {
-    patternName: "FLOWING_LINES",
+    patternName: "FLOWING_LINE",
     d: "M 0 0 L 5 10 L 10 0",
     w: 10,
     h: 10,
