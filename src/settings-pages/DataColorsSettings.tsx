@@ -525,7 +525,7 @@ const DataColors = (props) => {
 		setConfigValues((d) => {
 			return {
 				...d,
-				[EDataColorsSettings.CategoryColors]: [...shadow.categoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
+				[EDataColorsSettings.CategoryColors]: [...shadow.categoriesColorList].filter(d => !d.name.includes(shadow.othersLabel)).filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i)
 			};
 		});
 
@@ -533,7 +533,7 @@ const DataColors = (props) => {
 		setConfigValues((d) => {
 			return {
 				...d,
-				[EDataColorsSettings.SubCategoryColors]: [...shadow.subCategoriesColorList].filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i),
+				[EDataColorsSettings.SubCategoryColors]: [...shadow.subCategoriesColorList].filter(d => !d.name.includes(shadow.othersLabel)).filter((v, i, a) => a.findIndex((t) => t.name === v.name) === i),
 			};
 		});
 	}, [configValues.fillType]);
