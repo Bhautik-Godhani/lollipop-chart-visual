@@ -1648,11 +1648,6 @@ export class Visual extends Shadow {
 		let categories = categoricalCategoriesValues.values.filter((item, i, ar) => ar.indexOf(item) === i);
 		categories = categories.length > 0 ? categories : [];
 
-		this.subCategoriesName = categoricalMeasureFields
-			.map((d) => d.source.groupName)
-			.filter((d) => d && d !== null && d !== undefined && d !== "")
-			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
-
 		this.isSortDataFieldsAdded = categoricalSortFields.length > 0 || categoricalTooltipFields.length > 0;
 		this.sortFieldsDisplayName =
 			categoricalSortFields.length > 0
@@ -1886,6 +1881,14 @@ export class Visual extends Shadow {
 
 		this.categoryColorPairWithIndex = {};
 		this.subCategoryColorPairWithIndex = {};
+
+		const categoricalValues = categoricalData.values as any;
+		const measures: any[] = categoricalValues.filter((d) => d.source.roles[EDataRolesName.Measure]);
+
+		this.subCategoriesName = measures
+			.map((d) => d.source.groupName)
+			.filter((d) => d && d !== null && d !== undefined && d !== "")
+			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
 		// set colors for all pairs
 		this.categoricalDataPairs.forEach((data, i) => {
@@ -5313,7 +5316,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = true;
 
-				this.drawVerticalBrush(this.categoricalData, this.brushScaleBandBandwidth, this.totalLollipopCount);
+				this.drawVerticalBrush(this.categoricalData, this.brushScaleBandBandwidth, this.totalLollipopCount, isShowXAxis, isShowYAxis);
 			} else {
 				this.isScrollBrushDisplayed = false;
 				this.isHorizontalBrushDisplayed = false;
@@ -5359,7 +5362,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	drawVerticalBrush(categoricalData: powerbi.DataViewCategorical, barDistance: number, totalBarsCount: number): void {
+	drawVerticalBrush(categoricalData: powerbi.DataViewCategorical, barDistance: number, totalBarsCount: number, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		categoricalData = cloneDeep(categoricalData);
 		const yScaleDomain = this.brushScaleBand.domain();
 		this.brushScaleBand.range(this.yScale.range());
@@ -5428,7 +5431,7 @@ export class Visual extends Shadow {
 
 				this.configLegend();
 
-				this.initAndRenderLollipopChart(categoricalData2, this.viewPortWidth * this.yAxisTicksMaxWidthRatio, this.height, true, true);
+				this.initAndRenderLollipopChart(categoricalData2, this.viewPortWidth * this.yAxisTicksMaxWidthRatio, this.height, isShowXAxis, isShowYAxis);
 
 				isBrushRendered = true;
 			} else {
@@ -5438,7 +5441,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.brushWidth = 0;
 				this.brushMargin = 0;
-				this.drawXYAxis(this.categoricalData, true, true);
+				this.drawXYAxis(this.categoricalData, isShowXAxis, isShowYAxis);
 			}
 		};
 
@@ -5687,7 +5690,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = false;
 				this.brushHeight = 0;
-				this.drawXYAxis(this.categoricalData, true, true);
+				this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
 			}
 		};
 
@@ -8601,116 +8604,6 @@ export class Visual extends Shadow {
 						}
 					}
 				}
-
-
-				// if (((this.isHasImagesData && this.isShowImageMarker) || (this.isLollipopTypeCircle && this.markerSettings.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.markerShapeBase64Url))) {
-				// 	// const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
-				// 	// 	.classed(this.circleClass, true)
-				// 	// 	.classed(this.imageMarkerClass, true)
-				// 	// 	.classed("image-marker1", true);
-
-				// 	// imageMarker1Selection
-				// 	// 	.datum(d => {
-				// 	// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				// 	// 	});
-
-				// 	// this.imageMarkerFormatting(imageMarker1Selection, false, true);
-
-				// 	// if (this.isHasMultiMeasure) {
-				// 	// 	const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
-				// 	// 		.classed(this.circleClass, true)
-				// 	// 		.classed(this.imageMarkerClass, true)
-				// 	// 		.classed("image-marker2", true);
-
-				// 	// 	imageMarker2Selection
-				// 	// 		.datum(d => {
-				// 	// 			return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-				// 	// 		});
-
-				// 	// 	this.imageMarkerFormatting(imageMarker2Selection, true, true);
-				// 	// }
-				// } else {
-				// 	if (this.isLollipopTypeCircle && (this.markerSettings.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-				// 		// const symbol1 = lollipopG.append("defs")
-				// 		// 	.append("symbol")
-				// 		// 	.attr("id", d => `${d.category}_${marker.value}_MARKER1`)
-				// 		// 	.attr("class", "marker1-symbol")
-				// 		// 	.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
-
-				// 		// const path1Selection = symbol1.append("path")
-				// 		// 	.attr("d", marker.paths[0].d)
-				// 		// 	.attr("class", "marker1-path");
-
-				// 		// const circle1Selection = lollipopG.append("use")
-				// 		// 	.attr("id", CircleType.Circle1)
-				// 		// 	.classed(this.circleClass, true)
-				// 		// 	.classed(this.circle1Class, true);
-
-				// 		// this.setPath1Formatting(path1Selection);
-				// 		// this.setCircle1Formatting(circle1Selection, marker, true);
-
-				// 		// circle1Selection
-				// 		// 	.datum(d => {
-				// 		// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				// 		// 	});
-
-				// 		// path1Selection
-				// 		// 	.datum(d => {
-				// 		// 		return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				// 		// 	});
-
-				// 		// if (this.isHasMultiMeasure) {
-				// 		// 	const symbol2 = lollipopG.append("defs")
-				// 		// 		.append("symbol")
-				// 		// 		.attr("id", d => `${d.category}_${marker.value}_MARKER2`)
-				// 		// 		.attr("class", "marker2-symbol")
-				// 		// 		.attr("viewBox", `0 0 ${marker.w} ${marker.h}`);
-
-				// 		// 	const path2Selection = symbol2.append("path")
-				// 		// 		.attr("d", marker.paths[0].d)
-				// 		// 		.attr("class", "marker2-path");
-
-				// 		// 	const circle2Selection = lollipopG.append("use")
-				// 		// 		.attr("id", CircleType.Circle2)
-				// 		// 		.classed(this.circleClass, true).classed(this.circle2Class, true);
-
-				// 		// 	this.setPath2Formatting(path2Selection);
-				// 		// 	this.setCircle2Formatting(circle2Selection, marker, true);
-
-				// 		// 	path2Selection
-				// 		// 		.datum(d => {
-				// 		// 			return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				// 		// 		});
-
-				// 		// 	circle2Selection
-				// 		// 		.datum(d => {
-				// 		// 			return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-				// 		// 		});
-				// 		// }
-				// 	} else {
-				// 		const pie1Selection = lollipopG.append("foreignObject")
-				// 			.attr("id", "pie1ForeignObject");
-				// 		this.enterPieChart(pie1Selection, false, true);
-				// 		this.setPieDataLabelsDisplayStyle();
-
-				// 		if (this.isHasMultiMeasure) {
-				// 			const pie2Selection = lollipopG.append("foreignObject")
-				// 				.attr("id", "pie2ForeignObject");
-				// 			this.enterPieChart(pie2Selection, true, true);
-				// 			this.setPieDataLabelsDisplayStyle(true);
-
-				// 			pie2Selection
-				// 				.datum(d => {
-				// 					return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-				// 				})
-				// 		}
-
-				// 		pie1Selection
-				// 			.datum(d => {
-				// 				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-				// 			});
-				// 	}
-				// }
 
 				if (this.isHorizontalChart) {
 					this.setHorizontalLinesFormatting(lineSelection, true);

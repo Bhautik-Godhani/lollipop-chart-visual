@@ -503,11 +503,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.drawYGridLines();
 
             if (isUniformXScale) {
-                xAxisG.style("display", "none");
+                xAxisG.attr("display", "none");
             }
 
             if (isUniformYScale) {
-                yAxisG.style("display", "none");
+                yAxisG.attr("display", "none");
             }
 
             if (!isUniformXScale) {
