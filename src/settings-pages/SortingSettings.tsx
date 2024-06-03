@@ -199,7 +199,7 @@ const SortingSettings = (props) => {
 	const initialStates: ISortingSettings = parseObject(_initialStates, SORTING_SETTINGS);
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		shadow.persistProperties(sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

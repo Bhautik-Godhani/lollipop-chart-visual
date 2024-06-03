@@ -1199,8 +1199,18 @@ const XAxisSettings = (props) => {
     //   persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
     // }
 
-    persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
-    persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    if (xConfigValues.labelColor !== "rgba(64, 64, 64, 1)" ||
+      xConfigValues.labelFontSize !== 10) {
+      persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    } else {
+      shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    }
+
+    if (yConfigValues.show !== false) {
+      persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    } else {
+      shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    }
 
     closeCurrentSettingHandler();
   };

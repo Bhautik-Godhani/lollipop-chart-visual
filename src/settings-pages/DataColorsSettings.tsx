@@ -3,7 +3,7 @@ import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, Gra
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import * as React from "react";
 import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
-import { ColorPaletteType, EDataColorsSettings, EMarkerColorTypes } from "../enum";
+import { ColorPaletteType, EDataColorsSettings, EIBCSThemes, EMarkerColorTypes } from "../enum";
 import { parseObject, persistProperties } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
@@ -463,7 +463,15 @@ const DataColors = (props) => {
 	];
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+
+		if (configValues.fillType !== ((shadow.chartSettings.theme === EIBCSThemes.Diverging2Horizontal || shadow.chartSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single) ||
+			configValues.singleColor1 !== "rgba(64, 64, 64, 1)" ||
+			configValues.singleColor1 !== "rgba(64, 64, 64, 1)") {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		closeCurrentSettingHandler();
 	};
 

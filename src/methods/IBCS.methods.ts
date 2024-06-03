@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
-import { POSITIVE_COLOR, SORTING_SETTINGS } from "../constants";
-import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
+import { POSITIVE_COLOR } from "../constants";
+import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsMeasureTypes, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
 import { Visual } from "../visual";
 import { IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
@@ -165,6 +165,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.LineSettings]: JSON.stringify({
                         ...self.lineSettings,
+                        [ELineSettings.show]: true,
                         [ELineSettings.lineColor]: (self.chartSettings.theme === EIBCSThemes.DefaultVertical || self.chartSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
                         [ELineSettings.lineWidth]: 4,
                         [ELineSettings.lineType]: ELineType.Solid,
@@ -216,12 +217,15 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.DataLabelsSettings]: JSON.stringify({
                         ...self.dataLabelsSettings,
-                        [EDataLabelsSettings.show]: true,
-                        [EDataLabelsSettings.showBackground]: true,
-                        [EDataLabelsSettings.fontSize]: 12,
-                        [EDataLabelsSettings.placement]: DataLabelsPlacement.Outside,
-                        [EDataLabelsSettings.color]: "rgba(64, 64, 64, 1)",
-                        [EDataLabelsSettings.backgroundColor]: "rgba(255, 255, 255, 1)",
+                        [EDataLabelsMeasureTypes.Measure1]: {
+                            ...self.dataLabelsSettings.measure1,
+                            [EDataLabelsSettings.show]: true,
+                            [EDataLabelsSettings.showBackground]: true,
+                            [EDataLabelsSettings.fontSize]: 12,
+                            [EDataLabelsSettings.placement]: DataLabelsPlacement.Outside,
+                            [EDataLabelsSettings.color]: "rgba(64, 64, 64, 1)",
+                            [EDataLabelsSettings.backgroundColor]: "rgba(255, 255, 255, 1)",
+                        }
                     }),
                 },
                 selector: null,

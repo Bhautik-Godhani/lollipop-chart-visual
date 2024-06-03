@@ -132,7 +132,7 @@ const FillPatterns = (props) => {
 	const clonedGroupingPatterns = shadow.categoryPatterns;
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		shadow.persistProperties(sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};
 

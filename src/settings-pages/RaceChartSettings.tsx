@@ -53,7 +53,7 @@ const RaceChartSettings = (props) => {
   }
 
   const applyChanges = () => {
-    persistProperties(shadow, sectionName, propertyName, configValues);
+    shadow.persistProperties(sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
 

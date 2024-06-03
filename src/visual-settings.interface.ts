@@ -324,6 +324,8 @@ export interface ILabelValuePair {
 	label: string;
 	value: string;
 	icon?: React.ReactNode;
+	disabled?: boolean;
+	tooltip?: string;
 	isSortByCategory?: boolean;
 	isSortByMeasure?: boolean;
 	isSortByMultiMeasure?: boolean;

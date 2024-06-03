@@ -339,8 +339,16 @@ const ChartSettings = (props) => {
 					[EChartSettings.Theme]: undefined,
 					[EChartSettings.PrevTheme]: undefined,
 				};
-				ApplyBeforeIBCSAppliedSettingsBack(shadow);
-				shadow.persistProperties(sectionName, propertyName, newConfigValues);
+				if (newConfigValues.isShowZeroBaseLine !== true ||
+					(newConfigValues.orientation !== ((newConfigValues.theme === EIBCSThemes.DefaultHorizontal ||
+						newConfigValues.theme === EIBCSThemes.Diverging1Horizontal ||
+						newConfigValues.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical))
+				) {
+					ApplyBeforeIBCSAppliedSettingsBack(shadow);
+					shadow.persistProperties(sectionName, propertyName, newConfigValues);
+				} else {
+					shadow.persistProperties(sectionName, propertyName, newConfigValues);
+				}
 			} else {
 				configValues.theme = undefined;
 				configValues.prevTheme = undefined;

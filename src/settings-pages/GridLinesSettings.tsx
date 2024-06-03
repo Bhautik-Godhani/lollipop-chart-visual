@@ -179,7 +179,14 @@ const GridLinesSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		if (configValues.xGridLines.show !== false ||
+			configValues.yGridLines.show !== false
+		) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		closeCurrentSettingHandler();
 	};
 

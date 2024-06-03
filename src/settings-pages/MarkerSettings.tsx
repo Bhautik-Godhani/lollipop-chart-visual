@@ -15,17 +15,6 @@ import { persistProperties } from "../methods/methods";
 import { MarkerCircleIcon, MarkerDiamondIcon, MarkerHTriangleIcon, MarkerSquareIcon, MarkerVTriangleIcon } from "./SettingsIcons";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
-const MARKER_TYPES: ILabelValuePair[] = [
-	{
-		label: "Shape",
-		value: EMarkerTypes.SHAPE,
-	},
-	{
-		label: "Chart",
-		value: EMarkerTypes.CHART,
-	},
-];
-
 const MARKER_CHART_TYPES = [
 	{
 		image: PieIcon,
@@ -96,6 +85,19 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 		},
 	];
 
+	const MARKER_TYPES: ILabelValuePair[] = [
+		{
+			label: "Shape",
+			value: EMarkerTypes.SHAPE,
+		},
+		{
+			label: "Chart",
+			value: EMarkerTypes.CHART,
+			disabled: !shadow.isHasSubcategories,
+			tooltip: "Enter sub-category data to enable it"
+		},
+	];
+
 	return (
 		<>
 			<Row disableTopPadding>
@@ -142,6 +144,17 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 							</ConditionalWrapper>
 
 							<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+								<Row>
+									<Column>
+										<SwitchOption
+											label={"Marker Type"}
+											value={config.markerType}
+											optionsList={MARKER_TYPES}
+											handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
+										/>
+									</Column>
+								</Row>
+
 								<Row>
 									<Column>
 										<SwitchOption
@@ -409,7 +422,16 @@ const MarkerSettings = (props) => {
 			configValues[configValues.markerStyleType].markerShape = EMarkerShapeTypes.DEFAULT;
 		}
 
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		if (configValues.markerType !== EMarkerTypes.SHAPE ||
+			configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.DEFAULT ||
+			configValues[configValues.markerStyleType].dropdownMarkerType === EMarkerDefaultShapes.SQUARE ||
+			configValues[configValues.markerStyleType].markerSize !== 20
+		) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		closeCurrentSettingHandler();
 	};
 

@@ -43,7 +43,7 @@ const ReferenceLines = (props) => {
   const [initialStates, setInitialStates] = React.useState<IReferenceLineSettings[]>((shadow as Visual).referenceLinesData);
 
   const applyChanges = (configValues) => {
-    persistProperties(shadow, sectionName, propertyName, configValues);
+    shadow.persistProperties(sectionName, propertyName, configValues);
     // closeCurrentSettingHandler();
   };
 

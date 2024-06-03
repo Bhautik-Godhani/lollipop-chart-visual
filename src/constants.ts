@@ -134,7 +134,7 @@ export const CIRCLE2_SETTINGS: ICirclePropsSettings = {
 export const LINE_SETTINGS: ILineSettings = {
 	show: true,
 	lineType: ELineType.Solid,
-	lineWidth: 4,
+	lineWidth: 3,
 	lineColor: "rgba(128, 128, 128, 1)",
 	isApplyMarkerColor: false
 };
@@ -385,9 +385,9 @@ export const BRUSH_AND_ZOOM_AREA_SETTINGS: IBrushAndZoomAreaSettings = {
 	selectionTrackBackgroundColor: "rgba(0, 0, 0, 0.2)",
 	selectionTrackBorderColor: "rgba(225, 225, 225, 1)",
 	isAutoWidth: true,
-	isAutoHeight: true,
+	isAutoHeight: false,
 	width: undefined,
-	height: undefined
+	height: 40
 };
 
 export const PATTERN_SETTINGS: IPatternSettings = {

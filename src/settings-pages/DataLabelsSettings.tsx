@@ -543,7 +543,20 @@ const DataLabelsSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		persistProperties(shadow, sectionName, propertyName, configValues);
+		const marker1 = dataLabelsSettings.measure1;
+
+		if (dataLabelsSettings.show !== true ||
+			marker1.showBackground !== true ||
+			marker1.fontSize !== 12 ||
+			marker1.placement !== DataLabelsPlacement.Outside ||
+			marker1.color !== "rgba(64, 64, 64, 1)" ||
+			marker1.backgroundColor !== "rgba(255, 255, 255, 1)"
+		) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		closeCurrentSettingHandler();
 	};
 
@@ -633,7 +646,7 @@ const DataLabelsSettings = (props) => {
 			handleChange(true, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
 
-		if (measureConfigValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
+		if (!shadow.isIBCSEnabled && measureConfigValues.placement === DataLabelsPlacement.Outside && !measureConfigValues.isShowBackgroundChange && measureConfigValues.showBackground) {
 			// handleChange(true, EDataLabelsSettings.IsShowBackgroundChange, selectedMeasure, setConfigValues);
 			handleChange(false, EDataLabelsSettings.showBackground, selectedMeasure, setConfigValues);
 		}
