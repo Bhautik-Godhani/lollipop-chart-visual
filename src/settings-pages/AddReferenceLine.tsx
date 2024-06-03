@@ -642,6 +642,7 @@ const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configVal
               <ColorPicker
                 label={"Color"}
                 color={configValues.backgroundColor}
+                colorOpacity={0.2}
                 handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle)}
                 colorPalette={vizOptions.host.colorPalette}
                 size="sm"
