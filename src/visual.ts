@@ -2101,104 +2101,106 @@ export class Visual extends Shadow {
 		const expectedWidth = (this.brushScaleBandBandwidth * width) / this.brushScaleBand.bandwidth();
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
-		if (this.isHorizontalChart) {
-			if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-				this.brushXAxisTicksMaxHeight = 0;
-				this.setBrushYAxisTicksMaxWidth();
-			} else {
-				this.brushXAxisTicksMaxHeight = 0;
-				this.brushYAxisTicksMaxWidth = 0;
-			}
-
-			if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-				this.isScrollBrushDisplayed = true;
-				this.isVerticalBrushDisplayed = true;
-				this.isHorizontalBrushDisplayed = false;
-
-				const config: IBrushConfig = {
-					brushG: this.brushG.node(),
-					brushXPos: 0,
-					brushYPos: 0,
-					barDistance: this.brushScaleBandBandwidth,
-					totalBarsCount: this.totalLollipopCount,
-					scaleWidth: width,
-					scaleHeight: height,
-					smallMultiplesGridItemId: this.smallMultiplesGridItemId,
-					categoricalData: categoricalData,
-					isShowXAxis: true,
-					isShowYAxis: true,
-					isShowHorizontalBrush: true
-				};
-
-				this.initVerticalBrush(config);
-			} else {
-				this.isScrollBrushDisplayed = false;
-				this.isVerticalBrushDisplayed = false;
-				this.isHorizontalBrushDisplayed = false;
-				this.brushG.selectAll("*").remove();
-			}
-		} else {
-			if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-				this.brushYAxisTicksMaxWidth = 0;
-				this.setBrushXAxisTicksMaxHeight();
-			} else {
-				this.brushXAxisTicksMaxHeight = 0;
-				this.brushYAxisTicksMaxWidth = 0;
-			}
-
-			if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-				this.isScrollBrushDisplayed = true;
-				this.isHorizontalBrushDisplayed = true;
-				this.isVerticalBrushDisplayed = false;
-				const brushXPos = this.margin.left ? this.margin.left : 0;
-
-				const config: IBrushConfig = {
-					brushG: this.brushG.node(),
-					brushXPos: brushXPos,
-					brushYPos: 100000,
-					barDistance: this.brushScaleBandBandwidth,
-					totalBarsCount: this.totalLollipopCount,
-					scaleWidth: width,
-					scaleHeight: height,
-					smallMultiplesGridItemId: null,
-					categoricalData: categoricalData,
-					isShowXAxis: true,
-					isShowYAxis: true,
-					isShowHorizontalBrush: true
-				};
-
-				this.initHorizontalBrush(config);
-			} else {
-				this.isScrollBrushDisplayed = false;
-				this.isHorizontalBrushDisplayed = false;
-				this.isVerticalBrushDisplayed = false;
-				this.brushG.selectAll("*").remove();
-			}
-		}
-
-		// || this.height < expectedHeight
-		if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-			const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-			const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-			);
-
-			const categoricalData2 = cloneDeep(categoricalData);
-
-			categoricalData2.categories.forEach((d, i) => {
-				d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-			});
-
-			categoricalData2.values.forEach((d, i) => {
-				d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-				if (d.highlights) {
-					d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+		if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
+			if (this.isHorizontalChart) {
+				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.setBrushYAxisTicksMaxWidth();
+				} else {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.brushYAxisTicksMaxWidth = 0;
 				}
-			});
 
-			this.setCategoricalDataFields(categoricalData2);
-			this.setChartData(categoricalData2);
+				if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+					this.isScrollBrushDisplayed = true;
+					this.isVerticalBrushDisplayed = true;
+					this.isHorizontalBrushDisplayed = false;
+
+					const config: IBrushConfig = {
+						brushG: this.brushG.node(),
+						brushXPos: 0,
+						brushYPos: 0,
+						barDistance: this.brushScaleBandBandwidth,
+						totalBarsCount: this.totalLollipopCount,
+						scaleWidth: width,
+						scaleHeight: height,
+						smallMultiplesGridItemId: this.smallMultiplesGridItemId,
+						categoricalData: categoricalData,
+						isShowXAxis: true,
+						isShowYAxis: true,
+						isShowHorizontalBrush: true
+					};
+
+					this.initVerticalBrush(config);
+				} else {
+					this.isScrollBrushDisplayed = false;
+					this.isVerticalBrushDisplayed = false;
+					this.isHorizontalBrushDisplayed = false;
+					this.brushG.selectAll("*").remove();
+				}
+			} else {
+				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+					this.brushYAxisTicksMaxWidth = 0;
+					this.setBrushXAxisTicksMaxHeight();
+				} else {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.brushYAxisTicksMaxWidth = 0;
+				}
+
+				if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+					this.isScrollBrushDisplayed = true;
+					this.isHorizontalBrushDisplayed = true;
+					this.isVerticalBrushDisplayed = false;
+					const brushXPos = this.margin.left ? this.margin.left : 0;
+
+					const config: IBrushConfig = {
+						brushG: this.brushG.node(),
+						brushXPos: brushXPos,
+						brushYPos: 100000,
+						barDistance: this.brushScaleBandBandwidth,
+						totalBarsCount: this.totalLollipopCount,
+						scaleWidth: width,
+						scaleHeight: height,
+						smallMultiplesGridItemId: null,
+						categoricalData: categoricalData,
+						isShowXAxis: true,
+						isShowYAxis: true,
+						isShowHorizontalBrush: true
+					};
+
+					this.initHorizontalBrush(config);
+				} else {
+					this.isScrollBrushDisplayed = false;
+					this.isHorizontalBrushDisplayed = false;
+					this.isVerticalBrushDisplayed = false;
+					this.brushG.selectAll("*").remove();
+				}
+			}
+
+			// || this.height < expectedHeight
+			if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+				);
+
+				const categoricalData2 = cloneDeep(categoricalData);
+
+				categoricalData2.categories.forEach((d, i) => {
+					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+				});
+
+				categoricalData2.values.forEach((d, i) => {
+					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+					if (d.highlights) {
+						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+					}
+				});
+
+				this.setCategoricalDataFields(categoricalData2);
+				this.setChartData(categoricalData2);
+			}
 		}
 
 		return categoricalData;
@@ -6811,7 +6813,7 @@ export class Visual extends Shadow {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
-			this.scaleBandWidth = this.markerMaxSize;
+			this.scaleBandWidth = 0;
 		} else {
 			this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
 		}
@@ -6891,6 +6893,7 @@ export class Visual extends Shadow {
 
 		const posTiltDx = d3.scaleLinear().domain([30, 90]).range([0.35, -0.5]);
 		const negTiltDx = d3.scaleLinear().domain([-30, -90]).range([0.35, -0.5]);
+		const getY9 = (val) => d3.scaleLinear().domain(val > 0 ? [0, 90] : [0, -90]).range([0, 9])(val);
 
 		let rotateDegree = 0;
 		if (THIS.isBottomXAxis) {
@@ -6911,9 +6914,9 @@ export class Visual extends Shadow {
 			.selectAll("text")
 			.attr("dx", "0")
 			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
-			.attr("dy", isApplyTilt ? ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em")) : (this.isBottomXAxis ? "0.35em" : "-0.35em"))
+			.attr("dy", ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em")))
 			.attr("y", () => {
-				const y = isApplyTilt ? 0 : 9;
+				const y = isApplyTilt ? getY9(rotateDegree) : 9;
 				if (this.isHorizontalChart) {
 					return this.isBottomXAxis ? y : 0;
 				} else {
@@ -6964,7 +6967,7 @@ export class Visual extends Shadow {
 					text = text.split("--")[0];
 				}
 
-				if (THIS.isXIsDateTimeAxis && !THIS.isXIsContinuousAxis && !THIS.isHorizontalChart && !isOthersTick) {
+				if (THIS.isXIsDateTimeAxis && !THIS.isHorizontalChart && !isOthersTick) {
 					if (!xAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
 					} else {
@@ -7211,8 +7214,8 @@ export class Visual extends Shadow {
 
 			if ((this.isXIsDateTimeAxis && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
 				const dates = this.chartData.map((d) => d.category);
-				const minDate = d3.min(dates, d => d);
-				const maxDate = d3.max(dates, d => d);
+				const minDate = d3.min(dates, d => new Date(d).getTime());
+				const maxDate = d3.max(dates, d => new Date(d).getTime());
 
 				this.xScale = d3.scaleTime();
 				this.xScale.domain([new Date(minDate), new Date(maxDate)]);
