@@ -22,13 +22,13 @@ import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
 
 const TEXT_PLACEMENTS: ILabelValuePair[] = [
   {
-    label: "Bottom",
-    value: Position.Bottom,
-  },
-  {
     label: "Top",
     value: Position.Top,
   },
+  {
+    label: "Bottom",
+    value: Position.Bottom,
+  }
 ];
 
 const RaceChartSettings = (props) => {
