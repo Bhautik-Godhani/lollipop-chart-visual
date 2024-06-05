@@ -7416,7 +7416,7 @@ export class Visual extends Shadow {
 	}
 
 	drawXAxisLine(): void {
-		if (this.isBottomXAxis) {
+		if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
 			this.xAxisLineG.attr("transform", "translate(0," + this.height + ")");
 		} else {
 			this.xAxisLineG.attr("transform", "translate(0," + 0 + ")");
@@ -7438,16 +7438,16 @@ export class Visual extends Shadow {
 			.append("line")
 			.attr("class", "xAxisLine")
 			.attr("x1", x1)
-			.attr("x2", x2)
-			.attr("y1", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
-			.attr("y2", this.isBottomXAxis ? -this.yAxisStartMargin : this.yAxisStartMargin)
+			.attr("x2", this.isLeftYAxis && this.xAxisSettings.isInvertRange ? x2 - this.xAxisStartMargin : x2)
+			.attr("y1", ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) ? -this.yAxisStartMargin : this.yAxisStartMargin)
+			.attr("y2", ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) ? -this.yAxisStartMargin : this.yAxisStartMargin)
 			.attr("fill", this.getColor(this.xAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke", this.getColor(this.xAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", "1px");
 	}
 
 	drawYAxisLine(): void {
-		if (this.isLeftYAxis) {
+		if (((this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (!this.isLeftYAxis && this.xAxisSettings.isInvertRange))) {
 			this.yAxisLineG.attr("transform", `translate(0, 0)`);
 		} else {
 			this.yAxisLineG.attr("transform", `translate(${this.width}, 0)`);
@@ -7468,9 +7468,9 @@ export class Visual extends Shadow {
 		this.yAxisLineG
 			.append("line")
 			.attr("class", "yAxisLine")
-			.attr("x1", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
-			.attr("x2", this.isLeftYAxis ? this.yAxisStartMargin : -this.yAxisStartMargin)
-			.attr("y1", y1)
+			.attr("x1", ((this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (!this.isLeftYAxis && this.xAxisSettings.isInvertRange)) ? this.yAxisStartMargin : -this.yAxisStartMargin)
+			.attr("x2", ((this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (!this.isLeftYAxis && this.xAxisSettings.isInvertRange)) ? this.yAxisStartMargin : -this.yAxisStartMargin)
+			.attr("y1", this.yAxisSettings.isInvertRange ? this.xAxisStartMargin : y1)
 			.attr("y2", y2)
 			.attr("fill", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke", this.getColor(this.yAxisSettings.axisLineColor, EHighContrastColorType.Foreground))
