@@ -14,6 +14,7 @@ const GetActionMenuUI = (
   menuPosition: { x: number, y: number },
   setMenuPosition: React.Dispatch<React.SetStateAction<any>>,
   setActiveMenuRowIndex: React.Dispatch<React.SetStateAction<any>>,
+  addRule: (...any) => any,
   editRule: (...any) => any,
   setRules: React.Dispatch<React.SetStateAction<any>>,
   setShowConfirmPrompt: (...any) => any
@@ -37,9 +38,9 @@ const GetActionMenuUI = (
       <div className="context-menu-item delete-menu-item" onClick={(e) => {
         e.stopPropagation();
         setActiveMenuRowIndex(-1);
-        setRules((d) => {
-          return [...d, cloneDeep(rule)];
-        });
+        const clonedRule = cloneDeep(rule);
+        clonedRule.isDuplicateRule = true;
+        addRule(clonedRule);
       }}>
         <CopyIcon
           style={{ marginRight: "10px", cursor: "pointer" }}
@@ -64,6 +65,7 @@ const GetActionMenuUI = (
 
 const RulesList = ({
   rules,
+  addRule,
   setRules,
   createRule,
   handleDrag,
@@ -126,7 +128,7 @@ const RulesList = ({
                     </div>
                   </div>
 
-                  {GetActionMenuUI(index, rule, activeMenuRowIndex, menuPosition, setMenuPosition, setActiveMenuRowIndex, editRule, setRules, setShowConfirmPrompt)}
+                  {GetActionMenuUI(index, rule, activeMenuRowIndex, menuPosition, setMenuPosition, setActiveMenuRowIndex, addRule, editRule, setRules, setShowConfirmPrompt)}
 
                 </div>
               </div>
@@ -262,6 +264,10 @@ function RuleName(rule, condition: any) {
               }
             </>
           )}
+
+          {rule.isDuplicateRule && (
+            <span> - Copy </span>
+          )}
         </>
       )}
 
@@ -277,6 +283,7 @@ function RuleName(rule, condition: any) {
 function HomePage({
   rules,
   setRules,
+  addRule,
   createRule,
   deleteRule,
   editRule,
@@ -317,7 +324,7 @@ function HomePage({
                 style={{ background: rules?.[showConfirmPrompt.id]?.conditions?.[0]?.color }}
               ></span>
               <span className="section-delete-alert-subtext-text">
-                {RuleName(rules?.[showConfirmPrompt.id], rules?.[showConfirmPrompt.id]?.conditions[0])}
+                {rules?.[showConfirmPrompt.id]?.isDuplicateRule ? RuleName(rules?.[showConfirmPrompt.id], rules?.[showConfirmPrompt.id]?.conditions[0]) : RuleName(rules?.[showConfirmPrompt.id], rules?.[showConfirmPrompt.id]?.conditions[0])}
               </span>
             </p>
           </div>
@@ -352,6 +359,7 @@ function HomePage({
 
           <RulesList
             rules={filteredRules}
+            addRule={addRule}
             setRules={setRules}
             createRule={createRule}
             handleDrag={(ev) => handleDrag(ev, setDragId)}

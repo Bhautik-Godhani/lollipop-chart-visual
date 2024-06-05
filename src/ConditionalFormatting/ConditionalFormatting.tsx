@@ -200,6 +200,7 @@ const ConditionalFormatting = (props) => {
           createRule={createRule}
           rules={rules}
           setRules={setRules}
+          addRule={addRule}
           updateRules={updateRules}
           deleteRule={deleteRule}
           editRule={editRule}
