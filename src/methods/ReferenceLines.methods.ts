@@ -612,6 +612,8 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                 setData(rLine, true);
             }
 
+            rLine.labelText = getLabelText(self, rLine);
+
             rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
             rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
 
