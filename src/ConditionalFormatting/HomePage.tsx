@@ -95,7 +95,7 @@ const RulesList = ({
         <div
           className={"section section-separator section-pb section-add-button-wrapper clickable"}
         >
-          <span className="section-add-button-wrapper-text">Add New Rule</span>
+          <span className="section-add-button-wrapper-text" onClick={() => createRule()}>Add New Rule</span>
           <Button
             text={<PlusIcon fill="var(--blackColor" />}
             variant={"primary"}
