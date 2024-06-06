@@ -8724,11 +8724,11 @@ export class Visual extends Shadow {
 						circle1Selection.remove();
 						circle2Selection.remove();
 
-						this.enterPieChart(pie1Selection, false, false);
+						this.updatePieChart(pie1Selection, false, false);
 						this.setPieDataLabelsDisplayStyle();
 
 						if (this.isHasMultiMeasure) {
-							this.enterPieChart(pie2Selection, true, false);
+							this.updatePieChart(pie2Selection, true, false);
 							this.setPieDataLabelsDisplayStyle(true);
 						}
 					}
@@ -8759,11 +8759,11 @@ export class Visual extends Shadow {
 						circle1Selection.remove();
 						circle2Selection.remove();
 
-						this.enterPieChart(pie1Selection, false, false);
+						this.updatePieChart(pie1Selection, false, false);
 						this.setPieDataLabelsDisplayStyle();
 
 						if (this.isHasMultiMeasure) {
-							this.enterPieChart(pie2Selection, true, false);
+							this.updatePieChart(pie2Selection, true, false);
 							this.setPieDataLabelsDisplayStyle(true);
 						}
 					}
@@ -9558,208 +9558,169 @@ export class Visual extends Shadow {
 		}
 	}
 
-	enterPieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
-		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
-		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
-		const valueKey = isPie2 ? "value2" : "value1";
-		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
-		const d = pieViewBoxRadius * 2;
+	configurePieChart(d: ILollipopChartRow, ele: D3Selection<SVGElement>, i: number, isPie2: boolean): void {
+		d.subCategories.forEach(s => {
+			s.defaultValue = isPie2 ? s.value2 : s.value1;
+			s.valueType = d.valueType;
+		})
 
-		pieForeignObjectSelection.selectAll("*").remove();
+		// ele.selectAll("path").data(d.subCategories);
 
-		pieForeignObjectSelection
-			.attr("id", isPie2 ? "pie2ForeignObject" : "pie1ForeignObject")
-			.attr("width", d)
-			.attr("height", d)
-			.append("xhtml:div")
-			.attr("id", "pie")
-			.style("width", "100%")
-			.style("height", "100%")
-			.each((d: ILollipopChartRow, i, nodes) => {
-				const ele = d3.select(nodes[i]);
-				const ePieChart = echarts.init(ele.node(), null, { renderer: "svg" });
-				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
-				ePieChart.resize();
-
-				d.subCategories.forEach(s => {
-					s.defaultValue = isPie2 ? s.value2 : s.value1;
-					s.valueType = d.valueType;
-				})
-
-				// ele.selectAll("path").data(d.subCategories);
-
-				ele.selectAll("path").each(function () {
-					const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-					d3.select(this).datum((datum: any, i: number) => {
-						return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
-					})
-				})
-
-				ele.selectAll("path").attr("id", () => {
-					return isPie2 ? PieType.Pie2 : PieType.Pie1;
-				});
-
-				ele.selectAll("path").attr("class", () => {
-					return "pie-slice";
-					// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
-				});
-				// .attr("fill", (d: IChartSubCategory) => {
-				// 	return d.styles[pieType].color;
-				// });
-
-				// ele
-				// 	.select("g")
-				// 	.append("rect")
-				// 	.lower()
-				// 	.attr("class", "innerCenterRect")
-				// 	.attr("width", pieRadius + (pieRadius * 30) / 100)
-				// 	.attr("height", pieRadius + (pieRadius * 30) / 100)
-				// 	.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-				// 	.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-				// 	.attr("fill", "#fff");
-
-				// const isSingleCategoryPie = ele.selectAll(".pie-slice").nodes().length === 1;
-				// const tooltipEle = !isSingleCategoryPie ? ele.selectAll(".pie-slice") : ele;
-
-				// if (isSingleCategoryPie) {
-				// 	ele.datum(d.subCategories.find(d => d.value1 > 0))
-				// }
-
-				this.tooltipServiceWrapper.addTooltip(
-					ele.selectAll(".pie-slice"),
-					(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
-					(datapoint: IChartSubCategory) => datapoint.identity
-				);
-
-				const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-					return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
-				};
-
-				const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
-					const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
-					const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker2Color;
-					const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-					const posNegColor2 = pieData.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-
-					const tooltipData: TooltipData[] = [
-						{
-							displayName: this.categoryDisplayName,
-							value: this.getTooltipCategoryText(pieData.parentCategory).toString(),
-							color: "transparent",
-						},
-						{
-							displayName: this.subCategoryDisplayName,
-							value: pieData.category.toString(),
-							color: "transparent",
-						},
-						{
-							displayName: this.measure1DisplayName,
-							value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-							color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
-						}
-					];
-
-					if (this.isHasMultiMeasure) {
-						tooltipData.push({
-							displayName: this.measure2DisplayName,
-							value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-							color: (isPosNegColorScheme2 ? posNegColor2 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
-						})
-					}
-
-					pieData.tooltipFields.forEach((data, i: number) => {
-						let text = data.value;
-
-						if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
-							text = this.othersBarText;
-						} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
-							text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
-						} else {
-							if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
-								text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
-							} else {
-								text = data.value;
-							}
-						}
-
-						tooltipData.push({
-							displayName: data.displayName,
-							value: text,
-							color: data.color ? data.color : "transparent",
-						});
-					});
-
-					if (this.errorBarsSettings.tooltip.isEnabled) {
-						const errorBar1 = d.errorBar1;
-						const errorBar2 = d.errorBar2;
-						const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-
-						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-							if (this.isHasErrorUpperBounds) {
-								if (this.isRenderBothErrorBars) {
-									tooltipData.push({
-										displayName: "Upper",
-										value: !isPie2 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
-										color: "transparent",
-									});
-								} else {
-									if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
-										tooltipData.push({
-											displayName: "Upper",
-											value: errorBar1.tooltipUpperBoundValue,
-											color: "transparent",
-										});
-									}
-								}
-							}
-						}
-
-						if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-							if (this.isHasErrorLowerBounds) {
-								if (this.isRenderBothErrorBars) {
-									tooltipData.push({
-										displayName: "Lower",
-										value: !isPie2 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
-										color: "transparent",
-									});
-								} else {
-									if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
-										tooltipData.push({
-											displayName: "Lower",
-											value: errorBar1.tooltipLowerBoundValue,
-											color: "transparent",
-										});
-									}
-								}
-							}
-						}
-					}
-
-					if (d.isHighlight) {
-						tooltipData.push({
-							displayName: "Highlighted",
-							value: !isPie2
-								? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
-								: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-							color: "transparent",
-						});
-					}
-
-					pieData.tooltipFields.forEach((data) => {
-						tooltipData.push({
-							displayName: data.displayName,
-
-							value: typeof data.value === "number"
-								? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
-								: data.value,
-							color: data.color ? data.color : "transparent",
-						});
-					});
-
-					return tooltipData;
-				};
+		ele.selectAll("path").each(function () {
+			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
+			d3.select(this).datum((datum: any, i: number) => {
+				return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
 			})
+		})
 
+		ele.selectAll("path").attr("id", () => {
+			return isPie2 ? PieType.Pie2 : PieType.Pie1;
+		});
+
+		ele.selectAll("path").attr("class", () => {
+			return "pie-slice";
+			// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
+		});
+		// .attr("fill", (d: IChartSubCategory) => {
+		// 	return d.styles[pieType].color;
+		// });
+
+		this.tooltipServiceWrapper.addTooltip(
+			ele.selectAll(".pie-slice"),
+			(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
+			(datapoint: IChartSubCategory) => datapoint.identity
+		);
+
+		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
+			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
+		};
+
+		const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
+			const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
+			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker2Color;
+			const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+			const posNegColor2 = pieData.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+
+			const tooltipData: TooltipData[] = [
+				{
+					displayName: this.categoryDisplayName,
+					value: this.getTooltipCategoryText(pieData.parentCategory).toString(),
+					color: "transparent",
+				},
+				{
+					displayName: this.subCategoryDisplayName,
+					value: pieData.category.toString(),
+					color: "transparent",
+				},
+				{
+					displayName: this.measure1DisplayName,
+					value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
+					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+				}
+			];
+
+			if (this.isHasMultiMeasure) {
+				tooltipData.push({
+					displayName: this.measure2DisplayName,
+					value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+					color: (isPosNegColorScheme2 ? posNegColor2 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
+				})
+			}
+
+			pieData.tooltipFields.forEach((data, i: number) => {
+				let text = data.value;
+
+				if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
+					text = this.othersBarText;
+				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
+					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
+				} else {
+					if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
+						text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
+					} else {
+						text = data.value;
+					}
+				}
+
+				tooltipData.push({
+					displayName: data.displayName,
+					value: text,
+					color: data.color ? data.color : "transparent",
+				});
+			});
+
+			if (this.errorBarsSettings.tooltip.isEnabled) {
+				const errorBar1 = d.errorBar1;
+				const errorBar2 = d.errorBar2;
+				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+
+				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
+					if (this.isHasErrorUpperBounds) {
+						if (this.isRenderBothErrorBars) {
+							tooltipData.push({
+								displayName: "Upper",
+								value: !isPie2 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
+								color: "transparent",
+							});
+						} else {
+							if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+								tooltipData.push({
+									displayName: "Upper",
+									value: errorBar1.tooltipUpperBoundValue,
+									color: "transparent",
+								});
+							}
+						}
+					}
+				}
+
+				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
+					if (this.isHasErrorLowerBounds) {
+						if (this.isRenderBothErrorBars) {
+							tooltipData.push({
+								displayName: "Lower",
+								value: !isPie2 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
+								color: "transparent",
+							});
+						} else {
+							if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+								tooltipData.push({
+									displayName: "Lower",
+									value: errorBar1.tooltipLowerBoundValue,
+									color: "transparent",
+								});
+							}
+						}
+					}
+				}
+			}
+
+			if (d.isHighlight) {
+				tooltipData.push({
+					displayName: "Highlighted",
+					value: !isPie2
+						? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
+						: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+					color: "transparent",
+				});
+			}
+
+			pieData.tooltipFields.forEach((data) => {
+				tooltipData.push({
+					displayName: data.displayName,
+
+					value: typeof data.value === "number"
+						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
+						: data.value,
+					color: data.color ? data.color : "transparent",
+				});
+			});
+
+			return tooltipData;
+		};
+	}
+
+	transformPieForeignObject(pieForeignObjectSelection: D3Selection<SVGElement>, isEnter: boolean, valueKey: string, pieRadius: number, isPie2: boolean): void {
 		pieForeignObjectSelection
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
@@ -9785,6 +9746,35 @@ export class Visual extends Shadow {
 					this.updateAnnotationNodeElements();
 				}
 			});
+	}
+
+	enterPieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
+		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
+		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
+		const valueKey = isPie2 ? "value2" : "value1";
+		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
+		const d = pieViewBoxRadius * 2;
+
+		pieForeignObjectSelection.selectAll("*").remove();
+
+		pieForeignObjectSelection
+			.attr("id", isPie2 ? "pie2ForeignObject" : "pie1ForeignObject")
+			.attr("width", d)
+			.attr("height", d)
+			.append("xhtml:div")
+			.attr("id", "pie")
+			.style("width", "100%")
+			.style("height", "100%")
+			.each((d: ILollipopChartRow, i, nodes) => {
+				const ele = d3.select(nodes[i]);
+				const ePieChart = echarts.init(ele.node(), null, { renderer: "svg" });
+				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
+				ePieChart.resize();
+
+				this.configurePieChart(d, ele, i, isPie2);
+			})
+
+		this.transformPieForeignObject(pieForeignObjectSelection, isEnter, valueKey, pieRadius, isPie2);
 
 		// this.pieG.on("mouseover", (e) => {
 		// 	if (e.path.length && e.path[5]) {
@@ -9797,77 +9787,29 @@ export class Visual extends Shadow {
 		// });
 	}
 
-	// updatePieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
-	// 	isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
-	// 	const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
-	// 	const valueKey = isPie2 ? "value2" : "value1";
-	// 	const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
-	// 	const d = pieViewBoxRadius * 2;
-	// 	pieForeignObjectSelection
-	// 		.attr("width", d)
-	// 		.attr("height", d)
-	// 		.select("#pie")
-	// 		.style("width", "100%")
-	// 		.style("height", "100%")
-	// 		.each((d, i, nodes) => {
-	// 			const ele = d3.select(nodes[i]);
-	// 			const ePieChart = echarts.init(ele.node());
-	// 			ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
-	// 			ePieChart.resize();
+	updatePieChart(pieForeignObjectSelection: any, isPie2: boolean, isEnter: boolean): void {
+		isPie2 ? this.setPie2ChartFormatting() : this.setPie1ChartFormatting();
+		const pieRadius = isPie2 ? this.pie2Radius : this.pie1Radius;
+		const valueKey = isPie2 ? "value2" : "value1";
+		const pieViewBoxRadius = pieRadius + (pieRadius * (this.pieEmphasizeScaleSize * 2)) / 100;
+		const d = pieViewBoxRadius * 2;
+		pieForeignObjectSelection
+			.attr("width", d)
+			.attr("height", d)
+			.select("#pie")
+			.style("width", "100%")
+			.style("height", "100%")
+			.each((d, i, nodes) => {
+				const ele = d3.select(nodes[i]);
+				const ePieChart = echarts.init(ele.node());
+				ePieChart.setOption(this.getPieChartOptions(d.category, isPie2));
+				ePieChart.resize();
 
-	// 			d.subCategories.forEach(s => {
-	// 				s.defaultValue = isPie2 ? s.value2 : s.value1;
-	// 				s.valueType = d.valueType;
-	// 			})
+				this.configurePieChart(d, ele, i, isPie2);
+			})
 
-	// 			ele.selectAll("path").data(d.subCategories);
-	// 			ele.selectAll("path").each(function () {
-	// 				const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-	// 				d3.select(this).datum((d: any) => {
-	// 					return { ...d, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
-	// 				})
-	// 			})
-
-	// 			// ele
-	// 			// 	.selectAll("path")
-	// 			// 	.attr("class", (pieData: IChartSubCategory) => this.getPieSliceClass(d.category, pieData.category))
-	// 			// .style("fill", (d: IChartSubCategory) => d.styles[pieType].color);
-
-	// 			ele
-	// 				.selectAll(".innerCenterRect")
-	// 				.attr("width", pieRadius + (pieRadius * 30) / 100)
-	// 				.attr("height", pieRadius + (pieRadius * 30) / 100)
-	// 				.attr("x", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-	// 				.attr("y", (pieRadius - (pieRadius * 30) / 100 / 2) / 2)
-	// 				.attr("fill", "#fff");
-	// 		})
-
-	// 	pieForeignObjectSelection
-	// 		.transition()
-	// 		.duration(isEnter ? 0 : this.tickDuration)
-	// 		.ease(easeLinear)
-	// 		.attr("x", (d) => {
-	// 			const pieX = this.getXPosition(this.isHorizontalChart ? d[valueKey] : d.category);
-	// 			if (this.isLeftYAxis) {
-	// 				return this.isHorizontalChart ? pieX - pieRadius + this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
-	// 			} else {
-	// 				return this.isHorizontalChart ? pieX - pieRadius - this.getPieXScaleDiff(pieX, isPie2) : pieX + this.scaleBandWidth / 2 - pieRadius;
-	// 			}
-	// 		})
-	// 		.attr("y", (d) => {
-	// 			const pieY = this.getYPosition(this.isHorizontalChart ? d.category : d[valueKey]);
-	// 			if (this.isBottomXAxis) {
-	// 				return !this.isHorizontalChart ? pieY - pieRadius - this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
-	// 			} else {
-	// 				return !this.isHorizontalChart ? pieY - pieRadius + this.getPieYScaleDiff(pieY, isPie2) : pieY + this.scaleBandWidth / 2 - pieRadius;
-	// 			}
-	// 		})
-	// 		.on("end", (node, index) => {
-	// 			if (index === this.chartData.length - 1) {
-	// 				this.updateAnnotationNodeElements();
-	// 			}
-	// 		});
-	// }
+		this.transformPieForeignObject(pieForeignObjectSelection, isEnter, valueKey, pieRadius, isPie2);
+	}
 
 	handleShowBucket(): void {
 		const showBucketConfig = JSON.parse(this.vizOptions.formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]);
