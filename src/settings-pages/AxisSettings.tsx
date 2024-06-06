@@ -890,82 +890,80 @@ const UIYAxis = (
         toggleValue={yConfigValues.isDisplayTitle}
         onChangeToggle={() => handleYCheckbox(EXAxisSettings.IsDisplayTitle, setYConfigValues)}
       >
-        <ConditionalWrapper visible={yConfigValues.isDisplayTitle}>
-          <Row>
-            <Column>
-              <InputControl
-                label="Title Name"
-                type="text"
-                value={shadow.isHorizontalChart ? xConfigValues.titleName : yConfigValues.titleName}
-                handleChange={(value: any) => {
-                  if (shadow.isHorizontalChart) {
-                    handleXChange(value, EYAxisSettings.TitleName, setXConfigValues);
-                  } else {
-                    handleYChange(value, EYAxisSettings.TitleName, setYConfigValues);
-                  }
-                }}
-              />
-            </Column>
-          </Row>
+        <Row>
+          <Column>
+            <InputControl
+              label="Title Name"
+              type="text"
+              value={shadow.isHorizontalChart ? xConfigValues.titleName : yConfigValues.titleName}
+              handleChange={(value: any) => {
+                if (shadow.isHorizontalChart) {
+                  handleXChange(value, EYAxisSettings.TitleName, setXConfigValues);
+                } else {
+                  handleYChange(value, EYAxisSettings.TitleName, setYConfigValues);
+                }
+              }}
+            />
+          </Column>
+        </Row>
 
-          <Row>
-            <Column>
-              <SelectInput
-                label={"Font Family"}
-                value={yConfigValues.titleFontFamily}
-                isFontSelector={true}
-                optionsList={[]}
-                handleChange={value => handleYChange(value, EYAxisSettings.TitleFontFamily, setYConfigValues)}
-              />
-            </Column>
-          </Row>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Font Family"}
+              value={yConfigValues.titleFontFamily}
+              isFontSelector={true}
+              optionsList={[]}
+              handleChange={value => handleYChange(value, EYAxisSettings.TitleFontFamily, setYConfigValues)}
+            />
+          </Column>
+        </Row>
 
-          <Row>
-            <Column>
-              <SwitchOption
-                label="Styling"
-                value={yConfigValues.titleStyling}
-                optionsList={[
-                  {
-                    label: <BoldIcon style={{ fill: "currentColor" }} />,
-                    value: "bold",
-                  },
-                  {
-                    label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                    value: "italic",
-                  },
-                  {
-                    label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                    value: "underline",
-                  },
-                ]}
-                isMultiple
-                handleChange={(value) => handleYChange(value, EYAxisSettings.TitleStyling, setYConfigValues)}
-              />
-            </Column>
-          </Row>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Styling"
+              value={yConfigValues.titleStyling}
+              optionsList={[
+                {
+                  label: <BoldIcon style={{ fill: "currentColor" }} />,
+                  value: "bold",
+                },
+                {
+                  label: <ItalicIcon style={{ fill: "currentColor" }} />,
+                  value: "italic",
+                },
+                {
+                  label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+                  value: "underline",
+                },
+              ]}
+              isMultiple
+              handleChange={(value) => handleYChange(value, EYAxisSettings.TitleStyling, setYConfigValues)}
+            />
+          </Column>
+        </Row>
 
-          <Row>
-            <Column>
-              <InputControl
-                label="Text Size"
-                type="number"
-                value={yConfigValues.titleFontSize}
-                handleChange={(value: any) => handleYChange(value, EYAxisSettings.TitleFontSize, setYConfigValues)}
-                min={1}
-              />
-            </Column>
+        <Row>
+          <Column>
+            <InputControl
+              label="Text Size"
+              type="number"
+              value={yConfigValues.titleFontSize}
+              handleChange={(value: any) => handleYChange(value, EYAxisSettings.TitleFontSize, setYConfigValues)}
+              min={1}
+            />
+          </Column>
 
-            <Column>
-              <ColorPicker
-                label={"Color"}
-                color={yConfigValues.titleColor}
-                handleChange={value => handleYColor(value, EYAxisSettings.TitleColor, setYConfigValues)}
-                colorPalette={vizOptions.host.colorPalette}
-              />
-            </Column>
-          </Row>
-        </ConditionalWrapper>
+          <Column>
+            <ColorPicker
+              label={"Color"}
+              color={yConfigValues.titleColor}
+              handleChange={value => handleYColor(value, EYAxisSettings.TitleColor, setYConfigValues)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
+        </Row>
       </AccordionAlt>
 
       <AccordionAlt title="Show Label"
