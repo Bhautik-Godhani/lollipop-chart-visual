@@ -23,13 +23,17 @@ const GetCFormattingFormUI = (
   handleChangeContent: any,
   closeCurrentSettingHandler: any,
   setRuleDetails: any,
-  setIsEditableRuleName: any
+  setIsEditableRuleName: any,
+  setSelectedApplyOnCategoryState: any
 ) => {
   return <>
     <PopupModHeader
       title={isAddNew ? "Add Rule" : "Edit Rule"}
       icon={"BACK_BUTTON"}
-      onIconClickHandler={() => handleChangeContent("homePage")}
+      onIconClickHandler={() => {
+        handleChangeContent("homePage");
+        setSelectedApplyOnCategoryState("all");
+      }}
       closeSettingsPopup={closeCurrentSettingHandler}
     />
 
@@ -125,7 +129,9 @@ function CformattingForm({
   CFConfig,
   isSupportApplyOn,
   isShowBasedOnValueDropDown,
-  applyOnCategoriesList
+  applyOnCategoriesList,
+  selectedApplyOnCategory,
+  setSelectedApplyOnCategoryState
 }) {
   const isAddNew = isEmpty(formDetails);
   const [isEditableRuleName, setIsEditableRuleName] = useState(formDetails ? (formDetails?.name as string)?.includes("CFR") ? false : true : false);
@@ -133,7 +139,7 @@ function CformattingForm({
   const [ruleDetails, setRuleDetails] = useState(!formDetails ? {
     name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails?.name,
     isEditableRuleName: false,
-    applyOnCategories: [],
+    applyOnCategories: selectedApplyOnCategory ? selectedApplyOnCategory === "all" ? [...applyOnCategoriesList.map(d => d.value)] : [selectedApplyOnCategory] : [],
     conditions: [
       {
         applyTo: measureOptions.length > 0 ? "measure" : "category",
@@ -239,7 +245,7 @@ function CformattingForm({
 
   return (
     <>
-      {GetCFormattingFormUI(shadow, isAddNew, isSupportApplyOn, isShowBasedOnValueDropDown, applyOnCategories, ruleDetails, CFConfig, isEditableRuleName, dropdownHandler, measureOptions, categoryOptions, inputChangeHandler, setColorHandler, handleChangeContent, closeCurrentSettingHandler, setRuleDetails, setIsEditableRuleName)}
+      {GetCFormattingFormUI(shadow, isAddNew, isSupportApplyOn, isShowBasedOnValueDropDown, applyOnCategories, ruleDetails, CFConfig, isEditableRuleName, dropdownHandler, measureOptions, categoryOptions, inputChangeHandler, setColorHandler, handleChangeContent, closeCurrentSettingHandler, setRuleDetails, setIsEditableRuleName, setSelectedApplyOnCategoryState)}
       <Footer isShowResetButton={false} resetButtonHandler={() => { }} cancelButtonHandler={() => handleChangeContent("homePage")} saveButtonConfig={{
         text: "Save", handler: saveHandler, isDisabled:
           (ruleDetails.name === "" || isEditableRuleName && ruleDetails.name.includes("CFR") || (isSupportApplyOn && applyOnCategories?.length > 0 && ruleDetails.applyOnCategories.length === 0)) ? true : false

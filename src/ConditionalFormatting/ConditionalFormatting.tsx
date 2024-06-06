@@ -138,6 +138,7 @@ const ConditionalFormatting = (props) => {
   const [rules, setRules] = useState([]);
   const [formDetails, setFormDetails] = useState("");
   const [ruleIndex, setRuleIndex] = useState("");
+  const [selectedApplyOnCategory, setSelectedApplyOnCategory] = React.useState("all");
 
   useEffect(() => {
     let retrievedRules = vizOptions.formatTab?.[sectionName]?.[propertyName];
@@ -182,7 +183,7 @@ const ConditionalFormatting = (props) => {
 
   const createRule = () => {
     handleChangeContent("form");
-    setFormDetails("")
+    setFormDetails("");
   }
 
   const updateRules = (updatedRules) => {
@@ -208,6 +209,7 @@ const ConditionalFormatting = (props) => {
           closeCurrentSettingHandler={closeCurrentSettingHandler}
           isSupportApplyOn={isSupportApplyOn}
           applyOnCategories={applyOnCategories}
+          setSelectedApplyOnCategoryState={setSelectedApplyOnCategory}
         />
         :
         <CformattingForm
@@ -224,6 +226,8 @@ const ConditionalFormatting = (props) => {
           isSupportApplyOn={isSupportApplyOn}
           isShowBasedOnValueDropDown={isShowBasedOnValueDropDown}
           applyOnCategoriesList={applyOnCategories}
+          selectedApplyOnCategory={selectedApplyOnCategory}
+          setSelectedApplyOnCategoryState={setSelectedApplyOnCategory}
         />
       }
     </>

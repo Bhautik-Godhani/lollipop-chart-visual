@@ -291,7 +291,8 @@ function HomePage({
   conditionalFormattingIcon,
   closeCurrentSettingHandler,
   isSupportApplyOn,
-  applyOnCategories
+  applyOnCategories,
+  setSelectedApplyOnCategoryState
 }) {
   const [showConfirmPrompt, setShowConfirmPrompt] = React.useState({
     show: false,
@@ -349,6 +350,7 @@ function HomePage({
                   optionsList={[{ label: "All", value: "all" }, ...applyOnCategories]}
                   handleChange={(value) => {
                     setSelectedApplyOnCategory(value);
+                    setSelectedApplyOnCategoryState(value);
                     const newRules = value === "all" ? [...rules] : [...rules].filter(d => d.applyOnCategories.includes(value));
                     setFilteredRules(newRules);
                   }}
