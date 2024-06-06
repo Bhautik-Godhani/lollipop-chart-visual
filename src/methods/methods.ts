@@ -547,7 +547,7 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 				} else if (el.applyTo === "category") {
 					const v = el.staticValue;
 					const color = el.color;
-					category = el.categoryType1.category ? category : subCategory;
+					category = (el.categoryType1.category ? category : subCategory).toString();
 					let match: boolean;
 
 					if (!result.match) {

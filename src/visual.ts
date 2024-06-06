@@ -885,7 +885,7 @@ export class Visual extends Shadow {
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
-					Component: () => ConditionalFormatting,
+					Component: Components.ConditionalFormatting,
 					icon: ConditionalFormattingIcon,
 					displayHeader: false
 				},
