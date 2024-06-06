@@ -3170,60 +3170,10 @@ export class Visual extends Shadow {
 					(this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
 					!this.isCutAndClipAxisEnabled;
 
-				if (this.isCutAndClipAxisEnabled) {
-					if (!this.isHorizontalChart) {
-						this.yAxisG.selectAll(".domain").remove();
-						this.yAxisG.selectAll(".tick").remove();
-					} else {
-						this.xAxisG.selectAll(".domain").remove();
-						this.xAxisG.selectAll(".tick").remove();
-					}
-				}
-
 				this.isCutAndClipAxisEnabledLastValue = GetIsCutAndClipAxisEnabled(this);
 				this.isLastChartTypeIsHorizontal = this.chartSettings.orientation === Orientation.Horizontal;
 
-				if (this.isCutAndClipAxisEnabled) {
-					RenderLinearCutAxis(this);
-
-					if (this.isHorizontalChart) {
-						this.xAxisG.classed("cut-clip-axis", true);
-						this.yAxisG.classed("cut-clip-axis", false);
-					} else {
-						this.xAxisG.classed("cut-clip-axis", false);
-						this.yAxisG.classed("cut-clip-axis", true);
-					}
-
-					if (!this.isHorizontalChart) {
-						this.yScale = GetCutAndClipYScale.bind(this);
-						this.setYAxisTickStyle();
-					} else {
-						this.xScale = GetCutAndClipXScale.bind(this);
-						this.setXAxisTickStyle();
-					}
-				} else {
-					this.xAxisG.classed("cut-clip-axis", false);
-					this.yAxisG.classed("cut-clip-axis", false);
-					this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
-				}
-
-				// const axisConfig: IAxisConfig = {
-				// 	categoricalData: this.categoricalData,
-				// 	width: this.width,
-				// 	height: this.height,
-				// 	xAxisG: this.xAxisG.node(),
-				// 	yAxisG: this.yAxisG.node(),
-				// 	xAxisYPos: this.height,
-				// 	yAxisXPos: this.width,
-				// };
-
-				// this.isLinearScale = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
-
-				if (this.isCutAndClipAxisEnabled) {
-					RenderCutAndClipMarkerOnAxis(this);
-				} else {
-					this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
-				}
+				this.drawCutAndClipAxis();
 
 				this.drawXGridLines();
 				this.drawYGridLines();
@@ -3313,6 +3263,48 @@ export class Visual extends Shadow {
 			this.createErrorBarsMarkerDefs();
 		} catch (error) {
 			console.error("Error", error);
+		}
+	}
+
+	drawCutAndClipAxis(): void {
+		if (this.isCutAndClipAxisEnabled) {
+			if (!this.isHorizontalChart) {
+				this.yAxisG.selectAll(".domain").remove();
+				this.yAxisG.selectAll(".tick").remove();
+			} else {
+				this.xAxisG.selectAll(".domain").remove();
+				this.xAxisG.selectAll(".tick").remove();
+			}
+		}
+
+		if (this.isCutAndClipAxisEnabled) {
+			RenderLinearCutAxis(this);
+
+			if (this.isHorizontalChart) {
+				this.xAxisG.classed("cut-clip-axis", true);
+				this.yAxisG.classed("cut-clip-axis", false);
+			} else {
+				this.xAxisG.classed("cut-clip-axis", false);
+				this.yAxisG.classed("cut-clip-axis", true);
+			}
+
+			if (!this.isHorizontalChart) {
+				this.yScale = GetCutAndClipYScale.bind(this);
+				this.setYAxisTickStyle();
+			} else {
+				this.xScale = GetCutAndClipXScale.bind(this);
+				this.setXAxisTickStyle();
+			}
+		} else {
+			this.xAxisG.classed("cut-clip-axis", false);
+			this.yAxisG.classed("cut-clip-axis", false);
+			this.container.select(".barCutAndClipMarkersG").selectAll("*").remove();
+		}
+
+		if (this.isCutAndClipAxisEnabled) {
+			RenderCutAndClipMarkerOnAxis(this);
+		} else {
+			this.container.select(".axisCutAndClipMarkerG").selectAll("*").remove();
 		}
 	}
 
@@ -5539,6 +5531,16 @@ export class Visual extends Shadow {
 			});
 		}
 
+		if (this.isCutAndClipAxisEnabled) {
+			if (!this.isHorizontalChart) {
+				this.yAxisG.selectAll(".domain").remove();
+				this.yAxisG.selectAll(".tick").remove();
+			} else {
+				this.xAxisG.selectAll(".domain").remove();
+				this.xAxisG.selectAll(".tick").remove();
+			}
+		}
+
 		this.drawXYAxis(categoricalData, isShowXAxis, isShowYAxis);
 
 		if (this.isExpandAllApplied) {
@@ -5558,6 +5560,8 @@ export class Visual extends Shadow {
 				this.yScale = GetPositiveNegativeLogYScale.bind(this);
 			}
 		}
+
+		this.drawCutAndClipAxis();
 
 		this.drawXGridLines();
 		this.drawYGridLines();
