@@ -3452,43 +3452,27 @@ export class Visual extends Shadow {
 						}
 					}
 				} else {
-					// d.subCategories.forEach(s => {
-					// 	this.conditionalFormattingConditions.forEach((c) => {
-					// 		if (c.valueType === ECFValueTypes.Ranking) {
-					// 			if (c.rankingType === ECFRankingTypes.TopN) {
-					// 				if (i < c.staticRankingValue) {
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-					// 						this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
-					// 						this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
-					// 					}
-
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
-					// 						this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
-					// 					}
-
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
-					// 						this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
-					// 					}
-					// 				}
-					// 			} else if (c.rankingType === ECFRankingTypes.BottomN) {
-					// 				if (i > ((chartData.length - 1) - c.staticRankingValue)) {
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
-					// 						this.categoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
-					// 						this.categoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
-					// 					}
-
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
-					// 						this.categoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
-					// 					}
-
-					// 					if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
-					// 						this.categoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
-					// 					}
-					// 				}
-					// 			}
-					// 		}
-					// 	});
-					// });
+					d.subCategories.forEach((s, i) => {
+						this.conditionalFormattingConditions.forEach((c) => {
+							if (c.valueType === ECFValueTypes.Ranking) {
+								if (c.rankingType === ECFRankingTypes.TopN) {
+									if (i < c.staticRankingValue) {
+										if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+											this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
+											this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+										}
+									}
+								} else if (c.rankingType === ECFRankingTypes.BottomN) {
+									if (i > ((d.subCategories.length - 1) - c.staticRankingValue)) {
+										if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
+											this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
+											this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+										}
+									}
+								}
+							}
+						});
+					});
 				}
 			});
 
