@@ -339,9 +339,6 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
     const cellsHeightByRows: number[] = [];
     while (clonedCellsHeightByScale.length) cellsHeightByRows.push(clonedCellsHeightByScale.splice(0, columns));
 
-    console.log(cellsHeightByRows);
-
-
     // SCALED ROWS
     const getRankedScale = (value: number, min: number, max: number, minHeight: number, maxHeight: number) => {
         let rankedScale: any;
@@ -386,8 +383,6 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
     } else if (config.layoutType === ESmallMultiplesLayoutType.ScaledRows) {
         for (let i = 0; i < totalRows; i++) {
             const height = getRankedScale(totalValuesByRow[i], scaledRowsMin, scaledRowsMax, minScaledRowHeight, maxScaledRowHeight); // scaled rows
-            console.log(height);
-
             for (let j = 0; j < columns; j++) {
                 const randomBytes = generateSecureRandomBytes(16).toString("hex");
                 const category = config.categories[iterator];

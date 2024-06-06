@@ -151,8 +151,6 @@ export const renderLegends = (
             })
     }
 
-    console.log(isShowImageMarker);
-
     legendItems
         .append("text")
         .attr("x", () => circleRadius * 2 + 2)

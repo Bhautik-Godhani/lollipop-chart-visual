@@ -1,7 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
-import { PATTERNS } from "./patterns";
 import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
@@ -10,6 +9,7 @@ import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EF
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { select } from "d3-selection";
+import { PATTERNS } from "@truviz/shadow/dist/Components";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
 	if (shadow.chartSettings && shadow.chartSettings.isIBCSEnabled) {
