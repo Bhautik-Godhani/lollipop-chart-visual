@@ -791,6 +791,13 @@ export class Visual extends Shadow {
 					icon: SmallMultipleIcon
 				},
 				{
+					name: "Axis",
+					sectionName: EVisualConfig.XAxisConfig,
+					propertyName: EVisualSettings.XAxisSettings,
+					Component: () => AxisSettings,
+					icon: XAxisSettingsIcon
+				},
+				{
 					name: "Data Labels",
 					sectionName: "dataLabelsConfig",
 					propertyName: "dataLabelsSettings",
@@ -846,13 +853,6 @@ export class Visual extends Shadow {
 					Component: () => CutAndClipAxisSettings,
 					icon: CutAndClipAxisIcon
 				},
-				{
-					name: "Axis",
-					sectionName: EVisualConfig.XAxisConfig,
-					propertyName: EVisualSettings.XAxisSettings,
-					Component: () => AxisSettings,
-					icon: XAxisSettingsIcon
-				},
 				// {
 				// 	name: "Y Axis",
 				// 	sectionName: EVisualConfig.YAxisConfig,
@@ -885,7 +885,7 @@ export class Visual extends Shadow {
 					name: "Conditional Formatting",
 					sectionName: "editor",
 					propertyName: "conditionalFormatting",
-					Component: Components.ConditionalFormatting,
+					Component: () => ConditionalFormatting,
 					icon: ConditionalFormattingIcon,
 					displayHeader: false
 				},
@@ -1178,7 +1178,7 @@ export class Visual extends Shadow {
 		}
 
 		const sortByName = () => {
-			if (!this.isXIsDateTimeAxis && !this.isXIsNumericAxis) {
+			if (!this.isXIsDateTimeAxis && (this.isExpandAllApplied || !this.isXIsNumericAxis)) {
 				if (this.isMonthCategoryNames) {
 					// if (this.isHorizontalChart) {
 					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
@@ -1804,8 +1804,9 @@ export class Visual extends Shadow {
 				}
 
 				this.expandAllCategoriesName.forEach((d, i) => {
-					obj[d] = categoricalData.categories[i].values[index];
+					obj[d] = categoricalData.categories[i].values[index] as string;
 				});
+
 				categoricalData.values.forEach((d) => {
 					const roles = Object.keys(d.source.roles);
 					roles.forEach((role) => {
@@ -6908,6 +6909,10 @@ export class Visual extends Shadow {
 			} else {
 				rotateDegree = -xAxisSettings.labelTilt;
 			}
+		}
+
+		if (this.isExpandAllApplied) {
+			rotateDegree = 0;
 		}
 
 		this.xAxisG
