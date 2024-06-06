@@ -5,7 +5,7 @@ import { Primitive, group, sum } from "d3-array";
 import { getSVGTextSize } from "./methods";
 import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition } from "@truviz/shadow/dist/Components";
 import { RenderConnectingLine } from "./ConnectingLine.methods";
-import { ERankingCalcMethod, ERankingType } from "../enum";
+import { EDataRolesName, ERankingCalcMethod, ERankingType } from "../enum";
 import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
 import { cloneDeep } from "lodash";
 
@@ -135,19 +135,26 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 clonedCategoricalData.values.forEach((d) => {
                     const values: Primitive[][] = [];
 
-                    othersSMData.forEach(o => {
-                        const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
-                        const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+                    if (d.source.roles[EDataRolesName.Measure]) {
+                        othersSMData.forEach(o => {
+                            const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
+                            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
 
-                        const values1 = dataValuesIndexes.map((valueIndex) => {
+                            const values1 = dataValuesIndexes.map((valueIndex) => {
+                                const id = +valueIndex.split("-")[1];
+                                return d.values[id];
+                            });
+
+                            values.push(values1);
+                        });
+
+                        d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
+                    } else if (d.source.roles[EDataRolesName.ImagesData]) {
+                        d.values = dataValuesIndexes.map((valueIndex) => {
                             const id = +valueIndex.split("-")[1];
                             return d.values[id];
                         });
-
-                        values.push(values1);
-                    });
-
-                    d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
+                    }
                 });
 
                 self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
