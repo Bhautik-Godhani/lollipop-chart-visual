@@ -58,7 +58,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
   const formatTab = vizOptions.formatTab;
 
   const getConfig = () => {
-    return {
+    const obj = {
       [EVisualSettings.BrushAndZoomAreaSettings]: JSON.parse(formatTab[EVisualConfig.BrushAndZoomAreaConfig][EVisualSettings.BrushAndZoomAreaSettings]),
       [EVisualSettings.ChartSettings]: JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]),
       [EVisualSettings.CutAndClipAxisSettings]: JSON.parse(formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]),
@@ -77,8 +77,14 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
       [EVisualSettings.SmallMultiplesSettings]: JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]),
       [EVisualSettings.Sorting]: JSON.parse(formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]),
       [EVisualSettings.XAxisSettings]: JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]),
-      [EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings])
+      [EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings]),
     }
+
+    obj["conditionalFormatting"] = JSON.parse(formatTab["editor"]["conditionalFormatting"] !== "" ? formatTab["editor"]["conditionalFormatting"] : "{}");
+    obj["annotations"] = JSON.parse(formatTab["editor"]["annotations"]);
+
+    return obj;
+
     // get(vizOptions, `formatTab.${EVisualConfig.BrushAndZoomAreaConfig}`),
     //   get(vizOptions, `formatTab.${EVisualConfig.ChartConfig}`),
     //   get(vizOptions, `formatTab.${EVisualConfig.CutAndClipAxisConfig}`),
@@ -118,18 +124,29 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
       const keys = Object.keys(getConfig());
       const mergeObject = [];
       keys.forEach(el => {
-        if (obj.hasOwnProperty(el)) {
+        if (el === "conditionalFormatting" || el === "annotations") {
           mergeObject.push({
-            objectName: configs[el],
+            objectName: "editor",
             properties: {
-              [el]: JSON.stringify(obj[el]),
+              ["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
+              ["annotations"]: JSON.stringify(obj["annotations"]),
             },
             selector: null,
           })
-          // shadow.persistProperties("config", el, obj[el]);
-        }
-        else {
-          throw "Invalid JSON file"
+        } else {
+          if (obj.hasOwnProperty(el)) {
+            mergeObject.push({
+              objectName: configs[el],
+              properties: {
+                [el]: JSON.stringify(obj[el]),
+              },
+              selector: null,
+            })
+            // shadow.persistProperties("config", el, obj[el]);
+          }
+          else {
+            throw "Invalid JSON file"
+          }
         }
       });
 
