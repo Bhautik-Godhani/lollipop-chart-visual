@@ -7214,7 +7214,7 @@ export class Visual extends Shadow {
 				this.xScale.domain([new Date(minDate), new Date(maxDate)]);
 			} else {
 				this.xScale = d3.scaleLinear();
-				this.xScale.domain([min, max]);
+				this.xScale.domain([min, max]).nice();
 			}
 		} else {
 			this.xScale = d3.scaleBand();
@@ -7249,18 +7249,18 @@ export class Visual extends Shadow {
 		}
 
 		if (isLinearScale) {
-			this.yScale.domain([min, max]);
+			this.yScale.domain([min, max]).nice();
 		} else if (isLogarithmScale) {
 			if (this.isShowPositiveNegativeLogScale) {
 				if (this.isBottomXAxis) {
-					this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]);
-					this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+					this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
 				} else {
-					this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]);
-					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]);
+					this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
 				}
 			} else {
-				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]);
+				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]).nice();
 			}
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
