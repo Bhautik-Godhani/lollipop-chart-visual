@@ -847,16 +847,16 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
 
       <Row>
         <Column>
-          <Label text="Apply On Start"></Label>
+          <Label text="Start Value"></Label>
         </Column>
       </Row>
 
       <ConditionalWrapper visible={configValues.lineValue1.axis === EXYAxisNames.X}>
         <ConditionalWrapper visible={configValues.lineValue1.type === "value"}>
-          <Row disableTopPadding>
+          <Row>
             <Column>
               <SelectInput
-                label={"Value"}
+                label={"Select Value"}
                 value={configValues.lineValue1.value}
                 optionsList={categoriesNameList}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue1)}
@@ -869,10 +869,10 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       {UILineValueOptions1(vizOptions, shadow, configValues.lineValue1, handleChange, false)}
 
       <ConditionalWrapper visible={configValues.lineValue1.axis === EXYAxisNames.Y}>
-        <Row disableTopPadding>
+        <Row>
           <Column>
             <SelectInput
-              label={"Value"}
+              label={"Value Type"}
               value={configValues.lineValue1.computation}
               optionsList={ComputationTypeList}
               handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue1)}
@@ -899,16 +899,16 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
 
       <Row>
         <Column>
-          <Label text="Apply On End"></Label>
+          <Label text="End Value"></Label>
         </Column>
       </Row>
 
       <ConditionalWrapper visible={configValues.lineValue2.axis === EXYAxisNames.X}>
         <ConditionalWrapper visible={configValues.lineValue2.type === "value"}>
-          <Row disableTopPadding>
+          <Row>
             <Column>
               <SelectInput
-                label={"Value"}
+                label={"Select Value"}
                 value={configValues.lineValue2.value}
                 optionsList={categoriesNameList}
                 handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
@@ -921,10 +921,10 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
       {UILineValueOptions1(vizOptions, shadow, configValues.lineValue2, handleChange, true)}
 
       <ConditionalWrapper visible={configValues.lineValue2.axis === EXYAxisNames.Y}>
-        <Row disableTopPadding>
+        <Row>
           <Column>
             <SelectInput
-              label={"Value"}
+              label={"Value Type"}
               value={configValues.lineValue2.computation}
               optionsList={ComputationTypeList}
               handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue2)}
