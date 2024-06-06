@@ -224,15 +224,29 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
 
 const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
+    const isBand = d.referenceType === EReferenceType.REFERENCE_BAND;
+
     if (rLine.labelPosition === EBeforeAfterPosition.After) {
-        if ((max([d.line1Coord.x1, d.line2Coord.x1]) + 20 + labelTextBBox.height) > self.width) {
-            rLine.labelPosition = EBeforeAfterPosition.Before;
+        if (isBand) {
+            if ((max([d.line1Coord.x1, d.line2Coord.x1]) + 20 + labelTextBBox.height) > self.width) {
+                rLine.labelPosition = EBeforeAfterPosition.Before;
+            }
+        } else {
+            if ((d.line1Coord.x1 + 20 + labelTextBBox.height) > self.width) {
+                rLine.labelPosition = EBeforeAfterPosition.Before;
+            }
         }
     }
 
     if (rLine.labelPosition === EBeforeAfterPosition.Before) {
-        if ((min([d.line1Coord.x1, d.line2Coord.x1]) - 10) <= labelTextBBox.height) {
-            rLine.labelPosition = EBeforeAfterPosition.After;
+        if (isBand) {
+            if ((min([d.line1Coord.x1, d.line2Coord.x1]) - 10) <= labelTextBBox.height) {
+                rLine.labelPosition = EBeforeAfterPosition.After;
+            }
+        } else {
+            if ((d.line1Coord.x1 - 10) <= labelTextBBox.height) {
+                rLine.labelPosition = EBeforeAfterPosition.After;
+            }
         }
     }
 
