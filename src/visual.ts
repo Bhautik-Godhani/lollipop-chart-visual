@@ -1375,6 +1375,13 @@ export class Visual extends Shadow {
 	getYPosition(value: number | string): number {
 		const yPosition = this.yScale(this.yAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
+		if (this.isLogarithmScale) {
+			if (this.isShowPositiveNegativeLogScale) {
+				value = parseFloat(value.toString());
+				return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale(value * -1) + this.positiveLogScaleHeight
+			}
+		}
+
 		if (this.isYIsDateTimeAxis && this.isYIsContinuousAxis) {
 			return this.yScale(new Date(value));
 		} else {
@@ -7233,6 +7240,10 @@ export class Visual extends Shadow {
 		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
+		this.isHasNegativeValue = min < 0 || max < 0;
+		this.isHasPositiveValue = min > 0 || max > 0;
+		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
+
 		this.yScale = isLinearScale ? d3.scaleLinear() : d3.scaleBand();
 
 		if (isLinearScale) {
@@ -7265,10 +7276,6 @@ export class Visual extends Shadow {
 		} else {
 			this.yScale.domain(this.chartData.map((d) => d.value1));
 		}
-
-		this.isHasNegativeValue = min < 0 || max < 0;
-		this.isHasPositiveValue = min >= 0 || max >= 0;
-		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 	}
 
 	getStartEndAxisRangeDiff(): { startDiff: number, endDiff: number } {
@@ -7386,12 +7393,20 @@ export class Visual extends Shadow {
 
 			if (this.isShowPositiveNegativeLogScale) {
 				const height = this.axisDomainMaxValue * Math.abs(yAxisRange[0] - yAxisRange[1]) / Math.abs(this.axisDomainMinValue - this.axisDomainMaxValue);
-
 				this.positiveLogScaleHeight = height;
 				this.negativeLogScaleHeight = this.height - height;
 
-				this.positiveLogScale.range([this.positiveLogScaleHeight, 0]);
-				this.negativeLogScale.range([this.negativeLogScaleHeight, 0]);
+				if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+					|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
+					this.positiveLogScale.range([this.positiveLogScaleHeight + (this.markerMaxSize / 2) + endDiff, 0]);
+					this.negativeLogScale.range([this.negativeLogScaleHeight - this.yAxisStartMargin + startDiff, 0]);
+				} else {
+					// this.positiveLogScale.range([this.positiveLogScaleHeight - (this.markerMaxSize / 2) + endDiff, 0]);
+					// this.negativeLogScale.range([this.negativeLogScaleHeight - height + startDiff, 0]);
+
+					this.positiveLogScale.range([this.positiveLogScaleHeight, this.negativeLogScaleHeight]);
+					this.negativeLogScale.range([this.negativeLogScaleHeight, 0]);
+				}
 			} else {
 				this.yScale.range(yAxisRange);
 			}
