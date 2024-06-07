@@ -272,6 +272,7 @@ export class Visual extends Shadow {
 	measure1DisplayName: string;
 	measure2DisplayName: string;
 	isHasMultiMeasure: boolean;
+	isPercentageMeasure: boolean;
 	isHasSubcategories: boolean;
 	isHasCategories: boolean;
 	isHasImagesData: boolean;
@@ -1438,6 +1439,7 @@ export class Visual extends Shadow {
 		const categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
 		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
+		this.isPercentageMeasure = (categoricalMeasureFields[0].source.type.integer || categoricalMeasureFields[0].source.type.numeric) && categoricalMeasureFields[0].source.format.includes("%");
 
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
@@ -3898,22 +3900,24 @@ export class Visual extends Shadow {
 			let upperBoundValue: number = 0;
 			let lowerBoundValue: number = 0;
 
+			const percentageMultiplier = this.isPercentageMeasure ? 100 : 1;
+
 			switch (this.errorBarsSettings.measurement.calcType) {
 				case EErrorBarsCalcTypes.ByField:
 					if (this.isHasErrorUpperBounds && this.errorBarsSettings.measurement.upperBoundMeasure) {
 						const categoricalUpperBoundFields = this.categoricalUpperBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.upperBoundMeasure);
 						ub = this.isHasSubcategories ? d3.sum(categoricalUpperBoundFields, d => <number>d.values[idx]) : <number>categoricalUpperBoundFields[0].values[idx];
-						upperBoundValue = isErrorBarsAbsoluteRelation && !this.errorBarsSettings.measurement.makeSymmetrical ? ub : ub + value;
+						upperBoundValue = (isErrorBarsAbsoluteRelation && !this.errorBarsSettings.measurement.makeSymmetrical ? ub : ub + value) * percentageMultiplier;
 					}
 
 					if (this.isHasErrorLowerBounds && this.errorBarsSettings.measurement.lowerBoundMeasure && !this.errorBarsSettings.measurement.makeSymmetrical) {
 						const categoricalLowerBoundFields = this.categoricalLowerBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.lowerBoundMeasure);
 						lb = this.isHasSubcategories ? d3.sum(categoricalLowerBoundFields, d => <number>d.values[idx]) : <number>categoricalLowerBoundFields[0].values[idx];
-						lowerBoundValue = isErrorBarsAbsoluteRelation ? lb : lb + value;
+						lowerBoundValue = (isErrorBarsAbsoluteRelation ? lb : lb + value) * percentageMultiplier;
 					}
 
 					if (this.errorBarsSettings.measurement.makeSymmetrical) {
-						lb = lowerBoundValue = value - Math.abs(value - upperBoundValue);
+						lb = lowerBoundValue = (value - Math.abs(value - upperBoundValue)) * percentageMultiplier;
 					}
 
 					break;
