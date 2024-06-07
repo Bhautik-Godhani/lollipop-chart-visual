@@ -1439,7 +1439,8 @@ export class Visual extends Shadow {
 		const categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
 		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
-		this.isPercentageMeasure = (categoricalMeasureFields[0].source.type.integer || categoricalMeasureFields[0].source.type.numeric) && categoricalMeasureFields[0].source.format.includes("%");
+		this.isPercentageMeasure = (categoricalMeasureFields[0].source.type.integer || categoricalMeasureFields[0].source.type.numeric)
+			&& categoricalMeasureFields[0].source.format && categoricalMeasureFields[0].source.format.includes("%");
 
 		const categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
 		this.categoricalCategoriesLastIndex = categoricalCategoriesFields.length - 1;
