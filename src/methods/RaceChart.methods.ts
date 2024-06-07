@@ -124,11 +124,11 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr(
             "transform",
             "translate(" +
-            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width) +
+            (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right) +
             "," +
-            (self.raceChartSettings.placement === Position.Bottom ?
-                (self.height - (textBBox.height + tickerButtonRadius * 2 + 20)) :
-                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
+            // (self.raceChartSettings.placement === Position.Bottom ?
+            (self.height - (textBBox.height + tickerButtonRadius * 2 + 20)) +
+            // (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
             ")"
         )
 
@@ -136,11 +136,11 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr(
             "transform",
             "translate(" +
-            (self.margin.right - max([textBBox.width / 2, tickerButtonRadius])) +
+            (-max([textBBox.width / 2, tickerButtonRadius])) +
             "," +
-            (self.raceChartSettings.placement === Position.Bottom ?
-                (tickerButtonRadius * 2) :
-                (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius)) +
+            // (self.raceChartSettings.placement === Position.Bottom ?
+            (tickerButtonRadius * 2) +
+            // (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius)) +
             ")"
         )
 
@@ -167,9 +167,9 @@ export const RenderRaceTickerButton = (self: Visual): void => {
             "translate(" +
             (-max([raceBarDateLabelTextBBox.width / 2, tickerButtonRadius])) +
             "," +
-            (self.raceChartSettings.placement === Position.Bottom ?
-                (0) :
-                (self.margin.top + tickerButtonRadius)) +
+            // (self.raceChartSettings.placement === Position.Bottom ?
+            (0) +
+            // (self.margin.top + tickerButtonRadius)) +
             ")"
         )
         .on("click", () => {

@@ -6906,7 +6906,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.isExpandAllApplied) {
+		if (this.isExpandAllApplied && this.isXIsNumericAxis) {
 			rotateDegree = 0;
 		}
 
