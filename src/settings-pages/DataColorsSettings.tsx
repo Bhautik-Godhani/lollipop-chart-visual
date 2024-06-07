@@ -579,6 +579,33 @@ const DataColors = (props) => {
 							</Row>
 						</ConditionalWrapper>
 					</ConditionalWrapper>
+
+					<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled && rankingSettings.smallMultiples.enabled && rankingSettings.smallMultiples.showRemainingAsOthers}>
+						<Row>
+							<Column>
+								<ToggleButton
+									label={"Customize small multiple 'Others'"}
+									value={configValues.isCustomizeSMOthersColor}
+									handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeSMOthersColor, setConfigValues)}
+									appearance="toggle"
+								/>
+							</Column>
+						</Row>
+
+						<ConditionalWrapper visible={configValues.isCustomizeSMOthersColor}>
+							<Row appearance="padded">
+								<Column>
+									<ColorPicker
+										label={"Color"}
+										color={configValues.SMOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.SMOthersColor, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
+					</ConditionalWrapper>
 				</Column>
 			</Row>
 

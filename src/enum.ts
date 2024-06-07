@@ -307,7 +307,9 @@ export enum EDataColorsSettings {
 	NegativeColor = "negativeColor",
 	GradientAppliedToMeasure = "gradientAppliedToMeasure",
 	IsCustomizeOthersColor = "isCustomizeOthersColor",
-	OthersColor = "othersColor"
+	OthersColor = "othersColor",
+	IsCustomizeSMOthersColor = "isCustomizeSMOthersColor",
+	SMOthersColor = "SMOthersColor",
 }
 
 export enum ERankingSettings {

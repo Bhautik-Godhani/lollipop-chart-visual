@@ -216,6 +216,8 @@ export const DATA_COLORS: IDataColorsSettings = {
 	gradientAppliedToMeasure: EMarkerColorTypes.Marker1,
 	isCustomizeOthersColor: true,
 	othersColor: "rgba(84, 84, 84, 1)",
+	isCustomizeSMOthersColor: true,
+	SMOthersColor: "rgba(84, 84, 84, 1)"
 };
 
 export const RANKING_SETTINGS: IRankingSettings = {

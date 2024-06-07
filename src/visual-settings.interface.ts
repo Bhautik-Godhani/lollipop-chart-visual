@@ -294,6 +294,8 @@ export interface IDataColorsSettings {
 	gradientAppliedToMeasure: EMarkerColorTypes,
 	isCustomizeOthersColor: boolean,
 	othersColor: string;
+	isCustomizeSMOthersColor: boolean,
+	SMOthersColor: string;
 }
 
 export interface ICategoryRankingProps {

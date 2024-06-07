@@ -5137,8 +5137,8 @@ export class Visual extends Shadow {
 			this.CFCategoryColorPair[d.category] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 		});
 
-		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
-			const othersColor = this.dataColorsSettings.othersColor;
+		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeSMOthersColor && this.rankingSettings.smallMultiples.enabled && this.rankingSettings.smallMultiples.showRemainingAsOthers) {
+			const othersColor = this.dataColorsSettings.SMOthersColor;
 			this.categoricalDataPairs.forEach((d) => {
 				this.categoryColorPair[d.category].marker1Color = othersColor;
 				this.categoryColorPair[d.category].marker2Color = othersColor;
