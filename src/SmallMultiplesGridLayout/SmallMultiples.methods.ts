@@ -33,7 +33,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
     const totalRows = Math.ceil(config.categories.length / columns);
     const itemWidth = (config.containerWidth - config.outerSpacing * columns - config.outerSpacing) / columns;
-    const itemHeight = (config.containerHeight - SMPaginationPanelHeight) / rows - config.outerSpacing;
+    let itemHeight = (config.containerHeight - SMPaginationPanelHeight) / rows - config.outerSpacing;
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformXScaleAll = isUniformXScale && config.xAxisPosition === ESmallMultiplesXAxisPosition.All;
@@ -52,6 +52,16 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     const { hyperListMainContainer, SMPaginationPanel, uniformAxisContainer } = CreateSmallMultiplesContainer(config);
 
+    const { uniformBottomXAxis, uniformTopXAxis, uniformLeftYAxis, uniformRightYAxis } = CreateSmallMultiplesUniformAxis(
+        config,
+        xAxisGNodeHeight,
+        yAxisGNodeWidth,
+        uniformAxisContainer,
+        hyperListMainContainer
+    );
+
+    itemHeight = (config.containerHeight - xAxisGNodeHeight - SMPaginationPanelHeight) / rows - config.outerSpacing;
+
     hyperListMainContainer.style("height", function () {
         const height = d3.select(this).node().getBoundingClientRect().height;
         return (height - (isUniformXScale ? (isUniformXScaleAll ? xAxisGNodeHeight * 2 : xAxisGNodeHeight) : 0)) + "px";
@@ -67,14 +77,6 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const layoutProps = GetSmallMultiplesLayoutProps(config, layout, itemHeight - config.outerSpacing / 2, columns);
 
     ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
-
-    const { uniformBottomXAxis, uniformTopXAxis, uniformLeftYAxis, uniformRightYAxis } = CreateSmallMultiplesUniformAxis(
-        config,
-        xAxisGNodeHeight,
-        yAxisGNodeWidth,
-        uniformAxisContainer,
-        hyperListMainContainer
-    );
 
     if (isUniformXScale) {
         setTimeout(() => {
