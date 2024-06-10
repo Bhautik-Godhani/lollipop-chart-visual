@@ -735,7 +735,7 @@ const UIReferenceLine = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   ];
 
   return <>
-    <Row>
+    <Row classNames={["sticky-row"]}>
       <Column>
         <SwitchOption
           label="Select Axis"
@@ -802,7 +802,7 @@ const UIReferenceBand = (vizOptions: ShadowUpdateOptions, shadow: Visual, config
   }
 
   return <>
-    <Row>
+    <Row classNames={["sticky-row"]}>
       <Column>
         <SwitchOption
           label="Select Axis"
