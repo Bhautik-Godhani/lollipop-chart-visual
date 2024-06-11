@@ -170,7 +170,7 @@ export const SetAndBindChartBehaviorOptions = (
 ): void => {
 	if (self.interactivityService) {
 		const nodeData = [];
-		const nodeSelection = lollipopSelection;
+		const nodeSelection = lollipopSelection.filter((d) => d.identity);
 		nodeSelection.each(function () {
 			nodeData.push(d3Select(this).datum());
 		});
@@ -178,7 +178,7 @@ export const SetAndBindChartBehaviorOptions = (
 		self.interactivityService.applySelectionStateToData(nodeData);
 
 		const behaviorOptions: BehaviorOptions = {
-			lollipopSelection: lollipopSelection,
+			lollipopSelection: lollipopSelection.filter((d) => d.identity),
 			lineSelection: lineSelection,
 			legendItems: self.legends ? self.legends.legendItems : undefined,
 			dataPoints: nodeData,

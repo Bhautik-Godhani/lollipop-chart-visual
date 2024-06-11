@@ -4187,16 +4187,16 @@ export class Visual extends Shadow {
 				this.selectionIdByCategories[category] = selectionId;
 
 				series.forEach((ser: any) => {
-					ser.values.forEach((s) => {
-						const seriesSelectionId = this.vizOptions.host
-							.createSelectionIdBuilder()
-							.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
-							.withSeries(categoricalData.categorical.values, ser)
-							.withMeasure(s.source.queryName)
-							.createSelectionId();
+					// ser.values.forEach((s) => {
+					const seriesSelectionId = this.vizOptions.host
+						.createSelectionIdBuilder()
+						.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
+						.withSeries(categoricalData.categorical.values, ser)
+						// .withMeasure(s.source.queryName)
+						.createSelectionId();
 
-						this.selectionIdBySubCategories[`${category}-${ser.name}`] = seriesSelectionId as any;
-					});
+					this.selectionIdBySubCategories[`${category}-${ser.name}`] = seriesSelectionId as any;
+					// });
 				});
 			});
 		}
@@ -4326,6 +4326,8 @@ export class Visual extends Shadow {
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
 		}
+
+		console.log(this.chartData);
 	}
 
 	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
@@ -9570,13 +9572,6 @@ export class Visual extends Shadow {
 
 		// ele.selectAll("path").data(d.subCategories);
 
-		ele.selectAll("path").each(function () {
-			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-			d3.select(this).datum((datum: any, i: number) => {
-				return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
-			})
-		})
-
 		ele.selectAll("path").attr("id", () => {
 			return isPie2 ? PieType.Pie2 : PieType.Pie1;
 		});
@@ -9585,6 +9580,14 @@ export class Visual extends Shadow {
 			return "pie-slice";
 			// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
 		});
+
+		ele.selectAll(".pie-slice").each(function (_, i) {
+			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
+			d3.select(this).datum(() => {
+				return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+			})
+		})
+
 		// .attr("fill", (d: IChartSubCategory) => {
 		// 	return d.styles[pieType].color;
 		// });
