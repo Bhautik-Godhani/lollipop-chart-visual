@@ -65,6 +65,7 @@ import {
 	ERankingCalcMethod,
 	EDataLabelsBGApplyFor,
 	EDataLabelsDisplayTypes,
+	EGeneralTemplates,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -4245,9 +4246,9 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.patternSettings.enabled) {
-			this.setVisualPatternData();
-		}
+		// if (this.patternSettings.enabled) {
+		// 	this.setVisualPatternData();
+		// }
 
 		const min1Index = d3.minIndex(this.chartData, (d) => d.value1);
 		const max1Index = d3.maxIndex(this.chartData, (d) => d.value1);
@@ -4302,13 +4303,15 @@ export class Visual extends Shadow {
 
 		// this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
-		this.categoryPatterns = this.chartData
-			.map((d) => ({
-				name: d.category.replace(/--\d+/g, ''),
-				patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
-				isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
-				dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
-			}));
+		const isPatternTemplateApplied = this.templateSettings.isTemplatesEnabled && this.templateSettings.selectedTemplate === EGeneralTemplates.FillPatternTemplate;
+		this.categoryPatterns = this.chartData.map(d => ({ name: d.category.replace(/--\d+/g, ''), patternIdentifier: undefined, isImagePattern: undefined, dimensions: undefined }));
+		this.categoryPatterns
+			.forEach((c, i) => {
+				const d = this.patternSettings.categoryPatterns[i];
+				c.patternIdentifier = d ? d.patternIdentifier ? d.patternIdentifier : "NONE" : "NONE";
+				c.isImagePattern = d ? d.isImagePattern ? d.isImagePattern : false : false;
+				c.dimensions = d ? d.dimensions ? d.dimensions : undefined : undefined;
+			});
 
 		this.measuresPatterns = this.measureNames
 			.map((d) => {
@@ -4327,13 +4330,36 @@ export class Visual extends Shadow {
 		});
 
 		if (this.isHasSubcategories) {
-			this.subCategoryPatterns = this.chartData[0].subCategories
-				.map((d) => ({
-					name: d.category,
-					patternIdentifier: d.pattern ? d.pattern.patternIdentifier ? d.pattern.patternIdentifier : "NONE" : "NONE",
-					isImagePattern: d.pattern ? d.pattern.isImagePattern ? d.pattern.isImagePattern : false : false,
-					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
-				}));
+			this.subCategoryPatterns = this.chartData[0].subCategories.map(d => ({ name: d.category, patternIdentifier: undefined, isImagePattern: undefined, dimensions: undefined }));
+			this.subCategoryPatterns
+				.forEach((c, i) => {
+					const pattern = this.patternSettings.subCategoryPatterns[i];
+					c.patternIdentifier = pattern ? pattern.patternIdentifier ? pattern.patternIdentifier : "NONE" : "NONE";
+					c.isImagePattern = pattern ? pattern.isImagePattern ? pattern.isImagePattern : false : false;
+					c.dimensions = pattern ? pattern.dimensions ? pattern.dimensions : undefined : undefined;
+				});
+		}
+
+		if (isPatternTemplateApplied) {
+			this.categoryPatterns.forEach(d => {
+				if (!this.patternSettings.categoryPatterns.find(p => p.name === d.name)) {
+					d.patternIdentifier = this.patternSettings.categoryPatterns[0].patternIdentifier;
+					this.patternSettings.categoryPatterns.push(d);
+				}
+			})
+
+			if (this.isHasSubcategories) {
+				this.subCategoryPatterns.forEach(d => {
+					if (!this.patternSettings.subCategoryPatterns.find(p => p.name === d.name)) {
+						d.patternIdentifier = this.patternSettings.subCategoryPatterns[0].patternIdentifier;
+						this.patternSettings.subCategoryPatterns.push(d);
+					}
+				});
+			}
+		}
+
+		if (this.patternSettings.enabled) {
+			this.setVisualPatternData();
 		}
 	}
 

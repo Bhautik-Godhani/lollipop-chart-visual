@@ -3,7 +3,7 @@ import * as React from "react";
 import { TEMPLATES_SETTINGS as TEMPLATES_SETTINGS_IMP } from "../constants";
 import { EGeneralTemplates, EIBCSThemes, ETemplateTypes, ETemplatesSettings } from "../enum";
 import { Column, ConditionalWrapper, Footer, Label, Row, Tab, Tabs, ToggleButton } from "@truviz/shadow/dist/Components";
-import { CutClipAxisTemplate, FillPatternTemplate, GeneralTemplate, IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon, RaceChartTemplate } from "./SettingsIcons";
+import { IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon } from "./SettingsIcons";
 import { ITemplateSettings } from "../visual-settings.interface";
 import { ApplyThemeJson } from "../methods/methods";
 import { Visual } from "../visual";
@@ -43,7 +43,7 @@ const UIIBCSSettings = (
       <ConditionalWrapper visible={configValues.isIBCSEnabled}>
         <Row>
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.DefaultVertical ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.DefaultVertical, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -53,7 +53,7 @@ const UIIBCSSettings = (
           </Column>
 
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.DefaultHorizontal, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -65,7 +65,7 @@ const UIIBCSSettings = (
 
         <Row>
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.Diverging1Vertical, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -75,7 +75,7 @@ const UIIBCSSettings = (
           </Column>
 
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.Diverging1Horizontal, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -87,7 +87,7 @@ const UIIBCSSettings = (
 
         <Row>
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.Diverging2Vertical, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -97,7 +97,7 @@ const UIIBCSSettings = (
           </Column>
 
           <Column>
-            <div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "selected" : ""}`}
               onClick={
                 () => handleChange(EIBCSThemes.Diverging2Horizontal, ETemplatesSettings.Theme, setConfigValues)
               }>
@@ -132,27 +132,32 @@ const UIGeneralTemplates = (
       <ConditionalWrapper visible={configValues.isTemplatesEnabled}>
         <Row>
           <Column>
-            <div className={`ibcs-grid-item ${configValues.selectedTemplate === EGeneralTemplates.GeneralTemplate ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GeneralTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.GeneralTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
                   handleChange(JSON.stringify(DefaultTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <GeneralTemplate />
+              <img src={require("../../assets/templates/DefaultTemplate.svg")}></img>
             </div>
             <Label text="Default" classNames={["text-label"]}></Label>
           </Column>
 
           <Column>
-            <div className={`ibcs-grid-item ${configValues.selectedTemplate === EGeneralTemplates.RaceChartTemplate ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.RaceChartTemplate ? "selected" : ""}
+            ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.RaceChartTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
                   handleChange(JSON.stringify(RaceChartTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <RaceChartTemplate />
+              <img src={require("../../assets/templates/RaceChartTemplate.svg")}></img>
+              {!shadow.isChartIsRaceChart && (
+                <div className="disabled-theme"></div>
+              )
+              }
             </div>
             <Label text="Race Chart" classNames={["text-label"]}></Label>
           </Column>
@@ -160,27 +165,27 @@ const UIGeneralTemplates = (
 
         <Row>
           <Column>
-            <div className={`ibcs-grid-item ${configValues.selectedTemplate === EGeneralTemplates.FillPatternTemplate ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.FillPatternTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.FillPatternTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
                   handleChange(JSON.stringify(FillPatternsTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <FillPatternTemplate />
+              <img src={require("../../assets/templates/FillPatternTemplate.svg")}></img>
             </div>
             <Label text="Fill Pattern" classNames={["text-label"]}></Label>
           </Column>
 
           <Column>
-            <div className={`ibcs-grid-item ${configValues.selectedTemplate === EGeneralTemplates.CutClipAxisTemplate ? "active" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.CutClipAxisTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.CutClipAxisTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
                   handleChange(JSON.stringify(CutClipTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <CutClipAxisTemplate />
+              <img src={require("../../assets/templates/CutAndClipTemplate.svg")}></img>
             </div>
             <Label text="Cut/Clip Axis" classNames={["text-label"]}></Label>
           </Column>
