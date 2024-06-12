@@ -627,8 +627,8 @@ export const TREND_LINES_SETTINGS: ITrendLinesSettings = {
 
 export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
 	isEnabled: false,
-	breakStart: 0,
-	breakEnd: 0,
+	breakStart: undefined,
+	breakEnd: undefined,
 	markerStrokeColor: "rgba(102,102,102,1)",
 	markerBackgroundColor: "rgba(255, 255, 255, 1)",
 	markerPlacement: ECutAndClipMarkerPlacementTypes.Categories

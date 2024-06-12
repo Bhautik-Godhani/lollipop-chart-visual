@@ -65,6 +65,16 @@ const CutAndClipAxisSettings = (props) => {
     ...initialStates,
   });
 
+  React.useEffect(() => {
+    if (configValues.breakStart === undefined) {
+      handleChange(shadow.axisDomainMaxValue * 15 / 100, ECutAndClipAxisSettings.BreakStart);
+    }
+
+    if (configValues.breakEnd === undefined) {
+      handleChange(shadow.axisDomainMaxValue * 35 / 100, ECutAndClipAxisSettings.BreakEnd);
+    }
+  }, []);
+
   const handleChange = (val, n) => {
     setConfigValues((d) => ({
       ...d,

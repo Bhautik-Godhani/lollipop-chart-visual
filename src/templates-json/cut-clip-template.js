@@ -17,8 +17,8 @@ export default {
     },
     "cutAndClipAxisSettings": {
         "isEnabled": true,
-        "breakStart": 10,
-        "breakEnd": 30,
+        "breakStart": undefined,
+        "breakEnd": undefined,
         "markerStrokeColor": "rgba(31, 132, 255, 1)",
         "markerBackgroundColor": "rgba(255, 255, 255, 1)",
         "markerPlacement": "categories"
