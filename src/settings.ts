@@ -59,6 +59,7 @@ export class VisualSettings extends DataViewObjectsParser {
 	public dynamicDeviationConfig = new DynamicDeviationConfig();
 	public cutAndClipAxisConfig = new CutAndClipAxisConfig();
 	public smallMultiplesConfig = new SmallMultiplesConfig();
+	public templatesConfig = new TemplatesConfig();
 }
 
 export class License {
@@ -167,6 +168,10 @@ export class TrendLinesConfig {
 
 export class ReferenceLinesConfig {
 	public referenceLinesSettings: string = "{}";
+}
+
+export class TemplatesConfig {
+	public templatesSettings: string = "{}";
 }
 
 export class ErrorBarsConfig {

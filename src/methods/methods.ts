@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable max-lines-per-function */
 import { textMeasurementService, wordBreaker } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
@@ -5,14 +6,14 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { IValueFormatter, TooltipData } from "../model";
-import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, EVisualConfig, EVisualSettings } from "../enum";
+import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, ETemplatesSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { select } from "d3-selection";
 import { PATTERNS } from "@truviz/shadow/dist/Components";
 
 export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
-	if (shadow.chartSettings && shadow.chartSettings.isIBCSEnabled) {
+	if (shadow.templateSettings && shadow.templateSettings.isIBCSEnabled) {
 		ApplyBeforeIBCSAppliedSettingsBack(shadow);
 	}
 
@@ -27,18 +28,18 @@ export const persistProperties = (shadow: Visual, configName: EVisualConfig, set
 				selector: null,
 			},
 			{
-				objectName: EVisualConfig.ChartConfig,
-				displayName: EVisualSettings.ChartSettings,
+				objectName: EVisualConfig.TemplatesConfig,
+				displayName: EVisualSettings.TemplatesSettings,
 				properties: {
-					[EVisualSettings.ChartSettings]: JSON.stringify({
-						...shadow.chartSettings,
-						[EChartSettings.IsIBCSEnabled]: false,
-						[EChartSettings.Theme]: undefined,
-						[EChartSettings.PrevTheme]: undefined,
+					[EVisualSettings.TemplatesSettings]: JSON.stringify({
+						...shadow.templateSettings,
+						[ETemplatesSettings.IsIBCSEnabled]: false,
+						[ETemplatesSettings.Theme]: undefined,
+						[ETemplatesSettings.PrevTheme]: undefined,
 					}),
 				},
 				selector: null,
-			}
+			},
 		],
 	};
 
@@ -693,3 +694,96 @@ export const GetSVGTextSize2 = (
 	// Return width and height
 	return { width: bbox.width, height: bbox.height };
 }
+
+export const getConfig = (formatTab) => {
+	const obj = {
+		[EVisualSettings.BrushAndZoomAreaSettings]: JSON.parse(formatTab[EVisualConfig.BrushAndZoomAreaConfig][EVisualSettings.BrushAndZoomAreaSettings]),
+		[EVisualSettings.ChartSettings]: JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]),
+		[EVisualSettings.CutAndClipAxisSettings]: JSON.parse(formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]),
+		[EVisualSettings.DataColorsSettings]: JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]),
+		[EVisualSettings.DataLabelsSettings]: JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]),
+		[EVisualSettings.DynamicDeviationSettings]: JSON.parse(formatTab[EVisualConfig.DynamicDeviationConfig][EVisualSettings.DynamicDeviationSettings]),
+		[EVisualSettings.ErrorBarsSettings]: JSON.parse(formatTab[EVisualConfig.ErrorBarsConfig][EVisualSettings.ErrorBarsSettings]),
+		[EVisualSettings.GridLinesSettings]: JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EVisualSettings.GridLinesSettings]),
+		[EVisualSettings.LineSettings]: JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]),
+		[EVisualSettings.MarkerSettings]: JSON.parse(formatTab[EVisualConfig.MarkerConfig][EVisualSettings.MarkerSettings]),
+		[EVisualSettings.PatternSettings]: JSON.parse(formatTab[EVisualConfig.PatternConfig][EVisualSettings.PatternSettings]),
+		[EVisualSettings.RaceChartSettings]: JSON.parse(formatTab[EVisualConfig.RaceChartConfig][EVisualSettings.RaceChartSettings]),
+		[EVisualSettings.RankingSettings]: JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]),
+		[EVisualSettings.ReferenceLinesSettings]: JSON.parse(formatTab[EVisualConfig.ReferenceLinesConfig][EVisualSettings.ReferenceLinesSettings]),
+		[EVisualSettings.ShowBucketFormatting]: JSON.parse(formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]),
+		[EVisualSettings.SmallMultiplesSettings]: JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]),
+		[EVisualSettings.Sorting]: JSON.parse(formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]),
+		[EVisualSettings.XAxisSettings]: JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]),
+		[EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings]),
+	}
+
+	obj["conditionalFormatting"] = JSON.parse(formatTab["editor"]["conditionalFormatting"] !== "" ? formatTab["editor"]["conditionalFormatting"] : "{}");
+	obj["annotations"] = JSON.parse(formatTab["editor"]["annotations"]);
+
+	return obj;
+}
+
+export const configs = {
+	[EVisualSettings.BrushAndZoomAreaSettings]: EVisualConfig.BrushAndZoomAreaConfig,
+	[EVisualSettings.ChartSettings]: EVisualConfig.ChartConfig,
+	[EVisualSettings.CutAndClipAxisSettings]: EVisualConfig.CutAndClipAxisConfig,
+	[EVisualSettings.DataColorsSettings]: EVisualConfig.DataColorsConfig,
+	[EVisualSettings.DataLabelsSettings]: EVisualConfig.DataLabelsConfig,
+	[EVisualSettings.DynamicDeviationSettings]: EVisualConfig.DynamicDeviationConfig,
+	[EVisualSettings.ErrorBarsSettings]: EVisualConfig.ErrorBarsConfig,
+	[EVisualSettings.GridLinesSettings]: EVisualConfig.GridLinesConfig,
+	[EVisualSettings.IBCSSettings]: EVisualConfig.IBCSConfig,
+	[EVisualSettings.LineSettings]: EVisualConfig.LineConfig,
+	[EVisualSettings.MarkerSettings]: EVisualConfig.MarkerConfig,
+	[EVisualSettings.PatternSettings]: EVisualConfig.PatternConfig,
+	[EVisualSettings.RaceChartSettings]: EVisualConfig.RaceChartConfig,
+	[EVisualSettings.RankingSettings]: EVisualConfig.RankingConfig,
+	[EVisualSettings.ReferenceLinesSettings]: EVisualConfig.ReferenceLinesConfig,
+	[EVisualSettings.ShowBucketFormatting]: EVisualConfig.ShowBucketConfig,
+	[EVisualSettings.SmallMultiplesSettings]: EVisualConfig.SmallMultiplesConfig,
+	[EVisualSettings.Sorting]: EVisualConfig.SortingConfig,
+	[EVisualSettings.XAxisSettings]: EVisualConfig.XAxisConfig,
+	[EVisualSettings.YAxisSettings]: EVisualConfig.YAxisConfig
+};
+
+export const ApplyThemeJson = (self: Visual, json, formatTab) => {
+	try {
+		const obj = typeof json === "object" ? json : JSON.parse(json);
+		const keys = Object.keys(getConfig(formatTab));
+		const mergeObject = [];
+		keys.forEach(el => {
+			if (el === "conditionalFormatting" || el === "annotations") {
+				mergeObject.push({
+					objectName: "editor",
+					properties: {
+						["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
+						["annotations"]: JSON.stringify(obj["annotations"]),
+					},
+					selector: null,
+				})
+			} else {
+				if (obj.hasOwnProperty(el)) {
+					mergeObject.push({
+						objectName: configs[el],
+						properties: {
+							[el]: JSON.stringify(obj[el]),
+						},
+						selector: null,
+					})
+				}
+				else {
+					throw "Invalid JSON file"
+				}
+			}
+		});
+
+		if (mergeObject.length > 0) {
+			self._host.persistProperties({
+				merge: mergeObject,
+			});
+		}
+	} catch (e) {
+		console.log("Error while applying theme", e);
+	}
+};

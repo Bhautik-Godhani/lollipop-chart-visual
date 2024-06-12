@@ -1,15 +1,15 @@
 /* eslint-disable max-lines-per-function */
 import { POSITIVE_COLOR } from "../constants";
-import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsMeasureTypes, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
+import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsMeasureTypes, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, ETemplatesSettings, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
 import { Visual } from "../visual";
-import { IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
+import { IChartSettings, IDataColorsSettings, IDataLabelsSettings, IGridLinesSettings, ILegendSettings, ILineSettings, IMarkerSettings, ISortingSettings, IXAxisSettings, IYAxisSettings } from "../visual-settings.interface";
 
 export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeIBCSSettings;
 
     const markerSettings: IMarkerSettings = beforeIBCSSettings[EVisualSettings.MarkerSettings].configValues;
-    // const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
+    const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
     const dataLabelsSettings: IDataLabelsSettings = beforeIBCSSettings[EVisualSettings.DataLabelsSettings].configValues;
     const xAxisSettings: IXAxisSettings = beforeIBCSSettings[EVisualSettings.XAxisSettings].configValues;
     const yAxisSettings: IYAxisSettings = beforeIBCSSettings[EVisualSettings.YAxisSettings].configValues;
@@ -22,19 +22,14 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
 
     self._host.persistProperties({
         merge: [
-            // {
-            //     objectName: EVisualConfig.ChartConfig,
-            //     displayName: EVisualSettings.ChartSettings,
-            //     properties: {
-            //         [EVisualSettings.ChartSettings]: JSON.stringify({
-            //             ...chartSettings,
-            //             [EIBCSSettings.IsIBCSEnabled]: false,
-            //             [EIBCSSettings.Theme]: undefined,
-            //             [EIBCSSettings.PrevTheme]: undefined,
-            //         }),
-            //     },
-            //     selector: null,
-            // },
+            {
+                objectName: EVisualConfig.ChartConfig,
+                displayName: EVisualSettings.ChartSettings,
+                properties: {
+                    [EVisualSettings.ChartSettings]: JSON.stringify(chartSettings),
+                },
+                selector: null,
+            },
             {
                 objectName: EVisualConfig.LineConfig,
                 displayName: EVisualSettings.LineSettings,
@@ -116,7 +111,7 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
 export const ApplyIBCSTheme = (self: Visual): void => {
     let beforeIBCSSettings;
 
-    if (!self.chartSettings.prevTheme && self.chartSettings.theme) {
+    if (!self.templateSettings.prevTheme && self.templateSettings.theme) {
         beforeIBCSSettings = {
             [EVisualSettings.ChartSettings]: { configName: EVisualConfig.ChartConfig, settingName: EVisualSettings.ChartSettings, configValues: self.chartSettings },
             [EVisualSettings.LineSettings]: { configName: EVisualConfig.LineConfig, settingName: EVisualSettings.LineSettings, configValues: self.lineSettings },
@@ -148,13 +143,11 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.ChartSettings]: JSON.stringify({
                         ...self.chartSettings,
-                        [EChartSettings.IsIBCSEnabled]: true,
-                        [EChartSettings.PrevTheme]: self.chartSettings.theme,
                         [EChartSettings.isShowZeroBaseLine]: true,
                         [EChartSettings.orientation]:
-                            (self.chartSettings.theme === EIBCSThemes.DefaultHorizontal ||
-                                self.chartSettings.theme === EIBCSThemes.Diverging1Horizontal ||
-                                self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
+                            (self.templateSettings.theme === EIBCSThemes.DefaultHorizontal ||
+                                self.templateSettings.theme === EIBCSThemes.Diverging1Horizontal ||
+                                self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
                     }),
                 },
                 selector: null,
@@ -166,10 +159,10 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                     [EVisualSettings.LineSettings]: JSON.stringify({
                         ...self.lineSettings,
                         [ELineSettings.show]: true,
-                        [ELineSettings.lineColor]: (self.chartSettings.theme === EIBCSThemes.DefaultVertical || self.chartSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
+                        [ELineSettings.lineColor]: (self.templateSettings.theme === EIBCSThemes.DefaultVertical || self.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
                         [ELineSettings.lineWidth]: 4,
                         [ELineSettings.lineType]: ELineType.Solid,
-                        [ELineSettings.isApplyMarkerColor]: (self.chartSettings.theme === EIBCSThemes.Diverging2Vertical || self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false
+                        [ELineSettings.isApplyMarkerColor]: (self.templateSettings.theme === EIBCSThemes.Diverging2Vertical || self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false
                     }),
                 },
                 selector: null,
@@ -204,7 +197,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                 properties: {
                     [EVisualSettings.DataColorsSettings]: JSON.stringify({
                         ...self.dataColorsSettings,
-                        [EDataColorsSettings.FillType]: ((self.chartSettings.theme === EIBCSThemes.Diverging2Horizontal || self.chartSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
+                        [EDataColorsSettings.FillType]: ((self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal || self.templateSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
                         [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
                         [EDataColorsSettings.SingleColor2]: "rgba(64, 64, 64, 1)",
                     }),
@@ -293,6 +286,18 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                             ...self.gridSettings.yGridLines,
                             [EGridLinesSettings.show]: false,
                         },
+                    }),
+                },
+                selector: null,
+            },
+            {
+                objectName: EVisualConfig.TemplatesConfig,
+                displayName: EVisualSettings.TemplatesSettings,
+                properties: {
+                    [EVisualSettings.TemplatesSettings]: JSON.stringify({
+                        ...self.templateSettings,
+                        [ETemplatesSettings.IsIBCSEnabled]: true,
+                        [ETemplatesSettings.PrevTheme]: self.templateSettings.theme,
                     }),
                 },
                 selector: null,

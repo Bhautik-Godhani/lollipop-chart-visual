@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { LINE_SETTINGS as LINE_SETTINGS_IMP } from "../constants";
-import { ColorPaletteType, ELineSettings, ELineType, EMarkerShapeTypes } from "../enum";
+import { LINE_SETTINGS as LINE_SETTINGS_IMP, POSITIVE_COLOR } from "../constants";
+import { ColorPaletteType, EIBCSThemes, ELineSettings, ELineType, EMarkerShapeTypes } from "../enum";
 import { ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Row, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
@@ -59,6 +59,17 @@ const LineSettings = (props) => {
 	}
 
 	const applyChanges = () => {
+		if (configValues.show !== true ||
+			configValues.lineColor !== ((shadow.templateSettings.theme === EIBCSThemes.DefaultVertical || shadow.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR) ||
+			configValues.lineWidth !== 4 ||
+			configValues.lineType !== ELineType.Solid ||
+			configValues.isApplyMarkerColor !== ((shadow.templateSettings.theme === EIBCSThemes.Diverging2Vertical || shadow.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false)
+		) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
+		} else {
+			shadow.persistProperties(sectionName, propertyName, configValues);
+		}
+
 		shadow.persistProperties(sectionName, propertyName, configValues);
 		closeCurrentSettingHandler();
 	};

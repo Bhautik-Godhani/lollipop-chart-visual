@@ -10,6 +10,7 @@ import { DashedLineIcon, DottedLineIcon, IBCSDefaultHIcon, IBCSDefaultVIcon, IBC
 import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
 import VerticalOrientationIcon from "../../assets/icons/Vertical-orientation.svg";
 import HorizontalOrientationIcon from "../../assets/icons/horizontal-orientation.svg";
+import { persistProperties } from "../methods/methods";
 
 const ORIENTATIONS = [
 	{
@@ -154,95 +155,6 @@ const UIZeroBaseLineSettings = (
 	</>
 }
 
-const UIThemeSettings = (
-	shadow: Visual,
-	configValues: IChartSettings,
-	setConfigValues: React.Dispatch<React.SetStateAction<IChartSettings>>
-) => {
-	return (
-		<>
-			<AccordionAlt title="IBCS Theme"
-				open={configValues.isIBCSEnabled}
-				showToggle={true}
-				toggleValue={configValues.isIBCSEnabled}
-				onChangeToggle={(value) => {
-					handleChange(value, EChartSettings.IsIBCSEnabled, setConfigValues);
-				}}
-			>
-				<Row>
-					<Column>
-						<Label text="Chart Type"></Label>
-					</Column>
-				</Row>
-
-				<Row disableTopPadding={true}>
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultVertical ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.DefaultVertical, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDefaultVIcon />
-						</div>
-						<Label text="IBCS 1" classNames={["text-label"]}></Label>
-					</Column>
-
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Vertical ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.Diverging1Vertical, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDiverging1VIcon />
-						</div>
-						<Label text="IBCS 3" classNames={["text-label"]}></Label>
-					</Column>
-
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Vertical ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.Diverging2Vertical, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDiverging2VIcon />
-						</div>
-						<Label text="IBCS 5" classNames={["text-label"]}></Label>
-					</Column>
-				</Row>
-
-				<Row>
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.DefaultHorizontal ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.DefaultHorizontal, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDefaultHIcon />
-						</div>
-						<Label text="IBCS 2" classNames={["text-label"]}></Label>
-					</Column>
-
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging1Horizontal ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.Diverging1Horizontal, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDiverging1HIcon />
-						</div>
-						<Label text="IBCS 4" classNames={["text-label"]}></Label>
-					</Column>
-
-					<Column>
-						<div className={`ibcs-grid-item ${configValues.theme === EIBCSThemes.Diverging2Horizontal ? "active" : ""}`}
-							onClick={
-								() => handleChange(EIBCSThemes.Diverging2Horizontal, EChartSettings.Theme, setConfigValues)
-							}>
-							<IBCSDiverging2HIcon />
-						</div>
-						<Label text="IBCS 6" classNames={["text-label"]}></Label>
-					</Column>
-				</Row>
-			</AccordionAlt>
-		</>
-	);
-};
-
 const UIGeneralChartSettings = (
 	shadow: Visual,
 	vizOptions: ShadowUpdateOptions,
@@ -321,50 +233,27 @@ const ChartSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		configValues.prevTheme = shadow.chartSettings.theme;
-
 		// if (configValues.theme) {
 		// 	configValues.isIBCSEnabled = true;
 		// } else {
 		// 	ApplyBeforeIBCSAppliedSettingsBack(shadow);
 		// }
 
-		if (!configValues.isResetInIBCSPressed && (configValues.isIBCSEnabled !== shadow.chartSettings.isIBCSEnabled || configValues.theme !== shadow.chartSettings.theme)) {
-			shadow.persistProperties(sectionName, propertyName, configValues);
+		if (configValues.isShowZeroBaseLine !== true ||
+			(configValues.orientation !== ((shadow.templateSettings.theme === EIBCSThemes.DefaultHorizontal ||
+				shadow.templateSettings.theme === EIBCSThemes.Diverging1Horizontal ||
+				shadow.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical))
+		) {
+			persistProperties(shadow, sectionName, propertyName, configValues);
 		} else {
-			if (configValues.isIBCSEnabled || configValues.isResetInIBCSPressed) {
-				const newConfigValues = {
-					...configValues,
-					[EChartSettings.IsIBCSEnabled]: false,
-					[EChartSettings.Theme]: undefined,
-					[EChartSettings.PrevTheme]: undefined,
-				};
-				if (newConfigValues.isShowZeroBaseLine !== true ||
-					(newConfigValues.orientation !== ((newConfigValues.theme === EIBCSThemes.DefaultHorizontal ||
-						newConfigValues.theme === EIBCSThemes.Diverging1Horizontal ||
-						newConfigValues.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical))
-				) {
-					ApplyBeforeIBCSAppliedSettingsBack(shadow);
-					shadow.persistProperties(sectionName, propertyName, newConfigValues);
-				} else {
-					shadow.persistProperties(sectionName, propertyName, newConfigValues);
-				}
-			} else {
-				configValues.theme = undefined;
-				configValues.prevTheme = undefined;
-				shadow.persistProperties(sectionName, propertyName, configValues);
-			}
+			shadow.persistProperties(sectionName, propertyName, configValues);
 		}
 
 		closeCurrentSettingHandler();
 	};
 
 	const resetChanges = () => {
-		if (configValues.isIBCSEnabled) {
-			setConfigValues({ ...CHART_SETTINGS, isResetInIBCSPressed: true });
-		} else {
-			setConfigValues({ ...CHART_SETTINGS });
-		}
+		setConfigValues({ ...CHART_SETTINGS });
 	};
 
 	const [configValues, setConfigValues] = React.useState<IChartSettings>({
@@ -374,20 +263,9 @@ const ChartSettings = (props) => {
 
 	const [isHasSubCategories] = React.useState(shadow.isHasSubcategories);
 
-	React.useEffect(() => {
-		if (configValues.isIBCSEnabled && configValues.theme === undefined) {
-			setConfigValues({ ...configValues, theme: EIBCSThemes.DefaultVertical });
-		} else {
-			setConfigValues({ ...configValues, isResetInIBCSPressed: true });
-		}
-	}, [configValues.isIBCSEnabled])
-
 	return (
 		<>
 			{UIGeneralChartSettings(shadow, vizOptions, configValues, isHasSubCategories, setConfigValues)}
-
-			{UIThemeSettings(shadow, configValues, setConfigValues)}
-
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);

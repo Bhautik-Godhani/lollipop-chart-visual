@@ -32,6 +32,7 @@ export class Enumeration {
 			getTrendLinesSelection(),
 			cutAndClipAxisSelection(),
 			getSmallMultiplesSelection(),
+			getTemplatesSelection()
 		];
 	}
 }
@@ -551,6 +552,19 @@ function cutAndClipAxisSelection(): EnumerateSectionType {
 		properties: [
 			{
 				name: "cutAndClipAxisSettings",
+				isShow: true,
+			},
+		],
+	};
+}
+
+function getTemplatesSelection(): EnumerateSectionType {
+	return {
+		name: "templatesConfig",
+		isShow: false,
+		properties: [
+			{
+				name: "templatesSettings",
 				isShow: true,
 			},
 		],

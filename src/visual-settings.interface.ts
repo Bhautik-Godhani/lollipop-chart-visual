@@ -24,6 +24,7 @@ import {
 	EErrorBarsLabelFormat,
 	EErrorBarsMarkerShape,
 	EFontStyle,
+	EGeneralTemplates,
 	EIBCSThemes,
 	ELCRPosition,
 	ELegendPosition,
@@ -202,10 +203,6 @@ export interface IChartSettings {
 	connectingLineColor: string;
 	connectingLineWidth: number;
 	connectingLineStyle: ELineType;
-	isIBCSEnabled: boolean;
-	theme: EIBCSThemes;
-	prevTheme: EIBCSThemes;
-	isResetInIBCSPressed?: boolean;
 }
 
 export interface IMarkerSettings {
@@ -677,4 +674,14 @@ export interface ICutAndClipAxisSettings {
 	markerStrokeColor: string;
 	markerBackgroundColor: string;
 	markerPlacement: ECutAndClipMarkerPlacementTypes
+}
+
+export interface ITemplateSettings {
+	isIBCSEnabled: boolean;
+	isTemplatesEnabled: boolean;
+	theme: EIBCSThemes;
+	prevTheme: EIBCSThemes;
+	isResetInIBCSPressed?: boolean;
+	selectedTemplate: EGeneralTemplates;
+	templateSchema: string;
 }

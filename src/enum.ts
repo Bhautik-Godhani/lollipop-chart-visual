@@ -21,6 +21,7 @@ export enum EVisualConfig {
 	DynamicDeviationConfig = "dynamicDeviationConfig",
 	CutAndClipAxisConfig = "cutAndClipAxisConfig",
 	SmallMultiplesConfig = "smallMultiplesConfig",
+	TemplatesConfig = "templatesConfig",
 }
 
 export enum EVisualSettings {
@@ -51,6 +52,7 @@ export enum EVisualSettings {
 	DynamicDeviationSettings = "dynamicDeviationSettings",
 	CutAndClipAxisSettings = "cutAndClipAxisSettings",
 	SmallMultiplesSettings = "smallMultiplesSettings",
+	TemplatesSettings = "templatesSettings",
 }
 
 export enum ELineType {
@@ -201,10 +203,6 @@ export enum EChartSettings {
 	connectingLineColor = "connectingLineColor",
 	connectingLineWidth = "connectingLineWidth",
 	connectingLineStyle = "connectingLineStyle",
-	IsIBCSEnabled = "isIBCSEnabled",
-	Theme = "theme",
-	PrevTheme = "prevTheme",
-	IsResetInIBCSPressed = "isResetInIBCSPressed"
 }
 
 export enum ECircleSettings {
@@ -778,6 +776,13 @@ export enum EIBCSThemes {
 	Diverging2Horizontal = "diverging2Horizontal",
 }
 
+export enum EGeneralTemplates {
+	GeneralTemplate = "generalTemplate",
+	RaceChartTemplate = "raceChartTemplate",
+	FillPatternTemplate = "fillPatternTemplate",
+	CutClipAxisTemplate = "cutClipAxisTemplate",
+}
+
 export enum SemanticNegativeNumberFormats {
 	X = "X",
 	MinusX = "MinusX",
@@ -980,4 +985,19 @@ export enum EAxisNumberFormatting {
 	MillionScalingLabel = "millionScalingLabel",
 	BillionScalingLabel = "billionScalingLabel",
 	TrillionScalingLabel = "trillionScalingLabel"
+}
+
+export enum ETemplatesSettings {
+	IsIBCSEnabled = "isIBCSEnabled",
+	IsTemplatesEnabled = "isTemplatesEnabled",
+	Theme = "theme",
+	PrevTheme = "prevTheme",
+	IsResetInIBCSPressed = "isResetInIBCSPressed",
+	SelectedTemplate = "selectedTemplate",
+	TemplateSchema = "templateSchema"
+}
+
+export enum ETemplateTypes {
+	Template = "template",
+	IBCS = "IBCS"
 }

@@ -96,7 +96,8 @@ import {
 	POSITIVE_COLOR,
 	NEGATIVE_COLOR,
 	MonthNames,
-	SMALL_MULTIPLES_SETTINGS
+	SMALL_MULTIPLES_SETTINGS,
+	TEMPLATES_SETTINGS
 } from "./constants";
 import {
 	EInsideTextColorTypes,
@@ -129,6 +130,7 @@ import {
 	IShowBucketSettings,
 	ISortingProps,
 	ISortingSettings,
+	ITemplateSettings,
 	IXAxisSettings,
 	IYAxisSettings,
 } from "./visual-settings.interface";
@@ -163,11 +165,12 @@ import AxisSettings from "./settings-pages/AxisSettings";
 import YAxisSettings from "./settings-pages/YAxisSettings";
 import RaceChartSettings from "./settings-pages/RaceChartSettings";
 import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
+import TemplatesSettings from "./settings-pages/Templates";
 
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -662,6 +665,7 @@ export class Visual extends Shadow {
 	lastDynamicDeviationSettings: IDynamicDeviationSettings;
 	cutAndClipAxisSettings: ICutAndClipAxisSettings;
 	smallMultiplesSettings: ISmallMultiplesGridLayoutSettings;
+	templateSettings: ITemplateSettings;
 
 	public static landingPage: landingPageProp = {
 		title: "Lollipop Chart",
@@ -910,6 +914,13 @@ export class Visual extends Shadow {
 					propertyName: "showBucket",
 					Component: () => ShowCondition,
 					icon: ShowConditionIcon
+				},
+				{
+					name: "Templates",
+					sectionName: EVisualConfig.TemplatesConfig,
+					propertyName: EVisualSettings.TemplatesSettings,
+					Component: () => TemplatesSettings,
+					icon: TemplatesSettingsIcon
 				},
 			],
 		});
@@ -2594,10 +2605,10 @@ export class Visual extends Shadow {
 				this.chartSettings.orientation === Orientation.Horizontal ? this.xAxisSettings : this.yAxisSettings;
 			this.isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
-			const selectedIBCSTheme = this.chartSettings.theme;
-			const isIBCSEnabled = this.chartSettings.isIBCSEnabled;
+			const selectedIBCSTheme = this.templateSettings.theme;
+			const isIBCSEnabled = this.templateSettings.isIBCSEnabled;
 
-			if (this.chartSettings.theme && (!this.chartSettings.isIBCSEnabled || (this.chartSettings.prevTheme !== this.chartSettings.theme)) && ((this.chartSettings.prevTheme !== this.chartSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
+			if (this.templateSettings.theme && (!this.templateSettings.isIBCSEnabled || (this.templateSettings.prevTheme !== this.templateSettings.theme)) && ((this.templateSettings.prevTheme !== this.templateSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
 				ApplyIBCSTheme(this);
 			}
 
@@ -3117,7 +3128,7 @@ export class Visual extends Shadow {
 				// if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
 				this.drawXYAxis(this.categoricalData, true, true);
 
-				if (this.chartSettings.theme && (!this.chartSettings.isIBCSEnabled || (this.chartSettings.prevTheme !== this.chartSettings.theme)) && ((this.chartSettings.prevTheme !== this.chartSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
+				if (this.templateSettings.theme && (!this.templateSettings.isIBCSEnabled || (this.templateSettings.prevTheme !== this.templateSettings.theme)) && ((this.templateSettings.prevTheme !== this.templateSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
 					return;
 				}
 
@@ -4326,8 +4337,6 @@ export class Visual extends Shadow {
 					dimensions: d.pattern ? d.pattern.dimensions ? d.pattern.dimensions : undefined : undefined,
 				}));
 		}
-
-		console.log(this.chartData);
 	}
 
 	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
@@ -4780,6 +4789,14 @@ export class Visual extends Shadow {
 		this.cutAndClipAxisSettings = {
 			...CUT_AND_CLIP_AXIS_SETTINGS,
 			...cutAndClipAxisConfig,
+		};
+
+		const templateConfig = JSON.parse(
+			formatTab[EVisualConfig.TemplatesConfig][EVisualSettings.TemplatesSettings]
+		);
+		this.templateSettings = {
+			...TEMPLATES_SETTINGS,
+			...templateConfig,
 		};
 
 		this.changeVisualSettings();

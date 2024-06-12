@@ -45,6 +45,7 @@ import {
 	DisplayUnits,
 	EDataLabelsDisplayTypes,
 	EFontStyle,
+	EGeneralTemplates,
 } from "./enum";
 import {
 	EInsideTextColorTypes,
@@ -69,11 +70,13 @@ import {
 	IReferenceLineSettings,
 	IShowBucketSettings,
 	ISortingSettings,
+	ITemplateSettings,
 	ITrendLinesSettings,
 	IXAxisSettings,
 	IYAxisSettings,
 } from "./visual-settings.interface";
 import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
+import DefaultTemplateJS from './templates-json/default-template.js';
 
 export const MonthNames = [
 	"January", "February", "March", "April", "May", "June",
@@ -108,9 +111,6 @@ export const CHART_SETTINGS: IChartSettings = {
 	connectingLineColor: "rgba(0, 0, 0, 1)",
 	connectingLineWidth: 1,
 	connectingLineStyle: ELineType.Dotted,
-	isIBCSEnabled: false,
-	theme: undefined,
-	prevTheme: undefined
 };
 
 export const CIRCLE1_SETTINGS: ICirclePropsSettings = {
@@ -632,6 +632,15 @@ export const CUT_AND_CLIP_AXIS_SETTINGS: ICutAndClipAxisSettings = {
 	markerStrokeColor: "rgba(102,102,102,1)",
 	markerBackgroundColor: "rgba(255, 255, 255, 1)",
 	markerPlacement: ECutAndClipMarkerPlacementTypes.Categories
+};
+
+export const TEMPLATES_SETTINGS: ITemplateSettings = {
+	isIBCSEnabled: false,
+	isTemplatesEnabled: false,
+	theme: undefined,
+	prevTheme: undefined,
+	selectedTemplate: EGeneralTemplates.GeneralTemplate,
+	templateSchema: DefaultTemplateJS
 };
 
 export const AXIS_DATE_FORMATS: ILabelValuePair[] = [

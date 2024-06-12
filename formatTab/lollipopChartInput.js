@@ -28,6 +28,7 @@ const sectionKVPair = [
 	{ IBCSConfig: "IBCS Configuration" },
 	{ dynamicDeviationConfig: "Dynamic Deviation Configuration" },
 	{ cutAndClipAxisConfig: "Cut And Clip Axis Configuration" },
+	{ templatesConfig: "Templates Configuration" },
 ];
 
 const formatTab = {
@@ -611,6 +612,15 @@ const formatTab = {
 		{
 			technicalName: "cutAndClipAxisSettings",
 			displayName: "Cut And Clip Axis Settings",
+			description: "",
+			type: "text",
+			defaultValue: "{}",
+		},
+	],
+	templatesConfig: [
+		{
+			technicalName: "templatesSettings",
+			displayName: "Templates Settings",
 			description: "",
 			type: "text",
 			defaultValue: "{}",
