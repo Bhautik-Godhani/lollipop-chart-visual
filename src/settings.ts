@@ -148,6 +148,7 @@ export class Editor {
 	public conditionalFormatting: string = "";
 	public annotations: string = "[]";
 	public beforeIBCSSettings: string = "{}";
+	public beforeTemplateSettings: string = "{}";
 }
 
 export class BrushAndZoomAreaConfig {

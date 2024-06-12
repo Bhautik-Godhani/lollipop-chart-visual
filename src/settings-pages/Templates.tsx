@@ -13,6 +13,7 @@ import RaceChartTemplateJS from '../templates-json/race-chart-template.js';
 import FillPatternsTemplateJS from '../templates-json/fill-patterns-template.js';
 import CutClipTemplateJS from '../templates-json/cut-clip-template.js';
 import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
+import { ApplyBeforeTemplateAppliedSettingsBack, SetBeforeTemplateSettings } from "../methods/Template.methods";
 
 const handleChange = (val, n, setConfigValues: React.Dispatch<React.SetStateAction<ITemplateSettings>>): void => {
   setConfigValues((d) => ({
@@ -290,9 +291,11 @@ const TemplatesSettings = (props) => {
       if (shadow.isIBCSEnabled) {
         ApplyBeforeIBCSAppliedSettingsBack(shadow);
       }
+      SetBeforeTemplateSettings(shadow, configValues);
       ApplyThemeJson(shadow, configValues.templateSchema, vizOptions.formatTab);
       shadow.persistProperties(sectionName, propertyName, configValues);
     } else {
+      ApplyBeforeTemplateAppliedSettingsBack(shadow);
       shadow.persistProperties(sectionName, propertyName, configValues);
     }
 

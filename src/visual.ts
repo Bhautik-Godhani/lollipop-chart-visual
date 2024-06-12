@@ -559,6 +559,9 @@ export class Visual extends Shadow {
 	isIBCSEnabled: boolean = false;
 	beforeIBCSSettings: { [settingsName: string]: { configName: EVisualConfig, settingName: EVisualSettings, configValues: any } };
 
+	// Template
+	beforeTemplateSettings: { [settingsName: string]: { configName: EVisualConfig, settingName: EVisualSettings, configValues: any } };
+
 	// legend
 	legends: {
 		legendItems: D3Selection<SVGElement>, legendWrapper: D3Selection<SVGElement>
@@ -4798,6 +4801,8 @@ export class Visual extends Shadow {
 		};
 
 		this.beforeIBCSSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeIBCSSettings]);
+
+		this.beforeTemplateSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeTemplateSettings]);
 
 		this.lastDynamicDeviationSettings = this.dynamicDeviationSettings;
 

@@ -424,6 +424,10 @@ function getEditorSelection(): EnumerateSectionType {
 				name: 'beforeIBCSSettings',
 				isShow: false
 			},
+			{
+				name: 'beforeTemplateSettings',
+				isShow: false
+			},
 		]
 	}
 }

@@ -963,6 +963,13 @@
 					"type": {
 						"text": true
 					}
+				},
+				"beforeTemplateSettings": {
+					"displayName": "Before Template Settings",
+					"description": "",
+					"type": {
+						"text": true
+					}
 				}
 			}
 		}

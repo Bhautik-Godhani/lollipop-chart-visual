@@ -49,6 +49,7 @@ export enum EVisualSettings {
 	ErrorBarsSettings = "errorBarsSettings",
 	IBCSSettings = "IBCSSettings",
 	BeforeIBCSSettings = "beforeIBCSSettings",
+	BeforeTemplateSettings = "beforeTemplateSettings",
 	DynamicDeviationSettings = "dynamicDeviationSettings",
 	CutAndClipAxisSettings = "cutAndClipAxisSettings",
 	SmallMultiplesSettings = "smallMultiplesSettings",

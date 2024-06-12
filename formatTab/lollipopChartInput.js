@@ -535,6 +535,13 @@ const formatTab = {
 			description: "",
 			defaultValue: "{}",
 		},
+		{
+			technicalName: "Before Template Settings",
+			displayName: "beforeTemplateSettings",
+			type: "text",
+			description: "",
+			defaultValue: "{}",
+		},
 	],
 	brushAndZoomAreaConfig: [
 		{
