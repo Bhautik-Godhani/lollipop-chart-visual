@@ -233,17 +233,17 @@ const FillPatterns = (props) => {
 						<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
 							<Row disableTopPadding classNames={["normal-text-overflow"]}>
 								<Column>
-									{(shadow as Visual).isLollipopTypeCircle && !(shadow as Visual).isHasMultiMeasure && (
+									{(shadow as Visual).isLollipopTypeCircle && (
 										UICategoryPatterns(shadow, configValues, setConfigValues)
 									)}
 
-									{((shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType !== ColorPaletteType.Single)) && (
+									{shadow.isLollipopTypePie && (
 										UISubCategoryPatterns(shadow, configValues, setConfigValues)
 									)}
 
-									{((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
+									{/* {((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
 										UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-									)}
+									)} */}
 								</Column>
 							</Row>
 						</ConditionalWrapper>

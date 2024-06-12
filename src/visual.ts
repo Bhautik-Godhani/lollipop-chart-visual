@@ -4374,37 +4374,38 @@ export class Visual extends Shadow {
 		if (this.isLollipopTypeCircle) {
 			if (!this.isShowImageMarker1) {
 				switch (this.dataColorsSettings.fillType) {
+					// case ColorPaletteType.Single:
+					// if (!this.isHasMultiMeasure) {
+					// 	legendDataPoints = [{
+					// 		data: {
+					// 			name: this.measure1DisplayName,
+					// 			color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+					// 			pattern: undefined,
+					// 			imageUrl: undefined
+					// 		}
+					// 	}]
+					// } else {
+					// 	legendDataPoints = [
+					// 		{
+					// 			data: {
+					// 				name: this.measure1DisplayName,
+					// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+					// 				pattern: this.patternByMeasures[DataValuesType.Value1],
+					// 				imageUrl: undefined
+					// 			},
+					// 		},
+					// 		{
+					// 			data: {
+					// 				name: this.measure2DisplayName,
+					// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
+					// 				pattern: this.patternByMeasures[DataValuesType.Value2],
+					// 				imageUrl: undefined
+					// 			},
+					// 		}
+					// 	]
+					// }
+					// break;
 					case ColorPaletteType.Single:
-						if (!this.isHasMultiMeasure) {
-							legendDataPoints = [{
-								data: {
-									name: this.measure1DisplayName,
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: undefined,
-									imageUrl: undefined
-								}
-							}]
-						} else {
-							legendDataPoints = [
-								{
-									data: {
-										name: this.measure1DisplayName,
-										color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-										pattern: this.patternByMeasures[DataValuesType.Value1],
-										imageUrl: undefined
-									},
-								},
-								{
-									data: {
-										name: this.measure2DisplayName,
-										color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-										pattern: this.patternByMeasures[DataValuesType.Value2],
-										imageUrl: undefined
-									},
-								}
-							]
-						}
-						break;
 					case ColorPaletteType.PowerBi:
 					case ColorPaletteType.Diverging:
 					case ColorPaletteType.Qualitative:
@@ -4471,37 +4472,38 @@ export class Visual extends Shadow {
 
 		if (this.isHasSubcategories && this.isLollipopTypePie) {
 			switch (this.dataColorsSettings.fillType) {
+				// case ColorPaletteType.Single:
+				// 	if (!this.isHasMultiMeasure) {
+				// 		legendDataPoints = [{
+				// 			data: {
+				// 				name: this.measure1DisplayName,
+				// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+				// 				pattern: this.chartData[0].subCategories[0].pattern,
+				// 				imageUrl: undefined
+				// 			}
+				// 		}]
+				// 	} else {
+				// 		legendDataPoints = [
+				// 			{
+				// 				data: {
+				// 					name: this.measure1DisplayName,
+				// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+				// 					pattern: this.patternByMeasures[DataValuesType.Value1],
+				// 					imageUrl: undefined
+				// 				},
+				// 			},
+				// 			{
+				// 				data: {
+				// 					name: this.measure2DisplayName,
+				// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
+				// 					pattern: this.patternByMeasures[DataValuesType.Value2],
+				// 					imageUrl: undefined
+				// 				},
+				// 			}
+				// 		]
+				// 	}
+				// 	break;
 				case ColorPaletteType.Single:
-					if (!this.isHasMultiMeasure) {
-						legendDataPoints = [{
-							data: {
-								name: this.measure1DisplayName,
-								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-								pattern: this.chartData[0].subCategories[0].pattern,
-								imageUrl: undefined
-							}
-						}]
-					} else {
-						legendDataPoints = [
-							{
-								data: {
-									name: this.measure1DisplayName,
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value1],
-									imageUrl: undefined
-								},
-							},
-							{
-								data: {
-									name: this.measure2DisplayName,
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[DataValuesType.Value2],
-									imageUrl: undefined
-								},
-							}
-						]
-					}
-					break;
 				case ColorPaletteType.PowerBi:
 				case ColorPaletteType.Diverging:
 				case ColorPaletteType.Qualitative:
