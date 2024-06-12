@@ -2400,13 +2400,11 @@ export class Visual extends Shadow {
 					const label = values.join(" ");
 					arr = [...arr, { key, label }];
 					return arr;
-				}, []);
+				}, []).filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
 
 			if (this.rankingSettings.raceChartData.enabled) {
 				this.raceChartKeyLabelList = this.raceChartKeyLabelList.slice(0, this.rankingSettings.raceChartData.count);
 			}
-
-			// .filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
 		}
 
 		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
