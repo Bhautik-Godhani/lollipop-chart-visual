@@ -90,9 +90,10 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const toCategoryYPos = self.getYPosition(to.category);
     const isFromCategoryYPosTrue = fromCategoryYPos !== undefined;
     const isToCategoryYPosTrue = toCategoryYPos !== undefined;
-    const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? self.height : 0);
-    const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? 0 : self.height);
     const isToGreaterThenFrom: Boolean = to.value > from.value;
+    const hide = isToGreaterThenFrom ? isFromCategoryYPosTrue : isToCategoryYPosTrue;
+    const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isBottomXAxis ? 0 : self.height) : self.height);
+    const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isBottomXAxis ? self.height : 0) : 0);
 
     let dataLabelYPos = 0;
     if (isToGreaterThenFrom) {
@@ -113,7 +114,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         "transform",
         `translate(${(self.getXPosition(from.value) + self.getXPosition(to.value)) / 2 - dataLabelBBox.width / 2}, ${dataLabelYPos})`
     )
-        .attr("display", isToCategoryYPosTrue ? "block" : "none");
+        .attr("display", hide ? "block" : "none");
 
     self.dynamicDeviationG
         .append("line")
@@ -159,7 +160,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
         .attr("y2", isToGreaterThenFrom ? start : end)
         .attr("stroke", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
         .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth)
-        .attr("display", isToCategoryYPosTrue ? "block" : "none");
+        .attr("display", hide ? "block" : "none");
 
     if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
         connectorLine
@@ -209,7 +210,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${self.getXPosition(to.value) - w}, ${(isToGreaterThenFrom ? start : end) + (w * 3) / 2}) rotate(270)`)
                 .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-                .attr("display", isToCategoryYPosTrue ? "block" : "none");
+                .attr("display", hide ? "block" : "none");
 
             connectorLine
                 .attr("x1", self.getXPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
@@ -224,7 +225,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${self.getXPosition(to.value) + w}, ${(isToGreaterThenFrom ? start : end) - (w * 3) / 2}) rotate(90)`)
                 .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-                .attr("display", isToCategoryYPosTrue ? "block" : "none");
+                .attr("display", hide ? "block" : "none");
 
             connectorLine
                 .attr("x1", self.getXPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
@@ -273,9 +274,10 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     const isFromCategoryXPosTrue = fromCategoryXPos !== undefined;
     const isToCategoryXPosTrue = toCategoryXPos !== undefined;
     const isPositiveDeviation = from.value < to.value;
-    const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? self.width : 0);
-    const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (isPositiveDeviation ? 0 : self.width);
     const isToGreaterThenFrom: boolean = to.value > from.value;
+    const hide = isToGreaterThenFrom ? isFromCategoryXPosTrue : isToCategoryXPosTrue;
+    const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? self.width : 0) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isLeftYAxis ? 0 : self.width) : self.width);
+    const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? 0 : self.width) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isLeftYAxis ? self.width : 0) : 0);
 
     let dataLabelXPos = 0;
     if (isToGreaterThenFrom) {
@@ -297,7 +299,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             "transform",
             `translate(${dataLabelXPos}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2
             })`)
-        .attr("display", isToCategoryXPosTrue ? "block" : "none");
+        .attr("display", hide ? "block" : "none");
 
     self.dynamicDeviationG
         .append("line")
@@ -343,7 +345,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
         .attr("x2", isToGreaterThenFrom ? start : end)
         .attr("stroke", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
         .attr("stroke-width", self.dynamicDeviationSettings.connectorWidth)
-        .attr("display", isToCategoryXPosTrue ? "block" : "none");
+        .attr("display", hide ? "block" : "none");
 
     if (self.dynamicDeviationSettings.connectorType === EDynamicDeviationConnectingLineTypes.Dots) {
         connectorLine
@@ -393,7 +395,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${(isToGreaterThenFrom ? start : end) - (w * 3) / 2}, ${self.getYPosition(to.value) - w})`)
                 .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-                .attr("display", isToCategoryXPosTrue ? "block" : "none");
+                .attr("display", hide ? "block" : "none");
 
             connectorLine
                 .attr("y1", self.getYPosition(from.value) + dynamicDeviationSettings.connectingLineWidth / 2)
@@ -408,7 +410,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 .attr("points", `${(w * 3) / 2} ${w}, ${w * 3} ${w * 3}, ${0} ${w * 3} `)
                 .attr("transform", `translate(${(isToGreaterThenFrom ? start : end) + (w * 3) / 2}, ${self.getYPosition(to.value) + w}) rotate(180)`)
                 .attr("fill", self.getColor(self.DDConnectorFill, EHighContrastColorType.Foreground))
-                .attr("display", isToCategoryXPosTrue ? "block" : "none");
+                .attr("display", hide ? "block" : "none");
 
             connectorLine
                 .attr("y1", self.getYPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
