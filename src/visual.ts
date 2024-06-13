@@ -3874,7 +3874,11 @@ export class Visual extends Shadow {
 						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
 						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
 					selected: false,
-					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false
+					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false,
+					allMeasures: subCategoryGroup.reduce((obj, cur) => {
+						obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+						return obj;
+					}, {})
 				};
 				return [...arr, obj];
 			}, []);
@@ -4074,7 +4078,11 @@ export class Visual extends Shadow {
 					extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
 					extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
 					data1Label: "",
-					data2Label: ""
+					data2Label: "",
+					allMeasures: categoricalData.values.reduce((obj, cur) => {
+						obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+						return obj;
+					}, {})
 				}
 
 				arr = [...arr, obj];
@@ -4169,7 +4177,8 @@ export class Visual extends Shadow {
 							extraLabel1: "",
 							extraLabel2: "",
 							data1Label: "",
-							data2Label: ""
+							data2Label: "",
+							allMeasures: undefined
 						});
 					}
 				});

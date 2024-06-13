@@ -35,6 +35,12 @@ export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
 
     dataPoint[self.measure1DisplayName] = self.formatNumber(d.value1, self.numberSettings, self.measureNumberFormatter[0], true, true);
 
+    if (d.allMeasures && Object.keys(d.allMeasures).length > 0) {
+        Object.keys(d.allMeasures).forEach(key => {
+            dataPoint[key] = self.formatNumber(d.allMeasures[key].value, self.numberSettings, self.allNumberFormatter[Object.keys(d.allMeasures[key].roles)[0]], true, true);
+        })
+    }
+
     if (self.isHasMultiMeasure) {
         dataPoint[self.measure2DisplayName] = self.formatNumber(d.value2, self.numberSettings, self.measureNumberFormatter[1], true, true);
     }
