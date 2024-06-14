@@ -77,30 +77,36 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
     if (!self.isHorizontalChart) {
         if (self.isBottomXAxis) {
             const ticks: D3Selection<SVGElement> = self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text");
-            if (ticks.nodes().length > 1) {
-                self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "1.32em");
-            }
+            // if (ticks.nodes().length > 1) {
+            ticks.attr("dy", `${ticks.nodes()[0].getBoundingClientRect().height}px`);
+            // }
             self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "0.32em");
         } else {
-            self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "1.32em");
-            self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "0.32em");
+            const tick = self.afterCutLinearYAxisG.select(".tick").select("text");
+            tick.attr("dy", `${tick.node().getBBox().height}px`);
+            self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "0");
         }
     } else {
         if (self.isLeftYAxis) {
             const ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
-            if (ticks.nodes().length > 1) {
-                self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "end");
-            }
-            self.afterCutLinearXAxisG.select(".tick").select("text").attr("dx", "0.32em").attr("text-anchor", "start");
+            // if (ticks.nodes().length > 1) {
+            self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "middle");
+            // }
+            const tick = self.afterCutLinearXAxisG.select(".tick").select("text");
+            tick.attr("dx", `${tick.node().getBBox().width}px`).attr("text-anchor", "middle");
         } else {
-            self.afterCutLinearXAxisG.select(".tick").select("text").attr("dx", "-0.32em").attr("text-anchor", "end");
-            self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "start");
+            const tick = self.afterCutLinearXAxisG.select(".tick").select("text");
+            tick.attr("dx", `-${tick.node().getBBox().width}px`).attr("text-anchor", "end");
+            self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "0.32em").attr("text-anchor", "end");
         }
     }
 }
 
 export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartRow[]): void => {
-    SetOverlappedAxisTicksPosition(self);
+    if (self.isCutAndClipAxisEnabled) {
+        SetOverlappedAxisTicksPosition(self);
+    }
+
     const filteredData = barData.filter((d) => (self.isHasMultiMeasure ? (d.value1 + d.value2) : d.value1) > self.cutAndClipAxisSettings.breakStart);
     const imageGSelection = self.barCutAndClipMarkersG
         .selectAll(".barCutAndClipMarkersG")
