@@ -9681,8 +9681,8 @@ export class Visual extends Shadow {
 
 		ele.selectAll(".pie-slice").each(function (_, i) {
 			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
-			d3.select(this).datum(() => {
-				return { ...d.subCategories[i], valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+			d3.select(this).datum((datum: any) => {
+				return { ...(datum ? datum : d.subCategories[i]), valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
 			})
 		})
 
