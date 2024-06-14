@@ -1779,14 +1779,37 @@ export class Visual extends Shadow {
 		}
 
 		const createDate = (day: number, monthName: string, quarter: number, year: number) => {
-			const month = (quarter - 1) * 3 + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(monthName);
+			let finalMonthName = monthName;
+
+			if (!finalMonthName) {
+				if (quarter) {
+					switch (quarter) {
+						case 1:
+							finalMonthName = "January";
+							break;
+						case 2:
+							finalMonthName = "April";
+							break;
+						case 3:
+							finalMonthName = "July";
+							break;
+						case 4:
+							finalMonthName = "October";
+							break;
+					}
+				} else {
+					finalMonthName = "January";
+				}
+			}
+
+			const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(finalMonthName);
 			if (month === -1) {
-				throw new Error(`Invalid month name: ${monthName}`);
+				throw new Error(`Invalid month name: ${finalMonthName}`);
 			}
 			try {
 				return new Date(year, month, day);
 			} catch (error) {
-				throw new Error(`Invalid date: ${day} ${monthName} (${quarter}) ${year}`);
+				throw new Error(`Invalid date: ${day} ${finalMonthName} (${quarter}) ${year}`);
 			}
 		}
 
@@ -1859,10 +1882,10 @@ export class Visual extends Shadow {
 				if (this.isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
 					const day = obj["Day"] ? parseInt(obj["Day"].toString().split("--")[0]) : 1;
 					const month = obj["Month"] ? obj["Month"].split("--")[0] : "January";
-					const quarter = obj["Quarter"] ? obj["Quarter"].split("--")[0].split("Qtr")[1] : 1;
+					const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("--")[0].split("Qtr")[1]) : 1;
 					const year = obj["Year"] ? obj["Year"].split("--")[0] : 2024;
 
-					obj["date"] = createDate(day ? day : 1, month ? month : "January", quarter ? quarter : 1, year ? year : 2024);
+					obj["date"] = createDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
 				}
 
 				categoricalData.values.forEach((d) => {
