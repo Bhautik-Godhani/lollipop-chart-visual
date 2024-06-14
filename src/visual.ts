@@ -1210,20 +1210,29 @@ export class Visual extends Shadow {
 					}
 					// }
 				} else {
-					// if (this.isHorizontalChart) {
-					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
-					// 	} else {
-					// 		data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
-					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
-					// 	}
-					// } else {
-					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+					const keys = Object.keys(data[0]);
+					if (this.isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+							data.sort((a, b) => new Date(a["date"]).getTime() - new Date(b["date"]).getTime());
+						} else {
+							data.sort((a, b) => new Date(b["date"]).getTime() - new Date(a["date"]).getTime());
+						}
 					} else {
-						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						// if (this.isHorizontalChart) {
+						// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+						// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+						// 	} else {
+						// 		data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+						// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						// 	}
+						// } else {
+						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+						} else {
+							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						}
+						// }
 					}
-					// }
 				}
 			} else if (this.isXIsNumericAxis) {
 				// if (this.isHorizontalChart) {
@@ -1769,6 +1778,18 @@ export class Visual extends Shadow {
 			this.isChartRacePossible = false;
 		}
 
+		const createDate = (day: number, monthName: string, quarter: number, year: number) => {
+			const month = (quarter - 1) * 3 + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(monthName);
+			if (month === -1) {
+				throw new Error(`Invalid month name: ${monthName}`);
+			}
+			try {
+				return new Date(year, month, day);
+			} catch (error) {
+				throw new Error(`Invalid date: ${day} ${monthName} (${quarter}) ${year}`);
+			}
+		}
+
 		if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
 			let raceBarKeys = [];
 			const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
@@ -1828,9 +1849,21 @@ export class Visual extends Shadow {
 					});
 				}
 
+				obj[this.categoryDisplayName] = category;
+
 				this.expandAllCategoriesName.forEach((d, i) => {
-					obj[d] = categoricalData.categories[i].values[index] as string;
+					obj[d] = categoricalData.categories[i].values[index];
 				});
+
+				const keys = Object.keys(obj);
+				if (this.isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+					const day = obj["Day"] ? parseInt(obj["Day"].toString().split("--")[0]) : 1;
+					const month = obj["Month"] ? obj["Month"].split("--")[0] : "January";
+					const quarter = obj["Quarter"] ? obj["Quarter"].split("--")[0].split("Qtr")[1] : 1;
+					const year = obj["Year"] ? obj["Year"].split("--")[0] : 2024;
+
+					obj["date"] = createDate(day ? day : 1, month ? month : "January", quarter ? quarter : 1, year ? year : 2024);
+				}
 
 				categoricalData.values.forEach((d) => {
 					const roles = Object.keys(d.source.roles);
