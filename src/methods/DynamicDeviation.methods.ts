@@ -317,7 +317,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 ? `0, ${8} `
                 : `${8}, ${8}`
         )
-        .attr("display", (!fromCategoryXPos && !toCategoryXPos) || !self.dynamicDeviationSettings.isShowConnectorLine ? "none" : "block");
+        .attr("display", !self.dynamicDeviationSettings.isShowConnectorLine ? "none" : "block");
 
     // self.dynamicDeviationG
     //     .append("line")
