@@ -46,38 +46,49 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
     self.raceChartDataLabelText = self.raceChartDataLabelG.append("text").attr("class", "raceBarDataLabel");
     // }
 
+    const { headerTextStyles, subTextStyles } = self.raceChartSettings;
+
     const minFontSize = 20;
     const maxFontSize = 30;
-    let labelFontSize;
+    let headerFontSize: number;
+    let subTextFontSize: number;
 
-    if (self.raceChartSettings.isLabelAutoFontSize) {
+    if (headerTextStyles.isLabelAutoFontSize) {
         const autoSize = min([self.width / 25, self.height / 10]);
         if (autoSize > minFontSize && autoSize < maxFontSize) {
-            labelFontSize = autoSize;
+            headerFontSize = autoSize;
         } else if (autoSize < minFontSize) {
-            labelFontSize = minFontSize;
+            headerFontSize = minFontSize;
         } else if (autoSize > maxFontSize) {
-            labelFontSize = maxFontSize;
+            headerFontSize = maxFontSize;
         }
     } else {
-        labelFontSize = self.raceChartSettings.labelFontSize;
+        headerFontSize = headerTextStyles.labelFontSize;
+    }
+
+    if (subTextStyles.isLabelAutoFontSize) {
+        subTextFontSize = headerFontSize / 1.25;
+    } else {
+        subTextFontSize = subTextStyles.labelFontSize;
     }
 
     self.raceChartDataLabelText.selectAll("*").remove();
     self.raceChartDataLabelG.selectAll(".label-shadow").remove();
 
     self.raceChartDataLabelText
-        .style("text-decoration", self.raceChartSettings.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
-        .style("font-weight", self.raceChartSettings.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
-        .style("font-style", self.raceChartSettings.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
-        .attr("fill", self.raceChartSettings.labelColor)
-        .style("font-family", self.raceChartSettings.labelFontFamily)
         .attr("text-anchor", "middle");
 
     self.raceChartDataLabelText
         .append("tspan")
+        .attr("class", "header-label")
         .attr("x", "0")
-        .attr("font-size", labelFontSize)
+        .attr("y", "1.25em")
+        .style("text-decoration", headerTextStyles.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
+        .style("font-weight", headerTextStyles.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
+        .style("font-style", headerTextStyles.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
+        .attr("fill", headerTextStyles.labelColor)
+        .style("font-family", headerTextStyles.labelFontFamily)
+        .attr("font-size", headerFontSize)
         .text(self.raceChartDataLabelOnTick.split("--").map((d, i) => {
             if (self.categoricalRaceChartDataFields[i].source.type.dateTime) {
                 d = new Date(d) as any;
@@ -103,19 +114,25 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
 
     self.raceChartDataLabelText
         .append("tspan")
+        .attr("class", "sub-text-label")
         .attr("x", "0")
-        .attr("dy", labelFontSize / 1.25)
-        .attr("font-size", labelFontSize / 2)
+        .attr("dy", subTextFontSize)
+        .style("text-decoration", subTextStyles.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
+        .style("font-weight", subTextStyles.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
+        .style("font-style", subTextStyles.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
+        .attr("fill", subTextStyles.labelColor)
+        .style("font-family", subTextStyles.labelFontFamily)
+        .attr("font-size", headerFontSize / 2)
         .text(`${self.measure1DisplayName} : ${getTotal1Value()}`);
 
-    if (self.isHasMultiMeasure) {
-        self.raceChartDataLabelText
-            .append("tspan")
-            .attr("x", "0")
-            .attr("dy", labelFontSize / 1.5)
-            .attr("font-size", labelFontSize / 2)
-            .text(`${self.measure2DisplayName} : ${getTotal2Value()}`);
-    }
+    // if (self.isHasMultiMeasure) {
+    //     self.raceChartDataLabelText
+    //         .append("tspan")
+    //         .attr("x", "0")
+    //         .attr("dy", labelFontSize / 1.5)
+    //         .attr("font-size", labelFontSize / 2)
+    //         .text(`${self.measure2DisplayName} : ${getTotal2Value()}`);
+    // }
 
     const textBBox = self.raceChartDataLabelText.node().getBBox();
     const tickerButtonRadius = GetTickerButtonRadius(self);
@@ -139,19 +156,27 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             (-max([textBBox.width / 2, tickerButtonRadius])) +
             "," +
             // (self.raceChartSettings.placement === Position.Bottom ?
-            (tickerButtonRadius * 2) +
+            (tickerButtonRadius) +
             // (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius)) +
             ")"
         )
 
-    const clonedTitle = select(self.raceChartDataLabelText as any).node().clone(true);
+    const clonedTitle = select(self.raceChartDataLabelText as any).node().clone(true).lower();
     clonedTitle
-        .lower()
+        .select(".header-label")
         .attr("class", "label-shadow")
-        .attr("stroke", self.getColor(self.raceChartSettings.backgroundColor, EHighContrastColorType.Background))
+        .attr("stroke", self.getColor(headerTextStyles.backgroundColor, EHighContrastColorType.Background))
         .attr("stroke-width", 4)
         .attr("stroke-linejoin", "round")
-        .attr("opacity", self.raceChartSettings.isShowLabelBackground ? "1" : "0");
+        .attr("opacity", headerTextStyles.isShowLabelBackground ? "1" : "0");
+
+    clonedTitle
+        .select(".sub-text-label")
+        .attr("class", "label-shadow")
+        .attr("stroke", self.getColor(subTextStyles.backgroundColor, EHighContrastColorType.Background))
+        .attr("stroke-width", 4)
+        .attr("stroke-linejoin", "round")
+        .attr("opacity", subTextStyles.isShowLabelBackground ? "1" : "0");
 
     self.isRaceChartDataLabelDrawn = true;
 }

@@ -13,12 +13,14 @@ import {
   Quote,
   AccordionAlt,
   SwitchOption,
+  Tabs,
+  Tab,
 } from "@truviz/shadow/dist/Components";
-import { ILabelValuePair, IRaceChartSettings } from "../visual-settings.interface";
+import { ILabelValuePair, IRaceChartSettings, IRaceChartTextProps } from "../visual-settings.interface";
 import { ERaceChartSettings, Position } from "../enum";
-import { persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "./SettingsIcons";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const TEXT_PLACEMENTS: ILabelValuePair[] = [
   {
@@ -30,6 +32,141 @@ const TEXT_PLACEMENTS: ILabelValuePair[] = [
     value: Position.Bottom,
   }
 ];
+
+enum ETextType {
+  HeaderTextStyles = "headerTextStyles",
+  SubTextStyles = "subTextStyles"
+}
+
+const handleChange = (val, n, type: ETextType, setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>) => {
+  setConfigValues((d: any) => ({
+    ...d,
+    [type]: { ...d[type], [n]: val }
+  }));
+};
+
+const handleColor = (rgb, n, type: ETextType, setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>) => {
+  setConfigValues((d: any) => ({
+    ...d,
+    [type]: { ...d[type], [n]: rgb }
+  }));
+};
+
+const handleCheckbox = (n, type: ETextType, setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>) => {
+  setConfigValues((d: any) => ({
+    ...d,
+    [type]: { ...d[type], [n]: !d[type][n] }
+  }));
+};
+
+const UITextStylesSettings = (
+  shadow: Visual,
+  vizOptions: ShadowUpdateOptions,
+  textType: ETextType,
+  configValues: IRaceChartTextProps,
+  setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>
+) => {
+  return <>
+    <Row>
+      <Column>
+        <ToggleButton
+          label={"Auto Text Size"}
+          value={configValues.isLabelAutoFontSize}
+          handleChange={() => handleCheckbox(ERaceChartSettings.IsLabelAutoFontSize, textType, setConfigValues)}
+          appearance="toggle"
+        />
+      </Column>
+    </Row>
+
+    <ConditionalWrapper visible={!configValues.isLabelAutoFontSize}>
+      <Row appearance="padded">
+        <Column>
+          <InputControl
+            min={0}
+            type="number"
+            label="Text Size"
+            value={configValues.labelFontSize.toString()}
+            handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize, textType, setConfigValues)}
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+
+    <Row>
+      <Column>
+        <SelectInput
+          label={"Font Family"}
+          value={configValues.labelFontFamily}
+          isFontSelector={true}
+          optionsList={[]}
+          handleChange={value => handleChange(value, ERaceChartSettings.LabelFontFamily, textType, setConfigValues)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <SwitchOption
+          label="Styling"
+          value={configValues.fontStyles}
+          optionsList={[
+            {
+              label: <BoldIcon style={{ fill: "currentColor" }} />,
+              value: "bold",
+            },
+            {
+              label: <ItalicIcon style={{ fill: "currentColor" }} />,
+              value: "italic",
+            },
+            {
+              label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+              value: "underline",
+            },
+          ]}
+          isMultiple
+          handleChange={value => handleChange(value, ERaceChartSettings.FontStyles, textType, setConfigValues)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <ColorPicker
+          label={"Label Color"}
+          color={configValues.labelColor}
+          handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor, textType, setConfigValues)}
+          colorPalette={vizOptions.host.colorPalette}
+          size="sm"
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <ToggleButton
+          label="Show Background"
+          value={configValues.isShowLabelBackground}
+          handleChange={() => handleCheckbox(ERaceChartSettings.IsShowLabelBackground, textType, setConfigValues)}
+          appearance="toggle"
+        />
+      </Column>
+    </Row>
+
+    <ConditionalWrapper visible={configValues.isShowLabelBackground}>
+      <Row appearance="padded">
+        <Column>
+          <ColorPicker
+            label={"Color"}
+            color={configValues.backgroundColor}
+            handleChange={value => handleChange(value, ERaceChartSettings.BackgroundColor, textType, setConfigValues)}
+            colorPalette={vizOptions.host.colorPalette}
+            size="sm"
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+  </>
+}
 
 const RaceChartSettings = (props) => {
   const {
@@ -167,104 +304,14 @@ const RaceChartSettings = (props) => {
             <AccordionAlt title="Text Styles"
               open={true}
             >
-              <Row>
-                <Column>
-                  <ToggleButton
-                    label={"Auto Text Size"}
-                    value={configValues.isLabelAutoFontSize}
-                    handleChange={() => handleCheckbox(ERaceChartSettings.IsLabelAutoFontSize)}
-                    appearance="toggle"
-                  />
-                </Column>
-              </Row>
-
-              <ConditionalWrapper visible={!configValues.isLabelAutoFontSize}>
-                <Row appearance="padded">
-                  <Column>
-                    <InputControl
-                      min={0}
-                      type="number"
-                      label="Text Size"
-                      value={configValues.labelFontSize.toString()}
-                      handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize)}
-                    />
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
-
-              <Row>
-                <Column>
-                  <SelectInput
-                    label={"Font Family"}
-                    value={configValues.labelFontFamily}
-                    isFontSelector={true}
-                    optionsList={[]}
-                    handleChange={value => handleChange(value, ERaceChartSettings.LabelFontFamily)}
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <SwitchOption
-                    label="Styling"
-                    value={configValues.fontStyles}
-                    optionsList={[
-                      {
-                        label: <BoldIcon style={{ fill: "currentColor" }} />,
-                        value: "bold",
-                      },
-                      {
-                        label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                        value: "italic",
-                      },
-                      {
-                        label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                        value: "underline",
-                      },
-                    ]}
-                    isMultiple
-                    handleChange={value => handleChange(value, ERaceChartSettings.FontStyles)}
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <ColorPicker
-                    label={"Label Color"}
-                    color={configValues.labelColor}
-                    handleChange={(value) => handleColor(value, ERaceChartSettings.LabelColor)}
-                    colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <ToggleButton
-                    label="Show Background"
-                    value={configValues.isShowLabelBackground}
-                    handleChange={() => handleCheckbox(ERaceChartSettings.IsShowLabelBackground)}
-                    appearance="toggle"
-                  />
-                </Column>
-              </Row>
-
-              <ConditionalWrapper visible={configValues.isShowLabelBackground}>
-                <Row appearance="padded">
-                  <Column>
-                    <ColorPicker
-                      label={"Color"}
-                      color={configValues.backgroundColor}
-                      handleChange={value => handleChange(value, ERaceChartSettings.BackgroundColor)}
-                      colorPalette={vizOptions.host.colorPalette}
-                      size="sm"
-                    />
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
+              <Tabs selected={ETextType.HeaderTextStyles} >
+                <Tab title={"Header"} identifier={ETextType.HeaderTextStyles}>
+                  {UITextStylesSettings(shadow, vizOptions, ETextType.HeaderTextStyles, configValues.headerTextStyles, setConfigValues)}
+                </Tab>
+                <Tab title={"Sub-Text"} identifier={ETextType.SubTextStyles}>
+                  {UITextStylesSettings(shadow, vizOptions, ETextType.SubTextStyles, configValues.subTextStyles, setConfigValues)}
+                </Tab>
+              </Tabs >
             </AccordionAlt>
 
             <AccordionAlt title="Play Button"

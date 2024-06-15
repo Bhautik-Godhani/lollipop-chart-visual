@@ -455,21 +455,26 @@ export interface IConditionalFormattingProps {
 	secondaryStaticPercentValue: number
 }
 
+export interface IRaceChartTextProps {
+	labelColor: string;
+	labelFontSize: number;
+	isLabelAutoFontSize: boolean;
+	labelFontFamily: string;
+	fontStyles: EFontStyle[];
+	isShowLabelBackground: boolean;
+	backgroundColor: string;
+}
+
 export interface IRaceChartSettings {
 	isEnabled: boolean;
 	allowTransition: boolean;
 	transitionDuration: number;
 	dataChangeInterval: number;
-	labelColor: string;
-	labelFontSize: number;
-	isLabelAutoFontSize: boolean;
-	labelFontFamily: string;
 	tickerButtonRadius: number;
 	isTickerButtonAutoRadius: boolean;
 	tickerButtonColor: string;
-	fontStyles: EFontStyle[];
-	isShowLabelBackground: boolean;
-	backgroundColor: string;
+	headerTextStyles: IRaceChartTextProps;
+	subTextStyles: IRaceChartTextProps;
 	placement: Position;
 }
 

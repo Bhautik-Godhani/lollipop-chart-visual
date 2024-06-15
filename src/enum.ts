@@ -512,7 +512,9 @@ export enum ERaceChartSettings {
 	FontStyles = "fontStyles",
 	IsShowLabelBackground = "isShowLabelBackground",
 	BackgroundColor = "backgroundColor",
-	Placement = "placement"
+	Placement = "placement",
+	HeaderTextStyles = "headerTextStyles",
+	SubTextStyles = "subTextStyles"
 }
 
 export enum EReferenceLinesSettings {
