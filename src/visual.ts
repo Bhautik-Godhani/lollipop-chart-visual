@@ -1757,10 +1757,12 @@ export class Visual extends Shadow {
 			this.groupNamesByTotal = [];
 			const subCategoriesGroup = d3.group(categoricalMeasureFields.filter(d => d.source.displayName === (this.dataColorsSettings.gradientAppliedToMeasure === EMarkerColorTypes.Marker1 ? this.measure1DisplayName : this.measure2DisplayName)), d => d.source.groupName ? d.source.groupName.toString() : d.source.groupName);
 			[...new Set(subCategoriesGroup.keys())].forEach(d => {
-				this.groupNamesByTotal.push({ name: d.toString(), total: d3.max(subCategoriesGroup.get(d.toString()), m => d3.sum(m.values, t => +t)) });
+				this.groupNamesByTotal.push({ name: d ? d.toString() : undefined, total: d3.max(subCategoriesGroup.get(d ? d.toString() : d), m => d3.sum(m.values, t => +t)) });
 			});
 
 			this.groupNamesByTotal.sort((a, b) => b.total - a.total);
+		} else {
+			this.groupNamesByTotal = [];
 		}
 
 		this.setCategoricalDataBySubcategoryRanking(categoricalData);
@@ -2615,6 +2617,8 @@ export class Visual extends Shadow {
 			this.handleShowBucket();
 
 			const categoricalSmallMultiplesField = this.categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
+			const categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
+			this.isHasSubcategories = !!categoricalSubCategoryField;
 
 			if (!this.isChartInit) {
 				this.initChart();
@@ -5021,8 +5025,8 @@ export class Visual extends Shadow {
 			this.numberSettings.decimalPlaces = 0;
 		}
 
-		this.isLollipopTypeCircle = this.markerSettings.markerType === EMarkerTypes.SHAPE || (this.isHasMultiMeasure ? false : marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT);
-		this.isLollipopTypePie = this.markerSettings.markerType === EMarkerTypes.CHART && (this.isHasMultiMeasure ? true : marker1Style.markerShape === EMarkerShapeTypes.DEFAULT);
+		this.isLollipopTypeCircle = !this.isHasSubcategories || (this.markerSettings.markerType === EMarkerTypes.SHAPE || (this.isHasMultiMeasure ? false : marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT));
+		this.isLollipopTypePie = this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.CHART && (this.isHasMultiMeasure ? true : marker1Style.markerShape === EMarkerShapeTypes.DEFAULT);
 
 		if (this.isLollipopTypeCircle) {
 			this.config.CFConfig.isShowCategoriesTypeDropdown = false;
