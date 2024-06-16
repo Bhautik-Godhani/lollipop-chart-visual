@@ -1755,7 +1755,7 @@ export class Visual extends Shadow {
 
 		if (this.isLollipopTypePie) {
 			this.groupNamesByTotal = [];
-			const subCategoriesGroup = d3.group(categoricalMeasureFields.filter(d => d.source.displayName === (this.dataColorsSettings.gradientAppliedToMeasure === EMarkerColorTypes.Marker1 ? this.measure1DisplayName : this.measure2DisplayName)), d => d.source.groupName.toString());
+			const subCategoriesGroup = d3.group(categoricalMeasureFields.filter(d => d.source.displayName === (this.dataColorsSettings.gradientAppliedToMeasure === EMarkerColorTypes.Marker1 ? this.measure1DisplayName : this.measure2DisplayName)), d => d.source.groupName ? d.source.groupName.toString() : d.source.groupName);
 			[...new Set(subCategoriesGroup.keys())].forEach(d => {
 				this.groupNamesByTotal.push({ name: d.toString(), total: d3.max(subCategoriesGroup.get(d.toString()), m => d3.sum(m.values, t => +t)) });
 			});
