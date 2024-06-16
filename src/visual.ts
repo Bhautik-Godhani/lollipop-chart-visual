@@ -9127,7 +9127,7 @@ export class Visual extends Shadow {
 				let isHasPattern: boolean;
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+				const color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 				let pattern = d.pattern;
 				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 					pattern = this.patternByMeasures[DataValuesType.Value1];
