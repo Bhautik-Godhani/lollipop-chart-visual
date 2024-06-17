@@ -440,9 +440,9 @@ export class Visual extends Shadow {
 	public circleClass: string = "lollipop-circle";
 	public circleClassSelector: string = ".lollipop-circle";
 	public minCircleSize: number = 10;
-	public maxCircleSize: number = 30;
+	public maxCircleSize: number = 20;
 	public brushAndZoomAreaCircleMinSize: number = 10;
-	public brushAndZoomAreaCircleMaxSize: number = 30;
+	public brushAndZoomAreaCircleMaxSize: number = 20;
 	public brushAndZoomAreaCircleSize: number = 12;
 
 	// circle1
@@ -9162,7 +9162,7 @@ export class Visual extends Shadow {
 	setCircle1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
 		if (marker1Style.isAutoMarkerSize) {
-			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]);
+			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.60]);
 			if (size < this.maxCircleSize && size > this.minCircleSize) {
 				this.circle1Size = size;
 			} else if (size > this.maxCircleSize) {
