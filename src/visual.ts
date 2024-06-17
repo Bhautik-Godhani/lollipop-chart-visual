@@ -301,6 +301,7 @@ export class Visual extends Shadow {
 	CFCategoryColorPair: { [category: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
 	CFSubCategoryColorPair: { [subCategory: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
 	isHasNegativeValue: boolean;
+	isAllNegativeValue: boolean;
 	markerMaxSize: number = 0;
 	minMaxValuesByMeasures: { [measure: string]: { min: number, max: number } } = {};
 	measureNamesByTotal: { name: string, total: number }[] = [];
@@ -7420,6 +7421,7 @@ export class Visual extends Shadow {
 
 		this.isHasNegativeValue = min < 0 || max < 0;
 		this.isHasPositiveValue = min > 0 || max > 0;
+		this.isAllNegativeValue = min <= 0 && max <= 0;
 		this.isShowPositiveNegativeLogScale = this.isLogarithmScale && this.isHasNegativeValue;
 
 		this.yScale = isLinearScale ? d3.scaleLinear() : d3.scaleBand();
@@ -10140,6 +10142,15 @@ export class Visual extends Shadow {
 
 	setSummaryTableConfig(): void {
 		let seedDataFromVisual = [];
+		const axisSettings = !this.isHorizontalChart ? this.xAxisSettings : this.yAxisSettings;
+
+		const formatDate = (text: string, format: string) => {
+			if (!axisSettings.isAutoDateFormat) {
+				return FormatAxisDate(axisSettings.dateFormat === EAxisDateFormats.Custom ? axisSettings.customDateFormat : axisSettings.dateFormat, text);
+			} else {
+				return valueFormatter.create({ format: format }).format(new Date(text));
+			}
+		}
 
 		if (!this.isHasSubcategories) {
 			this.categoricalData.categories[0].values.forEach((d, i) => {
@@ -10150,7 +10161,7 @@ export class Visual extends Shadow {
 					if (text.toString().split("--").length > 1) {
 						text = text.toString().split("--")[0];
 					}
-					obj[c.source.displayName] = this.getTooltipCategoryText(<string>text, false);
+					obj[c.source.displayName] = c.source.type.dateTime ? formatDate(text as string, c.source.format) : text;
 				});
 
 				this.categoricalData.values.forEach(v => {
@@ -10171,7 +10182,7 @@ export class Visual extends Shadow {
 						if (text.toString().split("--").length > 1) {
 							text = text.toString().split("--")[0];
 						}
-						obj[c.source.displayName] = this.getTooltipCategoryText(<string>text, false);
+						obj[c.source.displayName] = c.source.type.dateTime ? formatDate(text as string, c.source.format) : text;
 					});
 
 					obj[this.categoricalSubCategoryField.displayName] = g;
@@ -10194,9 +10205,9 @@ export class Visual extends Shadow {
 			seedDataFromVisual = clonedData.reverse();
 		}
 
-		seedDataFromVisual.forEach(d => {
-			d[this.categoryDisplayName] = this.getTooltipCategoryText(d[this.categoryDisplayName], false);
-		})
+		// seedDataFromVisual.forEach(d => {
+		// 	d[this.categoryDisplayName] = this.getTooltipCategoryText(d[this.categoryDisplayName], false);
+		// })
 
 		// if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
 		// 	const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
