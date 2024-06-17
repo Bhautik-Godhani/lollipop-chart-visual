@@ -517,7 +517,7 @@ const DataColors = (props) => {
 	}, [configValues]);
 
 	React.useEffect(() => {
-		if (!configValues.isFillTypeChanged && shadow.isHasNegativeValue && shadow.isHasPositiveValue)
+		if (!configValues.isFillTypeChanged && shadow.isHasNegativeValue && shadow.isHasPositiveValue && !shadow.isIBCSEnabled)
 			setConfigValues((d) => ({
 				...d,
 				[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
