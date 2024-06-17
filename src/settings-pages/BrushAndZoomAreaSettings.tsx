@@ -7,6 +7,7 @@ import { EBrushAndZoomAreaSettings } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { Visual } from "../visual";
 import { persistProperties } from "../methods/methods";
+import { PreviewSliderPlaceholderIcon } from "./SettingsIcons";
 
 const handleColor = (rgb, n, setConfigValues: React.Dispatch<React.SetStateAction<IBrushAndZoomAreaSettings>>) => {
 	setConfigValues((d) => ({
@@ -101,6 +102,10 @@ const UIGeneralChartSettings = (
 					/>
 				</Column>
 			</Row>
+
+			<ConditionalWrapper visible={!configValues.enabled}>
+				<PreviewSliderPlaceholderIcon />
+			</ConditionalWrapper>
 
 			<ConditionalWrapper visible={configValues.enabled}>
 				<Row>
