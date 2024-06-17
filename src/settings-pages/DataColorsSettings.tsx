@@ -553,7 +553,9 @@ const DataColors = (props) => {
 					{UIColorPalette(shadow, configValues, setConfigValues)}
 					{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 
-					<ConditionalWrapper visible={rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers}>
+					<ConditionalWrapper visible={(rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers) ||
+						(rankingSettings.subCategory.enabled && rankingSettings.subCategory.showRemainingAsOthers)
+					}>
 						<Row>
 							<Column>
 								<ToggleButton

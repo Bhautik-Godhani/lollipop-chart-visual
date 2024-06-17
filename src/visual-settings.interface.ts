@@ -314,7 +314,7 @@ export interface ISubCategoryRankingProps {
 
 export interface IRankingSettings {
 	category: ICategoryRankingProps;
-	subCategory: ISubCategoryRankingProps;
+	subCategory: ICategoryRankingProps;
 	smallMultiples: ICategoryRankingProps;
 	raceChartData: ICategoryRankingProps;
 }

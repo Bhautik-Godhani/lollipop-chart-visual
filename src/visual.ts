@@ -286,6 +286,7 @@ export class Visual extends Shadow {
 	blankText: string = "(Blank)";
 	othersLabel = "Others";
 	othersBarText = "";
+	othersSubcategoryText = "";
 	totalLollipopCount: number = 0;
 	firstCFLine: IConditionalFormattingProps;
 	firstCFLabel: IConditionalFormattingProps;
@@ -1057,7 +1058,10 @@ export class Visual extends Shadow {
 
 			if (subCategoryRankingSettings.rankingType === ERankingType.TopN) {
 				if (this.isHorizontalChart) {
-					groupNames = measures.slice(0, subCategoryRankingSettings.count).map((d) => d.source.groupName);
+					groupNames = measures
+						.filter((d) => d.source.roles[EDataRolesName.Measure])
+						.slice(0, subCategoryRankingSettings.count)
+						.map((d) => d.source.groupName);
 				} else {
 					groupNames = measures
 						.filter((d) => d.source.roles[EDataRolesName.Measure])
@@ -1085,6 +1089,39 @@ export class Visual extends Shadow {
 			}
 
 			categoricalData.values = categoricalValues.filter((d) => groupNames.includes(d.source.groupName));
+
+			if (subCategoryRankingSettings.enabled && subCategoryRankingSettings.showRemainingAsOthers) {
+				const othersCategoricalValues = categoricalValues.filter((d) => !groupNames.includes(d.source.groupName));
+
+				let othersLabel: string;
+
+				switch (subCategoryRankingSettings.suffix) {
+					case ERankingSuffix.None:
+						othersLabel = this.othersLabel;
+						break;
+					case ERankingSuffix.OthersAndCategoryName:
+						othersLabel = this.othersLabel + " " + this.subCategoryDisplayName;
+						break;
+					case ERankingSuffix.OthersAndCount:
+						othersLabel = `${this.othersLabel} (${othersCategoricalValues.length})`;
+						break;
+					case ERankingSuffix.Both:
+						othersLabel = `${this.othersLabel} ${this.subCategoryDisplayName} (${othersCategoricalValues.length})`;
+						break;
+				}
+
+				this.othersSubcategoryText = othersLabel;
+
+				const groupByDisplayName = d3.group(othersCategoricalValues, (d: any) => d.source.displayName);
+				[...groupByDisplayName.keys()].forEach(d => {
+					const group = groupByDisplayName.get(d);
+					const values = group[0].values.map((d, i) => subCategoryRankingSettings.calcMethod === ERankingCalcMethod.Sum ? d3.sum(group, (g) => g.values[i]) : d3.sum(group, (g) => g.values[i]) / othersCategoricalValues.length);
+					const newGroup = group[0];
+					newGroup.source.groupName = this.othersSubcategoryText;
+					newGroup.values = values;
+					categoricalData.values.push(newGroup);
+				})
+			}
 		}
 	}
 
@@ -1956,7 +1993,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category");
+		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category", this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
 
 		const clonedCategoricalPair = cloneDeep(this.categoricalDataPairs);
 		if (this.isHorizontalChart) {
@@ -3127,6 +3164,12 @@ export class Visual extends Shadow {
 					this.setCategoricalDataFields(this.categoricalData);
 					this.setChartData(this.categoricalData);
 				}
+
+				const othersCategoricalDataValues = this.categoricalData.values.filter(d => d.source.groupName.toString().includes(this.othersLabel));
+				this.categoricalData.values = this.categoricalData.values.filter(d => !d.source.groupName.toString().includes(this.othersLabel)) as any;
+				this.categoricalData.values.push(...othersCategoricalDataValues);
+
+				this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
 
 				this.setColorsByDataColorsSettings();
 
@@ -4435,8 +4478,8 @@ export class Visual extends Shadow {
 		}
 	}
 
-	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string) => {
-		if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
+	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string, isShowRemainingAsOthers: boolean) => {
+		if (isShowRemainingAsOthers) {
 			const elementToMove = data.find(obj => (isHasCategories ? obj[categoryName] : obj).toString().includes(this.othersLabel));
 			if (elementToMove) {
 				const index = data.findIndex(obj => (isHasCategories ? obj[categoryName] : obj).toString().includes(this.othersLabel));
@@ -5410,6 +5453,17 @@ export class Visual extends Shadow {
 				this.CFSubCategoryColorPair[`${d.category}-${c}`] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 			});
 		});
+
+		if (this.rankingSettings.subCategory.enabled) {
+			if (this.rankingSettings.subCategory.showRemainingAsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
+				this.categoricalDataPairs.forEach((data) => {
+					if (this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`]) {
+						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.othersColor;
+						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.othersColor;
+					}
+				});
+			}
+		}
 	}
 
 	setChartWidthHeight(): void {
@@ -5535,7 +5589,6 @@ export class Visual extends Shadow {
 					}
 				});
 
-				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
@@ -5764,7 +5817,6 @@ export class Visual extends Shadow {
 					}
 				});
 
-				// this.sortSubcategoryData(categoricalData2);
 				this.setCategoricalDataFields(categoricalData2);
 				this.setChartData(categoricalData2);
 
@@ -10115,7 +10167,7 @@ export class Visual extends Shadow {
 			});
 		}
 
-		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName);
+		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName, this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
 
 		if (this.isHorizontalChart) {
 			const clonedData = cloneDeep(seedDataFromVisual);

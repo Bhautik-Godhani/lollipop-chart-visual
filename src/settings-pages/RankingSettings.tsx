@@ -121,7 +121,7 @@ const UIByCategoryRankingSettings = (
 };
 
 const UIByCategoryRankingOthersSettings = (
-	type: ERankingSettings.Category | ERankingSettings.SmallMultiples,
+	type: ERankingSettings.Category | ERankingSettings.SmallMultiples | ERankingSettings.SubCategory,
 	categoryRanking: ICategoryRankingProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
 ) => {
@@ -171,7 +171,7 @@ const UIByCategoryRankingOthersSettings = (
 
 const UIByGroupRankingSettings = (
 	vizOptions: ShadowUpdateOptions,
-	groupByRanking: ISubCategoryRankingProps,
+	groupByRanking: ICategoryRankingProps,
 	setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>
 ) => {
 	return (
@@ -197,7 +197,8 @@ const UIByGroupRankingSettings = (
 					/>
 				</Column>
 			</Row>
-			{/* {UIByGroupRankingOthersSettings(vizOptions, groupByRanking, setConfigValues)} */}
+
+			{UIByCategoryRankingOthersSettings(ERankingSettings.SubCategory, groupByRanking, setConfigValues)}
 		</>
 	);
 };

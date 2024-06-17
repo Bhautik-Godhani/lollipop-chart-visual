@@ -234,7 +234,8 @@ export const RANKING_SETTINGS: IRankingSettings = {
 		rankingType: ERankingType.TopN,
 		count: 10,
 		showRemainingAsOthers: false,
-		othersColor: "rgba(84, 84, 84, 1)",
+		suffix: ERankingSuffix.None,
+		calcMethod: ERankingCalcMethod.Sum
 	},
 	smallMultiples: {
 		enabled: true,
