@@ -3165,11 +3165,13 @@ export class Visual extends Shadow {
 					this.setChartData(this.categoricalData);
 				}
 
-				const othersCategoricalDataValues = this.categoricalData.values.filter(d => d.source.groupName.toString().includes(this.othersLabel));
-				this.categoricalData.values = this.categoricalData.values.filter(d => !d.source.groupName.toString().includes(this.othersLabel)) as any;
-				this.categoricalData.values.push(...othersCategoricalDataValues);
+				if (this.isHasSubcategories && this.isLollipopTypePie) {
+					const othersCategoricalDataValues = this.categoricalData.values.filter(d => d.source.groupName.toString().includes(this.othersLabel));
+					this.categoricalData.values = this.categoricalData.values.filter(d => !d.source.groupName.toString().includes(this.othersLabel)) as any;
+					this.categoricalData.values.push(...othersCategoricalDataValues);
 
-				this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
+					this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
+				}
 
 				this.setColorsByDataColorsSettings();
 
@@ -7926,6 +7928,8 @@ export class Visual extends Shadow {
 
 		if (isSetXYScaleDiffs) {
 			this.chartData.forEach(d => {
+				let flag: boolean = true;
+
 				const test = (isCircle2) => {
 					if (this.isLollipopTypeCircle) {
 						if (!this.isHorizontalChart) {
@@ -7986,11 +7990,27 @@ export class Visual extends Shadow {
 					}
 				}
 
-				if (this.isHasMultiMeasure) {
-					test(false);
-					test(true);
-				} else {
-					test(false);
+				const axisSettings = this.isHorizontalChart ? this.xAxisSettings : this.yAxisSettings;
+
+				if (axisSettings.isMinimumRangeEnabled) {
+					if (d.value1 < axisSettings.minimumRange) {
+						flag = false;
+					}
+				}
+
+				if (axisSettings.isMaximumRangeEnabled) {
+					if (d.value1 > axisSettings.maximumRange) {
+						flag = false;
+					}
+				}
+
+				if (flag) {
+					if (this.isHasMultiMeasure) {
+						test(false);
+						test(true);
+					} else {
+						test(false);
+					}
 				}
 			});
 
