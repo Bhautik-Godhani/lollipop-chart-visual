@@ -159,7 +159,7 @@ export const ApplyIBCSTheme = (self: Visual): void => {
                     [EVisualSettings.LineSettings]: JSON.stringify({
                         ...self.lineSettings,
                         [ELineSettings.show]: true,
-                        [ELineSettings.lineColor]: (self.templateSettings.theme === EIBCSThemes.DefaultVertical || self.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(142, 142, 142, 1)" : POSITIVE_COLOR,
+                        [ELineSettings.lineColor]: (self.templateSettings.theme === EIBCSThemes.DefaultVertical || self.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(64, 64, 64, 1)" : POSITIVE_COLOR,
                         [ELineSettings.lineWidth]: 4,
                         [ELineSettings.lineType]: ELineType.Solid,
                         [ELineSettings.isApplyMarkerColor]: (self.templateSettings.theme === EIBCSThemes.Diverging2Vertical || self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false

@@ -49,183 +49,185 @@ export const SetBeforeTemplateSettings = (self: Visual, templateSettings: ITempl
 export const ApplyBeforeTemplateAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeTemplateSettings;
 
-    const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
-    const markerSettings: IMarkerSettings = beforeIBCSSettings[EVisualSettings.MarkerSettings].configValues;
-    const lineSettings: ILineSettings = beforeIBCSSettings[EVisualSettings.LineSettings].configValues;
-    const dataColorsSettings: IDataColorsSettings = beforeIBCSSettings[EVisualSettings.DataColorsSettings].configValues;
-    const smallMultiplesSettings: ISmallMultiplesGridItemContent = beforeIBCSSettings[EVisualSettings.SmallMultiplesSettings].configValues;
-    const xAxisSettings: IXAxisSettings = beforeIBCSSettings[EVisualSettings.XAxisSettings].configValues;
-    const yAxisSettings: IYAxisSettings = beforeIBCSSettings[EVisualSettings.YAxisSettings].configValues;
-    const dataLabelsSettings: IDataLabelsSettings = beforeIBCSSettings[EVisualSettings.DataLabelsSettings].configValues;
-    const brushAndZoomAreaSettings: IBrushAndZoomAreaSettings = beforeIBCSSettings[EVisualSettings.BrushAndZoomAreaSettings].configValues;
-    const raceChartSettings: IRaceChartSettings = beforeIBCSSettings[EVisualSettings.RaceChartSettings].configValues;
-    const referenceLinesSettings: IReferenceLineSettings = beforeIBCSSettings[EVisualSettings.ReferenceLinesSettings].configValues;
-    const errorBarsSettings: IErrorBarsSettings = beforeIBCSSettings[EVisualSettings.ErrorBarsSettings].configValues;
-    const dynamicDeviationSettings: IDynamicDeviationSettings = beforeIBCSSettings[EVisualSettings.DynamicDeviationSettings].configValues;
-    const cutAndClipAxisSettings: ICutAndClipAxisSettings = beforeIBCSSettings[EVisualSettings.CutAndClipAxisSettings].configValues;
-    const patternSettings: IPatternSettings = beforeIBCSSettings[EVisualSettings.PatternSettings].configValues;
-    const rankingSettings: IRankingSettings = beforeIBCSSettings[EVisualSettings.RankingSettings].configValues;
-    const sortingSettings: ISortingSettings = beforeIBCSSettings[EVisualSettings.Sorting].configValues;
-    const gridSettings: IGridLinesSettings = beforeIBCSSettings[EVisualSettings.GridLinesSettings].configValues;
-    const legend: ILegendSettings = beforeIBCSSettings[EVisualSettings.Legend].configValues;
-    const numberSettings: NumberFormatting = beforeIBCSSettings[EVisualSettings.NumberFormatting].configValues;
+    if (beforeIBCSSettings) {
+        const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
+        const markerSettings: IMarkerSettings = beforeIBCSSettings[EVisualSettings.MarkerSettings].configValues;
+        const lineSettings: ILineSettings = beforeIBCSSettings[EVisualSettings.LineSettings].configValues;
+        const dataColorsSettings: IDataColorsSettings = beforeIBCSSettings[EVisualSettings.DataColorsSettings].configValues;
+        const smallMultiplesSettings: ISmallMultiplesGridItemContent = beforeIBCSSettings[EVisualSettings.SmallMultiplesSettings].configValues;
+        const xAxisSettings: IXAxisSettings = beforeIBCSSettings[EVisualSettings.XAxisSettings].configValues;
+        const yAxisSettings: IYAxisSettings = beforeIBCSSettings[EVisualSettings.YAxisSettings].configValues;
+        const dataLabelsSettings: IDataLabelsSettings = beforeIBCSSettings[EVisualSettings.DataLabelsSettings].configValues;
+        const brushAndZoomAreaSettings: IBrushAndZoomAreaSettings = beforeIBCSSettings[EVisualSettings.BrushAndZoomAreaSettings].configValues;
+        const raceChartSettings: IRaceChartSettings = beforeIBCSSettings[EVisualSettings.RaceChartSettings].configValues;
+        const referenceLinesSettings: IReferenceLineSettings = beforeIBCSSettings[EVisualSettings.ReferenceLinesSettings].configValues;
+        const errorBarsSettings: IErrorBarsSettings = beforeIBCSSettings[EVisualSettings.ErrorBarsSettings].configValues;
+        const dynamicDeviationSettings: IDynamicDeviationSettings = beforeIBCSSettings[EVisualSettings.DynamicDeviationSettings].configValues;
+        const cutAndClipAxisSettings: ICutAndClipAxisSettings = beforeIBCSSettings[EVisualSettings.CutAndClipAxisSettings].configValues;
+        const patternSettings: IPatternSettings = beforeIBCSSettings[EVisualSettings.PatternSettings].configValues;
+        const rankingSettings: IRankingSettings = beforeIBCSSettings[EVisualSettings.RankingSettings].configValues;
+        const sortingSettings: ISortingSettings = beforeIBCSSettings[EVisualSettings.Sorting].configValues;
+        const gridSettings: IGridLinesSettings = beforeIBCSSettings[EVisualSettings.GridLinesSettings].configValues;
+        const legend: ILegendSettings = beforeIBCSSettings[EVisualSettings.Legend].configValues;
+        const numberSettings: NumberFormatting = beforeIBCSSettings[EVisualSettings.NumberFormatting].configValues;
 
-    self._host.persistProperties({
-        merge: [
-            {
-                objectName: EVisualConfig.ChartConfig,
-                displayName: EVisualSettings.ChartSettings,
-                properties: {
-                    [EVisualSettings.ChartSettings]: JSON.stringify(chartSettings),
+        self._host.persistProperties({
+            merge: [
+                {
+                    objectName: EVisualConfig.ChartConfig,
+                    displayName: EVisualSettings.ChartSettings,
+                    properties: {
+                        [EVisualSettings.ChartSettings]: JSON.stringify(chartSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.LineConfig,
-                displayName: EVisualSettings.LineSettings,
-                properties: {
-                    [EVisualSettings.LineSettings]: JSON.stringify(lineSettings),
+                {
+                    objectName: EVisualConfig.LineConfig,
+                    displayName: EVisualSettings.LineSettings,
+                    properties: {
+                        [EVisualSettings.LineSettings]: JSON.stringify(lineSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.MarkerConfig,
-                displayName: EVisualSettings.MarkerSettings,
-                properties: {
-                    [EVisualSettings.MarkerSettings]: JSON.stringify(markerSettings),
+                {
+                    objectName: EVisualConfig.MarkerConfig,
+                    displayName: EVisualSettings.MarkerSettings,
+                    properties: {
+                        [EVisualSettings.MarkerSettings]: JSON.stringify(markerSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.DataColorsConfig,
-                displayName: EVisualSettings.DataColorsSettings,
-                properties: {
-                    [EVisualSettings.DataColorsSettings]: JSON.stringify(dataColorsSettings),
+                {
+                    objectName: EVisualConfig.DataColorsConfig,
+                    displayName: EVisualSettings.DataColorsSettings,
+                    properties: {
+                        [EVisualSettings.DataColorsSettings]: JSON.stringify(dataColorsSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.DataLabelsConfig,
-                displayName: EVisualSettings.DataLabelsSettings,
-                properties: {
-                    [EVisualSettings.DataLabelsSettings]: JSON.stringify(dataLabelsSettings),
+                {
+                    objectName: EVisualConfig.DataLabelsConfig,
+                    displayName: EVisualSettings.DataLabelsSettings,
+                    properties: {
+                        [EVisualSettings.DataLabelsSettings]: JSON.stringify(dataLabelsSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.XAxisConfig,
-                displayName: EVisualSettings.XAxisSettings,
-                properties: {
-                    [EVisualSettings.XAxisSettings]: JSON.stringify(xAxisSettings),
+                {
+                    objectName: EVisualConfig.XAxisConfig,
+                    displayName: EVisualSettings.XAxisSettings,
+                    properties: {
+                        [EVisualSettings.XAxisSettings]: JSON.stringify(xAxisSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.YAxisConfig,
-                displayName: EVisualSettings.YAxisSettings,
-                properties: {
-                    [EVisualSettings.YAxisSettings]: JSON.stringify(yAxisSettings),
+                {
+                    objectName: EVisualConfig.YAxisConfig,
+                    displayName: EVisualSettings.YAxisSettings,
+                    properties: {
+                        [EVisualSettings.YAxisSettings]: JSON.stringify(yAxisSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.SortingConfig,
-                displayName: EVisualSettings.Sorting,
-                properties: {
-                    [EVisualSettings.Sorting]: JSON.stringify(sortingSettings),
+                {
+                    objectName: EVisualConfig.SortingConfig,
+                    displayName: EVisualSettings.Sorting,
+                    properties: {
+                        [EVisualSettings.Sorting]: JSON.stringify(sortingSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualSettings.Legend,
-                properties: { ...legend },
-                selector: null,
-            },
-            {
-                objectName: EVisualSettings.NumberFormatting,
-                properties: { ...numberSettings },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.GridLinesConfig,
-                displayName: EVisualSettings.GridLinesSettings,
-                properties: {
-                    [EVisualSettings.GridLinesSettings]: JSON.stringify(gridSettings),
+                {
+                    objectName: EVisualSettings.Legend,
+                    properties: { ...legend },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.SmallMultiplesConfig,
-                displayName: EVisualSettings.SmallMultiplesSettings,
-                properties: {
-                    [EVisualSettings.SmallMultiplesSettings]: JSON.stringify(smallMultiplesSettings),
+                {
+                    objectName: EVisualSettings.NumberFormatting,
+                    properties: { ...numberSettings },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.BrushAndZoomAreaConfig,
-                displayName: EVisualSettings.BrushAndZoomAreaSettings,
-                properties: {
-                    [EVisualSettings.BrushAndZoomAreaSettings]: JSON.stringify(brushAndZoomAreaSettings),
+                {
+                    objectName: EVisualConfig.GridLinesConfig,
+                    displayName: EVisualSettings.GridLinesSettings,
+                    properties: {
+                        [EVisualSettings.GridLinesSettings]: JSON.stringify(gridSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.RaceChartConfig,
-                displayName: EVisualSettings.RaceChartSettings,
-                properties: {
-                    [EVisualSettings.RaceChartSettings]: JSON.stringify(raceChartSettings),
+                {
+                    objectName: EVisualConfig.SmallMultiplesConfig,
+                    displayName: EVisualSettings.SmallMultiplesSettings,
+                    properties: {
+                        [EVisualSettings.SmallMultiplesSettings]: JSON.stringify(smallMultiplesSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.ReferenceLinesConfig,
-                displayName: EVisualSettings.ReferenceLinesSettings,
-                properties: {
-                    [EVisualSettings.ReferenceLinesSettings]: JSON.stringify(referenceLinesSettings),
+                {
+                    objectName: EVisualConfig.BrushAndZoomAreaConfig,
+                    displayName: EVisualSettings.BrushAndZoomAreaSettings,
+                    properties: {
+                        [EVisualSettings.BrushAndZoomAreaSettings]: JSON.stringify(brushAndZoomAreaSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.ErrorBarsConfig,
-                displayName: EVisualSettings.ErrorBarsSettings,
-                properties: {
-                    [EVisualSettings.ErrorBarsSettings]: JSON.stringify(errorBarsSettings),
+                {
+                    objectName: EVisualConfig.RaceChartConfig,
+                    displayName: EVisualSettings.RaceChartSettings,
+                    properties: {
+                        [EVisualSettings.RaceChartSettings]: JSON.stringify(raceChartSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.DynamicDeviationConfig,
-                displayName: EVisualSettings.DynamicDeviationSettings,
-                properties: {
-                    [EVisualSettings.DynamicDeviationSettings]: JSON.stringify(dynamicDeviationSettings),
+                {
+                    objectName: EVisualConfig.ReferenceLinesConfig,
+                    displayName: EVisualSettings.ReferenceLinesSettings,
+                    properties: {
+                        [EVisualSettings.ReferenceLinesSettings]: JSON.stringify(referenceLinesSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.CutAndClipAxisConfig,
-                displayName: EVisualSettings.CutAndClipAxisSettings,
-                properties: {
-                    [EVisualSettings.CutAndClipAxisSettings]: JSON.stringify(cutAndClipAxisSettings),
+                {
+                    objectName: EVisualConfig.ErrorBarsConfig,
+                    displayName: EVisualSettings.ErrorBarsSettings,
+                    properties: {
+                        [EVisualSettings.ErrorBarsSettings]: JSON.stringify(errorBarsSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.PatternConfig,
-                displayName: EVisualSettings.PatternSettings,
-                properties: {
-                    [EVisualSettings.PatternSettings]: JSON.stringify(patternSettings),
+                {
+                    objectName: EVisualConfig.DynamicDeviationConfig,
+                    displayName: EVisualSettings.DynamicDeviationSettings,
+                    properties: {
+                        [EVisualSettings.DynamicDeviationSettings]: JSON.stringify(dynamicDeviationSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.RankingConfig,
-                displayName: EVisualSettings.RankingSettings,
-                properties: {
-                    [EVisualSettings.RankingSettings]: JSON.stringify(rankingSettings),
+                {
+                    objectName: EVisualConfig.CutAndClipAxisConfig,
+                    displayName: EVisualSettings.CutAndClipAxisSettings,
+                    properties: {
+                        [EVisualSettings.CutAndClipAxisSettings]: JSON.stringify(cutAndClipAxisSettings),
+                    },
+                    selector: null,
                 },
-                selector: null,
-            },
-        ],
-    });
+                {
+                    objectName: EVisualConfig.PatternConfig,
+                    displayName: EVisualSettings.PatternSettings,
+                    properties: {
+                        [EVisualSettings.PatternSettings]: JSON.stringify(patternSettings),
+                    },
+                    selector: null,
+                },
+                {
+                    objectName: EVisualConfig.RankingConfig,
+                    displayName: EVisualSettings.RankingSettings,
+                    properties: {
+                        [EVisualSettings.RankingSettings]: JSON.stringify(rankingSettings),
+                    },
+                    selector: null,
+                },
+            ],
+        });
+    }
 }
