@@ -514,7 +514,7 @@ export const REFERENCE_LINES_SETTINGS: IReferenceLineSettings = {
 		labelFontSize: "16",
 		labelPosition: EBeforeAfterPosition.Before,
 		labelAlignment: ELCRPosition.Centre,
-		styling: [],
+		styling: [EFontStyle.Bold],
 		labelOrientation: Orientation.Horizontal
 	},
 	line1Coord: {
