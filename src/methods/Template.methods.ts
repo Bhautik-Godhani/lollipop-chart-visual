@@ -49,7 +49,7 @@ export const SetBeforeTemplateSettings = (self: Visual, templateSettings: ITempl
 export const ApplyBeforeTemplateAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeTemplateSettings;
 
-    if (beforeIBCSSettings) {
+    if (Object.keys(beforeIBCSSettings).length > 0) {
         const chartSettings: IChartSettings = beforeIBCSSettings[EVisualSettings.ChartSettings].configValues;
         const markerSettings: IMarkerSettings = beforeIBCSSettings[EVisualSettings.MarkerSettings].configValues;
         const lineSettings: ILineSettings = beforeIBCSSettings[EVisualSettings.LineSettings].configValues;

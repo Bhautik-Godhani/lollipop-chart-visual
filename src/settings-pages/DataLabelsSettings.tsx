@@ -543,9 +543,9 @@ const DataLabelsSettings = (props) => {
 	}
 
 	const applyChanges = () => {
-		const marker1 = dataLabelsSettings.measure1;
+		const marker1 = configValues.measure1;
 
-		if (dataLabelsSettings.show !== true ||
+		if (configValues.show !== true ||
 			marker1.showBackground !== true ||
 			marker1.fontSize !== 12 ||
 			marker1.placement !== DataLabelsPlacement.Outside ||
