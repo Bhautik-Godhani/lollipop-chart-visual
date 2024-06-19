@@ -1420,6 +1420,20 @@ export class Visual extends Shadow {
 	getXPosition(value: number | string): number {
 		const xPosition = this.xScale(this.xAxisSettings.isLogarithmScale && value === 0 ? 0.1 : value);
 
+		if (this.isLogarithmScale) {
+			if (this.isShowPositiveNegativeLogScale) {
+				value = parseFloat(value.toString());
+				if (this.isHorizontalChart) {
+					if (((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
+						|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange))) {
+						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) + this.negativeLogScaleWidth : this.negativeLogScale(value * -1)
+					} else {
+						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale(value * -1) + this.positiveLogScaleWidth;
+					}
+				}
+			}
+		}
+
 		if (this.isXIsDateTimeAxis && this.isXIsContinuousAxis) {
 			return this.xScale(new Date(value));
 		} else {
@@ -1441,7 +1455,14 @@ export class Visual extends Shadow {
 		if (this.isLogarithmScale) {
 			if (this.isShowPositiveNegativeLogScale) {
 				value = parseFloat(value.toString());
-				return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale(value * -1) + this.positiveLogScaleHeight
+				if (!this.isHorizontalChart) {
+					if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+						|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
+						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale(value * -1) + this.positiveLogScaleHeight;
+					} else {
+						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) + this.negativeLogScaleHeight : this.negativeLogScale(value * -1)
+					}
+				}
 			}
 		}
 
@@ -7430,7 +7451,7 @@ export class Visual extends Shadow {
 		if (isLinearScale) {
 			this.yScale = d3.scaleLinear();
 		} else if (isLogarithmScale) {
-			if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
+			if (this.isShowPositiveNegativeLogScale) {
 				this.positiveLogScale = d3.scaleLog().base(10);
 				this.negativeLogScale = d3.scaleLog().base(10);
 			} else {
@@ -7444,12 +7465,22 @@ export class Visual extends Shadow {
 			this.yScale.domain([min, max]).nice();
 		} else if (isLogarithmScale) {
 			if (this.isShowPositiveNegativeLogScale) {
-				if (this.isBottomXAxis) {
-					this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
-					this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+				if (this.isHorizontalChart) {
+					if (this.isLeftYAxis) {
+						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+					} else {
+						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+					}
 				} else {
-					this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
-					this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+					if (this.isBottomXAxis) {
+						this.positiveLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+						this.negativeLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+					} else {
+						this.negativeLogScale.domain([0.1, this.axisDomainMaxValue]).nice();
+						this.positiveLogScale.domain([Math.abs(this.axisDomainMinValue), 0.1]).nice();
+					}
 				}
 			} else {
 				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]).nice();
@@ -7539,8 +7570,14 @@ export class Visual extends Shadow {
 				this.positiveLogScaleWidth = width;
 				this.negativeLogScaleWidth = this.width - width;
 
-				this.positiveLogScale.range([0, this.positiveLogScaleWidth]);
-				this.negativeLogScale.range([0, this.negativeLogScaleWidth]);
+				if (((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
+					|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange))) {
+					this.negativeLogScale.range([this.xAxisStartMargin + startDiff, this.negativeLogScaleWidth]);
+					this.positiveLogScale.range([0, this.positiveLogScaleWidth - (this.markerMaxSize / 2) + endDiff]);
+				} else {
+					this.positiveLogScale.range([(this.markerMaxSize) + endDiff, this.positiveLogScaleWidth]);
+					this.negativeLogScale.range([0, this.negativeLogScaleWidth - this.xAxisStartMargin + startDiff]);
+				}
 			} else {
 				this.xScale.range(xAxisRange);
 			}
@@ -7579,14 +7616,14 @@ export class Visual extends Shadow {
 
 				if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
 					|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
-					this.positiveLogScale.range([this.positiveLogScaleHeight + (this.markerMaxSize / 2) + endDiff, 0]);
+					this.positiveLogScale.range([this.positiveLogScaleHeight, (this.markerMaxSize / 2) + endDiff]);
 					this.negativeLogScale.range([this.negativeLogScaleHeight - this.yAxisStartMargin + startDiff, 0]);
 				} else {
 					// this.positiveLogScale.range([this.positiveLogScaleHeight - (this.markerMaxSize / 2) + endDiff, 0]);
 					// this.negativeLogScale.range([this.negativeLogScaleHeight - height + startDiff, 0]);
 
-					this.positiveLogScale.range([this.positiveLogScaleHeight, this.negativeLogScaleHeight]);
-					this.negativeLogScale.range([this.negativeLogScaleHeight, 0]);
+					this.negativeLogScale.range([this.negativeLogScaleHeight, this.yAxisStartMargin + startDiff]);
+					this.positiveLogScale.range([this.positiveLogScaleHeight - (this.markerMaxSize / 2) + endDiff, 0]);
 				}
 			} else {
 				this.yScale.range(yAxisRange);

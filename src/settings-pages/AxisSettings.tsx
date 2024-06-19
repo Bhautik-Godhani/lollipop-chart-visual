@@ -305,6 +305,7 @@ const UIXAxis = (
         <Row>
           <Column>
             <ToggleButton
+              disable={xConfigValues.isLogarithmScale}
               label={"Invert Range"}
               value={xConfigValues.isInvertRange}
               handleChange={() => handleXCheckbox(EXAxisSettings.IsInvertRange, setXConfigValues)}
@@ -850,6 +851,7 @@ const UIYAxis = (
         <Row>
           <Column>
             <ToggleButton
+              disable={yConfigValues.isLogarithmScale}
               label={"Invert Range"}
               value={yConfigValues.isInvertRange}
               handleChange={() => handleYCheckbox(EXAxisSettings.IsInvertRange, setYConfigValues)}

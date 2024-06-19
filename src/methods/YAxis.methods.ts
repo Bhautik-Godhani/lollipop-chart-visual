@@ -20,6 +20,8 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
             self.positiveLogScaleTicks = positiveTicks;
             self.negativeLogScaleTicks = negativeTicks.map(d => d * -1);
 
+            const positiveLogScaleRange = self.positiveLogScale.range();
+
             if (self.yAxisSettings.position === Position.Left) {
                 select(yAxisG).attr("transform", `translate(0, 0)`);
                 self.positiveLogYAxisG
@@ -27,7 +29,7 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                     .call(axisLeft(self.positiveLogScale).tickValues(positiveTicks).tickFormat(d => (d === 0.1 ? "isZero" : "") + d));
 
                 self.negativeLogYAxisG
-                    .attr("transform", `translate(0, ${self.isBottomXAxis ? self.positiveLogScaleHeight : 0})`)
+                    .attr("transform", `translate(0, ${self.isBottomXAxis ? positiveLogScaleRange[0] : 0})`)
                     .call(axisLeft(self.negativeLogScale).tickValues(negativeTicks).tickFormat(d => "-" + (d === 0.1 ? "isZero" : "") + d));
             } else if (self.yAxisSettings.position === Position.Right) {
                 select(yAxisG).attr("transform", `translate(${width}, 0)`);
