@@ -9167,30 +9167,37 @@ export class Visual extends Shadow {
 			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
 			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
 
-		let xAxisRange: number[];
-		if (this.isCutAndClipAxisEnabled) {
-			xAxisRange = this.beforeCutLinearScale.range();
-		} else {
-			xAxisRange = this.xScale.range();
-		}
+		// let xAxisRange: number[];
+		// if (this.isCutAndClipAxisEnabled) {
+		// 	xAxisRange = this.beforeCutLinearScale.range();
+		// } else {
+		// 	xAxisRange = this.xScale.range();
+		// }
 
-		let yAxisRange: number[];
-		if (this.isCutAndClipAxisEnabled) {
-			yAxisRange = this.beforeCutLinearScale.range();
+		// let yAxisRange: number[];
+		// if (this.isCutAndClipAxisEnabled) {
+		// 	yAxisRange = this.beforeCutLinearScale.range();
+		// } else {
+		// 	yAxisRange = this.yScale.range();
+		// }
+
+		let axisRange: number[];
+		if (this.isHorizontalChart) {
+			axisRange = this.yScale.range();
 		} else {
-			yAxisRange = this.yScale.range();
+			axisRange = this.xScale.range();
 		}
 
 		if (this.isHorizontalChart) {
 			this.zeroSeparatorLine
 				.attr("x1", this.getXPosition(0))
 				.attr("x2", this.getXPosition(0))
-				.attr("y1", yAxisRange[1])
-				.attr("y2", yAxisRange[0]);
+				.attr("y1", axisRange[1])
+				.attr("y2", axisRange[0]);
 		} else {
 			this.zeroSeparatorLine
-				.attr("x1", xAxisRange[0])
-				.attr("x2", xAxisRange[1])
+				.attr("x1", axisRange[0])
+				.attr("x2", axisRange[1])
 				.attr("y1", this.getYPosition(0))
 				.attr("y2", this.getYPosition(0));
 		}
