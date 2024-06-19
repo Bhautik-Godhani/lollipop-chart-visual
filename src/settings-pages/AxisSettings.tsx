@@ -1214,8 +1214,8 @@ const XAxisSettings = (props) => {
   };
 
   const resetChanges = () => {
-    setXConfigValues({ ...X_AXIS_SETTINGS });
-    setYConfigValues({ ...Y_AXIS_SETTINGS });
+    setXConfigValues({ ...X_AXIS_SETTINGS, isResetClicked: true });
+    setYConfigValues({ ...Y_AXIS_SETTINGS, isResetClicked: true });
   };
 
   const [xConfigValues, setXConfigValues] = React.useState<IXAxisSettings>({
@@ -1236,7 +1236,7 @@ const XAxisSettings = (props) => {
 
   React.useEffect(() => {
     if (xConfigValues.isDisplayTitle) {
-      if (xConfigValues.titleName.length === 0) {
+      if (xConfigValues.titleName.length === 0 && !xConfigValues.isResetClicked) {
         // if (shadow.isHasMultiMeasure) {
         //   handleXChange(shadow.measureNames.join(" and "), EXAxisSettings.TitleName, setXConfigValues);
         // } else {
@@ -1262,7 +1262,7 @@ const XAxisSettings = (props) => {
 
   React.useEffect(() => {
     if (yConfigValues.isDisplayTitle) {
-      if (yConfigValues.titleName.length === 0) {
+      if (yConfigValues.titleName.length === 0 && !yConfigValues.isResetClicked) {
         // if (shadow.isHasMultiMeasure) {
         //   handleYChange(shadow.categoryDisplayName, EYAxisSettings.TitleName, setYConfigValues);
         // } else {

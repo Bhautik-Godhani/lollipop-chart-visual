@@ -87,6 +87,7 @@ export interface IXAxisSettings {
 	dateFormat: EAxisDateFormats;
 	customDateFormat: string;
 	numberFormatting: NumberFormatting;
+	isResetClicked?: boolean;
 }
 
 export interface IYAxisSettings {
@@ -119,6 +120,7 @@ export interface IYAxisSettings {
 	dateFormat: EAxisDateFormats;
 	customDateFormat: string;
 	numberFormatting: NumberFormatting;
+	isResetClicked?: boolean;
 }
 
 export interface IAxisNumberFormatting {

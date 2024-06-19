@@ -2854,7 +2854,7 @@ export class Visual extends Shadow {
 				isDisplayXTitle = this.xAxisSettings.show && this.xAxisSettings.isDisplayTitle;
 			}
 
-			this.xAxisTitleSize = isDisplayXTitle
+			this.xAxisTitleSize = isDisplayXTitle && this.xAxisSettings.titleName && this.xAxisSettings.titleName.length > 0
 				? getSVGTextSize("Title", xAxisTitleFontFamily, xAxisTitleFontSize)
 				: { width: 0, height: 0 };
 
@@ -2865,7 +2865,7 @@ export class Visual extends Shadow {
 				isDisplayYTitle = this.yAxisSettings.show && this.yAxisSettings.isDisplayTitle;
 			}
 
-			this.yAxisTitleSize = isDisplayYTitle
+			this.yAxisTitleSize = isDisplayYTitle && this.yAxisSettings.titleName && this.yAxisSettings.titleName.length > 0
 				? getSVGTextSize("Title", yAxisTitleFontFamily, yAxisTitleFontSize)
 				: { width: 0, height: 0 };
 
@@ -6915,21 +6915,22 @@ export class Visual extends Shadow {
 		// 		}
 		// 	}
 		// } else {
-		if (this.xAxisSettings.isDisplayTitle) {
-			if (this.xAxisSettings.titleName.length === 0) {
-				this.xAxisSettings.titleName = this.categoryDisplayName;
-			}
-		}
-
-		if (this.yAxisSettings.isDisplayTitle) {
-			if (this.yAxisSettings.titleName.length === 0) {
-				this.yAxisSettings.titleName = this.measureNames.join(" and ");
-			}
-		}
-		// }
 
 		const xAxisSettings = this.xAxisSettings;
 		const yAxisSettings = this.yAxisSettings;
+
+		if (xAxisSettings.isDisplayTitle) {
+			if (xAxisSettings.titleName.length === 0 && !xAxisSettings.isResetClicked) {
+				xAxisSettings.titleName = this.categoryDisplayName;
+			}
+		}
+
+		if (yAxisSettings.isDisplayTitle) {
+			if (yAxisSettings.titleName.length === 0 && !yAxisSettings.isResetClicked) {
+				yAxisSettings.titleName = this.measureNames.join(" and ");
+			}
+		}
+		// }
 
 		const xAxisTitleProperties: TextProperties = {
 			text: xAxisSettings.titleName,
