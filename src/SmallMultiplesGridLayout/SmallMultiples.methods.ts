@@ -60,7 +60,9 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
         hyperListMainContainer
     );
 
-    itemHeight = (config.containerHeight - xAxisGNodeHeight - SMPaginationPanelHeight) / rows - config.outerSpacing;
+    if (isUniformXScale) {
+        itemHeight = (config.containerHeight - xAxisGNodeHeight - SMPaginationPanelHeight) / rows - config.outerSpacing;
+    }
 
     hyperListMainContainer.style("height", function () {
         const height = d3.select(this).node().getBoundingClientRect().height;
