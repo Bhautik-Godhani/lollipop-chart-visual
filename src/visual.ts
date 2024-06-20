@@ -6509,7 +6509,7 @@ export class Visual extends Shadow {
 				const ele = d3.select(this);
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
-				const borderSize = dataLabelsSettings.showBackground ? 3 : 0;
+				const borderSize = dataLabelsSettings.showBackground || THIS.dataLabelsSettings.isShowBestFitLabels ? 3 : 0;
 				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
 				ele
