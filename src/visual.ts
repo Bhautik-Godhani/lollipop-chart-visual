@@ -525,6 +525,9 @@ export class Visual extends Shadow {
 	isRacePlaying: boolean = false;
 	isLabelWithoutTransition: boolean = true;
 	raceChartKeyLabelList: { key: string, label: string }[] = [];
+	raceBarValueGroup: {
+		[key: string]: string[]
+	} = {};
 
 	// chart race labels
 	raceChartDataLabelG: D3Selection<SVGElement>;
@@ -1828,9 +1831,9 @@ export class Visual extends Shadow {
 
 		const getRaceBarKey = (index) => {
 			return categoricalRaceBarValues.reduce((str, cur) => {
-				str = str + "-" + cur.values[index]
+				str = str === "" ? cur.values[index].toString() : str + "--" + cur.values[index];
 				return str;
-			}, '');
+			}, "");
 		}
 
 		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
@@ -1888,7 +1891,7 @@ export class Visual extends Shadow {
 				(arr, category: string, index: number) => {
 					const raceBarKey = getRaceBarKey(index);
 					raceBarKeys.push(raceBarKey);
-					const obj = { category: category, raceBarKey };
+					const obj = { category: category, raceBarKey, index };
 					return [...arr, obj];
 				},
 				[]
@@ -1896,6 +1899,11 @@ export class Visual extends Shadow {
 
 			raceBarKeys = raceBarKeys.filter((item, i, ar) => ar.indexOf(item) === i && item);
 			const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
+			[...raceBarValueGroup.keys()].forEach(d => {
+				const value = raceBarValueGroup.get(d);
+				const newValue = value.map(d => d.category);
+				this.raceBarValueGroup[d] = newValue;
+			})
 			const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 0);
 			this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
 
@@ -2867,6 +2875,18 @@ export class Visual extends Shadow {
 			this.yAxisTitleMargin = this.yAxisSettings.isDisplayTitle ? 10 : 0;
 
 			this.setCategoricalDataFields(this.categoricalData);
+
+			if (this.xAxisSettings.isDisplayTitle) {
+				if (this.xAxisSettings.titleName.length === 0 && !this.xAxisSettings.isResetClicked) {
+					this.xAxisSettings.titleName = this.categoryDisplayName;
+				}
+			}
+
+			if (this.yAxisSettings.isDisplayTitle) {
+				if (this.yAxisSettings.titleName.length === 0 && !this.yAxisSettings.isResetClicked) {
+					this.yAxisSettings.titleName = this.measureNames.join(" and ");
+				}
+			}
 
 			let isDisplayXTitle: boolean;
 			if (this.isSmallMultiplesEnabled) {
@@ -4145,75 +4165,79 @@ export class Visual extends Shadow {
 		}
 
 		let idx = 0;
+
 		const data: ILollipopChartRow[] = this.categoriesName.reduce((arr, cat) => {
-			(this.isChartIsRaceChart && this.raceChartKeyLabelList.length > 0 ? this.raceChartKeyLabelList : [{ key: "", label: "" }]).forEach(raceBarKeyLabel => {
+			(this.isChartIsRaceChart && this.raceChartKeyLabelList.length > 0 ? this.raceChartKeyLabelList : [{ key: "", label: "" }]).forEach((raceBarKeyLabel) => {
 				const raceChartKey = raceBarKeyLabel.key;
 				const raceChartDataLabel = raceBarKeyLabel.label;
+				const raceKeyCategoryAvailable = this.raceBarValueGroup[raceBarKeyLabel.key] ? this.raceBarValueGroup[raceBarKeyLabel.key].includes(cat) : undefined;
 
-				if (this.isChartIsRaceChart) {
-					this.raceChartKeysList.push(raceChartKey);
-				}
+				if ((this.isChartIsRaceChart && raceKeyCategoryAvailable) || !this.isChartIsRaceChart) {
+					if (this.isChartIsRaceChart) {
+						this.raceChartKeysList.push(raceChartKey);
+					}
 
-				const selectedImageDataFieldIndex1 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker1Style.selectedImageDataField);
-				const selectedImageDataFieldIndex2 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker2Style.selectedImageDataField);
+					const selectedImageDataFieldIndex1 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker1Style.selectedImageDataField);
+					const selectedImageDataFieldIndex2 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker2Style.selectedImageDataField);
 
-				let value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
-				let value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
+					let value1 = !this.isHasSubcategories ? <number>this.categoricalMeasure1Field.values[idx] : 0;
+					let value2 = this.isHasMultiMeasure ? (!this.isHasSubcategories ? <number>this.categoricalMeasure2Field.values[idx] : 0) : 0;
 
-				if (this.categoricalMeasure1Field.source.format && this.categoricalMeasure1Field.source.format.includes("%")) {
-					value1 = value1 * 100;
-				}
+					if (this.categoricalMeasure1Field.source.format && this.categoricalMeasure1Field.source.format.includes("%")) {
+						value1 = value1 * 100;
+					}
 
-				if (this.isHasMultiMeasure && this.categoricalMeasure2Field.source.format && this.categoricalMeasure2Field.source.format.includes("%")) {
-					value2 = value2 * 100;
-				}
+					if (this.isHasMultiMeasure && this.categoricalMeasure2Field.source.format && this.categoricalMeasure2Field.source.format.includes("%")) {
+						value2 = value2 * 100;
+					}
 
-				const extraDataLabels = this.categoricalExtraDataLabelsFields.reduce((obj, current) => {
-					obj[current.source.displayName] = current.values[idx];
-					return obj;
-				}, {});
-
-				const obj: ILollipopChartRow = {
-					uid: getUID(cat),
-					category: cat.toString(),
-					raceChartKey,
-					raceChartDataLabel,
-					value1: value1 ? value1 : 0,
-					value2: value2 ? value2 : 0,
-					imageDataUrl1: this.isHasImagesData && this.isShowImageMarker1 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex1].values[idx] : null,
-					imageDataUrl2: this.isHasImagesData && this.isShowImageMarker2 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex2].values[idx] : null,
-					identity: undefined,
-					selected: false,
-					isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
-					tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
-					subCategories: this.isHasSubcategories ? getSubCategoryData(idx, <string>cat) : [],
-					positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
-					errorBar1: {
-						lowerBoundValue: 0,
-						upperBoundValue: 0,
-						tooltipLowerBoundValue: null,
-						tooltipUpperBoundValue: null,
-						boundsTotal: 0,
-					},
-					errorBar2: {
-						lowerBoundValue: 0,
-						upperBoundValue: 0,
-						tooltipLowerBoundValue: null,
-						tooltipUpperBoundValue: null,
-						boundsTotal: 0,
-					},
-					extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
-					extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
-					data1Label: "",
-					data2Label: "",
-					allMeasures: categoricalData.values.reduce((obj, cur) => {
-						obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+					const extraDataLabels = this.categoricalExtraDataLabelsFields.reduce((obj, current) => {
+						obj[current.source.displayName] = current.values[idx];
 						return obj;
-					}, {})
-				}
+					}, {});
 
-				arr = [...arr, obj];
-				idx++;
+					const obj: ILollipopChartRow = {
+						uid: getUID(cat),
+						category: cat.toString(),
+						raceChartKey,
+						raceChartDataLabel,
+						value1: value1 ? value1 : 0,
+						value2: value2 ? value2 : 0,
+						imageDataUrl1: this.isHasImagesData && this.isShowImageMarker1 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex1].values[idx] : null,
+						imageDataUrl2: this.isHasImagesData && this.isShowImageMarker2 ? <string>this.categoricalImagesDataFields[selectedImageDataFieldIndex2].values[idx] : null,
+						identity: undefined,
+						selected: false,
+						isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
+						tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
+						subCategories: this.isHasSubcategories ? getSubCategoryData(idx, <string>cat) : [],
+						positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
+						errorBar1: {
+							lowerBoundValue: 0,
+							upperBoundValue: 0,
+							tooltipLowerBoundValue: null,
+							tooltipUpperBoundValue: null,
+							boundsTotal: 0,
+						},
+						errorBar2: {
+							lowerBoundValue: 0,
+							upperBoundValue: 0,
+							tooltipLowerBoundValue: null,
+							tooltipUpperBoundValue: null,
+							boundsTotal: 0,
+						},
+						extraLabel1: extraDataLabels[this.data1LabelsSettings.customLabel],
+						extraLabel2: extraDataLabels[this.data2LabelsSettings.customLabel],
+						data1Label: "",
+						data2Label: "",
+						allMeasures: categoricalData.values.reduce((obj, cur) => {
+							obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+							return obj;
+						}, {})
+					}
+
+					arr = [...arr, obj];
+					idx++;
+				}
 			})
 			return arr;
 		}, []);
@@ -4278,39 +4302,39 @@ export class Visual extends Shadow {
 		// 	});
 		// });
 
-		if (this.isChartIsRaceChart) {
-			this.raceChartKeysList = this.raceChartKeysList.filter((item, i, ar) => ar.indexOf(item) === i);
-			this.raceChartKeysLength = this.raceChartKeysList.length - 1;
-			this.raceChartKeysList.forEach((raceBarKey) => {
-				this.categoriesName.forEach((category) => {
-					const isHasCategoryOnDate = data.find((d) => d.raceChartKey === raceBarKey && d.category === category);
-					if (!isHasCategoryOnDate) {
-						data.push({
-							uid: "",
-							category: <string>category,
-							raceChartKey: raceBarKey,
-							raceChartDataLabel: "",
-							value1: 0,
-							value2: 0,
-							imageDataUrl1: null,
-							imageDataUrl2: null,
-							subCategories: [],
-							selected: false,
-							identity: null,
-							isHighlight: false,
-							positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
-							errorBar1: undefined,
-							errorBar2: undefined,
-							extraLabel1: "",
-							extraLabel2: "",
-							data1Label: "",
-							data2Label: "",
-							allMeasures: undefined
-						});
-					}
-				});
-			});
-		}
+		// if (this.isChartIsRaceChart) {
+		// 	this.raceChartKeysList = this.raceChartKeysList.filter((item, i, ar) => ar.indexOf(item) === i);
+		// 	this.raceChartKeysLength = this.raceChartKeysList.length - 1;
+		// 	this.raceChartKeysList.forEach((raceBarKey) => {
+		// 		this.categoriesName.forEach((category) => {
+		// 			const isHasCategoryOnDate = data.find((d) => d.raceChartKey === raceBarKey && d.category === category);
+		// 			if (!isHasCategoryOnDate) {
+		// 				data.push({
+		// 					uid: "",
+		// 					category: <string>category,
+		// 					raceChartKey: raceBarKey,
+		// 					raceChartDataLabel: "",
+		// 					value1: 0,
+		// 					value2: 0,
+		// 					imageDataUrl1: null,
+		// 					imageDataUrl2: null,
+		// 					subCategories: [],
+		// 					selected: false,
+		// 					identity: null,
+		// 					isHighlight: false,
+		// 					positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
+		// 					errorBar1: undefined,
+		// 					errorBar2: undefined,
+		// 					extraLabel1: "",
+		// 					extraLabel2: "",
+		// 					data1Label: "",
+		// 					data2Label: "",
+		// 					allMeasures: undefined
+		// 				});
+		// 			}
+		// 		});
+		// 	});
+		// }
 
 		if (!this.isHasSubcategories) {
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
@@ -4354,12 +4378,12 @@ export class Visual extends Shadow {
 
 		if (this.isChartIsRaceChart) {
 			this.raceChartData = cloneDeep(data);
-			this.raceChartData = this.categoriesName.reduce((acc, category) => {
-				this.raceChartKeysList.forEach((key) => {
-					acc = [...acc, this.raceChartData.find((d) => d.category === category && d.raceChartKey === key)];
-				});
-				return acc;
-			}, []);
+			// this.raceChartData = this.categoriesName.reduce((acc, category) => {
+			// 	this.raceChartKeysList.forEach((key) => {
+			// 		acc = [...acc, this.raceChartData.find((d) => d.category === category && d.raceChartKey === key)];
+			// 	});
+			// 	return acc;
+			// }, []);
 
 			this.tickIndex = -1;
 			const setDataWithAllPositiveCategory = () => {
