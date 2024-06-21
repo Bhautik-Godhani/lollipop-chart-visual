@@ -47,6 +47,10 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
         if (self.yAxisSettings.isMaximumRangeEnabled && self.yAxisSettings.maximumRange) {
             max = self.yAxisSettings.maximumRange;
         }
+
+        if (min > max) {
+            max = min;
+        }
     }
 
     // if (max >= 0) {
