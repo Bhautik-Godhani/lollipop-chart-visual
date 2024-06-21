@@ -336,6 +336,7 @@ export interface ILabelValuePair {
 export interface ISortingSettings {
 	category: ISortingProps;
 	subCategory: ISortingProps;
+	smallMultiples: ISortingProps;
 }
 
 export interface ISortingProps {

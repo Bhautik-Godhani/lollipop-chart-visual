@@ -367,6 +367,15 @@ export const SORTING_SETTINGS: ISortingSettings = {
 		isSortByMultiMeasure: false,
 		isSortByExtraSortField: false,
 	},
+	smallMultiples: {
+		enabled: true,
+		sortBy: undefined,
+		sortOrder: ESortOrderTypes.DESC,
+		isSortByCategory: false,
+		isSortByMeasure: true,
+		isSortByMultiMeasure: false,
+		isSortByExtraSortField: false,
+	},
 };
 
 export const SHOW_BUCKET_SETTINGS: IShowBucketSettings = {

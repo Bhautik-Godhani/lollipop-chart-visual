@@ -338,13 +338,13 @@ export enum ESortByTypes {
 export enum ESortingSettings {
 	Category = "category",
 	SubCategory = "subCategory",
+	SmallMultiples = "smallMultiples",
 	Enabled = "enabled",
 	SortBy = "sortBy",
 	SortOrder = "sortOrder",
 	IsSortByCategory = "isSortByCategory",
 	IsSortByMeasure = "isSortByMeasure",
 	IsSortByExtraSortField = "isSortByExtraSortField",
-	SmallMultiples = "smallMultiples",
 }
 
 export enum EShowBucketSettings {

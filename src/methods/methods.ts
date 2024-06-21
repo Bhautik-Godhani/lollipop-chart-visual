@@ -787,3 +787,38 @@ export const ApplyThemeJson = (self: Visual, json, formatTab) => {
 		console.log("Error while applying theme", e);
 	}
 };
+
+export const CreateDate = (day: number, monthName: string, quarter: number, year: number) => {
+	let finalMonthName = monthName;
+
+	if (!finalMonthName) {
+		if (quarter) {
+			switch (quarter) {
+				case 1:
+					finalMonthName = "January";
+					break;
+				case 2:
+					finalMonthName = "April";
+					break;
+				case 3:
+					finalMonthName = "July";
+					break;
+				case 4:
+					finalMonthName = "October";
+					break;
+			}
+		} else {
+			finalMonthName = "January";
+		}
+	}
+
+	const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(finalMonthName);
+	if (month === -1) {
+		throw new Error(`Invalid month name: ${finalMonthName}`);
+	}
+	try {
+		return new Date(year, month, day);
+	} catch (error) {
+		throw new Error(`Invalid date: ${day} ${finalMonthName} (${quarter}) ${year}`);
+	}
+}

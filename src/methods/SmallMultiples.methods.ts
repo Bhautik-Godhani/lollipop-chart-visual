@@ -2,12 +2,14 @@
 import { create, select } from "d3-selection";
 import { Visual } from "../visual";
 import { Primitive, group, sum } from "d3-array";
-import { getSVGTextSize } from "./methods";
+import { CreateDate, getSVGTextSize } from "./methods";
 import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition } from "@truviz/shadow/dist/Components";
 import { RenderConnectingLine } from "./ConnectingLine.methods";
-import { EDataRolesName, ERankingCalcMethod, ERankingType } from "../enum";
+import { EDataRolesName, ERankingCalcMethod, ERankingType, ESortOrderTypes } from "../enum";
 import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
 import { cloneDeep } from "lodash";
+import { MonthNames } from "../constants";
+import { ISortingProps } from "../visual-settings.interface";
 
 export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
@@ -527,11 +529,29 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
 export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
     const categoricalSmallMultiplesDataFields = self.categoricalSmallMultiplesDataFields;
+    const smallMultiplesCategoryNames = categoricalSmallMultiplesDataFields.map(d => d.source.displayName);
+    const isExpandAllApplied = self.categoricalSmallMultiplesDataFields.length > 1;
+
     let categoricalSmallMultiplesValues = [];
     const categoricalDataPairsForGrouping = categoricalSmallMultiplesDataFields[0].values.reduce((arr: any, c: string, index: number) => {
         const category = categoricalSmallMultiplesDataFields.map(d => d.values[index]).join(", ");
         categoricalSmallMultiplesValues.push(category);
         const obj = { category: category, total: 0, [`index-${index}`]: index };
+
+        smallMultiplesCategoryNames.forEach((d, i) => {
+            obj[d] = categoricalSmallMultiplesDataFields[i].values[index].toString();
+        });
+
+        const keys = Object.keys(obj);
+        if (isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+            const day = obj["Day"] ? parseInt(obj["Day"].toString()) : 1;
+            const month = obj["Month"] ? obj["Month"].toString() : "January";
+            const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].toString().split("Qtr")[1]) : 1;
+            const year = obj["Year"] ? parseInt(obj["Year"].toString()) : 2024;
+
+            obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024) as any;
+        }
+
         return [...arr, obj];
     }, []);
 
@@ -545,7 +565,7 @@ export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
     const smallMultiplesDataPairs = categoricalSmallMultiplesValues.map((category) => Object.assign({}, ...categoricalDataPairsGroup.get(category)));
 
     smallMultiplesDataPairs.forEach(d => {
-        const keys = Object.keys(d).splice(2);
+        const keys = Object.keys(d).filter(k => k.includes("index-"));
         let total = 0;
         keys.forEach(key => {
             const index = key ? +key.split("-")[1] : 0;
@@ -554,9 +574,83 @@ export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
         d.total = total;
     });
 
-    smallMultiplesDataPairs.sort((a, b) => b.total - a.total);
-
-    // SortSmallMultiplesDataPairs();
+    sortSmallMultiplesDataPairs(self, smallMultiplesDataPairs, "category");
 
     return smallMultiplesDataPairs;
 };
+
+const sortSmallMultiplesDataPairs = (
+    self: Visual,
+    data: any[],
+    categoryKey: string
+): void => {
+    const sortingSettings: ISortingProps = self.sortingSettings.smallMultiples;
+    const isMeasure = sortingSettings.isSortByMeasure;
+    const isSortByExternalFields = sortingSettings.isSortByExtraSortField;
+    const categoricalSmallMultiplesDataFields = self.categoricalSmallMultiplesDataFields;
+    const smallMultiplesCategoryNames = categoricalSmallMultiplesDataFields.map(d => d.source.displayName);
+    const categoricalSmallMultiplesDataField = categoricalSmallMultiplesDataFields[0];
+
+    const isExpandAllApplied = self.categoricalSmallMultiplesDataFields.length > 1;
+    const firstVal = categoricalSmallMultiplesDataField.values[0] ? categoricalSmallMultiplesDataField.values[0] : categoricalSmallMultiplesDataField.values[1] ? categoricalSmallMultiplesDataField.values[1] : "";
+    const isXIsDateTimeAxis = categoricalSmallMultiplesDataField.source.type.dateTime;
+    const isMonthCategoryNames = categoricalSmallMultiplesDataField.source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>firstVal.toString().toLowerCase()) !== -1;
+    const isXIsNumericAxis = categoricalSmallMultiplesDataField.source.type.numeric;
+
+    const getMonthIndex = (monthName: string) => {
+        return MonthNames.indexOf(monthName);
+    }
+
+    const sortByName = () => {
+        if (!isXIsDateTimeAxis && (isExpandAllApplied || !isXIsNumericAxis)) {
+            if (isMonthCategoryNames) {
+                if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+                    data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
+                } else {
+                    data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
+                }
+            } else {
+                const keys = Object.keys(data[0]);
+                if (isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+                    if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+                        data.sort((a, b) => new Date(a["date"]).getTime() - new Date(b["date"]).getTime());
+                    } else {
+                        data.sort((a, b) => new Date(b["date"]).getTime() - new Date(a["date"]).getTime());
+                    }
+                } else {
+                    if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+                        data.sort((a, b) => [categoryKey, ...smallMultiplesCategoryNames].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+                    } else {
+                        data.sort((a, b) => [categoryKey, ...smallMultiplesCategoryNames].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+                    }
+                }
+            }
+        } else if (isXIsNumericAxis) {
+            if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+                data.sort((a, b) => a[categoryKey] - b[categoryKey]);
+            } else {
+                data.sort((a, b) => b[categoryKey] - a[categoryKey]);
+            }
+        } else if (isXIsDateTimeAxis) {
+            if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+                data.sort((a, b) => new Date(a[categoryKey]).getTime() - new Date(b[categoryKey]).getTime());
+            } else {
+                data.sort((a, b) => new Date(b[categoryKey]).getTime() - new Date(a[categoryKey]).getTime());
+            }
+        }
+    };
+
+    const sortByMeasure = () => {
+        if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+            data.sort((a, b) => a.total - b.total);
+        } else {
+            data.sort((a, b) => b.total - a.total);
+        }
+    };
+
+    if (isMeasure && !isSortByExternalFields) {
+        sortByMeasure();
+    } else if (!isMeasure && !isSortByExternalFields) {
+        sortByName();
+    }
+}
