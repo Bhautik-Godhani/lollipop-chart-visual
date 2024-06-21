@@ -1198,6 +1198,10 @@ export class Visual extends Shadow {
 					othersDataField[key] = categoryRankingSettings.calcMethod === ERankingCalcMethod.Sum ? d3.sum(othersBarData, (d) => d[key]) : (d3.sum(othersBarData, (d) => d[key]) / othersBarData.length);
 				});
 
+				this.categoricalCategoriesFields.forEach(d => {
+					othersDataField[d.source.displayName] = this.othersBarText;
+				});
+
 				this.categoricalImagesDataFields.forEach(d => {
 					const id = `${EDataRolesName.ImagesData}${d.source.index}`;
 					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
