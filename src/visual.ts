@@ -3603,11 +3603,11 @@ export class Visual extends Shadow {
 						}
 						break;
 					case ECFValueTypes.Ranking:
+						const i = this.categoricalDataPairs.findIndex(s => s.category === d.category);
 						if (this.isLollipopTypeCircle) {
 							if (c.valueType === ECFValueTypes.Ranking) {
 								if (c.rankingType === ECFRankingTypes.TopN) {
 									if (i < c.staticRankingValue) {
-
 										if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 											this.categoryColorPair[d.category].marker1Color = c.color;
 											this.categoryColorPair[d.category].marker2Color = c.color;
@@ -3651,7 +3651,7 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							d.subCategories.forEach((s, i) => {
+							d.subCategories.forEach((s, j) => {
 								conditionalFormattingConditions.forEach((c) => {
 									if (c.valueType === ECFValueTypes.Ranking) {
 										if (c.rankingType === ECFRankingTypes.TopN) {
@@ -10621,7 +10621,7 @@ export class Visual extends Shadow {
 					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						fill = `url('#${generatePattern(this.svg, pattern, color)}')`;
 					} else {
-						fill = color;
+						fill = color ? color : "rgba(0, 99, 178, 1)";
 					}
 
 					ele
