@@ -490,7 +490,7 @@ const UILayout1 = (
   configValues: ISmallMultiplesGridLayoutSettings,
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
   handleChange: (...any) => void) => {
-  return <ConditionalWrapper visible={isShowXYAxisSettings}>
+  return <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType !== ESmallMultiplesLayoutType.RankedPanels}>
     <AccordionAlt title="X Axis" open={true}>
       <Row>
         <Column>

@@ -139,7 +139,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption, number } from "echarts";
-import { GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch1, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { CreateDate, GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, isConditionMatch1, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -296,7 +296,9 @@ export class Visual extends Shadow {
 	categoryColorPairWithIndex: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPairWithIndex: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	othersCategoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	othersSubCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	isHasPositiveValue: boolean;
 	CFCategoryColorPair: { [category: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
 	CFSubCategoryColorPair: { [subCategory: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
@@ -640,6 +642,7 @@ export class Visual extends Shadow {
 	isSmallMultiplesEnabled: boolean = true;
 	smallMultiplesDataPairs: any[] = [];
 	smallMultiplesGridItemContent: { [index: string]: ISmallMultiplesGridItemContent } = {};
+	smallMultiplesGridItemsList: { rowIndex: number, colIndex: number, content: ISmallMultiplesGridItemContent }[] = [];
 	currentSmallMultipleIndex: number = 0;
 	isCurrentSmallMultipleIsOthers: boolean = false;
 	isSMUniformXAxis: boolean;
@@ -1463,11 +1466,20 @@ export class Visual extends Shadow {
 			if (this.isShowPositiveNegativeLogScale) {
 				value = parseFloat(value.toString());
 				if (!this.isHorizontalChart) {
-					if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
-						|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
-						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale(value * -1) + this.positiveLogScaleHeight;
+					if (this.isAllNegativeValue) {
+						if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+							|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
+							return this.negativeLogScale((value === 0 ? -0.1 : value) * -1) + this.positiveLogScaleHeight;
+						} else {
+							return this.negativeLogScale((value === 0 ? -0.1 : value) * -1)
+						}
 					} else {
-						return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) + this.negativeLogScaleHeight : this.negativeLogScale(value * -1)
+						if (((this.xAxisSettings.position === Position.Bottom && !this.yAxisSettings.isInvertRange)
+							|| (this.xAxisSettings.position === Position.Top && this.yAxisSettings.isInvertRange))) {
+							return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) : this.negativeLogScale((value === 0 ? -0.1 : value) * -1) + this.positiveLogScaleHeight;
+						} else {
+							return value >= 0 ? this.positiveLogScale(value === 0 ? 0.1 : value) + this.negativeLogScaleHeight : this.negativeLogScale((value === 0 ? -0.1 : value) * -1)
+						}
 					}
 				}
 			}
@@ -1788,6 +1800,8 @@ export class Visual extends Shadow {
 			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
 		}
 
+		const isSmallMultipleSortBy = !this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
+
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
 			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
@@ -1801,14 +1815,19 @@ export class Visual extends Shadow {
 
 		if (
 			!this.sortingSettings.category.sortBy ||
-			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure && !this.sortingSettings.category.isSortByExtraSortField)
+			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.category.sortBy) && !this.sortingSettings.category.isSortByExtraSortField)
 		) {
-			this.sortingSettings.category.sortBy = this.measure1DisplayName;
+			this.sortingSettings.category.sortBy = isSmallMultipleSortBy ? this.categoryDisplayName : this.measure1DisplayName;
 		}
 
 		if (!this.sortingSettings.subCategory.sortBy ||
 			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
-			this.sortingSettings.subCategory.sortBy = this.measure1DisplayName;
+			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+		}
+
+		if ((!this.sortingSettings.smallMultiples.sortBy ||
+			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.smallMultiples.sortBy)))) {
+			this.sortingSettings.smallMultiples.sortBy = this.categoryDisplayName;
 		}
 
 		this.measureNamesByTotal = [];
@@ -1844,41 +1863,6 @@ export class Visual extends Shadow {
 
 		if (this.isChartRacePossible && categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
 			this.isChartRacePossible = false;
-		}
-
-		const createDate = (day: number, monthName: string, quarter: number, year: number) => {
-			let finalMonthName = monthName;
-
-			if (!finalMonthName) {
-				if (quarter) {
-					switch (quarter) {
-						case 1:
-							finalMonthName = "January";
-							break;
-						case 2:
-							finalMonthName = "April";
-							break;
-						case 3:
-							finalMonthName = "July";
-							break;
-						case 4:
-							finalMonthName = "October";
-							break;
-					}
-				} else {
-					finalMonthName = "January";
-				}
-			}
-
-			const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(finalMonthName);
-			if (month === -1) {
-				throw new Error(`Invalid month name: ${finalMonthName}`);
-			}
-			try {
-				return new Date(year, month, day);
-			} catch (error) {
-				throw new Error(`Invalid date: ${day} ${finalMonthName} (${quarter}) ${year}`);
-			}
 		}
 
 		if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
@@ -1958,7 +1942,7 @@ export class Visual extends Shadow {
 					const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("--")[0].split("Qtr")[1]) : 1;
 					const year = obj["Year"] ? obj["Year"].split("--")[0] : 2024;
 
-					obj["date"] = createDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
+					obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
 				}
 
 				categoricalData.values.forEach((d) => {
@@ -2272,6 +2256,8 @@ export class Visual extends Shadow {
 					this.isHorizontalBrushDisplayed = false;
 
 					const config: IBrushConfig = {
+						width: this.width,
+						height: this.height,
 						brushG: this.brushG.node(),
 						brushXPos: 0,
 						brushYPos: 0,
@@ -2309,6 +2295,8 @@ export class Visual extends Shadow {
 					const brushXPos = this.margin.left ? this.margin.left : 0;
 
 					const config: IBrushConfig = {
+						width: this.width,
+						height: this.height,
 						brushG: this.brushG.node(),
 						brushXPos: brushXPos,
 						brushYPos: 100000,
@@ -2665,6 +2653,7 @@ export class Visual extends Shadow {
 			this.pieYScaleDiffs = [];
 			this.pieYScaleDiffs = [];
 			this.smallMultiplesGridItemContent = {};
+			this.smallMultiplesGridItemsList = [];
 			this.smallMultiplesGridItemId = undefined;
 			this.isRaceChartDataLabelDrawn = false;
 
@@ -3048,8 +3037,8 @@ export class Visual extends Shadow {
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
 					categories: smallMultiplesCategories,
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
-					onCellRendered: (category, index, ele) => {
-						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), ele);
+					onCellRendered: (category, index, rowIndex, colIndex, ele) => {
+						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), rowIndex, colIndex, ele);
 
 						if (index === this.smallMultiplesCategories.length - 1) {
 							this.configLegend();
@@ -3085,6 +3074,14 @@ export class Visual extends Shadow {
 							isAxisPositionChanged = true;
 						}
 
+						this.setInitialChartData(
+							this.clonedCategoricalData,
+							cloneDeep(this.clonedCategoricalData),
+							this.categoricalMetadata,
+							width,
+							height
+						);
+
 						this.setChartData(this.categoricalData);
 
 						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
@@ -3100,8 +3097,10 @@ export class Visual extends Shadow {
 						}
 
 						return {
-							xAxisNode: xAxisG.node().cloneNode(true),
-							xAxisNodeHeight: xAxisG.node().getBoundingClientRect().height,
+							xAxisNode: this.xAxisG.node().cloneNode(true),
+							xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height + (this.isHorizontalBrushDisplayed ? 20 : 0),
+							brushNode: this.brushG.node().cloneNode(true),
+							brushNodeHeight: this.brushG.node().getBoundingClientRect().height,
 							xAxisTitleG: this.xAxisTitleG.node().cloneNode(true),
 							xAxisTitleHeight: this.xAxisTitleG.node().getBoundingClientRect().height
 						};
@@ -3120,7 +3119,7 @@ export class Visual extends Shadow {
 							this.drawXYAxisTitle();
 						}
 
-						const { yAxisG } = this.drawXYAxis(this.categoricalData, true, true, false);
+						const { yAxisG } = this.drawXYAxis(this.categoricalData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
 
 						return {
 							yAxisNode: yAxisG.node(),
@@ -3129,28 +3128,37 @@ export class Visual extends Shadow {
 							yAxisTitleWidth: this.yAxisTitleG.node().getBoundingClientRect().width
 						};
 					},
-					getUniformXAxisAndBrushNode: (xAxisNode, brushNode) => {
-						// this.xAxisG = d3.select(xAxisNode);
-						// this.brushG = d3.select(brushNode);
+					getUniformXAxisAndBrushNode: (colIndex, xAxisNode, brushNode, width, height, isBottomXAxis) => {
+						if (xAxisNode && brushNode) {
+							this.xAxisG = d3.select(xAxisNode);
+							this.brushG = d3.select(brushNode);
 
-						// const config: IBrushConfig = {
-						// 	brushG: brushNode,
-						// 	brushXPos: 0,
-						// 	brushYPos: 0,
-						// 	barDistance: this.brushScaleBandBandwidth,
-						// 	totalBarsCount: this.totalLollipopCount,
-						// 	scaleWidth: this.width,
-						// 	scaleHeight: this.height,
-						// 	smallMultiplesGridItemId: this.smallMultiplesGridItemId,
-						// 	categoricalData: this.categoricalData,
-						// 	isShowXAxis: true,
-						// 	isShowYAxis: true,
-						// 	isShowHorizontalBrush: true
-						// };
+							const config: IBrushConfig = {
+								width,
+								height,
+								brushG: brushNode,
+								brushXPos: 0,
+								brushYPos: 0,
+								barDistance: this.brushScaleBandBandwidth,
+								totalBarsCount: this.totalLollipopCount,
+								scaleWidth: width,
+								scaleHeight: height,
+								smallMultiplesGridItemId: null,
+								categoricalData: this.categoricalData,
+								isShowXAxis: true,
+								isShowYAxis: false,
+								isShowHorizontalBrush: true,
+								isSMUniformXAxis: true,
+								isSMUniformXAxisIsBottom: isBottomXAxis,
+								SMUniformXAxisId: colIndex,
+								SMUniformXAxisG: xAxisNode
+							};
 
-						// this.drawHorizontalBrush(this, config);
-
-						return { xAxisNodeHeight: this.xScaleGHeight, yAxisNodeWidth: this.margin.left };
+							this.drawHorizontalBrush(this, config);
+							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.margin.left, isHorizontalBrushDisplayed: this.isHorizontalBrushDisplayed };
+						} else {
+							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.margin.left, isHorizontalBrushDisplayed: false };
+						}
 					},
 					onRenderingFinished: () => {
 						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
@@ -3602,7 +3610,7 @@ export class Visual extends Shadow {
 							});
 						}
 						break;
-					case ECFValueTypes.Ranking:
+					case ECFValueTypes.Ranking: {
 						const i = this.categoricalDataPairs.findIndex(s => s.category === d.category);
 						if (this.isLollipopTypeCircle) {
 							if (c.valueType === ECFValueTypes.Ranking) {
@@ -3673,6 +3681,7 @@ export class Visual extends Shadow {
 								});
 							});
 						}
+					}
 						break;
 					case ECFValueTypes.Percentage:
 						if (this.isLollipopTypeCircle) {
@@ -3970,7 +3979,8 @@ export class Visual extends Shadow {
 					allMeasures: subCategoryGroup.reduce((obj, cur) => {
 						obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
 						return obj;
-					}, {})
+					}, {}),
+					isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
 				};
 				return [...arr, obj];
 			}, []);
@@ -4177,7 +4187,8 @@ export class Visual extends Shadow {
 						allMeasures: categoricalData.values.reduce((obj, cur) => {
 							obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
 							return obj;
-						}, {})
+						}, {}),
+						isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
 					}
 
 					arr = [...arr, obj];
@@ -5294,14 +5305,15 @@ export class Visual extends Shadow {
 
 		this.categoricalDataPairs.forEach((d, i) => {
 			this.categoryColorPair[d.category] = this.categoryColorPairWithIndex[`${i}-${d.category}`];
+			this.othersCategoryColorPair[d.category] = cloneDeep(this.categoryColorPairWithIndex[`${i}-${d.category}`]);
 			this.CFCategoryColorPair[d.category] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 		});
 
 		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeSMOthersColor && this.rankingSettings.smallMultiples.enabled && this.rankingSettings.smallMultiples.showRemainingAsOthers) {
 			const othersColor = this.dataColorsSettings.SMOthersColor;
 			this.categoricalDataPairs.forEach((d) => {
-				this.categoryColorPair[d.category].marker1Color = othersColor;
-				this.categoryColorPair[d.category].marker2Color = othersColor;
+				this.othersCategoryColorPair[d.category].marker1Color = othersColor;
+				this.othersCategoryColorPair[d.category].marker2Color = othersColor;
 				this.CFCategoryColorPair[d.category] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 			});
 		}
@@ -5443,9 +5455,21 @@ export class Visual extends Shadow {
 		this.categoricalDataPairs.forEach(d => {
 			this.subCategoriesName.forEach((c, i) => {
 				this.subCategoryColorPair[`${d.category}-${c}`] = this.subCategoryColorPairWithIndex[`${i}-${d.category}-${c}`];
+				this.othersSubCategoryColorPair[`${d.category}-${c}`] = cloneDeep(this.subCategoryColorPairWithIndex[`${i}-${d.category}-${c}`]);
 				this.CFSubCategoryColorPair[`${d.category}-${c}`] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
 			});
 		});
+
+		if (this.isSmallMultiplesEnabled && this.isCurrentSmallMultipleIsOthers && this.dataColorsSettings.isCustomizeSMOthersColor && this.rankingSettings.smallMultiples.enabled && this.rankingSettings.smallMultiples.showRemainingAsOthers) {
+			const othersColor = this.dataColorsSettings.SMOthersColor;
+			this.categoricalDataPairs.forEach((d) => {
+				this.subCategoriesName.forEach((c) => {
+					this.othersSubCategoryColorPair[`${d.category}-${c}`].marker1Color = othersColor;
+					this.othersSubCategoryColorPair[`${d.category}-${c}`].marker2Color = othersColor;
+					this.CFCategoryColorPair[`${d.category}-${c}`] = { isMarker1Color: false, isMarker2Color: false, isLineColor: false, isLabelColor: false };
+				})
+			})
+		}
 
 		if (this.rankingSettings.subCategory.enabled) {
 			if (this.rankingSettings.subCategory.showRemainingAsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
@@ -5492,6 +5516,8 @@ export class Visual extends Shadow {
 				const brushYPos = this.viewPortHeight - this.brushHeight - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
 
 				const config: IBrushConfig = {
+					width: this.width,
+					height: this.height,
 					brushG: this.brushG.node(),
 					brushXPos: brushXPos,
 					brushYPos: brushYPos,
@@ -5731,6 +5757,7 @@ export class Visual extends Shadow {
 	}
 
 	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
+		const width = config.width;
 		const brushYPos: number = config.brushYPos;
 		const barDistance: number = config.barDistance;
 		const totalBarsCount: number = config.totalBarsCount;
@@ -5758,106 +5785,216 @@ export class Visual extends Shadow {
 				});
 			}
 
-			const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+			const method = (smallMultiplesGridItemContent: ISmallMultiplesGridItemContent) => {
+				const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
+				const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+				this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
 
-			const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
-			const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
-			categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
-			this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+				this.brushScaleBand.range(xScale.range());
 
-			this.brushScaleBand.range(xScale.range());
+				brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
 
-			brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
+				const newXScaleDomain = [];
+				let brushArea = selection;
+				if (brushArea === null) brushArea = xScale.range();
 
-			const newXScaleDomain = [];
-			let brushArea = selection;
-			if (brushArea === null) brushArea = xScale.range();
+				xScaleDomain.forEach((d, i) => {
+					const pos = this.brushScaleBand(d);
+					if (pos >= brushArea[0] && pos <= brushArea[1]) {
+						newXScaleDomain.push(d);
 
-			xScaleDomain.forEach((d, i) => {
-				const pos = this.brushScaleBand(d);
-				if (pos >= brushArea[0] && pos <= brushArea[1]) {
-					newXScaleDomain.push(d);
+						if (self.isExpandAllApplied) {
+							self.expandAllCategoriesName.forEach((d) => {
+								if (self[`${d}ScaleDomain`]) {
+									self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
+								}
+							});
+						}
+					}
+				});
 
-					if (self.isExpandAllApplied) {
-						self.expandAllCategoriesName.forEach((d) => {
-							if (self[`${d}ScaleDomain`]) {
-								self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
+				this.newScaleDomainByBrush = newXScaleDomain;
+
+				if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+					);
+
+					const categoricalData2 = cloneDeep(categoricalData);
+
+					categoricalData2.categories.forEach((d, i) => {
+						d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+					});
+
+					categoricalData2.values.forEach((d, i) => {
+						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+						if (d.highlights) {
+							d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+						}
+					});
+
+					this.setCategoricalDataFields(categoricalData2);
+					this.setChartData(categoricalData2);
+
+					this.configLegend();
+
+					if (smallMultiplesGridItemContent) {
+						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
+							this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
+						}
+
+						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+						}
+
+						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
+						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
+						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
+						this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
+						this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
+						this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
+						this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
+						this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
+						this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
+						this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
+						this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
+						this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
+						this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
+						this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
+						this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
+						this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
+						this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
+						this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
+						this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
+						this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+
+						this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+					} else {
+						this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+					}
+
+					isBrushRendered = true;
+				} else {
+					isBrushRendered = false;
+					this.isScrollBrushDisplayed = false;
+					this.isHorizontalBrushDisplayed = false;
+					this.isVerticalBrushDisplayed = false;
+					this.brushHeight = 0;
+					this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+				}
+			}
+
+			if (config.isSMUniformXAxis) {
+				const SMItemsList = this.smallMultiplesGridItemsList.filter(d => d.colIndex === config.SMUniformXAxisId);
+
+				if (config.isSMUniformXAxisIsBottom) {
+					this.isBottomXAxis = true;
+					this.xAxisSettings.position = Position.Bottom;
+				} else {
+					this.isBottomXAxis = false;
+					this.xAxisSettings.position = Position.Top;
+				}
+
+				SMItemsList.forEach(d => {
+					const smallMultiplesGridItemContent = d.content;
+
+					const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
+					const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+					categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+
+					this.brushScaleBand.range(xScale.range());
+
+					const newXScaleDomain = [];
+					let brushArea = selection;
+					if (brushArea === null) brushArea = xScale.range();
+
+					xScaleDomain.forEach((d, i) => {
+						const pos = this.brushScaleBand(d);
+						if (pos >= brushArea[0] && pos <= brushArea[1]) {
+							newXScaleDomain.push(d);
+
+							if (self.isExpandAllApplied) {
+								self.expandAllCategoriesName.forEach((d) => {
+									if (self[`${d}ScaleDomain`]) {
+										self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
+									}
+								});
+							}
+						}
+					});
+
+					this.newScaleDomainByBrush = newXScaleDomain;
+
+					if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+						const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+						const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+							this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+						);
+
+						const categoricalData2 = cloneDeep(categoricalData);
+
+						categoricalData2.categories.forEach((d, i) => {
+							d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+						});
+
+						categoricalData2.values.forEach((d, i) => {
+							d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+							if (d.highlights) {
+								d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
 							}
 						});
+
+						this.setCategoricalDataFields(categoricalData2);
+						this.setChartData(categoricalData2);
+
+						this.configLegend();
+
+						if (smallMultiplesGridItemContent) {
+							this.xAxisG = d3.select(config.SMUniformXAxisG);
+
+							if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+								this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+							}
+
+							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
+							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
+							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
+							this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
+							this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
+							this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
+							this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
+							this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
+							this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
+							this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
+							this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
+							this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
+							this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
+							this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
+							this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
+							this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
+							this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
+							this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
+							this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
+							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+
+							this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+
+							this.xAxisG.attr("transform", `translate(${0}, ${0})`);
+						} else {
+							this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						}
+
+						isBrushRendered = true;
 					}
-				}
-			});
-
-			this.newScaleDomainByBrush = newXScaleDomain;
-
-			if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
-				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-				);
-
-				const categoricalData2 = cloneDeep(categoricalData);
-
-				categoricalData2.categories.forEach((d, i) => {
-					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-				});
-
-				categoricalData2.values.forEach((d, i) => {
-					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-					if (d.highlights) {
-						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-					}
-				});
-
-				this.setCategoricalDataFields(categoricalData2);
-				this.setChartData(categoricalData2);
-
-				this.configLegend();
-
-				if (smallMultiplesGridItemContent) {
-					if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
-						this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
-					}
-
-					if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
-						this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
-					}
-
-					this.lollipopG = smallMultiplesGridItemContent.lollipopG;
-					this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
-					this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
-					this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
-					this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
-					this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
-					this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
-					this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
-					this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
-					this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
-					this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
-					this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
-					this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
-					this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
-					this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
-					this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
-					this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
-					this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
-					this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
-					this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
-
-					this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-				} else {
-					this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-				}
-
-				isBrushRendered = true;
+				})
 			} else {
-				isBrushRendered = false;
-				this.isScrollBrushDisplayed = false;
-				this.isHorizontalBrushDisplayed = false;
-				this.isVerticalBrushDisplayed = false;
-				this.brushHeight = 0;
-				this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+				const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+
+				method(smallMultiplesGridItemContent)
 			}
 		};
 
@@ -5865,7 +6002,7 @@ export class Visual extends Shadow {
 			.brushX()
 			.extent([
 				[0, 0],
-				[this.width, this.brushHeight - (this.brushAndZoomAreaSettings.enabled ? 2 : 0)],
+				[width, this.brushHeight - (this.brushAndZoomAreaSettings.enabled ? 2 : 0)],
 			])
 			.on("brush", brushed);
 
@@ -5873,7 +6010,7 @@ export class Visual extends Shadow {
 		const totalBar = totalBarsCount;
 		let widthByExpectedBar = (expectedBar * scaleWidth) / totalBar;
 
-		widthByExpectedBar = widthByExpectedBar > this.width ? this.width : widthByExpectedBar;
+		widthByExpectedBar = widthByExpectedBar > width ? width : widthByExpectedBar;
 
 		d3.select(brushG)
 			.attr("transform", `translate(${this.margin.left ? this.margin.left : 0}, ${brushYPos - this.brushXAxisTicksMaxHeight - ((this.brushAndZoomAreaSettings.enabled ? 2 : 0))})`)
@@ -5884,8 +6021,8 @@ export class Visual extends Shadow {
 		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 
 		let scrolled = false;
-		if (this.isScrollBrushDisplayed && isBrushRendered) {
-			(self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
+		if (this.isScrollBrushDisplayed && isBrushRendered && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
+			((self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData && smallMultiplesGridItemContent) ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
 				if (!scrolled && isBrushRendered) {
 					scrolled = true;
 					const prevExtent = d3.brushSelection(brushG as any);
@@ -6778,6 +6915,7 @@ export class Visual extends Shadow {
 		};
 
 		const getTooltipData = (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean): VisualTooltipDataItem[] => {
+			const categoryColorPair = this.isSmallMultiplesEnabled && value.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
 			const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative &&
 				(this.isLollipopTypeCircle ? !this.CFCategoryColorPair[value.category].isMarker1Color : true);
 
@@ -6796,7 +6934,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: (value.category.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.categoryColorPair[value.category].marker1Color)
+					color: (value.category.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : categoryColorPair[value.category].marker1Color)
 				},
 			];
 
@@ -6804,7 +6942,7 @@ export class Visual extends Shadow {
 				tooltipData.push({
 					displayName: this.measure2DisplayName,
 					value: numberFormatter(value.value2, this.measureNumberFormatter[1]),
-					color: (isPosNegColorScheme2 ? posNegColor2 : this.categoryColorPair[value.category].marker2Color),
+					color: (isPosNegColorScheme2 ? posNegColor2 : categoryColorPair[value.category].marker2Color),
 				})
 			}
 
@@ -7554,9 +7692,9 @@ export class Visual extends Shadow {
 
 
 			if (this.isYIsContinuousAxis) {
-				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize] : [this.xAxisStartMargin + this.markerMaxSize, yScaleHeight - this.markerMaxSize]);
+				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize] : [this.yAxisStartMargin + this.markerMaxSize, yScaleHeight - this.markerMaxSize]);
 			} else {
-				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.xAxisStartMargin, 0] : [this.xAxisStartMargin, yScaleHeight]);
+				this.yScale.range(this.xAxisSettings.position === Position.Bottom ? [yScaleHeight - this.yAxisStartMargin, 0] : [this.yAxisStartMargin, yScaleHeight]);
 			}
 		} else {
 			// if (this.isSmallMultiplesEnabled) {
@@ -7567,9 +7705,9 @@ export class Visual extends Shadow {
 			// 	}
 			// } else {
 			if (this.isXIsContinuousAxis) {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.yAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
 			} else {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.yAxisStartMargin, xScaleWidth] : [xScaleWidth - this.yAxisStartMargin, 0]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
 			}
 			// }
 
@@ -7741,10 +7879,14 @@ export class Visual extends Shadow {
 					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 90),
 				];
 			} else if (this.isLogarithmScale) {
-				xScaleTicks = [
-					...this.positiveLogScaleTicks,
-					...this.negativeLogScaleTicks,
-				];
+				if (this.isShowPositiveNegativeLogScale || this.isAllNegativeValue) {
+					xScaleTicks = [
+						...this.positiveLogScaleTicks,
+						...this.negativeLogScaleTicks,
+					];
+				} else {
+					xScaleTicks = isLinearScale ? this.xScale.ticks(this.width / 90) : this.xScale.domain();
+				}
 			} else {
 				xScaleTicks = isLinearScale ? this.xScale.ticks(this.width / 90) : this.xScale.domain();
 			}
@@ -7775,10 +7917,14 @@ export class Visual extends Shadow {
 					...this.beforeCutLinearScale.ticks(this.beforeCutLinearScaleArea / 90),
 				];
 			} else if (this.axisByBarOrientation.isLogarithmScale) {
-				yScaleTicks = [
-					...this.positiveLogScaleTicks,
-					...this.negativeLogScaleTicks,
-				];
+				if (this.isShowPositiveNegativeLogScale || this.isAllNegativeValue) {
+					yScaleTicks = [
+						...this.positiveLogScaleTicks,
+						...this.negativeLogScaleTicks,
+					];
+				} else {
+					yScaleTicks = this.yScale.ticks(this.height / 90);
+				}
 			} else {
 				yScaleTicks = this.yScale.ticks(this.height / 90);
 			}
@@ -7886,6 +8032,14 @@ export class Visual extends Shadow {
 	}
 
 	drawXYAxis(categoricalData: powerbi.DataViewCategorical, isShowXAxis: boolean, isShowYAxis: boolean, isSetXYScaleDiffs: boolean = true): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
+		// if (!isShowYAxis) {
+		// 	this.xAxisStartMargin = 0;
+		// }
+
+		// if (!isShowXAxis) {
+		// 	this.yAxisStartMargin = 0;
+		// }
+
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
@@ -8076,7 +8230,12 @@ export class Visual extends Shadow {
 		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
 			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
 				const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
-				this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+
+				if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+					this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+				} else {
+					this.xScaleGHeight = 0;
+				}
 			}
 		} else {
 			this.xScaleGHeight = 0;
@@ -8135,8 +8294,6 @@ export class Visual extends Shadow {
 			this.setYAxisTickStyle();
 		}
 
-		this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-
 		this.xAxisG.selectAll(".tick").style("display", this.xAxisSettings.isDisplayLabel ? "block" : "none");
 		this.yAxisG.selectAll(".tick").style("display", this.yAxisSettings.isDisplayLabel ? "block" : "none");
 
@@ -8144,7 +8301,7 @@ export class Visual extends Shadow {
 
 		// Truncate the ticks which are overlaps with the Y axis
 		const THIS = this;
-		if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+		if (!this.isSmallMultiplesEnabled) {
 			this.xAxisG
 				.selectAll(".tick")
 				.selectAll("text")
@@ -8627,6 +8784,7 @@ export class Visual extends Shadow {
 	}
 
 	drawLollipopChart(): void {
+		this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 		this.chartData.forEach(d => {
 			d.data1Label = this.getDataLabel(d, false);
 			d.data2Label = this.getDataLabel(d, true);
@@ -9215,7 +9373,13 @@ export class Visual extends Shadow {
 				let isHasPattern: boolean;
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-				const color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+				const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
+				let color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+
+				if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeOthersColor) {
+					color = this.dataColorsSettings.othersColor;
+				}
+
 				let pattern = d.pattern;
 				if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 					pattern = this.patternByMeasures[DataValuesType.Value1];
@@ -9226,6 +9390,10 @@ export class Visual extends Shadow {
 				} else {
 					fill = color;
 				}
+
+				// if (this.isSmallMultiplesEnabled && d.isOthersSmallMultiples && this.dataColorsSettings.isCustomizeSMOthersColor && this.rankingSettings.smallMultiples.enabled && this.rankingSettings.smallMultiples.showRemainingAsOthers) {
+				// 	fill = this.dataColorsSettings.SMOthersColor;
+				// }
 
 				if (marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly) {
 					ele
@@ -9444,7 +9612,9 @@ export class Visual extends Shadow {
 			const valueType = isPie2 ? "value2" : "value1";
 			let isHasPattern: boolean;
 
-			if (((d.parentCategory === this.othersBarText) || this.isCurrentSmallMultipleIsOthers) && this.dataColorsSettings.isCustomizeOthersColor) {
+			const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
+
+			if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeOthersColor) {
 				color = this.dataColorsSettings.othersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
@@ -9453,7 +9623,7 @@ export class Visual extends Shadow {
 				if (isPosNegColorScheme) {
 					color = posNegColor;
 				} else {
-					color = isPie2 ? this.subCategoryColorPair[`${parent.category}-${d.category}`].marker2Color : this.subCategoryColorPair[`${parent.category}-${d.category}`].marker1Color;
+					color = isPie2 ? subCategoryColorPair[`${parent.category}-${d.category}`].marker2Color : subCategoryColorPair[`${parent.category}-${d.category}`].marker1Color;
 				}
 			}
 
@@ -9822,6 +9992,7 @@ export class Visual extends Shadow {
 		};
 
 		const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
+			const subCategoryColorPair = this.isSmallMultiplesEnabled && pieData.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
 			const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
 			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker2Color;
 			const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
@@ -9841,7 +10012,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
 				}
 			];
 
@@ -9849,7 +10020,7 @@ export class Visual extends Shadow {
 				tooltipData.push({
 					displayName: this.measure2DisplayName,
 					value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-					color: (isPosNegColorScheme2 ? posNegColor2 : this.subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
+					color: (isPosNegColorScheme2 ? posNegColor2 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
 				})
 			}
 

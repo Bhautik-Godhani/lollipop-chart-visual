@@ -278,7 +278,9 @@ const TemplatesSettings = (props) => {
           configValues.isIBCSEnabled = false;
           configValues.theme = undefined;
           configValues.prevTheme = undefined;
-          ApplyBeforeIBCSAppliedSettingsBack(shadow);
+          if (visual.templateSettings.isIBCSEnabled) {
+            ApplyBeforeIBCSAppliedSettingsBack(shadow);
+          }
           shadow.persistProperties(sectionName, propertyName, configValues);
         }
       }

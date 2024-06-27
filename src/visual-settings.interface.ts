@@ -55,6 +55,7 @@ import {
 	RankingDataValuesType,
 } from "./enum";
 import { NumberFormatting } from "./settings";
+import { Selection } from "d3-selection";
 
 export interface IXAxisSettings {
 	show: boolean,
@@ -350,6 +351,8 @@ export interface ISortingProps {
 }
 
 export interface IBrushConfig {
+	width: number;
+	height: number;
 	brushG: SVGElement;
 	brushXPos: number;
 	brushYPos: number;
@@ -365,6 +368,10 @@ export interface IBrushConfig {
 	isShowXAxis: boolean;
 	isShowYAxis: boolean;
 	isShowHorizontalBrush: boolean;
+	isSMUniformXAxis?: boolean;
+	isSMUniformXAxisIsBottom?: boolean;
+	SMUniformXAxisId?: number
+	SMUniformXAxisG?: SVGElement
 }
 
 export interface IShowBucketSettings {

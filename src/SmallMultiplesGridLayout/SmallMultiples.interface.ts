@@ -54,9 +54,10 @@ export interface ISmallMultiplesGridLayoutSettings {
         color: string;
         inset: boolean;
     },
-    onCellRendered: (category: string, gridItemIndex: number, elementRef: HTMLDivElement) => void,
-    getUniformXAxisAndBrushNode: (xAxisNode: SVGElement, brushNode: SVGElement) => { xAxisNodeHeight: number, yAxisNodeWidth: number },
-    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isBottomXAxis: boolean) => { xAxisNode: any; xAxisNodeHeight: number; xAxisTitleG: any; xAxisTitleHeight: number; },
+    onCellRendered: (category: string, gridItemIndex: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => void,
+    getUniformXAxisAndBrushNode: (colIndex: number, xAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isBottomAxis: boolean) => { xAxisNodeHeight: number, yAxisNodeWidth: number, isHorizontalBrushDisplayed: boolean },
+    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isBottomXAxis: boolean, isCallBrush?: boolean) =>
+        { xAxisNode: any; xAxisNodeHeight: number; brushNode: any; brushNodeHeight: number; xAxisTitleG: any; xAxisTitleHeight: number; },
     getYAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number) => { yAxisNode: any, yAxisNodeWidth: number; yAxisTitleG: any; yAxisTitleWidth: number; },
     onRenderingFinished: () => void,
 }
@@ -86,7 +87,7 @@ export interface ISmallMultiplesLayoutProps {
     margin: number[],
     containerPadding: number[],
     smallMultiplesSettings: ISmallMultiplesGridLayoutSettings,
-    onCellRendered: (category: string, gridItemIndex: number, elementRef: HTMLDivElement) => void,
+    onCellRendered: (category: string, gridItemIndex: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => void,
     onRenderingFinished: () => void,
 }
 

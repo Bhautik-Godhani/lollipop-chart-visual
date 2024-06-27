@@ -96,7 +96,7 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
             onChange={(inView, entry) => {
               entry.target.setAttribute("data-visibility", String(inView));
               if (inView) {
-                props.onCellRendered(d.category, i, entry.target as HTMLDivElement);
+                props.onCellRendered(d.category, i, d.y, d.x, entry.target as HTMLDivElement);
               }
 
               if (settings.categories[settings.categories.length - 1] === d.category) {

@@ -30,7 +30,8 @@ export interface ILollipopChartRow {
 	extraLabel2: string;
 	data1Label: string;
 	data2Label: string;
-	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } }
+	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } };
+	isOthersSmallMultiples?: boolean;
 }
 
 export interface IErrorBarValue {
@@ -57,7 +58,8 @@ export interface IChartSubCategory {
 	sliceWidth?: number,
 	sliceHeight?: number,
 	pattern?: IPatternProps,
-	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } }
+	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } },
+	isOthersSmallMultiples?: boolean
 }
 
 export interface VisualTooltipDataItem {

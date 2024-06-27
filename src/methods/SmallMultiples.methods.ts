@@ -7,11 +7,12 @@ import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, 
 import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { EDataRolesName, ERankingCalcMethod, ERankingType, ESortOrderTypes } from "../enum";
 import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
-import { cloneDeep } from "lodash";
+import { cloneDeep, lowerFirst } from "lodash";
+import { CallExpandAllXScaleOnAxisGroup, RenderExpandAllXAxis } from "./expandAllXAxis.methods";
 import { MonthNames } from "../constants";
 import { ISortingProps } from "../visual-settings.interface";
 
-export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, elementRef: HTMLDivElement) => {
+export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => {
     const headerSettings = config.header;
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
@@ -126,7 +127,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 }
 
                 const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
                 clonedCategoricalData.categories.forEach((d) => {
                     d.values = dataValuesIndexes.map((valueIndex) => {
                         const id = +valueIndex.split("-")[1];
@@ -140,7 +141,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     if (d.source.roles[EDataRolesName.Measure]) {
                         othersSMData.forEach(o => {
                             const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
-                            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+                            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
 
                             const values1 = dataValuesIndexes.map((valueIndex) => {
                                 const id = +valueIndex.split("-")[1];
@@ -162,7 +163,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
             } else {
                 const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).splice(2);
+                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
 
                 clonedCategoricalData.categories.forEach((d) => {
                     d.values = dataValuesIndexes.map((valueIndex) => {
@@ -360,7 +361,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     break;
             }
 
-            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = {
+            const content = {
                 svg: svg.node(),
                 xScale: self.xScale,
                 yScale: self.yScale,
@@ -393,6 +394,14 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 errorBarsMarker: errorBarsMarker as any,
                 errorBarsMarkerPath: errorBarsMarkerPath as any
             };
+
+            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;
+
+            self.smallMultiplesGridItemsList.push({
+                rowIndex,
+                colIndex,
+                content
+            });
 
             self.svg = svg;
             self.container = container;
@@ -452,12 +461,31 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);
             self.lollipopG = smallMultiplesGridItemContent.lollipopG;
 
+            if (isUniformXScale) {
+                self.xAxisTitleMargin = 0;
+            }
+
+            if (isUniformYScale) {
+                self.yAxisTitleMargin = 0;
+            }
+
+            self.setMargins();
+
             self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
 
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].xScale = self.xScale;
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].yScale = self.yScale;
 
             let isDisplayBrushCalled: boolean = false;
+
+            if (self.categoricalCategoriesLastIndex > 0) {
+                if (!self.isHorizontalChart) {
+                    RenderExpandAllXAxis(self, self.categoricalData);
+                }
+                // else {
+                // 	RenderExpandAllYAxis(this, this.categoricalData);
+                // }
+            }
 
             if (self.isScrollBrushDisplayed) {
                 self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
@@ -468,6 +496,26 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 // self.margin.left = 0;
                 // self.margin.bottom = 0;
                 self.drawLollipopChart();
+            }
+
+            if (self.isExpandAllApplied) {
+                if (!self.isHorizontalChart) {
+                    if (self.isBottomXAxis) {
+                        self.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (self.height + self.xScaleGHeight) + "px" + ")");
+                    } else {
+                        self.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-self.xScaleGHeight) + "px" + ")");
+                    }
+
+                    CallExpandAllXScaleOnAxisGroup(self, self.scaleBandWidth);
+                }
+                // else {
+                // 	if (this.isLeftYAxis) {
+                // 		this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
+                // 	} else {
+                // 		this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
+                // 	}
+                // 	CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
+                // }
             }
 
             if (isDisplayBrushCalled && !self.isScrollBrushDisplayed) {
@@ -513,10 +561,12 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             if (isUniformXScale) {
                 xAxisG.attr("display", "none");
+                xAxisG.classed("display-none", true);
             }
 
             if (isUniformYScale) {
                 yAxisG.attr("display", "none");
+                // yAxisG.classed("display-none", true);
             }
 
             if (!isUniformXScale) {
