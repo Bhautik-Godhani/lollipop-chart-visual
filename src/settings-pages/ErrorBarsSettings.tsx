@@ -320,7 +320,9 @@ const ErrorBarsSettings = (props) => {
       <ConditionalWrapper visible={!configValues.isEnabled}>
         <Row>
           <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            <ErrorBarsPlaceholderIcon />
+            <div className="section section-preview-image">
+              <ErrorBarsPlaceholderIcon />
+            </div>
           </Column>
         </Row>
       </ConditionalWrapper>
