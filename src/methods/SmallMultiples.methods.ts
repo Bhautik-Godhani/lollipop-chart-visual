@@ -44,7 +44,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 headerSettings.fontStyles[EFontStyle.Italic],
                 headerSettings.fontStyles[EFontStyle.UnderLine]).height + 5;
 
-            const newItemWidth = hostElementsBBox.width - (config.innerSpacing * 2);
+            let newItemWidth = hostElementsBBox.width - (config.innerSpacing * 2);
             let newItemHeight = hostElementsBBox.height - (config.innerSpacing * 2) - panelTitleSize;
 
             if (newItemWidth <= 0 || newItemHeight <= 0) {
@@ -293,10 +293,15 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.categoricalData = initialChartDataByBrushScaleBand;
 
             if (self.isScrollBrushDisplayed) {
-                self.brushHeight = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaHeight : 10;
+                if (self.isHorizontalBrushDisplayed) {
+                    self.brushHeight = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaHeight : 10;
+                } else {
+                    self.brushWidth = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaWidth : 10;
+                }
             }
 
             newItemHeight -= self.brushHeight;
+            newItemWidth -= self.brushWidth;
 
             if (!self.isScrollBrushDisplayed) {
                 self.setCategoricalDataFields(self.categoricalData);
@@ -488,7 +493,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             }
 
             if (self.isScrollBrushDisplayed) {
-                self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+                self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, self.isHorizontalChart ? config.yAxisType === ESmallMultiplesAxisType.Individual : config.xAxisType === ESmallMultiplesAxisType.Individual);
                 isDisplayBrushCalled = true;
             } else {
                 // self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);

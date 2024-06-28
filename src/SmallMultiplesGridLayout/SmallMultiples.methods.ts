@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
@@ -51,7 +52,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
         false
     );
 
-    const { bottomXAxisNode, topXAxisNode, xAxisTitleGNode, yAxisGNode, yAxisTitleGNode, xAxisGNodeHeight, yAxisGNodeWidth, yAxisTitleWidth, brushNodeHeight } = GetRootXYAxisGNode(
+    const { bottomXAxisNode, topXAxisNode, xAxisTitleGNode, rightYAxisGNode, yAxisTitleGNode, xAxisGNodeHeight, yAxisGNodeWidth, yAxisTitleWidth, brushNodeHeight } = GetRootXYAxisGNode(
         config,
         itemWidth - config.innerSpacing * 2 - yAxisGNodeWidth1 - yAxisTitleWidth1,
         itemHeight - panelTitleSize.height - config.innerSpacing * 2,
@@ -93,48 +94,43 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
 
     setTimeout(() => {
-        if (isUniformXScale) {
-            const { xAxisNodeHeight, yAxisNodeWidth } = config.getUniformXAxisAndBrushNode(undefined, undefined, undefined, itemWidth, itemHeight, false);
-            const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
-            const itemWidth1 = bBox.width;
-            const itemHeight1 = bBox.height;
+        const { xAxisNodeHeight, yAxisNodeWidth } = config.getUniformXAxisAndBrushNode(undefined, undefined, undefined, itemWidth, itemHeight, false);
 
-            const { bottomXAxisNode: bottomXAxisNode1, topXAxisNode: topXAxisNode1, yAxisGNode: yAxisGNode1, brushNode, brushNodeHeight } = GetRootXYAxisGNode(
-                config,
-                itemWidth1 - config.innerSpacing * 2,
-                itemHeight1 - panelTitleSize.height - config.innerSpacing * 2,
-                true
-            );
+        const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
+        const itemWidth1 = bBox.width;
+        const itemHeight1 = bBox.height;
 
-            switch (config.xAxisPosition) {
-                case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
-                    RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, bottomXAxisNode1, brushNode, xAxisTitleGNode, xAxisTitleHeight, uniformBottomXAxis, isUniformXScale);
-                    break;
-                case ESmallMultiplesXAxisPosition.FrozenTopColumn:
-                    RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, topXAxisNode1, xAxisTitleGNode, xAxisTitleHeight, uniformTopXAxis, isUniformXScale);
-                    break;
-                case ESmallMultiplesXAxisPosition.All:
-                    RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, bottomXAxisNode1, brushNode, xAxisTitleGNode, xAxisTitleHeight, uniformBottomXAxis, isUniformXScale);
-                    RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, topXAxisNode1, xAxisTitleGNode, xAxisTitleHeight, uniformTopXAxis, isUniformXScale);
-                    break;
-            }
+        const { bottomXAxisNode: bottomXAxisNode1, topXAxisNode: topXAxisNode1, leftYAxisGNode: leftYAxisGNode1, rightYAxisGNode: rightYAxisGNode1, brushNode, brushNodeHeight } = GetRootXYAxisGNode(
+            config,
+            itemWidth1 - config.innerSpacing * 2,
+            itemHeight1 - panelTitleSize.height - config.innerSpacing * 2,
+            true
+        );
 
-            RenderSmallMultiplesUniformYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight1, hyperListMainContainer, yAxisGNode1, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, uniformRightYAxis, isUniformYScale, panelTitleSize);
-        } else {
-            // const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
-            // const itemWidth1 = bBox.width;
-            // const itemHeight1 = bBox.height;
+        switch (config.xAxisPosition) {
+            case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
+                RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, bottomXAxisNode1, brushNode, xAxisTitleGNode, xAxisTitleHeight, uniformBottomXAxis, isUniformXScale);
+                break;
+            case ESmallMultiplesXAxisPosition.FrozenTopColumn:
+                RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, topXAxisNode1, xAxisTitleGNode, xAxisTitleHeight, uniformTopXAxis, isUniformXScale);
+                break;
+            case ESmallMultiplesXAxisPosition.All:
+                RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, bottomXAxisNode1, brushNode, xAxisTitleGNode, xAxisTitleHeight, uniformBottomXAxis, isUniformXScale);
+                RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, yAxisNodeWidth + config.innerSpacing, columns, (itemWidth - config.outerSpacing), itemHeight, hyperListMainContainer, topXAxisNode1, xAxisTitleGNode, xAxisTitleHeight, uniformTopXAxis, isUniformXScale);
+                break;
+        }
 
-            // const { bottomXAxisNode: bottomXAxisNode1, topXAxisNode: topXAxisNode1, yAxisGNode: yAxisGNode1, brushNode, brushNodeHeight } = GetRootXYAxisGNode(
-            //     config,
-            //     itemWidth1 - config.innerSpacing * 2,
-            //     itemHeight1 - panelTitleSize.height - config.innerSpacing * 2,
-            //     true
-            // );
-
-            if (isUniformYScale) {
-                RenderSmallMultiplesUniformYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight, hyperListMainContainer, yAxisGNode, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, uniformRightYAxis, isUniformYScale, panelTitleSize);
-            }
+        switch (config.yAxisPosition) {
+            case ESmallMultiplesYAxisPosition.FrozenLeftColumn:
+                RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight1, hyperListMainContainer, leftYAxisGNode1, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                break;
+            case ESmallMultiplesYAxisPosition.FrozenRightColumn:
+                RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight1, hyperListMainContainer, rightYAxisGNode1, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                break;
+            case ESmallMultiplesYAxisPosition.All:
+                RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight1, hyperListMainContainer, leftYAxisGNode1, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, totalRows, itemHeight1, hyperListMainContainer, rightYAxisGNode1, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                break;
         }
     }, 100);
 };
@@ -476,7 +472,7 @@ export const GetReactPaginationLayout = (config: ISmallMultiplesGridLayoutSettin
     return layout;
 };
 
-export const RenderSmallMultiplesUniformYAxis = (
+export const RenderSmallMultiplesUniformLeftYAxis = (
     config: ISmallMultiplesGridLayoutSettings,
     xAxisGNodeHeight: number,
     yAxisGNodeWidth: number,
@@ -491,86 +487,180 @@ export const RenderSmallMultiplesUniformYAxis = (
     isUniformYScale: boolean,
     panelTitleSize: { width: number, height: number }
 ): void => {
-    const isFrozenLeftYColumn = config.yAxisPosition === ESmallMultiplesYAxisPosition.FrozenLeftColumn;
-    let uniformLeftYAxisDiv: D3Selection<HTMLElement>;
-    let uniformRightYAxisDiv: D3Selection<HTMLElement>;
+    const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
+    const itemWidth = bBox.width;
+    itemHeight = bBox.height;
 
     if (isUniformYScale) {
-
         if (uniformLeftYAxis) {
-            uniformLeftYAxisDiv = uniformLeftYAxis.append("div");
-            uniformLeftYAxisDiv.selectAll(".y-axis-col-svg").remove();
+            uniformLeftYAxis.selectAll(".y-axis-col-svg").remove();
         }
-
-        if (uniformRightYAxis) {
-            uniformRightYAxisDiv = uniformRightYAxis.append("div");
-            uniformRightYAxisDiv.selectAll(".y-axis-col-svg").remove();
-        }
-
-        if (config.xAxisPosition !== ESmallMultiplesXAxisPosition.FrozenBottomColumn) {
-            // if (uniformLeftYAxis) {
-            //     uniformLeftYAxis.style("margin-top", xAxisGNodeHeight + "px");
-            // }
-
-            // if (uniformRightYAxis) {
-            //     uniformRightYAxis.style("margin-top", xAxisGNodeHeight + "px");
-            // }
-        }
-
-        const smallMultiplesLayoutScrollbarWidth = 10;
 
         hyperListMainContainer.on("scroll", () => {
             if (uniformLeftYAxis) {
-                uniformLeftYAxisDiv.style("transform", `translate(${0}, ${-hyperListMainContainer.node().scrollTop}px)`);
-            }
-
-            if (uniformRightYAxis) {
-                uniformRightYAxisDiv.style("transform", `translate(${0}px, ${-hyperListMainContainer.node().scrollTop}px)`);
+                uniformLeftYAxis.style("transform", `translate(${0}, ${-hyperListMainContainer.node().scrollTop}px)`);
             }
         });
 
         // APPEND CLONED Y AXIS COPY
         for (let i = 0; i < totalRows; i++) {
-            const svg = d3.create("svg");
-            svg.classed("y-axis-col-svg", true);
-            svg.style("width", yAxisGNodeWidth + "px");
+            yAxisGNode.attr("id", "uniformYAxis-" + i);
 
-            const height = itemHeight;
-            svg.style("height", height + "px");
-            svg.attr("transform", `translate(${0}, ${i * height + ((i + 1) * config.outerSpacing)})`);
+            const uniformAxisContainer = d3.create("div");
+            uniformAxisContainer.style("transform", `translate(${0}px, ${i * itemHeight + ((i + 1) * config.outerSpacing)}px)`);
+            uniformAxisContainer.style("position", "absolute");
+
+            const axisSVG = d3.create("svg");
+            axisSVG.classed("y-axis-col-svg", true);
+            axisSVG.style("width", yAxisGNodeWidth + "px");
+            axisSVG.style("height", itemHeight + "px");
+            axisSVG.attr("transform", `translate(${0}, ${0})`);
 
             const g = d3.create("svg:g");
 
-            if (config.header.position === ESmallMultiplesHeaderPosition.Top) {
-                g.attr("transform", `translate(${yAxisGNodeWidth - (isFrozenLeftYColumn ? 0 : yAxisTitleWidth)}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? (10 + panelTitleSize.height) : 0})`);
+            const g1 = d3.create("svg:g");
+            g1.classed("test", true);
+
+            g.node().append(g1.node());
+            axisSVG.node().appendChild(g.node());
+
+            yAxisGNode.style("display", "block");
+
+            if (isUniformYScale) {
+                yAxisTitleGNode.attr("transform", `translate(${0}, ${itemHeight / 2})`);
+                yAxisTitleGNode.select(".yAxisTitle").attr("dy", "1em");
+            }
+
+            const uniformBrushSVG = RenderSmallMultiplesUniformYAxisBrush(true, itemHeight, yAxisGNodeWidth, yAxisTitleWidth);
+
+            if (isUniformYScale) {
+                axisSVG.node().appendChild(yAxisTitleGNode.node().cloneNode(true));
+            }
+
+            const { xAxisNodeHeight, isVerticalBrushDisplayed } = config.getUniformYAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth, itemHeight - xAxisGNodeHeight - config.innerSpacing, true);
+
+            if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
+                yAxisGNode.attr("transform", `translate(${0}, ${0})`);
             } else {
-                g.attr("transform", `translate(${yAxisGNodeWidth - (isFrozenLeftYColumn ? 0 : yAxisTitleWidth)}, ${0})`);
+                yAxisGNode.attr("transform", `translate(${0}, ${0})`);
+            }
+
+            if (config.header.position === ESmallMultiplesHeaderPosition.Top) {
+                g.attr("transform", `translate(${yAxisGNodeWidth - (0)}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? (config.innerSpacing + 5 + panelTitleSize.height) : 0})`);
+                uniformBrushSVG.select(".brush").attr("transform", `translate(${0}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? (config.innerSpacing + 5 + panelTitleSize.height) : 0})`);
+            } else {
+                g.attr("transform", `translate(${yAxisGNodeWidth - (0)}, ${0})`);
+                uniformBrushSVG.select(".brush").attr("transform", `translate(${0}, ${0})`);
+            }
+
+            if (!isVerticalBrushDisplayed) {
+                g.node().appendChild(yAxisGNode.node().cloneNode(true));
+            }
+
+            g1.attr("transform", `translate(${0}, ${0})`);
+
+            uniformAxisContainer.node().appendChild(axisSVG.node());
+            uniformAxisContainer.node().appendChild(uniformBrushSVG.node());
+
+            if (uniformLeftYAxis) {
+                uniformLeftYAxis.node().appendChild(uniformAxisContainer.node());
+            }
+        }
+    }
+};
+
+export const RenderSmallMultiplesUniformRightYAxis = (
+    config: ISmallMultiplesGridLayoutSettings,
+    xAxisGNodeHeight: number,
+    yAxisGNodeWidth: number,
+    totalRows: number,
+    itemHeight: number,
+    hyperListMainContainer: D3Selection<HTMLElement>,
+    yAxisGNode: D3Selection<SVGElement>,
+    yAxisTitleGNode: D3Selection<SVGElement>,
+    yAxisTitleWidth: number,
+    uniformRightYAxis: D3Selection<HTMLElement>,
+    isUniformYScale: boolean,
+    panelTitleSize: { width: number, height: number }
+): void => {
+    const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
+    const itemWidth = bBox.width;
+    itemHeight = bBox.height;
+
+    if (isUniformYScale) {
+        if (uniformRightYAxis) {
+            uniformRightYAxis.selectAll(".y-axis-col-svg").remove();
+        }
+
+        hyperListMainContainer.on("scroll", () => {
+            if (uniformRightYAxis) {
+                uniformRightYAxis.style("transform", `translate(${0}, ${-hyperListMainContainer.node().scrollTop}px)`);
+            }
+        });
+
+        // APPEND CLONED Y AXIS COPY
+        for (let i = 0; i < totalRows; i++) {
+            yAxisGNode.attr("id", "uniformYAxis-" + i);
+
+            const uniformAxisContainer = d3.create("div");
+            uniformAxisContainer.style("transform", `translate(${0}px, ${i * itemHeight + ((i + 1) * config.outerSpacing)}px)`);
+            uniformAxisContainer.style("position", "absolute");
+
+            const axisSVG = d3.create("svg");
+            axisSVG.classed("y-axis-col-svg", true);
+            axisSVG.style("width", yAxisGNodeWidth + "px");
+            axisSVG.style("height", itemHeight + "px");
+            axisSVG.attr("transform", `translate(${0}, ${0})`);
+
+            const g = d3.create("svg:g");
+
+            const g1 = d3.create("svg:g");
+            g1.classed("test", true);
+
+            g.node().append(g1.node());
+            axisSVG.node().appendChild(g.node());
+
+            yAxisGNode.style("display", "block");
+
+            if (isUniformYScale) {
+                yAxisTitleGNode.attr("transform", `translate(${yAxisGNodeWidth}, ${itemHeight / 2})`);
+            }
+
+            const uniformBrushSVG = RenderSmallMultiplesUniformYAxisBrush(false, itemHeight, yAxisGNodeWidth, yAxisTitleWidth);
+
+            if (isUniformYScale) {
+                axisSVG.node().appendChild(yAxisTitleGNode.node().cloneNode(true));
+            }
+
+            const { xAxisNodeHeight, isVerticalBrushDisplayed } = config.getUniformYAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth, itemHeight - xAxisGNodeHeight - config.innerSpacing, false);
+
+            if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
+                yAxisGNode.attr("transform", `translate(${0}, ${0})`);
+            } else {
+                yAxisGNode.attr("transform", `translate(${0}, ${0})`);
+            }
+
+            if (config.header.position === ESmallMultiplesHeaderPosition.Top) {
+                g.attr("transform", `translate(${0}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? (5 + panelTitleSize.height) + config.innerSpacing : 0})`);
+                uniformBrushSVG.select(".brush").attr("transform", `translate(${0}, ${config.header.position === ESmallMultiplesHeaderPosition.Top ? (5 + panelTitleSize.height) + config.innerSpacing : 0})`);
+            } else {
+                g.attr("transform", `translate(${0}, ${0})`);
+                uniformBrushSVG.select(".brush").attr("transform", `translate(${0}, ${0})`);
             }
 
             yAxisGNode.style("display", "block");
 
-            if (isUniformYScale && !isFrozenLeftYColumn) {
-                yAxisTitleGNode.attr("transform", `translate(${yAxisGNodeWidth}, ${itemHeight / 2})`);
-                svg.node().appendChild(yAxisTitleGNode.node());
+            if (!isVerticalBrushDisplayed) {
+                g.node().appendChild(yAxisGNode.node().cloneNode(true));
             }
 
-            svg.node().appendChild(g.node());
+            g1.attr("transform", `translate(${0}, ${0})`);
 
-            if (isUniformYScale && isFrozenLeftYColumn) {
-                yAxisTitleGNode.attr("transform", `translate(${0}, ${itemHeight / 2})`);
-                yAxisTitleGNode.select(".yAxisTitle").attr("dy", "1em");
-
-                svg.node().appendChild(yAxisTitleGNode.node());
-            }
-
-            g.node().appendChild(yAxisGNode.node().cloneNode(true));
-
-            if (uniformLeftYAxis) {
-                uniformLeftYAxisDiv.node().appendChild(svg.node().cloneNode(true));
-            }
+            uniformAxisContainer.node().appendChild(axisSVG.node());
+            uniformAxisContainer.node().appendChild(uniformBrushSVG.node());
 
             if (uniformRightYAxis) {
-                uniformRightYAxisDiv.node().appendChild(svg.node().cloneNode(true));
+                uniformRightYAxis.node().appendChild(uniformAxisContainer.node());
             }
         }
     }
@@ -619,9 +709,10 @@ export const GetSmallMultiplesUniformRightYAxis = (config: ISmallMultiplesGridLa
 export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, itemWidth: number, itemHeight: number, isCallBrush: boolean): {
     bottomXAxisNode: D3Selection<SVGElement>,
     topXAxisNode: D3Selection<SVGElement>,
+    leftYAxisGNode: D3Selection<SVGElement>,
+    rightYAxisGNode: D3Selection<SVGElement>,
     brushNode: D3Selection<SVGElement>,
     xAxisTitleGNode: D3Selection<SVGElement>,
-    yAxisGNode: D3Selection<SVGElement>,
     yAxisTitleGNode: D3Selection<SVGElement>,
     xAxisGNodeHeight: number,
     brushNodeHeight: number,
@@ -631,12 +722,15 @@ export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, it
 } => {
     const { xAxisNode: bottomXAxisNode, xAxisNodeHeight, xAxisTitleG, xAxisTitleHeight, brushNode, brushNodeHeight } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, true, isCallBrush);
     const { xAxisNode: topXAxisNode } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, false, isCallBrush);
-    const { yAxisNode, yAxisNodeWidth, yAxisTitleG, yAxisTitleWidth } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight);
+    const { yAxisNode: leftYAxisNode, yAxisNodeWidth, yAxisTitleG, yAxisTitleWidth } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, true);
+    const { yAxisNode: rightYAxisNode } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, false);
 
     const bottomXAxisGNode = d3.select(bottomXAxisNode.cloneNode(true));
     const topXAxisGNode = d3.select(topXAxisNode.cloneNode(true));
 
-    const yAxisGNode = d3.select(yAxisNode.cloneNode(true));
+    const leftYAxisGNode = d3.select(leftYAxisNode.cloneNode(true));
+    const rightYAxisGNode = d3.select(rightYAxisNode.cloneNode(true));
+
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
 
@@ -656,9 +750,10 @@ export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, it
     return {
         bottomXAxisNode: bottomXAxisGNode,
         topXAxisNode: topXAxisGNode,
+        leftYAxisGNode: leftYAxisGNode,
+        rightYAxisGNode: rightYAxisGNode,
         brushNode: d3.select(brushNode.cloneNode(true)),
         xAxisTitleGNode: xAxisTitleGNode,
-        yAxisGNode,
         xAxisGNodeHeight: (xAxisNodeHeight + 12 + (isUniformXScale ? xAxisTitleHeight : 0)),
         yAxisGNodeWidth: yAxisNodeWidth + (isUniformYScale ? (yAxisTitleWidth + 5) : 0),
         yAxisTitleGNode: yAxisTitleGNode,
@@ -919,6 +1014,26 @@ export const RenderSmallMultiplesUniformXAxisBrush = (isBottomXAxis: boolean, co
         brushSVG.attr("transform", `translate(${0}, ${xAxisGNodeHeight - 18 - xAxisTitleHeight})`);
     } else {
         brushSVG.attr("transform", `translate(${0}, ${10 + xAxisTitleHeight})`);
+    }
+
+    const brushG = d3.create("svg:g");
+    brushG.classed("brush", true);
+
+    brushSVG.node().append(brushG.node());
+
+    return brushSVG;
+};
+
+export const RenderSmallMultiplesUniformYAxisBrush = (isLeftYAxis: boolean, scaleHeight: number, yAxisGNodeWidth: number, yAxisTitleWidth: number): D3Selection<SVGElement> => {
+    const brushSVG = d3.create("svg");
+    brushSVG.classed("uniformYAxisBrush", true);
+    brushSVG.style("width", 18 + "px");
+    brushSVG.style("height", scaleHeight + "px");
+
+    if (isLeftYAxis) {
+        brushSVG.attr("transform", `translate(${yAxisTitleWidth + 10}, ${0})`);
+    } else {
+        brushSVG.attr("transform", `translate(${yAxisGNodeWidth - 10 - yAxisTitleWidth}, ${0})`);
     }
 
     const brushG = d3.create("svg:g");

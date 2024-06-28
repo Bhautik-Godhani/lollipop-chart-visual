@@ -367,11 +367,15 @@ export interface IBrushConfig {
 	brushNumber?: number;
 	isShowXAxis: boolean;
 	isShowYAxis: boolean;
-	isShowHorizontalBrush: boolean;
+	isShowBrush: boolean;
 	isSMUniformXAxis?: boolean;
 	isSMUniformXAxisIsBottom?: boolean;
 	SMUniformXAxisId?: number
 	SMUniformXAxisG?: SVGElement
+	isSMUniformYAxis?: boolean;
+	isSMUniformYAxisIsLeft?: boolean;
+	SMUniformYAxisId?: number
+	SMUniformYAxisG?: SVGElement
 }
 
 export interface IShowBucketSettings {
