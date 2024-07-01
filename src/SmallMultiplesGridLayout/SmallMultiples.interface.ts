@@ -55,11 +55,13 @@ export interface ISmallMultiplesGridLayoutSettings {
         inset: boolean;
     },
     onCellRendered: (category: string, gridItemIndex: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => void,
-    getUniformXAxisAndBrushNode: (colIndex: number, xAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isBottomAxis: boolean) => { xAxisNodeHeight: number, yAxisNodeWidth: number, isHorizontalBrushDisplayed: boolean },
-    getUniformYAxisAndBrushNode: (colIndex: number, yAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isLeftAxis: boolean) => { xAxisNodeHeight: number, yAxisNodeWidth: number, isVerticalBrushDisplayed: boolean },
-    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isBottomXAxis: boolean, isCallBrush?: boolean) =>
+    getUniformXAxisAndBrushNode: (colIndex: number, xAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isBottomAxis: boolean) =>
+        { xAxisNodeHeight: number, yAxisNodeWidth: number, isHorizontalBrushDisplayed: boolean },
+    getUniformYAxisAndBrushNode: (colIndex: number, yAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isLeftAxis: boolean) =>
+        { xAxisNodeHeight: number, yAxisNodeWidth: number, isVerticalBrushDisplayed: boolean },
+    getXAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isBottomXAxis: boolean, isDrawAxis: boolean) =>
         { xAxisNode: any; xAxisNodeHeight: number; brushNode: any; brushNodeHeight: number; xAxisTitleG: any; xAxisTitleHeight: number; },
-    getYAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isLeftYAxis: boolean) =>
+    getYAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isLeftYAxis: boolean, isDrawAxis: boolean) =>
         { yAxisNode: any, yAxisNodeWidth: number; brushNode: any; brushNodeWidth: number; yAxisTitleG: any; yAxisTitleWidth: number; },
     onRenderingFinished: () => void,
 }

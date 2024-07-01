@@ -171,7 +171,7 @@ import TemplatesSettings from "./settings-pages/Templates";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, UnderlineIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { RenderRaceChartDataLabel, RenderRaceTickerButton } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -1524,7 +1524,8 @@ export class Visual extends Shadow {
 		clonedCategoricalData: powerbi.DataViewCategorical,
 		categoricalMetadata: any,
 		width: number,
-		height: number
+		height: number,
+		isRenderBrush: boolean = true
 	): powerbi.DataViewCategorical {
 		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
 			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
@@ -2240,109 +2241,111 @@ export class Visual extends Shadow {
 		const expectedWidth = (this.brushScaleBandBandwidth * width) / this.brushScaleBand.bandwidth();
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
-		if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
-			if (this.isHorizontalChart) {
-				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-					this.brushXAxisTicksMaxHeight = 0;
-					this.setBrushYAxisTicksMaxWidth();
-				} else {
-					this.brushXAxisTicksMaxHeight = 0;
-					this.brushYAxisTicksMaxWidth = 0;
-				}
-
-				if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-					this.isScrollBrushDisplayed = true;
-					this.isVerticalBrushDisplayed = true;
-					this.isHorizontalBrushDisplayed = false;
-
-					const config: IBrushConfig = {
-						width: this.width,
-						height: this.height,
-						brushG: this.brushG.node(),
-						brushXPos: 0,
-						brushYPos: 0,
-						barDistance: this.brushScaleBandBandwidth,
-						totalBarsCount: this.totalLollipopCount,
-						scaleWidth: width,
-						scaleHeight: height,
-						smallMultiplesGridItemId: null,
-						categoricalData: categoricalData,
-						isShowXAxis: true,
-						isShowYAxis: true,
-						isShowBrush: true
-					};
-
-					this.initVerticalBrush(config);
-				} else {
-					this.isScrollBrushDisplayed = false;
-					this.isVerticalBrushDisplayed = false;
-					this.isHorizontalBrushDisplayed = false;
-					this.brushG.selectAll("*").remove();
-				}
-			} else {
-				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-					this.brushYAxisTicksMaxWidth = 0;
-					this.setBrushXAxisTicksMaxHeight();
-				} else {
-					this.brushXAxisTicksMaxHeight = 0;
-					this.brushYAxisTicksMaxWidth = 0;
-				}
-
-				if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-					this.isScrollBrushDisplayed = true;
-					this.isHorizontalBrushDisplayed = true;
-					this.isVerticalBrushDisplayed = false;
-					const brushXPos = this.margin.left ? this.margin.left : 0;
-
-					const config: IBrushConfig = {
-						width: this.width,
-						height: this.height,
-						brushG: this.brushG.node(),
-						brushXPos: brushXPos,
-						brushYPos: 100000,
-						barDistance: this.brushScaleBandBandwidth,
-						totalBarsCount: this.totalLollipopCount,
-						scaleWidth: width,
-						scaleHeight: height,
-						smallMultiplesGridItemId: null,
-						categoricalData: categoricalData,
-						isShowXAxis: true,
-						isShowYAxis: true,
-						isShowBrush: true
-					};
-
-					this.initHorizontalBrush(config);
-				} else {
-					this.isScrollBrushDisplayed = false;
-					this.isHorizontalBrushDisplayed = false;
-					this.isVerticalBrushDisplayed = false;
-					this.brushG.selectAll("*").remove();
-				}
-			}
-
-			// || this.height < expectedHeight
-			if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-				);
-
-				const categoricalData2 = cloneDeep(categoricalData);
-
-				categoricalData2.categories.forEach((d, i) => {
-					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-				});
-
-				categoricalData2.values.forEach((d, i) => {
-					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-					if (d.highlights) {
-						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+		if (isRenderBrush) {
+			if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
+				if (this.isHorizontalChart) {
+					if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+						this.brushXAxisTicksMaxHeight = 0;
+						this.setBrushYAxisTicksMaxWidth();
+					} else {
+						this.brushXAxisTicksMaxHeight = 0;
+						this.brushYAxisTicksMaxWidth = 0;
 					}
-				});
 
-				this.setCategoricalDataFields(categoricalData2);
-				this.setChartData(categoricalData2);
+					if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+						this.isScrollBrushDisplayed = true;
+						this.isVerticalBrushDisplayed = true;
+						this.isHorizontalBrushDisplayed = false;
+
+						const config: IBrushConfig = {
+							width: this.width,
+							height: this.height,
+							brushG: this.brushG.node(),
+							brushXPos: 0,
+							brushYPos: 0,
+							barDistance: this.brushScaleBandBandwidth,
+							totalBarsCount: this.totalLollipopCount,
+							scaleWidth: width,
+							scaleHeight: height,
+							smallMultiplesGridItemId: null,
+							categoricalData: categoricalData,
+							isShowXAxis: true,
+							isShowYAxis: true,
+							isShowBrush: true
+						};
+
+						this.initVerticalBrush(config);
+					} else {
+						this.isScrollBrushDisplayed = false;
+						this.isVerticalBrushDisplayed = false;
+						this.isHorizontalBrushDisplayed = false;
+						this.brushG.selectAll("*").remove();
+					}
+				} else {
+					if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+						this.brushYAxisTicksMaxWidth = 0;
+						this.setBrushXAxisTicksMaxHeight();
+					} else {
+						this.brushXAxisTicksMaxHeight = 0;
+						this.brushYAxisTicksMaxWidth = 0;
+					}
+
+					if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+						this.isScrollBrushDisplayed = true;
+						this.isHorizontalBrushDisplayed = true;
+						this.isVerticalBrushDisplayed = false;
+						const brushXPos = this.margin.left ? this.margin.left : 0;
+
+						const config: IBrushConfig = {
+							width: this.width,
+							height: this.height,
+							brushG: this.brushG.node(),
+							brushXPos: brushXPos,
+							brushYPos: 100000,
+							barDistance: this.brushScaleBandBandwidth,
+							totalBarsCount: this.totalLollipopCount,
+							scaleWidth: width,
+							scaleHeight: height,
+							smallMultiplesGridItemId: null,
+							categoricalData: categoricalData,
+							isShowXAxis: true,
+							isShowYAxis: true,
+							isShowBrush: true
+						};
+
+						this.initHorizontalBrush(config);
+					} else {
+						this.isScrollBrushDisplayed = false;
+						this.isHorizontalBrushDisplayed = false;
+						this.isVerticalBrushDisplayed = false;
+						this.brushG.selectAll("*").remove();
+					}
+				}
+
+				// || this.height < expectedHeight
+				if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+					);
+
+					const categoricalData2 = cloneDeep(categoricalData);
+
+					categoricalData2.categories.forEach((d, i) => {
+						d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+					});
+
+					categoricalData2.values.forEach((d, i) => {
+						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+						if (d.highlights) {
+							d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+						}
+					});
+
+					this.setCategoricalDataFields(categoricalData2);
+					this.setChartData(categoricalData2);
+				}
 			}
 		}
 
@@ -3059,101 +3062,136 @@ export class Visual extends Shadow {
 							}
 						}
 					},
-					getXAxisNodeElementAndMeasures: (width, height, isBottomXAxis) => {
-						this.viewPortWidth = width;
-						this.viewPortHeight = height;
-						this.width = width;
-						this.height = height;
-						this.settingsBtnWidth = 0;
-						this.settingsBtnHeight = 0;
-						let isAxisPositionChanged: boolean;
-
-						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && !isBottomXAxis) {
-							this.xAxisSettings.position = Position.Top;
-							this.isBottomXAxis = false;
-							isAxisPositionChanged = true;
-						}
-
-						this.setInitialChartData(
-							this.clonedCategoricalData,
-							cloneDeep(this.clonedCategoricalData),
-							this.categoricalMetadata,
-							width,
-							height
-						);
-
-						this.setChartData(this.categoricalData);
-
+					getXAxisNodeElementAndMeasures: (width, height, isBottomXAxis, isDrawAxis) => {
 						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
-							this.drawXYAxisTitle();
+							this.viewPortWidth = width;
+							this.viewPortHeight = height;
+							this.width = width;
+							this.height = height;
+							this.settingsBtnWidth = 0;
+							this.settingsBtnHeight = 0;
+							let isAxisPositionChanged: boolean;
+
+							if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && !isBottomXAxis) {
+								this.xAxisSettings.position = Position.Top;
+								this.isBottomXAxis = false;
+								isAxisPositionChanged = true;
+							}
+
+							const data = this.setInitialChartData(
+								this.clonedCategoricalData,
+								cloneDeep(this.clonedCategoricalData),
+								this.categoricalMetadata,
+								width,
+								height,
+								false
+							);
+
+							this.categoricalData = data;
+							this.setCategoricalDataFields(data);
+							this.setChartData(data);
+
+							if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+								this.drawXYAxisTitle();
+							}
+
+							if (isDrawAxis) {
+								const { xAxisG } = this.drawXYAxis(data, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
+							}
+
+							if (isAxisPositionChanged) {
+								this.xAxisSettings.position = Position.Bottom;
+								this.isBottomXAxis = true;
+								isAxisPositionChanged = false;
+							}
 						}
 
-						const { xAxisG } = this.drawXYAxis(this.categoricalData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
-
-						if (isAxisPositionChanged) {
-							this.xAxisSettings.position = Position.Bottom;
-							this.isBottomXAxis = true;
-							isAxisPositionChanged = false;
-						}
+						const { titleName, titleFontFamily, titleFontSize, titleStyling } = this.xAxisSettings;
+						const xAxisTitleSize = getSVGTextSize(
+							titleName,
+							titleFontFamily,
+							titleFontSize,
+							titleStyling[EFontStyle.Bold],
+							titleStyling[EFontStyle.Italic],
+							titleStyling[EFontStyle.UnderLine]
+						);
 
 						return {
 							xAxisNode: this.xAxisG.node().cloneNode(true),
-							xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height + (this.isHorizontalBrushDisplayed ? 20 : 0),
-							brushNode: this.brushG.node().cloneNode(true),
+							xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height + 10 + (this.isHorizontalBrushDisplayed ? 20 : 0),
+							brushNode: this.isHorizontalBrushDisplayed ? this.brushG.node().cloneNode(true) : d3.create("a").node(),
 							brushNodeHeight: this.brushG.node().getBoundingClientRect().height,
 							xAxisTitleG: this.xAxisTitleG.node().cloneNode(true),
-							xAxisTitleHeight: this.xAxisTitleG.node().getBoundingClientRect().height
+							xAxisTitleHeight: this.xAxisSettings.isDisplayTitle && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform ? xAxisTitleSize.height : 0
 						};
 					},
-					getYAxisNodeElementAndMeasures: (width, height, isLeftYAxis) => {
-						this.viewPortWidth = width;
-						this.viewPortHeight = height;
-						this.width = width;
-						this.height = height;
-						this.settingsBtnWidth = 0;
-						this.settingsBtnHeight = 0;
-						let isAxisPositionChanged: boolean;
+					getYAxisNodeElementAndMeasures: (width, height, isLeftYAxis, isDrawAxis) => {
+						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
+							this.viewPortWidth = width;
+							this.viewPortHeight = height;
+							this.width = width;
+							this.height = height;
+							this.settingsBtnWidth = 0;
+							this.settingsBtnHeight = 0;
+							let isAxisPositionChanged: boolean;
 
-						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform && !isLeftYAxis) {
-							this.yAxisSettings.position = Position.Right;
-							this.isLeftYAxis = false;
-							isAxisPositionChanged = true;
+							if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform && !isLeftYAxis) {
+								this.yAxisSettings.position = Position.Right;
+								this.isLeftYAxis = false;
+								isAxisPositionChanged = true;
+							}
+
+							const data = this.setInitialChartData(
+								this.clonedCategoricalData,
+								cloneDeep(this.clonedCategoricalData),
+								this.categoricalMetadata,
+								width,
+								height,
+								false
+							);
+
+							this.categoricalData = data;
+							this.setCategoricalDataFields(data);
+							this.setChartData(data);
+
+							if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+								this.drawXYAxisTitle();
+							}
+
+							if (isDrawAxis) {
+								const { yAxisG } = this.drawXYAxis(data, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
+							}
+
+							if (isAxisPositionChanged) {
+								this.yAxisSettings.position = Position.Left;
+								this.isLeftYAxis = true;
+								isAxisPositionChanged = false;
+							}
 						}
 
-						const data = this.setInitialChartData(
-							this.clonedCategoricalData,
-							cloneDeep(this.clonedCategoricalData),
-							this.categoricalMetadata,
-							width,
-							height
+						const { titleName, titleFontFamily, titleFontSize, titleStyling } = this.yAxisSettings;
+						const yAxisTitleSize = getSVGTextSize(
+							titleName,
+							titleFontFamily,
+							titleFontSize,
+							titleStyling[EFontStyle.Bold],
+							titleStyling[EFontStyle.Italic],
+							titleStyling[EFontStyle.UnderLine]
 						);
 
-						this.setChartData(this.categoricalData);
-
-						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
-							this.drawXYAxisTitle();
-						}
-
-						const { yAxisG } = this.drawXYAxis(this.categoricalData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
-
-						if (isAxisPositionChanged) {
-							this.yAxisSettings.position = Position.Left;
-							this.isLeftYAxis = true;
-							isAxisPositionChanged = false;
-						}
-
 						return {
-							yAxisNode: this.yAxisG.node(),
-							yAxisNodeWidth: this.yScaleGWidth + (this.isVerticalBrushDisplayed ? 20 : 0),
+							yAxisNode: this.yAxisG.node().cloneNode(true),
+							yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width + 10 + (this.isVerticalBrushDisplayed ? 20 : 0),
 							brushNode: this.brushG.node().cloneNode(true),
 							brushNodeWidth: this.brushG.node().getBoundingClientRect().width,
 							yAxisTitleG: this.yAxisTitleG.node().cloneNode(true),
-							yAxisTitleWidth: this.yAxisTitleG.node().getBoundingClientRect().width
+							yAxisTitleWidth: this.yAxisSettings.isDisplayTitle && this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? yAxisTitleSize.height : 0
 						};
 					},
 					getUniformXAxisAndBrushNode: (colIndex, xAxisNode, brushNode, width, height, isBottomXAxis) => {
+						this.xAxisG = d3.select(xAxisNode);
+
 						if (xAxisNode && brushNode && this.isHorizontalBrushDisplayed) {
-							this.xAxisG = d3.select(xAxisNode);
 							this.brushG = d3.select(brushNode);
 
 							const config: IBrushConfig = {
@@ -3178,16 +3216,17 @@ export class Visual extends Shadow {
 							};
 
 							this.drawHorizontalBrush(this, config);
-							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width, isHorizontalBrushDisplayed: this.isHorizontalBrushDisplayed };
+							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: this.isHorizontalBrushDisplayed };
 						} else {
-							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width, isHorizontalBrushDisplayed: false };
+							this.drawXYAxis(this.categoricalData, true, false, false);
+							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: false };
 						}
 					},
 					getUniformYAxisAndBrushNode: (colIndex, yAxisNode, brushNode, width, height, isLeftAxis) => {
-						if (yAxisNode && brushNode && this.isVerticalBrushDisplayed) {
-							this.yAxisG = d3.select(yAxisNode);
-							this.brushG = d3.select(brushNode);
+						this.yAxisG = d3.select(yAxisNode);
 
+						if (yAxisNode && brushNode && this.isVerticalBrushDisplayed) {
+							this.brushG = d3.select(brushNode);
 							const config: IBrushConfig = {
 								width,
 								height,
@@ -3210,9 +3249,12 @@ export class Visual extends Shadow {
 							};
 
 							this.drawVerticalBrush(this, config);
-							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width, isVerticalBrushDisplayed: this.isVerticalBrushDisplayed };
+							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
+							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: this.isVerticalBrushDisplayed };
 						} else {
-							return { xAxisNodeHeight: this.xAxisG.node().getBoundingClientRect().height, yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width, isVerticalBrushDisplayed: false };
+							this.drawXYAxis(this.categoricalData, false, true, false);
+							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
+							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: false };
 						}
 					},
 					onRenderingFinished: () => {
@@ -5748,8 +5790,6 @@ export class Visual extends Shadow {
 							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 
 							this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
-
-							this.yAxisG.attr("transform", `translate(${0}, ${0})`);
 						} else {
 							this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 						}
