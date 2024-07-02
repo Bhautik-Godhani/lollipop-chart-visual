@@ -8360,8 +8360,19 @@ export class Visual extends Shadow {
 			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue * 35 / 100;
 		}
 
-		if ((this.cutAndClipAxisSettings.breakStart >= this.axisDomainMaxValue) || (this.cutAndClipAxisSettings.breakEnd >= this.axisDomainMaxValue)) {
+		if (this.cutAndClipAxisSettings.breakStart < this.axisDomainMinValue) {
+			this.cutAndClipAxisSettings.breakStart = this.axisDomainMinValue;
+		}
+
+		if (this.cutAndClipAxisSettings.breakStart >= this.axisDomainMaxValue) {
 			this.cutAndClipAxisSettings.breakStart = this.axisDomainMaxValue;
+		}
+
+		if (this.cutAndClipAxisSettings.breakEnd < this.axisDomainMinValue) {
+			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMinValue;
+		}
+
+		if (this.cutAndClipAxisSettings.breakEnd >= this.axisDomainMaxValue) {
 			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue;
 		}
 

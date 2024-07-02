@@ -137,7 +137,7 @@ const CutAndClipAxisSettings = (props) => {
               <Row disableTopPadding={true}>
                 <Column >
                   <InputControl
-                    min={0}
+                    min={-Infinity}
                     type="number"
                     label="Break Start"
                     value={configValues.breakStart}
@@ -147,7 +147,7 @@ const CutAndClipAxisSettings = (props) => {
 
                 <Column>
                   <InputControl
-                    min={0}
+                    min={-Infinity}
                     type="number"
                     label="Break End"
                     value={configValues.breakEnd}
