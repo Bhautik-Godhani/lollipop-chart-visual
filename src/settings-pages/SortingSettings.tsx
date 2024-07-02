@@ -6,6 +6,7 @@ import { ESortByTypes, ESortOrderTypes, ESortingSettings } from "../enum";
 import { AccordionAlt, Column, ConditionalWrapper, ESmallMultiplesAxisType, Footer, RadioOption, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, ISortingProps, ISortingSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
+import { cloneDeep } from "lodash";
 
 const SORT_ORDER: ILabelValuePair[] = [
 	{
@@ -259,7 +260,7 @@ const SortingSettings = (props) => {
 
 	const CATEGORY_SORT_ON: ILabelValuePair[] = [
 		{
-			label: (shadow as Visual).isExpandAllApplied ? (shadow.categoryDisplayName as string + " ").concat((shadow as Visual).expandAllCategoriesName.join(" ")) : shadow.categoryDisplayName,
+			label: (shadow as Visual).isExpandAllApplied ? (shadow.categoryDisplayName as string + " ").concat(cloneDeep((shadow as Visual).expandAllCategoriesName).reverse().join(" ")) : shadow.categoryDisplayName,
 			value: shadow.categoryDisplayName,
 			isSortByCategory: true,
 			isSortByMeasure: false,
