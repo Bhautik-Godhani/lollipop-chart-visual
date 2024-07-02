@@ -1216,8 +1216,22 @@ const XAxisSettings = (props) => {
   };
 
   const resetChanges = () => {
-    setXConfigValues({ ...X_AXIS_SETTINGS, isResetClicked: true });
-    setYConfigValues({ ...Y_AXIS_SETTINGS, isResetClicked: true });
+    const xConfigValues: IXAxisSettings = { ...X_AXIS_SETTINGS, isResetClicked: true };
+    if (xConfigValues.isDisplayTitle) {
+      if (xConfigValues.titleName.length === 0) {
+        xConfigValues.titleName = shadow.categoryDisplayName;
+      }
+    }
+
+    const yConfigValues: IYAxisSettings = { ...Y_AXIS_SETTINGS, isResetClicked: true };
+    if (yConfigValues.isDisplayTitle) {
+      if (yConfigValues.titleName.length === 0) {
+        yConfigValues.titleName = shadow.measureNames.join(" and ");
+      }
+    }
+
+    setXConfigValues(xConfigValues);
+    setYConfigValues(yConfigValues);
   };
 
   const [xConfigValues, setXConfigValues] = React.useState<IXAxisSettings>({
