@@ -3681,6 +3681,7 @@ export class Visual extends Shadow {
 							}
 						} else {
 							d.subCategories.forEach((s) => {
+								const conditionalFormattingResult = isConditionMatch1(d.category, s.category, d.value1, d.value2, s.value1, s.value2, s.tooltipFields, c);
 								if (conditionalFormattingResult.match) {
 									// if (conditionalFormattingResult.measureType === EDataRolesName.Measure1) {
 									// 	this.subCategoryColorPair[d.category].marker1Color = conditionalFormattingResult.markerColor;
@@ -3768,14 +3769,14 @@ export class Visual extends Shadow {
 								conditionalFormattingConditions.forEach((c) => {
 									if (c.valueType === ECFValueTypes.Ranking) {
 										if (c.rankingType === ECFRankingTypes.TopN) {
-											if (i < c.staticRankingValue) {
+											if (j < c.staticRankingValue) {
 												if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
 												}
 											}
 										} else if (c.rankingType === ECFRankingTypes.BottomN) {
-											if (i > ((d.subCategories.length - 1) - c.staticRankingValue)) {
+											if (j > ((d.subCategories.length - 1) - c.staticRankingValue)) {
 												if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
