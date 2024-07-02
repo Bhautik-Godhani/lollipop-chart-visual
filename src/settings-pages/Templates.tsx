@@ -293,7 +293,9 @@ const TemplatesSettings = (props) => {
       if (shadow.isIBCSEnabled) {
         ApplyBeforeIBCSAppliedSettingsBack(shadow);
       }
-      SetBeforeTemplateSettings(shadow, configValues);
+      if (!shadow.templateSettings.isTemplatesEnabled) {
+        SetBeforeTemplateSettings(shadow, configValues);
+      }
       ApplyThemeJson(shadow, configValues.templateSchema, vizOptions.formatTab);
       shadow.persistProperties(sectionName, propertyName, configValues);
     } else {
