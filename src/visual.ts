@@ -4257,6 +4257,9 @@ export class Visual extends Shadow {
 						return obj;
 					}, {});
 
+					let subCategories = getSubCategoryData(idx, <string>cat);
+					subCategories = this.elementToMoveOthers(subCategories, true, "category", this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
+
 					const obj: ILollipopChartRow = {
 						uid: getUID(cat),
 						category: cat.toString(),
@@ -4270,7 +4273,7 @@ export class Visual extends Shadow {
 						selected: false,
 						isHighlight: this.categoricalMeasure1Field.highlights ? !!this.categoricalMeasure1Field.highlights[idx] : false,
 						tooltipFields: this.categoricalTooltipFields.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
-						subCategories: this.isHasSubcategories ? getSubCategoryData(idx, <string>cat) : [],
+						subCategories: this.isHasSubcategories ? subCategories : [],
 						positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
 						errorBar1: {
 							lowerBoundValue: 0,
