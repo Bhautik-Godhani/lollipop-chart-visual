@@ -921,18 +921,18 @@ export class Visual extends Shadow {
 					icon: ImportExportIcon
 				},
 				{
-					name: Components.ShowCondition,
-					sectionName: "showBucketConfig",
-					propertyName: "showBucket",
-					Component: () => ShowCondition,
-					icon: ShowConditionIcon
-				},
-				{
 					name: "Templates",
 					sectionName: EVisualConfig.TemplatesConfig,
 					propertyName: EVisualSettings.TemplatesSettings,
 					Component: () => TemplatesSettings,
 					icon: TemplatesSettingsIcon
+				},
+				{
+					name: Components.ShowCondition,
+					sectionName: "showBucketConfig",
+					propertyName: "showBucket",
+					Component: () => ShowCondition,
+					icon: ShowConditionIcon
 				},
 			],
 		});
@@ -5939,7 +5939,7 @@ export class Visual extends Shadow {
 		}
 
 		const scrolled = false;
-		if (this.isScrollBrushDisplayed && isBrushRendered) {
+		if (this.isScrollBrushDisplayed && isBrushRendered && !this.isSmallMultiplesEnabled) {
 			d3.select(this.hostContainer).on("wheel", (event, d) => {
 				if (!scrolled && isBrushRendered) {
 					// scrolled = true;
@@ -6305,7 +6305,7 @@ export class Visual extends Shadow {
 		const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 
 		let scrolled = false;
-		if (this.isScrollBrushDisplayed && isBrushRendered && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
+		if (this.isScrollBrushDisplayed && isBrushRendered && !this.isSmallMultiplesEnabled) {
 			((self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData && smallMultiplesGridItemContent) ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
 				if (!scrolled && isBrushRendered) {
 					scrolled = true;
