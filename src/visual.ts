@@ -7451,8 +7451,20 @@ export class Visual extends Shadow {
 		let xAxisTickHeight: number = 0;
 		let xAxisMaxWordHeight: number = 1;
 
+		const maxCharsLength = getSVGTextSize(
+			Array(xAxisSettings.labelCharLimit).join("a"),
+			xAxisSettings.titleFontFamily,
+			xAxisSettings.titleFontSize,
+			xAxisSettings.titleStyling[EFontStyle.Bold],
+			xAxisSettings.titleStyling[EFontStyle.Italic],
+			xAxisSettings.titleStyling[EFontStyle.UnderLine]
+		).width;
+		const maxWidth = xAxisSettings.isLabelAutoCharLimit ? this.scaleBandWidth : maxCharsLength;
+
 		if ((!this.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 			const xAxisDomain: string[] = this.xScale.domain();
+			const maxTextCount = d3.max(xAxisDomain, d => d.length);
+
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
 				const textProperties: TextProperties = {
@@ -7460,11 +7472,9 @@ export class Visual extends Shadow {
 					fontFamily: xAxisSettings.labelFontFamily,
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
-				return GetWordsSplitByWidth(newText, textProperties, this.scaleBandWidth, 3);
+				return GetWordsSplitByWidth(newText, textProperties, maxWidth, 3);
 			});
 
-			isApplyTilt = (xAxisSettings.isLabelAutoTilt && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
-				(this.markerMaxSize > this.scaleBandWidth))) || (!xAxisSettings.isLabelAutoTilt && xAxisSettings.labelTilt !== 0);
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
 				const textProperties: TextProperties = {
 					text: d + "ab",
@@ -7474,7 +7484,13 @@ export class Visual extends Shadow {
 				return textMeasurementService.measureSvgTextWidth(textProperties);
 			});
 			const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth);
-			xAxisMaxHeight = d3.min([this.height * 0.4, xAxisTicksMaxWidth]);
+			xAxisMaxHeight = !xAxisSettings.isLabelAutoCharLimit ? xAxisTicksMaxWidth : d3.min([this.height * 0.4, xAxisTicksMaxWidth]);
+
+			isApplyTilt = (xAxisSettings.isLabelAutoTilt && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
+				(this.markerMaxSize > this.scaleBandWidth)))
+				|| (!xAxisSettings.isLabelAutoCharLimit && xAxisTicksMaxWidth > this.scaleBandWidth)
+				|| (!xAxisSettings.isLabelAutoCharLimit && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 0) && xAxisTicksMaxWidth > this.scaleBandWidth)
+				|| (!xAxisSettings.isLabelAutoTilt && xAxisSettings.labelTilt !== 0);
 
 			const textProperties: TextProperties = {
 				text: "X Axis",
@@ -7585,7 +7601,7 @@ export class Visual extends Shadow {
 				};
 
 				const getFinalTruncatedText = (d: string) => {
-					return !xAxisSettings.isLabelAutoCharLimit && d.length === xAxisSettings.labelCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
+					return !xAxisSettings.isLabelAutoCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
 
 				if ((!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
@@ -7603,7 +7619,7 @@ export class Visual extends Shadow {
 							});
 						}
 
-						const words: string[] = GetWordsSplitByWidth(newText, textProperties, THIS.scaleBandWidth - xAxisSettings.labelFontSize / 2, 3);
+						const words: string[] = GetWordsSplitByWidth(newText, textProperties, maxWidth - xAxisSettings.labelFontSize / 2, 3);
 						words.forEach((d, i) => {
 							ele
 								.append("tspan")
@@ -10913,7 +10929,7 @@ export class Visual extends Shadow {
 
 	setBrushLollipopCircleSchemaColors(chartData: IBrushLollipopChartData[], schemeColors: string[] = [], isReverse: boolean, isGradient: boolean): void {
 		if (isReverse) {
-			schemeColors = schemeColors.reverse();
+			schemeColors = cloneDeep(schemeColors).reverse();
 		}
 
 		if (isGradient) {
