@@ -416,7 +416,7 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 	markerType: EMarkerTypes.SHAPE,
 	markerStyleType: EMarkerStyleTypes.Marker1Style,
 	marker1Style: {
-		isAutoMarkerSize: false,
+		isAutoMarkerSize: true,
 		markerSize: 20,
 		markerShape: EMarkerShapeTypes.DEFAULT,
 		markerChart: EMarkerChartTypes.DONUT,
@@ -432,7 +432,7 @@ export const MARKER_SETTINGS: IMarkerSettings = {
 		showOutlineOnly: false
 	},
 	marker2Style: {
-		isAutoMarkerSize: false,
+		isAutoMarkerSize: true,
 		markerSize: 20,
 		markerShape: EMarkerShapeTypes.DEFAULT,
 		markerChart: EMarkerChartTypes.DONUT,
