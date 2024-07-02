@@ -143,9 +143,9 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             "translate(" +
             (self.viewPortWidth - self.settingsBtnWidth - self.legendViewPort.width - self.margin.right) +
             "," +
-            // (self.raceChartSettings.placement === Position.Bottom ?
-            (self.height - (textBBox.height + tickerButtonRadius * 2 + 20)) +
-            // (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius + 10)) +
+            (self.raceChartSettings.placement === Position.Bottom ?
+                (self.height - (textBBox.height + tickerButtonRadius * 2 + 20)) :
+                (self.margin.top + tickerButtonRadius * 2)) +
             ")"
         )
 
