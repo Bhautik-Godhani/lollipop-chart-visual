@@ -1,13 +1,14 @@
 /* eslint-disable max-lines-per-function */
-import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, SwitchOption, ToggleButton } from "@truviz/shadow/dist/Components";
+import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import * as React from "react";
 import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
-import { ColorPaletteType, EDataColorsSettings, EIBCSThemes, EMarkerColorTypes } from "../enum";
+import { ColorPaletteType, EDataColorsSettings, EDataRolesName, EIBCSThemes, EMarkerColorTypes } from "../enum";
 import { parseObject, persistProperties } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import { Visual } from "../visual";
+import { max, min } from "d3";
 
 const handleChange = (v, n, setConfigValues: React.Dispatch<React.SetStateAction<IDataColorsSettings>>) => {
 	setConfigValues((d) => ({
@@ -510,7 +511,11 @@ const DataColors = (props) => {
 	}, []);
 
 	React.useEffect(() => {
-		if (!configValues.isFillTypeChanged && shadow.isHasNegativeValue && shadow.isHasPositiveValue && !shadow.isIBCSEnabled)
+		const categoricalDataValues = shadow.categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
+		const minVal = min(categoricalDataValues, (d: any) => min(d.values, v => v as number));
+		const maxVal = max(categoricalDataValues, (d: any) => max(d.values, v => v as number));
+
+		if (!configValues.isFillTypeChanged && minVal < 0 && maxVal > 0 && !shadow.isIBCSEnabled)
 			setConfigValues((d) => ({
 				...d,
 				[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
