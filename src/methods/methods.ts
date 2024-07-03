@@ -909,14 +909,25 @@ export const ApplyThemeJson = (self: Visual, json, formatTab) => {
 		const mergeObject = [];
 		keys.forEach(el => {
 			if (el === "conditionalFormatting" || el === "annotations") {
-				mergeObject.push({
-					objectName: "editor",
-					properties: {
-						["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
-						["annotations"]: JSON.stringify(obj["annotations"]),
-					},
-					selector: null,
-				})
+				if (el === "conditionalFormatting" && Object.keys(obj["conditionalFormatting"]).length > 0) {
+					mergeObject.push({
+						objectName: "editor",
+						properties: {
+							["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
+						},
+						selector: null,
+					})
+				}
+
+				if (el === "annotations" && obj["annotations"].length > 0) {
+					mergeObject.push({
+						objectName: "editor",
+						properties: {
+							["annotations"]: JSON.stringify(obj["annotations"]),
+						},
+						selector: null,
+					})
+				}
 			} else {
 				if (obj.hasOwnProperty(el)) {
 					mergeObject.push({
