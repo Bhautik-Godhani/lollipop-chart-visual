@@ -213,7 +213,9 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
         isPercentageNumber = true;
 
         if (!numberSettings.show) {
-            number = parseFloat(number.toString()) / 100;
+            // number = parseFloat(number.toString());
+        } else {
+            number = parseFloat(number.toString()) * 100;
         }
     }
 
