@@ -9953,7 +9953,7 @@ export class Visual extends Shadow {
 				color = this.dataColorsSettings.othersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
-				const posNegColor = parent[valueType] >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
 				if (isPosNegColorScheme) {
 					color = posNegColor;
