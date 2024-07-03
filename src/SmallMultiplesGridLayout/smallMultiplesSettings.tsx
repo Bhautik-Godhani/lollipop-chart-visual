@@ -46,33 +46,33 @@ const DISPLAY_TYPES: ILabelValuePair[] = [
 ];
 
 const X_AXIS_POSITIONS: ILabelValuePair[] = [
-  {
-    value: ESmallMultiplesXAxisPosition.All,
-    label: "All",
-  },
+  // {
+  //   value: ESmallMultiplesXAxisPosition.All,
+  //   label: "All",
+  // },
   {
     value: ESmallMultiplesXAxisPosition.FrozenBottomColumn,
     label: "Frozen Bottom Column",
   },
-  {
-    value: ESmallMultiplesXAxisPosition.FrozenTopColumn,
-    label: "Frozen Top Column",
-  },
+  // {
+  //   value: ESmallMultiplesXAxisPosition.FrozenTopColumn,
+  //   label: "Frozen Top Column",
+  // },
 ];
 
 const Y_AXIS_POSITIONS: ILabelValuePair[] = [
-  {
-    value: ESmallMultiplesYAxisPosition.All,
-    label: "All",
-  },
+  // {
+  //   value: ESmallMultiplesYAxisPosition.All,
+  //   label: "All",
+  // },
   {
     value: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
     label: "Frozen Left Column",
   },
-  {
-    value: ESmallMultiplesYAxisPosition.FrozenRightColumn,
-    label: "Frozen Right Column",
-  },
+  // {
+  //   value: ESmallMultiplesYAxisPosition.FrozenRightColumn,
+  //   label: "Frozen Right Column",
+  // },
 ];
 
 const HEADER_DISPLAY_TYPES: ILabelValuePair[] = [

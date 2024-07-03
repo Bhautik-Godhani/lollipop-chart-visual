@@ -1,3 +1,4 @@
+import { ICategoryValuePair } from "../visual-settings.interface";
 import { ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, EFontStyle } from "./SmallMultiples.enum";
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 export interface ISmallMultiplesGridLayoutSettings {
@@ -107,6 +108,8 @@ export interface ISmallMultiplesGridItemContent {
     yScale: any,
     categoricalData: any,
     categoricalDataPairs: any[],
+    firstCategoryValueDataPair: ICategoryValuePair;
+    lastCategoryValueDataPair: ICategoryValuePair;
     chartData: any,
     brushNumber?: number,
     dataLabels1G: D3Selection<SVGElement>;

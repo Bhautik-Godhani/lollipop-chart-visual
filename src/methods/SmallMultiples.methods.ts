@@ -6,8 +6,8 @@ import { CreateDate, getSVGTextSize } from "./methods";
 import { EFontStyle, ESmallMultiplesAxisType, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition } from "@truviz/shadow/dist/Components";
 import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { EDataRolesName, ERankingCalcMethod, ERankingType, ESortOrderTypes } from "../enum";
-import { ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
-import { cloneDeep, lowerFirst } from "lodash";
+import { ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
+import { cloneDeep } from "lodash";
 import { CallExpandAllXScaleOnAxisGroup, RenderExpandAllXAxis } from "./expandAllXAxis.methods";
 import { MonthNames } from "../constants";
 import { ISortingProps } from "../visual-settings.interface";
@@ -283,6 +283,11 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.brushG = brushG as any;
 
+            self.viewPortWidth = newItemWidth;
+            self.viewPortHeight = newItemHeight;
+            self.width = newItemWidth;
+            self.height = newItemHeight;
+
             const initialChartDataByBrushScaleBand = self.setInitialChartData(
                 clonedCategoricalData,
                 cloneDeep(clonedCategoricalData),
@@ -366,7 +371,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     break;
             }
 
-            const content = {
+            const content: ISmallMultiplesGridItemContent = {
                 svg: svg.node(),
                 xScale: self.xScale,
                 yScale: self.yScale,
@@ -378,6 +383,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 brush: null,
                 brushG: brushG.node() as any,
                 categoricalDataPairs: self.categoricalDataPairs,
+                firstCategoryValueDataPair: self.firstCategoryValueDataPair,
+                lastCategoryValueDataPair: self.lastCategoryValueDataPair,
                 chartData: self.chartData,
                 dataLabels1G: dataLabels1G as any,
                 dataLabels2G: dataLabels2G as any,

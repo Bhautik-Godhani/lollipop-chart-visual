@@ -5724,6 +5724,9 @@ export class Visual extends Shadow {
 					const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
 					const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
 					categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+					this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
 					this.brushScaleBand.range(yScale.range());
 
@@ -5823,6 +5826,9 @@ export class Visual extends Shadow {
 				const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
 				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 				this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
 				this.brushScaleBand.range(yScale.range());
 
@@ -6086,6 +6092,9 @@ export class Visual extends Shadow {
 				const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
 				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 				this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
 				this.brushScaleBand.range(xScale.range());
 
@@ -6200,6 +6209,9 @@ export class Visual extends Shadow {
 					const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
 					const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
 					categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+					this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
 					this.brushScaleBand.range(xScale.range());
 
