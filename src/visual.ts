@@ -5147,9 +5147,9 @@ export class Visual extends Shadow {
 		this.data1LabelsSettings = this.dataLabelsSettings.measure1;
 		this.data2LabelsSettings = this.dataLabelsSettings.measure2;
 
-		if (!this.dataColorsSettings.reverse) {
-			this.dataColorsSettings.schemeColors = cloneDeep(this.schemeColors.reverse());
-		}
+		// if (!this.dataColorsSettings.reverse) {
+		// 	this.dataColorsSettings.schemeColors = cloneDeep(this.schemeColors.reverse());
+		// }
 
 		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
@@ -10436,6 +10436,12 @@ export class Visual extends Shadow {
 				});
 			});
 
+			tooltipData.push({
+				displayName: "Total",
+				value: numberFormatter(d3.sum(this.chartData.find(d => d.category === pieData.parentCategory).subCategories, s => s.value1), this.measureNumberFormatter[0]),
+				color: "transparent",
+			});
+
 			return tooltipData;
 		};
 	}
@@ -10943,9 +10949,9 @@ export class Visual extends Shadow {
 	}
 
 	setBrushLollipopCircleSchemaColors(chartData: IBrushLollipopChartData[], schemeColors: string[] = [], isReverse: boolean, isGradient: boolean): void {
-		if (isReverse) {
-			schemeColors = cloneDeep(schemeColors).reverse();
-		}
+		// if (isReverse) {
+		// 	schemeColors = cloneDeep(schemeColors).reverse();
+		// }
 
 		if (isGradient) {
 			const range: any = [schemeColors[0], schemeColors[schemeColors.length - 1]];
