@@ -305,8 +305,10 @@ export enum EDataColorsSettings {
 	PositiveColor = "positiveColor",
 	NegativeColor = "negativeColor",
 	GradientAppliedToMeasure = "gradientAppliedToMeasure",
-	IsCustomizeOthersColor = "isCustomizeOthersColor",
-	OthersColor = "othersColor",
+	isCustomizeCategoryOthersColor = "isCustomizeCategoryOthersColor",
+	categoryOthersColor = "categoryOthersColor",
+	isCustomizeSubcategoryOthersColor = "isCustomizeSubcategoryOthersColor",
+	subcategoryOthersColor = "subcategoryOthersColor",
 	IsCustomizeSMOthersColor = "isCustomizeSMOthersColor",
 	SMOthersColor = "SMOthersColor",
 }

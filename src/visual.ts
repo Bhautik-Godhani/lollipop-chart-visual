@@ -5463,9 +5463,9 @@ export class Visual extends Shadow {
 		}
 
 		if (this.rankingSettings.category.enabled) {
-			if (this.rankingSettings.category.showRemainingAsOthers && this.categoryColorPair[this.othersBarText] && this.dataColorsSettings.isCustomizeOthersColor) {
-				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.othersColor;
-				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.othersColor;
+			if (this.rankingSettings.category.showRemainingAsOthers && this.categoryColorPair[this.othersBarText] && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+				this.categoryColorPair[this.othersBarText].marker1Color = this.dataColorsSettings.categoryOthersColor;
+				this.categoryColorPair[this.othersBarText].marker2Color = this.dataColorsSettings.categoryOthersColor;
 			}
 		}
 	}
@@ -5616,11 +5616,11 @@ export class Visual extends Shadow {
 		}
 
 		if (this.rankingSettings.subCategory.enabled) {
-			if (this.rankingSettings.subCategory.showRemainingAsOthers && this.dataColorsSettings.isCustomizeOthersColor) {
+			if (this.rankingSettings.subCategory.showRemainingAsOthers && this.dataColorsSettings.isCustomizeSubcategoryOthersColor) {
 				this.categoricalDataPairs.forEach((data) => {
 					if (this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`]) {
-						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.othersColor;
-						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.othersColor;
+						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.subcategoryOthersColor;
+						this.subCategoryColorPair[`${data.category}-${this.othersSubcategoryText}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.subcategoryOthersColor;
 					}
 				});
 			}
@@ -7283,7 +7283,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(value.value1, this.measureNumberFormatter[0]),
-					color: (value.category.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : categoryColorPair[value.category].marker1Color)
+					color: (value.category.toString().includes(this.othersLabel) ? this.dataColorsSettings.categoryOthersColor : isPosNegColorScheme1 ? posNegColor1 : categoryColorPair[value.category].marker1Color)
 				},
 			];
 
@@ -9750,10 +9750,10 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
-				let color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+				let color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeCategoryOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 
-				if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeOthersColor) {
-					color = this.dataColorsSettings.othersColor;
+				if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+					color = this.dataColorsSettings.categoryOthersColor;
 				}
 
 				let pattern = d.pattern;
@@ -9990,8 +9990,8 @@ export class Visual extends Shadow {
 
 			const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
 
-			if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeOthersColor) {
-				color = this.dataColorsSettings.othersColor;
+			if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+				color = this.dataColorsSettings.categoryOthersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
@@ -10388,7 +10388,7 @@ export class Visual extends Shadow {
 				{
 					displayName: this.measure1DisplayName,
 					value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.othersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.categoryOthersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
 				}
 			];
 

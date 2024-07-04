@@ -558,27 +558,52 @@ const DataColors = (props) => {
 					{UIColorPalette(shadow, configValues, setConfigValues)}
 					{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 
-					<ConditionalWrapper visible={(rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers) ||
-						(rankingSettings.subCategory.enabled && rankingSettings.subCategory.showRemainingAsOthers)
-					}>
+					<ConditionalWrapper visible={(rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers)}>
 						<Row>
 							<Column>
 								<ToggleButton
-									label={"Customize 'Others' color"}
-									value={configValues.isCustomizeOthersColor}
-									handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeOthersColor, setConfigValues)}
+									label={"Category 'Others' color"}
+									value={configValues.isCustomizeCategoryOthersColor}
+									handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeCategoryOthersColor, setConfigValues)}
 									appearance="toggle"
 								/>
 							</Column>
 						</Row>
 
-						<ConditionalWrapper visible={configValues.isCustomizeOthersColor}>
+						<ConditionalWrapper visible={configValues.isCustomizeCategoryOthersColor}>
 							<Row appearance="padded">
 								<Column>
 									<ColorPicker
 										label={"Color"}
-										color={configValues.othersColor}
-										handleChange={(value) => handleChange(value, EDataColorsSettings.OthersColor, setConfigValues)}
+										color={configValues.categoryOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.categoryOthersColor, setConfigValues)}
+										colorPalette={vizOptions.host.colorPalette}
+										size="sm"
+									/>
+								</Column>
+							</Row>
+						</ConditionalWrapper>
+					</ConditionalWrapper>
+
+					<ConditionalWrapper visible={(rankingSettings.subCategory.enabled && rankingSettings.subCategory.showRemainingAsOthers)}>
+						<Row>
+							<Column>
+								<ToggleButton
+									label={"Sub-category 'Others' color"}
+									value={configValues.isCustomizeSubcategoryOthersColor}
+									handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeSubcategoryOthersColor, setConfigValues)}
+									appearance="toggle"
+								/>
+							</Column>
+						</Row>
+
+						<ConditionalWrapper visible={configValues.isCustomizeSubcategoryOthersColor}>
+							<Row appearance="padded">
+								<Column>
+									<ColorPicker
+										label={"Color"}
+										color={configValues.subcategoryOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.subcategoryOthersColor, setConfigValues)}
 										colorPalette={vizOptions.host.colorPalette}
 										size="sm"
 									/>
@@ -591,7 +616,7 @@ const DataColors = (props) => {
 						<Row>
 							<Column>
 								<ToggleButton
-									label={"Customize small multiple 'Others'"}
+									label={"Small multiple 'Others'"}
 									value={configValues.isCustomizeSMOthersColor}
 									handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeSMOthersColor, setConfigValues)}
 									appearance="toggle"

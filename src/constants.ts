@@ -214,8 +214,10 @@ export const DATA_COLORS: IDataColorsSettings = {
 	negativeColor: NEGATIVE_COLOR,
 	positiveColor: POSITIVE_COLOR,
 	gradientAppliedToMeasure: EMarkerColorTypes.Marker1,
-	isCustomizeOthersColor: true,
-	othersColor: "rgba(84, 84, 84, 1)",
+	categoryOthersColor: "rgba(84, 84, 84, 1)",
+	isCustomizeCategoryOthersColor: true,
+	subcategoryOthersColor: "rgba(84, 84, 84, 1)",
+	isCustomizeSubcategoryOthersColor: true,
 	isCustomizeSMOthersColor: true,
 	SMOthersColor: "rgba(84, 84, 84, 1)"
 };

@@ -292,8 +292,10 @@ export interface IDataColorsSettings {
 	positiveColor: string,
 	negativeColor: string,
 	gradientAppliedToMeasure: EMarkerColorTypes,
-	isCustomizeOthersColor: boolean,
-	othersColor: string;
+	isCustomizeCategoryOthersColor: boolean,
+	categoryOthersColor: string;
+	isCustomizeSubcategoryOthersColor: boolean,
+	subcategoryOthersColor: string;
 	isCustomizeSMOthersColor: boolean,
 	SMOthersColor: string;
 }
