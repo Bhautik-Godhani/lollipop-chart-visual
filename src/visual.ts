@@ -4719,6 +4719,18 @@ export class Visual extends Shadow {
 								},
 							})
 						}
+
+						if (this.categoriesName.includes(this.othersBarText)) {
+							legendDataPoints.push(
+								{
+									data: {
+										name: this.othersBarText,
+										color: this.categoryColorPair[this.othersBarText].marker1Color,
+										pattern: undefined,
+										imageUrl: undefined
+									},
+								})
+						}
 						break;
 				}
 			} else {
@@ -4808,6 +4820,19 @@ export class Visual extends Shadow {
 								},
 							})
 					}
+
+					if (this.subCategoriesName.includes(this.othersSubcategoryText)) {
+						legendDataPoints.push(
+							{
+								data: {
+									name: this.othersSubcategoryText,
+									color: this.subCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
+									pattern: undefined,
+									imageUrl: undefined
+								},
+							})
+					}
+
 					break;
 			}
 		}
@@ -9965,7 +9990,7 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
-				if (isPosNegColorScheme) {
+				if (isPosNegColorScheme && !d.category.includes(this.othersLabel)) {
 					color = posNegColor;
 				} else {
 					color = isPie2 ? subCategoryColorPair[`${parent.category}-${d.category}`].marker2Color : subCategoryColorPair[`${parent.category}-${d.category}`].marker1Color;
