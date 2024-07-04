@@ -7228,6 +7228,12 @@ export class Visual extends Shadow {
 
 	drawTooltip(): void {
 		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(".lollipop-circle"),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+			(datapoint: any) => datapoint.identity
+		);
+
+		this.tooltipServiceWrapper.addTooltip(
 			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
 			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
 			(datapoint: any) => datapoint.identity
