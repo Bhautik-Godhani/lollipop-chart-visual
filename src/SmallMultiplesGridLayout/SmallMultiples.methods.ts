@@ -49,7 +49,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const { xAxisGNodeHeight: xAxisGNodeHeight1, yAxisGNodeWidth: yAxisGNodeWidth1, yAxisTitleWidth: yAxisTitleWidth1, xAxisTitleHeight: xAxisTitleHeight1 } = GetRootXYAxisGNode(
         config,
         itemWidth - config.innerSpacing * 2,
-        itemHeight - panelTitleSize.height - config.innerSpacing * 2,
+        itemHeight - panelTitleSize.height - config.innerSpacing * 2 - SMPaginationPanelHeight,
         true
     );
 
@@ -64,7 +64,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const { xAxisGNodeHeight, xAxisTitleHeight, yAxisGNodeWidth, yAxisTitleWidth } = GetRootXYAxisGNode(
         config,
         itemWidth - config.innerSpacing * 2,
-        itemHeight - panelTitleSize.height - config.innerSpacing * 2,
+        itemHeight - panelTitleSize.height - config.innerSpacing * 2 - SMPaginationPanelHeight,
         true
     );
 
@@ -1044,16 +1044,17 @@ export const RenderSmallMultiplesUniformYAxisBrush = (isLeftYAxis: boolean, scal
 export const GetSmallMultiplesUniformBottomXAxis = (config: ISmallMultiplesGridLayoutSettings, xAxisGNodeHeight: number, yAxisGNodeWidth: number): D3Selection<HTMLElement> => {
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
     const isFrozenRightYAxis = config.yAxisPosition === ESmallMultiplesYAxisPosition.FrozenRightColumn;
+    const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
 
     const uniformXAxis = d3.create("div");
     uniformXAxis.attr("id", "uniformBottomXAxis");
     uniformXAxis.classed("uniformBottomXAxis", true);
     uniformXAxis.style("width", "100%");
     uniformXAxis.style("height", xAxisGNodeHeight + "px");
-    uniformXAxis.style("transform", "translate(" + 0 + "px" + "," + (config.containerHeight - xAxisGNodeHeight) + "px" + ")");
+    uniformXAxis.style("transform", "translate(" + 0 + "px" + "," + (config.containerHeight - xAxisGNodeHeight - SMPaginationPanelHeight) + "px" + ")");
 
     if (isUniformYScale) {
-        uniformXAxis.style("transform", "translate(" + (isFrozenRightYAxis ? 0 : yAxisGNodeWidth) + "px" + "," + (config.containerHeight - xAxisGNodeHeight) + "px" + ")");
+        uniformXAxis.style("transform", "translate(" + (isFrozenRightYAxis ? 0 : yAxisGNodeWidth) + "px" + "," + (config.containerHeight - xAxisGNodeHeight - SMPaginationPanelHeight) + "px" + ")");
         uniformXAxis.style("width", `calc(100% - ${yAxisGNodeWidth}px)`);
     }
 
