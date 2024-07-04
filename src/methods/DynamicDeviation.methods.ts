@@ -31,7 +31,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
         }
     };
 
-    const dataLabelG = self.dynamicDeviationG.append("g").attr("class", "dynamic-deviation-label");
+    const dataLabelG = self.dynamicDeviationG.append("g").lower().attr("class", "dynamic-deviation-label");
 
     let dataLabelText;
     dataLabelText = dataLabelG
@@ -258,6 +258,8 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", dynamicDeviationSettings.connectingLineWidth + "px");
     }
+
+    dataLabelG.raise();
 }
 
 export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
@@ -297,7 +299,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     dataLabelG
         .attr(
             "transform",
-            `translate(${dataLabelXPos}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2 - dataLabelBBox.height / 2
+            `translate(${dataLabelXPos}, ${(self.getYPosition(from.value) + self.getYPosition(to.value)) / 2
             })`)
         .attr("display", hide ? "block" : "none");
 
@@ -443,6 +445,8 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px");
     }
+
+    dataLabelG.raise();
 }
 
 export const ShowStaticTooltip = (self: Visual, event: MouseEvent, displayName: string): void => {
