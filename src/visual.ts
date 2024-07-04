@@ -9776,7 +9776,7 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 				const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
-				let color = this.getColor(isPosNegColorScheme && (this.dataColorsSettings.isCustomizeCategoryOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+				let color = this.getColor(isPosNegColorScheme && (this.isSmallMultiplesEnabled ? !d.isOthersSmallMultiples : true) && (this.dataColorsSettings.isCustomizeCategoryOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 
 				if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
 					color = this.dataColorsSettings.categoryOthersColor;
