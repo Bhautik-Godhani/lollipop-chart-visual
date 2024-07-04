@@ -348,7 +348,7 @@ export const GetSmallMultiplesLayoutProps = (
     } else if (config.layoutType === ESmallMultiplesLayoutType.RankedPanels) {
         height = layoutRowHeight / 6;
     } else if (config.layoutType === ESmallMultiplesLayoutType.ScaledRows) {
-        height = layoutRowHeight / 6 < 50 ? 50 : layoutRowHeight / 6;
+        height = columns >= config.categories.length ? layoutRowHeight : layoutRowHeight / 6 < 50 ? 50 : layoutRowHeight / 6;
     }
 
     const layoutProps: ISmallMultiplesLayoutProps = {
@@ -433,7 +433,7 @@ export const GetReactGridLayout = (config: ISmallMultiplesGridLayoutSettings, co
             for (let j = 0; j < columns; j++) {
                 const randomBytes = generateSecureRandomBytes(16).toString("hex");
                 const category = config.categories[iterator];
-                const obj = { i: category ? randomBytes : undefined, category, x: j, y: i, w: 1, h: height, isDraggable: false, isResizable: false };
+                const obj = { i: category ? randomBytes : undefined, category, x: j, y: i, w: 1, h: columns >= config.categories.length ? 1 : height, isDraggable: false, isResizable: false };
                 layout.push(obj);
                 iterator++;
             }
