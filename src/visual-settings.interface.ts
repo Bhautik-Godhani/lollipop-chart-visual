@@ -335,6 +335,7 @@ export interface ILabelValuePair {
 }
 
 export interface ISortingSettings {
+	isDefaultSortByChanged: boolean;
 	category: ISortingProps;
 	subCategory: ISortingProps;
 	smallMultiples: ISortingProps;

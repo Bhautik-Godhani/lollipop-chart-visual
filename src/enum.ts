@@ -336,6 +336,7 @@ export enum ESortByTypes {
 }
 
 export enum ESortingSettings {
+	IsDefaultSortByChanged = "isDefaultSortByChanged",
 	Category = "category",
 	SubCategory = "subCategory",
 	SmallMultiples = "smallMultiples",

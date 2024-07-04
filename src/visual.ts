@@ -195,7 +195,6 @@ import { COLORBREWER } from "./color-schemes";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ESmallMultiplesXAxisPosition, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSettings";
 import ImportExport from "./settings-pages/ImportExport";
-import ConditionalFormatting from "./ConditionalFormatting/ConditionalFormatting";
 import { ECFCategoriesType } from "@truviz/shadow/dist/Components/ConditionalFormatting/ConditionalFormatting.enum";
 import { cloneDeep } from "lodash";
 
@@ -310,6 +309,7 @@ export class Visual extends Shadow {
 	groupNamesByTotal: { name: string, total: number }[] = [];
 	schemeColors: string[] = [];
 	isMonthCategoryNames: boolean;
+	isMonthSubcategoryNames: boolean;
 	extraDataLabelsDisplayNames: string[] = [];
 	isHasExtraDataLabels: boolean = false;
 	isHasGlobalMinValue: boolean;
@@ -1522,7 +1522,7 @@ export class Visual extends Shadow {
 	setInitialChartData(
 		categoricalData: powerbi.DataViewCategorical,
 		clonedCategoricalData: powerbi.DataViewCategorical,
-		categoricalMetadata: any,
+		categoricalMetadata: powerbi.DataViewMetadata,
 		width: number,
 		height: number,
 		isRenderBrush: boolean = true
@@ -1579,9 +1579,26 @@ export class Visual extends Shadow {
 			}
 		}
 
-		const firstVal = categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0] ? categoricalCategoriesFields[categoricalCategoriesLastIndex].values[0] : categoricalCategoriesFields[categoricalCategoriesLastIndex].values[1] ? categoricalCategoriesFields[categoricalCategoriesLastIndex].values[1] : "";
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("months") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
 
-		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase() === "months" || MonthNames.map(d => d.toLowerCase()).indexOf(<string>firstVal.toString().toLowerCase()) !== -1;
+		if (this.isHasSubcategories) {
+			const subCategoriesName = categoricalMeasureFields
+				.map((d) => d.source.groupName)
+				.filter((d) => d && d !== null && d !== undefined && d !== "")
+				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
+
+			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("months") || subCategoriesName.some(d => MonthNames.includes(d.toLowerCase()));
+
+			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
+				this.sortingSettings.category.sortBy = ESortByTypes.CATEGORY;
+				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+				this.sortingSettings.category.isSortByCategory = true;
+				this.sortingSettings.category.isSortByMeasure = false;
+				this.sortingSettings.category.isSortByMultiMeasure = false;
+				this.sortingSettings.category.isSortByExtraSortField = false;
+			}
+		}
+
 
 		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
 
@@ -3883,44 +3900,37 @@ export class Visual extends Shadow {
 
 	private sortSubcategoryData(categoricalData: powerbi.DataViewCategorical): void {
 		const { enabled, sortOrder, sortBy, isSortByCategory } = this.sortingSettings.subCategory;
+
+		const getMonthIndex = (monthName: string) => {
+			return MonthNames.indexOf(monthName);
+		}
+
 		if (enabled && this.isHasSubcategories) {
 			if (isSortByCategory) {
-				if (this.isHorizontalChart) {
-					if (sortOrder === ESortOrderTypes.DESC) {
-						categoricalData.values.sort((a, b) => {
-							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+				if ((this.isHorizontalChart && sortOrder === ESortOrderTypes.DESC) || (!this.isHorizontalChart && sortOrder === ESortOrderTypes.DESC)) {
+					categoricalData.values.sort((a, b) => {
+						if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+							if (this.isMonthSubcategoryNames) {
+								return getMonthIndex(b.source.groupName) - getMonthIndex(a.source.groupName);
+							} else {
 								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
-							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
-								return b.source.groupName - a.source.groupName;
 							}
-						});
-					} else {
-						categoricalData.values.sort((a, b) => {
-							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
-								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
-							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
-								return a.source.groupName - b.source.groupName;
-							}
-						});
-					}
+						} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+							return b.source.groupName - a.source.groupName;
+						}
+					});
 				} else {
-					if (sortOrder === ESortOrderTypes.ASC) {
-						categoricalData.values.sort((a, b) => {
-							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+					categoricalData.values.sort((a, b) => {
+						if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
+							if (this.isMonthSubcategoryNames) {
+								return getMonthIndex(a.source.groupName) - getMonthIndex(b.source.groupName);
+							} else {
 								return (a.source.groupName as string).localeCompare(b.source.groupName as string);
-							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
-								return a.source.groupName - b.source.groupName;
 							}
-						});
-					} else {
-						categoricalData.values.sort((a, b) => {
-							if (typeof a.source.groupName === "string" && typeof b.source.groupName === "string") {
-								return (b.source.groupName as string).localeCompare(a.source.groupName as string);
-							} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
-								return b.source.groupName - a.source.groupName;
-							}
-						});
-					}
+						} else if (typeof a.source.groupName === "number" && typeof b.source.groupName === "number") {
+							return a.source.groupName - b.source.groupName;
+						}
+					});
 				}
 			} else {
 				const categoricalDataValues: powerbi.DataViewValueColumn[] = cloneDeep(categoricalData.values);

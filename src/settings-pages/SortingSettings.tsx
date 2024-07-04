@@ -19,6 +19,13 @@ const SORT_ORDER: ILabelValuePair[] = [
 	},
 ];
 
+const handleDefaultSortByChange = (val, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[ESortingSettings.IsDefaultSortByChanged]: val,
+	}));
+};
+
 const handleChange = (val, n: ESortingSettings, key: ESortingSettings, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
@@ -53,6 +60,7 @@ const UICategorySortingSettings = (
 						value={categorySettings.sortBy}
 						optionsList={CATEGORY_SORT_ON}
 						handleChange={(value, obj) => {
+							handleDefaultSortByChange(true, setConfigValues);
 							handleChange(value, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 							handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
 							handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
@@ -90,6 +98,7 @@ const UIGroupBySortingSettings = (
 						value={groupBySettings.sortBy}
 						optionsList={GROUP_BY_SORT_ON}
 						handleChange={(value, obj) => {
+							handleDefaultSortByChange(true, setConfigValues);
 							handleChange(value, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
 							handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.SubCategory, setConfigValues);
 							handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.SubCategory, setConfigValues);
@@ -132,6 +141,7 @@ const UISmallMultiplesSortingSettings = (
 						value={smallMultiplesBySettings.sortBy}
 						optionsList={SMALL_MULTIPLES_BY_SORT_ON}
 						handleChange={(value, obj) => {
+							handleDefaultSortByChange(true, setConfigValues);
 							handleChange(value, ESortingSettings.SortBy, ESortingSettings.SmallMultiples, setConfigValues);
 							handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.SmallMultiples, setConfigValues);
 							handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.SmallMultiples, setConfigValues);
@@ -189,6 +199,7 @@ const UICategorySortingWithoutAccordionAltSettings = (
 									value={categorySettings.sortBy}
 									optionsList={CATEGORY_SORT_ON}
 									handleChange={(value, obj) => {
+										handleDefaultSortByChange(true, setConfigValues);
 										handleChange(value, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
 										handleChange(obj.isSortByCategory, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
 										handleChange(obj.isSortByMeasure, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
@@ -367,6 +378,14 @@ const SortingSettings = (props) => {
 	const isSmallMultipleSortBy = !shadow.isSmallMultiplesEnabled || (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
 
 	React.useEffect(() => {
+		if (shadow.isMonthCategoryNames && !configValues.isDefaultSortByChanged) {
+			handleChange(ESortByTypes.CATEGORY, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+			handleChange(ESortOrderTypes.ASC, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
+			handleChange(true, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
+			handleChange(false, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
+			handleChange(false, ESortingSettings.IsSortByExtraSortField, ESortingSettings.Category, setConfigValues);
+		}
+
 		if (
 			(!configValues.category.sortBy ||
 				(!CATEGORY_SORT_ON.map(d => d.value).includes(configValues.category.sortBy))) && isSmallMultipleSortBy

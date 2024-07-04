@@ -79,10 +79,10 @@ import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiples
 import DefaultTemplateJS from './templates-json/default-template.js';
 
 export const MonthNames = [
-	"January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December",
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	"january", "february", "march", "april", "may", "june",
+	"july", "august", "september", "october", "november", "december",
+	"jan", "feb", "mar", "apr", "may", "jun",
+	"jul", "aug", "sep", "oct", "nov", "dec"
 ];
 
 export const PIE1_SETTINGS: IPiePropsSettings = {
@@ -349,6 +349,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 };
 
 export const SORTING_SETTINGS: ISortingSettings = {
+	isDefaultSortByChanged: false,
 	category: {
 		enabled: true,
 		sortBy: undefined,
