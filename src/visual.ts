@@ -3786,17 +3786,43 @@ export class Visual extends Shadow {
 								conditionalFormattingConditions.forEach((c) => {
 									if (c.valueType === ECFValueTypes.Ranking) {
 										if (c.rankingType === ECFRankingTypes.TopN) {
-											if (j < c.staticRankingValue) {
+											if (i < c.staticRankingValue) {
 												if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker1Color = true;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker2Color = true;
+												}
+
+												if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+													this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLabelColor = true;
+												}
+
+												if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+													this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
 												}
 											}
 										} else if (c.rankingType === ECFRankingTypes.BottomN) {
-											if (j > ((d.subCategories.length - 1) - c.staticRankingValue)) {
+											if (i > ((d.subCategories.length - 1) - c.staticRankingValue)) {
 												if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
 													this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
+
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker1Color = true;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isMarker2Color = true;
+												}
+
+												if (c.applyOnCategories.includes(ECFApplyOnCategories.Labels)) {
+													this.subCategoryColorPair[`${d.category}-${s.category}`].labelColor = c.color;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLabelColor = true;
+												}
+
+												if (c.applyOnCategories.includes(ECFApplyOnCategories.Line)) {
+													this.subCategoryColorPair[`${d.category}-${s.category}`].lineColor = c.color;
+													this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
 												}
 											}
 										}
