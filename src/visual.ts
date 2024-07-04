@@ -1343,7 +1343,7 @@ export class Visual extends Shadow {
 		const sortByMultiMeasure = (measureKeys: string[]) => {
 			const getValue = (d: any) =>
 				measureKeys.reduce((value, key) => {
-					value += d[key];
+					value += (d[key] && !isNaN(d[key]) ? d[key] : 0);
 					return value;
 				}, 0);
 
@@ -1579,7 +1579,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("months") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("month") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
 
 		if (this.isHasSubcategories) {
 			const subCategoriesName = categoricalMeasureFields
@@ -1587,7 +1587,7 @@ export class Visual extends Shadow {
 				.filter((d) => d && d !== null && d !== undefined && d !== "")
 				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("months") || subCategoriesName.some(d => MonthNames.includes(d.toLowerCase()));
+			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toLowerCase()));
 
 			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
 				this.sortingSettings.category.sortBy = ESortByTypes.CATEGORY;
@@ -1826,7 +1826,7 @@ export class Visual extends Shadow {
 			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
 		}
 
-		const isSmallMultipleSortBy = !this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
+		const isSmallMultipleSortBy = (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&

@@ -375,7 +375,7 @@ const SortingSettings = (props) => {
 		});
 	}
 
-	const isSmallMultipleSortBy = !shadow.isSmallMultiplesEnabled || (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
+	const isSmallMultipleSortBy = (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
 
 	React.useEffect(() => {
 		if (shadow.isMonthCategoryNames && !configValues.isDefaultSortByChanged) {
