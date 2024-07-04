@@ -37,7 +37,7 @@ export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
 
     if (d.allMeasures && Object.keys(d.allMeasures).length > 0) {
         Object.keys(d.allMeasures).forEach(key => {
-            dataPoint[key] = self.formatNumber(d.allMeasures[key].value, self.numberSettings, self.allNumberFormatter[Object.keys(d.allMeasures[key].roles)[0]], true, true);
+            dataPoint[key] = self.formatNumber(d.allMeasures[key].value, self.numberSettings, self.allNumberFormatter[key], true, true);
         })
     }
 

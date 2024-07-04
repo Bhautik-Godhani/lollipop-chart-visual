@@ -4078,12 +4078,12 @@ export class Visual extends Shadow {
 				const measure1 = subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName);
 				const measure1Highlights: any[] = measure1 ? measure1.highlights : [];
 
+				const value1 = <number>subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx];
+
 				const obj: IChartSubCategory = {
 					category: cur,
 					parentCategory,
-					value1: <number>(
-						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx]
-					),
+					value1: this.isPercentageMeasure ? value1 * 100 : value1,
 					value2: this.isHasMultiMeasure ? <number>(
 						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure2DisplayName).values[idx]
 					) : 0,
@@ -4093,7 +4093,7 @@ export class Visual extends Shadow {
 					selected: false,
 					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false,
 					allMeasures: subCategoryGroup.reduce((obj, cur) => {
-						obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+						obj[cur.source.displayName] = { roles: cur.source.roles, value: this.isPercentageMeasure ? cur.values[idx] * 100 : cur.values[idx] };
 						return obj;
 					}, {}),
 					isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
@@ -4304,7 +4304,7 @@ export class Visual extends Shadow {
 						data1Label: "",
 						data2Label: "",
 						allMeasures: categoricalData.values.reduce((obj, cur) => {
-							obj[cur.source.displayName] = { roles: cur.source.roles, value: cur.values[idx] };
+							obj[cur.source.displayName] = { roles: cur.source.roles, value: this.isPercentageMeasure ? parseFloat(cur.values[idx].toString()) * 100 : cur.values[idx] };
 							return obj;
 						}, {}),
 						isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers

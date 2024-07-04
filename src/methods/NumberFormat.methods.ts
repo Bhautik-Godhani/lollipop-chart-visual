@@ -215,7 +215,7 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
         if (!numberSettings.show) {
             // number = parseFloat(number.toString());
         } else {
-            number = parseFloat(number.toString()) * 100;
+            number = parseFloat(number.toString());
         }
     }
 
