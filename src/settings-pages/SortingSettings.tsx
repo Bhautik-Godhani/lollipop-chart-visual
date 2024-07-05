@@ -26,6 +26,13 @@ const handleDefaultSortByChange = (val, setConfigValues: React.Dispatch<React.Se
 	}));
 };
 
+const handleDefaultSortOrderChange = (val, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
+	setConfigValues((d) => ({
+		...d,
+		[ESortingSettings.IsDefaultSortOrderChanged]: val,
+	}));
+};
+
 const handleChange = (val, n: ESortingSettings, key: ESortingSettings, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
 	setConfigValues((d) => ({
 		...d,
@@ -35,6 +42,20 @@ const handleChange = (val, n: ESortingSettings, key: ESortingSettings, setConfig
 		},
 	}));
 };
+
+const handleByCategoryChange = (val, key: ESortingSettings, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
+	handleChange(val, ESortingSettings.SortBy, key, setConfigValues);
+	handleChange(true, ESortingSettings.IsSortByCategory, key, setConfigValues);
+	handleChange(false, ESortingSettings.IsSortByMeasure, key, setConfigValues);
+	handleChange(false, ESortingSettings.IsSortByExtraSortField, key, setConfigValues);
+}
+
+const handleByMeasureChange = (val, key: ESortingSettings, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
+	handleChange(val, ESortingSettings.SortBy, key, setConfigValues);
+	handleChange(false, ESortingSettings.IsSortByCategory, key, setConfigValues);
+	handleChange(true, ESortingSettings.IsSortByMeasure, key, setConfigValues);
+	handleChange(false, ESortingSettings.IsSortByExtraSortField, key, setConfigValues);
+}
 
 const handleCheckbox = (n, key, setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>) => {
 	setConfigValues((d) => ({
@@ -76,7 +97,10 @@ const UICategorySortingSettings = (
 						label="Order By"
 						value={categorySettings.sortOrder}
 						optionsList={SORT_ORDER}
-						handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues)}
+						handleChange={(value) => {
+							handleDefaultSortOrderChange(true, setConfigValues);
+							handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
+						}}
 					/>
 				</Column>
 			</Row>
@@ -119,7 +143,10 @@ const UIGroupBySortingSettings = (
 						label="Order By"
 						value={groupBySettings.sortOrder}
 						optionsList={SORT_ORDER}
-						handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SubCategory, setConfigValues)}
+						handleChange={(value) => {
+							handleDefaultSortOrderChange(true, setConfigValues);
+							handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SubCategory, setConfigValues);
+						}}
 					/>
 				</Column>
 			</Row>
@@ -162,7 +189,10 @@ const UISmallMultiplesSortingSettings = (
 						label="Order By"
 						value={smallMultiplesBySettings.sortOrder}
 						optionsList={SORT_ORDER}
-						handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SmallMultiples, setConfigValues)}
+						handleChange={(value) => {
+							handleDefaultSortOrderChange(true, setConfigValues);
+							handleChange(value, ESortingSettings.SortOrder, ESortingSettings.SmallMultiples, setConfigValues);
+						}}
 					/>
 				</Column>
 			</Row>
@@ -215,7 +245,10 @@ const UICategorySortingWithoutAccordionAltSettings = (
 									label="Order By"
 									value={categorySettings.sortOrder}
 									optionsList={SORT_ORDER}
-									handleChange={(value) => handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues)}
+									handleChange={(value) => {
+										handleDefaultSortOrderChange(true, setConfigValues);
+										handleChange(value, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
+									}}
 								/>
 							</Column>
 						</Row>
@@ -378,61 +411,74 @@ const SortingSettings = (props) => {
 	const isSmallMultipleSortBy = (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
 
 	React.useEffect(() => {
-		if (shadow.isMonthCategoryNames && !configValues.isDefaultSortByChanged) {
-			handleChange(ESortByTypes.CATEGORY, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
-			handleChange(ESortOrderTypes.ASC, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
-			handleChange(true, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
-			handleChange(false, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
-			handleChange(false, ESortingSettings.IsSortByExtraSortField, ESortingSettings.Category, setConfigValues);
-		}
-
 		if (
 			(!configValues.category.sortBy ||
 				(!CATEGORY_SORT_ON.map(d => d.value).includes(configValues.category.sortBy))) && isSmallMultipleSortBy
 		) {
-			handleChange(isSmallMultipleSortBy ? shadow.categoryDisplayName : shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+			if (isSmallMultipleSortBy) {
+				handleByCategoryChange(shadow.categoryDisplayName, ESortingSettings.Category, setConfigValues);
+			} else {
+				handleByMeasureChange(shadow.measure1DisplayName, ESortingSettings.Category, setConfigValues);
+			}
 		}
 
 		if ((!configValues.subCategory.sortBy ||
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy))) && isSmallMultipleSortBy) {
-			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+			handleByCategoryChange(shadow.subCategoryDisplayName, ESortingSettings.SubCategory, setConfigValues);
 		}
 
 		if ((!configValues.smallMultiples.sortBy ||
 			(!SMALL_MULTIPLES_SORT_ON.map(d => d.value).includes(configValues.smallMultiples.sortBy)))) {
-			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SmallMultiples, setConfigValues);
+			handleByMeasureChange(shadow.measure1DisplayName, ESortingSettings.SmallMultiples, setConfigValues);
+		}
+
+		if ((shadow.isMonthCategoryNames || shadow.isDateCategoryNames || shadow.isXIsDateTimeAxis || shadow.isYIsDateTimeAxis) && !configValues.isDefaultSortByChanged) {
+			handleByCategoryChange(shadow.categoryDisplayName, ESortingSettings.Category, setConfigValues);
+
+			if (!configValues.isDefaultSortOrderChanged) {
+				handleChange(ESortOrderTypes.ASC, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
+			}
 		}
 	}, []);
 
 	React.useEffect(() => {
 		if (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
-			handleChange(shadow.categoryDisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+			handleByCategoryChange(shadow.categoryDisplayName, ESortingSettings.Category, setConfigValues);
 		}
 	}, []);
 
 	React.useEffect(() => {
 		if ((configValues.category.isSortByExtraSortField && ![...shadow.sortFieldsDisplayName, ...shadow.tooltipFieldsDisplayName].find((d) => d.label === configValues.category.sortBy))) {
-			handleChange(ESortByTypes.VALUE, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
-			handleChange(false, ESortingSettings.IsSortByCategory, ESortingSettings.Category, setConfigValues);
-			handleChange(true, ESortingSettings.IsSortByMeasure, ESortingSettings.Category, setConfigValues);
-			handleChange(false, ESortingSettings.IsSortByExtraSortField, ESortingSettings.Category, setConfigValues);
+			handleByMeasureChange(ESortByTypes.VALUE, ESortingSettings.Category, setConfigValues);
 		}
 
 		if (
 			(!configValues.category.sortBy ||
 				(!CATEGORY_SORT_ON.map(d => d.value).includes(configValues.category.sortBy)))
 		) {
-			handleChange(isSmallMultipleSortBy ? shadow.categoryDisplayName : shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.Category, setConfigValues);
+			if (isSmallMultipleSortBy) {
+				handleByCategoryChange(shadow.categoryDisplayName, ESortingSettings.Category, setConfigValues);
+			} else {
+				handleByMeasureChange(shadow.measure1DisplayName, ESortingSettings.Category, setConfigValues);
+			}
 		}
 
 		if ((!configValues.subCategory.sortBy ||
 			(!GROUP_BY_SORT_ON.map(d => d.value).includes(configValues.subCategory.sortBy)))) {
-			handleChange(shadow.subCategoryDisplayName, ESortingSettings.SortBy, ESortingSettings.SubCategory, setConfigValues);
+			handleByCategoryChange(shadow.subCategoryDisplayName, ESortingSettings.SubCategory, setConfigValues);
 		}
 
 		if ((!configValues.smallMultiples.sortBy ||
 			(!SMALL_MULTIPLES_SORT_ON.map(d => d.value).includes(configValues.smallMultiples.sortBy)))) {
-			handleChange(shadow.measure1DisplayName, ESortingSettings.SortBy, ESortingSettings.SmallMultiples, setConfigValues);
+			handleByMeasureChange(shadow.measure1DisplayName, ESortingSettings.SmallMultiples, setConfigValues);
+		}
+
+		if ((shadow.isMonthCategoryNames || shadow.isDateCategoryNames || shadow.isXIsDateTimeAxis || shadow.isYIsDateTimeAxis) && !configValues.isDefaultSortByChanged) {
+			handleByCategoryChange(shadow.categoryDisplayName, ESortingSettings.Category, setConfigValues);
+
+			if (!configValues.isDefaultSortOrderChanged) {
+				handleChange(ESortOrderTypes.ASC, ESortingSettings.SortOrder, ESortingSettings.Category, setConfigValues);
+			}
 		}
 	}, [configValues.category.sortBy]);
 
