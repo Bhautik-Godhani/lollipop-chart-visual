@@ -3119,7 +3119,7 @@ export class Visual extends Shadow {
 						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), rowIndex, colIndex, ele);
 
 						if (index === this.smallMultiplesCategories.length - 1) {
-							this.configLegend();
+							// this.configLegend();
 
 							if (this.isLollipopTypeCircle) {
 								this.categoriesColorList.push(...this.categoricalDataPairs.map(d => {
@@ -4695,7 +4695,7 @@ export class Visual extends Shadow {
 	}
 
 	public configLegend(): void {
-		if (this.legendSettings.show) {
+		if (this.legendSettings.show && !this.isSmallMultiplesEnabled) {
 			d3.select("div.legend-wrapper").attr("display", "block");
 			this.drawLegend();
 		} else {
