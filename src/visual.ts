@@ -3710,7 +3710,7 @@ export class Visual extends Shadow {
 		chartData.forEach((d, i) => {
 			conditionalFormattingConditions.forEach(c => {
 				const conditionalFormattingResult = isConditionMatch1(d.category, undefined, d.value1, d.value2, undefined, undefined, d.tooltipFields, c);
-				const percentage1 = (d.value1 / value1Total) * 100;
+				const percentage1 = this.isPercentageMeasure ? d.value1 : (d.value1 / value1Total) * 100;
 
 				switch (c.valueType) {
 					case ECFValueTypes.Value:
@@ -3925,7 +3925,7 @@ export class Visual extends Shadow {
 							const value2Total = d3.sum(d.subCategories, d => d.value2);
 
 							d.subCategories.forEach(s => {
-								const percentage1 = (s.value1 / value1Total) * 100;
+								const percentage1 = this.isPercentageMeasure ? s.value1 : (s.value1 / value1Total) * 100;
 
 								if (isPercentageMatch(c, percentage1)) {
 									if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
