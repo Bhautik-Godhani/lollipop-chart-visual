@@ -309,6 +309,7 @@ export class Visual extends Shadow {
 	groupNamesByTotal: { name: string, total: number }[] = [];
 	schemeColors: string[] = [];
 	isMonthCategoryNames: boolean;
+	isDateCategoryNames: boolean;
 	isMonthSubcategoryNames: boolean;
 	extraDataLabelsDisplayNames: string[] = [];
 	isHasExtraDataLabels: boolean = false;
@@ -1252,35 +1253,51 @@ export class Visual extends Shadow {
 					// 	}
 					// } else {
 					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
+						data.sort((a, b) => getMonthIndex(a.category.toLowerCase()) - getMonthIndex(b.category.toLowerCase()));
 					} else {
-						data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
+						data.sort((a, b) => getMonthIndex(b.category.toLowerCase()) - getMonthIndex(a.category.toLowerCase()));
 					}
 					// }
-				} else {
+				} else if (this.isDateCategoryNames) {
 					const keys = Object.keys(data[0]);
-					if (this.isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
-						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-							data.sort((a, b) => new Date(a["date"]).getTime() - new Date(b["date"]).getTime());
-						} else {
-							data.sort((a, b) => new Date(b["date"]).getTime() - new Date(a["date"]).getTime());
+					if (this.isExpandAllApplied) {
+						if ((keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+							if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+								data.sort((a, b) => new Date(a["date"]).getTime() - new Date(b["date"]).getTime());
+							} else {
+								data.sort((a, b) => new Date(b["date"]).getTime() - new Date(a["date"]).getTime());
+							}
 						}
 					} else {
-						// if (this.isHorizontalChart) {
-						// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
-						// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
-						// 	} else {
-						// 		data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
-						// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
-						// 	}
-						// } else {
-						if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
-						} else {
-							data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+						if (keys.includes("Year") || keys.includes("Day")) {
+							if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+								data.sort((a, b) => a[categoryKey] - b[categoryKey]);
+							} else {
+								data.sort((a, b) => b[categoryKey] - a[categoryKey]);
+							}
+						} else if (keys.includes("Quarter")) {
+							if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+								data.sort((a, b) => a[categoryKey].localeCompare(b[categoryKey]));
+							} else {
+								data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+							}
 						}
-						// }
 					}
+				} else {
+					// if (this.isHorizontalChart) {
+					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
+					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+					// 	} else {
+					// 		data.sort((a, b) => b[categoryKey].localeCompare(a[categoryKey]));
+					// 		data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+					// 	}
+					// } else {
+					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+					} else {
+						data.sort((a, b) => [categoryKey, ...this.expandAllCategoriesName].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+					}
+					// }
 				}
 			} else if (this.isXIsNumericAxis) {
 				// if (this.isHorizontalChart) {
@@ -1579,7 +1596,10 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
+		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
 		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("month") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
+		this.isDateCategoryNames = ["year", "month", "quarter", "day"].includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase());
 
 		if (this.isHasSubcategories) {
 			const subCategoriesName = categoricalMeasureFields
@@ -1590,8 +1610,12 @@ export class Visual extends Shadow {
 			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toLowerCase()));
 
 			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
-				this.sortingSettings.category.sortBy = ESortByTypes.CATEGORY;
-				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+				this.sortingSettings.category.sortBy = this.categoryDisplayName;
+
+				if (!this.sortingSettings.isDefaultSortOrderChanged) {
+					this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+				}
+
 				this.sortingSettings.category.isSortByCategory = true;
 				this.sortingSettings.category.isSortByMeasure = false;
 				this.sortingSettings.category.isSortByMultiMeasure = false;
@@ -1599,6 +1623,18 @@ export class Visual extends Shadow {
 			}
 		}
 
+		if ((this.isDateCategoryNames || this.isXIsDateTimeAxis || this.isYIsDateTimeAxis) && !this.sortingSettings.isDefaultSortByChanged) {
+			this.sortingSettings.category.sortBy = this.categoryDisplayName;
+
+			if (!this.sortingSettings.isDefaultSortOrderChanged) {
+				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+			}
+
+			this.sortingSettings.category.isSortByCategory = true;
+			this.sortingSettings.category.isSortByMeasure = false;
+			this.sortingSettings.category.isSortByMultiMeasure = false;
+			this.sortingSettings.category.isSortByExtraSortField = false;
+		}
 
 		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
 
@@ -1712,9 +1748,6 @@ export class Visual extends Shadow {
 
 		this.isXIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 		this.isYIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
-
-		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
-		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
 
 		this.isXIsContinuousAxis = !this.isHorizontalChart && (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
 		this.isYIsContinuousAxis = this.isHorizontalChart && (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
@@ -3056,6 +3089,23 @@ export class Visual extends Shadow {
 							smallMultiplesCategories.push(othersDataField);
 						}
 					}
+				}
+
+				if (this.legendSettings.show) {
+					this._host.persistProperties({
+						merge: [
+							{
+								objectName: EVisualSettings.Legend,
+								properties: { show: false },
+								selector: null,
+							},
+						],
+					});
+				}
+
+				if (!this.legendSettings.show) {
+					this.legendViewPort.width = 0;
+					this.legendViewPort.height = 0;
 				}
 
 				const settings: ISmallMultiplesGridLayoutSettings = {

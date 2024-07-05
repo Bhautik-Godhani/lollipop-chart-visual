@@ -209,7 +209,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	],
 	colorBlindSafe: false,
 	colorScheme: "Blue",
-	reverse: false,
+	reverse: true,
 	isGradient: true,
 	negativeColor: NEGATIVE_COLOR,
 	positiveColor: POSITIVE_COLOR,
@@ -352,6 +352,7 @@ export const Y_AXIS_SETTINGS: IYAxisSettings = {
 
 export const SORTING_SETTINGS: ISortingSettings = {
 	isDefaultSortByChanged: false,
+	isDefaultSortOrderChanged: false,
 	category: {
 		enabled: true,
 		sortBy: undefined,
