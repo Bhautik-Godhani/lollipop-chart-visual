@@ -567,7 +567,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.setMargins();
             self.drawXYAxisTitle();
-            self.configLegend();
+            // self.configLegend();
             self.drawXGridLines();
             self.drawYGridLines();
 
