@@ -35,7 +35,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
     const totalRows = Math.ceil(config.categories.length / columns);
     let itemWidth = (config.containerWidth - config.outerSpacing * columns - config.outerSpacing) / columns;
-    let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing;
+    let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing - 5;
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformXScaleAll = isUniformXScale && config.xAxisPosition === ESmallMultiplesXAxisPosition.All;
@@ -67,6 +67,14 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
         itemHeight - panelTitleSize.height - config.innerSpacing * 2 - SMPaginationPanelHeight,
         true
     );
+
+    if (isUniformXScale) {
+        itemHeight = (config.containerHeight - xAxisGNodeHeight - xAxisTitleHeight - titleToAxisMargin - SMPaginationPanelHeight) / rows - config.outerSpacing - 5;
+    }
+
+    if (isUniformYScale) {
+        itemWidth = (config.containerWidth - yAxisGNodeWidth - yAxisTitleWidth - titleToAxisMargin - config.outerSpacing * columns - config.outerSpacing) / columns;
+    }
 
     const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
     const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
