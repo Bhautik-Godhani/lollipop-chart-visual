@@ -192,7 +192,7 @@ const UIXAxis = (
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
+      <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
         <Row>
           <Column>
             <SelectInput
@@ -567,7 +567,7 @@ const UIXAxis = (
         </ConditionalWrapper>
       </AccordionAlt>
 
-      <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
+      <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis))}>
         {UINumberFormatting(xConfigValues, setXConfigValues)}
       </ConditionalWrapper>
     </ConditionalWrapper >
@@ -751,7 +751,7 @@ const UIYAxis = (
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
+      <ConditionalWrapper visible={shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
         <Row>
           <Column>
             <SelectInput

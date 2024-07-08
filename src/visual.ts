@@ -1752,6 +1752,16 @@ export class Visual extends Shadow {
 		this.isXIsContinuousAxis = !this.isHorizontalChart && (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
 		this.isYIsContinuousAxis = this.isHorizontalChart && (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
 
+		if (!(!this.isHorizontalChart && !this.isExpandAllApplied && (this.isXIsNumericAxis || this.isXIsDateTimeAxis))) {
+			this.xAxisSettings.categoryType = AxisCategoryType.Categorical;
+			this.isXIsContinuousAxis = false;
+		}
+
+		if (!(this.isHorizontalChart && !this.isExpandAllApplied && (this.isYIsNumericAxis || this.isYIsDateTimeAxis))) {
+			this.yAxisSettings.categoryType = AxisCategoryType.Categorical;
+			this.isYIsContinuousAxis = false;
+		}
+
 		if (!this.upperBoundMeasureNames.includes(this.errorBarsSettings.measurement.upperBoundMeasure)) {
 			this.errorBarsSettings.measurement.upperBoundMeasure = undefined;
 		}
@@ -2300,7 +2310,7 @@ export class Visual extends Shadow {
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
 		if (isRenderBrush) {
-			if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
+			if ((!this.isHorizontalChart) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
 				if (this.isHorizontalChart) {
 					if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
 						this.brushXAxisTicksMaxHeight = 0;
@@ -6216,7 +6226,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = xScale.range();
 
 				xScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d);
+					const pos = this.brushScaleBand(d) - this.brushScaleBand.range()[0];
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newXScaleDomain.push(d);
 
@@ -7592,7 +7602,7 @@ export class Visual extends Shadow {
 			xAxisSettings.titleStyling[EFontStyle.Italic],
 			xAxisSettings.titleStyling[EFontStyle.UnderLine]
 		).width;
-		const maxWidth = xAxisSettings.isLabelAutoCharLimit ? this.scaleBandWidth : maxCharsLength;
+		const maxWidth = xAxisSettings.isLabelAutoCharLimit ? (this.scaleBandWidth > 0 ? this.scaleBandWidth : this.brushScaleBandBandwidth) : maxCharsLength;
 
 		if ((!this.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 			const xAxisDomain: string[] = this.xScale.domain();
@@ -7655,7 +7665,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.isExpandAllApplied && this.isXIsNumericAxis) {
+		if (((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
 			rotateDegree = 0;
 		}
 
@@ -7663,7 +7673,13 @@ export class Visual extends Shadow {
 			.selectAll("text")
 			.attr("dx", "0")
 			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
-			.attr("dy", ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em")))
+			.attr("dy", () => {
+				if (((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
+					return 0;
+				} else {
+					return ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em"));
+				}
+			})
 			.attr("y", () => {
 				const y = isApplyTilt ? getY9(rotateDegree) : 9;
 				if (this.isHorizontalChart) {
@@ -7734,10 +7750,14 @@ export class Visual extends Shadow {
 				};
 
 				const getFinalTruncatedText = (d: string) => {
-					return !xAxisSettings.isLabelAutoCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
+					if (THIS.isXIsNumericAxis && (!THIS.isXIsDateTimeAxis && !THIS.isDateCategoryNames)) {
+						return THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
+					} else {
+						return !xAxisSettings.isLabelAutoCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
+					}
 				}
 
-				if ((!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
+				if ((!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && (THIS.isXIsDateTimeAxis || THIS.isDateCategoryNames))) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
 						if (!THIS.isBottomXAxis) {
@@ -7792,6 +7812,14 @@ export class Visual extends Shadow {
 					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
 					const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 					ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
+
+					if (!xAxisSettings.isLabelAutoTilt) {
+						if (THIS.isBottomXAxis) {
+							ele.attr("transform", `rotate( ${rotateDegree})`);
+						} else {
+							ele.attr("transform", `rotate( ${rotateDegree})`);
+						}
+					}
 				}
 			});
 	}
@@ -7941,34 +7969,40 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
-			if (this.isXIsContinuousAxis) {
-				if (this.xAxisSettings.isMinimumRangeEnabled) {
-					min = this.xAxisSettings.minimumRange;
-				}
-
-				if (this.xAxisSettings.isMaximumRangeEnabled) {
-					max = this.xAxisSettings.maximumRange;
-				}
-			}
-
-			if (this.isYIsContinuousAxis) {
-				if (this.yAxisSettings.isMinimumRangeEnabled) {
-					min = this.yAxisSettings.minimumRange;
-				}
-
-				if (this.yAxisSettings.isMaximumRangeEnabled) {
-					max = this.yAxisSettings.maximumRange;
-				}
-			}
-
 			if ((this.isXIsDateTimeAxis && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
 				const dates = this.chartData.map((d) => d.category);
 				const minDate = d3.min(dates, d => new Date(d).getTime());
 				const maxDate = d3.max(dates, d => new Date(d).getTime());
 
-				this.xScale = d3.scaleTime();
-				this.xScale.domain([new Date(minDate), new Date(maxDate)]);
+				this.xScale = d3.scaleBand();
+				this.xScale.domain(dates);
 			} else {
+				const values = this.chartData.map(d => parseFloat(d.category));
+
+				let min = +d3.min(values, d => +d);
+				let max = +d3.max(values, d => +d);
+
+				if (this.isXIsContinuousAxis) {
+					if (this.xAxisSettings.isMinimumRangeEnabled) {
+						min = this.xAxisSettings.minimumRange;
+					}
+
+					if (this.xAxisSettings.isMaximumRangeEnabled) {
+						max = this.xAxisSettings.maximumRange;
+					}
+				}
+
+				if (this.isYIsContinuousAxis) {
+					if (this.yAxisSettings.isMinimumRangeEnabled) {
+						min = this.yAxisSettings.minimumRange;
+					}
+
+					if (this.yAxisSettings.isMaximumRangeEnabled) {
+						max = this.yAxisSettings.maximumRange;
+					}
+				}
+
+
 				this.xScale = d3.scaleLinear();
 				this.xScale.domain([min, max]).nice();
 			}

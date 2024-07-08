@@ -309,7 +309,7 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
 
 export const extractDigitsFromString = (str) => {
     // Use a regular expression to match all digits
-    const digitMatches = str.match(/\d/g);
+    const digitMatches = str.match(/[-+]?\d+(\.\d+)?/g);
 
     // Check if there are any matches
     if (digitMatches) {
