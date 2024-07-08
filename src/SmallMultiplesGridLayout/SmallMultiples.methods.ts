@@ -503,9 +503,16 @@ export const RenderSmallMultiplesUniformLeftYAxis = (
             uniformLeftYAxis.selectAll(".y-axis-col-svg").remove();
         }
 
+        const uniformAxisContainer = d3.create("div");
+        uniformAxisContainer
+            .classed("uniform-axis-container", true)
+            .style("height", (config.containerHeight * config.columns) + "px");
+
+        uniformLeftYAxis.node().appendChild(uniformAxisContainer.node());
+
         hyperListMainContainer.on("scroll", () => {
-            if (uniformLeftYAxis) {
-                uniformLeftYAxis.style("transform", `translate(${0}, ${-hyperListMainContainer.node().scrollTop}px)`);
+            if (uniformAxisContainer) {
+                uniformAxisContainer.style("transform", `translate(${0}, ${-hyperListMainContainer.node().scrollTop}px)`);
             }
         });
 
@@ -513,9 +520,9 @@ export const RenderSmallMultiplesUniformLeftYAxis = (
         for (let i = 0; i < totalRows; i++) {
             // yAxisGNode.attr("id", "uniformYAxis-" + i);
 
-            const uniformAxisContainer = d3.create("div");
-            uniformAxisContainer.style("transform", `translate(${0}px, ${i * itemHeight + ((i + 1) * config.outerSpacing)}px)`);
-            uniformAxisContainer.style("position", "absolute");
+            const uniformAxis = d3.create("div");
+            uniformAxis.style("transform", `translate(${0}px, ${i * itemHeight + ((i + 1) * config.outerSpacing)}px)`);
+            uniformAxis.style("position", "absolute");
 
             const axisSVG = d3.create("svg");
             axisSVG.classed("y-axis-col-svg", true);
@@ -566,12 +573,10 @@ export const RenderSmallMultiplesUniformLeftYAxis = (
 
             // g1.attr("transform", `translate(${0}, ${0})`);
 
-            uniformAxisContainer.node().appendChild(axisSVG.node());
-            uniformAxisContainer.node().appendChild(uniformBrushSVG.node());
+            uniformAxis.node().appendChild(axisSVG.node());
+            uniformAxis.node().appendChild(uniformBrushSVG.node());
 
-            if (uniformLeftYAxis) {
-                uniformLeftYAxis.node().appendChild(uniformAxisContainer.node());
-            }
+            uniformAxisContainer.node().appendChild(uniformAxis.node());
         }
     }
 };
@@ -683,6 +688,7 @@ export const GetSmallMultiplesUniformLeftYAxis = (config: ISmallMultiplesGridLay
         .classed("uniformLeftYAxis", true)
         .style("width", yAxisGNodeWidth + "px")
         .style("height", (config.containerHeight - xAxisGNodeHeight) + "px")
+        // .style("height", (config.containerHeight * config.columns) + "px")
         .style("transform", "translate(" + 0 + "px" + "," + 0 + "px" + ")")
         .style("overflow", "hidden");
 
