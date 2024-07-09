@@ -1607,7 +1607,7 @@ export class Visual extends Shadow {
 				.filter((d) => d && d !== null && d !== undefined && d !== "")
 				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toLowerCase()));
+			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toString().toLowerCase()));
 
 			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
 				this.sortingSettings.category.sortBy = this.categoryDisplayName;
@@ -10106,7 +10106,7 @@ export class Visual extends Shadow {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
 				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
-				if (isPosNegColorScheme && !d.category.includes(this.othersLabel)) {
+				if (isPosNegColorScheme && !d.category.toString().includes(this.othersLabel)) {
 					color = posNegColor;
 				} else {
 					color = isPie2 ? subCategoryColorPair[`${parent.category}-${d.category}`].marker2Color : subCategoryColorPair[`${parent.category}-${d.category}`].marker1Color;
