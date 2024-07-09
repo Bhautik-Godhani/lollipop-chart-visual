@@ -122,7 +122,7 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .style("font-style", subTextStyles.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
         .attr("fill", subTextStyles.labelColor)
         .style("font-family", subTextStyles.labelFontFamily)
-        .attr("font-size", headerFontSize / 2)
+        .attr("font-size", subTextStyles.isLabelAutoFontSize ? headerFontSize / 2 : subTextStyles.labelFontSize)
         .text(`${self.measure1DisplayName} : ${getTotal1Value()}`);
 
     // if (self.isHasMultiMeasure) {
