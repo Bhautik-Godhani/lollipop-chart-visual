@@ -909,7 +909,7 @@ export const ApplyThemeJson = (self: Visual, json, formatTab) => {
 		const mergeObject = [];
 		keys.forEach(el => {
 			if (el === "conditionalFormatting" || el === "annotations") {
-				if (el === "conditionalFormatting" && Object.keys(obj["conditionalFormatting"]).length > 0) {
+				if (el === "conditionalFormatting" && Object.keys(obj["conditionalFormatting"] ? obj["conditionalFormatting"] : {}).length > 0) {
 					mergeObject.push({
 						objectName: "editor",
 						properties: {
@@ -919,7 +919,7 @@ export const ApplyThemeJson = (self: Visual, json, formatTab) => {
 					})
 				}
 
-				if (el === "annotations" && obj["annotations"].length > 0) {
+				if (el === "annotations" && obj["annotations"] && obj["annotations"].length > 0) {
 					mergeObject.push({
 						objectName: "editor",
 						properties: {
