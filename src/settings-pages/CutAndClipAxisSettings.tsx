@@ -51,7 +51,19 @@ const CutAndClipAxisSettings = (props) => {
   }
 
   const applyChanges = () => {
-    if ((configValues.isEnabled && (configValues.breakEnd > configValues.breakStart)) || !configValues.isEnabled) {
+    if ((configValues.isEnabled)) {
+      if (configValues.breakEnd < 0 && configValues.breakStart < 0) {
+        if (configValues.breakEnd < configValues.breakStart) {
+          shadow.persistProperties(sectionName, propertyName, configValues);
+          closeCurrentSettingHandler();
+        }
+      }
+
+      if (configValues.breakEnd > configValues.breakStart) {
+        shadow.persistProperties(sectionName, propertyName, configValues);
+        closeCurrentSettingHandler();
+      }
+    } else if (!configValues.isEnabled) {
       shadow.persistProperties(sectionName, propertyName, configValues);
       closeCurrentSettingHandler();
     }
@@ -66,12 +78,22 @@ const CutAndClipAxisSettings = (props) => {
   });
 
   React.useEffect(() => {
-    if (configValues.breakStart === undefined) {
-      handleChange(shadow.axisDomainMaxValue * 15 / 100, ECutAndClipAxisSettings.BreakStart);
-    }
+    if (shadow.isAllNegativeValue) {
+      if (configValues.breakStart === undefined) {
+        handleChange((shadow.axisDomainMinValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
+      }
 
-    if (configValues.breakEnd === undefined) {
-      handleChange(shadow.axisDomainMaxValue * 35 / 100, ECutAndClipAxisSettings.BreakEnd);
+      if (configValues.breakEnd === undefined) {
+        handleChange((shadow.axisDomainMinValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
+      }
+    } else {
+      if (configValues.breakStart === undefined) {
+        handleChange((shadow.axisDomainMaxValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
+      }
+
+      if (configValues.breakEnd === undefined) {
+        handleChange((shadow.axisDomainMaxValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
+      }
     }
   }, []);
 
