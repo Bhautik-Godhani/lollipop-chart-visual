@@ -413,13 +413,6 @@
 						"bool": true
 					}
 				},
-				"isLegendAutoChanged": {
-					"displayName": "",
-					"description": "",
-					"type": {
-						"bool": true
-					}
-				},
 				"legendPosition": {
 					"displayName": "Position",
 					"description": "",
