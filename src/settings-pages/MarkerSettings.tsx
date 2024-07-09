@@ -341,7 +341,7 @@ const UIMarkerSizeSettings = (shadow: Visual, vizOptions: ShadowUpdateOptions, c
 			<ConditionalWrapper visible={configValues[configValues.markerStyleType].isShowMarkerOutline}>
 				<Row appearance="padded">
 					<Column>
-						<Row>
+						<Row disableTopPadding>
 							<Column>
 								<InputControl
 									min={0}

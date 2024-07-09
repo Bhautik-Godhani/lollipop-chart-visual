@@ -187,6 +187,7 @@ const UIXAxis = (
               value={xConfigValues.position}
               optionsList={X_AXIS_POSITION}
               handleChange={value => handleXChange(value, EXAxisSettings.Position, setXConfigValues)}
+              selectorAppearance="secondary"
             />
           </Column>
         </Row>

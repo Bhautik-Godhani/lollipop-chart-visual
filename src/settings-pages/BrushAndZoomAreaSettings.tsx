@@ -120,6 +120,7 @@ const UIGeneralChartSettings = (
 							handleChange={(value) => handleChange(value, EBrushAndZoomAreaSettings.MinLollipopCount, setConfigValues)}
 						/>
 					</Column>
+					<Column></Column>
 				</Row>
 
 				<Row>

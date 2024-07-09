@@ -157,7 +157,17 @@ const LineSettings = (props) => {
 							handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
 						/>
 					</Column>
-					<Column></Column>
+
+					<Column>
+						<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
+							<ColorPicker
+								label="Color"
+								color={configValues.lineColor}
+								handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+								colorPalette={vizOptions.host.colorPalette}
+							/>
+						</ConditionalWrapper>
+					</Column>
 				</Row>
 
 				<ConditionalWrapper visible={!shadow.isShowImageMarker1 && shadow.markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.UPLOAD_ICON && (shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true)}>
@@ -185,20 +195,6 @@ const LineSettings = (props) => {
 							</Column>
 						</Row>
 					</ConditionalWrapper>
-				</ConditionalWrapper>
-
-				<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
-					<Row>
-						<Column>
-							<ColorPicker
-								label="Color"
-								color={configValues.lineColor}
-								handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
-								colorPalette={vizOptions.host.colorPalette}
-								size="sm"
-							/>
-						</Column>
-					</Row>
 				</ConditionalWrapper>
 			</ConditionalWrapper>
 

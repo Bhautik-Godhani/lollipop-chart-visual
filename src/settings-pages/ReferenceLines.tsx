@@ -271,7 +271,7 @@ const ReferenceLines = (props) => {
           {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length === 0 && (
             <>
               <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
                   <ReferenceLinePlaceholderIcon />
                 </Column>
               </Row>
@@ -328,7 +328,7 @@ const ReferenceLines = (props) => {
           {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length === 0 && (
             <>
               <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
                   <ReferenceBandPlaceholderIcon />
                 </Column>
               </Row>
