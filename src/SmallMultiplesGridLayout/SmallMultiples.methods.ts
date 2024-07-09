@@ -35,7 +35,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
     const totalRows = Math.ceil(config.categories.length / columns);
     let itemWidth = (config.containerWidth - config.outerSpacing * columns - config.outerSpacing) / columns;
-    let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing - 5;
+    let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing - 10;
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformXScaleAll = isUniformXScale && config.xAxisPosition === ESmallMultiplesXAxisPosition.All;
@@ -58,7 +58,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     }
 
     if (isUniformYScale) {
-        itemWidth = (config.containerWidth - yAxisGNodeWidth1 - yAxisTitleWidth1 - titleToAxisMargin - config.outerSpacing * columns - config.outerSpacing) / columns;
+        itemWidth = (config.containerWidth - yAxisGNodeWidth1 - yAxisTitleWidth1 - titleToAxisMargin - (config.outerSpacing * columns) - config.outerSpacing) / columns;
     }
 
     const { xAxisGNodeHeight, xAxisTitleHeight, yAxisGNodeWidth, yAxisTitleWidth } = GetRootXYAxisGNode(
@@ -69,7 +69,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     );
 
     if (isUniformXScale) {
-        itemHeight = (config.containerHeight - xAxisGNodeHeight - xAxisTitleHeight - titleToAxisMargin - SMPaginationPanelHeight) / rows - config.outerSpacing - 5;
+        itemHeight = (config.containerHeight - xAxisGNodeHeight - xAxisTitleHeight - titleToAxisMargin - SMPaginationPanelHeight) / rows - config.outerSpacing - 10;
     }
 
     if (isUniformYScale) {
@@ -912,9 +912,9 @@ export const RenderSmallMultiplesUniformBottomXAxis = (
                 // bottomXAxisNode.attr("transform", `translate(${0}, ${5})`);
                 uniformBrushSVG.select(".brush").attr("transform", `translate(${config.innerSpacing}, ${0})`);
             } else {
-                g.attr("transform", `translate(${yAxisGNodeWidth + config.innerSpacing}, ${10})`);
+                g.attr("transform", `translate(${yAxisGNodeWidth}, ${10})`);
                 // bottomXAxisNode.attr("transform", `translate(${0}, ${5})`);
-                uniformBrushSVG.select(".brush").attr("transform", `translate(${yAxisGNodeWidth + config.innerSpacing}, ${0})`);
+                uniformBrushSVG.select(".brush").attr("transform", `translate(${yAxisGNodeWidth}, ${0})`);
             }
 
             // if (!isHorizontalBrushDisplayed) {

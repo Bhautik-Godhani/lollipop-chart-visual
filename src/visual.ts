@@ -1616,10 +1616,7 @@ export class Visual extends Shadow {
 					this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
 				}
 
-				this.sortingSettings.category.isSortByCategory = true;
-				this.sortingSettings.category.isSortByMeasure = false;
-				this.sortingSettings.category.isSortByMultiMeasure = false;
-				this.sortingSettings.category.isSortByExtraSortField = false;
+				this.handleSortByCategoryChange(this.sortingSettings.category);
 			}
 		}
 
@@ -1630,10 +1627,7 @@ export class Visual extends Shadow {
 				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
 			}
 
-			this.sortingSettings.category.isSortByCategory = true;
-			this.sortingSettings.category.isSortByMeasure = false;
-			this.sortingSettings.category.isSortByMultiMeasure = false;
-			this.sortingSettings.category.isSortByExtraSortField = false;
+			this.handleSortByCategoryChange(this.sortingSettings.category);
 		}
 
 		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
@@ -1869,8 +1863,6 @@ export class Visual extends Shadow {
 			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
 		}
 
-		const isSmallMultipleSortBy = (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
-
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
 			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
@@ -1880,23 +1872,6 @@ export class Visual extends Shadow {
 			this.sortingSettings.category.isSortByMeasure = true;
 			this.sortingSettings.category.isSortByMultiMeasure = false;
 			this.sortingSettings.category.isSortByExtraSortField = false;
-		}
-
-		if (
-			!this.sortingSettings.category.sortBy ||
-			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.category.sortBy) && !this.sortingSettings.category.isSortByExtraSortField)
-		) {
-			this.sortingSettings.category.sortBy = isSmallMultipleSortBy ? this.categoryDisplayName : this.measure1DisplayName;
-		}
-
-		if (!this.sortingSettings.subCategory.sortBy ||
-			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
-			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
-		}
-
-		if ((!this.sortingSettings.smallMultiples.sortBy ||
-			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.smallMultiples.sortBy)))) {
-			this.sortingSettings.smallMultiples.sortBy = this.categoryDisplayName;
 		}
 
 		this.measureNamesByTotal = [];
@@ -2313,115 +2288,131 @@ export class Visual extends Shadow {
 		const expectedWidth = (this.brushScaleBandBandwidth * width) / this.brushScaleBand.bandwidth();
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
-		if (isRenderBrush) {
-			if ((!this.isHorizontalChart) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
-				if (this.isHorizontalChart) {
-					if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-						this.brushXAxisTicksMaxHeight = 0;
-						this.setBrushYAxisTicksMaxWidth();
-					} else {
-						this.brushXAxisTicksMaxHeight = 0;
-						this.brushYAxisTicksMaxWidth = 0;
-					}
+		if ((!this.isHorizontalChart) || (this.isHorizontalChart && !this.isYIsContinuousAxis)) {
+			if (this.isHorizontalChart) {
+				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.setBrushYAxisTicksMaxWidth();
+				} else {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.brushYAxisTicksMaxWidth = 0;
+				}
 
-					if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-						this.isScrollBrushDisplayed = true;
-						this.isVerticalBrushDisplayed = true;
-						this.isHorizontalBrushDisplayed = false;
+				if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+					this.isScrollBrushDisplayed = true;
+					this.isVerticalBrushDisplayed = true;
+					this.isHorizontalBrushDisplayed = false;
 
-						const config: IBrushConfig = {
-							width: this.width,
-							height: this.height,
-							brushG: this.brushG.node(),
-							brushXPos: 0,
-							brushYPos: 0,
-							barDistance: this.brushScaleBandBandwidth,
-							totalBarsCount: this.totalLollipopCount,
-							scaleWidth: width,
-							scaleHeight: height,
-							smallMultiplesGridItemId: null,
-							categoricalData: categoricalData,
-							isShowXAxis: true,
-							isShowYAxis: true,
-							isShowBrush: true
-						};
+					const config: IBrushConfig = {
+						width: this.width,
+						height: this.height,
+						brushG: this.brushG.node(),
+						brushXPos: 0,
+						brushYPos: 0,
+						barDistance: this.brushScaleBandBandwidth,
+						totalBarsCount: this.totalLollipopCount,
+						scaleWidth: width,
+						scaleHeight: height,
+						smallMultiplesGridItemId: null,
+						categoricalData: categoricalData,
+						isShowXAxis: true,
+						isShowYAxis: true,
+						isShowBrush: true
+					};
 
+					if (isRenderBrush) {
 						this.initVerticalBrush(config);
-					} else {
-						this.isScrollBrushDisplayed = false;
-						this.isVerticalBrushDisplayed = false;
-						this.isHorizontalBrushDisplayed = false;
-						this.brushG.selectAll("*").remove();
 					}
 				} else {
-					if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
-						this.brushYAxisTicksMaxWidth = 0;
-						this.setBrushXAxisTicksMaxHeight();
-					} else {
-						this.brushXAxisTicksMaxHeight = 0;
-						this.brushYAxisTicksMaxWidth = 0;
-					}
+					this.isScrollBrushDisplayed = false;
+					this.isVerticalBrushDisplayed = false;
+					this.isHorizontalBrushDisplayed = false;
+					this.brushG.selectAll("*").remove();
+				}
+			} else {
+				if (this.brushAndZoomAreaSettings.enabled && this.brushAndZoomAreaSettings.isShowAxis) {
+					this.brushYAxisTicksMaxWidth = 0;
+					this.setBrushXAxisTicksMaxHeight();
+				} else {
+					this.brushXAxisTicksMaxHeight = 0;
+					this.brushYAxisTicksMaxWidth = 0;
+				}
 
-					if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-						this.isScrollBrushDisplayed = true;
-						this.isHorizontalBrushDisplayed = true;
-						this.isVerticalBrushDisplayed = false;
-						const brushXPos = this.margin.left ? this.margin.left : 0;
+				if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+					this.isScrollBrushDisplayed = true;
+					this.isHorizontalBrushDisplayed = true;
+					this.isVerticalBrushDisplayed = false;
+					const brushXPos = this.margin.left ? this.margin.left : 0;
 
-						const config: IBrushConfig = {
-							width: this.width,
-							height: this.height,
-							brushG: this.brushG.node(),
-							brushXPos: brushXPos,
-							brushYPos: 100000,
-							barDistance: this.brushScaleBandBandwidth,
-							totalBarsCount: this.totalLollipopCount,
-							scaleWidth: width,
-							scaleHeight: height,
-							smallMultiplesGridItemId: null,
-							categoricalData: categoricalData,
-							isShowXAxis: true,
-							isShowYAxis: true,
-							isShowBrush: true
-						};
+					const config: IBrushConfig = {
+						width: this.width,
+						height: this.height,
+						brushG: this.brushG.node(),
+						brushXPos: brushXPos,
+						brushYPos: 100000,
+						barDistance: this.brushScaleBandBandwidth,
+						totalBarsCount: this.totalLollipopCount,
+						scaleWidth: width,
+						scaleHeight: height,
+						smallMultiplesGridItemId: null,
+						categoricalData: categoricalData,
+						isShowXAxis: true,
+						isShowYAxis: true,
+						isShowBrush: true
+					};
 
+					if (isRenderBrush) {
 						this.initHorizontalBrush(config);
-					} else {
-						this.isScrollBrushDisplayed = false;
-						this.isHorizontalBrushDisplayed = false;
-						this.isVerticalBrushDisplayed = false;
-						this.brushG.selectAll("*").remove();
 					}
+				} else {
+					this.isScrollBrushDisplayed = false;
+					this.isHorizontalBrushDisplayed = false;
+					this.isVerticalBrushDisplayed = false;
+					this.brushG.selectAll("*").remove();
 				}
+			}
 
-				// || this.height < expectedHeight
-				if (this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-					);
+			// || this.height < expectedHeight
+			if (isRenderBrush && this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
+				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+					this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+				);
 
-					const categoricalData2 = cloneDeep(categoricalData);
+				const categoricalData2 = cloneDeep(categoricalData);
 
-					categoricalData2.categories.forEach((d, i) => {
-						d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-					});
+				categoricalData2.categories.forEach((d, i) => {
+					d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+				});
 
-					categoricalData2.values.forEach((d, i) => {
-						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+				categoricalData2.values.forEach((d, i) => {
+					d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
 
-						if (d.highlights) {
-							d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-						}
-					});
+					if (d.highlights) {
+						d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+					}
+				});
 
-					this.setCategoricalDataFields(categoricalData2);
-					this.setChartData(categoricalData2);
-				}
+				this.setCategoricalDataFields(categoricalData2);
+				this.setChartData(categoricalData2);
 			}
 		}
 
 		return categoricalData;
+	}
+
+	handleSortByCategoryChange(props: ISortingProps): void {
+		props.isSortByCategory = true;
+		props.isSortByMeasure = false;
+		props.isSortByMultiMeasure = false;
+		props.isSortByExtraSortField = false;
+	}
+
+	handleSortByMeasureChange(props: ISortingProps): void {
+		props.isSortByCategory = false;
+		props.isSortByMeasure = true;
+		props.isSortByMultiMeasure = false;
+		props.isSortByExtraSortField = false;
 	}
 
 	public setCategoricalDataFields(categoricalData: powerbi.DataViewCategorical): void {
@@ -2536,16 +2527,34 @@ export class Visual extends Shadow {
 
 		this.measure1DisplayName = this.categoricalMeasureFields.length > 0 ? this.categoricalMeasureFields[0].source.displayName : "";
 		this.measure2DisplayName = this.categoricalMeasureFields.length > 1 ? this.categoricalMeasureFields[1].source.displayName : "";
+		this.isHasSmallMultiplesData = this.categoricalSmallMultiplesDataFields.length > 0;
+		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
 			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
 		) {
-			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
-			this.sortingSettings.category.isSortByCategory = false;
-			this.sortingSettings.category.isSortByMeasure = true;
-			this.sortingSettings.category.isSortByMultiMeasure = false;
-			this.sortingSettings.category.isSortByExtraSortField = false;
+			this.sortingSettings.category.sortBy = this.measure1DisplayName;
+			this.handleSortByMeasureChange(this.sortingSettings.category);
+		}
+
+		if (!this.sortingSettings.subCategory.sortBy) {
+			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+			this.handleSortByCategoryChange(this.sortingSettings.subCategory);
+		}
+
+		const isSmallMultipleSortBy = (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
+
+		if (
+			!this.sortingSettings.category.sortBy ||
+			(![this.categoryDisplayName, ...(isSmallMultipleSortBy ? [] : this.measureNames)].includes(this.sortingSettings.category.sortBy) && !this.sortingSettings.category.isSortByExtraSortField)
+		) {
+			this.sortingSettings.category.sortBy = isSmallMultipleSortBy ? this.categoryDisplayName : this.measure1DisplayName;
+			if (isSmallMultipleSortBy) {
+				this.handleSortByCategoryChange(this.sortingSettings.category);
+			} else {
+				this.handleSortByMeasureChange(this.sortingSettings.category);
+			}
 		}
 
 		if (
@@ -2553,10 +2562,20 @@ export class Visual extends Shadow {
 			(!(this.measureNames as string[]).includes(this.sortingSettings.category.sortBy) && this.sortingSettings.category.isSortByMeasure && !this.sortingSettings.category.isSortByExtraSortField)
 		) {
 			this.sortingSettings.category.sortBy = this.measure1DisplayName;
+			this.handleSortByMeasureChange(this.sortingSettings.category);
+
 		}
 
-		if (!this.sortingSettings.subCategory.sortBy) {
+		if (!this.sortingSettings.subCategory.sortBy ||
+			(![this.subCategoryDisplayName, this.measure1DisplayName, this.measure2DisplayName, ...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].includes(this.sortingSettings.subCategory.sortBy))) {
 			this.sortingSettings.subCategory.sortBy = this.subCategoryDisplayName;
+			this.handleSortByCategoryChange(this.sortingSettings.subCategory);
+		}
+
+		if ((!this.sortingSettings.smallMultiples.sortBy ||
+			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.smallMultiples.sortBy)))) {
+			this.sortingSettings.smallMultiples.sortBy = this.categoryDisplayName;
+			this.handleSortByCategoryChange(this.sortingSettings.smallMultiples);
 		}
 
 		if (this.measureNames.length > 1) {
@@ -3167,9 +3186,32 @@ export class Visual extends Shadow {
 								isAxisPositionChanged = true;
 							}
 
+							const clonedCategoricalData: powerbi.DataViewCategorical = cloneDeep(this.originalCategoricalData);
+							const smallMultiplesDataPair = this.smallMultiplesDataPairs.find((d) => d.category === settings.categories[0]);
+							const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+
+							clonedCategoricalData.categories.forEach((d) => {
+								d.values = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return d.values[id];
+								});
+							});
+
+							clonedCategoricalData.values.forEach((d) => {
+								d.values = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return d.values[id];
+								});
+
+								d.highlights = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+								});
+							});
+
 							const data = this.setInitialChartData(
-								this.clonedCategoricalData,
-								cloneDeep(this.clonedCategoricalData),
+								clonedCategoricalData,
+								cloneDeep(clonedCategoricalData),
 								this.categoricalMetadata,
 								width,
 								height,
@@ -3230,9 +3272,32 @@ export class Visual extends Shadow {
 								isAxisPositionChanged = true;
 							}
 
+							const clonedCategoricalData: powerbi.DataViewCategorical = cloneDeep(this.originalCategoricalData);
+							const smallMultiplesDataPair = this.smallMultiplesDataPairs.find((d) => d.category === settings.categories[0]);
+							const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+
+							clonedCategoricalData.categories.forEach((d) => {
+								d.values = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return d.values[id];
+								});
+							});
+
+							clonedCategoricalData.values.forEach((d) => {
+								d.values = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return d.values[id];
+								});
+
+								d.highlights = dataValuesIndexes.map((valueIndex) => {
+									const id = +valueIndex.split("-")[1];
+									return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+								});
+							});
+
 							const data = this.setInitialChartData(
-								this.clonedCategoricalData,
-								cloneDeep(this.clonedCategoricalData),
+								clonedCategoricalData,
+								cloneDeep(clonedCategoricalData),
 								this.categoricalMetadata,
 								width,
 								height,
@@ -3270,7 +3335,7 @@ export class Visual extends Shadow {
 
 						return {
 							yAxisNode: this.yAxisG.node().cloneNode(true),
-							yAxisNodeWidth: this.yAxisG.node().getBoundingClientRect().width + 10 + (this.isVerticalBrushDisplayed ? 20 : 0),
+							yAxisNodeWidth: this.margin.left,
 							brushNode: this.brushG.node().cloneNode(true),
 							brushNodeWidth: this.brushG.node().getBoundingClientRect().width,
 							yAxisTitleG: this.yAxisTitleG.node().cloneNode(true),
@@ -5258,6 +5323,10 @@ export class Visual extends Shadow {
 		if (!this.yAxisSettings.show) {
 			this.yAxisSettings.isDisplayLabel = false;
 			this.yAxisSettings.isDisplayTitle = false;
+		}
+
+		if (this.isSmallMultiplesEnabled && !this.xAxisSettings.isLabelAutoTilt) {
+			this.xAxisSettings.isLabelAutoTilt = true;
 		}
 
 		// SET TRANSITION DURATION
@@ -7662,16 +7731,24 @@ export class Visual extends Shadow {
 
 		let rotateDegree = 0;
 		if (THIS.isBottomXAxis) {
-			if (xAxisSettings.isLabelAutoTilt) {
-				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? -90 : -35;
+			if (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+				rotateDegree = -90;
 			} else {
-				rotateDegree = xAxisSettings.labelTilt;
+				if (xAxisSettings.isLabelAutoTilt) {
+					rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? -90 : -35;
+				} else {
+					rotateDegree = xAxisSettings.labelTilt;
+				}
 			}
 		} else {
-			if (xAxisSettings.isLabelAutoTilt) {
-				rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? 90 : 35;
+			if (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+				rotateDegree = 90;
 			} else {
-				rotateDegree = -xAxisSettings.labelTilt;
+				if (xAxisSettings.isLabelAutoTilt) {
+					rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? 90 : 35;
+				} else {
+					rotateDegree = -xAxisSettings.labelTilt;
+				}
 			}
 		}
 

@@ -461,7 +461,7 @@ const UIXAxis = (
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+        <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isSmallMultiplesEnabled}>
           <Row>
             <Column>
               <ToggleButton
@@ -1244,6 +1244,12 @@ const XAxisSettings = (props) => {
   });
 
   const [selectedAxisTab, setSelectedAxisTab] = React.useState<EXYAxisNames>(EXYAxisNames.X);
+
+  React.useEffect(() => {
+    if (shadow.isSmallMultiplesEnabled && !xConfigValues.isLabelAutoTilt) {
+      handleXChange(true, EXAxisSettings.IsLabelAutoTilt, setXConfigValues);
+    }
+  }, []);
 
   React.useEffect(() => {
     if (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform && shadow.smallMultiplesSettings.xAxisPosition === ESmallMultiplesXAxisPosition.FrozenTopColumn) {
