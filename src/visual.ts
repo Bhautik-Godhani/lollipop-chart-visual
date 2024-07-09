@@ -3411,6 +3411,9 @@ export class Visual extends Shadow {
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: false };
 						}
 					},
+					getBottomLeftMargin: () => {
+						return { bottomMargin: this.margin.bottom, leftMargin: this.margin.left }
+					},
 					onRenderingFinished: () => {
 						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 

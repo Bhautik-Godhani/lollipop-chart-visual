@@ -360,7 +360,8 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
   getUniformYAxisAndBrushNode: undefined,
   getXAxisNodeElementAndMeasures: undefined,
   getYAxisNodeElementAndMeasures: undefined,
-  onRenderingFinished: undefined
+  getBottomLeftMargin: undefined,
+  onRenderingFinished: undefined,
 };
 
 const UILayout = (

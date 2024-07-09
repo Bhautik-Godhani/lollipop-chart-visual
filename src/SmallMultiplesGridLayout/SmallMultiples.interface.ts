@@ -64,6 +64,8 @@ export interface ISmallMultiplesGridLayoutSettings {
         { xAxisNode: any; xAxisNodeHeight: number; brushNode: any; brushNodeHeight: number; xAxisTitleG: any; xAxisTitleHeight: number; },
     getYAxisNodeElementAndMeasures: (gridItemWidth: number, gridItemHeight: number, isLeftYAxis: boolean, isDrawAxis: boolean) =>
         { yAxisNode: any, yAxisNodeWidth: number; brushNode: any; brushNodeWidth: number; yAxisTitleG: any; yAxisTitleWidth: number; },
+    getBottomLeftMargin: () =>
+        { bottomMargin: number, leftMargin: number },
     onRenderingFinished: () => void,
 }
 

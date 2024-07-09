@@ -110,10 +110,12 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
         const itemWidth = bBox.width;
         const itemHeight = bBox.height;
 
+        const { bottomMargin, leftMargin } = config.getBottomLeftMargin();
+
         const { yAxisTitleGNode, xAxisTitleGNode, xAxisTitleHeight, yAxisTitleWidth } = GetRootXYAxisGNode(
             config,
-            itemWidth - config.innerSpacing * 2,
-            itemHeight - panelTitleSize.height - config.innerSpacing * 2,
+            itemWidth - (!isUniformYScale ? leftMargin : config.innerSpacing * 2),
+            itemHeight - panelTitleSize.height - (!isUniformXScale ? bottomMargin : config.innerSpacing * 2),
             false
         );
 
