@@ -146,7 +146,7 @@ const CutAndClipAxisSettings = (props) => {
         <ConditionalWrapper visible={!configValues.isEnabled}>
           <Row>
             <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <div className="section section-preview-image">
+              <div className="preview-image">
                 <CutAndClipAxisPlaceholderIcon />
               </div>
             </Column>

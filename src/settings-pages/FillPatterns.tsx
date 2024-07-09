@@ -196,7 +196,7 @@ const FillPatterns = (props) => {
 				</Row>
 
 				<ConditionalWrapper visible={!configValues.enabled}>
-					<div className="section section-preview-image">
+					<div className="preview-image">
 						<PreviewPatterns />
 					</div>
 				</ConditionalWrapper>

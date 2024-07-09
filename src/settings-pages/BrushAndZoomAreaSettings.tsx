@@ -104,7 +104,7 @@ const UIGeneralChartSettings = (
 			</Row>
 
 			<ConditionalWrapper visible={!configValues.enabled}>
-				<div className="section section-preview-image">
+				<div className="preview-image">
 					<PreviewSliderPlaceholderIcon />
 				</div>
 			</ConditionalWrapper>

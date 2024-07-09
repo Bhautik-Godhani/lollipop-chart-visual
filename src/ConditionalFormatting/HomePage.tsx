@@ -149,7 +149,7 @@ const RulesList = ({
 const EmptyRulesScreen = ({ createRule, closeCurrentSettingHandler }) => {
   return (
     <>
-      <div className="section section-preview-image">
+      <div className="preview-image">
         <img src={require("../../assets/icons/preview-conditional-formatting.svg")} />
         <Button text={"Add New Rule"} variant={"primary"} clickHandler={() => createRule()} />
       </div>
