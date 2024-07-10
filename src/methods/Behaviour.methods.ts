@@ -7,7 +7,7 @@ import {
 } from "powerbi-visuals-utils-interactivityutils/lib/interactivityBaseService";
 import { SelectableDataPoint } from "powerbi-visuals-utils-interactivityutils/lib/interactivitySelectionService";
 import { Visual } from "../visual";
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { ILollipopChartRow } from "../model";
 
 import ISelectionManager = powerbi.extensibility.ISelectionManager;

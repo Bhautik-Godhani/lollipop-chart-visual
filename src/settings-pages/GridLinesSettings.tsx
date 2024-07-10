@@ -62,6 +62,7 @@ const UIXAxisGridLines = (
 							label="Line Style"
 							value={configValues[EGridLinesSettings.xGridLines].lineType}
 							optionsList={LINE_TYPES}
+							selectorAppearance="secondary"
 							handleChange={(value) => handleChange(value, EGridLinesSettings.lineType, EGridLinesSettings.xGridLines, setConfigValues)}
 						/>
 					</Column>
@@ -112,6 +113,7 @@ const UIYAxisGridLines = (
 							label="Line Style"
 							value={configValues[EGridLinesSettings.yGridLines].lineType}
 							optionsList={LINE_TYPES}
+							selectorAppearance="secondary"
 							handleChange={(value) => handleChange(value, EGridLinesSettings.lineType, EGridLinesSettings.yGridLines, setConfigValues)}
 						/>
 					</Column>

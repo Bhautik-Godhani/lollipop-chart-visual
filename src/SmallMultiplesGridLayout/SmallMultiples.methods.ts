@@ -899,7 +899,7 @@ export const RenderSmallMultiplesUniformBottomXAxis = (
 
             const uniformBrushSVG = RenderSmallMultiplesUniformXAxisBrush(true, i, itemWidth, itemHeight, xAxisMargin);
 
-            const { isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - (isUniformYScale ? 0 : yAxisGNodeWidth) - config.innerSpacing, itemHeight, true);
+            const { isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - (isUniformYScale ? 0 : yAxisGNodeWidth) - config.innerSpacing * 2, itemHeight, true);
 
             if (isUniformXScale) {
                 xAxisTitleGNode.attr("transform", `translate(${yAxisGNodeWidth + ((itemWidth - yAxisGNodeWidth) / 2)}, ${xAxisGNodeHeight + titleToAxisMargin + 5 - (isHorizontalBrushDisplayed ? 20 : 0)})`);
@@ -993,7 +993,7 @@ export const RenderSmallMultiplesUniformTopXAxis = (
                 axisSVG.node().appendChild(xAxisTitleGNode.node().cloneNode(true));
             }
 
-            const { xAxisNodeHeight, isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - yAxisGNodeWidth - config.innerSpacing, itemHeight, false);
+            const { xAxisNodeHeight, isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - yAxisGNodeWidth - config.innerSpacing * 2, itemHeight, false);
 
             if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
                 g.attr("transform", `translate(${yAxisGNodeWidth}, ${xAxisGNodeHeight - 5 - 12})`);

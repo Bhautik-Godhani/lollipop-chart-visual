@@ -116,6 +116,7 @@ const UIDataLabelsFontFamilyAndStyle = (
 							},
 						]}
 						isMultiple
+						selectorAppearance="secondary"
 						handleChange={(value) => handleChange(value, EDataLabelsSettings.fontStyle, selectedMeasure, setConfigValues)}
 					/>
 				</Column>
@@ -176,6 +177,7 @@ const UIDataLabelsFontSettings = (
 						label={"Placement"}
 						value={configValues.placement}
 						optionsList={LABEL_PLACEMENTS}
+						selectorAppearance="secondary"
 						handleChange={(value) => handleChange(value, EDataLabelsSettings.placement, selectedMeasure, setConfigValues)}
 					/>
 				</Column>
@@ -214,6 +216,8 @@ const UIDataLabelsFontSettings = (
 					</Column>
 				</Row>
 			</ConditionalWrapper>
+
+			{UIDataLabelsFontFamilyAndStyle(selectedMeasure, configValues, setConfigValues)}
 
 			<ConditionalWrapper visible={shadow.isLollipopTypeCircle && configValues.placement === DataLabelsPlacement.Outside}>
 				<Row appearance="padded">
@@ -321,8 +325,6 @@ const UIDataLabelsFontSettings = (
 					</Column>
 				</Row>
 			</ConditionalWrapper> */}
-
-			{UIDataLabelsFontFamilyAndStyle(selectedMeasure, configValues, setConfigValues)}
 
 			<ConditionalWrapper visible={configValues.placement === DataLabelsPlacement.Inside && shadow.isLollipopTypeCircle}>
 				{UIInsideLabelsTextColorSettings(shadow, vizOptions, selectedMeasure, configValues, setConfigValues)}

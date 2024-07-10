@@ -147,7 +147,7 @@ import {
 	RenderExpandAllXAxis,
 	RenderExpandAllYAxis,
 } from "./methods/expandAllXAxis.methods";
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { GetAnnotationDataPoint, RenderLollipopAnnotations } from "./methods/Annotations.methods";
 import { clearLegends, renderLegends } from "./legendHelper";
 import { Behavior, SetAndBindChartBehaviorOptions } from "./methods/Behaviour.methods";

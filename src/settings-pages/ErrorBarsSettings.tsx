@@ -337,6 +337,7 @@ const ErrorBarsSettings = (props) => {
                 label="Position"
                 value={configValues.measurement.direction}
                 optionsList={DIRECTION}
+                selectorAppearance="secondary"
                 handleChange={(value) => handleChange(value, EErrorBarsSettings.Direction, EErrorBarsSettings.Measurement)}
               />
             </Column>
@@ -558,6 +559,7 @@ const ErrorBarsSettings = (props) => {
                     label="Relationship To Measure"
                     value={configValues.measurement.relationshipToMeasure}
                     optionsList={RELATIONSHIP_TO_MEASURE}
+                    selectorAppearance="secondary"
                     handleChange={value => handleChange(value, EErrorBarsSettings.RelationshipToMeasure, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -650,7 +652,7 @@ const ErrorBarsSettings = (props) => {
           </Row>
 
           <ConditionalWrapper visible={configValues.errorBars.isBorderEnabled}>
-            <Row>
+            <Row appearance="padded">
               <Column>
                 <InputControl
                   min={0}
@@ -737,6 +739,7 @@ const ErrorBarsSettings = (props) => {
                   label="Line Style"
                   value={configValues.errorBand.lineStyle}
                   optionsList={LINE_TYPES}
+                  selectorAppearance="secondary"
                   handleChange={(value) => handleChange(value, EErrorBarsSettings.LineStyle, EErrorBarsSettings.ErrorBand)}
                 />
               </Column>
@@ -792,6 +795,7 @@ const ErrorBarsSettings = (props) => {
                   },
                 ]}
                 isMultiple
+                selectorAppearance="secondary"
                 handleChange={(value) => handleChange(value, EErrorBarsSettings.FontStyle, EErrorBarsSettings.ErrorLabels)}
               />
             </Column>

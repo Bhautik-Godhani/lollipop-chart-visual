@@ -91,6 +91,7 @@ const UIShowBucketSettings = (
 							},
 						]}
 						isMultiple
+						selectorAppearance="secondary"
 						handleChange={(value) => handleChange(value, EShowBucketSettings.Styling)}
 					/>
 				</Column>

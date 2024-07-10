@@ -1,8 +1,9 @@
+/* eslint-disable max-lines-per-function */
 import React from "react";
 import RGL, { WidthProvider } from "react-grid-layout";
 import { useInView } from "react-intersection-observer";
 import { InView } from "react-intersection-observer";
-import { ESmallMultiplesBackgroundType, ESmallMultiplesShadowType } from "./SmallMultiples.enum";
+import { ESmallMultiplesBackgroundType, ESmallMultiplesShadowPosition } from "./SmallMultiples.enum";
 import { ILayoutItemProps, ISmallMultiplesLayoutProps } from "./SmallMultiples.interface";
 
 const ReactGridLayoutProvider = WidthProvider(RGL);
@@ -59,15 +60,50 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
   };
 
   const getBoxShadow = () => {
-    switch (shadowSettings.type) {
-      case ESmallMultiplesShadowType.Simple:
-        return `${shadowSettings.color} 0px 3px 8px`;
-      case ESmallMultiplesShadowType.StandOut:
-        return `${shadowSettings.color} 0px 5px 15px`;
-      case ESmallMultiplesShadowType.Custom:
-        return `${shadowSettings.horizontalOffset}px ${shadowSettings.verticalOffset}px ${shadowSettings.blur}px ${shadowSettings.spread
-          }px ${shadowSettings.color} ${shadowSettings.inset ? "inset" : ""}`;
+    const {
+      isEnabled = false,
+      offset = "outside",
+      position = "center",
+      size = 0,
+      blur = 0,
+      angle = 4,
+      distance = 3,
+      color = "rgba(0,0,0,0.15)",
+    } = shadowSettings;
+
+    if (!isEnabled) return "unset";
+
+    let value = "";
+    const outset = offset === "outside";
+    if (position === ESmallMultiplesShadowPosition.BottomRight)
+      value = outset ? "4px 4px 8.5px 1.5px" : "-4px -4px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.Bottom)
+      value = outset ? "0px 6px 8.5px 1.5px" : "0px -6px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.BottomLeft)
+      value = outset ? "-4px 4px 8.5px 1.5px" : "4px -4px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.Right)
+      value = outset ? "6px 0px 8.5px 1.5px" : "-6px 0px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.Center)
+      value = outset ? "0px 0px 15px 3px" : "0px 0px 20px 0px inset";
+    if (position === ESmallMultiplesShadowPosition.Left)
+      value = outset ? "-6px 0px 8.5px 1.5px" : "6px 0px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.TopRight)
+      value = outset ? "4px -4px 8.5px 1.5px" : "-4px 4px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.Top)
+      value = outset ? "0px -6px 8.5px 1.5px" : "0px 6px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.TopLeft)
+      value = outset ? "-4px -4px 8.5px 1.5px" : "4px 4px 8.5px 1.5px inset";
+    if (position === ESmallMultiplesShadowPosition.Custom) {
+      const ang = ((180 - angle) * 3.14) / 180; //convert to radians.
+      const offsetY = Math.round(Math.sin(ang) * distance);
+      const offsetX = Math.round(Math.cos(ang) * distance);
+      const spreadRadius = (size * (100 - blur)) / 100;
+      const blurRadius = size - spreadRadius;
+
+      value = `${offsetX}px ${offsetY}px ${blurRadius}px ${spreadRadius}px${outset ? "" : " inset"}`;
     }
+
+    return `${color} ${value}`;
   };
 
   function generateDOM() {

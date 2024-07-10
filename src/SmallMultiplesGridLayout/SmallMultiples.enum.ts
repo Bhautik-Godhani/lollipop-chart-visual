@@ -55,12 +55,12 @@ export enum ESmallMultiplesSettings {
     Radius = "radius",
     Color = "color",
     Shadow = "shadow",
-    VerticalOffset = "verticalOffset",
-    HorizontalOffset = "horizontalOffset",
+    IsEnabled = "isEnabled",
+    Offset = "offset",
+    Size = "size",
     Blur = "blur",
-    Spread = "spread",
-    Inset = "inset",
-    IsEnabled = "isEnabled"
+    Distance = "distance",
+    Angle = "angle"
 }
 
 export enum ESmallMultiplesBackgroundType {
@@ -70,9 +70,16 @@ export enum ESmallMultiplesBackgroundType {
     AlternateColumns = "alternateColumns"
 }
 
-export enum ESmallMultiplesShadowType {
-    Simple = "shadow",
-    StandOut = "standOut",
+export enum ESmallMultiplesShadowPosition {
+    BottomRight = "bottomRight",
+    Bottom = "bottom",
+    BottomLeft = "bottomLeft",
+    Right = "right",
+    Center = "center",
+    Left = "left",
+    TopRight = "topRight",
+    Top = "top",
+    TopLeft = "topLeft",
     Custom = "custom"
 }
 
@@ -127,4 +134,9 @@ export enum EFontStyle {
     Bold = "bold",
     UnderLine = "underLine",
     None = "none",
+}
+
+export enum ESmallMultiplesShadowOffset {
+    Inside = "inside",
+    Outside = "outside",
 }

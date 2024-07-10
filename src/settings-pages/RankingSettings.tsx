@@ -20,11 +20,11 @@ import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptio
 
 const RANKING_TYPES: ILabelValuePair[] = [
 	{
-		label: "Top N",
+		label: "Top",
 		value: ERankingType.TopN,
 	},
 	{
-		label: "Bottom N",
+		label: "Bottom",
 		value: ERankingType.BottomN,
 	},
 ];
@@ -98,6 +98,7 @@ const UIByCategoryRankingSettings = (
 					<SwitchOption
 						value={categoryRanking.rankingType}
 						optionsList={RANKING_TYPES}
+						selectorAppearance="secondary"
 						handleChange={(value) => handleChange(value, ERankingSettings.RankingType, type, setConfigValues)}
 					/>
 				</Column>
@@ -139,9 +140,9 @@ const UIByCategoryRankingOthersSettings = (
 			</Row>
 
 			<ConditionalWrapper visible={categoryRanking.showRemainingAsOthers}>
-				<Row appearance="padded" disableTopPadding>
+				<Row appearance="padded">
 					<Column>
-						<Row>
+						<Row disableTopPadding>
 							<Column>
 								<SelectInput
 									label={"Add Suffix"}
@@ -181,6 +182,7 @@ const UIByGroupRankingSettings = (
 					<SwitchOption
 						value={groupByRanking.rankingType}
 						optionsList={RANKING_TYPES}
+						selectorAppearance="secondary"
 						handleChange={(value) => handleChange(value, ERankingSettings.RankingType, ERankingSettings.SubCategory, setConfigValues)}
 					/>
 				</Column>

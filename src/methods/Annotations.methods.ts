@@ -1,5 +1,5 @@
 import { Visual } from '../visual';
-import VisualAnnotations from "@truviz/viz-annotations/VisualAnnotations";
+import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { select, selectAll } from 'd3-selection';
 import { DataValuesType } from '../enum';
 

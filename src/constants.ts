@@ -75,7 +75,7 @@ import {
 	IXAxisSettings,
 	IYAxisSettings,
 } from "./visual-settings.interface";
-import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
+import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
 import DefaultTemplateJS from './templates-json/default-template.js';
 
 export const MonthNames = [
@@ -784,14 +784,14 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
 		color: "rgba(0, 0, 0, 1)"
 	},
 	shadow: {
-		type: ESmallMultiplesShadowType.Simple,
-		verticalOffset: 3,
-		horizontalOffset: 3,
-		blur: 7,
-		spread: 0,
-		color: "rgba(0, 0, 0, 0.24)",
-		inset: false,
-		isEnabled: true
+		isEnabled: true,
+		color: "rgba(229, 229, 229, 1)",
+		offset: ESmallMultiplesShadowOffset.Outside,
+		position: ESmallMultiplesShadowPosition.Custom,
+		size: 8,
+		blur: 81,
+		angle: 135,
+		distance: 6
 	},
 	onCellRendered: undefined,
 	getUniformXAxisAndBrushNode: undefined,

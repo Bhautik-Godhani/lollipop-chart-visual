@@ -179,167 +179,158 @@ const UIXAxis = (
     </Row>
 
     <ConditionalWrapper visible={xConfigValues.show}>
-      <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
-        <Row>
-          <Column>
-            <SwitchOption
-              label="Position"
-              value={xConfigValues.position}
-              optionsList={X_AXIS_POSITION}
-              handleChange={value => handleXChange(value, EXAxisSettings.Position, setXConfigValues)}
-              selectorAppearance="secondary"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Axis Mode"}
-              value={xConfigValues.categoryType}
-              optionsList={AXIS_MODE}
-              handleChange={(value) => {
-                handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
-                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
-              }}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      {/* <ConditionalWrapper visible={shadow.isHorizontalChart}>
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Logarithm Scale"}
-              value={xConfigValues.isLogarithmScale}
-              handleChange={() => handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues)}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper> */}
-
-      <ConditionalWrapper visible={xConfigValues.categoryType === AxisCategoryType.Continuous || shadow.isHorizontalChart}>
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Minimum Range"}
-              value={xConfigValues.isMinimumRangeEnabled}
-              handleChange={() => {
-                handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
-                handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
-              }}
-              appearance="toggle"
-            />
-          </Column>
-        </Row>
-
-        <ConditionalWrapper visible={xConfigValues.isMinimumRangeEnabled}>
-          <Row appearance="padded">
+      <AccordionAlt title="General"
+        open={true}
+      >
+        <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
+          <Row>
             <Column>
-              <InputControl
-                min={-Infinity}
-                type="number"
-                label=""
-                value={xConfigValues.minimumRange}
+              <SwitchOption
+                label="Position"
+                value={xConfigValues.position}
+                optionsList={X_AXIS_POSITION}
+                handleChange={value => handleXChange(value, EXAxisSettings.Position, setXConfigValues)}
+                selectorAppearance="secondary"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Axis Mode"}
+                value={xConfigValues.categoryType}
+                optionsList={AXIS_MODE}
                 handleChange={(value) => {
-                  handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
-                  handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
+                  handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
+                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
                 }}
               />
             </Column>
-            <Column></Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={xConfigValues.categoryType === AxisCategoryType.Continuous || shadow.isHorizontalChart}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Minimum Range"}
+                value={xConfigValues.isMinimumRangeEnabled}
+                handleChange={() => {
+                  handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
+                  handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
+                }}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={xConfigValues.isMinimumRangeEnabled}>
+            <Row appearance="padded">
+              <Column>
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label=""
+                  value={xConfigValues.minimumRange}
+                  handleChange={(value) => {
+                    handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
+                    handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
+                  }}
+                />
+              </Column>
+              <Column></Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Maximum Range"}
+                value={xConfigValues.isMaximumRangeEnabled}
+                handleChange={() => {
+                  handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
+                  handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
+                }}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={xConfigValues.isMaximumRangeEnabled}>
+            <Row appearance="padded">
+              <Column>
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label=""
+                  value={xConfigValues.maximumRange}
+                  handleChange={(value) => {
+                    handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
+                    handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
+                  }}
+                />
+              </Column>
+              <Column></Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Logarithm Scale"}
+                value={xConfigValues.isLogarithmScale}
+                handleChange={() => {
+                  handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+                }}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
+          <Row>
+            <Column>
+              <ToggleButton
+                disable={xConfigValues.isLogarithmScale}
+                label={"Invert Range"}
+                value={xConfigValues.isInvertRange}
+                handleChange={() => handleXCheckbox(EXAxisSettings.IsInvertRange, setXConfigValues)}
+                appearance="checkbox"
+              />
+            </Column>
           </Row>
         </ConditionalWrapper>
 
         <Row>
           <Column>
             <ToggleButton
-              label={"Maximum Range"}
-              value={xConfigValues.isMaximumRangeEnabled}
-              handleChange={() => {
-                handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
-                handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
-              }}
+              label={"Axis Line"}
+              value={xConfigValues.isShowAxisLine}
+              handleChange={() => handleXCheckbox(EXAxisSettings.IsShowAxisLine, setXConfigValues)}
               appearance="toggle"
             />
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={xConfigValues.isMaximumRangeEnabled}>
+        <ConditionalWrapper visible={xConfigValues.isShowAxisLine}>
           <Row appearance="padded">
             <Column>
-              <InputControl
-                min={-Infinity}
-                type="number"
-                label=""
-                value={xConfigValues.maximumRange}
-                handleChange={(value) => {
-                  handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
-                  handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
-                }}
+              <ColorPicker
+                label={"Color"}
+                color={xConfigValues.axisLineColor}
+                handleChange={value => handleXColor(value, EXAxisSettings.AxisLineColor, setXConfigValues)}
+                colorPalette={vizOptions.host.colorPalette}
+                size="sm"
               />
             </Column>
-            <Column></Column>
           </Row>
         </ConditionalWrapper>
-
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Logarithm Scale"}
-              value={xConfigValues.isLogarithmScale}
-              handleChange={() => {
-                handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
-                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
-              }}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
-        <Row>
-          <Column>
-            <ToggleButton
-              disable={xConfigValues.isLogarithmScale}
-              label={"Invert Range"}
-              value={xConfigValues.isInvertRange}
-              handleChange={() => handleXCheckbox(EXAxisSettings.IsInvertRange, setXConfigValues)}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Axis Line"}
-            value={xConfigValues.isShowAxisLine}
-            handleChange={() => handleXCheckbox(EXAxisSettings.IsShowAxisLine, setXConfigValues)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={xConfigValues.isShowAxisLine}>
-        <Row appearance="padded">
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={xConfigValues.axisLineColor}
-              handleChange={value => handleXColor(value, EXAxisSettings.AxisLineColor, setXConfigValues)}
-              colorPalette={vizOptions.host.colorPalette}
-              size="sm"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
+      </AccordionAlt>
 
       <AccordionAlt title="Show Title"
         open={xConfigValues.isDisplayTitle}
@@ -383,6 +374,7 @@ const UIXAxis = (
               value={xConfigValues.titleStyling}
               optionsList={STYLING}
               isMultiple
+              selectorAppearance="secondary"
               handleChange={(value) => handleXChange(value, EXAxisSettings.TitleStyling, setXConfigValues)}
             />
           </Column>
@@ -456,6 +448,7 @@ const UIXAxis = (
               value={xConfigValues.labelStyling}
               optionsList={STYLING}
               isMultiple
+              selectorAppearance="secondary"
               handleChange={(value) => handleXChange(value, EXAxisSettings.LabelStyling, setXConfigValues)}
             />
           </Column>
@@ -739,153 +732,159 @@ const UIYAxis = (
     </Row>
 
     <ConditionalWrapper visible={yConfigValues.show}>
-      <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
-        <Row>
-          <Column>
-            <SwitchOption
-              label="Position"
-              value={yConfigValues.position}
-              optionsList={Y_AXIS_POSITION}
-              handleChange={value => handleYChange(value, EYAxisSettings.Position, setYConfigValues)}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
 
-      <ConditionalWrapper visible={shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Axis Mode"}
-              value={yConfigValues.categoryType}
-              optionsList={AXIS_MODE}
-              handleChange={(value) => {
-                handleYChange(value, EXAxisSettings.CategoryType, setYConfigValues);
-                handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
-              }}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={!shadow.isHorizontalChart || yConfigValues.categoryType === AxisCategoryType.Continuous}>
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Minimum Range"}
-              value={yConfigValues.isMinimumRangeEnabled}
-              handleChange={() => {
-                handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
-                handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
-              }}
-              appearance="toggle"
-            />
-          </Column>
-        </Row>
-
-        <ConditionalWrapper visible={yConfigValues.isMinimumRangeEnabled}>
-          <Row appearance="padded">
+      <AccordionAlt title="Show Title"
+        open={true}
+      >
+        <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
+          <Row>
             <Column>
-              <InputControl
-                min={-Infinity}
-                type="number"
-                label=""
-                value={yConfigValues.minimumRange}
+              <SwitchOption
+                label="Position"
+                value={yConfigValues.position}
+                optionsList={Y_AXIS_POSITION}
+                selectorAppearance="secondary"
+                handleChange={value => handleYChange(value, EYAxisSettings.Position, setYConfigValues)}
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
+          <Row>
+            <Column>
+              <SelectInput
+                label={"Axis Mode"}
+                value={yConfigValues.categoryType}
+                optionsList={AXIS_MODE}
                 handleChange={(value) => {
-                  handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
-                  handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
+                  handleYChange(value, EXAxisSettings.CategoryType, setYConfigValues);
+                  handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
                 }}
               />
             </Column>
-            <Column></Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={!shadow.isHorizontalChart || yConfigValues.categoryType === AxisCategoryType.Continuous}>
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Minimum Range"}
+                value={yConfigValues.isMinimumRangeEnabled}
+                handleChange={() => {
+                  handleYCheckbox(EYAxisSettings.IsMinimumRangeEnabled, setYConfigValues);
+                  handleXCheckbox(EXAxisSettings.IsMinimumRangeEnabled, setXConfigValues);
+                }}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={yConfigValues.isMinimumRangeEnabled}>
+            <Row appearance="padded">
+              <Column>
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label=""
+                  value={yConfigValues.minimumRange}
+                  handleChange={(value) => {
+                    handleYChange(value, EYAxisSettings.MinimumRange, setYConfigValues);
+                    handleXChange(value, EXAxisSettings.MinimumRange, setXConfigValues);
+                  }}
+                />
+              </Column>
+              <Column></Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Maximum Range"}
+                value={yConfigValues.isMaximumRangeEnabled}
+                handleChange={() => {
+                  handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
+                  handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
+                }}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={yConfigValues.isMaximumRangeEnabled}>
+            <Row appearance="padded">
+              <Column>
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label=""
+                  value={yConfigValues.maximumRange}
+                  handleChange={(value) => {
+                    handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
+                    handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
+                  }}
+                />
+              </Column>
+              <Column></Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Logarithm Scale"}
+                value={yConfigValues.isLogarithmScale}
+                handleChange={() => {
+                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+                  handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+                }}
+                appearance="checkbox"
+              />
+            </Column>
+          </Row>
+        </ConditionalWrapper>
+
+        <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
+          <Row>
+            <Column>
+              <ToggleButton
+                disable={yConfigValues.isLogarithmScale}
+                label={"Invert Range"}
+                value={yConfigValues.isInvertRange}
+                handleChange={() => handleYCheckbox(EXAxisSettings.IsInvertRange, setYConfigValues)}
+                appearance="checkbox"
+              />
+            </Column>
           </Row>
         </ConditionalWrapper>
 
         <Row>
           <Column>
             <ToggleButton
-              label={"Maximum Range"}
-              value={yConfigValues.isMaximumRangeEnabled}
-              handleChange={() => {
-                handleYCheckbox(EYAxisSettings.IsMaximumRangeEnabled, setYConfigValues);
-                handleXCheckbox(EXAxisSettings.IsMaximumRangeEnabled, setXConfigValues);
-              }}
+              label={"Axis Line"}
+              value={yConfigValues.isShowAxisLine}
+              handleChange={() => handleYCheckbox(EYAxisSettings.IsShowAxisLine, setYConfigValues)}
               appearance="toggle"
             />
           </Column>
         </Row>
 
-        <ConditionalWrapper visible={yConfigValues.isMaximumRangeEnabled}>
+        <ConditionalWrapper visible={yConfigValues.isShowAxisLine}>
           <Row appearance="padded">
             <Column>
-              <InputControl
-                min={-Infinity}
-                type="number"
-                label=""
-                value={yConfigValues.maximumRange}
-                handleChange={(value) => {
-                  handleYChange(value, EYAxisSettings.MaximumRange, setYConfigValues);
-                  handleXChange(value, EXAxisSettings.MaximumRange, setXConfigValues);
-                }}
+              <ColorPicker
+                label={"Color"}
+                color={yConfigValues.axisLineColor}
+                handleChange={value => handleYColor(value, EXAxisSettings.AxisLineColor, setYConfigValues)}
+                colorPalette={vizOptions.host.colorPalette}
+                size="sm"
               />
             </Column>
-            <Column></Column>
           </Row>
         </ConditionalWrapper>
-
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Logarithm Scale"}
-              value={yConfigValues.isLogarithmScale}
-              handleChange={() => {
-                handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
-                handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
-              }}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
-        <Row>
-          <Column>
-            <ToggleButton
-              disable={yConfigValues.isLogarithmScale}
-              label={"Invert Range"}
-              value={yConfigValues.isInvertRange}
-              handleChange={() => handleYCheckbox(EXAxisSettings.IsInvertRange, setYConfigValues)}
-              appearance="checkbox"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <Row>
-        <Column>
-          <ToggleButton
-            label={"Axis Line"}
-            value={yConfigValues.isShowAxisLine}
-            handleChange={() => handleYCheckbox(EYAxisSettings.IsShowAxisLine, setYConfigValues)}
-            appearance="toggle"
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={yConfigValues.isShowAxisLine}>
-        <Row appearance="padded">
-          <Column>
-            <ColorPicker
-              label={"Color"}
-              color={yConfigValues.axisLineColor}
-              handleChange={value => handleYColor(value, EXAxisSettings.AxisLineColor, setYConfigValues)}
-              colorPalette={vizOptions.host.colorPalette}
-              size="sm"
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
+      </AccordionAlt>
 
       <AccordionAlt title="Show Title"
         open={yConfigValues.isDisplayTitle}
@@ -942,6 +941,7 @@ const UIYAxis = (
                 },
               ]}
               isMultiple
+              selectorAppearance="secondary"
               handleChange={(value) => handleYChange(value, EYAxisSettings.TitleStyling, setYConfigValues)}
             />
           </Column>

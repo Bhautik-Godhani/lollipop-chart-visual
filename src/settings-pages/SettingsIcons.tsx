@@ -792,6 +792,27 @@ export const CenterHorizontalAlignmentIcon = (props: SVGProps<SVGSVGElement>) =>
 	</svg>
 );
 
+export const LeftAlignmentIcon2 = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M1 3.5C1 3.22386 1.22386 3 1.5 3H10.5C10.7761 3 11 3.22386 11 3.5C11 3.77614 10.7761 4 10.5 4H1.5C1.22386 4 1 3.77614 1 3.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H14.5C14.7761 7 15 7.22386 15 7.5C15 7.77614 14.7761 8 14.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM1 11.5C1 11.2239 1.22386 11 1.5 11H6.5C6.77614 11 7 11.2239 7 11.5C7 11.7761 6.77614 12 6.5 12H1.5C1.22386 12 1 11.7761 1 11.5Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const RightAlignmentIcon2 = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M15 3.5C15 3.22386 14.7761 3 14.5 3H5.5C5.22386 3 5 3.22386 5 3.5C5 3.77614 5.22386 4 5.5 4H14.5C14.7761 4 15 3.77614 15 3.5ZM15 7.5C15 7.22386 14.7761 7 14.5 7H1.5C1.22386 7 1 7.22386 1 7.5C1 7.77614 1.22386 8 1.5 8H14.5C14.7761 8 15 7.77614 15 7.5ZM15 11.5C15 11.2239 14.7761 11 14.5 11H9.5C9.22386 11 9 11.2239 9 11.5C9 11.7761 9.22386 12 9.5 12H14.5C14.7761 12 15 11.7761 15 11.5Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
+export const CenterHorizontalAlignmentIcon2 = (props: SVGProps<SVGSVGElement>) => (
+	<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="https://www.w3.org/2000/svg" {...props}>
+		<path d="M3 3.5C3 3.22386 3.22386 3 3.5 3H12.5C12.7761 3 13 3.22386 13 3.5C13 3.77614 12.7761 4 12.5 4H3.5C3.22386 4 3 3.77614 3 3.5ZM1 7.5C1 7.22386 1.22386 7 1.5 7H14.5C14.7761 7 15 7.22386 15 7.5C15 7.77614 14.7761 8 14.5 8H1.5C1.22386 8 1 7.77614 1 7.5ZM5 11.5C5 11.2239 5.22386 11 5.5 11H10.5C10.7761 11 11 11.2239 11 11.5C11 11.7761 10.7761 12 10.5 12H5.5C5.22386 12 5 11.7761 5 11.5Z"
+			fill={props.fill || "var(--activeSelected)"} />
+	</svg>
+);
+
 export const LeftAlignment = (props) => (
 	<svg width="17" height="16" viewBox="0 0 17 16" fill="none" {...props} style={props.style || {}} xmlns="https://www.w3.org/2000/svg">
 		<path

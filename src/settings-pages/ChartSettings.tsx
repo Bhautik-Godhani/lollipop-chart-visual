@@ -91,6 +91,7 @@ const UIConnectingLineSettings = (
 						value={configValues.connectingLineStyle}
 						optionsList={LINE_TYPES}
 						handleChange={(value) => handleChange(value, EChartSettings.connectingLineStyle, setConfigValues)}
+						selectorAppearance="secondary"
 					/>
 				</Column>
 			</Row>
@@ -194,7 +195,7 @@ const UIGeneralChartSettings = (
 							<RangeSlider
 								min={20}
 								max={180}
-								label="Min Category Width (px)"
+								label="Min Category Width (PX)"
 								value={configValues.lollipopWidth ? configValues.lollipopWidth : Math.ceil(shadow.scaleBandWidth)}
 								handleChange={(value) => handleChange(value, EChartSettings.lollipopWidth, setConfigValues)}
 								isViewEditable

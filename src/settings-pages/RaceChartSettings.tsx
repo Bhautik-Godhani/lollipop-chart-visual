@@ -124,6 +124,7 @@ const UITextStylesSettings = (
             },
           ]}
           isMultiple
+          selectorAppearance="secondary"
           handleChange={value => handleChange(value, ERaceChartSettings.FontStyles, textType, setConfigValues)}
         />
       </Column>
@@ -273,6 +274,7 @@ const RaceChartSettings = (props) => {
                     label={"Placement"}
                     value={configValues.placement}
                     optionsList={TEXT_PLACEMENTS}
+                    selectorAppearance="secondary"
                     handleChange={(value) => handleChange(value, ERaceChartSettings.Placement)}
                   />
                 </Column>

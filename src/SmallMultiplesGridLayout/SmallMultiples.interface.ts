@@ -1,5 +1,5 @@
 import { ICategoryValuePair } from "../visual-settings.interface";
-import { ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, EFontStyle } from "./SmallMultiples.enum";
+import { ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, EFontStyle, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition } from "./SmallMultiples.enum";
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 export interface ISmallMultiplesGridLayoutSettings {
     showInfoPage: boolean;
@@ -47,13 +47,13 @@ export interface ISmallMultiplesGridLayoutSettings {
     };
     shadow: {
         isEnabled: boolean;
-        type: ESmallMultiplesShadowType;
-        verticalOffset: number;
-        horizontalOffset: number;
-        blur: number;
-        spread: number;
         color: string;
-        inset: boolean;
+        offset: ESmallMultiplesShadowOffset;
+        position: ESmallMultiplesShadowPosition;
+        size: number;
+        blur: number;
+        distance: number;
+        angle: number;
     },
     onCellRendered: (category: string, gridItemIndex: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => void,
     getUniformXAxisAndBrushNode: (colIndex: number, xAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isBottomAxis: boolean) =>

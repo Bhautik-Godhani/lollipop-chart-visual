@@ -1,8 +1,8 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowType, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
-import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
-import { AccordionAlt, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Quote, Row, SelectInput, SwitchOption, Tab, Tabs, ToggleButton } from "@truviz/shadow/dist/Components";
+import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
+import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
+import { AccordionAlt, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Quote, RangeSlider, Row, SelectInput, SwitchOption, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const LAYOUT_TYPES: ILabelValuePair[] = [
@@ -96,26 +96,26 @@ const HEADER_DISPLAY_TYPES: ILabelValuePair[] = [
 
 const HEADER_ALIGNMENT = [
   {
-    label: <LeftAlignmentIcon fill="currentColor" />,
+    label: <LeftAlignmentIcon2 fill="currentColor" />,
     value: "left",
   },
   {
-    label: <CenterHorizontalAlignmentIcon fill="currentColor" />,
+    label: <CenterHorizontalAlignmentIcon2 fill="currentColor" />,
     value: "center",
   },
   {
-    label: <RightAlignmentIcon fill="currentColor" />,
+    label: <RightAlignmentIcon2 fill="currentColor" />,
     value: "right",
   },
 ];
 
 const HEADER_POSITION = [
   {
-    label: <TopAlignmentIcon fill="currentColor" />,
+    label: "Top",
     value: "top",
   },
   {
-    label: <BottomAlignmentIcon fill="currentColor" />,
+    label: "Bottom",
     value: "bottom",
   },
 ];
@@ -135,22 +135,57 @@ const BACKGROUND_TYPES: ILabelValuePair[] = [
   }
 ];
 
-const SHADOW_TYPES: ILabelValuePair[] = [
-  // {
-  //   value: ESmallMultiplesShadowType.None,
-  //   label: "None",
-  // },
+const SHADOW_POSITION: ILabelValuePair[] = [
   {
-    value: ESmallMultiplesShadowType.Simple,
-    label: "Simple",
+    label: "Bottom Right",
+    value: ESmallMultiplesShadowPosition.BottomRight,
   },
   {
-    value: ESmallMultiplesShadowType.StandOut,
-    label: "Stand Out",
+    label: "Bottom",
+    value: ESmallMultiplesShadowPosition.Bottom,
   },
   {
-    value: ESmallMultiplesShadowType.Custom,
+    label: "Bottom Left",
+    value: ESmallMultiplesShadowPosition.BottomLeft,
+  },
+  {
+    label: "Right",
+    value: ESmallMultiplesShadowPosition.Right,
+  },
+  {
+    label: "Center",
+    value: ESmallMultiplesShadowPosition.Center,
+  },
+  {
+    label: "Left",
+    value: ESmallMultiplesShadowPosition.Left,
+  },
+  {
+    label: "Top Right",
+    value: ESmallMultiplesShadowPosition.TopRight,
+  },
+  {
+    label: "Top",
+    value: ESmallMultiplesShadowPosition.Top,
+  },
+  {
+    label: "Top Left",
+    value: ESmallMultiplesShadowPosition.TopLeft,
+  },
+  {
     label: "Custom",
+    value: ESmallMultiplesShadowPosition.Custom,
+  },
+];
+
+const SHADOW_OFFSET: ILabelValuePair[] = [
+  {
+    label: "Inside",
+    value: ESmallMultiplesShadowOffset.Inside,
+  },
+  {
+    label: "Outside",
+    value: ESmallMultiplesShadowOffset.Outside,
   },
 ];
 
@@ -346,14 +381,14 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
     color: "rgba(0, 0, 0, 1)"
   },
   shadow: {
-    type: ESmallMultiplesShadowType.Simple,
-    verticalOffset: 3,
-    horizontalOffset: 3,
-    blur: 7,
-    spread: 0,
-    color: "rgba(0, 0, 0, 10)",
-    inset: false,
-    isEnabled: true
+    isEnabled: true,
+    color: "rgba(229, 229, 229, 1)",
+    offset: ESmallMultiplesShadowOffset.Outside,
+    position: ESmallMultiplesShadowPosition.Custom,
+    size: 8,
+    blur: 81,
+    angle: 135,
+    distance: 6
   },
   onCellRendered: undefined,
   getUniformXAxisAndBrushNode: undefined,
@@ -428,7 +463,7 @@ const UILayout = (
               min={0}
               type="number"
               label="Rows"
-              value={configValues.rows?.toString()}
+              value={configValues.rows}
               handleChange={(value) => handleChange(value, ESmallMultiplesSettings.Rows, setConfigValues)}
             />
           </Column>
@@ -438,7 +473,7 @@ const UILayout = (
               min={0}
               type="number"
               label="Columns"
-              value={configValues.columns?.toString()}
+              value={configValues.columns}
               handleChange={(value) => handleChange(value, ESmallMultiplesSettings.Columns, setConfigValues)}
             />
           </Column>
@@ -452,7 +487,7 @@ const UILayout = (
               min={0}
               type="number"
               label="Columns"
-              value={configValues.columns?.toString()}
+              value={configValues.columns}
               handleChange={(value) => handleChange(value, ESmallMultiplesSettings.Columns, setConfigValues)}
             />
           </Column>
@@ -467,7 +502,7 @@ const UILayout = (
           min={0}
           type="number"
           label="Inner Spacing"
-          value={configValues.innerSpacing?.toString()}
+          value={configValues.innerSpacing}
           handleChange={(value) => handleChange(value, ESmallMultiplesSettings.InnerSpacing, setConfigValues)}
         />
       </Column>
@@ -477,7 +512,7 @@ const UILayout = (
           min={0}
           type="number"
           label="Outer Spacing"
-          value={configValues.outerSpacing?.toString()}
+          value={configValues.outerSpacing}
           handleChange={(value) => handleChange(value, ESmallMultiplesSettings.OuterSpacing, setConfigValues)}
         />
       </Column>
@@ -554,85 +589,88 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
   handleHeaderColor: (...any) => void,
   handleHeaderCheckbox: (...any) => void) => {
   return <>
-    {/* <AccordionAlt title="Header" open={true} > */}
-    <Row>
-      <Column>
-        <SelectInput
-          label={"Type"}
-          value={configValues.header.displayType}
-          optionsList={HEADER_DISPLAY_TYPES}
-          handleChange={(value) => handleHeaderChange(value, ESmallMultiplesSettings.DisplayType, setConfigValues)}
-        />
-      </Column>
-    </Row>
-
-    <ConditionalWrapper visible={configValues.header.displayType !== ESmallMultiplesHeaderDisplayType.None}>
+    <AccordionAlt title="Header" open={true} >
       <Row>
         <Column>
           <SelectInput
-            label={"Font Family"}
-            value={configValues.header.fontFamily}
-            isFontSelector={true}
-            optionsList={[]}
-            handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.FontFamily, setConfigValues)}
+            label={"Type"}
+            value={configValues.header.displayType}
+            optionsList={HEADER_DISPLAY_TYPES}
+            handleChange={(value) => handleHeaderChange(value, ESmallMultiplesSettings.DisplayType, setConfigValues)}
           />
         </Column>
       </Row>
 
-      <Row>
-        <Column>
-          <InputControl
-            label="Text Size"
-            type="number"
-            value={configValues.header.fontSize.toString()}
-            handleChange={(value: any) => handleHeaderChange(value, ESmallMultiplesSettings.FontSize, setConfigValues)}
-            min={1}
-          />
-        </Column>
+      <ConditionalWrapper visible={configValues.header.displayType !== ESmallMultiplesHeaderDisplayType.None}>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Font Family"}
+              value={configValues.header.fontFamily}
+              isFontSelector={true}
+              optionsList={[]}
+              handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.FontFamily, setConfigValues)}
+            />
+          </Column>
+        </Row>
 
-        <Column>
-          <ColorPicker
-            label={"Color"}
-            color={configValues.header.fontColor}
-            handleChange={value => handleHeaderColor(value, ESmallMultiplesSettings.FontColor, setConfigValues)}
-            colorPalette={vizOptions.host.colorPalette}
-          />
-        </Column>
-      </Row>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Styling"
+              value={configValues.header.fontStyles}
+              optionsList={FONT_STYLES}
+              isMultiple
+              selectorAppearance="secondary"
+              handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.FontStyles, setConfigValues)}
+            />
+          </Column>
+        </Row>
 
-      <Row>
-        <Column>
-          <SwitchOption
-            label="Styling"
-            value={configValues.header.fontStyles}
-            optionsList={FONT_STYLES}
-            isMultiple
-            handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.FontStyles, setConfigValues)}
-          />
-        </Column>
-      </Row>
+        <Row>
+          <Column>
+            <InputControl
+              label="Text Size"
+              type="number"
+              value={configValues.header.fontSize.toString()}
+              handleChange={(value: any) => handleHeaderChange(value, ESmallMultiplesSettings.FontSize, setConfigValues)}
+              min={1}
+            />
+          </Column>
 
-      <Row>
-        <Column>
-          <SwitchOption
-            label="Alignment"
-            value={configValues.header.alignment}
-            optionsList={HEADER_ALIGNMENT}
-            handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.Alignment, setConfigValues)}
-          />
-        </Column>
+          <Column>
+            <ColorPicker
+              label={"Color"}
+              color={configValues.header.fontColor}
+              handleChange={value => handleHeaderColor(value, ESmallMultiplesSettings.FontColor, setConfigValues)}
+              colorPalette={vizOptions.host.colorPalette}
+            />
+          </Column>
+        </Row>
 
-        <Column>
-          <SwitchOption
-            label="Position"
-            value={configValues.header.position}
-            optionsList={HEADER_POSITION}
-            handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.Position, setConfigValues)}
-          />
-        </Column>
-      </Row>
+        <Row>
+          <Column>
+            <SwitchOption
+              label="Alignment"
+              value={configValues.header.alignment}
+              optionsList={HEADER_ALIGNMENT}
+              selectorAppearance="secondary"
+              handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.Alignment, setConfigValues)}
+            />
+          </Column>
 
-      {/* <Row>
+          <Column>
+            <SwitchOption
+              label="Position"
+              value={configValues.header.position}
+              optionsList={HEADER_POSITION}
+              selectorAppearance="secondary"
+              handleChange={value => handleHeaderChange(value, ESmallMultiplesSettings.Position, setConfigValues)}
+            />
+          </Column>
+        </Row>
+
+        {/* <Row>
         <Column>
           <ToggleButton
             label={"Text Wrap"}
@@ -642,8 +680,8 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
           />
         </Column>
       </Row> */}
-    </ConditionalWrapper>
-    {/* </AccordionAlt> */}
+      </ConditionalWrapper>
+    </AccordionAlt>
   </>
 }
 
@@ -713,6 +751,7 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
             label="Stroke Style"
             value={configValues.border.style}
             optionsList={LINE_STYLES}
+            selectorAppearance="secondary"
             handleChange={value => handleBorderChange(value, ESmallMultiplesSettings.Style, setConfigValues)}
           />
         </Column>
@@ -724,7 +763,7 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
             min={0}
             type="number"
             label="Width"
-            value={configValues.border.width?.toString()}
+            value={configValues.border.width}
             handleChange={(value) => handleBorderChange(+value, ESmallMultiplesSettings.Width, setConfigValues)}
           />
         </Column>
@@ -734,7 +773,7 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
             min={0}
             type="number"
             label="Radius"
-            value={configValues.border.radius?.toString()}
+            value={configValues.border.radius}
             handleChange={(value) => handleBorderChange(+value, ESmallMultiplesSettings.Radius, setConfigValues)}
           />
         </Column>
@@ -776,18 +815,7 @@ const UIShadow = (vizOptions: ShadowUpdateOptions,
         </Column>
       </Row>
 
-      <Row>
-        <Column>
-          <SelectInput
-            label="Shadow"
-            value={configValues.shadow.type}
-            optionsList={SHADOW_TYPES}
-            handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.BackgroundType, setConfigValues)}
-          />
-        </Column>
-      </Row>
-
-      {UIBorderAndShadow1(vizOptions, configValues, setConfigValues, handleShadowChange, handleShadowColor, handleShadowCheckbox)}
+      {UIBorderAndShadow1(vizOptions, configValues, setConfigValues, handleShadowChange)}
     </AccordionAlt>
   </>
 }
@@ -795,65 +823,81 @@ const UIShadow = (vizOptions: ShadowUpdateOptions,
 const UIBorderAndShadow1 = (vizOptions: ShadowUpdateOptions,
   configValues: ISmallMultiplesGridLayoutSettings,
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
-  handleShadowChange: (...any) => void,
-  handleShadowColor: (...any) => void,
-  handleShadowCheckbox: (...any) => void) => {
-  return < ConditionalWrapper visible={configValues.shadow.type === ESmallMultiplesShadowType.Custom} >
+  handleShadowChange: (val, n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => void,
+) => {
+  return <>
     <Row>
       <Column>
-        <InputControl
-          min={-Infinity}
-          type="number"
-          label="X - Direction"
-          value={configValues.shadow.horizontalOffset?.toString()}
-          handleChange={(value) => handleShadowChange(value, ESmallMultiplesSettings.HorizontalOffset, setConfigValues)}
+        <SelectInput
+          label={"Offset"}
+          value={configValues.shadow.offset}
+          optionsList={SHADOW_OFFSET}
+          handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Offset, setConfigValues)}
         />
       </Column>
 
       <Column>
-        <InputControl
-          min={-Infinity}
-          type="number"
-          label="Y - Direction"
-          value={configValues.shadow.verticalOffset?.toString()}
-          handleChange={(value) => handleShadowChange(value, ESmallMultiplesSettings.VerticalOffset, setConfigValues)}
+        <SelectInput
+          label={"Position"}
+          value={configValues.shadow.position}
+          optionsList={SHADOW_POSITION}
+          handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Position, setConfigValues)}
         />
       </Column>
     </Row>
 
-    <Row>
-      <Column>
-        <InputControl
-          min={0}
-          type="number"
-          label="Blur"
-          value={configValues.shadow.blur?.toString()}
-          handleChange={(value) => handleShadowChange(+value, ESmallMultiplesSettings.Blur, setConfigValues)}
-        />
-      </Column>
+    <ConditionalWrapper visible={configValues.shadow.position === ESmallMultiplesShadowPosition.Custom}>
+      <Row>
+        <Column>
+          <RangeSlider
+            value={configValues.shadow.size}
+            handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Size, setConfigValues)}
+            label="Size"
+            isViewValue
+            isViewEditable
+          />
+        </Column>
+      </Row>
 
-      <Column>
-        <InputControl
-          min={0}
-          type="number"
-          label="Spread"
-          value={configValues.shadow.spread?.toString()}
-          handleChange={(value) => handleShadowChange(+value, ESmallMultiplesSettings.Spread, setConfigValues)}
-        />
-      </Column>
-    </Row>
+      <Row>
+        <Column>
+          <RangeSlider
+            value={configValues.shadow.blur}
+            handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Blur, setConfigValues)}
+            label="Blur"
+            isViewValue
+            isViewEditable
+          />
+        </Column>
+      </Row>
 
-    <Row>
-      <Column>
-        <ToggleButton
-          label={"Inset"}
-          value={configValues.shadow.inset}
-          handleChange={() => handleShadowCheckbox(ESmallMultiplesSettings.Inset, setConfigValues)}
-          appearance="checkbox"
-        />
-      </Column>
-    </Row>
-  </ConditionalWrapper >
+      <Row>
+        <Column>
+          <RangeSlider
+            value={configValues.shadow.distance}
+            handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Distance, setConfigValues)}
+            label="Distance"
+            isViewValue
+            isViewEditable
+          />
+        </Column>
+      </Row>
+
+      <Row>
+        <Column>
+          <RangeSlider
+            value={configValues.shadow.angle}
+            handleChange={value => handleShadowChange(value, ESmallMultiplesSettings.Angle, setConfigValues)}
+            label="Angle"
+            isViewValue
+            min={0}
+            max={360}
+            isViewEditable
+          />
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+  </>
 }
 
 const SmallMultiplesSettings = (props) => {
@@ -944,16 +988,13 @@ const SmallMultiplesSettings = (props) => {
       <ConditionalWrapper visible={!isShowInfoPage} style={{ width: "300px" }}>
         <Row disableTopPadding>
           <Column>
-            <Tabs selected={selectedTab} isEqualWidthTabs={true} onChange={(val) => setSelectedTab(val)}>
+            <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
               <Tab title="Layout" identifier="layout">
                 {UILayout(isShowGridLayoutOnly, isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
               </Tab>
 
-              <Tab title="Header" identifier="header">
+              <Tab title="Style" identifier="style">
                 {UIHeader(vizOptions, configValues, setConfigValues, handleHeaderChange, handleHeaderColor, handleHeaderCheckbox)}
-              </Tab>
-
-              <Tab title="General" identifier="general">
                 {UIBackground(vizOptions, configValues, setConfigValues, handleBackgroundChange, handleBackgroundColor)}
                 {UIShadow(vizOptions, configValues, setConfigValues, handleShadowChange)}
                 {UIBorder(vizOptions, configValues, setConfigValues, handleBorderCheckbox, handleBorderChange, handleBorderColor)}

@@ -347,6 +347,7 @@ const DynamicDeviationSettings = (props) => {
                   label="Line Style"
                   value={configValues.connectingLineType}
                   optionsList={LINE_TYPES}
+                  selectorAppearance="secondary"
                   handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectingLineType)}
                 />
               </Column>
@@ -423,6 +424,7 @@ const DynamicDeviationSettings = (props) => {
                     },
                   ]}
                   isMultiple
+                  selectorAppearance="secondary"
                   handleChange={(value) => handleChange(value, EDataLabelsSettings.fontStyle)}
                 />
               </Column>
