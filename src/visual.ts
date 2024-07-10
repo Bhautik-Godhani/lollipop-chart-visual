@@ -310,6 +310,7 @@ export class Visual extends Shadow {
 	schemeColors: string[] = [];
 	isMonthCategoryNames: boolean;
 	isDateCategoryNames: boolean;
+	isDateSubcategoryNames: boolean;
 	isMonthSubcategoryNames: boolean;
 	extraDataLabelsDisplayNames: string[] = [];
 	isHasExtraDataLabels: boolean = false;
@@ -1608,6 +1609,7 @@ export class Visual extends Shadow {
 				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
 			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toString().toLowerCase()));
+			this.isDateSubcategoryNames = categoricalSubCategoryField.type.dateTime;
 
 			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
 				this.sortingSettings.category.sortBy = this.categoryDisplayName;
@@ -4849,7 +4851,7 @@ export class Visual extends Shadow {
 							const chartData = cloneDeep(this.chartData);
 							legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
 								data: {
-									name: d.category.replace(/--\d+/g, ''),
+									name: valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(d.category.replace(/--\d+/g, ''))),
 									color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
 									pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category),
 									imageUrl: undefined
@@ -4950,7 +4952,7 @@ export class Visual extends Shadow {
 					// only this needs to be change for pattern
 					legendDataPoints = this.subCategoriesName.map((d, i) => ({
 						data: {
-							name: d,
+							name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d),
 							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
 							pattern: this.subCategoryPatterns.find(s => s.name === d),
 							imageUrl: undefined
@@ -10584,7 +10586,7 @@ export class Visual extends Shadow {
 				},
 				{
 					displayName: this.subCategoryDisplayName,
-					value: pieData.category.toString(),
+					value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : pieData.category.toString()),
 					color: "transparent",
 				},
 				{
