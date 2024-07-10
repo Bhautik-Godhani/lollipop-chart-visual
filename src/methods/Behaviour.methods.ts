@@ -108,9 +108,9 @@ export class Behavior implements IInteractiveBehavior {
 						selectionHandler.handleSelection(d, e.ctrlKey);
 					})
 				} else {
-					groupByData.forEach(() => {
-						selectionHandler.handleSelection(groupByData, e.ctrlKey);
-					})
+					// groupByData.forEach(() => {
+					selectionHandler.handleSelection(groupByData, e.ctrlKey);
+					// })
 				}
 
 				e.stopPropagation();
