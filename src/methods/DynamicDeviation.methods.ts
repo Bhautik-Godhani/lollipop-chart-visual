@@ -92,8 +92,8 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const isToCategoryYPosTrue = toCategoryYPos !== undefined;
     const isToGreaterThenFrom: Boolean = to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryYPosTrue : isToCategoryYPosTrue;
-    const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isBottomXAxis ? 0 : self.height) : self.height);
-    const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isBottomXAxis ? self.height : 0) : 0);
+    const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) ? (self.isBottomXAxis ? 0 : self.height) : self.height);
+    const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) ? (self.isBottomXAxis ? self.height : 0) : 0);
 
     let dataLabelYPos = 0;
     if (isToGreaterThenFrom) {
@@ -133,6 +133,18 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 ? `0, ${8} `
                 : `${8}, ${8}`
         )
+        .attr("opacity", () => {
+            if (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) {
+                const index = self.categoricalDataPairs.findIndex(d => d.category === self.chartData[0].category);
+                if (index >= dynamicDeviationSettings.fromIndex && index < dynamicDeviationSettings.toIndex) {
+                    return 1;
+                } else if (!isFromCategoryYPosTrue && !isToCategoryYPosTrue) {
+                    return 0;
+                }
+            }
+
+            return 1;
+        });
 
     // self.dynamicDeviationG
     //     .append("line")
@@ -278,8 +290,8 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     const isPositiveDeviation = from.value < to.value;
     const isToGreaterThenFrom: boolean = to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryXPosTrue : isToCategoryXPosTrue;
-    const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? self.width : 0) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isLeftYAxis ? 0 : self.width) : self.width);
-    const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? 0 : self.width) : dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual ? (self.isLeftYAxis ? self.width : 0) : 0);
+    const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? self.width : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) ? (self.isLeftYAxis ? 0 : self.width) : self.width);
+    const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? 0 : self.width) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) ? (self.isLeftYAxis ? self.width : 0) : 0);
 
     let dataLabelXPos = 0;
     if (isToGreaterThenFrom) {
@@ -319,7 +331,19 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
                 ? `0, ${8} `
                 : `${8}, ${8}`
         )
-        .attr("display", !self.dynamicDeviationSettings.isShowConnectorLine ? "none" : "block");
+        .attr("display", !self.dynamicDeviationSettings.isShowConnectorLine ? "none" : "block")
+        .attr("opacity", () => {
+            if (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) {
+                const index = self.categoricalDataPairs.findIndex(d => d.category === self.chartData[0].category);
+                if (index >= dynamicDeviationSettings.fromIndex && index < dynamicDeviationSettings.toIndex) {
+                    return 1;
+                } else if (!isFromCategoryXPosTrue && !isToCategoryXPosTrue) {
+                    return 0;
+                }
+            }
+
+            return 1;
+        });
 
     // self.dynamicDeviationG
     //     .append("line")
