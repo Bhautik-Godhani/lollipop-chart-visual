@@ -10540,7 +10540,7 @@ export class Visual extends Shadow {
 			return isPie2 ? PieType.Pie2 : PieType.Pie1;
 		});
 
-		ele.selectAll("path").attr("class", () => {
+		ele.selectAll("path").filter(function () { return !d3.select(this).attr("fill-opacity") }).attr("class", () => {
 			return "pie-slice";
 			// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
 		});
@@ -10549,7 +10549,7 @@ export class Visual extends Shadow {
 			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
 			d3.select(this).datum((datum: any) => {
 				const subCategories = d.subCategories.filter(d => isPie2 ? (d.value2 < 0 ? (d.value2 * -1) : d.value2) : (d.value1 < 0 ? (d.value1 * -1) : d.value1));
-				return { ...(datum ? datum : subCategories[i]), valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+				return { ...(datum ? datum : subCategories[i]), isHighlight: subCategories[i].isHighlight, valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
 			})
 		})
 
