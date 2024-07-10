@@ -2067,6 +2067,8 @@ export class Visual extends Shadow {
 		this.categoryColorPairWithIndex = {};
 		this.subCategoryColorPairWithIndex = {};
 
+		this.sortSubcategoryData(categoricalData);
+
 		const categoricalValues = categoricalData.values as any;
 		const measures: any[] = categoricalValues.filter((d) => d.source.roles[EDataRolesName.Measure]);
 
@@ -3439,7 +3441,7 @@ export class Visual extends Shadow {
 
 				DrawSmallMultiplesGridLayout(settings);
 			} else {
-				this.sortSubcategoryData(clonedCategoricalData);
+				// this.sortSubcategoryData(clonedCategoricalData);
 
 				// NORMAL CHART
 				this.categoricalData = this.setInitialChartData(

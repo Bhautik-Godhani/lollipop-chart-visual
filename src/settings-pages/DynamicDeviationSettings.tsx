@@ -292,6 +292,7 @@ const DynamicDeviationSettings = (props) => {
                       value: EDynamicDeviationConnectingLineTypes.Bar,
                     },
                   ]}
+                  selectorAppearance="secondary"
                   handleChange={(value) => handleChange(value, EDynamicDeviationSettings.ConnectorType)}
                 />
               </Column>

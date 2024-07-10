@@ -79,6 +79,8 @@ import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiples
 import DefaultTemplateJS from './templates-json/default-template.js';
 
 export const MonthNames = [
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December",
 	"january", "february", "march", "april", "may", "june",
 	"july", "august", "september", "october", "november", "december",
 	"jan", "feb", "mar", "apr", "may", "jun",
