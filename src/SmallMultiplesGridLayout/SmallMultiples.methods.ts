@@ -555,7 +555,7 @@ export const RenderSmallMultiplesUniformLeftYAxis = (
             const { isVerticalBrushDisplayed } = config.getUniformYAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth, itemHeight - xAxisGNodeHeight - config.innerSpacing, true);
 
             if (isUniformYScale) {
-                yAxisTitleGNode.attr("transform", `translate(${titleToAxisMargin + (isVerticalBrushDisplayed ? 20 : 0)}, ${itemHeight / 2})`);
+                yAxisTitleGNode.attr("transform", `translate(${titleToAxisMargin + (isVerticalBrushDisplayed ? 15 : 0)}, ${itemHeight / 2})`);
                 yAxisTitleGNode.select(".yAxisTitle").attr("dy", "1em");
             }
 
