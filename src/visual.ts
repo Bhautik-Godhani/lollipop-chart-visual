@@ -3440,6 +3440,7 @@ export class Visual extends Shadow {
 				this.subCategoriesColorList = [];
 
 				this.setSummaryTableConfig();
+				this.configLegend();
 
 				DrawSmallMultiplesGridLayout(settings);
 			} else {
@@ -7701,7 +7702,7 @@ export class Visual extends Shadow {
 					fontFamily: xAxisSettings.labelFontFamily,
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
-				return GetWordsSplitByWidth(newText, textProperties, maxWidth, 3);
+				return GetWordsSplitByWidth(newText, textProperties, maxWidth, THIS.isSmallMultiplesEnabled ? 1 : 3);
 			});
 
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
@@ -7866,7 +7867,7 @@ export class Visual extends Shadow {
 							});
 						}
 
-						const words: string[] = GetWordsSplitByWidth(newText, textProperties, maxWidth - xAxisSettings.labelFontSize / 2, 3);
+						const words: string[] = GetWordsSplitByWidth(newText, textProperties, maxWidth - xAxisSettings.labelFontSize / 2, THIS.isSmallMultiplesEnabled ? 1 : 3);
 						words.forEach((d, i) => {
 							ele
 								.append("tspan")
