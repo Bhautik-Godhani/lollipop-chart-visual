@@ -209,7 +209,7 @@ export const DATA_COLORS: IDataColorsSettings = {
 	],
 	colorBlindSafe: false,
 	colorScheme: "Blue",
-	reverse: true,
+	reverse: false,
 	isGradient: true,
 	negativeColor: NEGATIVE_COLOR,
 	positiveColor: POSITIVE_COLOR,

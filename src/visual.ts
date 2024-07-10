@@ -5566,7 +5566,7 @@ export class Visual extends Shadow {
 					case ColorPaletteType.Qualitative: {
 						const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
 						const getMarkerColor = (i: number) => {
-							const scaleColors = chroma.scale(marker.schemeColors);
+							const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
 							if (marker.isGradient) {
 								return "rgb(" + scaleColors(colorIdxRangeScale((keys.length - 1) - i)).rgb().join() + ")";
 							} else {
@@ -5744,7 +5744,7 @@ export class Visual extends Shadow {
 						case ColorPaletteType.Diverging:
 						case ColorPaletteType.Qualitative: {
 							const getMarkerColor = (i: number) => {
-								const scaleColors = chroma.scale(marker.schemeColors);
+								const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
 								if (marker.isGradient) {
 									return "rgb(" + scaleColors(colorIdxRangeScale((this.subCategoriesName.length - 1) - i)).rgb().join() + ")";
 								} else {
