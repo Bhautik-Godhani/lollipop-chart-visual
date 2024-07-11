@@ -512,26 +512,6 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 self.drawLollipopChart();
             }
 
-            if (self.isExpandAllApplied) {
-                if (!self.isHorizontalChart) {
-                    if (self.isBottomXAxis) {
-                        self.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (self.height + self.xScaleGHeight) + "px" + ")");
-                    } else {
-                        self.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (-self.xScaleGHeight) + "px" + ")");
-                    }
-
-                    CallExpandAllXScaleOnAxisGroup(self, self.scaleBandWidth);
-                }
-                // else {
-                // 	if (this.isLeftYAxis) {
-                // 		this.expandAllYAxisG.style("transform", "translate(" + (-this.expandAllYScaleGWidth - this.yScaleGWidth) + "px" + "," + 0 + "px" + ")");
-                // 	} else {
-                // 		this.expandAllYAxisG.style("transform", "translate(" + (this.width) + "px" + "," + 0 + "px" + ")");
-                // 	}
-                // 	CallExpandAllYScaleOnAxisGroup(this, this.expandAllYScaleGWidth);
-                // }
-            }
-
             if (isDisplayBrushCalled && !self.isScrollBrushDisplayed) {
                 self.drawLollipopChart();
             }

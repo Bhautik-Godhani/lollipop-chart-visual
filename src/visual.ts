@@ -222,6 +222,8 @@ export class Visual extends Shadow {
 	public height: number;
 	public settingsBtnHeight: number = 40;
 	public settingsBtnWidth: number = 152;
+	public origViewPortWidth: number;
+	public origViewPortHeight: number;
 	public viewPortWidth: number;
 	public viewPortHeight: number;
 	public margin: { top: number; right: number; bottom: number; left: number };
@@ -1986,7 +1988,7 @@ export class Visual extends Shadow {
 					const day = obj["Day"] ? parseInt(obj["Day"].toString().split("--")[0]) : 1;
 					const month = obj["Month"] ? obj["Month"].split("--")[0] : "January";
 					const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("--")[0].split("Qtr")[1]) : 1;
-					const year = obj["Year"] ? obj["Year"].split("--")[0] : 2024;
+					const year = obj["Year"] ? obj["Year"].toString().split("--")[0] : 2024;
 
 					obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
 				}
@@ -2759,6 +2761,9 @@ export class Visual extends Shadow {
 			this.maxCircleYScaleDiff = 0;
 			this.maxPieXScaleDiff = 0;
 			this.maxPieYScaleDiff = 0;
+
+			this.origViewPortWidth = cloneDeep(this.vizOptions.options.viewport.width) - 10;
+			this.origViewPortHeight = cloneDeep(this.vizOptions.options.viewport.height);
 
 			this.viewPortWidth = cloneDeep(this.vizOptions.options.viewport.width) - 10;
 			this.viewPortHeight = cloneDeep(this.vizOptions.options.viewport.height);
@@ -6356,7 +6361,7 @@ export class Visual extends Shadow {
 					this.setCategoricalDataFields(categoricalData2);
 					this.setChartData(categoricalData2);
 
-					if (this.isExpandAllApplied) {
+					if (this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 						RenderExpandAllXAxis(this, categoricalData2);
 					}
 
@@ -7730,7 +7735,7 @@ export class Visual extends Shadow {
 				return textMeasurementService.measureSvgTextWidth(textProperties);
 			});
 			const xAxisTicksMaxWidth = d3.max(xAxisTicksWidth);
-			xAxisMaxHeight = !xAxisSettings.isLabelAutoCharLimit ? xAxisTicksMaxWidth : d3.min([this.height * 0.4, xAxisTicksMaxWidth]);
+			xAxisMaxHeight = !xAxisSettings.isLabelAutoCharLimit ? xAxisTicksMaxWidth : d3.min([this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform ? this.origViewPortHeight * 0.3 : this.height * 0.4, xAxisTicksMaxWidth]);
 
 			isApplyTilt = (xAxisSettings.isLabelAutoTilt && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
 				(this.markerMaxSize > this.scaleBandWidth)))
@@ -8021,7 +8026,8 @@ export class Visual extends Shadow {
 						const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
 						ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 					} else {
-						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
+						const width = THIS.isSmallMultiplesEnabled && THIS.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? THIS.origViewPortWidth : THIS.viewPortWidth;
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * THIS.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
 				} else {
@@ -8033,7 +8039,8 @@ export class Visual extends Shadow {
 
 					ele.text("");
 
-					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, THIS.viewPortWidth * THIS.yAxisTicksMaxWidthRatio);
+					const width = THIS.isSmallMultiplesEnabled && THIS.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? THIS.origViewPortWidth : THIS.viewPortWidth;
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * THIS.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 				}
 			});
@@ -8855,7 +8862,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.isExpandAllApplied) {
+		if (this.isExpandAllApplied && !this.isSmallMultiplesEnabled) {
 			if (!this.isHorizontalChart) {
 				// if (this.isBottomXAxis) {
 				// 	this.expandAllXAxisG.style("transform", "translate(" + 0 + "px" + "," + (this.height + this.xScaleGHeight) + "px" + ")");
@@ -8898,27 +8905,27 @@ export class Visual extends Shadow {
 
 		// Truncate the ticks which are overlaps with the Y axis
 		const THIS = this;
-		// if (!this.isSmallMultiplesEnabled) {
-		this.xAxisG
-			.selectAll(".tick")
-			.selectAll("text")
-			.each(function () {
-				const ele = d3.select(this);
-				const start = SVGBBox.x;
-				const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
+		if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+			this.xAxisG
+				.selectAll(".tick")
+				.selectAll("text")
+				.each(function () {
+					const ele = d3.select(this);
+					const start = SVGBBox.x;
+					const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
 
-				if ((bBox.x - start) < 0) {
-					const textProperties: TextProperties = {
-						text: ele.text(),
-						fontFamily: THIS.xAxisSettings.labelFontFamily,
-						fontSize: THIS.xAxisSettings.labelFontSize + "px",
-					};
+					if ((bBox.x - start) < 0) {
+						const textProperties: TextProperties = {
+							text: ele.text(),
+							fontFamily: THIS.xAxisSettings.labelFontFamily,
+							fontSize: THIS.xAxisSettings.labelFontSize + "px",
+						};
 
-					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
-					ele.text(truncatedText);
-				}
-			});
-		// }
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
+						ele.text(truncatedText);
+					}
+				});
+		}
 
 		this.xScaleRange = this.xScale.range();
 		this.yScaleRange = this.yScale.range();
