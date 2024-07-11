@@ -283,12 +283,12 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
       label: d as string,
       value: d as string
-    })).reverse();
+    })).reverse().filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   } else {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
       label: d as string,
       value: d as string
-    }));
+    })).filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   }
 
   return <>
@@ -826,12 +826,12 @@ const UIReferenceBand = (
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
       label: d as string,
       value: d as string
-    })).reverse();
+    })).reverse().filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   } else {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
       label: d as string,
       value: d as string
-    }));
+    })).filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   }
 
   return <>
