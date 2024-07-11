@@ -8,6 +8,9 @@ import { IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineVa
 import { calculateStandardDeviation, GetSVGTextSize2 } from "./methods";
 import { GetFormattedNumber } from "./NumberFormat.methods";
 import { cloneDeep } from "lodash";
+import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
+import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
+
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const generateSecureRandomBytes = (length) => {
@@ -119,7 +122,14 @@ const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
 export const FormattingReferenceLineText = (self: Visual, textSelection: D3Selection<SVGElement>): void => {
     textSelection
         .attr("display", "block")
-        .text((d: IReferenceLineSettings) => d.labelText)
+        .text((d: IReferenceLineSettings) => {
+            const textProperties: TextProperties = {
+                text: d.labelText,
+                fontFamily: d.labelStyle.labelFontFamily,
+                fontSize: d.labelStyle.labelFontSize + "px",
+            };
+            return textMeasurementService.getTailoredTextOrDefault(textProperties, self.isHorizontalChart ? self.width * 0.9 : self.height * 0.9)
+        })
         .attr("x", (d: IReferenceLineSettings) => {
             if (d.lineValue1.axis === EXYAxisNames.X) {
                 if (self.isHorizontalChart) {
