@@ -5982,6 +5982,10 @@ export class Visual extends Shadow {
 						this.setCategoricalDataFields(categoricalData2);
 						this.setChartData(categoricalData2);
 
+						if (this.isExpandAllApplied) {
+							RenderExpandAllYAxis(this, categoricalData2);
+						}
+
 						this.configLegend();
 
 						if (smallMultiplesGridItemContent) {
@@ -6223,9 +6227,9 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isExpandAllApplied) {
-			this.expandAllCategoriesName.forEach((d) => {
-				this[`${d}Scale`].domain(this[`${d}ScaleNewDomain`]);
-			});
+			// this.expandAllCategoriesName.forEach((d) => {
+			// 	this[`${d}Scale`].domain(this[`${d}ScaleNewDomain`]);
+			// });
 		}
 
 		if (this.isCutAndClipAxisEnabled) {
@@ -6351,6 +6355,10 @@ export class Visual extends Shadow {
 
 					this.setCategoricalDataFields(categoricalData2);
 					this.setChartData(categoricalData2);
+
+					if (this.isExpandAllApplied) {
+						RenderExpandAllXAxis(this, categoricalData2);
+					}
 
 					this.configLegend();
 
