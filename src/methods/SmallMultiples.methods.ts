@@ -372,6 +372,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             }
 
             const content: ISmallMultiplesGridItemContent = {
+                width: newItemWidth,
+                height: newItemHeight,
                 svg: svg.node(),
                 xScale: self.xScale,
                 yScale: self.yScale,

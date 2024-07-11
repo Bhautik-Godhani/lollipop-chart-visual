@@ -6363,6 +6363,10 @@ export class Visual extends Shadow {
 							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
 						}
 
+						this.viewPortWidth = smallMultiplesGridItemContent.width;
+						this.viewPortHeight = smallMultiplesGridItemContent.height;
+
+						this.svg = d3.select(smallMultiplesGridItemContent.svg);
 						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
@@ -6476,6 +6480,10 @@ export class Visual extends Shadow {
 								this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
 							}
 
+							this.viewPortWidth = smallMultiplesGridItemContent.width;
+							this.viewPortHeight = smallMultiplesGridItemContent.height;
+
+							this.svg = d3.select(smallMultiplesGridItemContent.svg);
 							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
@@ -8882,27 +8890,27 @@ export class Visual extends Shadow {
 
 		// Truncate the ticks which are overlaps with the Y axis
 		const THIS = this;
-		if (!this.isSmallMultiplesEnabled) {
-			this.xAxisG
-				.selectAll(".tick")
-				.selectAll("text")
-				.each(function () {
-					const ele = d3.select(this);
-					const start = SVGBBox.x;
-					const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
+		// if (!this.isSmallMultiplesEnabled) {
+		this.xAxisG
+			.selectAll(".tick")
+			.selectAll("text")
+			.each(function () {
+				const ele = d3.select(this);
+				const start = SVGBBox.x;
+				const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
 
-					if ((bBox.x - start) < 0) {
-						const textProperties: TextProperties = {
-							text: ele.text(),
-							fontFamily: THIS.xAxisSettings.labelFontFamily,
-							fontSize: THIS.xAxisSettings.labelFontSize + "px",
-						};
+				if ((bBox.x - start) < 0) {
+					const textProperties: TextProperties = {
+						text: ele.text(),
+						fontFamily: THIS.xAxisSettings.labelFontFamily,
+						fontSize: THIS.xAxisSettings.labelFontSize + "px",
+					};
 
-						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
-						ele.text(truncatedText);
-					}
-				});
-		}
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
+					ele.text(truncatedText);
+				}
+			});
+		// }
 
 		this.xScaleRange = this.xScale.range();
 		this.yScaleRange = this.yScale.range();
