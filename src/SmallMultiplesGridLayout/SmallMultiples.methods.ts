@@ -29,7 +29,7 @@ export const getSVGTextSize = (text: string,
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
-export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSettings): void => {
+export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSettings): () => any => {
     const { rows, columns } = GetGridLayoutRowsColumnsCount(config);
 
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
@@ -105,7 +105,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
 
-    setTimeout(() => {
+    const renderUniformXYAxisToContainer = () => {
         const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
         const itemWidth = bBox.width;
         const itemHeight = bBox.height;
@@ -151,7 +151,9 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
                     break;
             }
         }
-    }, 100);
+    }
+
+    return renderUniformXYAxisToContainer;
 };
 
 export const CreateSmallMultiplesContainer = (config: ISmallMultiplesGridLayoutSettings): { hyperListMainContainer: D3Selection<any>, SMPaginationPanel: D3Selection<HTMLDivElement>, uniformAxisContainer: D3Selection<any> } => {

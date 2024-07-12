@@ -3446,6 +3446,10 @@ export class Visual extends Shadow {
 						this.behavior.renderSelection(this.interactivityService.hasSelection());
 
 						this.drawTooltip();
+
+						if (renderUniformXYAxisToContainer) {
+							renderUniformXYAxisToContainer();
+						}
 					}
 				};
 
@@ -3455,7 +3459,8 @@ export class Visual extends Shadow {
 				this.setSummaryTableConfig();
 				this.configLegend();
 
-				DrawSmallMultiplesGridLayout(settings);
+				const fn = DrawSmallMultiplesGridLayout(settings);
+				const renderUniformXYAxisToContainer = fn;
 			} else {
 				// this.sortSubcategoryData(clonedCategoricalData);
 
