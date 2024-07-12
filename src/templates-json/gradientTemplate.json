@@ -1,4 +1,4 @@
-export default {
+{
     "brushAndZoomAreaSettings": {},
     "chartSettings": {
         "lollipopInnerPadding": 30,
@@ -13,19 +13,25 @@ export default {
         "connectingLineColor": "rgba(0, 0, 0, 1)",
         "connectingLineWidth": 1,
         "connectingLineStyle": "dotted",
-        "isIBCSEnabled": false,
-        "isResetInIBCSPressed": false
+        "isIBCSEnabled": false
     },
-    "cutAndClipAxisSettings": {},
+    "cutAndClipAxisSettings": {
+        "isEnabled": false,
+        "breakStart": 10,
+        "breakEnd": 30,
+        "markerStrokeColor": "rgba(102,102,102,1)",
+        "markerBackgroundColor": "rgba(255, 255, 255, 1)",
+        "markerPlacement": "categories"
+    },
     "dataColorsSettings": {
-        "fillMin": "rgba(248, 231, 28, 1)",
+        "fillMin": "rgba(239, 72, 151, 1)",
         "fillMid": "rgba(127, 88, 246, 1)",
         "fillMax": "rgba(75, 132, 244, 1)",
-        "isAddMidColor": false,
+        "isAddMidColor": true,
         "fillType": "gradient",
         "isFillTypeChanged": true,
-        "singleColor1": "rgba(64, 64, 64, 1)",
-        "singleColor2": "rgba(64, 64, 64, 1)",
+        "singleColor1": "rgba(0, 99, 178, 1)",
+        "singleColor2": "rgba(156, 195, 213, 1)",
         "gradientColors": [
             "rgba(186, 72, 239, 1)",
             "rgba(127, 88, 246, 1)",
@@ -34,34 +40,37 @@ export default {
         "categoryColors": [],
         "numberOfClasses": 8,
         "schemeColors": [
-            "rgb(204,233,255)",
-            "rgb(160,214,255)",
-            "rgb(117,195,255)",
-            "rgb(68,176,255)",
-            "rgb(25,145,233)"
+            "rgb(231,98,84)",
+            "rgb(240,142,73)",
+            "rgb(249,180,94)",
+            "rgb(255,216,138)",
+            "rgb(213,225,204)",
+            "rgb(135,200,217)",
+            "rgb(90,154,183)",
+            "rgb(58,108,152)"
         ],
         "colorBlindSafe": false,
-        "colorScheme": "Blue",
+        "colorScheme": "Hiroshige",
         "reverse": false,
         "isGradient": true,
         "negativeColor": "rgba(229, 51, 39, 1)",
         "positiveColor": "rgba(141, 200, 61, 1)",
         "gradientAppliedToMeasure": "marker1Color",
-        "isCustomizeOthersColor": true,
+        "isCustomizeOthersColor": false,
         "othersColor": "rgba(84, 84, 84, 1)"
     },
     "dataLabelsSettings": {
-        "show": false,
+        "show": true,
         "isShowBestFitLabels": true,
         "measure1": {
             "color": "rgba(93, 93, 93, 1)",
             "borderColor": "rgba(255, 255, 255,1)",
             "borderWidth": 1,
             "orientation": "horizontal",
-            "placement": "inside",
+            "placement": "outside",
             "fontSize": 12,
             "fontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
-            "showBackground": true,
+            "showBackground": false,
             "backgroundColor": "rgba(93, 93, 93, 1)",
             "fontStyle": [],
             "isAutoFontSize": true,
@@ -102,31 +111,25 @@ export default {
     "errorBarsSettings": {},
     "gridLinesSettings": {
         "xGridLines": {
-            "show": false,
+            "show": true,
             "lineType": "dotted",
             "lineWidth": 1,
-            "lineColor": "rgba(151,151,151,1)"
+            "lineColor": "rgba(210, 207, 207, 1)"
         },
         "yGridLines": {
-            "show": false,
+            "show": true,
             "lineType": "dotted",
             "lineWidth": 1,
-            "lineColor": "rgba(151,151,151,1)"
+            "lineColor": "rgba(210, 207, 207, 1)"
         }
     },
-    "lineSettings": {
-        "show": true,
-        "lineType": "solid",
-        "lineWidth": 4,
-        "lineColor": "rgba(128, 128, 128, 1)",
-        "isApplyMarkerColor": true
-    },
+    "lineSettings": {},
     "markerSettings": {
         "markerType": "shape",
         "markerStyleType": "marker1Style",
         "marker1Style": {
             "isAutoMarkerSize": false,
-            "markerSize": 30,
+            "markerSize": 25,
             "markerShape": "default",
             "markerChart": "donut",
             "markerShapePath": "",
@@ -155,107 +158,62 @@ export default {
         "isAutoLollipopTypePie": false,
         "isAutoLollipopTypeImage": false
     },
-    "patternSettings": {
-        "enabled": true,
-        "categoryPatterns": [
-            {
-                "name": "Friday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Monday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Saturday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Sunday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Thursday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Tuesday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            },
-            {
-                "name": "Wednesday",
-                "patternIdentifier": "FORWARD_SLASH",
-                "isImagePattern": false,
-                "dimensions": {}
-            }
-        ],
-        "measuresPatterns": [
-            {
-                "name": "Visit everyday",
-                "patternIdentifier": "NONE",
-                "isImagePattern": false
-            }
-        ],
-        "subCategoryPatterns": [],
-        "basedOn": "bySubCategory",
-        "isPatternBorderEnabled": false,
-        "patternBorderWidth": 1
-    },
+    "patternSettings": {},
     "raceChartSettings": {},
-    "rankingSettings": {},
-    "referenceLinesSettings": {},
-    "showBucket": {},
-    "smallMultiplesSettings": {},
-    "sorting": {
+    "rankingSettings": {
         "category": {
             "enabled": true,
-            "sortBy": "Day",
-            "sortOrder": "1",
-            "isSortByCategory": true,
-            "isSortByMeasure": false,
-            "isSortByMultiMeasure": false,
-            "isSortByExtraSortField": false
+            "rankingType": "topN",
+            "count": 50,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
         },
         "subCategory": {
             "enabled": true,
-            "sortBy": "Visit everyday",
-            "sortOrder": "2",
-            "isSortByCategory": false,
-            "isSortByMeasure": true,
-            "isSortByMultiMeasure": false,
-            "isSortByExtraSortField": false
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "smallMultiples": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "raceChartData": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 20,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
         }
     },
+    "referenceLinesSettings": [],
+    "showBucket": {},
+    "smallMultiplesSettings": {},
+    "sorting": {},
     "xAxisSettings": {
         "show": true,
         "position": "bottom",
         "isLogarithmScale": false,
-        "isDisplayTitle": true,
-        "titleName": "",
+        "isDisplayTitle": false,
+        "titleName": "Level 2",
         "titleColor": "rgba(84, 84, 84, 1)",
-        "titleFontSize": 13,
+        "titleFontSize": 12,
         "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
-        "titleStyling": [
-            "bold"
-        ],
+        "titleStyling": [],
         "isDisplayLabel": true,
         "labelColor": "rgba(84, 84, 84, 1)",
         "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
         "labelFontSize": 12,
-        "isLabelAutoTilt": true,
-        "labelTilt": 0,
+        "isLabelAutoTilt": false,
+        "labelTilt": -30,
         "labelCharLimit": 20,
         "labelStyling": [],
         "isShowAxisLine": false,
@@ -291,7 +249,7 @@ export default {
         "position": "left",
         "isLogarithmScale": false,
         "isDisplayTitle": true,
-        "titleName": "",
+        "titleName": "Sum of Value",
         "titleColor": "rgba(84, 84, 84, 1)",
         "titleFontSize": 13,
         "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
@@ -332,5 +290,7 @@ export default {
             "billionScalingLabel": "B",
             "trillionScalingLabel": "T"
         }
-    }
+    },
+    "conditionalFormatting": {},
+    "annotations": []
 }

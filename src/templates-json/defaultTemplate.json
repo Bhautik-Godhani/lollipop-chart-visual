@@ -1,4 +1,4 @@
-export default {
+{
     "brushAndZoomAreaSettings": {},
     "chartSettings": {
         "lollipopInnerPadding": 30,
@@ -62,7 +62,7 @@ export default {
             "borderWidth": 1,
             "orientation": "horizontal",
             "placement": "outside",
-            "fontSize": 12,
+            "fontSize": 10,
             "fontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
             "showBackground": false,
             "backgroundColor": "rgba(93, 93, 93, 1)",
@@ -164,7 +164,7 @@ export default {
         "category": {
             "enabled": true,
             "rankingType": "topN",
-            "count": 12,
+            "count": 50,
             "showRemainingAsOthers": false,
             "suffix": "none",
             "calcMethod": "sum"
@@ -174,7 +174,8 @@ export default {
             "rankingType": "topN",
             "count": 10,
             "showRemainingAsOthers": false,
-            "othersColor": "rgba(84, 84, 84, 1)"
+            "suffix": "none",
+            "calcMethod": "sum"
         },
         "smallMultiples": {
             "enabled": true,
@@ -221,7 +222,7 @@ export default {
         "position": "bottom",
         "isLogarithmScale": false,
         "isDisplayTitle": true,
-        "titleName": "",
+        "titleName": "Sum of Sales",
         "titleColor": "rgba(84, 84, 84, 1)",
         "titleFontSize": 13,
         "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
@@ -253,7 +254,7 @@ export default {
             "valueType": "absolute",
             "decimalSeparator": ".",
             "thousandsSeparator": ",",
-            "decimalPlaces": 0,
+            "decimalPlaces": 1,
             "scaling": "auto",
             "prefix": "",
             "suffix": "",
@@ -262,14 +263,15 @@ export default {
             "millionScalingLabel": "M",
             "billionScalingLabel": "B",
             "trillionScalingLabel": "T"
-        }
+        },
+        "isResetClicked": true
     },
     "yAxisSettings": {
         "show": true,
         "position": "left",
         "isLogarithmScale": false,
         "isDisplayTitle": true,
-        "titleName": "",
+        "titleName": "Category",
         "titleColor": "rgba(84, 84, 84, 1)",
         "titleFontSize": 13,
         "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
@@ -300,7 +302,7 @@ export default {
             "valueType": "absolute",
             "decimalSeparator": ".",
             "thousandsSeparator": ",",
-            "decimalPlaces": 0,
+            "decimalPlaces": 1,
             "scaling": "auto",
             "prefix": "",
             "suffix": "",
@@ -309,6 +311,9 @@ export default {
             "millionScalingLabel": "M",
             "billionScalingLabel": "B",
             "trillionScalingLabel": "T"
-        }
-    }
+        },
+        "isResetClicked": true
+    },
+    "conditionalFormatting": {},
+    "annotations": []
 }

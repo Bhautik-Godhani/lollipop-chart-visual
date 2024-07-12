@@ -8,10 +8,17 @@ import { ITemplateSettings } from "../visual-settings.interface";
 import { ApplyThemeJson } from "../methods/methods";
 import { Visual } from "../visual";
 
-import DefaultTemplateJS from '../templates-json/default-template.js';
-import RaceChartTemplateJS from '../templates-json/race-chart-template.js';
-import FillPatternsTemplateJS from '../templates-json/fill-patterns-template.js';
-import CutClipTemplateJS from '../templates-json/cut-clip-template.js';
+import DefaultTemplateJS from '../templates-json/defaultTemplate.json';
+import RaceChartTemplateJS from '../templates-json/raceChartTemplate.json';
+import FillPatternTemplateJS from '../templates-json/fillPatternTemplate.json';
+import CutClipAxisTemplateJS from '../templates-json/cutClipAxisTemplate.json';
+import GradientTemplateJS from '../templates-json/gradientTemplate.json';
+import ReferenceLineBandTemplateJS from '../templates-json/referenceLineBandTemplate.json';
+import SubcategoryWithPatternTemplateJS from '../templates-json/subcategoryWithPatternTemplate.json';
+import DynamicDeviationTemplateJS from '../templates-json/dynamicDeviationTemplate.json';
+import ErrorBarTemplateJS from '../templates-json/errorBarTemplate.json';
+import DonutLollipopTemplateJS from '../templates-json/donutLollipopTemplate.json';
+
 import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
 import { ApplyBeforeTemplateAppliedSettingsBack, SetBeforeTemplateSettings } from "../methods/Template.methods";
 
@@ -133,18 +140,33 @@ const UIGeneralTemplates = (
       <ConditionalWrapper visible={configValues.isTemplatesEnabled}>
         <Row>
           <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GeneralTemplate ? "selected" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DefaultTemplate ? "selected" : ""}`}
               onClick={
                 () => {
-                  handleChange(EGeneralTemplates.GeneralTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(EGeneralTemplates.DefaultTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
                   handleChange(JSON.stringify(DefaultTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <img src={require("../../assets/templates/DefaultTemplate.svg")}></img>
+              <img src={require("../../assets/templates/defaultTemplate.png")}></img>
             </div>
             <Label text="Default" classNames={["text-label"]}></Label>
           </Column>
 
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.CutClipAxisTemplate ? "selected" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.CutClipAxisTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(CutClipAxisTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/cutClipAxisTemplate.png")}></img>
+            </div>
+            <Label text="Cut/Clip Axis" classNames={["text-label"]}></Label>
+          </Column>
+        </Row>
+
+        <Row>
           <Column>
             <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.RaceChartTemplate ? "selected" : ""}
             ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
@@ -154,7 +176,7 @@ const UIGeneralTemplates = (
                   handleChange(JSON.stringify(RaceChartTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <img src={require("../../assets/templates/RaceChartTemplate.svg")}></img>
+              <img src={require("../../assets/templates/RaceChartTemplate.png")}></img>
               {!shadow.isChartIsRaceChart && (
                 <div className="disabled-theme"></div>
               )
@@ -162,33 +184,118 @@ const UIGeneralTemplates = (
             </div>
             <Label text="Race Chart" classNames={["text-label"]}></Label>
           </Column>
-        </Row>
 
-        <Row>
           <Column>
             <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.FillPatternTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.FillPatternTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(FillPatternsTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                  handleChange(JSON.stringify(FillPatternTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <img src={require("../../assets/templates/FillPatternTemplate.svg")}></img>
+              <img src={require("../../assets/templates/FillPatternTemplate.png")}></img>
             </div>
             <Label text="Fill Pattern" classNames={["text-label"]}></Label>
           </Column>
+        </Row>
 
+        <Row>
           <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.CutClipAxisTemplate ? "selected" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GradientTemplate ? "selected" : ""}
+            ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
               onClick={
                 () => {
-                  handleChange(EGeneralTemplates.CutClipAxisTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(CutClipTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                  handleChange(EGeneralTemplates.GradientTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(GradientTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
                 }
               }>
-              <img src={require("../../assets/templates/CutAndClipTemplate.svg")}></img>
+              <img src={require("../../assets/templates/gradientTemplate.png")}></img>
+              {!shadow.isChartIsRaceChart && (
+                <div className="disabled-theme"></div>
+              )
+              }
             </div>
-            <Label text="Cut/Clip Axis" classNames={["text-label"]}></Label>
+            <Label text="Gradient" classNames={["text-label"]}></Label>
+          </Column>
+
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ReferenceLineBandTemplate ? "selected" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.ReferenceLineBandTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(ReferenceLineBandTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/referenceLineBandTemplate.png")}></img>
+            </div>
+            <Label text="Reference Line/Band" classNames={["text-label"]}></Label>
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate ? "selected" : ""}
+            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.SubcategoryWithPatternTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(SubcategoryWithPatternTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/subcategoryWithPatternTemplate.png")}></img>
+              {!shadow.isChartIsRaceChart && (
+                <div className="disabled-theme"></div>
+              )
+              }
+            </div>
+            <Label text="Sub Category With Patterns" classNames={["text-label"]}></Label>
+          </Column>
+
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DynamicDeviationTemplate ? "selected" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.DynamicDeviationTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(DynamicDeviationTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/dynamicDeviationTemplate.png")}></img>
+            </div>
+            <Label text="Dynamic Deviation" classNames={["text-label"]}></Label>
+          </Column>
+        </Row>
+
+        <Row>
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ErrorBarTemplate ? "selected" : ""}
+            ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.ErrorBarTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(ErrorBarTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/errorBarTemplate.png")}></img>
+              {!shadow.isChartIsRaceChart && (
+                <div className="disabled-theme"></div>
+              )
+              }
+            </div>
+            <Label text="Error Bar" classNames={["text-label"]}></Label>
+          </Column>
+
+          <Column>
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DonutLollipopTemplate ? "selected" : ""}
+            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
+              onClick={
+                () => {
+                  handleChange(EGeneralTemplates.DonutLollipopTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+                  handleChange(JSON.stringify(DonutLollipopTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+                }
+              }>
+              <img src={require("../../assets/templates/donutLollipopTemplate.png")}></img>
+            </div>
+            <Label text="Donut Lollipop Chart" classNames={["text-label"]}></Label>
           </Column>
         </Row>
       </ConditionalWrapper >

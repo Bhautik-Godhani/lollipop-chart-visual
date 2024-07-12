@@ -1,0 +1,399 @@
+{
+    "brushAndZoomAreaSettings": {},
+    "chartSettings": {
+        "lollipopInnerPadding": 30,
+        "isHasSubCategories": false,
+        "orientation": "horizontal",
+        "isAutoLollipopWidth": true,
+        "isLollipopDistanceChange": false,
+        "isShowZeroBaseLine": true,
+        "zeroBaseLineColor": "rgba(211, 211, 211, 1)",
+        "zeroBaseLineSize": 1,
+        "showConnectingLine": false,
+        "connectingLineColor": "rgba(0, 0, 0, 1)",
+        "connectingLineWidth": 1,
+        "connectingLineStyle": "dotted",
+        "isIBCSEnabled": false,
+        "isResetInIBCSPressed": false
+    },
+    "cutAndClipAxisSettings": {},
+    "dataColorsSettings": {
+        "fillMin": "rgba(249, 254, 192, 1)",
+        "fillMid": "rgba(233, 79, 55, 1)",
+        "fillMax": "rgba(57, 62, 65, 1)",
+        "isAddMidColor": true,
+        "fillType": "gradient",
+        "isFillTypeChanged": true,
+        "singleColor1": "rgba(248, 231, 28, 1)",
+        "singleColor2": "rgba(156, 195, 213, 1)",
+        "gradientColors": [
+            "rgba(186, 72, 239, 1)",
+            "rgba(127, 88, 246, 1)",
+            "rgba(75, 132, 244, 1)"
+        ],
+        "categoryColors": [],
+        "numberOfClasses": 8,
+        "schemeColors": [
+            "rgb(215,48,39)",
+            "rgb(238,106,70)",
+            "rgb(253,162,102)",
+            "rgb(254,214,133)",
+            "rgb(236,232,139)",
+            "rgb(208,235,134)",
+            "rgb(163,215,107)",
+            "rgb(100,186,90)"
+        ],
+        "colorBlindSafe": false,
+        "colorScheme": "Red to Green",
+        "reverse": false,
+        "isGradient": true,
+        "negativeColor": "rgba(229, 51, 39, 1)",
+        "positiveColor": "rgba(141, 200, 61, 1)",
+        "gradientAppliedToMeasure": "marker1Color",
+        "isCustomizeOthersColor": true,
+        "othersColor": "rgba(84, 84, 84, 1)"
+    },
+    "dataLabelsSettings": {},
+    "dynamicDeviationSettings": {},
+    "errorBarsSettings": {},
+    "gridLinesSettings": {},
+    "lineSettings": {},
+    "markerSettings": {
+        "markerType": "shape",
+        "markerStyleType": "marker1Style",
+        "marker1Style": {
+            "isAutoMarkerSize": false,
+            "markerSize": 20,
+            "markerShape": "default",
+            "markerChart": "donut",
+            "markerShapePath": "",
+            "markerShapeBase64Url": "",
+            "dropdownMarkerType": "circle",
+            "isShowMarkerOutline": true,
+            "outlineWidth": 3,
+            "outlineColor": "rgba(128, 128, 128, 1)",
+            "sameOutlineAsMarkerColor": true,
+            "showOutlineOnly": false
+        },
+        "marker2Style": {
+            "isAutoMarkerSize": false,
+            "markerSize": 20,
+            "markerShape": "default",
+            "markerChart": "donut",
+            "markerShapePath": "",
+            "markerShapeBase64Url": "",
+            "dropdownMarkerType": "circle",
+            "isShowMarkerOutline": true,
+            "outlineWidth": 1,
+            "outlineColor": "rgba(128, 128, 128, 1)",
+            "sameOutlineAsMarkerColor": true,
+            "showOutlineOnly": false
+        },
+        "isAutoLollipopTypePie": false,
+        "isAutoLollipopTypeImage": false
+    },
+    "patternSettings": {},
+    "raceChartSettings": {},
+    "rankingSettings": {
+        "category": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 50,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "subCategory": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "smallMultiples": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "raceChartData": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 20,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        }
+    },
+    "referenceLinesSettings": [
+        {
+            "referenceType": "referenceBand",
+            "lineValue1": {
+                "axis": "X",
+                "type": "value",
+                "value": "October",
+                "isValueChanged": false,
+                "measureName": "Month",
+                "computation": "fixed",
+                "rankOrder": "start",
+                "rank": 5
+            },
+            "lineValue2": {
+                "axis": "X",
+                "type": "value",
+                "value": "September",
+                "isValueChanged": false,
+                "computation": "fixed",
+                "rankOrder": "start",
+                "rank": 8
+            },
+            "lineStyle": {
+                "lineStyle": "solid",
+                "lineColor": "rgba(9, 82, 159, 1)",
+                "autoLineWidth": true,
+                "lineWidth": "3",
+                "linePlacement": "front"
+            },
+            "labelStyle": {
+                "show": true,
+                "labelNameType": "value",
+                "lineLabel": "Reference Line",
+                "bandLabel": "Reference Band",
+                "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+                "labelColor": "rgba(15, 58, 105, 1)",
+                "isShowLabelBackground": false,
+                "labelBackgroundColor": "rgba(0,0,0,1)",
+                "autoFontSize": false,
+                "labelFontSize": 16,
+                "labelPosition": "before",
+                "labelAlignment": "center",
+                "styling": [
+                    "bold"
+                ],
+                "labelOrientation": "horizontal",
+                "textAnchor": "middle",
+                "textAlignment": "ideographic"
+            },
+            "line1Coord": {
+                "x1": 10,
+                "x2": 937.6436634063721,
+                "y1": 219.34895833333331,
+                "y2": 219.34895833333331,
+                "textX1": 468.82183170318604,
+                "textY1": 209.34895833333331
+            },
+            "line2Coord": {
+                "x1": 10,
+                "x2": 937.6436634063721,
+                "y1": 307.0885416666667,
+                "y2": 307.0885416666667,
+                "textX1": 468.82183170318604,
+                "textY1": 297.0885416666667
+            },
+            "labelCoord": {
+                "textX1": 468.82183170318604,
+                "textY1": 209.34895833333331
+            },
+            "bandStyle": {
+                "isShowBackgroundColor": true,
+                "backgroundColor": "rgba(248, 250, 219, 0.65)"
+            },
+            "labelText": "October - September"
+        },
+        {
+            "uid": "1718814443582",
+            "referenceType": "referenceLine",
+            "lineValue1": {
+                "axis": "Y",
+                "type": "value",
+                "value": "19485.5",
+                "isValueChanged": false,
+                "measureName": "Sum of Quantity",
+                "computation": "average",
+                "rankOrder": "start",
+                "rank": "1"
+            },
+            "lineValue2": {
+                "axis": "X",
+                "type": "value",
+                "value": "November",
+                "isValueChanged": false,
+                "computation": "fixed",
+                "rankOrder": "start",
+                "rank": "2"
+            },
+            "lineStyle": {
+                "lineStyle": "dashed",
+                "lineColor": "rgba(74, 74, 74, 1)",
+                "autoLineWidth": true,
+                "lineWidth": "3",
+                "linePlacement": "front"
+            },
+            "labelStyle": {
+                "show": true,
+                "labelNameType": "text_value",
+                "lineLabel": "Avg Value",
+                "bandLabel": "Reference Band",
+                "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+                "labelColor": "rgba(15, 61, 110, 1)",
+                "isShowLabelBackground": false,
+                "labelBackgroundColor": "rgba(255,255,255,1)",
+                "autoFontSize": false,
+                "labelFontSize": 15,
+                "labelPosition": "after",
+                "labelAlignment": "left",
+                "styling": [
+                    "bold"
+                ],
+                "labelOrientation": "horizontal",
+                "textAnchor": "start",
+                "textAlignment": "hanging"
+            },
+            "line1Coord": {
+                "x1": 727.4519802158277,
+                "x2": 727.4519802158277,
+                "y1": 0,
+                "y2": 526.4375,
+                "textX1": 737.4519802158277,
+                "textY1": 516.4375
+            },
+            "line2Coord": {
+                "x1": 0,
+                "x2": 0,
+                "y1": 0,
+                "y2": 0
+            },
+            "labelCoord": {
+                "textX1": 737.4519802158277,
+                "textY1": 516.4375
+            },
+            "bandStyle": {
+                "isShowBackgroundColor": true,
+                "backgroundColor": "rgba(0,0,0,0.2)"
+            },
+            "labelText": "Avg Value 19.5K"
+        }
+    ],
+    "showBucket": {},
+    "smallMultiplesSettings": {},
+    "sorting": {
+        "category": {
+            "enabled": true,
+            "sortBy": "Month",
+            "sortOrder": "2",
+            "isSortByCategory": true,
+            "isSortByMeasure": false,
+            "isSortByMultiMeasure": false,
+            "isSortByExtraSortField": false
+        },
+        "subCategory": {
+            "enabled": true,
+            "sortBy": "Sum of Quantity",
+            "sortOrder": "2",
+            "isSortByCategory": false,
+            "isSortByMeasure": true,
+            "isSortByMultiMeasure": false,
+            "isSortByExtraSortField": false
+        }
+    },
+    "xAxisSettings": {
+        "show": true,
+        "position": "bottom",
+        "isLogarithmScale": false,
+        "isDisplayTitle": false,
+        "titleName": "Month",
+        "titleColor": "rgba(84, 84, 84, 1)",
+        "titleFontSize": 13,
+        "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "titleStyling": [
+            "bold"
+        ],
+        "isDisplayLabel": true,
+        "labelColor": "rgba(84, 84, 84, 1)",
+        "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "labelFontSize": 11,
+        "isLabelAutoTilt": true,
+        "labelTilt": 0,
+        "labelCharLimit": 20,
+        "labelStyling": [],
+        "isShowAxisLine": false,
+        "axisLineColor": "rgba(84, 84, 84, 1)",
+        "isLabelAutoCharLimit": true,
+        "categoryType": "categorical",
+        "isMaximumRangeEnabled": false,
+        "maximumRange": 0,
+        "isMinimumRangeEnabled": false,
+        "minimumRange": 0,
+        "isInvertRange": false,
+        "isAutoDateFormat": true,
+        "dateFormat": "DD:MM:YYYY hh:mm A",
+        "customDateFormat": "DD:MM:YYYY hh:mm A",
+        "numberFormatting": {
+            "show": true,
+            "valueType": "absolute",
+            "decimalSeparator": ".",
+            "thousandsSeparator": ",",
+            "decimalPlaces": 1,
+            "scaling": "auto",
+            "prefix": "",
+            "suffix": "",
+            "scalingLabel": false,
+            "thousandScalingLabel": "K",
+            "millionScalingLabel": "M",
+            "billionScalingLabel": "B",
+            "trillionScalingLabel": "T"
+        }
+    },
+    "yAxisSettings": {
+        "show": true,
+        "position": "left",
+        "isLogarithmScale": false,
+        "isDisplayTitle": false,
+        "titleName": "Sum of Quantity",
+        "titleColor": "rgba(84, 84, 84, 1)",
+        "titleFontSize": 13,
+        "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "titleStyling": [
+            "bold"
+        ],
+        "isDisplayLabel": true,
+        "labelColor": "rgba(84, 84, 84, 1)",
+        "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "labelFontSize": 12,
+        "labelCharLimit": 3,
+        "labelStyling": [],
+        "isShowLabelsAboveLine": false,
+        "isShowAxisLine": false,
+        "axisLineColor": "rgba(84, 84, 84, 1)",
+        "isLabelAutoCharLimit": true,
+        "categoryType": "categorical",
+        "isMaximumRangeEnabled": false,
+        "maximumRange": 0,
+        "isMinimumRangeEnabled": false,
+        "minimumRange": 0,
+        "isInvertRange": false,
+        "isAutoDateFormat": true,
+        "dateFormat": "DD:MM:YYYY hh:mm A",
+        "customDateFormat": "DD:MM:YYYY hh:mm A",
+        "numberFormatting": {
+            "show": true,
+            "valueType": "absolute",
+            "decimalSeparator": ".",
+            "thousandsSeparator": ",",
+            "decimalPlaces": 1,
+            "scaling": "auto",
+            "prefix": "",
+            "suffix": "",
+            "scalingLabel": false,
+            "thousandScalingLabel": "K",
+            "millionScalingLabel": "M",
+            "billionScalingLabel": "B",
+            "trillionScalingLabel": "T"
+        }
+    },
+    "conditionalFormatting": {},
+    "annotations": []
+}

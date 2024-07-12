@@ -1,0 +1,299 @@
+{
+    "brushAndZoomAreaSettings": {},
+    "chartSettings": {
+        "lollipopInnerPadding": 30,
+        "isHasSubCategories": false,
+        "orientation": "vertical",
+        "isAutoLollipopWidth": true,
+        "isLollipopDistanceChange": false,
+        "isShowZeroBaseLine": true,
+        "zeroBaseLineColor": "rgba(211, 211, 211, 1)",
+        "zeroBaseLineSize": 1,
+        "showConnectingLine": false,
+        "connectingLineColor": "rgba(0, 0, 0, 1)",
+        "connectingLineWidth": 1,
+        "connectingLineStyle": "dotted",
+        "isIBCSEnabled": false
+    },
+    "cutAndClipAxisSettings": {},
+    "dataColorsSettings": {
+        "fillMin": "rgba(245, 166, 35, 1)",
+        "fillMid": "rgba(127, 88, 246, 1)",
+        "fillMax": "rgba(89, 164, 114, 1)",
+        "isAddMidColor": true,
+        "fillType": "gradient",
+        "isFillTypeChanged": true,
+        "singleColor1": "rgba(0, 99, 178, 1)",
+        "singleColor2": "rgba(156, 195, 213, 1)",
+        "gradientColors": [
+            "rgba(186, 72, 239, 1)",
+            "rgba(127, 88, 246, 1)",
+            "rgba(75, 132, 244, 1)"
+        ],
+        "categoryColors": [],
+        "numberOfClasses": 8,
+        "schemeColors": [
+            "rgb(166,206,227)",
+            "rgb(48,131,186)",
+            "rgb(141,197,149)",
+            "rgb(99,184,79)",
+            "rgb(151,157,99)",
+            "rgb(242,106,106)",
+            "rgb(234,67,49)",
+            "rgb(253,183,97)"
+        ],
+        "colorBlindSafe": false,
+        "colorScheme": "Paired",
+        "reverse": false,
+        "isGradient": true,
+        "negativeColor": "rgba(229, 51, 39, 1)",
+        "positiveColor": "rgba(141, 200, 61, 1)",
+        "gradientAppliedToMeasure": "marker1Color",
+        "isCustomizeOthersColor": true,
+        "othersColor": "rgba(84, 84, 84, 1)"
+    },
+    "dataLabelsSettings": {},
+    "dynamicDeviationSettings": {},
+    "errorBarsSettings": {},
+    "gridLinesSettings": {},
+    "lineSettings": {
+        "show": true,
+        "lineType": "solid",
+        "lineWidth": 4,
+        "lineColor": "rgba(15, 61, 110, 1)",
+        "isApplyMarkerColor": false
+    },
+    "markerSettings": {
+        "markerType": "chart",
+        "markerStyleType": "marker1Style",
+        "marker1Style": {
+            "isAutoMarkerSize": false,
+            "markerSize": 22,
+            "markerShape": "default",
+            "markerChart": "pie",
+            "markerShapePath": "",
+            "markerShapeBase64Url": "",
+            "dropdownMarkerType": "circle",
+            "selectedImageDataField": "#Color image dax",
+            "isShowMarkerOutline": true,
+            "outlineWidth": 1,
+            "outlineColor": "rgba(15, 61, 110, 1)",
+            "sameOutlineAsMarkerColor": false,
+            "showOutlineOnly": false,
+            "markerType": "shape"
+        },
+        "marker2Style": {
+            "isAutoMarkerSize": false,
+            "markerSize": 20,
+            "markerShape": "default",
+            "markerChart": "donut",
+            "markerShapePath": "",
+            "markerShapeBase64Url": "",
+            "dropdownMarkerType": "circle",
+            "selectedImageDataField": "#Color image dax",
+            "isShowMarkerOutline": false,
+            "outlineWidth": 1,
+            "outlineColor": "rgba(128, 128, 128, 1)",
+            "sameOutlineAsMarkerColor": true,
+            "showOutlineOnly": false,
+            "markerType": "shape"
+        },
+        "isAutoLollipopTypePie": true,
+        "isAutoLollipopTypeImage": false
+    },
+    "patternSettings": {
+        "enabled": true,
+        "categoryPatterns": [
+            {
+                "name": "Western Asia",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            },
+            {
+                "name": "Southeastern Asia",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            },
+            {
+                "name": "Western Africa",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            },
+            {
+                "name": "Central America",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            },
+            {
+                "name": "Central US",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            }
+        ],
+        "measuresPatterns": [
+            {
+                "name": "Sum of Discount",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            }
+        ],
+        "subCategoryPatterns": [
+            {
+                "name": "Home Office",
+                "patternIdentifier": "NONE",
+                "isImagePattern": false
+            },
+            {
+                "name": "Corporate",
+                "patternIdentifier": "DIAMOND",
+                "isImagePattern": false
+            },
+            {
+                "name": "Consumer",
+                "patternIdentifier": "BACKWARD_SLASH",
+                "isImagePattern": false
+            }
+        ],
+        "basedOn": "bySubCategory",
+        "isPatternBorderEnabled": false,
+        "patternBorderWidth": 1
+    },
+    "raceChartSettings": {},
+    "rankingSettings": {
+        "category": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 50,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "subCategory": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "smallMultiples": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "raceChartData": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 20,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        }
+    },
+    "referenceLinesSettings": {},
+    "showBucket": {},
+    "smallMultiplesSettings": {},
+    "sorting": {},
+    "xAxisSettings": {
+        "show": true,
+        "position": "bottom",
+        "isLogarithmScale": false,
+        "isDisplayTitle": true,
+        "titleName": "",
+        "titleColor": "rgba(84, 84, 84, 1)",
+        "titleFontSize": 13,
+        "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "titleStyling": [
+            "bold"
+        ],
+        "isDisplayLabel": true,
+        "labelColor": "rgba(84, 84, 84, 1)",
+        "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "labelFontSize": 12,
+        "isLabelAutoTilt": true,
+        "labelTilt": 0,
+        "labelCharLimit": 20,
+        "labelStyling": [],
+        "isShowAxisLine": false,
+        "axisLineColor": "rgba(84, 84, 84, 1)",
+        "isLabelAutoCharLimit": true,
+        "categoryType": "categorical",
+        "isMaximumRangeEnabled": false,
+        "maximumRange": 0,
+        "isMinimumRangeEnabled": false,
+        "minimumRange": 0,
+        "isInvertRange": false,
+        "isAutoDateFormat": true,
+        "dateFormat": "dddd, MMMM DD, YYYY",
+        "customDateFormat": "dddd, MMMM DD, YYYY",
+        "numberFormatting": {
+            "show": true,
+            "valueType": "absolute",
+            "decimalSeparator": ".",
+            "thousandsSeparator": ",",
+            "decimalPlaces": 1,
+            "scaling": "auto",
+            "prefix": "",
+            "suffix": "",
+            "scalingLabel": false,
+            "thousandScalingLabel": "K",
+            "millionScalingLabel": "M",
+            "billionScalingLabel": "B",
+            "trillionScalingLabel": "T"
+        },
+        "isResetClicked": true
+    },
+    "yAxisSettings": {
+        "show": true,
+        "position": "left",
+        "isLogarithmScale": false,
+        "isDisplayTitle": true,
+        "titleName": "",
+        "titleColor": "rgba(84, 84, 84, 1)",
+        "titleFontSize": 13,
+        "titleFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "titleStyling": [
+            "bold"
+        ],
+        "isDisplayLabel": true,
+        "labelColor": "rgba(84, 84, 84, 1)",
+        "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
+        "labelFontSize": 12,
+        "labelCharLimit": 20,
+        "labelStyling": [],
+        "isShowLabelsAboveLine": false,
+        "isShowAxisLine": false,
+        "axisLineColor": "rgba(84, 84, 84, 1)",
+        "isLabelAutoCharLimit": true,
+        "categoryType": "categorical",
+        "isMaximumRangeEnabled": false,
+        "maximumRange": 0,
+        "isMinimumRangeEnabled": false,
+        "minimumRange": 0,
+        "isInvertRange": false,
+        "isAutoDateFormat": true,
+        "dateFormat": "dddd, MMMM DD, YYYY",
+        "customDateFormat": "dddd, MMMM DD, YYYY",
+        "numberFormatting": {
+            "show": true,
+            "valueType": "absolute",
+            "decimalSeparator": ".",
+            "thousandsSeparator": ",",
+            "decimalPlaces": 1,
+            "scaling": "auto",
+            "prefix": "",
+            "suffix": "",
+            "scalingLabel": false,
+            "thousandScalingLabel": "K",
+            "millionScalingLabel": "M",
+            "billionScalingLabel": "B",
+            "trillionScalingLabel": "T"
+        },
+        "isResetClicked": true
+    },
+    "conditionalFormatting": {},
+    "annotations": []
+}

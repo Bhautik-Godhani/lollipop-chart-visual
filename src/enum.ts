@@ -784,10 +784,16 @@ export enum EIBCSThemes {
 }
 
 export enum EGeneralTemplates {
-	GeneralTemplate = "generalTemplate",
+	DefaultTemplate = "defaultTemplate",
+	CutClipAxisTemplate = "cutClipAxisTemplate",
 	RaceChartTemplate = "raceChartTemplate",
 	FillPatternTemplate = "fillPatternTemplate",
-	CutClipAxisTemplate = "cutClipAxisTemplate",
+	GradientTemplate = "gradientTemplate",
+	ReferenceLineBandTemplate = "referenceLineBandTemplate",
+	SubcategoryWithPatternTemplate = "subcategoryWithPatternTemplate",
+	DynamicDeviationTemplate = "dynamicDeviationTemplate",
+	ErrorBarTemplate = "errorBarTemplate",
+	DonutLollipopTemplate = "donutLollipopTemplate"
 }
 
 export enum SemanticNegativeNumberFormats {

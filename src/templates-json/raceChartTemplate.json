@@ -1,4 +1,4 @@
-export default {
+{
     "brushAndZoomAreaSettings": {},
     "chartSettings": {
         "lollipopInnerPadding": 30,
@@ -181,7 +181,7 @@ export default {
         "transitionDuration": 500,
         "dataChangeInterval": 500,
         "labelColor": "rgba(15, 61, 110, 1)",
-        "labelFontSize": 30,
+        "labelFontSize": 20,
         "isLabelAutoFontSize": false,
         "labelFontFamily": "\"Calibri\"",
         "tickerButtonRadius": 30,
@@ -194,7 +194,40 @@ export default {
         "backgroundColor": "rgba(0,0,0,1)",
         "placement": "bottom"
     },
-    "rankingSettings": {},
+    "rankingSettings": {
+        "category": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 50,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "subCategory": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "smallMultiples": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 10,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        },
+        "raceChartData": {
+            "enabled": true,
+            "rankingType": "topN",
+            "count": 20,
+            "showRemainingAsOthers": false,
+            "suffix": "none",
+            "calcMethod": "sum"
+        }
+    },
     "referenceLinesSettings": {},
     "showBucket": {},
     "smallMultiplesSettings": {},
@@ -293,5 +326,7 @@ export default {
             "billionScalingLabel": "B",
             "trillionScalingLabel": "T"
         }
-    }
+    },
+    "conditionalFormatting": {},
+    "annotations": []
 }

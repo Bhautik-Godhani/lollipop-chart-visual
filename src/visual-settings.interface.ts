@@ -706,5 +706,5 @@ export interface ITemplateSettings {
 	prevTheme: EIBCSThemes;
 	isResetInIBCSPressed?: boolean;
 	selectedTemplate: EGeneralTemplates;
-	templateSchema: string;
+	templateSchema: any;
 }

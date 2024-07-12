@@ -76,7 +76,7 @@ import {
 	IYAxisSettings,
 } from "./visual-settings.interface";
 import { ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
-import DefaultTemplateJS from './templates-json/default-template.js';
+import DefaultTemplateJS from './templates-json/default-template.json';
 
 export const MonthNames = [
 	"January", "February", "March", "April", "May", "June",
@@ -666,7 +666,7 @@ export const TEMPLATES_SETTINGS: ITemplateSettings = {
 	isTemplatesEnabled: false,
 	theme: undefined,
 	prevTheme: undefined,
-	selectedTemplate: EGeneralTemplates.GeneralTemplate,
+	selectedTemplate: EGeneralTemplates.DefaultTemplate,
 	templateSchema: DefaultTemplateJS
 };
 
