@@ -2232,7 +2232,7 @@ export class Visual extends Shadow {
 		// 		});
 		// }
 
-		const categoricalDataValues = this.categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
+		const categoricalDataValues = categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
 
 		const min = d3.min(categoricalDataValues, d => d3.min(d.values, v => <number>v));
 		const max = d3.max(categoricalDataValues, d => d3.max(d.values, v => <number>v));

@@ -5,6 +5,7 @@ import DynamicDeviationIcon from "../../assets/icons/DeviationIcon.svg";
 import { ICategoryValuePair } from "../visual-settings.interface";
 import { getSVGTextSize } from "./methods";
 import { cloneDeep } from "lodash";
+import { sum } from "d3-array";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair): void => {
@@ -565,8 +566,10 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
                 const fromIndex = categoricalDataPairs[dynamicDeviationSettings.fromIndex - 1];
                 const toIndex = categoricalDataPairs[dynamicDeviationSettings.toIndex - 1];
                 const measureKey = Object.keys(categoricalDataPairs[0]).find(d => d.includes("measure"));
-                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
-                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
+                const fromTotal = sum(Object.keys(fromIndex).filter(d => d.includes("measure")), d => fromIndex[d]);
+                const toTotal = sum(Object.keys(toIndex).filter(d => d.includes("measure")), d => toIndex[d]);
+                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: self.isHasSubcategories ? fromTotal : fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
+                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: self.isHasSubcategories ? toTotal : toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
 
                 RenderDynamicDeviation(
                     self,
