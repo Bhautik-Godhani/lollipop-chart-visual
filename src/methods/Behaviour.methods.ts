@@ -96,11 +96,11 @@ export class Behavior implements IInteractiveBehavior {
 			legendItems.on("click", function (e) {
 				const legendData: any = d3Select(this).datum();
 				const categoryData = lollipopSelection
-					.filter((data) => legendData.data.name === data.category)
+					.filter((data) => legendData.data.name.toString() === data.category.toString())
 					.data();
 
 				const groupByData = lollipopSelection
-					.filter((data) => legendData.data.name === data.category)
+					.filter((data) => legendData.data.name.toString() === data.category.toString())
 					.data();
 
 				if (!isHasSubcategories) {
@@ -137,7 +137,7 @@ export class Behavior implements IInteractiveBehavior {
 			const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
 			selectedDataPoints.forEach(d => {
 				legendItems
-					.filter(function (legendDataPoint) { return legendDataPoint.data.name === d.category })
+					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === d.category.toString() })
 					.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
 			});
 		}
