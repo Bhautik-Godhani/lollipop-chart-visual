@@ -5830,7 +5830,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = true;
 
-				const xPos = this.viewPortWidth - this.brushWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth;
+				const xPos = this.viewPortWidth - this.brushWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth - this.settingsPopupOptionsWidth;
 				const yPos = this.margin.top ? this.margin.top : 0;
 
 				const config: IBrushConfig = {
