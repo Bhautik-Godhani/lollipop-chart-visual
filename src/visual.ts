@@ -3063,6 +3063,8 @@ export class Visual extends Shadow {
 				// 	this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
 				// }
 
+				this.configLegend();
+
 				this.setMargins();
 
 				this.svg
@@ -3154,11 +3156,6 @@ export class Visual extends Shadow {
 							},
 						],
 					});
-				}
-
-				if (!this.legendSettings.show) {
-					this.legendViewPort.width = 0;
-					this.legendViewPort.height = 0;
 				}
 
 				const settings: ISmallMultiplesGridLayoutSettings = {
@@ -4799,10 +4796,11 @@ export class Visual extends Shadow {
 
 	public configLegend(): void {
 		if (this.legendSettings.show && !this.isSmallMultiplesEnabled) {
-			d3.select("div.legend-wrapper").attr("display", "block");
+			d3.select("div.legend-wrapper").style("display", "block");
 			this.drawLegend();
 		} else {
-			d3.select("div.legend-wrapper").attr("display", "none");
+			d3.select("div.legend-wrapper").style("display", "none");
+			d3.select("div.legend-wrapper").classed("hidden", true);
 			clearLegends();
 			this.legendViewPort.width = 0;
 			this.legendViewPort.height = 0;
