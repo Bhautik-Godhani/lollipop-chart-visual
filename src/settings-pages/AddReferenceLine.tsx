@@ -281,12 +281,12 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
   let categoriesNameList: ILabelValuePair[];
   if (shadow.isHorizontalChart) {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-      label: d as string,
+      label: shadow.getTooltipCategoryText(d.toString()) as string,
       value: d as string
     })).reverse().filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   } else {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-      label: d as string,
+      label: shadow.getTooltipCategoryText(d.toString()) as string,
       value: d as string
     })).filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   }
@@ -824,12 +824,12 @@ const UIReferenceBand = (
   let categoriesNameList: ILabelValuePair[];
   if (shadow.isHorizontalChart) {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-      label: d as string,
+      label: shadow.getTooltipCategoryText(d.toString()) as string,
       value: d as string
     })).reverse().filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   } else {
     categoriesNameList = shadow.categoricalData.categories[shadow.categoricalCategoriesLastIndex].values.map(d => ({
-      label: d as string,
+      label: shadow.getTooltipCategoryText(d.toString()) as string,
       value: d as string
     })).filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i);
   }

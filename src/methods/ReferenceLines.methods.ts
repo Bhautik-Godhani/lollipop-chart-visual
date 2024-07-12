@@ -97,16 +97,16 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 }
 
 const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
-    const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
+    const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN" && !self.isDateCategoryNames;
     const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
     let labelValue: string;
 
     if (d.referenceType === EReferenceType.REFERENCE_BAND) {
         labelValue = isValue1TypeNumber ?
             GetFormattedNumber(self, +d.lineValue1.value, self.numberSettings, undefined, true, true) + " - " + GetFormattedNumber(self, +d.lineValue2.value, self.numberSettings, undefined, true, true) :
-            d.lineValue1.value + " - " + d.lineValue2.value;
+            self.getTooltipCategoryText(d.lineValue1.value) + " - " + self.getTooltipCategoryText(d.lineValue2.value);
     } else {
-        labelValue = isValue1TypeNumber ? GetFormattedNumber(self, +d.lineValue1.value, self.numberSettings, undefined, true, true) : d.lineValue1.value;
+        labelValue = isValue1TypeNumber ? GetFormattedNumber(self, +d.lineValue1.value, self.numberSettings, undefined, true, true) : self.getTooltipCategoryText(d.lineValue1.value);
     }
 
     switch (d.labelStyle.labelNameType) {

@@ -101,7 +101,7 @@ const ReferenceLines = (props) => {
   const mappedInitialState = React.useMemo(() => {
     return (initialStates || []).map((row: IReferenceLineSettings, rowIndex) => {
       let text;
-      const isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN";
+      const isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN" && !shadow.isDateCategoryNames;
       const isValue2TypeNumber = parseFloat(row.lineValue2.value).toString().length > 0 && parseFloat(row.lineValue2.value).toString() !== "NaN";
 
       const getAxisName = (axis: EXYAxisNames) => {
@@ -118,9 +118,9 @@ const ReferenceLines = (props) => {
 
       if (row.referenceType === EReferenceType.REFERENCE_BAND) {
         text = `Band on ${getAxisName(row.lineValue1.axis)}-Axis ${row.lineValue1.type === "ranking" ? `at ranking from ${row.lineValue1.rank} 
-        to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value} to ${isValue2TypeNumber ? GetFormattedNumber(shadow, +row.lineValue2.value, shadow.numberSettings, undefined, true, true) : row.lineValue2.value}`}`;
+        to ${row.lineValue2.rank}` : `at value from ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : shadow.getTooltipCategoryText(row.lineValue1.value)} to ${isValue2TypeNumber ? GetFormattedNumber(shadow, +row.lineValue2.value, shadow.numberSettings, undefined, true, true) : shadow.getTooltipCategoryText(row.lineValue2.value)}`}`;
       } else {
-        text = `Line on ${getAxisName(row.lineValue1.axis)}-Axis ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : row.lineValue1.value}`}`;
+        text = `Line on ${getAxisName(row.lineValue1.axis)}-Axis ${row.lineValue1.type === "ranking" ? `at ranking ${row.lineValue1.rank}` : `at value ${isValue1TypeNumber ? GetFormattedNumber(shadow, +row.lineValue1.value, shadow.numberSettings, undefined, true, true) : shadow.getTooltipCategoryText(row.lineValue1.value)}`}`;
       }
 
       return {
