@@ -8023,7 +8023,7 @@ export class Visual extends Shadow {
 
 					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
 						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : THIS.numberSettings);
-						const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+						const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : truncatedText);
 						ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 					} else {
 						const width = THIS.isSmallMultiplesEnabled && THIS.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? THIS.origViewPortWidth : THIS.viewPortWidth;
