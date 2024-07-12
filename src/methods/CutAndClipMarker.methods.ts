@@ -65,12 +65,19 @@ export const GetIsCutAndClipAxisEnabled = (self: Visual): boolean => {
     const minValue = self.minCategoryValueDataPair.value;
     const maxValue = self.maxCategoryValueDataPair.value;
 
-    return (
-        self.cutAndClipAxisSettings.isEnabled &&
-        breakEnd > breakStart &&
-        (minValue >= 0 ? breakStart > 0 : breakStart > minValue) &&
-        breakEnd < maxValue
-    );
+    let isEnabled = false;
+
+    if (self.cutAndClipAxisSettings.isEnabled) {
+        if (breakEnd < 0 && breakStart < 0) {
+            return breakEnd < breakStart;
+        } else {
+            return (breakEnd > breakStart &&
+                (minValue >= 0 ? breakStart > 0 : breakStart > minValue) &&
+                breakEnd < maxValue);
+        }
+    }
+
+    return isEnabled;
 }
 
 const SetOverlappedAxisTicksPosition = (self: Visual): void => {
@@ -107,7 +114,7 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
         SetOverlappedAxisTicksPosition(self);
     }
 
-    const filteredData = barData.filter((d) => (self.isHasMultiMeasure ? (d.value1 + d.value2) : d.value1) > self.cutAndClipAxisSettings.breakStart);
+    const filteredData = barData.filter((d) => (self.isHasMultiMeasure ? (d.value1 + d.value2) : d.value1) < self.cutAndClipAxisSettings.breakStart);
     const imageGSelection = self.barCutAndClipMarkersG
         .selectAll(".barCutAndClipMarkersG")
         .data(filteredData, (d) => Math.random());

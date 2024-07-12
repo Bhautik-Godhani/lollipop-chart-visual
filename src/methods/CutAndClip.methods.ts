@@ -24,13 +24,16 @@ export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, c
             self.afterCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
         }
 
+        const start = self.isAllNegativeValue ? self.cutAndClipAxisSettings.breakEnd : self.cutAndClipAxisSettings.breakStart;
+        const end = self.isAllNegativeValue ? self.cutAndClipAxisSettings.breakStart : self.cutAndClipAxisSettings.breakEnd;
+
         if (isLinearScale) {
             if (self.isLeftYAxis) {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
+                self.beforeCutLinearScale.domain([min, start]).nice();
+                self.afterCutLinearScale.domain([end, max]).nice();
             } else {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
+                self.beforeCutLinearScale.domain([min, start]).nice();
+                self.afterCutLinearScale.domain([end, max]).nice();
             }
         }
     } else {
@@ -39,13 +42,16 @@ export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, c
             self.afterCutLinearScale = isLogarithmScale ? scaleSymlog() : scaleLinear();
         }
 
+        const start = self.isAllNegativeValue ? self.cutAndClipAxisSettings.breakEnd : self.cutAndClipAxisSettings.breakStart;
+        const end = self.isAllNegativeValue ? self.cutAndClipAxisSettings.breakStart : self.cutAndClipAxisSettings.breakEnd;
+
         if (isLinearScale) {
             if (self.isBottomXAxis) {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
+                self.beforeCutLinearScale.domain([min, start]).nice();
+                self.afterCutLinearScale.domain([end, max]).nice();
             } else {
-                self.beforeCutLinearScale.domain([min, self.cutAndClipAxisSettings.breakStart]).nice();
-                self.afterCutLinearScale.domain([self.cutAndClipAxisSettings.breakEnd, max]).nice();
+                self.beforeCutLinearScale.domain([min, start]).nice();
+                self.afterCutLinearScale.domain([end, max]).nice();
             }
         }
     }

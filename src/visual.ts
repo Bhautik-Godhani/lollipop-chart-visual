@@ -7937,7 +7937,7 @@ export class Visual extends Shadow {
 					}
 
 					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
-					const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : "-".concat(truncatedText));
+					const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : truncatedText);
 					ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 
 					if (!xAxisSettings.isLabelAutoTilt) {
