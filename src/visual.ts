@@ -1815,12 +1815,22 @@ export class Visual extends Shadow {
 		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
 		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
 
-		if (this.legendSettings.legendTitle.length === 0) {
+		if (!this.isSmallMultiplesEnabled && this.legendSettings.legendTitle.length === 0) {
 			if (this.isLollipopTypePie) {
 				this.legendSettings.legendTitle = this.subCategoryDisplayName;
 			} else {
 				this.legendSettings.legendTitle = this.categoryDisplayName;
 			}
+
+			this._host.persistProperties({
+				merge: [
+					{
+						objectName: EVisualSettings.Legend,
+						properties: { legendTitle: this.legendSettings.legendTitle },
+						selector: null,
+					},
+				],
+			});
 		}
 
 		const categoricalCategoriesValues = categoricalData.categories[this.categoricalCategoriesLastIndex];
