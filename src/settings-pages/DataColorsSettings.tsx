@@ -511,15 +511,32 @@ const DataColors = (props) => {
 	}, []);
 
 	React.useEffect(() => {
-		const categoricalDataValues = shadow.categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
-		const minVal = min(categoricalDataValues, (d: any) => min(d.values, v => v as number));
-		const maxVal = max(categoricalDataValues, (d: any) => max(d.values, v => v as number));
+		if (shadow.isSmallMultiplesEnabled) {
+			const categoricalDataValues = [];
+			shadow.smallMultiplesGridItemsList.forEach(d => {
+				const categoricalData = d.content.categoricalData;
+				categoricalDataValues.push(...categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]));
+			});
 
-		if (!configValues.isFillTypeChanged && minVal < 0 && maxVal > 0 && !shadow.isIBCSEnabled)
-			setConfigValues((d) => ({
-				...d,
-				[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
-			}));
+			const minVal = min(categoricalDataValues, (d: any) => min(d.values, v => v as number));
+			const maxVal = max(categoricalDataValues, (d: any) => max(d.values, v => v as number));
+
+			if (!configValues.isFillTypeChanged && minVal < 0 && maxVal > 0 && !shadow.isIBCSEnabled)
+				setConfigValues((d) => ({
+					...d,
+					[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
+				}));
+		} else {
+			const categoricalDataValues = shadow.categoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
+			const minVal = min(categoricalDataValues, (d: any) => min(d.values, v => v as number));
+			const maxVal = max(categoricalDataValues, (d: any) => max(d.values, v => v as number));
+
+			if (!configValues.isFillTypeChanged && minVal < 0 && maxVal > 0 && !shadow.isIBCSEnabled)
+				setConfigValues((d) => ({
+					...d,
+					[EDataColorsSettings.FillType]: ColorPaletteType.PositiveNegative,
+				}));
+		}
 	}, []);
 
 	React.useEffect(() => {
