@@ -7515,7 +7515,7 @@ export class Visual extends Shadow {
 
 			const tooltipData: TooltipData[] = [
 				{
-					displayName: this.categoryDisplayName,
+					displayName: this.isExpandAllApplied ? (this.categoryDisplayName + " " + this.expandAllCategoriesName.join(" ")) : this.categoryDisplayName,
 					value: this.getTooltipCategoryText(value.category).toString(),
 					color: "transparent",
 				},
