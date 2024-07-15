@@ -285,7 +285,8 @@ export class Visual extends Shadow {
 	sortFieldsDisplayName: ILabelValuePair[] = [];
 	tooltipFieldsDisplayName: ILabelValuePair[] = [];
 	blankText: string = "(Blank)";
-	othersLabel = "Others";
+	othersLabel = "Others-1234567890123";
+	othersString = "Others";
 	othersBarText = "";
 	othersSubcategoryText = "";
 	totalLollipopCount: number = 0;
@@ -7874,6 +7875,9 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
+
+				text = text.replace(new RegExp("-1234567890123", 'g'), '');
+
 				const isOthersTick = text.includes(THIS.othersLabel);
 
 				// if (!text.includes(THIS.othersLabel)) {}
@@ -8008,6 +8012,9 @@ export class Visual extends Shadow {
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text();
+
+				text = text.replace(new RegExp("-1234567890123", 'g'), '');
+
 				const isOthersTick = text.includes(THIS.othersLabel);
 
 				// if (!text.includes(THIS.othersLabel)) { }
@@ -10591,8 +10598,10 @@ export class Visual extends Shadow {
 
 	getTooltipCategoryText(text: string, toUpperCase: boolean = false, isSubcategory: boolean = false): string {
 		if (text) {
+			text = text.replace(new RegExp("-1234567890123", 'g'), '');
+
 			text = text.toString();
-			const isOthersTick = text.toString().includes(this.othersLabel);
+			const isOthersTick = text.toString().includes(this.othersString);
 
 			if (isSubcategory && this.isHasSubcategories && this.isDateSubcategoryNames) {
 				return valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(new Date(text));
