@@ -10589,7 +10589,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	getTooltipCategoryText(text: string, toUpperCase: boolean = true, isSubcategory: boolean = false): string {
+	getTooltipCategoryText(text: string, toUpperCase: boolean = false, isSubcategory: boolean = false): string {
 		if (text) {
 			text = text.toString();
 			const isOthersTick = text.toString().includes(this.othersLabel);
