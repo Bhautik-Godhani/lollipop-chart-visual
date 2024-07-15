@@ -167,6 +167,7 @@ const UIColorPalette = (shadow: Visual, configValues: IDataColorsSettings, setCo
 				<Column>
 					<SelectInput
 						label={"Color Palette"}
+						tooltip="The selected color will apply to markers only."
 						value={configValues.fillType}
 						optionsList={colorPaletteDropdownList}
 						handleChange={(newValue) => {
