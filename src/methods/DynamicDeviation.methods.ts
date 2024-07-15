@@ -568,8 +568,8 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
                 const measureKey = Object.keys(categoricalDataPairs[0]).find(d => d.includes("measure"));
                 const fromTotal = sum(Object.keys(fromIndex).filter(d => d.includes("measure")), d => fromIndex[d]);
                 const toTotal = sum(Object.keys(toIndex).filter(d => d.includes("measure")), d => toIndex[d]);
-                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: self.isHasSubcategories ? fromTotal : fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
-                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: self.isHasSubcategories ? toTotal : toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
+                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: self.isHasSubcategories ? fromTotal * (self.isPercentageMeasure ? 100 : 1) : fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
+                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: self.isHasSubcategories ? toTotal * (self.isPercentageMeasure ? 100 : 1) : toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
 
                 RenderDynamicDeviation(
                     self,
