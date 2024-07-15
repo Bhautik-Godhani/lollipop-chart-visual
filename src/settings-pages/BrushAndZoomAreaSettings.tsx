@@ -114,7 +114,7 @@ const UIGeneralChartSettings = (
 					<Column>
 						<InputControl
 							min={5}
-							max={shadow.categoricalCategoriesFields[0].values.length}
+							max={shadow.categoricalCategoriesFields[0].values.length < 5 ? 5 : shadow.categoricalCategoriesFields[0].values.length}
 							type="number"
 							label="Preview Lollipop Count"
 							value={configValues.minLollipopCount}
