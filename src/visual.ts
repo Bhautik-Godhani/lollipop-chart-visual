@@ -10589,10 +10589,15 @@ export class Visual extends Shadow {
 		}
 	}
 
-	getTooltipCategoryText(text: string, toUpperCase: boolean = true): string {
+	getTooltipCategoryText(text: string, toUpperCase: boolean = true, isSubcategory: boolean = false): string {
 		if (text) {
 			text = text.toString();
 			const isOthersTick = text.toString().includes(this.othersLabel);
+
+			if (isSubcategory && this.isHasSubcategories && this.isDateSubcategoryNames) {
+				return valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(new Date(text));
+			}
+
 			if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart && !isOthersTick) {
 				if (!this.xAxisSettings.isAutoDateFormat) {
 					return FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? this.xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
