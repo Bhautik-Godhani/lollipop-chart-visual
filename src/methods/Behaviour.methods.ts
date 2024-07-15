@@ -16,6 +16,7 @@ import { CircleType, DataValuesType, PieType } from "../enum";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
+	visual: Visual,
 	lollipopSelection: D3Selection<SVGElement>;
 	lineSelection: D3Selection<SVGElement>;
 	legendItems: D3Selection<SVGElement>;
@@ -24,6 +25,7 @@ export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
 	selectionManager: ISelectionManager;
 	isHasSubcategories: boolean;
 	othersCategoriesList: ILollipopChartRow[],
+	getTooltipCategoryText: (text: string, toUpperCase?: boolean, isSubcategory?: boolean) => string;
 	onLollipopClick: (...any) => any;
 }
 
@@ -38,7 +40,7 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories, othersCategoriesList } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories, visual, getTooltipCategoryText } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
@@ -113,11 +115,13 @@ export class Behavior implements IInteractiveBehavior {
 			legendItems.on("click", function (e) {
 				const legendData: any = d3Select(this).datum();
 				const categoryData = lollipopSelection
-					.filter((data) => legendData.data.name.toString() === data.category.toString())
+					.filter((data) => legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isHasSubcategories))
 					.data();
 
 				const groupByData = lollipopSelection
-					.filter((data) => legendData.data.name.toString() === data.category.toString())
+					.filter((data) => {
+						return legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isHasSubcategories)
+					})
 					.data();
 
 				if (!isHasSubcategories) {
@@ -141,7 +145,7 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, dataPoints, interactivityService, legendItems } = this.options;
+		const { lollipopSelection, dataPoints, interactivityService, legendItems, getTooltipCategoryText, visual, isHasSubcategories } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
 		if (legendItems) {
@@ -154,7 +158,7 @@ export class Behavior implements IInteractiveBehavior {
 			const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
 			selectedDataPoints.forEach(d => {
 				legendItems
-					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === d.category.toString() })
+					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === getTooltipCategoryText.bind(visual)(d.category.toString(), false, isHasSubcategories) })
 					.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
 			});
 		}
@@ -195,6 +199,7 @@ export const SetAndBindChartBehaviorOptions = (
 		self.interactivityService.applySelectionStateToData(nodeData);
 
 		const behaviorOptions: BehaviorOptions = {
+			visual: self,
 			lollipopSelection: lollipopSelection.filter((d) => d.identity),
 			lineSelection: lineSelection,
 			legendItems: self.legends ? self.legends.legendItems : undefined,
@@ -205,7 +210,8 @@ export const SetAndBindChartBehaviorOptions = (
 			behavior: self.behavior,
 			isHasSubcategories: self.isHasSubcategories,
 			othersCategoriesList: self.othersCategoriesList,
-			onLollipopClick
+			onLollipopClick,
+			getTooltipCategoryText: self.getTooltipCategoryText
 		};
 		self.interactivityService.bind(behaviorOptions);
 	}
