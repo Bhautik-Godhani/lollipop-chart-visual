@@ -8650,12 +8650,24 @@ export class Visual extends Shadow {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
-		if (this.cutAndClipAxisSettings.breakStart === undefined) {
-			this.cutAndClipAxisSettings.breakStart = this.axisDomainMaxValue * 15 / 100;
-		}
+		const cutAndClipAxisSettings = this.cutAndClipAxisSettings;
 
-		if (this.cutAndClipAxisSettings.breakEnd === undefined) {
-			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue * 35 / 100;
+		if (this.isAllNegativeValue) {
+			if (cutAndClipAxisSettings.breakStart === undefined || cutAndClipAxisSettings.breakStart === null) {
+				this.cutAndClipAxisSettings.breakStart = this.axisDomainMinValue * 15 / 100;
+			}
+
+			if (cutAndClipAxisSettings.breakEnd === undefined || cutAndClipAxisSettings.breakEnd === null) {
+				this.cutAndClipAxisSettings.breakEnd = this.axisDomainMinValue * 35 / 100;
+			}
+		} else {
+			if (cutAndClipAxisSettings.breakStart === undefined || cutAndClipAxisSettings.breakStart === null) {
+				this.cutAndClipAxisSettings.breakStart = this.axisDomainMaxValue * 15 / 100;
+			}
+
+			if (cutAndClipAxisSettings.breakEnd === undefined || cutAndClipAxisSettings.breakEnd === null) {
+				this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue * 35 / 100;
+			}
 		}
 
 		if (this.cutAndClipAxisSettings.breakStart < this.axisDomainMinValue) {

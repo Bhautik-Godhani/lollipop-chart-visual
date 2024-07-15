@@ -201,8 +201,7 @@ const UIGeneralTemplates = (
 
         <Row>
           <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GradientTemplate ? "selected" : ""}
-            ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GradientTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.GradientTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
@@ -210,10 +209,6 @@ const UIGeneralTemplates = (
                 }
               }>
               <img src={require("../../assets/templates/gradientTemplate.png")}></img>
-              {!shadow.isChartIsRaceChart && (
-                <div className="disabled-theme"></div>
-              )
-              }
             </div>
             <Label text="Gradient" classNames={["text-label"]}></Label>
           </Column>
@@ -243,7 +238,7 @@ const UIGeneralTemplates = (
                 }
               }>
               <img src={require("../../assets/templates/subcategoryWithPatternTemplate.png")}></img>
-              {!shadow.isChartIsRaceChart && (
+              {!shadow.isHasSubcategories && (
                 <div className="disabled-theme"></div>
               )
               }
@@ -267,8 +262,7 @@ const UIGeneralTemplates = (
 
         <Row>
           <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ErrorBarTemplate ? "selected" : ""}
-            ${!shadow.isChartIsRaceChart ? "disabled" : ""}`}
+            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ErrorBarTemplate ? "selected" : ""}`}
               onClick={
                 () => {
                   handleChange(EGeneralTemplates.ErrorBarTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
@@ -276,10 +270,6 @@ const UIGeneralTemplates = (
                 }
               }>
               <img src={require("../../assets/templates/errorBarTemplate.png")}></img>
-              {!shadow.isChartIsRaceChart && (
-                <div className="disabled-theme"></div>
-              )
-              }
             </div>
             <Label text="Error Bar" classNames={["text-label"]}></Label>
           </Column>
@@ -294,6 +284,10 @@ const UIGeneralTemplates = (
                 }
               }>
               <img src={require("../../assets/templates/donutLollipopTemplate.png")}></img>
+              {!shadow.isHasSubcategories && (
+                <div className="disabled-theme"></div>
+              )
+              }
             </div>
             <Label text="Donut Lollipop Chart" classNames={["text-label"]}></Label>
           </Column>

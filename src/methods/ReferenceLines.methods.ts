@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { Visual } from "../visual";
 import { select, Selection } from "d3-selection";
 import { min as d3Min, max as d3Max, mean, median, max, min } from "d3-array";
@@ -233,7 +232,7 @@ export const FormattingReferenceLineLayers = (self: Visual, layerSelection: D3Se
         .style("pointer-events", "none");
 }
 
-const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, x1: number, isLine2: boolean): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
+const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, x1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
     const isBand = d.referenceType === EReferenceType.REFERENCE_BAND;
 
@@ -250,7 +249,7 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, r
     }
 
     if (rLine.labelPosition === EBeforeAfterPosition.Before) {
-        if (isLine2) {
+        if (isBand) {
             if ((min([d.line1Coord.x1, d.line2Coord.x1]) - 10) <= labelTextBBox.height) {
                 rLine.labelPosition = EBeforeAfterPosition.After;
             }
@@ -427,19 +426,19 @@ const setValueForXAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
         newY2 = y2;
     }
 
-    // if (self.isHorizontalChart) {
-    //     const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
-    //     newTextX1 = textX1;
-    //     newTextY1 = textY1;
-    //     newTextAnchor = textAnchor;
-    //     newTextAlignment = textAlignment;
-    // } else {
-    //     const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
-    //     newTextX1 = textX1;
-    //     newTextY1 = textY1;
-    //     newTextAnchor = textAnchor;
-    //     newTextAlignment = textAlignment;
-    // }
+    if (self.isHorizontalChart) {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    } else {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    }
 
     return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment, value };
 }
@@ -490,19 +489,19 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
         newY2 = y2;
     }
 
-    // if (self.isHorizontalChart) {
-    //     const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
-    //     newTextX1 = textX1;
-    //     newTextY1 = textY1;
-    //     newTextAnchor = textAnchor;
-    //     newTextAlignment = textAlignment;
-    // } else {
-    //     const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
-    //     newTextX1 = textX1;
-    //     newTextY1 = textY1;
-    //     newTextAnchor = textAnchor;
-    //     newTextAlignment = textAlignment;
-    // }
+    if (self.isHorizontalChart) {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLineLabelStyle, newX1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    } else {
+        const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLineLabelStyle, newY1);
+        newTextX1 = textX1;
+        newTextY1 = textY1;
+        newTextAnchor = textAnchor;
+        newTextAlignment = textAlignment;
+    }
 
     return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
 }
@@ -564,10 +563,10 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             x2 = newX2;
             y1 = newY1;
             y2 = newY2;
-            // textX1 = newTextX1;
-            // textY1 = newTextY1;
-            // textAnchor = newTextAnchor;
-            // textAlignment = newTextAlignment;
+            textX1 = newTextX1;
+            textY1 = newTextY1;
+            textAnchor = newTextAnchor;
+            textAlignment = newTextAlignment;
             newValue = value2;
         } else if (rLineValue.axis === EXYAxisNames.Y) {
             const { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment } = setValueForYAxisRefLine(self, rLine, rLineValue, rLine.labelStyle, value);
@@ -575,10 +574,10 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             x2 = newX2;
             y1 = newY1;
             y2 = newY2;
-            // textX1 = newTextX1;
-            // textY1 = newTextY1;
-            // textAnchor = newTextAnchor;
-            // textAlignment = newTextAlignment;
+            textX1 = newTextX1;
+            textY1 = newTextY1;
+            textAnchor = newTextAnchor;
+            textAlignment = newTextAlignment;
         }
 
         if (isLine2) {
@@ -586,8 +585,8 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.line2Coord.x2 = x2;
             rLine.line2Coord.y1 = y1;
             rLine.line2Coord.y2 = y2;
-            // rLine.line2Coord.textX1 = textX1;
-            // rLine.line2Coord.textY1 = textY1;
+            rLine.line2Coord.textX1 = textX1;
+            rLine.line2Coord.textY1 = textY1;
 
             if (rLineValue.axis === EXYAxisNames.X) {
                 rLine.lineValue2.value = newValue;
@@ -597,43 +596,13 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.line1Coord.x2 = x2;
             rLine.line1Coord.y1 = y1;
             rLine.line1Coord.y2 = y2;
-            // rLine.line1Coord.textX1 = textX1;
-            // rLine.line1Coord.textY1 = textY1;
-            // rLine.labelStyle.textAnchor = textAnchor;
-            // rLine.labelStyle.textAlignment = textAlignment;
+            rLine.line1Coord.textX1 = textX1;
+            rLine.line1Coord.textY1 = textY1;
+            rLine.labelStyle.textAnchor = textAnchor;
+            rLine.labelStyle.textAlignment = textAlignment;
 
             if (rLineValue.axis === EXYAxisNames.X) {
                 rLine.lineValue1.value = newValue;
-            }
-        }
-
-        if (isLine2) {
-            if (self.isHorizontalChart) {
-                const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLine.labelStyle, y1);
-                rLine.line2Coord.textX1 = textX1;
-                rLine.line2Coord.textY1 = textY1;
-                // rLine.labelStyle.textAnchor = textAnchor;
-                // rLine.labelStyle.textAlignment = textAlignment;
-            } else {
-                const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLine.labelStyle, x1, isLine2);
-                rLine.line2Coord.textX1 = textX1;
-                rLine.line2Coord.textY1 = textY1;
-                // rLine.labelStyle.textAnchor = textAnchor;
-                // rLine.labelStyle.textAlignment = textAlignment;
-            }
-        } else {
-            if (self.isHorizontalChart) {
-                const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForVerticalLine(self, rLine, rLine.labelStyle, y1);
-                rLine.line1Coord.textX1 = textX1;
-                rLine.line1Coord.textY1 = textY1;
-                rLine.labelStyle.textAnchor = textAnchor;
-                rLine.labelStyle.textAlignment = textAlignment;
-            } else {
-                const { textX1, textY1, textAnchor, textAlignment } = getTextX1Y1ForHorizontalLine(self, rLine, rLine.labelStyle, x1, isLine2);
-                rLine.line1Coord.textX1 = textX1;
-                rLine.line1Coord.textY1 = textY1;
-                rLine.labelStyle.textAnchor = textAnchor;
-                rLine.labelStyle.textAlignment = textAlignment;
             }
         }
     }

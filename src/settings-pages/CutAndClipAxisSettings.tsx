@@ -79,19 +79,19 @@ const CutAndClipAxisSettings = (props) => {
 
   React.useEffect(() => {
     if (shadow.isAllNegativeValue) {
-      if (configValues.breakStart === undefined) {
+      if (configValues.breakStart === undefined || configValues.breakStart === null) {
         handleChange((shadow.axisDomainMinValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
       }
 
-      if (configValues.breakEnd === undefined) {
+      if (configValues.breakEnd === undefined || configValues.breakEnd === null) {
         handleChange((shadow.axisDomainMinValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
       }
     } else {
-      if (configValues.breakStart === undefined) {
+      if (configValues.breakStart === undefined || configValues.breakStart === null) {
         handleChange((shadow.axisDomainMaxValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
       }
 
-      if (configValues.breakEnd === undefined) {
+      if (configValues.breakEnd === undefined || configValues.breakEnd === null) {
         handleChange((shadow.axisDomainMaxValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
       }
     }
