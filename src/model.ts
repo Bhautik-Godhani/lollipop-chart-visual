@@ -32,6 +32,8 @@ export interface ILollipopChartRow {
 	data2Label: string;
 	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } };
 	isOthersSmallMultiples?: boolean;
+	othersIdentity?: ISelectionId[];
+	parentCategory?: string;
 }
 
 export interface IErrorBarValue {
@@ -50,6 +52,7 @@ export interface IChartSubCategory {
 	value1: number;
 	value2: number;
 	identity?: ISelectionId;
+	othersIdentity?: ISelectionId[];
 	selected: boolean;
 	isHighlight: boolean;
 	tooltipFields?: TooltipData[];

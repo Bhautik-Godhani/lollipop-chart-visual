@@ -322,6 +322,8 @@ export class Visual extends Shadow {
 	// selection id
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
 	selectionIdBySubCategories: { [subcategory: string]: ISelectionId } = {};
+	othersCategoriesList: ILollipopChartRow[] = [];
+	othersSubcategoriesList: ILollipopChartRow[] = [];
 
 	// number formatter
 	public measureNumberFormatter: IValueFormatter[] = [];
@@ -1227,6 +1229,8 @@ export class Visual extends Shadow {
 				}
 			}
 		}
+
+		this.othersCategoriesList = othersBarData;
 	}
 
 	sortCategoryDataPairs(
@@ -4593,27 +4597,38 @@ export class Visual extends Shadow {
 		// }
 
 		if (!this.isHasSubcategories) {
+			const categoricalSmallMultiplesFields = this.clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
 				const selectionId = this.vizOptions.host
 					.createSelectionIdBuilder()
-					.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i)
-					// .withCategory(this.categoricalData.categories[1] as any, this.currentSmallMultipleIndex)
-					.createSelectionId();
+					.withCategory(this.categoricalData.categories[this.categoricalCategoriesLastIndex] as any, i);
+
+				// categoricalSmallMultiplesFields.forEach((d, j) => {
+				// 	selectionId.withCategory(d, j);
+				// });
+
+				const id = selectionId.createSelectionId();
 
 				// if (this.smallMultiplesGridItemId) {
-				this.selectionIdByCategories[category] = selectionId;
+				this.selectionIdByCategories[category] = id;
 				// }
 			});
 		} else {
 			const categoricalData = this.vizOptions.options.dataViews[0];
+			const categoricalSmallMultiplesFields = categoricalData.categorical.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			const series: any[] = categoricalData.categorical.values.grouped();
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
 				const selectionId = this.vizOptions.host
 					.createSelectionIdBuilder()
 					.withCategory(categoricalData.categorical.categories[this.categoricalCategoriesLastIndex], i)
-					.createSelectionId();
 
-				this.selectionIdByCategories[category] = selectionId;
+				// categoricalSmallMultiplesFields.forEach(d => {
+				// 	selectionId.withCategory(d, i);
+				// });
+
+				const id = selectionId.createSelectionId();
+
+				this.selectionIdByCategories[category] = id;
 
 				series.forEach((ser: any) => {
 					// ser.values.forEach((s) => {
@@ -5107,12 +5122,28 @@ export class Visual extends Shadow {
 		if (!this.isHasSubcategories) {
 			data.forEach((el) => {
 				el.identity = this.selectionIdByCategories[el.category];
+
+				if (el.category === this.othersBarText) {
+					el.identity = this.selectionIdByCategories[this.othersCategoriesList[0].category];
+					el.othersIdentity = this.othersCategoriesList.map(d => this.selectionIdByCategories[d.category]);
+				}
 			});
 		} else {
 			data.forEach((el: ILollipopChartRow) => {
 				el.identity = this.selectionIdByCategories[el.category];
+
+				if (el.category.includes(this.othersLabel)) {
+					el.identity = this.selectionIdByCategories[this.othersCategoriesList[0].category];
+					el.othersIdentity = this.othersCategoriesList.map(d => this.selectionIdByCategories[d.category]);
+				}
+
 				el.subCategories.forEach((d) => {
 					d.identity = this.selectionIdBySubCategories[`${el.category}-${d.category}`];
+
+					if (el.category.includes(this.othersLabel)) {
+						d.identity = this.selectionIdBySubCategories[`${this.othersCategoriesList[0].category}-${d.category}`];
+						d.othersIdentity = this.othersCategoriesList.map(o => this.selectionIdBySubCategories[`${o.category}-${d.category}`]);
+					}
 				});
 			});
 		}

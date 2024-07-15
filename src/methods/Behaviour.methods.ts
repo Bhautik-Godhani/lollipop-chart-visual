@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { select as d3Select, select, Selection } from "d3-selection";
 import {
 	IBehaviorOptions,
@@ -22,6 +23,7 @@ export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
 	interactivityService: IInteractivityService<SelectableDataPoint>;
 	selectionManager: ISelectionManager;
 	isHasSubcategories: boolean;
+	othersCategoriesList: ILollipopChartRow[],
 	onLollipopClick: (...any) => any;
 }
 
@@ -36,14 +38,29 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories, othersCategoriesList } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
 			if (visualAnnotations.isAnnotationScreenActivated) {
 				visualAnnotations.onAnnotationNodeClick(event, data);
 			} else {
-				selectionHandler.handleSelection(data, event.ctrlKey);
+				if (isHasSubcategories) {
+					if (data.parentCategory.includes("Others")) {
+						const othersData = data.othersIdentity.map(d => ({ selected: false, identity: d }));
+						selectionHandler.handleSelection(othersData, event.ctrlKey);
+					} else {
+						selectionHandler.handleSelection(data, event.ctrlKey);
+					}
+				} else {
+					if (data.category.includes("Others")) {
+						const othersData = data.othersIdentity.map(d => ({ selected: false, identity: d }));
+						selectionHandler.handleSelection(othersData, event.ctrlKey);
+					} else {
+						selectionHandler.handleSelection(data, event.ctrlKey);
+					}
+				}
+
 				event.stopPropagation();
 			}
 		};
@@ -187,6 +204,7 @@ export const SetAndBindChartBehaviorOptions = (
 			selectionManager: self.selectionManager,
 			behavior: self.behavior,
 			isHasSubcategories: self.isHasSubcategories,
+			othersCategoriesList: self.othersCategoriesList,
 			onLollipopClick
 		};
 		self.interactivityService.bind(behaviorOptions);
