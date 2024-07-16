@@ -93,7 +93,7 @@ const DynamicDeviationSettings = (props) => {
     }));
   };
 
-  const DISPLAY_TYPES: ILabelValuePair[] = [
+  let DISPLAY_TYPES: ILabelValuePair[] = [
     {
       label: "Auto",
       value: EDynamicDeviationDisplayTypes.Auto,
@@ -158,12 +158,42 @@ const DynamicDeviationSettings = (props) => {
   };
 
   if (!(shadow as Visual).isSmallMultiplesEnabled && shadow.isLollipopTypeCircle) {
-    DISPLAY_TYPES.unshift(
-      {
-        label: "Create Your Own",
-        value: EDynamicDeviationDisplayTypes.CreateYourOwn,
-      }
-    )
+    DISPLAY_TYPES = [{
+      label: "Auto",
+      value: EDynamicDeviationDisplayTypes.Auto,
+    },
+    {
+      label: "Create Your Own",
+      value: EDynamicDeviationDisplayTypes.CreateYourOwn,
+    },
+    {
+      label: "Custom Range",
+      value: EDynamicDeviationDisplayTypes.CustomRange,
+    },
+    {
+      label: "First To Last",
+      value: EDynamicDeviationDisplayTypes.FirstToLast,
+    },
+    {
+      label: "First To Last Actual",
+      value: EDynamicDeviationDisplayTypes.FirstToLastActual,
+    },
+    {
+      label: "Last To First",
+      value: EDynamicDeviationDisplayTypes.LastToFirst,
+    },
+    {
+      label: "Last To First Actual",
+      value: EDynamicDeviationDisplayTypes.LastToFirstActual,
+    },
+    {
+      label: "Min To Max",
+      value: EDynamicDeviationDisplayTypes.MinToMax,
+    },
+    {
+      label: "Penultimate To Last",
+      value: EDynamicDeviationDisplayTypes.PenultimateToLast
+    }];
   }
 
   React.useEffect(() => {
