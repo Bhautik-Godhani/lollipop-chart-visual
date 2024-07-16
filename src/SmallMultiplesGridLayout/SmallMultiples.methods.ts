@@ -903,7 +903,9 @@ export const RenderSmallMultiplesUniformBottomXAxis = (
 
             const { isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - (isUniformYScale ? 0 : yAxisGNodeWidth) - config.innerSpacing * 2, itemHeight, true);
 
-            if (isUniformXScale) {
+            if (isUniformYScale) {
+                xAxisTitleGNode.attr("transform", `translate(${((itemWidth) / 2)}, ${xAxisGNodeHeight + titleToAxisMargin + 5 - (isHorizontalBrushDisplayed ? 20 : 0)})`);
+            } else {
                 xAxisTitleGNode.attr("transform", `translate(${yAxisGNodeWidth + ((itemWidth - yAxisGNodeWidth) / 2)}, ${xAxisGNodeHeight + titleToAxisMargin + 5 - (isHorizontalBrushDisplayed ? 20 : 0)})`);
             }
 
