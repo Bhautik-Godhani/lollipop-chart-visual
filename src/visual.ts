@@ -4738,7 +4738,7 @@ export class Visual extends Shadow {
 
 		// this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
-		const isPatternTemplateApplied = this.templateSettings.isTemplatesEnabled && this.templateSettings.selectedTemplate === EGeneralTemplates.FillPatternTemplate;
+		const isPatternTemplateApplied = this.templateSettings.isTemplatesEnabled && (this.templateSettings.selectedTemplate === EGeneralTemplates.FillPatternTemplate || this.templateSettings.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate);
 		this.categoryPatterns = this.chartData.map(d => ({ name: d.category.replace(/--\d+/g, ''), patternIdentifier: undefined, isImagePattern: undefined, dimensions: undefined }));
 		this.categoryPatterns
 			.forEach((c, i) => {
@@ -4776,20 +4776,34 @@ export class Visual extends Shadow {
 		}
 
 		if (isPatternTemplateApplied) {
-			this.categoryPatterns.forEach(d => {
-				if (!this.patternSettings.categoryPatterns.find(p => p.name === d.name)) {
-					d.patternIdentifier = this.patternSettings.categoryPatterns[0].patternIdentifier;
-					this.patternSettings.categoryPatterns.push(d);
+			this.patternSettings.categoryPatterns.forEach((d, i) => {
+				if (this.categoryPatterns[i]) {
+					this.categoryPatterns[i].patternIdentifier = d.patternIdentifier;
+					this.patternSettings.categoryPatterns.push(this.categoryPatterns[i]);
 				}
 			})
 
+			// this.categoryPatterns.forEach(d => {
+			// 	if (!this.patternSettings.categoryPatterns.find(p => p.name === d.name)) {
+			// 		d.patternIdentifier = this.patternSettings.categoryPatterns[0].patternIdentifier;
+			// 		this.patternSettings.categoryPatterns.push(d);
+			// 	}
+			// })
+
 			if (this.isHasSubcategories) {
-				this.subCategoryPatterns.forEach(d => {
-					if (!this.patternSettings.subCategoryPatterns.find(p => p.name === d.name)) {
-						d.patternIdentifier = this.patternSettings.subCategoryPatterns[0].patternIdentifier;
-						this.patternSettings.subCategoryPatterns.push(d);
+				this.patternSettings.subCategoryPatterns.forEach((d, i) => {
+					if (this.subCategoryPatterns[i]) {
+						this.subCategoryPatterns[i].patternIdentifier = d.patternIdentifier;
+						this.patternSettings.subCategoryPatterns.push(this.subCategoryPatterns[i]);
 					}
-				});
+				})
+
+				// this.subCategoryPatterns.forEach(d => {
+				// 	if (!this.patternSettings.subCategoryPatterns.find(p => p.name === d.name)) {
+				// 		d.patternIdentifier = this.patternSettings.subCategoryPatterns[0].patternIdentifier;
+				// 		this.patternSettings.subCategoryPatterns.push(d);
+				// 	}
+				// });
 			}
 		}
 
