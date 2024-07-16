@@ -116,7 +116,7 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .append("tspan")
         .attr("class", "sub-text-label")
         .attr("x", "0")
-        .attr("dy", subTextFontSize)
+        .attr("dy", subTextFontSize + 10)
         .style("text-decoration", subTextStyles.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
         .style("font-weight", subTextStyles.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
         .style("font-style", subTextStyles.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
