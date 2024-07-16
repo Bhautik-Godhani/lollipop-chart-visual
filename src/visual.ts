@@ -391,7 +391,6 @@ export class Visual extends Shadow {
 	public xScalePaddingOuter: number = 0.25;
 	public isBottomXAxis: boolean;
 	public xAxisStartMargin: number = 10;
-	public xAxisEndMargin: number = 2;
 	public isXIsNumericAxis: boolean;
 	public isXIsDateTimeAxis: boolean;
 	public isXIsContinuousAxis: boolean;
@@ -7216,6 +7215,11 @@ export class Visual extends Shadow {
 				const borderSize = dataLabelsSettings.showBackground || THIS.dataLabelsSettings.isShowBestFitLabels ? 3 : 0;
 				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
+				if (getBBox.width > THIS.scaleBandWidth) {
+					ele.attr("opacity", 0);
+					return;
+				}
+
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
@@ -8365,9 +8369,9 @@ export class Visual extends Shadow {
 			// 	}
 			// } else {
 			if (this.isXIsContinuousAxis) {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize - this.xAxisEndMargin] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize + this.xAxisEndMargin]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
 			} else {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth - this.xAxisEndMargin] : [xScaleWidth - this.xAxisStartMargin, this.xAxisEndMargin]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
 			}
 			// }
 
@@ -8513,7 +8517,7 @@ export class Visual extends Shadow {
 			.attr("class", this.yGridSettings.lineType)
 			.classed("grid-line", true)
 			.attr("x1", this.xAxisStartMargin)
-			.attr("x2", this.width - this.xAxisEndMargin)
+			.attr("x2", this.width)
 			.attr("y1", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
 			.attr("y2", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
 			.attr("stroke", this.yGridSettings.lineColor)
