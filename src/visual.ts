@@ -391,6 +391,7 @@ export class Visual extends Shadow {
 	public xScalePaddingOuter: number = 0.25;
 	public isBottomXAxis: boolean;
 	public xAxisStartMargin: number = 10;
+	public xAxisEndMargin: number = 2;
 	public isXIsNumericAxis: boolean;
 	public isXIsDateTimeAxis: boolean;
 	public isXIsContinuousAxis: boolean;
@@ -8364,9 +8365,9 @@ export class Visual extends Shadow {
 			// 	}
 			// } else {
 			if (this.isXIsContinuousAxis) {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin + this.markerMaxSize, xScaleWidth - this.markerMaxSize - this.xAxisEndMargin] : [xScaleWidth - this.xAxisStartMargin - this.markerMaxSize, this.markerMaxSize + this.xAxisEndMargin]);
 			} else {
-				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth] : [xScaleWidth - this.xAxisStartMargin, 0]);
+				this.xScale.range(this.yAxisSettings.position === Position.Left ? [this.xAxisStartMargin, xScaleWidth - this.xAxisEndMargin] : [xScaleWidth - this.xAxisStartMargin, this.xAxisEndMargin]);
 			}
 			// }
 
@@ -8512,7 +8513,7 @@ export class Visual extends Shadow {
 			.attr("class", this.yGridSettings.lineType)
 			.classed("grid-line", true)
 			.attr("x1", this.xAxisStartMargin)
-			.attr("x2", this.width)
+			.attr("x2", this.width - this.xAxisEndMargin)
 			.attr("y1", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
 			.attr("y2", (d) => this.getYPosition(d) + (this.isHorizontalChart ? this.scaleBandWidth / 2 : 0))
 			.attr("stroke", this.yGridSettings.lineColor)
