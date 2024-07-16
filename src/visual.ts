@@ -4233,6 +4233,12 @@ export class Visual extends Shadow {
 			this.margin.right = this.yScaleGWidth + this.yAxisTitleSize.width + this.yAxisTitleMargin + this.brushWidth + this.brushMargin + this.expandAllYScaleGWidth + this.brushYAxisTicksMaxWidth;
 		}
 
+		if (this.isSmallMultiplesEnabled) {
+			if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
+				this.margin.bottom = 0;
+			}
+		}
+
 		this.setChartWidthHeight();
 	}
 
@@ -5870,7 +5876,7 @@ export class Visual extends Shadow {
 	setChartWidthHeight(): void {
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
 		this.height =
-			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
+			this.viewPortHeight - 0 - this.margin.top - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
 	}
 
 	displayBrush(isShowXAxis: boolean, isShowYAxis: boolean, isShowBrush: boolean): void {

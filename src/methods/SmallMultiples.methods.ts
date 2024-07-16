@@ -305,8 +305,13 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 }
             }
 
-            newItemHeight -= self.brushHeight;
-            newItemWidth -= self.brushWidth;
+            if (!isUniformXScale) {
+                newItemHeight -= self.brushHeight;
+            }
+
+            if (!isUniformYScale) {
+                newItemWidth -= self.brushWidth;
+            }
 
             if (!self.isScrollBrushDisplayed) {
                 self.setCategoricalDataFields(self.categoricalData);
