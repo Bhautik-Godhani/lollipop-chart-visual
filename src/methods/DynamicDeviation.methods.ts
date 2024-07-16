@@ -84,7 +84,7 @@ export const RemoveDynamicDeviation = (self: Visual): void => {
 export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
-    const labelToConnectorDistance = getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
+    const labelToConnectorDistance = 10;
     const isPositiveDeviation = from.value < to.value;
 
     const fromCategoryYPos = self.getYPosition(from.category);
@@ -96,20 +96,21 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? 0 : self.height) : self.height);
     const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? self.height : 0) : 0);
 
-    let dataLabelYPos = 0;
-    if (isToGreaterThenFrom) {
-        if (start < (dataLabelBBox.height + labelToConnectorDistance)) {
-            dataLabelYPos = start - labelToConnectorDistance;
-        } else {
-            dataLabelYPos = start + labelToConnectorDistance;
-        }
+    let dataLabelYPos = isToGreaterThenFrom ? start : end;
+
+    // if (isToGreaterThenFrom) {
+    if (dataLabelYPos < (dataLabelBBox.height + labelToConnectorDistance)) {
+        dataLabelYPos = dataLabelYPos + getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
     } else {
-        if (end < (dataLabelBBox.height + labelToConnectorDistance)) {
-            dataLabelYPos = end + labelToConnectorDistance;
-        } else {
-            dataLabelYPos = end - labelToConnectorDistance;
-        }
+        dataLabelYPos = dataLabelYPos - labelToConnectorDistance;
     }
+
+    // if (end < (dataLabelBBox.height + labelToConnectorDistance)) {
+    //     dataLabelYPos = end + labelToConnectorDistance;
+    // } else {
+    //     dataLabelYPos = end - labelToConnectorDistance;
+    // }
+    // }
 
     dataLabelG.attr(
         "transform",
@@ -278,7 +279,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
 export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
-    const labelToConnectorDistance = getSVGTextSize("Title", dynamicDeviationSettings.labelFontFamily, dynamicDeviationSettings.labelFontSize).height;
+    const labelToConnectorDistance = 10;
     let dynamicDeviationSpace = 0;
     if (self.dynamicDeviationSettings.isEnabled) {
         dynamicDeviationSpace = self.width * 0.05;
