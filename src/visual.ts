@@ -2793,7 +2793,7 @@ export class Visual extends Shadow {
 				d3.select(this.chartContainer).select(".validation-page-container").remove();
 			}
 
-			this.handleShowBucket();
+			// this.handleShowBucket();
 
 			const categoricalSmallMultiplesField = this.categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			const categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
@@ -2807,6 +2807,8 @@ export class Visual extends Shadow {
 				d3.select(this.chartContainer).selectAll("*").remove();
 				this.initChart();
 			}
+
+			this.handleShowBucket();
 
 			this.xAxisG.selectAll("*").remove();
 			this.yAxisG.selectAll("*").remove();
