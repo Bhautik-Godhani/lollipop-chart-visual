@@ -5876,7 +5876,7 @@ export class Visual extends Shadow {
 	setChartWidthHeight(): void {
 		this.width = this.viewPortWidth - this.margin.left - this.margin.right - this.settingsBtnWidth - this.legendViewPort.width;
 		this.height =
-			this.viewPortHeight - 0 - this.margin.top - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
+			this.viewPortHeight - this.margin.bottom - this.margin.top - this.settingsBtnHeight - (this.isSmallMultiplesEnabled ? 0 : this.legendViewPort.height) - this.footerHeight;
 	}
 
 	displayBrush(isShowXAxis: boolean, isShowYAxis: boolean, isShowBrush: boolean): void {
