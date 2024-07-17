@@ -1253,7 +1253,7 @@ export class Visual extends Shadow {
 
 		const sortByName = () => {
 			if (!this.isXIsDateTimeAxis && (this.isExpandAllApplied || !this.isXIsNumericAxis)) {
-				if (this.isMonthCategoryNames) {
+				if (this.isMonthCategoryNames && !this.isExpandAllApplied) {
 					// if (this.isHorizontalChart) {
 					// 	if (sortingSettings.sortOrder === ESortOrderTypes.DESC) {
 					// 		data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
@@ -1645,7 +1645,7 @@ export class Visual extends Shadow {
 		if (this.isExpandAllApplied) {
 			const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);
 			const categoriesName = categoricalCategoriesFields[this.categoricalCategoriesLastIndex].values
-				.map((d: string, i) => d + " " + startCategories.map(d => d.values[i]).join(" ")).filter(
+				.map((d: string, i) => startCategories.map(d => d.values[i]).join("&&") + "&&" + d).filter(
 					(v, i, a) => a.findIndex((t) => t === v) === i
 				) as string[];
 
@@ -2001,12 +2001,21 @@ export class Visual extends Shadow {
 
 				const keys = Object.keys(obj);
 				if (this.isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
-					const day = obj["Day"] ? parseInt(obj["Day"].toString().split("--")[0]) : 1;
-					const month = obj["Month"] ? obj["Month"].split("--")[0] : "January";
-					const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("--")[0].split("Qtr")[1]) : 1;
-					const year = obj["Year"] ? obj["Year"].toString().split("--")[0] : 2024;
+					if (this.isSmallMultiplesEnabled) {
+						const day = obj["Day"] ? parseInt(obj["Day"].toString().split("&&")[this.categoryDisplayName === "Day" ? categoricalCategoriesLastIndex : 0]) : 1;
+						const month = obj["Month"] ? obj["Month"].split("&&")[this.categoryDisplayName === "Month" ? categoricalCategoriesLastIndex : 0] : "January";
+						const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("&&")[this.categoryDisplayName === "Quarter" ? categoricalCategoriesLastIndex + 0 : 0].split(" ")[1]) : 1;
+						const year = obj["Year"] ? obj["Year"].toString().split("&&")[this.categoryDisplayName === "Year" ? categoricalCategoriesLastIndex : 0] : 2024;
 
-					obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
+						obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
+					} else {
+						const day = obj["Day"] ? parseInt(obj["Day"].toString().split("--")[0]) : 1;
+						const month = obj["Month"] ? obj["Month"].split("--")[0] : "January";
+						const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].split("--")[0].split("Qtr")[1]) : 1;
+						const year = obj["Year"] ? obj["Year"].toString().split("--")[0] : 2024;
+
+						obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024);
+					}
 				}
 
 				categoricalData.values.forEach((d) => {
@@ -7861,7 +7870,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
+		if (!this.isSmallMultiplesEnabled && ((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
 			rotateDegree = 0;
 		}
 
@@ -7929,6 +7938,10 @@ export class Visual extends Shadow {
 
 				if (text.includes("--")) {
 					text = text.split("--")[0];
+				}
+
+				if (text.includes("&&")) {
+					text = text.replace(/&&/g, " ");
 				}
 
 				if (THIS.isXIsDateTimeAxis && !THIS.isHorizontalChart && !isOthersTick) {
