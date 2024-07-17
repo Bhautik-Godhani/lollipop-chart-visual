@@ -196,7 +196,7 @@ const UIXAxis = (
           </Row>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis)} >
+        <ConditionalWrapper visible={!shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isXIsNumericAxis && !shadow.isDateCategoryNames)} >
           <Row>
             <Column>
               <SelectInput
@@ -292,7 +292,7 @@ const UIXAxis = (
           </Row>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis || shadow.isXIsDateTimeAxis) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis && !shadow.isDateCategoryNames) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
           <Row>
             <Column>
               <ToggleButton
@@ -750,7 +750,7 @@ const UIYAxis = (
           </Row>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis)} >
+        <ConditionalWrapper visible={shadow.isHorizontalChart && !shadow.isExpandAllApplied && (shadow.isYIsNumericAxis && !shadow.isDateCategoryNames)} >
           <Row>
             <Column>
               <SelectInput
@@ -846,7 +846,7 @@ const UIYAxis = (
           </Row>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis || shadow.isYIsDateTimeAxis) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis && !shadow.isDateCategoryNames) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
           <Row>
             <Column>
               <ToggleButton

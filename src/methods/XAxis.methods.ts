@@ -65,11 +65,11 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                 .call(axisBottom(self.xScale).ticks(width / 90)
                     .tickFormat(d => {
                         const isOthersTick = d.toString().includes(self.othersLabel);
-                        if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis && !isOthersTick) {
-                            return timeFormat("%b %Y")(new Date(d.toString()));
-                        } else {
-                            return d.toString();
-                        }
+                        // if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis && !isOthersTick) {
+                        //     return timeFormat("%b %Y")(new Date(d.toString()));
+                        // } else {
+                        return d.toString();
+                        // }
                     }));
         } else if (self.xAxisSettings.position === Position.Top) {
             select(xAxisG).attr("transform", "translate(0," + 0 + ")").call(axisTop(self.xScale).ticks(width / 90)

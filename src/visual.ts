@@ -1753,10 +1753,10 @@ export class Visual extends Shadow {
 		this.isXIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 		this.isYIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 
-		this.isXIsContinuousAxis = !this.isHorizontalChart && (this.isXIsNumericAxis || this.isXIsDateTimeAxis) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
+		this.isXIsContinuousAxis = !this.isHorizontalChart && (this.isXIsNumericAxis || this.isXIsDateTimeAxis || this.isDateCategoryNames) && this.xAxisSettings.categoryType === AxisCategoryType.Continuous;
 		this.isYIsContinuousAxis = this.isHorizontalChart && (this.isYIsNumericAxis || this.isYIsDateTimeAxis) && this.yAxisSettings.categoryType === AxisCategoryType.Continuous;
 
-		if (!(!this.isHorizontalChart && !this.isExpandAllApplied && (this.isXIsNumericAxis || this.isXIsDateTimeAxis))) {
+		if (!(!this.isHorizontalChart && !this.isExpandAllApplied && (this.isXIsNumericAxis || this.isXIsDateTimeAxis || this.isDateCategoryNames))) {
 			this.xAxisSettings.categoryType = AxisCategoryType.Categorical;
 			this.isXIsContinuousAxis = false;
 		}
@@ -7739,7 +7739,7 @@ export class Visual extends Shadow {
 	setScaleBandwidth(): void {
 		const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 
-		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
+		if ((this.isXIsContinuousAxis && this.isXIsNumericAxis && !this.isDateCategoryNames) || (this.isYIsContinuousAxis && this.isYIsNumericAxis)) {
 			this.scaleBandWidth = 0;
 		} else {
 			this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
@@ -8173,7 +8173,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
-			if ((this.isXIsDateTimeAxis && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
+			if (((this.isXIsDateTimeAxis || this.isDateCategoryNames) && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
 				const dates = this.chartData.map((d) => d.category);
 				const minDate = d3.min(dates, d => new Date(d).getTime());
 				const maxDate = d3.max(dates, d => new Date(d).getTime());
