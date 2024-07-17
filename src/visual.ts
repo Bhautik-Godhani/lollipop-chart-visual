@@ -6594,6 +6594,13 @@ export class Visual extends Shadow {
 						}
 
 						isBrushRendered = true;
+					} else {
+						isBrushRendered = false;
+						this.isScrollBrushDisplayed = false;
+						this.isHorizontalBrushDisplayed = false;
+						this.isVerticalBrushDisplayed = false;
+						this.brushHeight = 0;
+						this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
 					}
 				})
 			} else {
@@ -7813,7 +7820,7 @@ export class Visual extends Shadow {
 			isApplyTilt = (xAxisSettings.isLabelAutoTilt && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 3 ||
 				(this.markerMaxSize > this.scaleBandWidth)))
 				|| (!xAxisSettings.isLabelAutoCharLimit && xAxisTicksMaxWidth > this.scaleBandWidth)
-				|| (!xAxisSettings.isLabelAutoCharLimit && (xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 0) && xAxisTicksMaxWidth > this.scaleBandWidth)
+				|| ((xAxisTicks.flat(1).filter((d) => d.includes("...") || d.includes("....")).length > 0) && xAxisTicksMaxWidth > this.scaleBandWidth)
 				|| (!xAxisSettings.isLabelAutoTilt && xAxisSettings.labelTilt !== 0);
 
 			const textProperties: TextProperties = {
