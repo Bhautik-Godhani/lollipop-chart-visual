@@ -530,6 +530,7 @@ export class Visual extends Shadow {
 	tickIndex: number = -1;
 	tickDuration: number = 0;
 	maxLollipopCount: number = 2;
+	raceChartDataLabelLength: number = 0;
 	raceChartKeysList: string[] = [];
 	raceChartKeysLength: number;
 	raceChartKeyOnTick: string;
@@ -2657,6 +2658,17 @@ export class Visual extends Shadow {
 				this.raceChartKeyLabelList = this.raceChartKeyLabelList.slice(0, this.rankingSettings.raceChartData.count);
 			}
 		}
+
+		const xAxisTicksWidth = this.raceChartKeyLabelList.map((d) => {
+			const textProperties: any = {
+				text: d.label,
+				fontFamily: this.raceChartSettings.headerTextStyles.labelFontFamily,
+				fontSize: this.raceChartSettings.headerTextStyles.labelFontSize + "px",
+			};
+			return textMeasurementService.measureSvgTextWidth(textProperties);
+		});
+
+		this.raceChartDataLabelLength = d3.max(xAxisTicksWidth);
 
 		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
 			this.markerSettings.marker1Style.selectedImageDataField = this.imagesDataFieldsName[0];

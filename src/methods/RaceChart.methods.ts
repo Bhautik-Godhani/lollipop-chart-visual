@@ -37,8 +37,6 @@ export const StartChartRace = (self: Visual) => {
                 RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
             }
         }
-
-        RenderRaceTickerButton(self);
     }, self.raceChartSettings.dataChangeInterval);
 }
 
@@ -155,7 +153,7 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr(
             "transform",
             "translate(" +
-            (-max([textBBox.width / 2, tickerButtonRadius])) +
+            (-max([self.raceChartDataLabelLength / 2, tickerButtonRadius])) +
             "," +
             // (self.raceChartSettings.placement === Position.Bottom ?
             (tickerButtonRadius) +
@@ -192,7 +190,7 @@ export const RenderRaceTickerButton = (self: Visual): void => {
         .attr(
             "transform",
             "translate(" +
-            (-max([raceBarDateLabelTextBBox.width / 2, tickerButtonRadius])) +
+            (-max([self.raceChartDataLabelLength / 2, tickerButtonRadius])) +
             "," +
             // (self.raceChartSettings.placement === Position.Bottom ?
             (0) +
