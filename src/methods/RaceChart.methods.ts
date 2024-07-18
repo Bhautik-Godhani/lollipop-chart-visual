@@ -29,7 +29,7 @@ export const StartChartRace = (self: Visual) => {
             self.raceChartDataLabelOnTick = self.chartData[0].raceChartDataLabel;
             RenderRaceChartDataLabel(self);
 
-            if (self.raceChartKeysLength === self.tickIndex) {
+            if (self.raceChartKeyLabelList.length === self.tickIndex) {
                 self.tickIndex = -2;
                 setDataWithAllPositiveCategory();
                 self.ticker.stop();
