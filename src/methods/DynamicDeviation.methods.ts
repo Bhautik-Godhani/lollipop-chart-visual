@@ -555,8 +555,16 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
                     self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
                 }
 
-                if (self.fromCategoryValueDataPair && self.toCategoryValueDataPair) {
-                    RenderDynamicDeviation(self, self.fromCategoryValueDataPair, self.toCategoryValueDataPair);
+                if (self.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && self.dynamicDeviationSettings.removeCurrentDeviation) {
+                    RemoveDynamicDeviation(self);
+                    self.fromCategoryValueDataPair = undefined;
+                    self.toCategoryValueDataPair = undefined;
+                    self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
+                }
+
+                const { from, to } = self.dynamicDeviationSettings.createYourOwnDeviation;
+                if (from && to) {
+                    RenderDynamicDeviation(self, from, to);
                 }
             }
             break;

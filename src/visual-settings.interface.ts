@@ -637,6 +637,8 @@ export interface IDynamicDeviationSettings {
 	isEnabled: boolean;
 	displayType: EDynamicDeviationDisplayTypes;
 	lastDisplayType: EDynamicDeviationDisplayTypes;
+	createYourOwnDeviation: { from: ICategoryValuePair, to: ICategoryValuePair };
+	removeCurrentDeviation: boolean;
 	fromIndex: number;
 	toIndex: number;
 	position: Position;

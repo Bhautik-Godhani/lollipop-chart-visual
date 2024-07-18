@@ -604,6 +604,8 @@ export const DYNAMIC_DEVIATION_SETTINGS: IDynamicDeviationSettings = {
 	isEnabled: false,
 	displayType: EDynamicDeviationDisplayTypes.FirstToLast,
 	lastDisplayType: EDynamicDeviationDisplayTypes.FirstToLast,
+	createYourOwnDeviation: { from: undefined, to: undefined },
+	removeCurrentDeviation: false,
 	fromIndex: 1,
 	toIndex: 2,
 	position: Position.Right,

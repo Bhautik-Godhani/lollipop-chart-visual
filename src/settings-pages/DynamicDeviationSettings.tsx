@@ -74,6 +74,11 @@ const DynamicDeviationSettings = (props) => {
 
   const applyChanges = () => {
     configValues.lastDisplayType = shadow.dynamicDeviationSettings.displayType;
+
+    if (configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && configValues.removeCurrentDeviation) {
+      configValues.createYourOwnDeviation = { from: undefined, to: undefined };
+    }
+
     shadow.persistProperties(sectionName, propertyName, configValues);
     closeCurrentSettingHandler();
   };
@@ -258,6 +263,19 @@ const DynamicDeviationSettings = (props) => {
                     By selecting 'Create Your Own' type you will get plus icon to select bar on mouse hover (click to select it).
                     Once selected the first bar, by hovering on any other bar you will get deviation line and click on bar to save it.
                   </Quote>
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (!!configValues.createYourOwnDeviation && !!configValues.createYourOwnDeviation.from)}>
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label={"Remove Current Deviation"}
+                    value={configValues.removeCurrentDeviation}
+                    handleChange={() => handleCheckbox(EDynamicDeviationSettings.RemoveCurrentDeviation)}
+                    appearance="checkbox"
+                  />
                 </Column>
               </Row>
             </ConditionalWrapper>

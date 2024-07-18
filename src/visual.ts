@@ -66,6 +66,7 @@ import {
 	EDataLabelsBGApplyFor,
 	EDataLabelsDisplayTypes,
 	EGeneralTemplates,
+	EDynamicDeviationSettings,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -9390,6 +9391,33 @@ export class Visual extends Shadow {
 			if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
 				THIS.toCategoryValueDataPair = { category: data.category, value: data.value1 };
 				RenderDynamicDeviation(this, THIS.fromCategoryValueDataPair, THIS.toCategoryValueDataPair);
+
+				console.log(this.dynamicDeviationSettings.createYourOwnDeviation);
+
+
+				if (!this.dynamicDeviationSettings.createYourOwnDeviation || !this.dynamicDeviationSettings.createYourOwnDeviation.from) {
+					THIS.visualHost.persistProperties({
+						merge: [
+							{
+								objectName: "dynamicDeviationConfig",
+								displayName: "dynamicDeviationSettings",
+								properties: {
+									dynamicDeviationSettings: JSON.stringify({
+										...THIS.dynamicDeviationSettings,
+										[EDynamicDeviationSettings.CreateYourOwnDeviation]: {
+											...THIS.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
+											from: THIS.fromCategoryValueDataPair,
+											to: THIS.toCategoryValueDataPair,
+										},
+										[EDynamicDeviationSettings.RemoveCurrentDeviation]: false
+									}),
+								},
+								selector: null,
+							},
+						],
+					});
+				}
+
 				d3.select(".dynamic-deviation-button").classed("selected", false);
 				THIS.isDynamicDeviationButtonSelected = false;
 				THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "unset");
@@ -9408,6 +9436,11 @@ export class Visual extends Shadow {
 										...THIS.dynamicDeviationSettings,
 										displayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
 										lastDisplayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
+										[EDynamicDeviationSettings.CreateYourOwnDeviation]: {
+											...THIS.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
+											from: THIS.fromCategoryValueDataPair,
+											to: THIS.toCategoryValueDataPair,
+										},
 									}),
 								},
 								selector: null,

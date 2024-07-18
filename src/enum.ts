@@ -862,7 +862,9 @@ export enum EDynamicDeviationSettings {
 	LabelPosition = "labelPosition",
 	FontStyle = "fontStyle",
 	IsShowConnectorLine = "isShowConnectorLine",
-	IsShowDataLabel = "isShowDataLabel"
+	IsShowDataLabel = "isShowDataLabel",
+	CreateYourOwnDeviation = "createYourOwnDeviation",
+	RemoveCurrentDeviation = "removeCurrentDeviation"
 }
 
 export enum EDynamicDeviationDisplayTypes {
