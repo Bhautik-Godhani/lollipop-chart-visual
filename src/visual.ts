@@ -3063,13 +3063,15 @@ export class Visual extends Shadow {
 
 					if (cf.applyTo === "measure") {
 						if (cf.valueType === ECFValueTypes.Value) {
-							const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
-							cf.measureType = {
-								measure: roles[EDataRolesName.Measure],
-								measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
-								measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
-								tooltip: roles[EDataRolesName.Tooltip]
-							};
+							if (this.categoricalData.values.map(d => d.source.displayName).includes(cf.sourceName)) {
+								const roles = this.categoricalData.values.find(d => d.source.displayName === cf.sourceName && (d.source.roles[EDataRolesName.Measure] || d.source.roles[EDataRolesName.Tooltip])).source.roles;
+								cf.measureType = {
+									measure: roles[EDataRolesName.Measure],
+									measure1: cf.sourceName === this.categoricalData.values[0].source.displayName,
+									measure2: this.isHasMultiMeasure ? cf.sourceName === this.categoricalData.values[1].source.displayName : false,
+									tooltip: roles[EDataRolesName.Tooltip]
+								};
+							}
 						}
 					} else if (cf.applyTo === "category") {
 						cf.categoryType1 = { [EDataRolesName.Category]: cf.sourceName === this.categoryDisplayName, [EDataRolesName.SubCategory]: cf.sourceName === this.subCategoryDisplayName };
