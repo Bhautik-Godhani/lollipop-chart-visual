@@ -97,7 +97,18 @@ export const FormattingReferenceLines = (self: Visual, lineSelection: D3Selectio
 }
 
 const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
-    const isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN" && !self.isDateCategoryNames;
+    let isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
+
+    if (self.isHorizontalChart) {
+        if (d.lineValue1.axis === EXYAxisNames.Y && self.isDateCategoryNames) {
+            isValue1TypeNumber = false;
+        }
+    } else {
+        if (d.lineValue1.axis === EXYAxisNames.X && self.isDateCategoryNames) {
+            isValue1TypeNumber = false;
+        }
+    }
+
     const labelText = d.referenceType === EReferenceType.REFERENCE_BAND ? d.labelStyle.bandLabel : d.labelStyle.lineLabel;
     let labelValue: string;
 

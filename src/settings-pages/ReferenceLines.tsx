@@ -101,7 +101,18 @@ const ReferenceLines = (props) => {
   const mappedInitialState = React.useMemo(() => {
     return (initialStates || []).map((row: IReferenceLineSettings, rowIndex) => {
       let text;
-      const isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN" && !shadow.isDateCategoryNames;
+      let isValue1TypeNumber = parseFloat(row.lineValue1.value).toString().length > 0 && parseFloat(row.lineValue1.value).toString() !== "NaN";
+
+      if (shadow.isHorizontalChart) {
+        if (row.lineValue1.axis === EXYAxisNames.Y && shadow.isDateCategoryNames) {
+          isValue1TypeNumber = false;
+        }
+      } else {
+        if (row.lineValue1.axis === EXYAxisNames.X && shadow.isDateCategoryNames) {
+          isValue1TypeNumber = false;
+        }
+      }
+
       const isValue2TypeNumber = parseFloat(row.lineValue2.value).toString().length > 0 && parseFloat(row.lineValue2.value).toString() !== "NaN";
 
       const getAxisName = (axis: EXYAxisNames) => {
