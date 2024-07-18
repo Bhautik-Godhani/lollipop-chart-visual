@@ -3495,7 +3495,7 @@ export class Visual extends Shadow {
 					this.isHasGlobalMinValue = d3.min(this.originalCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]), d => d.minLocal as number) < 0;
 				}
 
-				this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
+				// this.toggleLegendBasedOnGroupByData(this.isHasMultiMeasure, this.isHasSubcategories);
 
 				if (this.isHorizontalBrushDisplayed) {
 					this.brushHeight = this.brushAndZoomAreaSettings.enabled ? (this.brushAndZoomAreaHeight + 2) : 10;
