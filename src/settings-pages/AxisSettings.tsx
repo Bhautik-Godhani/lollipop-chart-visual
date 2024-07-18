@@ -205,7 +205,6 @@ const UIXAxis = (
                 optionsList={AXIS_MODE}
                 handleChange={(value) => {
                   handleXChange(value, EXAxisSettings.CategoryType, setXConfigValues);
-                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
                 }}
               />
             </Column>
@@ -277,22 +276,25 @@ const UIXAxis = (
             </Row>
           </ConditionalWrapper>
 
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Logarithm Scale"}
-                value={xConfigValues.isLogarithmScale}
-                handleChange={() => {
-                  handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
-                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
-                }}
-                appearance="checkbox"
-              />
-            </Column>
-          </Row>
+          <ConditionalWrapper visible={shadow.isHorizontalChart}>
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Logarithm Scale"}
+                  value={xConfigValues.isLogarithmScale}
+                  handleChange={() => {
+                    handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+                    handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+                  }}
+                  appearance="checkbox"
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis && !shadow.isDateCategoryNames) && xConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        <ConditionalWrapper visible={shadow.isHorizontalChart}>
+          {/* <ConditionalWrapper visible={shadow.isHorizontalChart || (!shadow.isHorizontalChart && (shadow.isXIsNumericAxis && !shadow.isDateCategoryNames) && xConfigValues.categoryType === AxisCategoryType.Continuous)}> */}
           <Row>
             <Column>
               <ToggleButton
@@ -831,22 +833,25 @@ const UIYAxis = (
             </Row>
           </ConditionalWrapper>
 
-          <Row>
-            <Column>
-              <ToggleButton
-                label={"Logarithm Scale"}
-                value={yConfigValues.isLogarithmScale}
-                handleChange={() => {
-                  handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
-                  handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
-                }}
-                appearance="checkbox"
-              />
-            </Column>
-          </Row>
+          <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+            <Row>
+              <Column>
+                <ToggleButton
+                  label={"Logarithm Scale"}
+                  value={yConfigValues.isLogarithmScale}
+                  handleChange={() => {
+                    handleYCheckbox(EYAxisSettings.IsLogarithmScale, setYConfigValues);
+                    handleXCheckbox(EXAxisSettings.IsLogarithmScale, setXConfigValues);
+                  }}
+                  appearance="checkbox"
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis && !shadow.isDateCategoryNames) && yConfigValues.categoryType === AxisCategoryType.Continuous)}>
+        <ConditionalWrapper visible={!shadow.isHorizontalChart}>
+          {/* <ConditionalWrapper visible={!shadow.isHorizontalChart || (shadow.isHorizontalChart && (shadow.isYIsNumericAxis && !shadow.isDateCategoryNames) && yConfigValues.categoryType === AxisCategoryType.Continuous)}> */}
           <Row>
             <Column>
               <ToggleButton

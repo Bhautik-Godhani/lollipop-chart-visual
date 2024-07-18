@@ -5978,7 +5978,7 @@ export class Visual extends Shadow {
 		let brushG: SVGElement = config.brushG;
 
 		const yScaleDomain = this.brushScaleBand.domain();
-		this.brushScaleBand.range(this.yScale.range());
+		this.brushScaleBand.range(this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse());
 
 		categoricalData.categories.forEach((d, i) => {
 			if (i < categoricalData.categories.length - 1) {
@@ -6018,11 +6018,11 @@ export class Visual extends Shadow {
 					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-					this.brushScaleBand.range(yScale.range());
+					this.brushScaleBand.range(this.isBottomXAxis ? yScale.range() : yScale.range().reverse());
 
 					const newYScaleDomain = [];
 					let brushArea = selection;
-					if (brushArea === null) brushArea = this.yScale.range();
+					if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
 
 					yScaleDomain.forEach((d, i) => {
 						const pos = this.brushScaleBand(d);
@@ -6390,13 +6390,13 @@ export class Visual extends Shadow {
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-				this.brushScaleBand.range(xScale.range());
+				this.brushScaleBand.range(this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 				brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
 
 				const newXScaleDomain = [];
 				let brushArea = selection;
-				if (brushArea === null) brushArea = xScale.range();
+				if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 				xScaleDomain.forEach((d, i) => {
 					const pos = this.brushScaleBand(d) - this.brushScaleBand.range()[0];
