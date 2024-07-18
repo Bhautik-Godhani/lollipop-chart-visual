@@ -735,7 +735,7 @@ const UIYAxis = (
 
     <ConditionalWrapper visible={yConfigValues.show}>
 
-      <AccordionAlt title="Show Title"
+      <AccordionAlt title="General"
         open={true}
       >
         <ConditionalWrapper visible={(shadow.isSmallMultiplesEnabled ? shadow.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual ? true : false : true)}>
