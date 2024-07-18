@@ -258,6 +258,7 @@ export class Visual extends Shadow {
 	public categoricalSubCategoryField: any;
 	public categoricalCategoriesLastIndex: number = 0;
 	public categoricalDataPairs: any[] = [];
+	public sortedCategoricalDataPairs: any[] = [];
 	public categoricalSmallMultiplesDataFields: powerbi.DataViewValueColumn[] = [];
 	public categoricalExtraDataLabelsFields: powerbi.DataViewValueColumn[] = [];
 
@@ -2065,6 +2066,7 @@ export class Visual extends Shadow {
 
 		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs)
 		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
+		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
 		this.categoricalDataPairs = clonedCategoricalDataPairs;
 
 		this.setCategoricalDataPairsByRanking();
@@ -2091,6 +2093,7 @@ export class Visual extends Shadow {
 		const clonedCategoricalPair = cloneDeep(this.categoricalDataPairs);
 		if (this.isHorizontalChart) {
 			this.categoricalDataPairs = clonedCategoricalPair.reverse();
+			this.sortedCategoricalDataPairs = this.sortedCategoricalDataPairs.reverse();
 		}
 
 		this.categoryColorPairWithIndex = {};
@@ -2106,7 +2109,7 @@ export class Visual extends Shadow {
 			.filter((d) => d && d !== null && d !== undefined && d !== "")
 			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
 
-		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? clonedCategoricalDataPairs : this.categoricalDataPairs;
+		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs;
 
 		// set colors for all pairs
 		categoricalDataPairs.forEach((data, i) => {
@@ -5571,9 +5574,9 @@ export class Visual extends Shadow {
 
 		const markerSeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings);
 
-		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
+		// const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 		const measureKeys = this.categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
-		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, this.categoricalMeasureFields);
+		// this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, this.categoricalMeasureFields);
 
 		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
 			if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor && this.markerSettings.marker1Style.showOutlineOnly) {
@@ -5621,7 +5624,7 @@ export class Visual extends Shadow {
 								});
 							});
 						} else {
-							clonedCategoricalDataPairs.forEach((data, i: number) => {
+							this.sortedCategoricalDataPairs.forEach((data, i: number) => {
 								const color = getMarkerColor(i);
 								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
 								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
@@ -5700,7 +5703,7 @@ export class Visual extends Shadow {
 
 		setMarkerColor(marker, markerSeqColorsArray);
 
-		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? clonedCategoricalDataPairs : this.categoricalDataPairs;
+		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs;
 
 		categoricalDataPairs.forEach((d, i) => {
 			this.categoryColorPair[d.category] = this.categoryColorPairWithIndex[`${i}-${d.category}`];
