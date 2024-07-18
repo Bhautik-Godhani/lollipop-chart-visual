@@ -37,6 +37,8 @@ export const StartChartRace = (self: Visual) => {
                 RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
             }
         }
+
+        RenderRaceTickerButton(self);
     }, self.raceChartSettings.dataChangeInterval);
 }
 
