@@ -130,11 +130,12 @@
     },
     "referenceLinesSettings": [
         {
+            "uid": "1718814443581",
             "referenceType": "referenceBand",
             "lineValue1": {
                 "axis": "X",
-                "type": "value",
-                "value": "October",
+                "type": "ranking",
+                "value": "August",
                 "isValueChanged": false,
                 "measureName": "Month",
                 "computation": "fixed",
@@ -143,8 +144,8 @@
             },
             "lineValue2": {
                 "axis": "X",
-                "type": "value",
-                "value": "September",
+                "type": "ranking",
+                "value": "May",
                 "isValueChanged": false,
                 "computation": "fixed",
                 "rankOrder": "start",
@@ -167,9 +168,9 @@
                 "isShowLabelBackground": false,
                 "labelBackgroundColor": "rgba(0,0,0,1)",
                 "autoFontSize": false,
-                "labelFontSize": 16,
+                "labelFontSize": "16",
                 "labelPosition": "before",
-                "labelAlignment": "center",
+                "labelAlignment": "left",
                 "styling": [
                     "bold"
                 ],
@@ -179,29 +180,29 @@
             },
             "line1Coord": {
                 "x1": 10,
-                "x2": 937.6436634063721,
-                "y1": 219.34895833333331,
-                "y2": 219.34895833333331,
-                "textX1": 468.82183170318604,
-                "textY1": 209.34895833333331
+                "x2": 669.3699226379395,
+                "y1": 204.22501838207245,
+                "y2": 204.22501838207245,
+                "textX1": 334.6849613189697,
+                "textY1": 194.22501838207245
             },
             "line2Coord": {
                 "x1": 10,
-                "x2": 937.6436634063721,
-                "y1": 307.0885416666667,
-                "y2": 307.0885416666667,
-                "textX1": 468.82183170318604,
-                "textY1": 297.0885416666667
+                "x2": 669.3699226379395,
+                "y1": 340.37503063678736,
+                "y2": 340.37503063678736,
+                "textX1": 334.6849613189697,
+                "textY1": 330.37503063678736
             },
             "labelCoord": {
-                "textX1": 468.82183170318604,
-                "textY1": 209.34895833333331
+                "textX1": 334.6849613189697,
+                "textY1": 194.22501838207245
             },
             "bandStyle": {
                 "isShowBackgroundColor": true,
                 "backgroundColor": "rgba(248, 250, 219, 0.65)"
             },
-            "labelText": "October - September"
+            "labelText": "August - May"
         },
         {
             "uid": "1718814443582",
@@ -209,7 +210,7 @@
             "lineValue1": {
                 "axis": "Y",
                 "type": "value",
-                "value": "19485.5",
+                "value": "14859.333333333334",
                 "isValueChanged": false,
                 "measureName": "Sum of Quantity",
                 "computation": "average",
@@ -242,23 +243,23 @@
                 "isShowLabelBackground": false,
                 "labelBackgroundColor": "rgba(255,255,255,1)",
                 "autoFontSize": false,
-                "labelFontSize": 15,
-                "labelPosition": "after",
+                "labelFontSize": "15",
+                "labelPosition": "before",
                 "labelAlignment": "left",
                 "styling": [
                     "bold"
                 ],
                 "labelOrientation": "horizontal",
                 "textAnchor": "start",
-                "textAlignment": "hanging"
+                "textAlignment": "ideographic"
             },
             "line1Coord": {
-                "x1": 727.4519802158277,
-                "x2": 727.4519802158277,
+                "x1": 391.01879824797317,
+                "x2": 391.01879824797317,
                 "y1": 0,
-                "y2": 526.4375,
-                "textX1": 737.4519802158277,
-                "textY1": 516.4375
+                "y2": 544.6000490188599,
+                "textX1": 381.01879824797317,
+                "textY1": 534.6000490188599
             },
             "line2Coord": {
                 "x1": 0,
@@ -267,14 +268,14 @@
                 "y2": 0
             },
             "labelCoord": {
-                "textX1": 737.4519802158277,
-                "textY1": 516.4375
+                "textX1": 381.01879824797317,
+                "textY1": 534.6000490188599
             },
             "bandStyle": {
                 "isShowBackgroundColor": true,
                 "backgroundColor": "rgba(0,0,0,0.2)"
             },
-            "labelText": "Avg Value 19.5K"
+            "labelText": "Avg Value 14.9K"
         }
     ],
     "showBucket": {},

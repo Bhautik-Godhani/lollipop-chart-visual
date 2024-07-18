@@ -67,6 +67,7 @@ import {
 	EDataLabelsDisplayTypes,
 	EGeneralTemplates,
 	EDynamicDeviationSettings,
+	EReferenceType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -5482,6 +5483,20 @@ export class Visual extends Shadow {
 
 		if (this.isShowImageMarker1 || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
 			this.lineSettings.isApplyMarkerColor = false;
+		}
+
+
+		if (this.templateSettings.isTemplatesEnabled && this.templateSettings.selectedTemplate === EGeneralTemplates.ReferenceLineBandTemplate) {
+			this.referenceLinesSettings.forEach(d => {
+				if (d.uid === "1718814443581" && d.referenceType === EReferenceType.REFERENCE_BAND) {
+					d.lineValue1.rank = "1";
+					d.lineValue2.rank = this.originalCategoricalData.categories[0].values.length > 1 ? "2" : "1";
+				}
+
+				if (d.uid === "1718814443582") {
+					d.lineValue1.rank = "1";
+				}
+			})
 		}
 
 		// if (this.rankingSettings.isRankingEnabled) {

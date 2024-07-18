@@ -7,7 +7,7 @@
         "fillMid": "rgba(127, 88, 246, 1)",
         "fillMax": "rgba(75, 132, 244, 1)",
         "isAddMidColor": true,
-        "fillType": "bySubCategory",
+        "fillType": "diverging",
         "isFillTypeChanged": true,
         "singleColor1": "rgba(0, 99, 178, 1)",
         "singleColor2": "rgba(156, 195, 213, 1)",
@@ -16,59 +16,42 @@
             "rgba(127, 88, 246, 1)",
             "rgba(75, 132, 244, 1)"
         ],
-        "categoryColors": [
-            {
-                "name": "Paseo",
-                "marker": "rgb(25,145,233)"
-            },
-            {
-                "name": "VTT",
-                "marker": "rgb(59,170,251)"
-            },
-            {
-                "name": "Velo",
-                "marker": "rgb(97,187,255)"
-            },
-            {
-                "name": "Amarilla",
-                "marker": "rgb(134,203,255)"
-            },
-            {
-                "name": "Montana",
-                "marker": "rgb(169,218,255)"
-            },
-            {
-                "name": "Carretera",
-                "marker": "rgb(204,233,255)"
-            }
-        ],
+        "categoryColors": [],
         "subCategoryColors": [
             {
-                "name": "Small Business",
-                "marker": "rgba(29, 47, 111, 1)"
-            },
-            {
-                "name": "Government",
-                "marker": "rgba(131, 144, 250, 1)"
+                "name": "Channel Partners",
+                "marker": "rgb(211,101,42)"
             },
             {
                 "name": "Enterprise",
-                "marker": "rgba(250, 199, 72, 1)"
+                "marker": "rgb(72,133,135)"
+            },
+            {
+                "name": "Government",
+                "marker": "rgb(150,171,57)"
+            },
+            {
+                "name": "Midmarket",
+                "marker": "rgb(57,136,147)"
+            },
+            {
+                "name": "Small Business",
+                "marker": "rgb(136,81,0)"
             }
         ],
         "numberOfClasses": 8,
         "schemeColors": [
-            "rgb(204,233,255)",
-            "rgb(179,222,255)",
-            "rgb(153,211,255)",
-            "rgb(128,200,255)",
-            "rgb(102,189,255)",
-            "rgb(73,178,255)",
-            "rgb(43,167,255)",
-            "rgb(22,142,230)"
+            "rgb(231,98,84)",
+            "rgb(240,142,73)",
+            "rgb(249,180,94)",
+            "rgb(255,216,138)",
+            "rgb(213,225,204)",
+            "rgb(135,200,217)",
+            "rgb(90,154,183)",
+            "rgb(58,108,152)"
         ],
         "colorBlindSafe": false,
-        "colorScheme": "Blue",
+        "colorScheme": "Hiroshige",
         "reverse": false,
         "isGradient": true,
         "negativeColor": "rgba(229, 51, 39, 1)",
