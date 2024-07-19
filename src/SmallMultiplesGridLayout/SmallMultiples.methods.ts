@@ -512,7 +512,7 @@ export const RenderSmallMultiplesUniformLeftYAxis = (
 
     if (isUniformYScale) {
         if (uniformLeftYAxis) {
-            uniformLeftYAxis.selectAll(".y-axis-col-svg").remove();
+            uniformLeftYAxis.selectAll(".uniform-axis-container").remove();
         }
 
         const uniformAxisContainer = d3.create("div");
