@@ -199,6 +199,7 @@ import SmallMultiplesSettings from "./SmallMultiplesGridLayout/smallMultiplesSet
 import ImportExport from "./settings-pages/ImportExport";
 import { ECFCategoriesType } from "@truviz/shadow/dist/Components/ConditionalFormatting/ConditionalFormatting.enum";
 import { cloneDeep } from "lodash";
+import { IRowGroupIndexByField } from "@truviz/shadow/dist/Components/SummaryTable/SummaryTable";
 
 type D3Selection<T extends d3.BaseType> = d3.Selection<T, any, any, any>;
 
@@ -11201,6 +11202,12 @@ export class Visual extends Shadow {
 		// 	}
 		// }
 
+		const rowGroupIndexByFields: IRowGroupIndexByField[] = [];
+
+		[...this.categoricalSmallMultiplesDataFields, ...this.categoricalCategoriesFields].forEach((d, i) => {
+			rowGroupIndexByFields.push({ field: d.source.displayName, rowGroupIndex: i });
+		});
+
 		const tooltipFields = this.categoricalTooltipFields.map(d => d.source.displayName);
 
 		this.summaryTableConfig = {
@@ -11238,6 +11245,7 @@ export class Visual extends Shadow {
 				width: this.vizOptions.options.viewport.width,
 				height: this.vizOptions.options.viewport.height,
 			},
+			rowGroupIndexByFields: rowGroupIndexByFields
 		};
 
 		// if (this.rankingSettings.category.enabled) {
