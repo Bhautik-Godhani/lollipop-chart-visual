@@ -4973,7 +4973,7 @@ export class Visual extends Shadow {
 							legendDataPoints.push(
 								{
 									data: {
-										name: this.othersBarText,
+										name: this.othersBarText.replace(new RegExp("-1234567890123", 'g'), ''),
 										color: this.categoryColorPair[this.othersBarText].marker1Color,
 										pattern: undefined,
 										imageUrl: undefined
@@ -5074,7 +5074,7 @@ export class Visual extends Shadow {
 						legendDataPoints.push(
 							{
 								data: {
-									name: this.othersSubcategoryText,
+									name: this.othersSubcategoryText.replace(new RegExp("-1234567890123", 'g'), ''),
 									color: this.subCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
 									pattern: undefined,
 									imageUrl: undefined
