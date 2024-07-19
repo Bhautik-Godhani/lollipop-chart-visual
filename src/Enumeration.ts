@@ -229,7 +229,7 @@ function getYAxisConfigSelection(): EnumerateSectionType {
 
 function getLegendSelection(): EnumerateSectionType {
 	return {
-		name: "Legend",
+		name: "legend",
 		isShow: true,
 		properties: [
 			{

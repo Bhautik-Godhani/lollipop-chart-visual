@@ -511,6 +511,13 @@
 							"fontFamily": true
 						}
 					}
+				},
+				"isLegendAutoChanged": {
+					"displayName": "",
+					"description": "",
+					"type": {
+						"bool": true
+					}
 				}
 			}
 		},
