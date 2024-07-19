@@ -249,11 +249,11 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, r
 
     if (rLine.labelPosition === EBeforeAfterPosition.After) {
         if (isBand) {
-            if ((max([d.line1Coord.x1, d.line2Coord.x1]) + 20 + labelTextBBox.height) > self.width) {
+            if ((max([d.line1Coord.x1, x1]) + 20 + labelTextBBox.height) > self.width) {
                 rLine.labelPosition = EBeforeAfterPosition.Before;
             }
         } else {
-            if ((d.line1Coord.x1 + 20 + labelTextBBox.height) > self.width) {
+            if ((x1 + 20 + labelTextBBox.height) > self.width) {
                 rLine.labelPosition = EBeforeAfterPosition.Before;
             }
         }
@@ -261,11 +261,11 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, r
 
     if (rLine.labelPosition === EBeforeAfterPosition.Before) {
         if (isBand) {
-            if ((min([d.line1Coord.x1, d.line2Coord.x1]) - 10) <= labelTextBBox.height) {
+            if ((min([d.line1Coord.x1, x1]) - 10) <= labelTextBBox.height) {
                 rLine.labelPosition = EBeforeAfterPosition.After;
             }
         } else {
-            if ((d.line1Coord.x1 - 10) <= labelTextBBox.height) {
+            if ((x1 - 10) <= labelTextBBox.height) {
                 rLine.labelPosition = EBeforeAfterPosition.After;
             }
         }
