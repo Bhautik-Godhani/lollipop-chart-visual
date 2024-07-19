@@ -22,7 +22,7 @@
         "fillMid": "rgba(233, 79, 55, 1)",
         "fillMax": "rgba(57, 62, 65, 1)",
         "isAddMidColor": true,
-        "fillType": "gradient",
+        "fillType": "diverging",
         "isFillTypeChanged": true,
         "singleColor1": "rgba(248, 231, 28, 1)",
         "singleColor2": "rgba(156, 195, 213, 1)",
@@ -32,43 +32,52 @@
             "rgba(75, 132, 244, 1)"
         ],
         "categoryColors": [],
+        "subCategoryColors": [],
         "numberOfClasses": 8,
         "schemeColors": [
-            "rgb(215,48,39)",
-            "rgb(238,106,70)",
-            "rgb(253,162,102)",
-            "rgb(254,214,133)",
-            "rgb(236,232,139)",
-            "rgb(208,235,134)",
-            "rgb(163,215,107)",
-            "rgb(100,186,90)"
+            "rgb(0,155,158)",
+            "rgb(41,173,175)",
+            "rgb(91,190,192)",
+            "rgb(154,208,209)",
+            "rgb(198,202,215)",
+            "rgb(226,187,214)",
+            "rgb(218,157,199)",
+            "rgb(208,126,185)"
         ],
         "colorBlindSafe": false,
-        "colorScheme": "Red to Green",
+        "colorScheme": "Tropic",
         "reverse": false,
         "isGradient": true,
         "negativeColor": "rgba(229, 51, 39, 1)",
         "positiveColor": "rgba(141, 200, 61, 1)",
         "gradientAppliedToMeasure": "marker1Color",
         "isCustomizeOthersColor": true,
-        "othersColor": "rgba(84, 84, 84, 1)"
+        "othersColor": "rgba(84, 84, 84, 1)",
+        "isCustomizeSMOthersColor": true,
+        "SMOthersColor": "rgba(84, 84, 84, 1)"
     },
     "dataLabelsSettings": {},
     "dynamicDeviationSettings": {},
     "errorBarsSettings": {},
     "gridLinesSettings": {},
-    "lineSettings": {},
+    "lineSettings": {
+        "show": true,
+        "lineType": "solid",
+        "lineWidth": 3,
+        "lineColor": "rgba(209, 203, 203, 1)",
+        "isApplyMarkerColor": false
+    },
     "markerSettings": {
         "markerType": "shape",
         "markerStyleType": "marker1Style",
         "marker1Style": {
             "isAutoMarkerSize": false,
-            "markerSize": 20,
+            "markerSize": 15,
             "markerShape": "default",
             "markerChart": "donut",
             "markerShapePath": "",
             "markerShapeBase64Url": "",
-            "dropdownMarkerType": "circle",
+            "dropdownMarkerType": "diamond",
             "isShowMarkerOutline": true,
             "outlineWidth": 3,
             "outlineColor": "rgba(128, 128, 128, 1)",
@@ -135,21 +144,21 @@
             "lineValue1": {
                 "axis": "X",
                 "type": "ranking",
-                "value": "August",
+                "value": "March",
                 "isValueChanged": false,
                 "measureName": "Month",
                 "computation": "fixed",
                 "rankOrder": "start",
-                "rank": 5
+                "rank": 3
             },
             "lineValue2": {
                 "axis": "X",
                 "type": "ranking",
-                "value": "May",
+                "value": "June",
                 "isValueChanged": false,
                 "computation": "fixed",
                 "rankOrder": "start",
-                "rank": 8
+                "rank": 6
             },
             "lineStyle": {
                 "lineStyle": "solid",
@@ -165,8 +174,8 @@
                 "bandLabel": "Reference Band",
                 "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
                 "labelColor": "rgba(15, 58, 105, 1)",
-                "isShowLabelBackground": false,
-                "labelBackgroundColor": "rgba(0,0,0,1)",
+                "isShowLabelBackground": true,
+                "labelBackgroundColor": "rgba(221, 249, 247, 0.57)",
                 "autoFontSize": false,
                 "labelFontSize": "16",
                 "labelPosition": "before",
@@ -175,34 +184,34 @@
                     "bold"
                 ],
                 "labelOrientation": "horizontal",
-                "textAnchor": "middle",
+                "textAnchor": "start",
                 "textAlignment": "ideographic"
             },
             "line1Coord": {
                 "x1": 10,
                 "x2": 669.3699226379395,
-                "y1": 204.22501838207245,
-                "y2": 204.22501838207245,
-                "textX1": 334.6849613189697,
-                "textY1": 194.22501838207245
+                "y1": 113.4583435455958,
+                "y2": 113.4583435455958,
+                "textX1": 20,
+                "textY1": 103.4583435455958
             },
             "line2Coord": {
                 "x1": 10,
                 "x2": 669.3699226379395,
-                "y1": 340.37503063678736,
-                "y2": 340.37503063678736,
-                "textX1": 334.6849613189697,
-                "textY1": 330.37503063678736
+                "y1": 249.60835580031076,
+                "y2": 249.60835580031076,
+                "textX1": 20,
+                "textY1": 239.60835580031076
             },
             "labelCoord": {
-                "textX1": 334.6849613189697,
-                "textY1": 194.22501838207245
+                "textX1": 20,
+                "textY1": 103.4583435455958
             },
             "bandStyle": {
                 "isShowBackgroundColor": true,
                 "backgroundColor": "rgba(248, 250, 219, 0.65)"
             },
-            "labelText": "August - May"
+            "labelText": "MARCH - JUNE"
         },
         {
             "uid": "1718814443582",
@@ -240,26 +249,26 @@
                 "bandLabel": "Reference Band",
                 "labelFontFamily": "\"Segoe UI\", wf_segoe-ui_normal, helvetica, arial, sans-serif",
                 "labelColor": "rgba(15, 61, 110, 1)",
-                "isShowLabelBackground": false,
-                "labelBackgroundColor": "rgba(255,255,255,1)",
+                "isShowLabelBackground": true,
+                "labelBackgroundColor": "rgba(221, 249, 247, 0.81)",
                 "autoFontSize": false,
                 "labelFontSize": "15",
-                "labelPosition": "before",
+                "labelPosition": "after",
                 "labelAlignment": "left",
                 "styling": [
                     "bold"
                 ],
                 "labelOrientation": "horizontal",
-                "textAnchor": "start",
-                "textAlignment": "ideographic"
+                "textAnchor": "end",
+                "textAlignment": "hanging"
             },
             "line1Coord": {
-                "x1": 391.01879824797317,
-                "x2": 391.01879824797317,
+                "x1": 393.3405690813065,
+                "x2": 393.3405690813065,
                 "y1": 0,
                 "y2": 544.6000490188599,
-                "textX1": 381.01879824797317,
-                "textY1": 534.6000490188599
+                "textX1": 403.3405690813065,
+                "textY1": 20
             },
             "line2Coord": {
                 "x1": 0,
@@ -268,14 +277,14 @@
                 "y2": 0
             },
             "labelCoord": {
-                "textX1": 381.01879824797317,
-                "textY1": 534.6000490188599
+                "textX1": 403.3405690813065,
+                "textY1": 20
             },
             "bandStyle": {
                 "isShowBackgroundColor": true,
                 "backgroundColor": "rgba(0,0,0,0.2)"
             },
-            "labelText": "Avg Value 14.9K"
+            "labelText": "Avg Value 14859.333333333334"
         }
     ],
     "showBucket": {},
@@ -284,13 +293,22 @@
         "category": {
             "enabled": true,
             "sortBy": "Month",
-            "sortOrder": "2",
+            "sortOrder": "1",
             "isSortByCategory": true,
             "isSortByMeasure": false,
             "isSortByMultiMeasure": false,
             "isSortByExtraSortField": false
         },
         "subCategory": {
+            "enabled": true,
+            "sortBy": "",
+            "sortOrder": "2",
+            "isSortByCategory": false,
+            "isSortByMeasure": true,
+            "isSortByMultiMeasure": false,
+            "isSortByExtraSortField": false
+        },
+        "smallMultiples": {
             "enabled": true,
             "sortBy": "Sum of Quantity",
             "sortOrder": "2",
