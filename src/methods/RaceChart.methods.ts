@@ -98,6 +98,14 @@ export const StartChartRace = (self: Visual) => {
     }, self.raceChartSettings.dataChangeInterval);
 }
 
+export const getTotal1ValueForRaceChartLabel = (self: Visual) => {
+    if (self.isLollipopTypePie) {
+        return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value1)), self.numberSettings, undefined, true, true);
+    } else {
+        return self.formatNumber(sum(self.chartData, d => d.value1), self.numberSettings, undefined, true, true);
+    }
+}
+
 export const RenderRaceChartDataLabel = (self: Visual): void => {
     self.raceChartDataLabelG.selectAll("*").remove();
     // if (!self.isRaceChartDataLabelDrawn) {
@@ -154,13 +162,6 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             return self.raceBarLabelsFormatter[i].formatter.format(d);
         }).join(" "));
 
-    const getTotal1Value = () => {
-        if (self.isLollipopTypePie) {
-            return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value1)), self.numberSettings, undefined, true, true);
-        } else {
-            return self.formatNumber(sum(self.chartData, d => d.value1), self.numberSettings, undefined, true, true);
-        }
-    }
 
     const getTotal2Value = () => {
         if (self.isLollipopTypePie) {
@@ -174,14 +175,14 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .append("tspan")
         .attr("class", "sub-text-label")
         .attr("x", "0")
-        .attr("dy", subTextFontSize + 10)
+        .attr("dy", subTextFontSize)
         .style("text-decoration", subTextStyles.fontStyles.includes(EFontStyle.UnderLine) ? "underline" : "")
         .style("font-weight", subTextStyles.fontStyles.includes(EFontStyle.Bold) ? "bold" : "normal")
         .style("font-style", subTextStyles.fontStyles.includes(EFontStyle.Italic) ? "italic" : "")
         .attr("fill", subTextStyles.labelColor)
         .style("font-family", subTextStyles.labelFontFamily)
         .attr("font-size", subTextStyles.isLabelAutoFontSize ? headerFontSize / 2 : subTextStyles.labelFontSize)
-        .text(`${self.measure1DisplayName} : ${getTotal1Value()}`);
+        .text(`${self.measure1DisplayName} : ${getTotal1ValueForRaceChartLabel(self)}`);
 
     // if (self.isHasMultiMeasure) {
     //     self.raceChartDataLabelText

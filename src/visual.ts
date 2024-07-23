@@ -175,7 +175,7 @@ import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
 import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, UnderlineIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
-import { GetRaceChartDataPairsByItem, RenderRaceChartDataLabel, RenderRaceTickerButton } from "./methods/RaceChart.methods";
+import { GetRaceChartDataPairsByItem, RenderRaceChartDataLabel, RenderRaceTickerButton, getTotal1ValueForRaceChartLabel } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
 import ErrorBarsSettings from "./settings-pages/ErrorBarsSettings";
 import { RenderErrorBand, RenderErrorBars } from "./methods/ErrorBars.methods";
@@ -2671,16 +2671,16 @@ export class Visual extends Shadow {
 		// 	}
 		// }
 
-		const xAxisTicksWidth = this.raceChartCategories.map((d) => {
-			const textProperties: any = {
-				text: d,
-				fontFamily: this.raceChartSettings.headerTextStyles.labelFontFamily,
-				fontSize: this.raceChartSettings.headerTextStyles.labelFontSize + "px",
-			};
-			return textMeasurementService.measureSvgTextWidth(textProperties);
-		});
+		// const xAxisTicksWidth = [...this.raceChartCategories, `${this.measure1DisplayName} : ${getTotal1ValueForRaceChartLabel(this)}`].map((d) => {
+		// 	const textProperties: any = {
+		// 		text: d,
+		// 		fontFamily: this.raceChartSettings.headerTextStyles.labelFontFamily,
+		// 		fontSize: this.raceChartSettings.headerTextStyles.labelFontSize + "px",
+		// 	};
+		// 	return textMeasurementService.measureSvgTextWidth(textProperties);
+		// });
 
-		this.raceChartDataLabelLength = d3.max(xAxisTicksWidth);
+		// this.raceChartDataLabelLength = d3.max(xAxisTicksWidth);
 
 		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
 			this.markerSettings.marker1Style.selectedImageDataField = this.imagesDataFieldsName[0];
@@ -4911,6 +4911,25 @@ export class Visual extends Shadow {
 
 		if (this.patternSettings.enabled) {
 			this.setVisualPatternData();
+		}
+
+		if (this.isChartIsRaceChart) {
+			const raceChartMainLabelTextWidth = this.raceChartCategories.map((d) => {
+				const textProperties: any = {
+					text: d,
+					fontFamily: this.raceChartSettings.headerTextStyles.labelFontFamily,
+					fontSize: this.raceChartSettings.headerTextStyles.labelFontSize + "px",
+				};
+				return textMeasurementService.measureSvgTextWidth(textProperties);
+			});
+
+			const raceChartSubLabelTextWidth = textMeasurementService.measureSvgTextWidth({
+				text: `${this.measure1DisplayName} : ${getTotal1ValueForRaceChartLabel(this)}`,
+				fontFamily: this.raceChartSettings.subTextStyles.labelFontFamily,
+				fontSize: this.raceChartSettings.subTextStyles.labelFontSize + "px",
+			});
+
+			this.raceChartDataLabelLength = d3.max([...raceChartMainLabelTextWidth, raceChartSubLabelTextWidth]);
 		}
 	}
 
@@ -7342,10 +7361,10 @@ export class Visual extends Shadow {
 				const borderSize = dataLabelsSettings.showBackground || THIS.dataLabelsSettings.isShowBestFitLabels ? 3 : 0;
 				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
 
-				if (getBBox.width > THIS.scaleBandWidth) {
-					ele.attr("opacity", 0);
-					return;
-				}
+				// if (getBBox.width > THIS.scaleBandWidth) {
+				// 	ele.attr("opacity", 0);
+				// 	return;
+				// }
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
