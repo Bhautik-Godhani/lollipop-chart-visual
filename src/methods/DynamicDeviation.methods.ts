@@ -143,6 +143,16 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
                 } else if (!isFromCategoryYPosTrue && !isToCategoryYPosTrue) {
                     return 0;
                 }
+            } else if (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) {
+                const index = self.categoricalDataPairs.findIndex(d => d.category === self.chartData[0].category);
+                const fromIndex = self.categoricalDataPairs.findIndex(d => d.category === from.category);
+                const toIndex = self.categoricalDataPairs.findIndex(d => d.category === to.category);
+
+                if (index >= fromIndex && index < toIndex) {
+                    return 1;
+                } else if (!isFromCategoryYPosTrue && !isToCategoryYPosTrue) {
+                    return 0;
+                }
             }
 
             return 1;
@@ -338,6 +348,16 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             if (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange) {
                 const index = self.categoricalDataPairs.findIndex(d => d.category === self.chartData[0].category);
                 if (index >= dynamicDeviationSettings.fromIndex && index < dynamicDeviationSettings.toIndex) {
+                    return 1;
+                } else if (!isFromCategoryXPosTrue && !isToCategoryXPosTrue) {
+                    return 0;
+                }
+            } else if (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) {
+                const index = self.categoricalDataPairs.findIndex(d => d.category === self.chartData[0].category);
+                const fromIndex = self.categoricalDataPairs.findIndex(d => d.category === from.category);
+                const toIndex = self.categoricalDataPairs.findIndex(d => d.category === to.category);
+
+                if (index >= fromIndex && index < toIndex) {
                     return 1;
                 } else if (!isFromCategoryXPosTrue && !isToCategoryXPosTrue) {
                     return 0;
