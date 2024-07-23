@@ -3401,7 +3401,7 @@ export class Visual extends Shadow {
 
 						return {
 							yAxisNode: this.yAxisG.node().cloneNode(true),
-							yAxisNodeWidth: this.margin.left,
+							yAxisNodeWidth: this.margin.left + (this.isVerticalBrushDisplayed ? 10 : 0),
 							brushNode: this.brushG.node().cloneNode(true),
 							brushNodeWidth: this.brushG.node().getBoundingClientRect().width,
 							yAxisTitleG: this.yAxisTitleG.node().cloneNode(true),
@@ -8193,6 +8193,10 @@ export class Visual extends Shadow {
 
 				if (text.includes("--")) {
 					text = text.split("--")[0];
+				}
+
+				if (text.includes("&&")) {
+					text = text.replace(/&&/g, " ");
 				}
 
 				if (THIS.isYIsNumericAxis && THIS.isYIsContinuousAxis) {
