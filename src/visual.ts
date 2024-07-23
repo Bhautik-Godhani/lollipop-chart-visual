@@ -1256,7 +1256,7 @@ export class Visual extends Shadow {
 		const isSortByExternalFields = sortingSettings.isSortByExtraSortField;
 
 		const getMonthIndex = (monthName: string) => {
-			return MonthNames.indexOf(monthName);
+			return MonthNames.findIndex(d => d.includes(monthName));
 		}
 
 		const sortByName = () => {
