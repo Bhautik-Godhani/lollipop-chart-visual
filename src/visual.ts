@@ -1256,7 +1256,7 @@ export class Visual extends Shadow {
 		const isSortByExternalFields = sortingSettings.isSortByExtraSortField;
 
 		const getMonthIndex = (monthName: string) => {
-			return MonthNames.findIndex(d => d.includes(monthName));
+			return MonthNames.findIndex(d => d.includes(monthName.toLowerCase()));
 		}
 
 		const sortByName = () => {
@@ -1270,9 +1270,9 @@ export class Visual extends Shadow {
 					// 	}
 					// } else {
 					if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-						data.sort((a, b) => getMonthIndex(a.category.toLowerCase()) - getMonthIndex(b.category.toLowerCase()));
+						data.sort((a, b) => getMonthIndex(a.category) - getMonthIndex(b.category));
 					} else {
-						data.sort((a, b) => getMonthIndex(b.category.toLowerCase()) - getMonthIndex(a.category.toLowerCase()));
+						data.sort((a, b) => getMonthIndex(b.category) - getMonthIndex(a.category));
 					}
 					// }
 				} else if (this.isDateCategoryNames) {
@@ -4185,7 +4185,7 @@ export class Visual extends Shadow {
 		const { enabled, sortOrder, sortBy, isSortByCategory } = this.sortingSettings.subCategory;
 
 		const getMonthIndex = (monthName: string) => {
-			return MonthNames.indexOf(monthName);
+			return MonthNames.findIndex(d => d.includes(monthName.toLowerCase()));
 		}
 
 		if (enabled && this.isHasSubcategories) {
