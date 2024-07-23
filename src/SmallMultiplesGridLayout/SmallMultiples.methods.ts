@@ -34,8 +34,11 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
     const totalRows = Math.ceil(config.categories.length / columns);
+    const minItemWidth = 150;
+    const minItemHeight = 150;
     let itemWidth = (config.containerWidth - config.outerSpacing * columns - config.outerSpacing) / columns;
     let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing - 10;
+
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformXScaleAll = isUniformXScale && config.xAxisPosition === ESmallMultiplesXAxisPosition.All;
@@ -99,6 +102,9 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     } else {
         SMPaginationPanel.selectAll("*").remove();
     }
+
+    itemWidth = itemWidth < minItemWidth ? minItemWidth : itemWidth;
+    itemHeight = itemHeight < minItemHeight ? minItemHeight : itemHeight;
 
     const layout = GetReactGridLayout(config, columns, config.viewType === ESmallMultiplesViewType.Pagination ? rows : totalRows);
     const layoutProps = GetSmallMultiplesLayoutProps(config, layout, itemHeight, columns);
