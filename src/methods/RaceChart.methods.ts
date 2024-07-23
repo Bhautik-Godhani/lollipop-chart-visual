@@ -1,7 +1,10 @@
 /* eslint-disable max-lines-per-function */
 import { EFontStyle, EHighContrastColorType, EPlayPauseButton, Position } from '../enum';
 import { Visual } from '../visual';
-import { interval, max, min, select, sum } from "d3";
+import { group, interval, max, min, select, sum } from "d3";
+import { CreateDate } from './methods';
+import { cloneDeep } from 'lodash';
+import { RenderExpandAllXAxis } from './expandAllXAxis.methods';
 
 export const StartChartRace = (self: Visual) => {
     if (self.ticker) {
@@ -11,32 +14,87 @@ export const StartChartRace = (self: Visual) => {
     self.ticker = interval(() => {
         const setDataWithAllPositiveCategory = () => {
             self.tickIndex++;
-            self.raceChartKeyOnTick = self.raceChartKeysList[self.tickIndex];
-            self.chartData = self.raceChartData.filter((d) => d.raceChartKey === self.raceChartKeyOnTick);
+            self.raceChartKeyOnTick = self.raceChartCategories[self.tickIndex];
 
-            if (self.chartData.length > 0) {
-                self.initAndRenderLollipopChart(self.categoricalData, self.width, self.height, true, true);
+            const raceChartDataPair = self.raceChartDataPairs.find((d) => d.category === self.raceChartCategories[self.tickIndex]);
+            const dataValuesIndexes = Object.keys(raceChartDataPair).filter(key => key.includes("index-"));
+            const originalCategoricalData: powerbi.DataViewCategorical = cloneDeep(self.clonedCategoricalDataForRaceChart);
 
-                if (self.brushAndZoomAreaSettings.enabled) {
-                    self.drawBrushLollipopChart(self.clonedCategoricalData);
+            originalCategoricalData.categories.forEach((d) => {
+                d.values = dataValuesIndexes.map((valueIndex) => {
+                    const id = +valueIndex.split("-")[1];
+                    return d.values[id];
+                });
+            });
+
+            originalCategoricalData.values.forEach((d) => {
+                d.values = dataValuesIndexes.map((valueIndex) => {
+                    const id = +valueIndex.split("-")[1];
+                    return d.values[id];
+                });
+
+                d.highlights = dataValuesIndexes.map((valueIndex) => {
+                    const id = +valueIndex.split("-")[1];
+                    return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+                });
+            });
+
+            self.categoricalData = self.setInitialChartData(
+                originalCategoricalData,
+                cloneDeep(originalCategoricalData),
+                self.categoricalMetadata,
+                self.vizOptions.options.viewport.width,
+                self.vizOptions.options.viewport.height
+            );
+
+            if (!self.isScrollBrushDisplayed) {
+                self.setCategoricalDataFields(self.categoricalData);
+                self.setChartData(self.categoricalData);
+            }
+
+            self.drawXYAxis(self.categoricalData, true, true);
+
+            if (self.categoricalCategoriesLastIndex > 0) {
+                if (!self.isHorizontalChart) {
+                    RenderExpandAllXAxis(self, self.categoricalData);
+                }
+            }
+
+            // if (self.isExpandAllApplied && (!self.isSmallMultiplesEnabled || (self.isSmallMultiplesEnabled && self.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
+            //     RenderExpandAllXAxis(self, self.categoricalData);
+            // }
+
+            if (self.isScrollBrushDisplayed) {
+                self.displayBrush(true, true, true);
+            } else {
+                // self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+                // self.drawXYAxis(true, true);
+                // self.margin.left = 0;
+                // self.margin.bottom = 0;         
+
+                if (self.chartData.length > 0) {
+                    self.initAndRenderLollipopChart(self.categoricalData, self.width, self.height, true, true);
+
+                    if (self.brushAndZoomAreaSettings.enabled) {
+                        self.drawBrushLollipopChart(self.clonedCategoricalData);
+                    }
                 }
             }
         };
 
-        setDataWithAllPositiveCategory();
+        // if (self.chartData.length > 0) {
+        if ((self.raceChartCategories.length - 1) === self.tickIndex) {
+            self.tickIndex = -1;
+            self.ticker.stop();
+            self.isRacePlaying = false;
+            RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
+        } else {
+            setDataWithAllPositiveCategory();
 
-        if (self.chartData.length > 0) {
-            self.raceChartDataLabelOnTick = self.chartData[0].raceChartDataLabel;
+            self.raceChartDataLabelOnTick = self.raceChartCategories[self.tickIndex];
             RenderRaceChartDataLabel(self);
-
-            if (self.raceChartKeyLabelList.length === self.tickIndex) {
-                self.tickIndex = -2;
-                setDataWithAllPositiveCategory();
-                self.ticker.stop();
-                self.isRacePlaying = false;
-                RenderTickerButtonPlayPausePath(self, EPlayPauseButton.Play);
-            }
         }
+        // }
     }, self.raceChartSettings.dataChangeInterval);
 }
 
@@ -198,7 +256,7 @@ export const RenderRaceTickerButton = (self: Visual): void => {
             ")"
         )
         .on("click", () => {
-            if (self.raceChartKeysList.length > 1) {
+            if (self.raceChartCategories.length > 1) {
                 self.isRacePlaying = !self.isRacePlaying;
                 RenderTickerButtonPlayPausePath(self, self.isRacePlaying ? EPlayPauseButton.Pause : EPlayPauseButton.Play);
 
@@ -247,3 +305,53 @@ export const RenderTickerButtonPlayPausePath = (self: Visual, buttonType: EPlayP
                 : "translate(-9.5703125, -10.9375) scale(0.042724609375)"
         );
 }
+
+export const GetRaceChartDataPairsByItem = (self: Visual): any => {
+    const categoricalRaceChartDataFields = self.categoricalRaceChartDataFields;
+    const raceChartCategoryNames = categoricalRaceChartDataFields.map(d => d.source.displayName);
+    const isExpandAllApplied = self.categoricalCategoriesFields.length > 1;
+
+    let categoricalRaceChartValues = [];
+    const categoricalDataPairsForGrouping = categoricalRaceChartDataFields[0].values.reduce((arr: any, c: string, index: number) => {
+        const category = categoricalRaceChartDataFields.map(d => d.values[index]).join(", ");
+        categoricalRaceChartValues.push(category);
+        const obj = { category: category, total: 0, [`index-${index}`]: index };
+
+        raceChartCategoryNames.forEach((d, i) => {
+            obj[d] = categoricalRaceChartDataFields[i].values[index].toString();
+        });
+
+        const keys = Object.keys(obj);
+        if (isExpandAllApplied && (keys.includes("Year") || keys.includes("Quarter") || keys.includes("Month") || keys.includes("Day"))) {
+            const day = obj["Day"] ? parseInt(obj["Day"].toString()) : 1;
+            const month = obj["Month"] ? obj["Month"].toString() : "January";
+            const quarter = obj["Quarter"] ? parseInt(obj["Quarter"].toString().split("Qtr")[1]) : 1;
+            const year = obj["Year"] ? parseInt(obj["Year"].toString()) : 2024;
+
+            obj["date"] = CreateDate(day ? day : 1, month, quarter ? quarter : 1, year ? year : 2024) as any;
+        }
+
+        return [...arr, obj];
+    }, []);
+
+    categoricalRaceChartValues = categoricalRaceChartValues.filter((item, i, ar) => ar.indexOf(item) === i);
+
+    if (!categoricalRaceChartValues) {
+        categoricalRaceChartValues = [];
+    }
+
+    const categoricalDataPairsGroup = group(categoricalDataPairsForGrouping, (d: any) => d.category);
+    const raceChartDataPairs = categoricalRaceChartValues.map((category) => Object.assign({}, ...categoricalDataPairsGroup.get(category)));
+
+    raceChartDataPairs.forEach(d => {
+        const keys = Object.keys(d).filter(k => k.includes("index-"));
+        let total = 0;
+        keys.forEach(key => {
+            const index = key ? +key.split("-")[1] : 0;
+            total += +self.categoricalMeasureFields[0].values[index];
+        });
+        d.total = total;
+    });
+
+    return raceChartDataPairs;
+};

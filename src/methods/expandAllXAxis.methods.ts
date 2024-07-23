@@ -7,35 +7,35 @@ import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 
 export const RenderExpandAllXAxis = (self: Visual, categoricalData: powerbi.DataViewCategorical): void => {
-	if (self.isChartIsRaceChart) {
-		const data = self.raceChartKeysList.reduce((arr, cur, i) => {
-			const obj = { raceChartKey: cur };
-			for (let index = 0; index < self.categoricalData.categories.length; index++) {
-				obj[categoricalData.categories[index].source.displayName] = categoricalData.categories[index].values[i];
-			}
-			arr = [...arr, obj]
-			return arr;
-		}, []);
+	// if (self.isChartIsRaceChart) {
+	// 	const data = self.raceChartCategories.reduce((arr, cur, i) => {
+	// 		const obj = { raceChartKey: cur };
+	// 		for (let index = 0; index < self.categoricalData.categories.length; index++) {
+	// 			obj[categoricalData.categories[index].source.displayName] = categoricalData.categories[index].values[i];
+	// 		}
+	// 		arr = [...arr, obj]
+	// 		return arr;
+	// 	}, []);
 
-		self.expandAllCategoriesName.forEach((d, i) => {
-			const values = data.filter((c) => c.raceChartKey === self.raceChartKeyOnTick).map(m => m[d]);
+	// 	self.expandAllCategoriesName.forEach((d, i) => {
+	// 		const values = data.filter((c) => c.raceChartKey === self.raceChartKeyOnTick).map(m => m[d]);
+	// 		const xScaleCopy = self.xScale.copy();
+	// 		xScaleCopy.domain(values);
+	// 		self[`${d}ScaleDomain`] = values;
+	// 		self[`${d}ScaleNewDomain`] = [];
+	// 		self[d + "Scale"] = xScaleCopy;
+	// 	});
+	// } else {
+	categoricalData.categories.forEach((d, i) => {
+		if (i < self.categoricalData.categories.length - 1) {
 			const xScaleCopy = self.xScale.copy();
-			xScaleCopy.domain(values);
-			self[`${d}ScaleDomain`] = values;
-			self[`${d}ScaleNewDomain`] = [];
-			self[d + "Scale"] = xScaleCopy;
-		});
-	} else {
-		categoricalData.categories.forEach((d, i) => {
-			if (i < self.categoricalData.categories.length - 1) {
-				const xScaleCopy = self.xScale.copy();
-				xScaleCopy.domain(d.values);
-				self[`${d.source.displayName}ScaleDomain`] = d.values;
-				self[`${d.source.displayName}ScaleNewDomain`] = [];
-				self[d.source.displayName + "Scale"] = xScaleCopy;
-			}
-		});
-	}
+			xScaleCopy.domain(d.values);
+			self[`${d.source.displayName}ScaleDomain`] = d.values;
+			self[`${d.source.displayName}ScaleNewDomain`] = [];
+			self[d.source.displayName + "Scale"] = xScaleCopy;
+		}
+	});
+	// }
 };
 
 export const CallExpandAllXScaleOnAxisGroup = (self: Visual, width: number): void => {
@@ -95,35 +95,35 @@ export const SetExpandAllXAxisTickStyle = (self: Visual) => {
 };
 
 export const RenderExpandAllYAxis = (self: Visual, categoricalData: powerbi.DataViewCategorical): void => {
-	if (self.isChartIsRaceChart) {
-		const data = self.raceChartKeysList.reduce((arr, cur, i) => {
-			const obj = { raceChartKey: cur };
-			for (let index = 0; index < self.categoricalData.categories.length; index++) {
-				obj[categoricalData.categories[index].source.displayName] = categoricalData.categories[index].values[i];
-			}
-			arr = [...arr, obj]
-			return arr;
-		}, []);
+	// if (self.isChartIsRaceChart) {
+	// 	const data = self.raceChartKeysList.reduce((arr, cur, i) => {
+	// 		const obj = { raceChartKey: cur };
+	// 		for (let index = 0; index < self.categoricalData.categories.length; index++) {
+	// 			obj[categoricalData.categories[index].source.displayName] = categoricalData.categories[index].values[i];
+	// 		}
+	// 		arr = [...arr, obj]
+	// 		return arr;
+	// 	}, []);
 
-		self.expandAllCategoriesName.forEach((d, i) => {
-			const values = data.filter((c) => c.raceChartKey === self.raceChartKeyOnTick).map(m => m[d]);
+	// 	self.expandAllCategoriesName.forEach((d, i) => {
+	// 		const values = data.filter((c) => c.raceChartKey === self.raceChartKeyOnTick).map(m => m[d]);
+	// 		const yScaleCopy = self.yScale.copy();
+	// 		yScaleCopy.domain(values);
+	// 		self[`${d}ScaleDomain`] = values;
+	// 		self[`${d}ScaleNewDomain`] = [];
+	// 		self[d + "Scale"] = yScaleCopy;
+	// 	});
+	// } else {
+	categoricalData.categories.forEach((d, i) => {
+		if (i < self.categoricalData.categories.length - 1) {
 			const yScaleCopy = self.yScale.copy();
-			yScaleCopy.domain(values);
-			self[`${d}ScaleDomain`] = values;
-			self[`${d}ScaleNewDomain`] = [];
-			self[d + "Scale"] = yScaleCopy;
-		});
-	} else {
-		categoricalData.categories.forEach((d, i) => {
-			if (i < self.categoricalData.categories.length - 1) {
-				const yScaleCopy = self.yScale.copy();
-				yScaleCopy.domain(d.values);
-				self[`${d.source.displayName}ScaleDomain`] = d.values;
-				self[`${d.source.displayName}ScaleNewDomain`] = [];
-				self[d.source.displayName + "Scale"] = yScaleCopy;
-			}
-		});
-	}
+			yScaleCopy.domain(d.values);
+			self[`${d.source.displayName}ScaleDomain`] = d.values;
+			self[`${d.source.displayName}ScaleNewDomain`] = [];
+			self[d.source.displayName + "Scale"] = yScaleCopy;
+		}
+	});
+	// }
 };
 
 export const CallExpandAllYScaleOnAxisGroup = (self: Visual, expandAllScaleWidth: number): void => {

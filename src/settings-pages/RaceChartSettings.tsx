@@ -249,7 +249,7 @@ const RaceChartSettings = (props) => {
         </ConditionalWrapper>
 
         <ConditionalWrapper visible={(shadow as Visual).isChartRacePossible}>
-          <Row>
+          {/* <Row>
             <Column>
               <ToggleButton
                 label={"Enable"}
@@ -258,7 +258,7 @@ const RaceChartSettings = (props) => {
                 appearance="toggle"
               />
             </Column>
-          </Row>
+          </Row> */}
 
           <ConditionalWrapper visible={configValues.isEnabled}>
 
