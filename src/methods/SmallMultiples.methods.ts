@@ -261,7 +261,6 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             container.node().append(dataLabels2G.node());
             container.node().append(referenceLineLayersG.node());
             container.node().append(referenceLinesContainerG.node());
-            container.node().append(dynamicDeviationG.node());
             container.node().append(connectingLineG.node());
             container.node().append(xAxisTitleG.node());
             container.node().append(yAxisTitleG.node());
@@ -277,6 +276,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             errorBarsMarkersG.node().append(errorBarsMarkerDef.node());
             errorBarsMarkerDef.node().append(errorBarsMarker.node());
             errorBarsMarker.node().append(errorBarsMarkerPath.node());
+
+            container.node().append(dynamicDeviationG.node());
 
             svg.node().append(brushG.node());
             svgDiv.node().appendChild(svg.node());
