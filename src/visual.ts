@@ -3627,7 +3627,7 @@ export class Visual extends Shadow {
 					this.categoricalData.values = this.categoricalData.values.filter(d => !d.source.groupName.toString().includes(this.othersLabel)) as any;
 					this.categoricalData.values.push(...othersCategoricalDataValues);
 
-					this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
+					// this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
 				}
 
 				this.setColorsByDataColorsSettings();
@@ -3639,6 +3639,8 @@ export class Visual extends Shadow {
 				if (this.conditionalFormattingConditions.length) {
 					this.setConditionalFormattingColor();
 				}
+
+				this.subCategoriesName = this.elementToMoveOthers(this.subCategoriesName, false, undefined, this.rankingSettings.subCategory.enabled && this.rankingSettings.subCategory.showRemainingAsOthers);
 
 				this.setCategoriesColorList();
 				this.setSubcategoriesColorList();
@@ -5154,7 +5156,7 @@ export class Visual extends Shadow {
 					// only this needs to be change for pattern
 					legendDataPoints = this.subCategoriesName.map((d, i) => ({
 						data: {
-							name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d),
+							name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d).replace(new RegExp("-1234567890123", 'g'), ''),
 							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
 							pattern: this.subCategoryPatterns.find(s => s.name === d),
 							imageUrl: undefined
