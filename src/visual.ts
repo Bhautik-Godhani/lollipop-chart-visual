@@ -10840,9 +10840,8 @@ export class Visual extends Shadow {
 
 	getTooltipCategoryText(text: string, toUpperCase: boolean = false, isSubcategory: boolean = false): string {
 		if (text) {
-			text = text.replace(new RegExp("-1234567890123", 'g'), '');
+			text = text.toString().replace(new RegExp("-1234567890123", 'g'), '').replace(/&&/g, " ");
 
-			text = text.toString();
 			const isOthersTick = text.toString().includes(this.othersString);
 
 			if (isSubcategory && this.isHasSubcategories && this.isDateSubcategoryNames) {
