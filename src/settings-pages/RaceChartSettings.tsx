@@ -15,6 +15,7 @@ import {
   SwitchOption,
   Tabs,
   Tab,
+  Label,
 } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair, IRaceChartSettings, IRaceChartTextProps } from "../visual-settings.interface";
 import { ERaceChartSettings, Position } from "../enum";
@@ -89,6 +90,7 @@ const UITextStylesSettings = (
             handleChange={(value) => handleChange(value, ERaceChartSettings.LabelFontSize, textType, setConfigValues)}
           />
         </Column>
+        <Column></Column>
       </Row>
     </ConditionalWrapper>
 
@@ -261,13 +263,61 @@ const RaceChartSettings = (props) => {
           </Row> */}
 
           <ConditionalWrapper visible={configValues.isEnabled}>
-
-            <AccordionAlt title="Animation Transition"
-              open={configValues.allowTransition}
-              showToggle={true}
-              toggleValue={configValues.allowTransition}
-              onChangeToggle={(value) => handleChange(value, ERaceChartSettings.AllowTransition)}
+            <AccordionAlt title="Auto Play Button"
+              open={true}
             >
+              <Row>
+                <Column>
+                  <ToggleButton
+                    label={"Auto Play Button Radius"}
+                    value={configValues.isTickerButtonAutoRadius}
+                    handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
+                    appearance="toggle"
+                  />
+                </Column>
+              </Row>
+
+              <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
+                <Row appearance="padded">
+                  <Column>
+                    <Row>
+                      <Column>
+                        <InputControl
+                          min={0}
+                          type="number"
+                          label="Radius"
+                          value={configValues.tickerButtonRadius.toString()}
+                          handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
+                        />
+                      </Column>
+
+                      <Column>
+                        <ColorPicker
+                          label={"Play Button Color"}
+                          color={configValues.tickerButtonColor}
+                          handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                          colorPalette={vizOptions.host.colorPalette}
+                        />
+                      </Column>
+                    </Row>
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+
+              <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
+                <Row>
+                  <Column>
+                    <ColorPicker
+                      label={"Play Button Color"}
+                      color={configValues.tickerButtonColor}
+                      handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                      colorPalette={vizOptions.host.colorPalette}
+                      size="sm"
+                    />
+                  </Column>
+                </Row>
+              </ConditionalWrapper>
+
               <Row>
                 <Column>
                   <SwitchOption
@@ -281,6 +331,12 @@ const RaceChartSettings = (props) => {
               </Row>
 
               <Row>
+                <Column>
+                  <Label text="Animation Transition"></Label>
+                </Column>
+              </Row>
+
+              <Row disableTopPadding>
                 <Column>
                   <InputControl
                     min={0}
@@ -314,58 +370,6 @@ const RaceChartSettings = (props) => {
                   {UITextStylesSettings(shadow, vizOptions, ETextType.SubTextStyles, configValues.subTextStyles, setConfigValues)}
                 </Tab>
               </Tabs >
-            </AccordionAlt>
-
-            <AccordionAlt title="Play Button"
-              open={true}
-            >
-              <Row>
-                <Column>
-                  <ToggleButton
-                    label={"Auto Play Button Radius"}
-                    value={configValues.isTickerButtonAutoRadius}
-                    handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
-                    appearance="toggle"
-                  />
-                </Column>
-              </Row>
-
-              <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
-                <Row>
-                  <Column>
-                    <InputControl
-                      min={0}
-                      type="number"
-                      label="Radius"
-                      value={configValues.tickerButtonRadius.toString()}
-                      handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
-                    />
-                  </Column>
-
-                  <Column>
-                    <ColorPicker
-                      label={"Play Button Color"}
-                      color={configValues.tickerButtonColor}
-                      handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                      colorPalette={vizOptions.host.colorPalette}
-                    />
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
-
-              <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
-                <Row>
-                  <Column>
-                    <ColorPicker
-                      label={"Play Button Color"}
-                      color={configValues.tickerButtonColor}
-                      handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                      colorPalette={vizOptions.host.colorPalette}
-                      size="sm"
-                    />
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
             </AccordionAlt>
           </ConditionalWrapper>
         </ConditionalWrapper>
