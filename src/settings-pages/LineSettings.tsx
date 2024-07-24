@@ -162,7 +162,7 @@ const LineSettings = (props) => {
 							</Column>
 
 							<Column>
-								<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure && shadow.dataColorsSettings.fillType !== ColorPaletteType.Single)) : false}>
+								<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure)) : false}>
 									<ColorPicker
 										label="Color"
 										color={configValues.lineColor}
