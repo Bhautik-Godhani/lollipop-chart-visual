@@ -5022,7 +5022,7 @@ export class Visual extends Shadow {
 							const chartData = cloneDeep(this.chartData);
 							legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
 								data: {
-									name: valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(this.isXIsDateTimeAxis ? new Date(d.category.replace(/--\d+/g, '')) : d.category.replace(/--\d+/g, '')),
+									name: valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(this.isXIsDateTimeAxis ? new Date(d.category.replace(/--\d+/g, '')) : d.category.replace(/--\d+/g, '')).replace(new RegExp("-1234567890123", 'g'), ''),
 									color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
 									pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category),
 									imageUrl: undefined
