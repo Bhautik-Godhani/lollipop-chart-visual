@@ -1,9 +1,9 @@
 /* eslint-disable max-lines-per-function */
-import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
+import { ColorPicker, ColorSchemePicker, Column, ConditionalWrapper, Footer, GradientPicker, Quote, Row, SelectInput, ToggleButton } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import * as React from "react";
 import { DATA_COLORS as DATA_COLORS_IMP } from "../constants";
-import { ColorPaletteType, EDataColorsSettings, EDataRolesName, EIBCSThemes, EMarkerColorTypes } from "../enum";
+import { ColorPaletteType, EDataColorsSettings, EDataRolesName, EIBCSThemes, EMarkerColorTypes, EMarkerShapeTypes } from "../enum";
 import { parseObject, persistProperties } from "../methods/methods";
 import { IDataColorsSettings, ILabelValuePair } from "../visual-settings.interface";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
@@ -571,93 +571,105 @@ const DataColors = (props) => {
 
 	return (
 		<>
-			<Row classNames={["data-colors-settings"]} disableTopPadding>
-				<Column>
-					{UIColorPalette(shadow, configValues, setConfigValues)}
-					{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
+			<ConditionalWrapper visible={(shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES || (shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON}>
+				<Row>
+					<Column>
+						<Quote>
+							<strong>Note: </strong>Data colors settings is not supporting "Image" marker. Please select other marker type to enable this settings.
+						</Quote>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 
-					<ConditionalWrapper visible={(rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers)}>
-						<Row>
-							<Column>
-								<ToggleButton
-									label={"Category 'Others' color"}
-									value={configValues.isCustomizeCategoryOthersColor}
-									handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeCategoryOthersColor, setConfigValues)}
-									appearance="toggle"
-								/>
-							</Column>
-						</Row>
+			<ConditionalWrapper visible={(shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || (shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST}>
+				<Row classNames={["data-colors-settings"]} disableTopPadding>
+					<Column>
+						{UIColorPalette(shadow, configValues, setConfigValues)}
+						{UIColorPaletteTypes(shadow, configValues, vizOptions, setConfigValues)}
 
-						<ConditionalWrapper visible={configValues.isCustomizeCategoryOthersColor}>
-							<Row appearance="padded">
+						<ConditionalWrapper visible={(rankingSettings.category.enabled && rankingSettings.category.showRemainingAsOthers)}>
+							<Row>
 								<Column>
-									<ColorPicker
-										label={"Color"}
-										color={configValues.categoryOthersColor}
-										handleChange={(value) => handleChange(value, EDataColorsSettings.categoryOthersColor, setConfigValues)}
-										colorPalette={vizOptions.host.colorPalette}
-										size="sm"
+									<ToggleButton
+										label={"Category 'Others' color"}
+										value={configValues.isCustomizeCategoryOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeCategoryOthersColor, setConfigValues)}
+										appearance="toggle"
 									/>
 								</Column>
 							</Row>
+
+							<ConditionalWrapper visible={configValues.isCustomizeCategoryOthersColor}>
+								<Row appearance="padded">
+									<Column>
+										<ColorPicker
+											label={"Color"}
+											color={configValues.categoryOthersColor}
+											handleChange={(value) => handleChange(value, EDataColorsSettings.categoryOthersColor, setConfigValues)}
+											colorPalette={vizOptions.host.colorPalette}
+											size="sm"
+										/>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
 						</ConditionalWrapper>
-					</ConditionalWrapper>
 
-					<ConditionalWrapper visible={(rankingSettings.subCategory.enabled && rankingSettings.subCategory.showRemainingAsOthers)}>
-						<Row>
-							<Column>
-								<ToggleButton
-									label={"Sub-category 'Others' color"}
-									value={configValues.isCustomizeSubcategoryOthersColor}
-									handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeSubcategoryOthersColor, setConfigValues)}
-									appearance="toggle"
-								/>
-							</Column>
-						</Row>
-
-						<ConditionalWrapper visible={configValues.isCustomizeSubcategoryOthersColor}>
-							<Row appearance="padded">
+						<ConditionalWrapper visible={(rankingSettings.subCategory.enabled && rankingSettings.subCategory.showRemainingAsOthers)}>
+							<Row>
 								<Column>
-									<ColorPicker
-										label={"Color"}
-										color={configValues.subcategoryOthersColor}
-										handleChange={(value) => handleChange(value, EDataColorsSettings.subcategoryOthersColor, setConfigValues)}
-										colorPalette={vizOptions.host.colorPalette}
-										size="sm"
+									<ToggleButton
+										label={"Sub-category 'Others' color"}
+										value={configValues.isCustomizeSubcategoryOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.isCustomizeSubcategoryOthersColor, setConfigValues)}
+										appearance="toggle"
 									/>
 								</Column>
 							</Row>
+
+							<ConditionalWrapper visible={configValues.isCustomizeSubcategoryOthersColor}>
+								<Row appearance="padded">
+									<Column>
+										<ColorPicker
+											label={"Color"}
+											color={configValues.subcategoryOthersColor}
+											handleChange={(value) => handleChange(value, EDataColorsSettings.subcategoryOthersColor, setConfigValues)}
+											colorPalette={vizOptions.host.colorPalette}
+											size="sm"
+										/>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
 						</ConditionalWrapper>
-					</ConditionalWrapper>
 
-					<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled && rankingSettings.smallMultiples.enabled && rankingSettings.smallMultiples.showRemainingAsOthers}>
-						<Row>
-							<Column>
-								<ToggleButton
-									label={"Small multiple 'Others'"}
-									value={configValues.isCustomizeSMOthersColor}
-									handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeSMOthersColor, setConfigValues)}
-									appearance="toggle"
-								/>
-							</Column>
-						</Row>
-
-						<ConditionalWrapper visible={configValues.isCustomizeSMOthersColor}>
-							<Row appearance="padded">
+						<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled && rankingSettings.smallMultiples.enabled && rankingSettings.smallMultiples.showRemainingAsOthers}>
+							<Row>
 								<Column>
-									<ColorPicker
-										label={"Color"}
-										color={configValues.SMOthersColor}
-										handleChange={(value) => handleChange(value, EDataColorsSettings.SMOthersColor, setConfigValues)}
-										colorPalette={vizOptions.host.colorPalette}
-										size="sm"
+									<ToggleButton
+										label={"Small multiple 'Others'"}
+										value={configValues.isCustomizeSMOthersColor}
+										handleChange={(value) => handleChange(value, EDataColorsSettings.IsCustomizeSMOthersColor, setConfigValues)}
+										appearance="toggle"
 									/>
 								</Column>
 							</Row>
+
+							<ConditionalWrapper visible={configValues.isCustomizeSMOthersColor}>
+								<Row appearance="padded">
+									<Column>
+										<ColorPicker
+											label={"Color"}
+											color={configValues.SMOthersColor}
+											handleChange={(value) => handleChange(value, EDataColorsSettings.SMOthersColor, setConfigValues)}
+											colorPalette={vizOptions.host.colorPalette}
+											size="sm"
+										/>
+									</Column>
+								</Row>
+							</ConditionalWrapper>
 						</ConditionalWrapper>
-					</ConditionalWrapper>
-				</Column>
-			</Row>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
