@@ -3235,6 +3235,8 @@ export class Visual extends Shadow {
 								}));
 							}
 						}
+
+						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 					},
 					getXAxisNodeElementAndMeasures: (width, height, isBottomXAxis, isDrawAxis) => {
 						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
@@ -3499,6 +3501,20 @@ export class Visual extends Shadow {
 						if (renderUniformXYAxisToContainer) {
 							renderUniformXYAxisToContainer();
 						}
+					},
+					onScrollPage: () => {
+						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
+
+						const onLollipopClick = (ele: D3Selection<SVGElement>) => {
+							this.handleCreateOwnDynamicDeviationOnBarClick(ele.node());
+						}
+
+						if (!this.isLollipopTypePie) {
+							SetAndBindChartBehaviorOptions(this, d3.selectAll(".lollipop-group"), d3.selectAll(".lollipop-line"), onLollipopClick);
+						} else {
+							SetAndBindChartBehaviorOptions(this, d3.selectAll(".pie-slice"), d3.selectAll(".lollipop-line"), onLollipopClick);
+						}
+						this.behavior.renderSelection(this.interactivityService.hasSelection());
 					}
 				};
 

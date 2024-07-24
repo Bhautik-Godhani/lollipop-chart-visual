@@ -67,6 +67,7 @@ export interface ISmallMultiplesGridLayoutSettings {
     getBottomLeftMargin: () =>
         { bottomMargin: number, leftMargin: number },
     onRenderingFinished: () => void,
+    onScrollPage?: () => void,
 }
 
 export interface ILayoutItemProps {

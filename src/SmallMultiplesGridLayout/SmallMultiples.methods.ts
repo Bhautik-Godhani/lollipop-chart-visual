@@ -111,6 +111,10 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
 
+    hyperListMainContainer.on("scroll", () => {
+        config.onScrollPage();
+    });
+
     const renderUniformXYAxisToContainer = () => {
         const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
         const itemWidth = bBox.width;
