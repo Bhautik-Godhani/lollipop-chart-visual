@@ -527,7 +527,7 @@ const UILayout1 = (
   configValues: ISmallMultiplesGridLayoutSettings,
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
   handleChange: (...any) => void) => {
-  return <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType !== ESmallMultiplesLayoutType.RankedPanels}>
+  return <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType === ESmallMultiplesLayoutType.Grid}>
     <AccordionAlt title="X Axis" open={true}>
       <Row>
         <Column>
@@ -948,6 +948,16 @@ const SmallMultiplesSettings = (props) => {
         [ESmallMultiplesSettings.yAxisType]: ESmallMultiplesAxisType.Individual,
       }));
     }
+  }, []);
+
+  React.useEffect(() => {
+    if (configValues.layoutType !== ESmallMultiplesLayoutType.Grid) {
+      setConfigValues((d) => ({
+        ...d,
+        [ESmallMultiplesSettings.xAxisType]: ESmallMultiplesAxisType.Individual,
+        [ESmallMultiplesSettings.yAxisType]: ESmallMultiplesAxisType.Individual,
+      }));
+    }
   }, [configValues.layoutType, configValues.xAxisType, configValues.yAxisType]);
 
   React.useEffect(() => {
@@ -970,8 +980,6 @@ const SmallMultiplesSettings = (props) => {
       }));
     }
   }, [configValues]);
-
-
 
   return (
     <>
