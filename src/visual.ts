@@ -3506,6 +3506,9 @@ export class Visual extends Shadow {
 						if (renderUniformXYAxisToContainer) {
 							renderUniformXYAxisToContainer();
 						}
+
+						this.setCategoriesColorList();
+						this.setSubcategoriesColorList();
 					},
 					onScrollPage: () => {
 						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
@@ -3637,35 +3640,8 @@ export class Visual extends Shadow {
 					this.setConditionalFormattingColor();
 				}
 
-				if (this.isLollipopTypeCircle) {
-					this.categoriesColorList = this.chartData.map(d => {
-						const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
-						const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-						const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
-						const obj = {
-							name: d.category,
-							marker: color,
-						}
-
-						return obj;
-					});
-				}
-
-				if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
-					this.subCategoriesColorList = [];
-
-					this.subCategoriesColorList = this.chartData[0].subCategories.map(s => {
-						const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
-						const posNegColor = s.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-						const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.subCategoryColorPair[`${s.parentCategory}-${s.category}`] ? this.subCategoryColorPair[`${s.parentCategory}-${s.category}`].marker1Color : null), EHighContrastColorType.Foreground);
-						const obj = {
-							name: s.category,
-							marker: color,
-						}
-
-						return obj;
-					});
-				}
+				this.setCategoriesColorList();
+				this.setSubcategoriesColorList();
 
 				this.configLegend();
 				this.setMargins();
@@ -3845,6 +3821,40 @@ export class Visual extends Shadow {
 			this.createErrorBarsMarkerDefs();
 		} catch (error) {
 			console.error("Error", error);
+		}
+	}
+
+	setCategoriesColorList(): void {
+		if (this.isLollipopTypeCircle) {
+			this.categoriesColorList = this.chartData.map(d => {
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+				const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+				const obj = {
+					name: d.category,
+					marker: color,
+				}
+
+				return obj;
+			});
+		}
+	}
+
+	setSubcategoriesColorList(): void {
+		if (this.chartData.length && this.isHasSubcategories && this.isLollipopTypePie) {
+			this.subCategoriesColorList = [];
+
+			this.subCategoriesColorList = this.chartData[0].subCategories.map(s => {
+				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
+				const posNegColor = s.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+				const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.subCategoryColorPair[`${s.parentCategory}-${s.category}`] ? this.subCategoryColorPair[`${s.parentCategory}-${s.category}`].marker1Color : null), EHighContrastColorType.Foreground);
+				const obj = {
+					name: s.category,
+					marker: color,
+				}
+
+				return obj;
+			});
 		}
 	}
 
