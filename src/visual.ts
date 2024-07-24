@@ -1231,6 +1231,11 @@ export class Visual extends Shadow {
 					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
 				});
 
+				this.categoricalTooltipFields.forEach(d => {
+					const id = `${EDataRolesName.Tooltip}${d.source.index}`;
+					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
+				});
+
 				if (this.isHorizontalChart) {
 					this.categoricalDataPairs.push(othersDataField);
 				} else {
