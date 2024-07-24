@@ -98,6 +98,8 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 		},
 	];
 
+	const isLollipopTypePie = shadow.isHasSubcategories && config.markerType === EMarkerTypes.CHART && (shadow.isHasMultiMeasure ? true : configValues.markerShape === EMarkerShapeTypes.DEFAULT);
+
 	return (
 		<>
 			<Row disableTopPadding>
@@ -190,7 +192,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 								</Row>
 							</ConditionalWrapper>
 
-							<ConditionalWrapper visible={shadow.isHasImagesData && shadow.isLollipopTypePie}>
+							<ConditionalWrapper visible={shadow.isHasImagesData && isLollipopTypePie}>
 								<Row>
 									<Column>
 										<Quote>
@@ -200,7 +202,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 								</Row>
 							</ConditionalWrapper>
 
-							<ConditionalWrapper visible={shadow.isHasImagesData && !shadow.isLollipopTypePie}>
+							<ConditionalWrapper visible={shadow.isHasImagesData && !isLollipopTypePie}>
 								<Row>
 									<Column>
 										<SelectInput
@@ -221,7 +223,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 						</Tab>
 
 						<Tab title={"Upload"} identifier={EMarkerShapeTypes.UPLOAD_ICON}>
-							<ConditionalWrapper visible={shadow.isLollipopTypePie}>
+							<ConditionalWrapper visible={isLollipopTypePie}>
 								<Row>
 									<Column>
 										<Quote>
@@ -231,7 +233,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 								</Row>
 							</ConditionalWrapper>
 
-							<ConditionalWrapper visible={!shadow.isLollipopTypePie}>
+							<ConditionalWrapper visible={!isLollipopTypePie}>
 								<UploadTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} />
 								{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
 							</ConditionalWrapper>

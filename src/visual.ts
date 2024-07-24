@@ -5197,7 +5197,7 @@ export class Visual extends Shadow {
 				legendDataPoints,
 				this.legendSettings,
 				this.patternSettings.enabled,
-				this.isShowImageMarker1
+				this.isShowImageMarker1 || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON
 			);
 
 			this.updateChartDimensions(this.legends.legendWrapper);
