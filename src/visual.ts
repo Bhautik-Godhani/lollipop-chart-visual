@@ -7819,14 +7819,14 @@ export class Visual extends Shadow {
 			fontFamily: xAxisSettings.titleFontFamily,
 			fontSize: xAxisSettings.titleFontSize + "px",
 		};
-		const xAxisTitle = textMeasurementService.getTailoredTextOrDefault(xAxisTitleProperties, this.width);
+		const xAxisTitle = textMeasurementService.getTailoredTextOrDefault(xAxisTitleProperties, this.isHorizontalChart ? this.height : this.width);
 
 		const yAxisTitleProperties: TextProperties = {
 			text: yAxisSettings.titleName,
 			fontFamily: yAxisSettings.titleFontFamily,
 			fontSize: yAxisSettings.titleFontSize + "px",
 		};
-		const yAxisTitle = textMeasurementService.getTailoredTextOrDefault(yAxisTitleProperties, this.height);
+		const yAxisTitle = textMeasurementService.getTailoredTextOrDefault(yAxisTitleProperties, this.isHorizontalChart ? this.width : this.height);
 
 		this.xAxisTitleText
 			.attr("fill", this.getColor(xAxisSettings.titleColor, EHighContrastColorType.Foreground))
