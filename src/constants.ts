@@ -549,7 +549,7 @@ export const ERROR_BARS_SETTINGS: IErrorBarsSettings = {
 	measurement: {
 		direction: EErrorBarsDirection.Both,
 		applySettingsToMeasure: undefined,
-		calcType: EErrorBarsCalcTypes.ByField,
+		calcType: EErrorBarsCalcTypes.ByPercentage,
 		relationshipToMeasure: ERelationshipToMeasure.Absolute,
 		makeSymmetrical: false,
 		upperBoundMeasure: undefined,
