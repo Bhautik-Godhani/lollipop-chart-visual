@@ -5913,7 +5913,7 @@ export class Visual extends Shadow {
 					});
 				});
 			} else {
-				this.categoricalDataPairs.forEach(d => {
+				(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach(d => {
 					switch (marker.fillType) {
 						case ColorPaletteType.Single: {
 							this.subCategoriesName.forEach((data, i) => {
