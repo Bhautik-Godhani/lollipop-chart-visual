@@ -280,7 +280,7 @@ const RaceChartSettings = (props) => {
               <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
                 <Row appearance="padded">
                   <Column>
-                    <Row>
+                    <Row disableTopPadding>
                       <Column>
                         <InputControl
                           min={0}
