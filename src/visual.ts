@@ -7721,6 +7721,7 @@ export class Visual extends Shadow {
 
 				if (this.categoricalTooltipFields[i].source.type.text && value.category === this.othersBarText) {
 					text = this.othersBarText;
+					text = text.replace(new RegExp("-1234567890123", 'g'), '');
 				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
 					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
 				} else {
@@ -10928,6 +10929,7 @@ export class Visual extends Shadow {
 
 				if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
 					text = this.othersBarText;
+					text = text.replace(new RegExp("-1234567890123", 'g'), '');
 				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
 					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
 				} else {
