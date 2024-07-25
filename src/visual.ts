@@ -9587,9 +9587,6 @@ export class Visual extends Shadow {
 				THIS.toCategoryValueDataPair = { category: data.category, value: data.value1 };
 				RenderDynamicDeviation(this, THIS.fromCategoryValueDataPair, THIS.toCategoryValueDataPair);
 
-				console.log(this.dynamicDeviationSettings.createYourOwnDeviation);
-
-
 				if (!this.dynamicDeviationSettings.createYourOwnDeviation || !this.dynamicDeviationSettings.createYourOwnDeviation.from) {
 					THIS.visualHost.persistProperties({
 						merge: [
@@ -10510,7 +10507,7 @@ export class Visual extends Shadow {
 	setPie1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
 		if (marker1Style.isAutoMarkerSize) {
-			const size = d3.min([this.width * 0.10, this.scaleBandWidth * 0.80]) / 2;
+			const size = d3.min([this.width * 0.10, this.height * 0.10, this.scaleBandWidth * 0.80]) / 2;
 			if (size < this.maxPieSize && size > this.minPieSize) {
 				this.pie1Radius = size;
 			} else if (size > this.maxPieSize) {

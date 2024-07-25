@@ -368,7 +368,7 @@ export const GetSmallMultiplesLayoutProps = (
     if (config.layoutType === ESmallMultiplesLayoutType.Grid) {
         height = layoutRowHeight;
     } else if (config.layoutType === ESmallMultiplesLayoutType.RankedPanels) {
-        height = layoutRowHeight / 6;
+        height = layoutRowHeight / 6 > 50 ? layoutRowHeight / 6 : 50;
     } else if (config.layoutType === ESmallMultiplesLayoutType.ScaledRows) {
         height = columns >= config.categories.length ? layoutRowHeight : layoutRowHeight / 6 < 50 ? 50 : layoutRowHeight / 6;
     }
