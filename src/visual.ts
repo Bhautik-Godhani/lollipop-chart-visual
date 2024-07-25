@@ -8952,15 +8952,15 @@ export class Visual extends Shadow {
 			return;
 		}
 
-		if (isShowXAxis) {
-			// // // SET X-AXIS TICKS MAX HEIGHT
-			this.setXScaleGHeight();
-		}
+		// if (isShowXAxis) {
+		// 	// // // SET X-AXIS TICKS MAX HEIGHT
+		// 	this.setXScaleGHeight();
+		// }
 
-		if (isShowYAxis) {
-			// // // SET Y-AXIS TICKS MAX HEIGHT
-			this.setYScaleGWidth();
-		}
+		// if (isShowYAxis) {
+		// 	// // // SET Y-AXIS TICKS MAX HEIGHT
+		// 	this.setYScaleGWidth();
+		// }
 
 		this.setMargins();
 
@@ -9076,23 +9076,23 @@ export class Visual extends Shadow {
 			return;
 		}
 
-		if (isShowXAxis) {
-			// // // SET X-AXIS TICKS MAX HEIGHT
-			this.setXScaleGHeight();
-		}
+		// if (isShowXAxis) {
+		// 	// // // SET X-AXIS TICKS MAX HEIGHT
+		// this.setXScaleGHeight();
+		// }
 
-		if (isShowYAxis) {
-			// // // SET Y-AXIS TICKS MAX HEIGHT
-			this.setYScaleGWidth();
-		}
+		// if (isShowYAxis) {
+		// 	// // // SET Y-AXIS TICKS MAX HEIGHT
+		// 	this.setYScaleGWidth();
+		// }
 
 		this.setMargins();
 
-		this.setXYAxisRange(this.width, this.height);
+		// this.setXYAxisRange(this.width, this.height);
 
-		if (isNaN(this.width) || isNaN(this.height)) {
-			return;
-		}
+		// if (isNaN(this.width) || isNaN(this.height)) {
+		// 	return;
+		// }
 
 		this.setScaleBandwidth();
 		this.callXYScaleOnAxisGroup(isShowXAxis, isShowYAxis);
@@ -9160,8 +9160,46 @@ export class Visual extends Shadow {
 
 		this.setMargins();
 
+		// first round
 		this.setXYAxisRange(this.width, this.height);
 		this.setScaleBandwidth();
+		this.callXYScaleOnAxisGroup(isShowXAxis, isShowYAxis);
+
+		if (this.xAxisSettings.isDisplayLabel && isShowXAxis && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart))) {
+			this.setXAxisTickStyle();
+		}
+
+		if (this.yAxisSettings.isDisplayLabel && isShowYAxis && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart))) {
+			this.setYAxisTickStyle();
+		}
+
+		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
+			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+				const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
+
+				if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+					this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+				} else {
+					this.xScaleGHeight = 0;
+				}
+			}
+		} else {
+			this.xScaleGHeight = 0;
+		}
+
+		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
+			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+				const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+				this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+			}
+		} else {
+			this.yScaleGWidth = 0;
+		}
+
+		// second round
+		this.setMargins();
+		this.setXYAxisRange(this.width, this.height);
+
 		this.callXYScaleOnAxisGroup(isShowXAxis, isShowYAxis);
 
 		if (this.xAxisSettings.isDisplayLabel && isShowXAxis && (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart))) {
