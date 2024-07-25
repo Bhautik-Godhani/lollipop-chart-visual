@@ -491,7 +491,7 @@ export class Visual extends Shadow {
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
 	public minPieSize: number = 10;
-	public maxPieSize: number = 30;
+	public maxPieSize: number = 25;
 
 	// connecting line
 	public connectingLineG: D3Selection<SVGElement>;

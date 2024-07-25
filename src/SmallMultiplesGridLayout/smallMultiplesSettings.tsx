@@ -34,17 +34,6 @@ const XY_AXIS_TYPES: ILabelValuePair[] = [
   },
 ];
 
-const DISPLAY_TYPES: ILabelValuePair[] = [
-  {
-    value: ESmallMultiplesDisplayType.Fixed,
-    label: "Fixed",
-  },
-  {
-    value: ESmallMultiplesDisplayType.Fluid,
-    label: "Fluid",
-  },
-];
-
 const X_AXIS_POSITIONS: ILabelValuePair[] = [
   // {
   //   value: ESmallMultiplesXAxisPosition.All,
@@ -417,6 +406,26 @@ const UILayout = (
       value: ESmallMultiplesViewType.Pagination,
       label: "Pagination",
     });
+  }
+
+  let DISPLAY_TYPES: ILabelValuePair[] = [
+    {
+      value: ESmallMultiplesDisplayType.Fixed,
+      label: "Fixed",
+    },
+    {
+      value: ESmallMultiplesDisplayType.Fluid,
+      label: "Fluid",
+    },
+  ];
+
+  if (configValues.layoutType !== ESmallMultiplesLayoutType.Grid) {
+    DISPLAY_TYPES = [
+      {
+        value: ESmallMultiplesDisplayType.Fixed,
+        label: "Fixed",
+      }
+    ];
   }
 
   return <>
