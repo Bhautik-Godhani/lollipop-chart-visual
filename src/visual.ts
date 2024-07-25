@@ -4734,7 +4734,7 @@ export class Visual extends Shadow {
 		// 	});
 		// }
 
-		if (!this.isHasSubcategories) {
+		if (!this.isLollipopTypePie) {
 			const categoricalSmallMultiplesFields = this.clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
 				const selectionId = this.vizOptions.host
@@ -5290,7 +5290,7 @@ export class Visual extends Shadow {
 	}
 
 	setSelectionIds(data: ILollipopChartRow[]): void {
-		if (!this.isHasSubcategories) {
+		if (!this.isLollipopTypePie) {
 			data.forEach((el) => {
 				el.identity = this.selectionIdByCategories[el.category];
 

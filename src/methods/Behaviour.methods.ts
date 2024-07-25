@@ -23,7 +23,7 @@ export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
 	clearCatcher: D3Selection<SVGElement>;
 	interactivityService: IInteractivityService<SelectableDataPoint>;
 	selectionManager: ISelectionManager;
-	isHasSubcategories: boolean;
+	isLollipopTypePie: boolean;
 	othersCategoriesList: ILollipopChartRow[],
 	getTooltipCategoryText: (text: string, toUpperCase?: boolean, isSubcategory?: boolean) => string;
 	onLollipopClick: (...any) => any;
@@ -40,14 +40,14 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isHasSubcategories, visual, getTooltipCategoryText } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isLollipopTypePie, visual, getTooltipCategoryText } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
 			if (visualAnnotations.isAnnotationScreenActivated) {
 				visualAnnotations.onAnnotationNodeClick(event, data);
 			} else {
-				if (isHasSubcategories) {
+				if (isLollipopTypePie) {
 					if (data.parentCategory.includes("Others")) {
 						const othersData = data.othersIdentity.map(d => ({ selected: false, identity: d }));
 						selectionHandler.handleSelection(othersData, event.ctrlKey);
@@ -115,16 +115,16 @@ export class Behavior implements IInteractiveBehavior {
 			legendItems.on("click", function (e) {
 				const legendData: any = d3Select(this).datum();
 				const categoryData = lollipopSelection
-					.filter((data) => legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isHasSubcategories))
+					.filter((data) => legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isLollipopTypePie))
 					.data();
 
 				const groupByData = lollipopSelection
 					.filter((data) => {
-						return legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isHasSubcategories)
+						return legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isLollipopTypePie)
 					})
 					.data();
 
-				if (!isHasSubcategories) {
+				if (!isLollipopTypePie) {
 					categoryData.forEach(d => {
 						selectionHandler.handleSelection(d, e.ctrlKey);
 					})
@@ -145,7 +145,7 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, dataPoints, interactivityService, legendItems, getTooltipCategoryText, visual, isHasSubcategories } = this.options;
+		const { lollipopSelection, dataPoints, interactivityService, legendItems, getTooltipCategoryText, visual, isLollipopTypePie } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
 		if (legendItems) {
@@ -158,7 +158,7 @@ export class Behavior implements IInteractiveBehavior {
 			const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
 			selectedDataPoints.forEach(d => {
 				legendItems
-					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === getTooltipCategoryText.bind(visual)(d.category.toString(), false, isHasSubcategories) })
+					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === getTooltipCategoryText.bind(visual)(d.category.toString(), false, isLollipopTypePie) })
 					.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
 			});
 		}
@@ -208,7 +208,7 @@ export const SetAndBindChartBehaviorOptions = (
 			interactivityService: self.interactivityService,
 			selectionManager: self.selectionManager,
 			behavior: self.behavior,
-			isHasSubcategories: self.isHasSubcategories,
+			isLollipopTypePie: self.isLollipopTypePie,
 			othersCategoriesList: self.othersCategoriesList,
 			onLollipopClick,
 			getTooltipCategoryText: self.getTooltipCategoryText
