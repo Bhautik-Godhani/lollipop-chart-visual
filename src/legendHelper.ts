@@ -193,7 +193,7 @@ export const renderLegends = (
         legend.attr("height", horizontalLegendsHeight);
         legend.attr("width", horizontalLegendsWidth);
 
-        legendWrapper.style("height", `${horizontalLegendsHeight}px`);
+        legendWrapper.style("height", `${horizontalLegendsHeight - bottomSpace}px`);
         legendWrapper.style("width", `calc(100% - ${legendFormattingOptions.fontSize * 1.6}px`);
 
         if (legendWrapperXOffset) {
@@ -212,7 +212,7 @@ export const renderLegends = (
         legend.attr("height", verticalLegendsHeight);
         legend.attr("width", verticalLegendElementWidth);
 
-        legendWrapper.style("height", `calc(100% - ${5}px`); // decreaseing on both top and bottom
+        legendWrapper.style("height", `calc(100% - ${5 + bottomSpace}px`); // decreaseing on both top and bottom
         legendWrapper.style("margin-top", `${legendFormattingOptions.fontSize * 1.6}px`);
         legendWrapper.style("width", `${verticalLegendElementWidth}px`);
 
@@ -229,7 +229,16 @@ export const renderLegends = (
 
     positionLabels(legendFormattingOptions, mainContainer, iconsBar, leftRightArrows, topBottomArrows, bottomSpace);
 
-    plotNavigationArrows(legendWrapper, legend, legendFormattingOptions, leftRightArrows, topBottomArrows);
+    if (legendFormattingOptions.legendPosition === "RightTop" ||
+        legendFormattingOptions.legendPosition === "RightCenter" ||
+        legendFormattingOptions.legendPosition === "RightBottom" ||
+        legendFormattingOptions.legendPosition === "LeftTop" ||
+        legendFormattingOptions.legendPosition === "LeftCenter" ||
+        legendFormattingOptions.legendPosition === "LeftBottom") {
+        legendWrapper.style("height", `calc(100% - ${(topBottomArrows ? legendFormattingOptions.fontSize * 1.6 * 2 : 5) + bottomSpace}px)`)
+    }
+
+    plotNavigationArrows(legendWrapper, legend, legendFormattingOptions, leftRightArrows, topBottomArrows, bottomSpace);
 
     return {
         legendWrapper: legendWrapper,
@@ -237,7 +246,7 @@ export const renderLegends = (
     };
 };
 
-export const plotNavigationArrows = (legendWrapper, legend, legendFormattingOptions, leftRightArrows, topBottomArrows) => {
+export const plotNavigationArrows = (legendWrapper, legend, legendFormattingOptions, leftRightArrows, topBottomArrows, bottomSpace) => {
     if ((legendFormattingOptions.legendPosition === "TopLeft" || legendFormattingOptions.legendPosition === "TopCenter" || legendFormattingOptions.legendPosition === "TopRight" || legendFormattingOptions.legendPosition === "BottomLeft" || legendFormattingOptions.legendPosition === "BottomCenter" || legendFormattingOptions.legendPosition === "BottomRight") && leftRightArrows) {
         rightArrow = legendWrapper
             .append("p").attr("id", "rightArrow").style("position", "absolute").style("right", `0px`).style("color", "#808080").text("▶")
@@ -301,12 +310,12 @@ export const plotNavigationArrows = (legendWrapper, legend, legendFormattingOpti
             rightArrow.style("top", "0px");
             leftArrow.style("top", "0px");
         } else if (legendFormattingOptions.legendPosition === "BottomLeft" || legendFormattingOptions.legendPosition === "BottomCenter" || legendFormattingOptions.legendPosition === "BottomRight") {
-            rightArrow.style("bottom", "0px");
-            leftArrow.style("bottom", "0px");
+            rightArrow.style("bottom", `${bottomSpace}px`);
+            leftArrow.style("bottom", `${bottomSpace}px`);
         }
     } else if ((legendFormattingOptions.legendPosition === "LeftTop" || legendFormattingOptions.legendPosition === "LeftCenter" || legendFormattingOptions.legendPosition === "LeftBottom" || legendFormattingOptions.legendPosition === "RightTop" || legendFormattingOptions.legendPosition === "RightCenter" || legendFormattingOptions.legendPosition === "RightBottom") && topBottomArrows) {
         bottomArrow = legendWrapper
-            .append("p").attr("id", "bottomArrow").style("position", "absolute").style("bottom", `0px`).style("color", "#808080").text("▼")
+            .append("p").attr("id", "bottomArrow").style("position", "absolute").style("bottom", `${bottomSpace}px`).style("color", "#808080").text("▼")
             .style("font-size", Math.max(legendFormattingOptions.fontSize * 1.2, 11) + "px")
             .on("click", () => {
                 const legendWrapperNode = legendWrapper.node();
@@ -406,7 +415,7 @@ export const positionLabels = (legendFormattingOptions, mainContainer, iconsBar,
                     iconsBar.getBoundingClientRect().y + iconsBar.getBoundingClientRect().height
                 ) {
                     legendWrapper
-                        .style("height", `calc(100% - ${iconsBar.clientHeight + legendFormattingOptions.fontSize * 1.6 * 2}px)`)
+                        .style("height", `calc(100% - ${(iconsBar.clientHeight + legendFormattingOptions.fontSize * 1.6 * 2) + bottomSpace}px)`)
                         .style("margin-top", `${iconsBar.clientHeight + legendFormattingOptions.fontSize * 1.6}px`);
                     if (topArrow) {
                         topArrow.style("top", `${iconsBar.clientHeight}px`);
@@ -435,7 +444,7 @@ export const positionLabels = (legendFormattingOptions, mainContainer, iconsBar,
                 legendFormattingOptions.legendPosition === "LeftBottom"
             ) {
                 legendWrapper
-                    .style("height", `calc(100% - ${topBottomArrows ? legendFormattingOptions.fontSize * 1.6 * 2 : 5}px)`)
+                    .style("height", `calc(100% - ${(topBottomArrows ? legendFormattingOptions.fontSize * 1.6 * 2 : 5) + bottomSpace}px)`)
                     .style("margin-top", `${legendFormattingOptions.fontSize * 1.6}px`);
                 if (topArrow) {
                     topArrow.style("top", `0px`);
