@@ -1241,6 +1241,8 @@ export class Visual extends Shadow {
 				} else {
 					this.categoricalDataPairs.push(othersDataField);
 				}
+
+				this.sortedCategoricalDataPairs.push(othersDataField);
 			}
 		}
 
