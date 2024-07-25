@@ -3408,7 +3408,7 @@ export class Visual extends Shadow {
 
 						return {
 							yAxisNode: this.yAxisG.node().cloneNode(true),
-							yAxisNodeWidth: this.margin.left + (this.isVerticalBrushDisplayed ? 10 : 0),
+							yAxisNodeWidth: this.margin.left + 10 + (this.isVerticalBrushDisplayed ? 10 : 0),
 							brushNode: this.brushG.node().cloneNode(true),
 							brushNodeWidth: this.brushG.node().getBoundingClientRect().width,
 							yAxisTitleG: this.yAxisTitleG.node().cloneNode(true),
@@ -10507,7 +10507,7 @@ export class Visual extends Shadow {
 	setPie1Radius(): void {
 		const marker1Style = this.markerSettings.marker1Style;
 		if (marker1Style.isAutoMarkerSize) {
-			const size = d3.min([this.width * 0.10, this.height * 0.10, this.scaleBandWidth * 0.80]) / 2;
+			const size = d3.min([this.width * 0.10, this.height * 0.20, this.scaleBandWidth * 0.80]) / 2;
 			if (size < this.maxPieSize && size > this.minPieSize) {
 				this.pie1Radius = size;
 			} else if (size > this.maxPieSize) {

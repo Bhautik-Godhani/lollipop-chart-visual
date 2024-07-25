@@ -34,8 +34,8 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     const SMPaginationPanelHeight: number = config.viewType === ESmallMultiplesViewType.Pagination ? 35 : 0;
     const totalRows = Math.ceil(config.categories.length / columns);
-    const minItemWidth = 150;
-    const minItemHeight = 150;
+    const minItemWidth = 175;
+    const minItemHeight = 175;
     let itemWidth = (config.containerWidth - config.outerSpacing * columns - config.outerSpacing) / columns;
     let itemHeight = ((config.containerHeight - SMPaginationPanelHeight) / rows) - config.outerSpacing - 10;
 
@@ -219,8 +219,8 @@ export const GetGridLayoutRowsColumnsCount = (
     const maxColumns = 6;
 
     //  FLUID LAYOUT
-    const minItemWidth = 150;
-    const minItemHeight = 150;
+    const minItemWidth = 175;
+    const minItemHeight = 175;
     const fluidColumnsCount = Math.floor(config.containerWidth / config.categories.length) > minItemWidth ? config.categories.length : Math.floor(config.containerWidth / minItemWidth);
     const fluidRowsCount = Math.floor(config.containerHeight / Math.ceil(config.categories.length / fluidColumnsCount)) > minItemHeight ? Math.ceil(config.categories.length / fluidColumnsCount) : Math.floor(config.containerHeight / minItemHeight);
 
