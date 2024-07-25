@@ -11750,22 +11750,40 @@ export class Visual extends Shadow {
 				.each((d: ILollipopChartRow, i: number, nodes) => {
 					const ele = d3.select(nodes[i]);
 					let fill: string;
-					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
+					let isHasPattern: boolean;
+					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && (this.isLollipopTypeCircle ? !this.CFCategoryColorPair[d.category].isMarker1Color : true);
 					const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-					const color = this.getColor(isPosNegColorScheme ? posNegColor : (this.categoryColorPair[d.category] ? this.categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+					const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
+					let color = this.getColor(isPosNegColorScheme && (this.isSmallMultiplesEnabled ? !d.isOthersSmallMultiples : true) && (this.dataColorsSettings.isCustomizeCategoryOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
+
+					if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+						color = this.dataColorsSettings.categoryOthersColor;
+					}
+
 					let pattern = d.pattern;
 					if ((this.isHasMultiMeasure || (this.isLollipopTypePie && this.dataColorsSettings.fillType === ColorPaletteType.Single)) && this.isPatternApplied) {
 						pattern = this.patternByMeasures[DataValuesType.Value1];
 					}
 					if (pattern && pattern.patternIdentifier && pattern.patternIdentifier !== "" && String(pattern.patternIdentifier).toUpperCase() !== "NONE") {
 						fill = `url('#${generatePattern(this.svg, pattern, color)}')`;
+						isHasPattern = true;
 					} else {
-						fill = color ? color : "rgba(0, 99, 178, 1)";
+						fill = color;
 					}
 
-					ele
-						.attr("fill", marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly ? "rgba(255, 255, 255, 1)" : fill)
-						.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+					// if (this.isSmallMultiplesEnabled && d.isOthersSmallMultiples && this.dataColorsSettings.isCustomizeSMOthersColor && this.rankingSettings.smallMultiples.enabled && this.rankingSettings.smallMultiples.showRemainingAsOthers) {
+					// 	fill = this.dataColorsSettings.SMOthersColor;
+					// }
+
+					if (marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly) {
+						ele
+							.attr("fill", !isHasPattern ? "rgba(255, 255, 255, 1)" : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
+							.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+					} else {
+						ele
+							.attr("fill", fill)
+							.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+					}
 				}
 				);
 		}
