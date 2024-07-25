@@ -80,19 +80,19 @@ const CutAndClipAxisSettings = (props) => {
   React.useEffect(() => {
     if (shadow.isAllNegativeValue) {
       if (configValues.breakStart === undefined || configValues.breakStart === null) {
-        handleChange((shadow.axisDomainMinValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
+        handleChange(parseInt((shadow.axisDomainMinValue * 15 / 100).toFixed(0)), ECutAndClipAxisSettings.BreakStart);
       }
 
       if (configValues.breakEnd === undefined || configValues.breakEnd === null) {
-        handleChange((shadow.axisDomainMinValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
+        handleChange(parseInt((shadow.axisDomainMinValue * 35 / 100).toFixed(0)), ECutAndClipAxisSettings.BreakEnd);
       }
     } else {
       if (configValues.breakStart === undefined || configValues.breakStart === null) {
-        handleChange((shadow.axisDomainMaxValue * 15 / 100).toFixed(0), ECutAndClipAxisSettings.BreakStart);
+        handleChange(parseInt((shadow.axisDomainMaxValue * 15 / 100).toFixed(0)), ECutAndClipAxisSettings.BreakStart);
       }
 
       if (configValues.breakEnd === undefined || configValues.breakEnd === null) {
-        handleChange((shadow.axisDomainMaxValue * 35 / 100).toFixed(0), ECutAndClipAxisSettings.BreakEnd);
+        handleChange(parseInt((shadow.axisDomainMaxValue * 35 / 100).toFixed(0)), ECutAndClipAxisSettings.BreakEnd);
       }
     }
   }, []);
@@ -130,7 +130,17 @@ const CutAndClipAxisSettings = (props) => {
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled}>
+      <ConditionalWrapper visible={shadow.isChartIsRaceChart}>
+        <Row>
+          <Column>
+            <Quote>
+              <strong>Note: </strong>Please remove the race chart data to use this feature.
+            </Quote>
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled && !shadow.isChartIsRaceChart}>
         <Row>
           <Column>
             <ToggleButton

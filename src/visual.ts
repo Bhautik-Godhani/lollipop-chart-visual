@@ -8933,9 +8933,6 @@ export class Visual extends Shadow {
 			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue;
 		}
 
-		this.cutAndClipAxisSettings.breakStart = parseFloat(this.cutAndClipAxisSettings.breakStart.toString());
-		this.cutAndClipAxisSettings.breakEnd = parseFloat(this.cutAndClipAxisSettings.breakEnd.toString());
-
 		// if (!this.dataColorsSettings.isFillTypeChanged && this.minCategoryValueDataPair.value < 0 && this.maxCategoryValueDataPair.value > 0 && !this.isIBCSEnabled) {
 		// 	this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
 		// }
