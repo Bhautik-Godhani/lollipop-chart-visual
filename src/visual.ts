@@ -5730,7 +5730,7 @@ export class Visual extends Shadow {
 
 		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
 			if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor && this.markerSettings.marker1Style.showOutlineOnly) {
-				this.categoricalDataPairs.forEach((data, i) => {
+				(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach((data, i) => {
 					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
 					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
 				});
@@ -10344,12 +10344,12 @@ export class Visual extends Shadow {
 
 				if (marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly) {
 					ele
-						.attr("fill", !isHasPattern ? "rgba(255, 255, 255, 1)" : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
-						.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+						.attr("fill", !isHasPattern ? this.getColor("rgba(255, 255, 255, 1)", EHighContrastColorType.Background) : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
+						.attr("stroke", this.getColor(marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor, EHighContrastColorType.Foreground))
 				} else {
 					ele
 						.attr("fill", fill)
-						.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+						.attr("stroke", this.getColor(marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor, EHighContrastColorType.Background))
 				}
 			}
 			);
