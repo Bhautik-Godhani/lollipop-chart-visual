@@ -3721,7 +3721,7 @@ export class Visual extends Shadow {
 					// }
 				}
 
-				this.isCutAndClipAxisEnabled = GetIsCutAndClipAxisEnabled(this);
+				this.isCutAndClipAxisEnabled = GetIsCutAndClipAxisEnabled(this) && !this.isChartIsRaceChart;
 
 				this.isShowRegularXAxis =
 					(!this.isCutAndClipAxisEnabled && this.isHorizontalChart) ||
