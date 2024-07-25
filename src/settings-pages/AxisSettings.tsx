@@ -1314,6 +1314,34 @@ const XAxisSettings = (props) => {
     // }
   }, [yConfigValues.categoryType]);
 
+  React.useEffect(() => {
+    if (xConfigValues.isMinimumRangeEnabled) {
+      if (xConfigValues.minimumRange === undefined) {
+        handleXChange(shadow.axisDomainMinValue, EXAxisSettings.MinimumRange, setXConfigValues);
+      }
+    }
+
+    if (xConfigValues.isMaximumRangeEnabled) {
+      if (xConfigValues.maximumRange === undefined) {
+        handleXChange(shadow.axisDomainMaxValue, EXAxisSettings.MaximumRange, setXConfigValues);
+      }
+    }
+  }, [xConfigValues]);
+
+  React.useEffect(() => {
+    if (yConfigValues.isMinimumRangeEnabled) {
+      if (yConfigValues.minimumRange === undefined) {
+        handleYChange(shadow.axisDomainMinValue, EXAxisSettings.MinimumRange, setYConfigValues);
+      }
+    }
+
+    if (yConfigValues.isMaximumRangeEnabled) {
+      if (yConfigValues.maximumRange === undefined) {
+        handleYChange(shadow.axisDomainMaxValue, EXAxisSettings.MaximumRange, setYConfigValues);
+      }
+    }
+  }, [yConfigValues]);
+
   return (
     <>
       <div className={"sticky-tabs axis-tabs"} >

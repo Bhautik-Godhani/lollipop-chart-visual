@@ -62,7 +62,8 @@ export interface IChartSubCategory {
 	sliceHeight?: number,
 	pattern?: IPatternProps,
 	allMeasures: { [displayName: string]: { role: { [name: string]: boolean }, value: number | string } },
-	isOthersSmallMultiples?: boolean
+	isOthersSmallMultiples?: boolean,
+	smallMultipleCategory?: string
 }
 
 export interface VisualTooltipDataItem {

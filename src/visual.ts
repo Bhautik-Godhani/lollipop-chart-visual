@@ -10920,11 +10920,19 @@ export class Visual extends Shadow {
 			// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
 		});
 
+		const THIS = this;
+
 		ele.selectAll(".pie-slice").each(function (_, i) {
 			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
 			d3.select(this).datum((datum: any) => {
 				const subCategories = d.subCategories.filter(d => isPie2 ? (d.value2 < 0 ? (d.value2 * -1) : d.value2) : (d.value1 < 0 ? (d.value1 * -1) : d.value1));
-				return { ...(datum ? datum : subCategories[i]), valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1, sliceWidth: bBox.width, sliceHeight: bBox.height }
+				return {
+					...(datum ? datum : subCategories[i]),
+					valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1,
+					sliceWidth: bBox.width,
+					sliceHeight: bBox.height,
+					smallMultipleCategory: THIS.smallMultiplesGridItemId
+				}
 			})
 		})
 
@@ -11065,11 +11073,13 @@ export class Visual extends Shadow {
 				});
 			});
 
-			tooltipData.push({
-				displayName: "Total",
-				value: numberFormatter(d3.sum(this.chartData.find(d => d.category === pieData.parentCategory).subCategories, s => s.value1), this.measureNumberFormatter[0]),
-				color: "transparent",
-			});
+			if (this.chartData.find(d => d.category === pieData.parentCategory)) {
+				tooltipData.push({
+					displayName: "Total",
+					value: numberFormatter(d3.sum(this.chartData.find(d => d.category === pieData.parentCategory).subCategories, (s: any) => s.value1), this.measureNumberFormatter[0]),
+					color: "transparent",
+				});
+			}
 
 			return tooltipData;
 		};
