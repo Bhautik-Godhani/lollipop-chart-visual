@@ -490,7 +490,7 @@ export class Visual extends Shadow {
 	pieEmphasizeScaleSize: number = 4;
 	pieViewBoxRatio: number = 100 - this.pieEmphasizeScaleSize;
 	isRankingSettingsChanged: boolean = false;
-	public minPieSize: number = 15;
+	public minPieSize: number = 10;
 	public maxPieSize: number = 30;
 
 	// connecting line
@@ -1834,7 +1834,7 @@ export class Visual extends Shadow {
 		if (this.isLollipopTypeCircle) {
 			this.minScaleBandWidth = 35;
 		} else {
-			this.minScaleBandWidth = 50;
+			this.minScaleBandWidth = 90;
 		}
 
 		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues);
@@ -2539,7 +2539,7 @@ export class Visual extends Shadow {
 		if (this.isLollipopTypeCircle) {
 			this.minScaleBandWidth = 40;
 		} else {
-			this.minScaleBandWidth = 60;
+			this.minScaleBandWidth = 90;
 		}
 
 		this.setNumberFormatters(this.categoricalMeasureFields, this.categoricalTooltipFields, this.categoricalSortFields, this.categoricalRaceChartDataFields);
