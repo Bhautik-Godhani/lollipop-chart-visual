@@ -96,7 +96,7 @@ export const SetLinearCutAxisRange = (self: Visual, xScaleWidth: number, yScaleH
             ]);
 
             self.beforeCutLinearScale.range([
-                xScaleWidth - self.xAxisStartMargin - self.xAxisStartMargin + startDiff,
+                xScaleWidth - self.xAxisStartMargin + startDiff,
                 width - beforeCutLinearScaleArea - self.barCutAndClipMarkerLinesGap / 2,
             ]);
         }
