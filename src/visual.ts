@@ -3221,6 +3221,7 @@ export class Visual extends Shadow {
 					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight,
 					categories: smallMultiplesCategories,
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
+					itemsPerPage: smallMultiplesCategories.length,
 					onCellRendered: (category, index, rowIndex, colIndex, ele) => {
 						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), rowIndex, colIndex, ele);
 

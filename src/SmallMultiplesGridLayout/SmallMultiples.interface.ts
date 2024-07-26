@@ -22,6 +22,7 @@ export interface ISmallMultiplesGridLayoutSettings {
     outerSpacing: number;
     showGridLayoutOnly: boolean;
     showXYAxisSettings: boolean;
+    itemsPerPage: number;
     header: {
         displayType: ESmallMultiplesHeaderDisplayType,
         fontFamily: string,

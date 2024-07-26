@@ -269,6 +269,8 @@ export const CreateSmallMultiplesPaginationPanel = (
     const SMTotalPages = Math.ceil(SMTotalItems / SMItemsPerPage);
     let SMFirstItemIndexOnCurrentPage = (SMCurrentPage - 1) * SMItemsPerPage + 1;
 
+    config.itemsPerPage = SMItemsPerPage;
+
     SMPaginationPanel.selectAll("*").remove();
 
     const paginationPanelContent = SMPaginationPanel.append("div")

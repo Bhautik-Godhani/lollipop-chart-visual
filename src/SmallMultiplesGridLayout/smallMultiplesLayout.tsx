@@ -135,7 +135,7 @@ function SmallMultiplesLayout(props: ISmallMultiplesLayoutProps) {
                 props.onCellRendered(d.category, i, d.y, d.x, entry.target as HTMLDivElement);
               }
 
-              if (settings.categories[settings.categories.length - 1] === d.category) {
+              if (settings.categories[settings.itemsPerPage - 1] === d.category) {
                 props.onRenderingFinished();
               }
             }}

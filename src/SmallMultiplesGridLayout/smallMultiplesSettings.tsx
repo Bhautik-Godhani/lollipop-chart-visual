@@ -346,6 +346,7 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
   yAxisPosition: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
   showGridLayoutOnly: false,
   showXYAxisSettings: true,
+  itemsPerPage: undefined,
   header: {
     displayType: ESmallMultiplesHeaderDisplayType.TitleAndTotalValue,
     fontFamily: '"Segoe UI", wf_segoe-ui_normal, helvetica, arial, sans-serif',
