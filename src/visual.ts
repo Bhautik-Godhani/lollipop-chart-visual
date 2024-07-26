@@ -11353,7 +11353,7 @@ export class Visual extends Shadow {
 					const groupBy = group.get(g);
 
 					groupBy.forEach(d => {
-						obj[d.source.displayName] = d.values[i] ? d.values[i] : 0;
+						obj[d.source.displayName] = d.source.type.dateTime ? formatDate(d.values[i] as string, d.source.format) : (d.values[i] ? d.values[i] : 0);
 					});
 
 					seedDataFromVisual.push(obj);
