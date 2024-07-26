@@ -3218,7 +3218,7 @@ export class Visual extends Shadow {
 					...this.smallMultiplesSettings,
 					hostContainerId: "smallMultipleHostContainer",
 					containerWidth: vizOptions.options.viewport.width - this.settingsBtnWidth - this.legendViewPort.width,
-					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height,
+					containerHeight: vizOptions.options.viewport.height - this.settingsBtnHeight - this.legendViewPort.height - this.footerHeight,
 					categories: smallMultiplesCategories,
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					onCellRendered: (category, index, rowIndex, colIndex, ele) => {
