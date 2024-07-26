@@ -8897,7 +8897,16 @@ export class Visual extends Shadow {
 		this.setXAxisDomain();
 		this.setYAxisDomain();
 
-		const cutAndClipAxisSettings = this.cutAndClipAxisSettings;
+		const cutAndClipAxisConfig = JSON.parse(
+			this.vizOptions.formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]
+		);
+
+		const cutAndClipAxisSettings = {
+			...CUT_AND_CLIP_AXIS_SETTINGS,
+			...cutAndClipAxisConfig,
+		};
+
+		this.cutAndClipAxisSettings = cutAndClipAxisSettings;
 
 		if (this.isAllNegativeValue) {
 			if (cutAndClipAxisSettings.breakStart === undefined || cutAndClipAxisSettings.breakStart === null) {
@@ -8917,19 +8926,19 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.cutAndClipAxisSettings.breakStart < this.axisDomainMinValue) {
+		if (cutAndClipAxisSettings.breakStart < this.axisDomainMinValue) {
 			this.cutAndClipAxisSettings.breakStart = this.axisDomainMinValue;
 		}
 
-		if (this.cutAndClipAxisSettings.breakStart >= this.axisDomainMaxValue) {
+		if (cutAndClipAxisSettings.breakStart >= this.axisDomainMaxValue) {
 			this.cutAndClipAxisSettings.breakStart = this.axisDomainMaxValue;
 		}
 
-		if (this.cutAndClipAxisSettings.breakEnd < this.axisDomainMinValue) {
+		if (cutAndClipAxisSettings.breakEnd < this.axisDomainMinValue) {
 			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMinValue;
 		}
 
-		if (this.cutAndClipAxisSettings.breakEnd >= this.axisDomainMaxValue) {
+		if (cutAndClipAxisSettings.breakEnd >= this.axisDomainMaxValue) {
 			this.cutAndClipAxisSettings.breakEnd = this.axisDomainMaxValue;
 		}
 
