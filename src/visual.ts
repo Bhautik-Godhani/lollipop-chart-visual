@@ -11328,7 +11328,7 @@ export class Visual extends Shadow {
 				});
 
 				this.categoricalData.values.forEach(v => {
-					obj[v.source.displayName] = v.values[i] ? v.values[i] : 0;
+					obj[v.source.displayName] = v.source.type.dateTime ? formatDate(v.values[i] as string, v.source.format) : (v.values[i] ? v.values[i] : 0);
 				});
 
 				seedDataFromVisual.push(obj);
