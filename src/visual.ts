@@ -1236,6 +1236,11 @@ export class Visual extends Shadow {
 					othersDataField[id] = clonedCategoricalDataPairs[othersStartIndex][id];
 				});
 
+				this.categoricalSmallMultiplesDataFields.forEach(d => {
+					const id = `${"smallMultipleCategory-"}${d.source.index}`;
+					othersDataField[id] = this.smallMultiplesCategories[this.currentSmallMultipleIndex]
+				});
+
 				if (this.isHorizontalChart) {
 					this.categoricalDataPairs.push(othersDataField);
 				} else {
@@ -3214,6 +3219,8 @@ export class Visual extends Shadow {
 					});
 				}
 
+				this.smallMultiplesCategories = smallMultiplesCategories;
+
 				const settings: ISmallMultiplesGridLayoutSettings = {
 					...this.smallMultiplesSettings,
 					hostContainerId: "smallMultipleHostContainer",
@@ -3512,6 +3519,8 @@ export class Visual extends Shadow {
 
 						this.setCategoriesColorList();
 						this.setSubcategoriesColorList();
+
+						this.setSummaryTableConfig();
 					},
 					onScrollPage: () => {
 						RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
@@ -3532,7 +3541,6 @@ export class Visual extends Shadow {
 				this.categoriesColorList = [];
 				this.subCategoriesColorList = [];
 
-				this.setSummaryTableConfig();
 				this.configLegend();
 
 				const fn = DrawSmallMultiplesGridLayout(settings);
@@ -11315,50 +11323,62 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (!this.isHasSubcategories) {
-			this.categoricalData.categories[0].values.forEach((d, i) => {
-				const obj = {};
-
-				this.categoricalData.categories.forEach(c => {
-					let text = c.values[i] ? c.values[i] : 0;
-					if (text.toString().split("--").length > 1) {
-						text = text.toString().split("--")[0];
-					}
-					obj[c.source.displayName] = c.source.type.dateTime ? formatDate(text as string, c.source.format) : text;
-				});
-
-				this.categoricalData.values.forEach(v => {
-					obj[v.source.displayName] = v.source.type.dateTime ? formatDate(v.values[i] as string, v.source.format) : (v.values[i] ? v.values[i] : 0);
-				});
-
-				seedDataFromVisual.push(obj);
-			});
-		} else {
-			const group = d3.group(this.categoricalData.values, d => d.source.groupName);
-
-			this.categoricalData.categories[0].values.forEach((d, i) => {
-				[...group.keys()].forEach(g => {
+		const setSeedDataFromVisual = (categoricalData) => {
+			if (!this.isHasSubcategories) {
+				categoricalData.categories[0].values.forEach((d, i) => {
 					const obj = {};
 
-					this.categoricalData.categories.forEach(c => {
+					categoricalData.categories.forEach(c => {
 						let text = c.values[i] ? c.values[i] : 0;
 						if (text.toString().split("--").length > 1) {
 							text = text.toString().split("--")[0];
 						}
-						obj[c.source.displayName] = c.source.type.dateTime ? formatDate(text as string, c.source.format) : text;
+						obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
 					});
 
-					obj[this.categoricalSubCategoryField.displayName] = g;
-
-					const groupBy = group.get(g);
-
-					groupBy.forEach(d => {
-						obj[d.source.displayName] = d.source.type.dateTime ? formatDate(d.values[i] as string, d.source.format) : (d.values[i] ? d.values[i] : 0);
+					categoricalData.values.forEach(v => {
+						obj[v.source.displayName] = v.source.type.dateTime ? formatDate(v.values[i] as string, v.source.format) : (v.values[i] ? v.values[i] : 0);
 					});
 
 					seedDataFromVisual.push(obj);
 				});
-			});
+			} else {
+				const group = d3.group(categoricalData.values, (d: any) => d.source.groupName);
+
+				categoricalData.categories[0].values.forEach((d, i) => {
+					[...group.keys()].forEach(g => {
+						const obj = {};
+
+						categoricalData.categories.forEach(c => {
+							let text = c.values[i] ? c.values[i] : 0;
+							if (text.toString().split("--").length > 1) {
+								text = text.toString().split("--")[0];
+							}
+							obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
+						});
+
+						obj[this.categoricalSubCategoryField.displayName] = g.toString().replace(new RegExp("-1234567890123", 'g'), '');
+
+						const groupBy = group.get(g);
+
+						groupBy.forEach((d: any) => {
+							obj[d.source.displayName] = (d.source.type.dateTime ? formatDate(d.values[i] as string, d.source.format) : (d.values[i] ? d.values[i] : 0)).toString().replace(new RegExp("-1234567890123", 'g'), '');
+						});
+
+						seedDataFromVisual.push(obj);
+					});
+				});
+			}
+		}
+
+		if (this.isSmallMultiplesEnabled) {
+			this.smallMultiplesGridItemsList.forEach(d => {
+				const smallMultiplesGridItemContent = d.content;
+				const categoricalData = smallMultiplesGridItemContent.categoricalData;
+				setSeedDataFromVisual(categoricalData);
+			})
+		} else {
+			setSeedDataFromVisual(this.categoricalData);
 		}
 
 		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName, this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
