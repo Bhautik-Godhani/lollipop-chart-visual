@@ -11333,6 +11333,10 @@ export class Visual extends Shadow {
 						if (text.toString().split("--").length > 1) {
 							text = text.toString().split("--")[0];
 						}
+						if (text.toString().split("&&").length > 1) {
+							text = text.toString().split("&&")[text.toString().split("&&").length - 1];
+						}
+
 						obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
 					});
 
@@ -11354,6 +11358,10 @@ export class Visual extends Shadow {
 							if (text.toString().split("--").length > 1) {
 								text = text.toString().split("--")[0];
 							}
+							if (text.toString().split("&&").length > 1) {
+								text = text.toString().split("&&")[text.toString().split("&&").length - 1];
+							}
+
 							obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
 						});
 
