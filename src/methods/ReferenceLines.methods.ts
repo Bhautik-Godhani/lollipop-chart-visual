@@ -100,7 +100,7 @@ const getLabelText = (self: Visual, d: IReferenceLineSettings): string => {
     let isValue1TypeNumber = parseFloat(d.lineValue1.value).toString().length > 0 && parseFloat(d.lineValue1.value).toString() !== "NaN";
 
     if (self.isHorizontalChart) {
-        if (d.lineValue1.axis === EXYAxisNames.Y && self.isDateCategoryNames) {
+        if (d.lineValue1.axis === EXYAxisNames.X && self.isDateCategoryNames) {
             isValue1TypeNumber = false;
         }
     } else {
