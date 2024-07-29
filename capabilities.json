@@ -109,6 +109,12 @@
 		{
 			"conditions": [
 				{
+					"category": {
+						"max": 4
+					},
+					"smallMultiples": {
+						"max": 4
+					},
 					"measure": {
 						"max": 1
 					},
