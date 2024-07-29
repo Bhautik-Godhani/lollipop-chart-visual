@@ -708,31 +708,36 @@ export class Visual extends Shadow {
 			},
 			{
 				imageUrl: require("../assets/landing-pages-2/page2.png"),
+				imageTitle: "Marker styles",
+				imageDescription: "Pick from various marker styles or upload your own!",
+			},
+			{
+				imageUrl: require("../assets/landing-pages-2/page3.png"),
 				imageTitle: "Chart Style",
 				imageDescription: "Easily switch between Vertical and Horizontal chart style.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages-2/page3.png"),
+				imageUrl: require("../assets/landing-pages-2/page4.png"),
 				imageTitle: "Small Multiples",
 				imageDescription: "Split your visual into multiple smaller visuals based on the field selected.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages-2/page4.png"),
+				imageUrl: require("../assets/landing-pages-2/page5.png"),
 				imageTitle: "Race Chart",
 				imageDescription: "Visualize changes in trend over the time ",
 			},
 			{
-				imageUrl: require("../assets/landing-pages-2/page5.png"),
+				imageUrl: require("../assets/landing-pages-2/page6.png"),
 				imageTitle: "Dynamic Deviation",
 				imageDescription: "Analyze the variance between two measures using this feature.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages-2/page6.png"),
+				imageUrl: require("../assets/landing-pages-2/page7.png"),
 				imageTitle: "Reference Line/Band",
 				imageDescription: "Add a Reference line or Band to highlight or compare the data against a range of data.",
 			},
 			{
-				imageUrl: require("../assets/landing-pages-2/page7.png"),
+				imageUrl: require("../assets/landing-pages-2/page8.png"),
 				imageTitle: "And Many More Features",
 				imageDescription: "Analyze and customize Lollipop chart with extra features available.",
 			},
