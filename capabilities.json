@@ -24,7 +24,7 @@
 					"integer": true
 				}
 			],
-			"description": "Add a multiple numerical field or measure to visualize the data."
+			"description": "Add a single numerical field or measure to visualize the data."
 		},
 		{
 			"displayName": "Small Multiples",
