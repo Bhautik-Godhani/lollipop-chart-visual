@@ -450,6 +450,7 @@ const UILayout = (
           label={"Display Type"}
           value={configValues.displayType}
           optionsList={DISPLAY_TYPES}
+          disabledFlag={configValues.layoutType !== ESmallMultiplesLayoutType.Grid}
           handleChange={(value) => handleChange(value, ESmallMultiplesSettings.DisplayType, setConfigValues)}
         />
       </Column>
