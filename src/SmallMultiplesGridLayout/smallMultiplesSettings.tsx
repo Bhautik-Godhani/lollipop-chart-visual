@@ -773,7 +773,7 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
             type="number"
             label="Width"
             value={configValues.border.width}
-            handleChange={(value) => handleBorderChange(+value, ESmallMultiplesSettings.Width, setConfigValues)}
+            handleChange={(value) => handleBorderChange(value, ESmallMultiplesSettings.Width, setConfigValues)}
           />
         </Column>
 
@@ -782,7 +782,7 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
             type="number"
             label="Radius"
             value={configValues.border.radius}
-            handleChange={(value) => handleBorderChange(+value, ESmallMultiplesSettings.Radius, setConfigValues)}
+            handleChange={(value) => handleBorderChange(value, ESmallMultiplesSettings.Radius, setConfigValues)}
           />
         </Column>
       </Row>
