@@ -770,7 +770,6 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
       <Row>
         <Column>
           <InputControl
-            min={0}
             type="number"
             label="Width"
             value={configValues.border.width}
@@ -780,7 +779,6 @@ const UIBorder = (vizOptions: ShadowUpdateOptions,
 
         <Column>
           <InputControl
-            min={0}
             type="number"
             label="Radius"
             value={configValues.border.radius}
