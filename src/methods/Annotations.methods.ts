@@ -46,8 +46,8 @@ export const GetAnnotationDataPoint = (self: Visual, d: any): any => {
     }
 
     if (d.tooltipFields && d.tooltipFields.length) {
-        d.tooltipFields.forEach((d, i) => {
-            dataPoint[d.displayName] = self.formatNumber(d.value, self.numberSettings, self.tooltipNumberFormatter[i], true, true);
+        d.tooltipFields.forEach((tooltip, i) => {
+            dataPoint[tooltip.displayName] = d.category.includes("Others") ? self.othersBarText.replace(new RegExp("-1234567890123", 'g'), '') : self.formatNumber(tooltip.value, self.numberSettings, self.tooltipNumberFormatter[i], true, true);
         });
     }
 
