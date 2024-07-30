@@ -783,7 +783,8 @@ export class Visual extends Shadow {
 				categoriesList: [
 					{ label: "Category", value: ECFCategoriesType.Category },
 					{ label: "Sub category", value: ECFCategoriesType.SubCategory },
-				]
+				],
+				applyFor: []
 			},
 			smallMultiplesConfig: {
 				...SMALL_MULTIPLES_SETTINGS,
@@ -8988,6 +8989,9 @@ export class Visual extends Shadow {
 
 		this.circleYScaleDiffs = [];
 		this.circleXScaleDiffs = [];
+
+		this.pieXScaleDiffs = [];
+		this.pieYScaleDiffs = [];
 
 		if (isSetXYScaleDiffs) {
 			this.chartData.forEach(d => {
