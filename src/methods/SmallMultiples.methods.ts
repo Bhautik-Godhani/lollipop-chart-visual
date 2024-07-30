@@ -382,6 +382,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             }
 
             const content: ISmallMultiplesGridItemContent = {
+                category: config.categories[smallMultipleIndex].toString(),
                 width: newItemWidth,
                 height: newItemHeight,
                 svg: svg.node(),
@@ -420,8 +421,6 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             };
 
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;
-
-            console.log(isOthersSM, content.categoricalData);
 
             self.smallMultiplesGridItemsList.push({
                 rowIndex,

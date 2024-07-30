@@ -2828,6 +2828,7 @@ export class Visual extends Shadow {
 			this.smallMultiplesGridItemsList = [];
 			this.smallMultiplesGridItemId = undefined;
 			this.isRaceChartDataLabelDrawn = false;
+			this.isCurrentSmallMultipleIsOthers = false;
 
 			this.maxCircleXScaleDiff = 0;
 			this.maxCircleYScaleDiff = 0;
@@ -6178,6 +6179,7 @@ export class Visual extends Shadow {
 
 				SMItemsList.forEach(d => {
 					const smallMultiplesGridItemContent = d.content;
+					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
 
 					const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
 					const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
@@ -6679,6 +6681,7 @@ export class Visual extends Shadow {
 
 				SMItemsList.forEach(d => {
 					const smallMultiplesGridItemContent = d.content;
+					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
 
 					const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
 					const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();

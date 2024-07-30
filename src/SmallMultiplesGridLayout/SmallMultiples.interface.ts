@@ -101,6 +101,7 @@ export interface ISmallMultiplesLayoutProps {
 }
 
 export interface ISmallMultiplesGridItemContent {
+    category: string,
     width: number,
     height: number,
     svg: SVGElement,
