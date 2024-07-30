@@ -133,6 +133,10 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                         const id = +valueIndex.split("-")[1];
                         return d.values[id];
                     });
+
+                    if (d.source.roles[EDataRolesName.SmallMultiples]) {
+                        d.values = d.values.map(d => self.othersBarText);
+                    }
                 });
 
                 clonedCategoricalData.values.forEach((d) => {
@@ -416,6 +420,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             };
 
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;
+
+            console.log(isOthersSM, content.categoricalData);
 
             self.smallMultiplesGridItemsList.push({
                 rowIndex,
