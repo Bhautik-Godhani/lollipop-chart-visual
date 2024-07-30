@@ -2640,9 +2640,9 @@ export class Visual extends Shadow {
 		}
 
 		if ((!this.sortingSettings.smallMultiples.sortBy ||
-			(![this.categoryDisplayName, ...this.measureNames].includes(this.sortingSettings.smallMultiples.sortBy)))) {
-			this.sortingSettings.smallMultiples.sortBy = this.categoryDisplayName;
-			this.handleSortByCategoryChange(this.sortingSettings.smallMultiples);
+			(![this.smallMultiplesCategoricalDataSourceName, ...this.measureNames].includes(this.sortingSettings.smallMultiples.sortBy)))) {
+			this.sortingSettings.smallMultiples.sortBy = this.measure1DisplayName;
+			this.handleSortByMeasureChange(this.sortingSettings.smallMultiples);
 		}
 
 		if (this.measureNames.length > 1) {
