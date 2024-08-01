@@ -95,101 +95,105 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             const smallMultipleIndex = gridItemId;
             self.currentSmallMultipleIndex = gridItemId;
-            const isOthersSM = config.categories[smallMultipleIndex].toString().includes(self.othersLabel);
-            const clonedCategoricalData: powerbi.DataViewCategorical = cloneDeep(self.originalCategoricalData);
+            // const isOthersSM = config.categories[smallMultipleIndex].toString().includes(self.othersLabel);
+            // const clonedCategoricalData: powerbi.DataViewCategorical = cloneDeep(self.originalCategoricalData);
+
+            // if (gridItemId === 0) {
+            //     self.setSmallMultiplesChartDataBySMCategory(newItemWidth, newItemHeight);
+            // }
 
             self.isCurrentSmallMultipleIsOthers = false;
 
-            if (isOthersSM) {
-                self.isCurrentSmallMultipleIsOthers = true;
-                const SMRaking = self.rankingSettings.smallMultiples;
-                let othersSMData: any[];
+            // if (isOthersSM) {
+            //     self.isCurrentSmallMultipleIsOthers = true;
+            //     const SMRaking = self.rankingSettings.smallMultiples;
+            //     let othersSMData: any[];
 
-                if (SMRaking.enabled) {
-                    if (SMRaking.rankingType === ERankingType.TopN) {
-                        if (self.isHorizontalChart) {
-                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
-                                othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
-                            }
-                        } else {
-                            othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
-                        }
-                    }
-                    if (SMRaking.rankingType === ERankingType.BottomN) {
-                        if (self.isHorizontalChart) {
-                            othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
-                        } else {
-                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
-                                othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
-                            }
-                        }
-                    }
-                }
+            //     if (SMRaking.enabled) {
+            //         if (SMRaking.rankingType === ERankingType.TopN) {
+            //             if (self.isHorizontalChart) {
+            //                 if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+            //                     othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+            //                 }
+            //             } else {
+            //                 othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+            //             }
+            //         }
+            //         if (SMRaking.rankingType === ERankingType.BottomN) {
+            //             if (self.isHorizontalChart) {
+            //                 othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+            //             } else {
+            //                 if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+            //                     othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+            //                 }
+            //             }
+            //         }
+            //     }
 
-                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
-                clonedCategoricalData.categories.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
+            //     const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
+            //     const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+            //     clonedCategoricalData.categories.forEach((d) => {
+            //         d.values = dataValuesIndexes.map((valueIndex) => {
+            //             const id = +valueIndex.split("-")[1];
+            //             return d.values[id];
+            //         });
 
-                    if (d.source.roles[EDataRolesName.SmallMultiples]) {
-                        d.values = d.values.map(d => self.othersBarText);
-                    }
-                });
+            //         if (d.source.roles[EDataRolesName.SmallMultiples]) {
+            //             d.values = d.values.map(d => self.othersBarText);
+            //         }
+            //     });
 
-                clonedCategoricalData.values.forEach((d) => {
-                    const values: Primitive[][] = [];
+            //     clonedCategoricalData.values.forEach((d) => {
+            //         const values: Primitive[][] = [];
 
-                    if (d.source.roles[EDataRolesName.Measure]) {
-                        othersSMData.forEach(o => {
-                            const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
-                            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+            //         if (d.source.roles[EDataRolesName.Measure]) {
+            //             othersSMData.forEach(o => {
+            //                 const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
+            //                 const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
 
-                            const values1 = dataValuesIndexes.map((valueIndex) => {
-                                const id = +valueIndex.split("-")[1];
-                                return d.values[id];
-                            });
+            //                 const values1 = dataValuesIndexes.map((valueIndex) => {
+            //                     const id = +valueIndex.split("-")[1];
+            //                     return d.values[id];
+            //                 });
 
-                            values.push(values1);
-                        });
+            //                 values.push(values1);
+            //             });
 
-                        d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
-                    } else if (d.source.roles[EDataRolesName.ImagesData]) {
-                        d.values = dataValuesIndexes.map((valueIndex) => {
-                            const id = +valueIndex.split("-")[1];
-                            return d.values[id];
-                        });
-                    }
-                });
+            //             d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
+            //         } else if (d.source.roles[EDataRolesName.ImagesData]) {
+            //             d.values = dataValuesIndexes.map((valueIndex) => {
+            //                 const id = +valueIndex.split("-")[1];
+            //                 return d.values[id];
+            //             });
+            //         }
+            //     });
 
-                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
-            } else {
-                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+            //     self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+            // } else {
+            //     const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
+            //     const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
 
-                clonedCategoricalData.categories.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
-                });
+            //     clonedCategoricalData.categories.forEach((d) => {
+            //         d.values = dataValuesIndexes.map((valueIndex) => {
+            //             const id = +valueIndex.split("-")[1];
+            //             return d.values[id];
+            //         });
+            //     });
 
-                clonedCategoricalData.values.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
+            //     clonedCategoricalData.values.forEach((d) => {
+            //         d.values = dataValuesIndexes.map((valueIndex) => {
+            //             const id = +valueIndex.split("-")[1];
+            //             return d.values[id];
+            //         });
 
-                    d.highlights = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
-                    });
-                });
+            //         d.highlights = dataValuesIndexes.map((valueIndex) => {
+            //             const id = +valueIndex.split("-")[1];
+            //             return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+            //         });
+            //     });
 
-                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
-            }
+            //     self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+            // }
 
             // const initialChartDataByBrushScaleBand = self.setInitialChartData(
             //     clonedCategoricalData,
@@ -293,9 +297,12 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             self.width = newItemWidth;
             self.height = newItemHeight;
 
+            const categoricalData = cloneDeep(self.smallMultiplesGridItemsCategoricalData[config.categories[smallMultipleIndex]].categoricalData);
+
+            // remove this use in future
             const initialChartDataByBrushScaleBand = self.setInitialChartData(
-                clonedCategoricalData,
-                cloneDeep(clonedCategoricalData),
+                categoricalData,
+                cloneDeep(categoricalData),
                 self.categoricalMetadata,
                 newItemWidth,
                 newItemHeight
@@ -392,7 +399,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 brushScaleBand: self.brushScaleBand,
                 xAxisG: xAxisG.node() as any,
                 yAxisG: yAxisG.node() as any,
-                categoricalData: self.isSMUniformXAxis ? initialChartDataByBrushScaleBand : self.categoricalData,
+                categoricalData: self.categoricalData,
                 brush: null,
                 brushG: brushG.node() as any,
                 categoricalDataPairs: self.categoricalDataPairs,

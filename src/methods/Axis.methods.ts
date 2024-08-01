@@ -1,7 +1,7 @@
 import { max as D3Max, min as D3Min, sum } from "d3-array";
 import { Visual } from "../visual";
 import { ESmallMultiplesAxisType } from "@truviz/shadow/dist/Components";
-import { AxisCategoryType, EAxisDateFormats } from "../enum";
+import { AxisCategoryType, EAxisDateFormats, EDataRolesName } from "../enum";
 import * as moment from "moment";
 
 export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } => {
@@ -31,8 +31,12 @@ export const GetAxisDomainMinMax = (self: Visual): { min: number, max: number } 
 
     if (self.isSmallMultiplesEnabled && self.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform) {
         const values = self.originalCategoricalData.values;
-        min = self.isHasSubcategories ? D3Min(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : +self.originalCategoricalData.values[0].minLocal;
-        max = self.isHasSubcategories ? D3Max(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : +self.originalCategoricalData.values[0].maxLocal;
+        const allValues = self.smallMultiplesCategories.map(d => self.smallMultiplesGridItemsCategoricalData[d].categoricalData.values.filter(v => v.source.roles[EDataRolesName.Measure]))[0];
+        const minVal = D3Min(allValues, d => D3Min(d.values, s => +s));
+        const maxVal = D3Max(allValues, d => D3Max(d.values, s => +s));
+
+        min = self.isHasSubcategories ? D3Min(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : minVal;
+        max = self.isHasSubcategories ? D3Max(new Array(values[0].values.length).fill("A"), (d, i) => sum(values, v => +v.values[i])) : maxVal;
     }
 
     if (min > 0) {
