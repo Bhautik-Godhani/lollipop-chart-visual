@@ -162,7 +162,7 @@ const DynamicDeviationSettings = (props) => {
     }));
   };
 
-  if (!(shadow as Visual).isSmallMultiplesEnabled && shadow.isLollipopTypeCircle) {
+  if (!(shadow as Visual).isSmallMultiplesEnabled && shadow.isLollipopTypeCircle && !(shadow as Visual).isChartIsRaceChart) {
     DISPLAY_TYPES = [{
       label: "Auto",
       value: EDynamicDeviationDisplayTypes.Auto,
@@ -203,8 +203,9 @@ const DynamicDeviationSettings = (props) => {
 
   React.useEffect(() => {
     if ((configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isSmallMultiplesEnabled) ||
-      configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isLollipopTypePie) {
-      handleChange(EDynamicDeviationDisplayTypes.FirstToLast, EDynamicDeviationSettings.DisplayType);
+      configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isLollipopTypePie ||
+      configValues.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && (shadow as Visual).isChartIsRaceChart) {
+      handleChange(EDynamicDeviationDisplayTypes.Auto, EDynamicDeviationSettings.DisplayType);
     }
   }, []);
 

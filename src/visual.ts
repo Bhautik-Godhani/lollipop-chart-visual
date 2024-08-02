@@ -1975,6 +1975,12 @@ export class Visual extends Shadow {
 			this.isChartRacePossible = false;
 		}
 
+		if (this.dynamicDeviationSettings.isEnabled && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) {
+			if (this.isChartIsRaceChart || this.isSmallMultiplesEnabled || this.isLollipopTypeCircle) {
+				this.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.Auto;
+			}
+		}
+
 		// if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
 		// let raceBarKeys = [];
 		// const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
