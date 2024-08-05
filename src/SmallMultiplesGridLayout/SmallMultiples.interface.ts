@@ -57,6 +57,7 @@ export interface ISmallMultiplesGridLayoutSettings {
         angle: number;
     },
     onCellRendered: (category: string, gridItemIndex: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => void,
+    tempCall: (width: number, height: number) => void,
     getUniformXAxisAndBrushNode: (colIndex: number, xAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isBottomAxis: boolean) =>
         { xAxisNodeHeight: number, yAxisNodeWidth: number, isHorizontalBrushDisplayed: boolean },
     getUniformYAxisAndBrushNode: (colIndex: number, yAxisNode: SVGElement, brushNode: SVGElement, width: number, height: number, isLeftAxis: boolean) =>

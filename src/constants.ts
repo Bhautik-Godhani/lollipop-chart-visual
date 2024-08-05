@@ -795,6 +795,7 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
 		distance: 6
 	},
 	onCellRendered: undefined,
+	tempCall: undefined,
 	getUniformXAxisAndBrushNode: undefined,
 	getUniformYAxisAndBrushNode: undefined,
 	getXAxisNodeElementAndMeasures: undefined,

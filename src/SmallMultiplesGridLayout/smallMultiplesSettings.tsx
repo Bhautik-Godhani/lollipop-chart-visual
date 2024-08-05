@@ -381,6 +381,7 @@ export const SMALL_MULTIPLES_SETTINGS: ISmallMultiplesGridLayoutSettings = {
     distance: 6
   },
   onCellRendered: undefined,
+  tempCall: undefined,
   getUniformXAxisAndBrushNode: undefined,
   getUniformYAxisAndBrushNode: undefined,
   getXAxisNodeElementAndMeasures: undefined,
@@ -539,7 +540,23 @@ const UILayout1 = (
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
   handleChange: (...any) => void) => {
   return <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType === ESmallMultiplesLayoutType.Grid}>
-    <AccordionAlt title="X Axis" open={true}>
+    <AccordionAlt title="Axis" open={true}>
+      <Row>
+        <Column>
+          <SelectInput
+            label={"Type"}
+            value={configValues.xAxisType}
+            optionsList={XY_AXIS_TYPES}
+            handleChange={(value) => {
+              handleChange(value, ESmallMultiplesSettings.xAxisType, setConfigValues);
+              handleChange(value, ESmallMultiplesSettings.yAxisType, setConfigValues);
+            }}
+          />
+        </Column>
+      </Row>
+    </AccordionAlt>
+
+    {/* <AccordionAlt title="X Axis" open={true}>
       <Row>
         <Column>
           <SelectInput
@@ -589,7 +606,7 @@ const UILayout1 = (
           </Column>
         </Row>
       </ConditionalWrapper>
-    </AccordionAlt>
+    </AccordionAlt> */}
   </ConditionalWrapper >
 }
 

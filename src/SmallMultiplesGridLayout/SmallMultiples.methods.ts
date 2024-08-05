@@ -120,45 +120,47 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
         const itemWidth = bBox.width;
         const itemHeight = bBox.height;
 
-        const { bottomMargin, leftMargin } = config.getBottomLeftMargin();
+        if (itemWidth > 0 && itemHeight > 0) {
+            const { bottomMargin, leftMargin } = config.getBottomLeftMargin();
 
-        const { yAxisTitleGNode, xAxisTitleGNode, xAxisTitleHeight, yAxisTitleWidth } = GetRootXYAxisGNode(
-            config,
-            itemWidth - (!isUniformYScale ? leftMargin : config.innerSpacing * 2),
-            itemHeight - panelTitleSize.height - (!isUniformXScale ? bottomMargin : config.innerSpacing * 2),
-            false
-        );
+            const { yAxisTitleGNode, xAxisTitleGNode, xAxisTitleHeight, yAxisTitleWidth } = GetRootXYAxisGNode(
+                config,
+                itemWidth - (!isUniformYScale ? leftMargin : config.innerSpacing * 2),
+                itemHeight - panelTitleSize.height - (!isUniformXScale ? bottomMargin : config.innerSpacing * 2),
+                false
+            );
 
-        const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
-        const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
+            const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
+            const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
 
-        if (isUniformXScale) {
-            switch (config.xAxisPosition) {
-                case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
-                    RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
-                    break;
-                case ESmallMultiplesXAxisPosition.FrozenTopColumn:
-                    RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
-                    break;
-                case ESmallMultiplesXAxisPosition.All:
-                    RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
-                    RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
-                    break;
+            if (isUniformXScale) {
+                switch (config.xAxisPosition) {
+                    case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
+                        RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
+                        break;
+                    case ESmallMultiplesXAxisPosition.FrozenTopColumn:
+                        RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
+                        break;
+                    case ESmallMultiplesXAxisPosition.All:
+                        RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
+                        RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
+                        break;
+                }
             }
-        }
 
-        if (isUniformYScale) {
-            switch (config.yAxisPosition) {
-                case ESmallMultiplesYAxisPosition.FrozenLeftColumn:
-                    RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
-                    break;
-                case ESmallMultiplesYAxisPosition.FrozenRightColumn:
-                    RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
-                    break;
-                case ESmallMultiplesYAxisPosition.All:
-                    RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
-                    RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
-                    break;
+            if (isUniformYScale) {
+                switch (config.yAxisPosition) {
+                    case ESmallMultiplesYAxisPosition.FrozenLeftColumn:
+                        RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
+                        break;
+                    case ESmallMultiplesYAxisPosition.FrozenRightColumn:
+                        RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                        break;
+                    case ESmallMultiplesYAxisPosition.All:
+                        RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
+                        RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                        break;
+                }
             }
         }
     }
@@ -756,47 +758,66 @@ export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, it
     xAxisTitleHeight: number,
     yAxisTitleWidth: number,
 } => {
-    const { xAxisNode: bottomXAxisNode, xAxisNodeHeight, xAxisTitleG, xAxisTitleHeight, brushNode, brushNodeHeight } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, true, isDrawAxis);
-    const { xAxisNode: topXAxisNode } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, false, isDrawAxis);
-    const { yAxisNode: leftYAxisNode, yAxisNodeWidth, yAxisTitleG, yAxisTitleWidth } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, true, isDrawAxis);
-    const { yAxisNode: rightYAxisNode } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, false, isDrawAxis);
+    if (config.xAxisType === ESmallMultiplesAxisType.Uniform) {
+        config.tempCall(itemWidth, itemHeight);
 
-    const bottomXAxisGNode = d3.select(bottomXAxisNode.cloneNode(true));
-    const topXAxisGNode = d3.select(topXAxisNode.cloneNode(true));
+        const { xAxisNode: bottomXAxisNode, xAxisNodeHeight, xAxisTitleG, xAxisTitleHeight, brushNode, brushNodeHeight } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, true, isDrawAxis);
+        // const { xAxisNode: topXAxisNode } = config.getXAxisNodeElementAndMeasures(itemWidth, itemHeight, false, isDrawAxis);
+        const { yAxisNode: leftYAxisNode, yAxisNodeWidth, yAxisTitleG, yAxisTitleWidth } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, true, isDrawAxis);
+        // const { yAxisNode: rightYAxisNode } = config.getYAxisNodeElementAndMeasures(itemWidth, itemHeight, false, isDrawAxis);
 
-    const leftYAxisGNode = d3.select(leftYAxisNode.cloneNode(true));
-    const rightYAxisGNode = d3.select(rightYAxisNode.cloneNode(true));
+        const bottomXAxisGNode = d3.select(bottomXAxisNode.cloneNode(true));
+        // const topXAxisGNode = d3.select(topXAxisNode.cloneNode(true));
 
-    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
-    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+        const leftYAxisGNode = d3.select(leftYAxisNode.cloneNode(true));
+        // const rightYAxisGNode = d3.select(rightYAxisNode.cloneNode(true));
 
-    const xAxisTitleGNode = d3.select(xAxisTitleG.cloneNode(true));
-    const yAxisTitleGNode = d3.select(yAxisTitleG.cloneNode(true));
+        const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
+        const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
 
-    if (!isUniformXScale) {
-        bottomXAxisGNode.selectAll("text").attr("y", 0);
-        bottomXAxisGNode.selectAll("tspan").attr("y", 0);
+        const xAxisTitleGNode = d3.select(xAxisTitleG.cloneNode(true));
+        const yAxisTitleGNode = d3.select(yAxisTitleG.cloneNode(true));
 
-        topXAxisGNode.selectAll("text").attr("y", 0);
-        topXAxisGNode.selectAll("tspan").attr("y", 0);
+        if (!isUniformXScale) {
+            bottomXAxisGNode.selectAll("text").attr("y", 0);
+            bottomXAxisGNode.selectAll("tspan").attr("y", 0);
+
+            // topXAxisGNode.selectAll("text").attr("y", 0);
+            // topXAxisGNode.selectAll("tspan").attr("y", 0);
+        } else {
+            xAxisTitleGNode.attr("transform", `translate(${0}, ${0})`);
+        }
+
+        return {
+            bottomXAxisNode: bottomXAxisGNode,
+            topXAxisNode: undefined,
+            leftYAxisGNode: leftYAxisGNode,
+            rightYAxisGNode: undefined,
+            brushNode: d3.select(brushNode.cloneNode(true)),
+            xAxisTitleGNode: xAxisTitleGNode,
+            xAxisGNodeHeight: xAxisNodeHeight,
+            yAxisGNodeWidth: yAxisNodeWidth,
+            yAxisTitleGNode: yAxisTitleGNode,
+            xAxisTitleHeight: xAxisTitleHeight,
+            yAxisTitleWidth: yAxisTitleWidth,
+            brushNodeHeight
+        };
     } else {
-        xAxisTitleGNode.attr("transform", `translate(${0}, ${0})`);
+        return {
+            bottomXAxisNode: undefined,
+            topXAxisNode: undefined,
+            leftYAxisGNode: undefined,
+            rightYAxisGNode: undefined,
+            brushNode: undefined,
+            xAxisTitleGNode: undefined,
+            xAxisGNodeHeight: 0,
+            yAxisGNodeWidth: 0,
+            yAxisTitleGNode: undefined,
+            xAxisTitleHeight: 0,
+            yAxisTitleWidth: 0,
+            brushNodeHeight: 0
+        }
     }
-
-    return {
-        bottomXAxisNode: bottomXAxisGNode,
-        topXAxisNode: topXAxisGNode,
-        leftYAxisGNode: leftYAxisGNode,
-        rightYAxisGNode: rightYAxisGNode,
-        brushNode: d3.select(brushNode.cloneNode(true)),
-        xAxisTitleGNode: xAxisTitleGNode,
-        xAxisGNodeHeight: xAxisNodeHeight,
-        yAxisGNodeWidth: yAxisNodeWidth,
-        yAxisTitleGNode: yAxisTitleGNode,
-        xAxisTitleHeight: xAxisTitleHeight,
-        yAxisTitleWidth: yAxisTitleWidth,
-        brushNodeHeight
-    };
 };
 
 export const CreateSmallMultiplesUniformAxis = (
