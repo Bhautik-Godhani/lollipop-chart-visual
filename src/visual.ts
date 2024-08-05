@@ -9180,7 +9180,12 @@ export class Visual extends Shadow {
 		}
 	}
 
-	drawXYAxis(categoricalData: powerbi.DataViewCategorical, isShowXAxis: boolean, isShowYAxis: boolean, isSetXYScaleDiffs: boolean = true): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
+	drawXYAxis(
+		categoricalData: powerbi.DataViewCategorical,
+		isShowXAxis: boolean,
+		isShowYAxis: boolean,
+		isSetXYScaleDiffs: boolean = true,
+	): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
 		// if (!isShowYAxis) {
 		// 	this.xAxisStartMargin = 0;
 		// }
@@ -9266,6 +9271,26 @@ export class Visual extends Shadow {
 		// }
 
 		this.setMargins();
+
+		if (isShowYAxis && this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+			if ((this.width * 100 / this.viewPortWidth < 60) || this.width < 150) {
+				this.yAxisTitleMargin = 0;
+				this.yAxisTitleSize = { width: 0, height: 0 };
+				this.yAxisSettings.isDisplayTitle = false;
+			}
+
+			if ((this.width * 100 / this.viewPortWidth < 55) || this.width < 125) {
+				if (this.isHorizontalChart) {
+					isShowYAxis = false;
+					this.yAxisSettings.isDisplayLabel = false;
+					this.yScaleGWidth = 0;
+				} else {
+					isShowYAxis = false;
+					this.yAxisSettings.isDisplayLabel = false;
+					this.yScaleGWidth = 0;
+				}
+			}
+		}
 
 		this.circleYScaleDiffs = [];
 		this.circleXScaleDiffs = [];
