@@ -9573,7 +9573,7 @@ export class Visual extends Shadow {
 
 		// Truncate the ticks which are overlaps with the Y axis
 		const THIS = this;
-		if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+		if (!this.isHorizontalChart && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 			this.xAxisG
 				.selectAll(".tick")
 				.selectAll("text")
