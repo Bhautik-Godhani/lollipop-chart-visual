@@ -160,6 +160,17 @@ const FillPatterns = (props) => {
 	const isShowNote: boolean = (!shadow.isHasMultiMeasure && markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT) ||
 		(shadow.isHasMultiMeasure ? (markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.DEFAULT || markerSettings.marker2Style.markerShape !== EMarkerShapeTypes.DEFAULT) : false);
 
+	React.useEffect(() => {
+		if (shadow.isHorizontalChart) {
+			setConfigValues(d => ({
+				...d,
+				categoryPatterns: d.categoryPatterns.reverse(),
+				measuresPatterns: d.measuresPatterns,
+				subCategoryPatterns: d.subCategoryPatterns
+			}));
+		}
+	}, []);
+
 	return (
 		<>
 			{/* <ConditionalWrapper visible={(!shadow.isLollipopTypePie && !shadow.isHasMultiMeasure)}>

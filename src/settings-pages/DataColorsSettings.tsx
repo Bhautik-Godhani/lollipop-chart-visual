@@ -569,6 +569,26 @@ const DataColors = (props) => {
 		});
 	}, [configValues.fillType]);
 
+	if (shadow.isHorizontalChart) {
+		React.useEffect(() => {
+			setConfigValues((d) => {
+				return {
+					...d,
+					[EDataColorsSettings.CategoryColors]: d.categoryColors.reverse(),
+				};
+			});
+		}, []);
+
+		React.useEffect(() => {
+			setConfigValues((d) => {
+				return {
+					...d,
+					[EDataColorsSettings.CategoryColors]: d.categoryColors.reverse(),
+				};
+			});
+		}, [configValues.categoryColors]);
+	}
+
 	return (
 		<>
 			<ConditionalWrapper visible={(shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES || (shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON}>
