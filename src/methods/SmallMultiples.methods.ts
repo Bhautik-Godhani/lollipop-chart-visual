@@ -496,7 +496,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.setMargins();
 
-            self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+            self.drawXYAxis(isUniformXScale ? self.SMCategoricalInitBrushScaleBandData : self.categoricalData, self.SMChartData.length > 0 && isUniformXScale ? self.SMChartData : self.chartData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
 
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].xScale = self.xScale;
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].yScale = self.yScale;

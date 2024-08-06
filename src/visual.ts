@@ -3342,7 +3342,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { xAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
+								const { xAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.chartData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -3428,7 +3428,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { yAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
+								const { yAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.chartData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -3487,7 +3487,7 @@ export class Visual extends Shadow {
 							this.drawHorizontalBrush(this, config);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: this.isHorizontalBrushDisplayed };
 						} else {
-							this.drawXYAxis(this.categoricalData, true, false, false);
+							this.drawXYAxis(this.categoricalData, this.chartData, true, false, false);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: false };
 						}
 					},
@@ -3521,7 +3521,7 @@ export class Visual extends Shadow {
 							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: this.isVerticalBrushDisplayed };
 						} else {
-							this.drawXYAxis(this.categoricalData, false, true, false);
+							this.drawXYAxis(this.categoricalData, this.chartData, false, true, false);
 							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: false };
 						}
@@ -3708,7 +3708,7 @@ export class Visual extends Shadow {
 				this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
 
 				// if (this.isScrollBrushDisplayed || this.brushAndZoomAreaSettings.enabled) {
-				this.drawXYAxis(this.categoricalData, true, true);
+				this.drawXYAxis(this.categoricalData, this.chartData, true, true);
 
 				if (this.templateSettings.theme && (!this.templateSettings.isIBCSEnabled || (this.templateSettings.prevTheme !== this.templateSettings.theme)) && ((this.templateSettings.prevTheme !== this.templateSettings.theme) || (!this.isIBCSEnabled && isIBCSEnabled))) {
 					return;
@@ -3880,6 +3880,8 @@ export class Visual extends Shadow {
 	SMCategoricalData: any;
 
 	SMCategoricalInitBrushScaleBandData: any;
+	SMChartData: ILollipopChartRow[] = [];
+
 
 	setSmallMultiplesChartDataBySMCategory(width: number, height: number): void {
 		this.smallMultiplesGridItemsCategoricalData = {};
@@ -4094,8 +4096,10 @@ export class Visual extends Shadow {
 
 		this.SMCategoricalData = cloneDeep(categoricalData);
 
-		// this.setCategoricalDataFields(categoricalData);
-		// this.setChartData(categoricalData);
+		this.setCategoricalDataFields(categoricalData);
+		this.setChartData(categoricalData);
+
+		this.SMChartData = cloneDeep(this.chartData);
 
 		// const categories = this.isHorizontalChart ? this.chartData.map(d => d.category).reverse() : this.chartData.map(d => d.category);
 
@@ -6547,7 +6551,7 @@ export class Visual extends Shadow {
 						this.isHorizontalBrushDisplayed = false;
 						this.brushWidth = 0;
 						this.brushMargin = 0;
-						this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 					}
 				});
 			} else {
@@ -6657,7 +6661,7 @@ export class Visual extends Shadow {
 					this.isHorizontalBrushDisplayed = false;
 					this.brushWidth = 0;
 					this.brushMargin = 0;
-					this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 				}
 			}
 		};
@@ -6764,7 +6768,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.drawXYAxis(categoricalData, isShowXAxis, isShowYAxis);
+		this.drawXYAxis(categoricalData, this.chartData, isShowXAxis, isShowYAxis);
 
 		// if (this.isChartIsRaceChart && this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 		// RenderExpandAllXAxis(this, this.categoricalData);
@@ -6938,7 +6942,7 @@ export class Visual extends Shadow {
 					this.isHorizontalBrushDisplayed = false;
 					this.isVerticalBrushDisplayed = false;
 					this.brushHeight = 0;
-					this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 				}
 			}
 
@@ -7061,7 +7065,7 @@ export class Visual extends Shadow {
 						this.isHorizontalBrushDisplayed = false;
 						this.isVerticalBrushDisplayed = false;
 						this.brushHeight = 0;
-						this.drawXYAxis(this.categoricalData, config.isShowXAxis, config.isShowYAxis);
+						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 					}
 				})
 			} else {
@@ -8624,8 +8628,8 @@ export class Visual extends Shadow {
 		}
 	}
 
-	setXAxisDomain(): void {
-		const values = this.categoricalData.categories[this.categoricalCategoriesLastIndex].values;
+	setXAxisDomain(categoricalData: powerbi.DataViewCategorical, chartData: ILollipopChartRow[]): void {
+		const values = categoricalData.categories[this.categoricalCategoriesLastIndex].values;
 
 		let min = +d3.min(values, d => +d);
 		let max = +d3.max(values, d => +d);
@@ -8644,14 +8648,14 @@ export class Visual extends Shadow {
 
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
 			if (((this.isXIsDateTimeAxis || this.isDateCategoryNames) && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
-				const dates = this.chartData.map((d) => d.category);
+				const dates = chartData.map((d) => d.category);
 				const minDate = d3.min(dates, d => new Date(d).getTime());
 				const maxDate = d3.max(dates, d => new Date(d).getTime());
 
 				this.xScale = d3.scaleBand();
 				this.xScale.domain(dates);
 			} else {
-				const values = this.chartData.map(d => parseFloat(d.category));
+				const values = chartData.map(d => parseFloat(d.category));
 
 				let min = +d3.min(values, d => +d);
 				let max = +d3.max(values, d => +d);
@@ -8682,11 +8686,11 @@ export class Visual extends Shadow {
 			}
 		} else {
 			this.xScale = d3.scaleBand();
-			this.xScale.domain(this.chartData.map((d) => d.category));
+			this.xScale.domain(chartData.map((d) => d.category));
 		}
 	}
 
-	setYAxisDomain(): void {
+	setYAxisDomain(chartData: ILollipopChartRow[],): void {
 		const { min, max } = GetAxisDomainMinMax(this);
 
 		this.axisDomainMinValue = min;
@@ -8694,7 +8698,7 @@ export class Visual extends Shadow {
 
 		this.axisDomainMaxValueDisplayUnit = getNumberDisplayUnit(this.axisDomainMaxValue, true);
 
-		const isLinearScale: boolean = typeof this.chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
+		const isLinearScale: boolean = typeof chartData.map((d) => d.value1)[0] === "number" && !this.isLogarithmScale;
 		const isLogarithmScale = this.axisByBarOrientation.isLogarithmScale;
 
 		this.isHasNegativeValue = min < 0 || max < 0;
@@ -8742,7 +8746,7 @@ export class Visual extends Shadow {
 				this.yScale.domain([this.axisDomainMinValue === 0 ? 0.1 : this.axisDomainMinValue, this.axisDomainMaxValue]).nice();
 			}
 		} else {
-			this.yScale.domain(this.chartData.map((d) => d.value1));
+			this.yScale.domain(chartData.map((d) => d.value1));
 		}
 	}
 
@@ -9182,6 +9186,7 @@ export class Visual extends Shadow {
 
 	drawXYAxis(
 		categoricalData: powerbi.DataViewCategorical,
+		chartData: ILollipopChartRow[],
 		isShowXAxis: boolean,
 		isShowYAxis: boolean,
 		isSetXYScaleDiffs: boolean = true,
@@ -9194,8 +9199,8 @@ export class Visual extends Shadow {
 		// 	this.yAxisStartMargin = 0;
 		// }
 
-		this.setXAxisDomain();
-		this.setYAxisDomain();
+		this.setXAxisDomain(categoricalData, chartData);
+		this.setYAxisDomain(chartData);
 
 		const cutAndClipAxisConfig = JSON.parse(
 			this.vizOptions.formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]

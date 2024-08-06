@@ -52,7 +52,7 @@ export const StartChartRace = (self: Visual) => {
                 self.setChartData(self.categoricalData);
             }
 
-            self.drawXYAxis(self.categoricalData, true, true);
+            self.drawXYAxis(self.categoricalData, self.chartData, true, true);
 
             if (self.categoricalCategoriesLastIndex > 0) {
                 if (!self.isHorizontalChart) {
