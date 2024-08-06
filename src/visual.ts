@@ -8046,6 +8046,14 @@ export class Visual extends Shadow {
 				},
 			];
 
+			if (this.isSmallMultiplesEnabled) {
+				tooltipData.push({
+					displayName: this.smallMultiplesCategoricalDataSourceName,
+					value: value.SMCategory,
+					color: "transparent",
+				})
+			}
+
 			if (isMultiMeasure) {
 				tooltipData.push({
 					displayName: this.measure2DisplayName,
@@ -11330,6 +11338,14 @@ export class Visual extends Shadow {
 					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.categoryOthersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
 				}
 			];
+
+			if (this.isSmallMultiplesEnabled) {
+				tooltipData.push({
+					displayName: this.smallMultiplesCategoricalDataSourceName,
+					value: pieData.smallMultipleCategory,
+					color: "transparent",
+				})
+			}
 
 			if (this.isHasMultiMeasure) {
 				tooltipData.push({
