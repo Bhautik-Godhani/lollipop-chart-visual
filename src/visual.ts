@@ -1580,8 +1580,13 @@ export class Visual extends Shadow {
 		isRenderBrush: boolean = true,
 		isOnlyCreateDataPairs: boolean = false
 	): powerbi.DataViewCategorical {
-		const categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
+		let categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
 			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
+
+		if (this.isSmallMultiplesEnabled && categoricalCategoriesFields.length > 1) {
+			categoricalCategoriesFields = categoricalCategoriesFields.splice(0, 1);
+		}
+
 		const categoricalRaceBarValues = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData])
 			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 		const categoricalSmallMultiplesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
@@ -1594,7 +1599,7 @@ export class Visual extends Shadow {
 		const categoricalLowerBoundFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.LowerBound]);
 		const categoricalExtraDataLabelsFields = categoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.ExtraDataLabels]);
 
-		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
+		this.isExpandAllApplied = categoricalCategoriesFields.length >= 2 && !this.isSmallMultiplesEnabled;
 		this.isPercentageMeasure = (categoricalMeasureFields[0].source.type.integer || categoricalMeasureFields[0].source.type.numeric)
 			&& categoricalMeasureFields[0].source.format && categoricalMeasureFields[0].source.format.includes("%");
 
@@ -2488,6 +2493,11 @@ export class Visual extends Shadow {
 	public setCategoricalDataFields(categoricalData: powerbi.DataViewCategorical): void {
 		this.categoricalCategoriesFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
 			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
+
+		if (this.isSmallMultiplesEnabled && this.categoricalCategoriesFields.length > 1) {
+			this.categoricalCategoriesFields = this.categoricalCategoriesFields.splice(0, 1);
+		}
+
 		this.categoricalRaceChartDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.RaceChartData])
 			.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
 		this.categoricalSmallMultiplesDataFields = categoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
@@ -2960,8 +2970,13 @@ export class Visual extends Shadow {
 			}
 
 			const clonedCategoricalData = cloneDeep(this.vizOptions.options.dataViews[0].categorical);
-			const categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
+			let categoricalCategoriesFields = clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.Category])
 				.filter((v, i, a) => a.findIndex((t) => t.source.index === v.source.index) === i);
+
+			if (this.isSmallMultiplesEnabled && categoricalCategoriesFields.length > 1) {
+				categoricalCategoriesFields = categoricalCategoriesFields.splice(0, 1);
+			}
+
 			this.isExpandAllApplied = categoricalCategoriesFields.length >= 2;
 
 			if (this.isExpandAllApplied) {
