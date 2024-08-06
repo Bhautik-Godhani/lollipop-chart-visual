@@ -111,7 +111,7 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
 
     ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
 
-    hyperListMainContainer.on("scroll", () => {
+    hyperListMainContainer.node().addEventListener("scroll", () => {
         config.onScrollPage();
     });
 

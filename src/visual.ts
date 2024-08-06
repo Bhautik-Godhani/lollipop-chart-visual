@@ -3357,7 +3357,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { xAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.chartData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
+								const { xAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -3443,7 +3443,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { yAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.chartData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
+								const { yAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -3502,7 +3502,7 @@ export class Visual extends Shadow {
 							this.drawHorizontalBrush(this, config);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: this.isHorizontalBrushDisplayed };
 						} else {
-							this.drawXYAxis(this.categoricalData, this.chartData, true, false, false);
+							this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, true, false, false);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isHorizontalBrushDisplayed: false };
 						}
 					},
@@ -3536,7 +3536,7 @@ export class Visual extends Shadow {
 							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: this.isVerticalBrushDisplayed };
 						} else {
-							this.drawXYAxis(this.categoricalData, this.chartData, false, true, false);
+							this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, false, true, false);
 							this.yAxisG.attr("transform", `translate(${0}, ${this.margin.top})`);
 							return { xAxisNodeHeight: undefined, yAxisNodeWidth: undefined, isVerticalBrushDisplayed: false };
 						}
@@ -4008,7 +4008,7 @@ export class Visual extends Shadow {
 			categoricalDataPairs.push(this.categoricalDataPairs);
 		});
 
-		const data = categoricalDataPairs.reduce((arr: string[], cur) => {
+		let data = categoricalDataPairs.reduce((arr: string[], cur) => {
 			cur.forEach(d => {
 				arr.push(d);
 			});
@@ -4077,6 +4077,11 @@ export class Visual extends Shadow {
 		}
 
 		this.elementToMoveOthers(data, true, categoryKey, true);
+
+		const clonedCategoricalPair = cloneDeep(data);
+		if (this.isHorizontalChart) {
+			data = clonedCategoricalPair.reverse();
+		}
 
 		const categoricalData = cloneDeep(this.originalCategoricalData);
 
