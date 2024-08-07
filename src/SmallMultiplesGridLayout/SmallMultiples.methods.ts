@@ -320,6 +320,8 @@ export const CreateSmallMultiplesPaginationPanel = (
         const layout = GetReactPaginationLayout(config, columns, config.viewType === ESmallMultiplesViewType.Pagination ? rows : totalRows, SMFirstItemIndexOnCurrentPage);
         const layoutProps = GetSmallMultiplesLayoutProps(config, layout, itemHeight - config.outerSpacing / 2, columns);
 
+        d3.select("#uniformAxisContainer").select("#uniformLeftYAxis").style("height", (itemHeight + config.innerSpacing * 2) * rows + "px");
+
         ReactDOM.render(React.createElement(SmallMultiplesLayout, layoutProps), hyperListMainContainer.node());
     };
 
@@ -706,6 +708,8 @@ export const RenderSmallMultiplesUniformRightYAxis = (
 export const GetSmallMultiplesUniformLeftYAxis = (config: ISmallMultiplesGridLayoutSettings, xAxisGNodeHeight: number, yAxisGNodeWidth: number, smallMultiplesWrapper: D3Selection<HTMLElement>): D3Selection<HTMLElement> => {
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformTopXAxis = config.xAxisPosition !== ESmallMultiplesXAxisPosition.FrozenBottomColumn;
+
+    console.log({ xAxisGNodeHeight });
 
     const uniformYAxis = d3.create("div");
 
