@@ -4008,7 +4008,7 @@ export class Visual extends Shadow {
 			categoricalDataPairs.push(this.categoricalDataPairs);
 		});
 
-		let data = categoricalDataPairs.reduce((arr: string[], cur) => {
+		const data = categoricalDataPairs.reduce((arr: string[], cur) => {
 			cur.forEach(d => {
 				arr.push(d);
 			});
@@ -4078,10 +4078,10 @@ export class Visual extends Shadow {
 
 		this.elementToMoveOthers(data, true, categoryKey, true);
 
-		const clonedCategoricalPair = cloneDeep(data);
-		if (this.isHorizontalChart) {
-			data = clonedCategoricalPair.reverse();
-		}
+		// const clonedCategoricalPair = cloneDeep(data);
+		// if (this.isHorizontalChart) {
+		// 	data = clonedCategoricalPair.reverse();
+		// }
 
 		const categoricalData = cloneDeep(this.originalCategoricalData);
 
@@ -4932,7 +4932,8 @@ export class Visual extends Shadow {
 					obj[cur.source.displayName] = { roles: cur.source.roles, value: this.isPercentageMeasure ? parseFloat(cur.values[idx].toString()) * 100 : cur.values[idx] };
 					return obj;
 				}, {}),
-				isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
+				isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers,
+				SMCategory: this.smallMultiplesCategories[this.currentSmallMultipleIndex]
 			}
 
 			arr = [...arr, obj];
@@ -6474,6 +6475,13 @@ export class Visual extends Shadow {
 					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
+					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+
 					this.brushScaleBand.range(this.isBottomXAxis ? yScale.range() : yScale.range().reverse());
 
 					const newYScaleDomain = [];
@@ -6564,6 +6572,7 @@ export class Visual extends Shadow {
 						}
 
 						isBrushRendered = true;
+						this.brushG.attr("display", "block");
 					} else {
 						isBrushRendered = false;
 						this.isScrollBrushDisplayed = false;
@@ -6572,6 +6581,7 @@ export class Visual extends Shadow {
 						this.brushWidth = 0;
 						this.brushMargin = 0;
 						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+						this.brushG.attr("display", "none");
 					}
 				});
 			} else {
@@ -6583,6 +6593,13 @@ export class Visual extends Shadow {
 				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
+
+				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
 
 				this.brushScaleBand.range(yScale.range());
 
@@ -6674,6 +6691,7 @@ export class Visual extends Shadow {
 					}
 
 					isBrushRendered = true;
+					this.brushG.attr("display", "block");
 				} else {
 					isBrushRendered = false;
 					this.isScrollBrushDisplayed = false;
@@ -6682,6 +6700,7 @@ export class Visual extends Shadow {
 					this.brushWidth = 0;
 					this.brushMargin = 0;
 					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+					this.brushG.attr("display", "none");
 				}
 			}
 		};
@@ -6858,6 +6877,13 @@ export class Visual extends Shadow {
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
+				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+
 				this.brushScaleBand.range(this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 				brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
@@ -6954,8 +6980,8 @@ export class Visual extends Shadow {
 					} else {
 						this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 					}
-
 					isBrushRendered = true;
+					this.brushG.attr("display", "block");
 				} else {
 					isBrushRendered = false;
 					this.isScrollBrushDisplayed = false;
@@ -6963,6 +6989,7 @@ export class Visual extends Shadow {
 					this.isVerticalBrushDisplayed = false;
 					this.brushHeight = 0;
 					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+					this.brushG.attr("display", "none");
 				}
 			}
 
@@ -6987,6 +7014,13 @@ export class Visual extends Shadow {
 					this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
+
+					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
 
 					this.brushScaleBand.range(xScale.range());
 
@@ -7079,6 +7113,7 @@ export class Visual extends Shadow {
 						}
 
 						isBrushRendered = true;
+						this.brushG.attr("display", "block");
 					} else {
 						isBrushRendered = false;
 						this.isScrollBrushDisplayed = false;
@@ -7086,11 +7121,11 @@ export class Visual extends Shadow {
 						this.isVerticalBrushDisplayed = false;
 						this.brushHeight = 0;
 						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+						this.brushG.attr("display", "none");
 					}
 				})
 			} else {
 				const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
-
 				method(smallMultiplesGridItemContent)
 			}
 		};

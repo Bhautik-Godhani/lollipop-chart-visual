@@ -164,7 +164,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     }
                 });
 
-                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+                self.smallMultiplesGridItemId = self.othersBarText;
             } else {
                 const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
                 const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
@@ -382,7 +382,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             }
 
             const content: ISmallMultiplesGridItemContent = {
-                category: config.categories[smallMultipleIndex].toString(),
+                category: isOthersSM ? self.othersBarText : config.categories[smallMultipleIndex].toString(),
                 width: newItemWidth,
                 height: newItemHeight,
                 svg: svg.node(),
@@ -417,7 +417,13 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 errorBarsMarkersG: errorBarsMarkersG as any,
                 errorBarsMarkerDef: errorBarsMarkerDef as any,
                 errorBarsMarker: errorBarsMarker as any,
-                errorBarsMarkerPath: errorBarsMarkerPath as any
+                errorBarsMarkerPath: errorBarsMarkerPath as any,
+                categoryColorPair: cloneDeep(self.categoryColorPair),
+                othersCategoryColorPair: cloneDeep(self.othersCategoryColorPair),
+                subCategoryColorPair: cloneDeep(self.subCategoryColorPair),
+                othersSubCategoryColorPair: cloneDeep(self.othersSubCategoryColorPair),
+                CFCategoryColorPair: cloneDeep(self.CFCategoryColorPair),
+                CFSubCategoryColorPair: cloneDeep(self.CFSubCategoryColorPair)
             };
 
             self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;

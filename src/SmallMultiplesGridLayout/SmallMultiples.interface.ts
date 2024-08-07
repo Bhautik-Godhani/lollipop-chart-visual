@@ -139,6 +139,12 @@ export interface ISmallMultiplesGridItemContent {
     errorBarsMarkerDef: D3Selection<SVGElement>;
     errorBarsMarker: D3Selection<SVGElement>;
     errorBarsMarkerPath: D3Selection<SVGElement>;
+    categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } };
+    othersCategoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } };
+    subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } };
+    othersSubCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } };
+    CFCategoryColorPair: { [category: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } };
+    CFSubCategoryColorPair: { [subCategory: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } };
 }
 
 export interface IAxisConfig {
