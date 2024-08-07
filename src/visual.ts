@@ -8115,7 +8115,7 @@ export class Visual extends Shadow {
 			if (this.isSmallMultiplesEnabled) {
 				tooltipData.push({
 					displayName: this.smallMultiplesCategoricalDataSourceName,
-					value: value.SMCategory,
+					value: this.getTooltipCategoryText(value.SMCategory),
 					color: "transparent",
 				})
 			}
@@ -11408,7 +11408,7 @@ export class Visual extends Shadow {
 			if (this.isSmallMultiplesEnabled) {
 				tooltipData.push({
 					displayName: this.smallMultiplesCategoricalDataSourceName,
-					value: pieData.smallMultipleCategory,
+					value: this.getTooltipCategoryText(pieData.smallMultipleCategory),
 					color: "transparent",
 				})
 			}

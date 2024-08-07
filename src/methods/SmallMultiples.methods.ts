@@ -310,6 +310,14 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 }
             }
 
+            if (isUniformYScale) {
+                self.brushWidth = 0;
+            }
+
+            if (isUniformXScale) {
+                self.brushHeight = 0;
+            }
+
             if (!isUniformXScale) {
                 newItemHeight -= self.brushHeight;
             }
