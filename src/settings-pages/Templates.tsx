@@ -42,7 +42,10 @@ const UIIBCSSettings = (
           <ToggleButton
             label={"Enable"}
             value={configValues.isIBCSEnabled}
-            handleChange={(value) => handleChange(value, ETemplatesSettings.IsIBCSEnabled, setConfigValues)}
+            handleChange={(value) => {
+              handleChange(value, ETemplatesSettings.IsIBCSEnabled, setConfigValues);
+              handleChange(false, ETemplatesSettings.IsTemplatesEnabled, setConfigValues);
+            }}
             appearance="toggle"
           />
         </Column>
@@ -131,7 +134,10 @@ const UIGeneralTemplates = (
           <ToggleButton
             label={"Enabled"}
             value={configValues.isTemplatesEnabled}
-            handleChange={(value) => handleChange(value, ETemplatesSettings.IsTemplatesEnabled, setConfigValues)}
+            handleChange={(value) => {
+              handleChange(value, ETemplatesSettings.IsTemplatesEnabled, setConfigValues);
+              handleChange(false, ETemplatesSettings.IsIBCSEnabled, setConfigValues);
+            }}
             appearance="toggle"
           />
         </Column>
