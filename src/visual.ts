@@ -11385,13 +11385,13 @@ export class Visual extends Shadow {
 				})
 			}
 
-			if (this.isHasMultiMeasure) {
-				tooltipData.push({
-					displayName: this.measure2DisplayName,
-					value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-					color: (isPosNegColorScheme2 ? posNegColor2 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
-				})
-			}
+			// if (this.isHasMultiMeasure) {
+			// 	tooltipData.push({
+			// 		displayName: this.measure2DisplayName,
+			// 		value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+			// 		color: (isPosNegColorScheme2 ? posNegColor2 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
+			// 	})
+			// }
 
 			pieData.tooltipFields.forEach((data, i: number) => {
 				let text = data.value;
@@ -11471,17 +11471,6 @@ export class Visual extends Shadow {
 					color: "transparent",
 				});
 			}
-
-			pieData.tooltipFields.forEach((data) => {
-				tooltipData.push({
-					displayName: data.displayName,
-
-					value: typeof data.value === "number"
-						? powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i])
-						: data.value,
-					color: data.color ? data.color : "transparent",
-				});
-			});
 
 			const data = this.isSmallMultiplesEnabled ? this.smallMultiplesGridItemContent[pieData.smallMultipleCategory].chartData.find(d => d.category === pieData.parentCategory && d.SMCategory === pieData.smallMultipleCategory) : this.chartData.find(d => d.category === pieData.parentCategory);
 			if (data) {
