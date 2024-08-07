@@ -317,14 +317,28 @@ const getTextX1Y1ForHorizontalLine = (self: Visual, d: IReferenceLineSettings, r
 const getTextX1Y1ForVerticalLine = (self: Visual, d: IReferenceLineSettings, rLine: IReferenceLineLabelStyleProps, y1: number): { textX1: number, textY1: number, textAnchor: string, textAlignment: string } => {
     const labelTextBBox = GetSVGTextSize2(d.labelText, rLine.labelFontFamily, +rLine.labelFontSize, rLine.styling, 5);
     if (rLine.labelPosition === EBeforeAfterPosition.After) {
-        if ((y1 + 10 + labelTextBBox.height) > (self.height - self.margin.bottom)) {
-            rLine.labelPosition = EBeforeAfterPosition.Before;
+        if (((self.xAxisSettings.position === Position.Bottom && !self.yAxisSettings.isInvertRange)
+            || (self.xAxisSettings.position === Position.Top && self.yAxisSettings.isInvertRange))) {
+            if ((y1 + 10 + labelTextBBox.height) > (self.height - self.margin.bottom)) {
+                rLine.labelPosition = EBeforeAfterPosition.Before;
+            }
+        } else {
+            if ((y1 + 10 + labelTextBBox.height) < (self.height - self.margin.bottom)) {
+                rLine.labelPosition = EBeforeAfterPosition.Before;
+            }
         }
     }
 
     if (rLine.labelPosition === EBeforeAfterPosition.Before) {
-        if (labelTextBBox.height > (y1 - 10 + self.margin.top)) {
-            rLine.labelPosition = EBeforeAfterPosition.After;
+        if (((self.xAxisSettings.position === Position.Bottom && !self.yAxisSettings.isInvertRange)
+            || (self.xAxisSettings.position === Position.Top && self.yAxisSettings.isInvertRange))) {
+            if (labelTextBBox.height > (y1 - 10 + self.margin.top)) {
+                rLine.labelPosition = EBeforeAfterPosition.After;
+            }
+        } else {
+            if (labelTextBBox.height < (y1 - 10 + self.margin.top)) {
+                rLine.labelPosition = EBeforeAfterPosition.After;
+            }
         }
     }
 
