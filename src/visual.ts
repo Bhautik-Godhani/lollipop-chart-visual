@@ -11483,10 +11483,11 @@ export class Visual extends Shadow {
 				});
 			});
 
-			if (this.chartData.find(d => d.category === pieData.parentCategory)) {
+			const data = this.isSmallMultiplesEnabled ? this.smallMultiplesGridItemContent[pieData.smallMultipleCategory].chartData.find(d => d.category === pieData.parentCategory && d.SMCategory === pieData.smallMultipleCategory) : this.chartData.find(d => d.category === pieData.parentCategory);
+			if (data) {
 				tooltipData.push({
 					displayName: "Total",
-					value: numberFormatter(d3.sum(this.chartData.find(d => d.category === pieData.parentCategory).subCategories, (s: any) => s.value1), this.measureNumberFormatter[0]),
+					value: numberFormatter(d3.sum(data.subCategories, (s: any) => s.value1), this.measureNumberFormatter[0]),
 					color: "transparent",
 				});
 			}
