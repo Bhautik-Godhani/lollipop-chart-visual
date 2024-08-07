@@ -3484,6 +3484,7 @@ export class Visual extends Shadow {
 						this.xAxisG = d3.select(xAxisNode);
 
 						if (xAxisNode && brushNode && this.isHorizontalBrushDisplayed) {
+							this.brushHeight = 10;
 							this.brushG = d3.select(brushNode);
 
 							const config: IBrushConfig = {
@@ -3518,7 +3519,9 @@ export class Visual extends Shadow {
 						this.yAxisG = d3.select(yAxisNode);
 
 						if (yAxisNode && brushNode && this.isVerticalBrushDisplayed) {
+							this.brushWidth = 10;
 							this.brushG = d3.select(brushNode);
+
 							const config: IBrushConfig = {
 								width,
 								height,
@@ -4005,7 +4008,8 @@ export class Visual extends Shadow {
 				cloneDeep(clonedCategoricalData),
 				this.categoricalMetadata,
 				width,
-				height
+				height,
+				false
 			);
 
 			this.smallMultiplesGridItemsCategoricalData[d] = cloneDeep({
