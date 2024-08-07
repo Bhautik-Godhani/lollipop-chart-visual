@@ -10961,7 +10961,7 @@ export class Visual extends Shadow {
 
 			const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
 
-			if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+			if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor && d.category !== this.othersBarText) {
 				color = this.dataColorsSettings.categoryOthersColor;
 			} else {
 				const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative;
