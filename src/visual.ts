@@ -11367,7 +11367,7 @@ export class Visual extends Shadow {
 				},
 				{
 					displayName: this.subCategoryDisplayName,
-					value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : pieData.category.toString()),
+					value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : this.getTooltipCategoryText(pieData.category)),
 					color: "transparent",
 				},
 				{
