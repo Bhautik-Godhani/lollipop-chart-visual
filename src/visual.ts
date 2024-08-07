@@ -329,7 +329,7 @@ export class Visual extends Shadow {
 	selectionIdByCategories: { [category: string]: ISelectionId } = {};
 	selectionIdBySubCategories: { [subcategory: string]: ISelectionId } = {};
 	othersCategoriesList: ILollipopChartRow[] = [];
-	othersSubcategoriesList: ILollipopChartRow[] = [];
+	othersSubcategoriesList: string[] = [];
 
 	// number formatter
 	public measureNumberFormatter: IValueFormatter[] = [];
@@ -1084,37 +1084,44 @@ export class Visual extends Shadow {
 
 		if (subCategoryRankingSettings.enabled) {
 			let groupNames: string[] = measures.map((d) => d.source.groupName);
+			let othersGroupNames: string[] = [];
+			const filteredMeasure = measures
+				.filter((d) => d.source.roles[EDataRolesName.Measure]);
 
 			if (subCategoryRankingSettings.rankingType === ERankingType.TopN) {
 				if (this.isHorizontalChart) {
-					groupNames = measures
-						.filter((d) => d.source.roles[EDataRolesName.Measure])
+					groupNames = filteredMeasure
 						.slice(0, subCategoryRankingSettings.count)
 						.map((d) => d.source.groupName);
 				} else {
-					groupNames = measures
-						.filter((d) => d.source.roles[EDataRolesName.Measure])
+					groupNames = filteredMeasure
 						.slice(0, subCategoryRankingSettings.count)
 						.map((d) => d.source.groupName);
 				}
+
+				othersGroupNames = filteredMeasure
+					.slice(subCategoryRankingSettings.count, filteredMeasure.length)
+					.map((d) => d.source.groupName);
 			}
 
 			if (subCategoryRankingSettings.rankingType === ERankingType.BottomN) {
 				if (this.isHorizontalChart) {
 					if (subCategoryRankingSettings.count <= measures.length) {
-						groupNames = measures
-							.filter((d) => d.source.roles[EDataRolesName.Measure])
+						groupNames = filteredMeasure
 							.slice(measures.length - subCategoryRankingSettings.count, measures.length)
 							.map((d) => d.source.groupName);
 					}
 				} else {
 					if (subCategoryRankingSettings.count <= measures.length) {
-						groupNames = measures
-							.filter((d) => d.source.roles[EDataRolesName.Measure])
+						groupNames = filteredMeasure
 							.slice(measures.length - subCategoryRankingSettings.count, measures.length)
 							.map((d) => d.source.groupName);
 					}
 				}
+
+				othersGroupNames = filteredMeasure
+					.slice(0, measures.length - subCategoryRankingSettings.count)
+					.map((d) => d.source.groupName);
 			}
 
 			categoricalData.values = categoricalValues.filter((d) => groupNames.includes(d.source.groupName));
@@ -1151,6 +1158,8 @@ export class Visual extends Shadow {
 					categoricalData.values.push(newGroup);
 				})
 			}
+
+			this.othersSubcategoriesList = othersGroupNames;
 		}
 	}
 
@@ -5607,15 +5616,30 @@ export class Visual extends Shadow {
 
 				if (el.category.includes(this.othersLabel)) {
 					el.identity = this.selectionIdByCategories[this.othersCategoriesList[0].category];
-					el.othersIdentity = this.othersCategoriesList.map(d => this.selectionIdByCategories[d.category]);
+					el.othersIdentity = this.othersSubcategoriesList.map(d => this.selectionIdByCategories[d]);
 				}
 
 				el.subCategories.forEach((d) => {
 					d.identity = this.selectionIdBySubCategories[`${el.category}-${d.category}`];
 
+					if (d.category.includes(this.othersLabel)) {
+						d.identity = this.selectionIdBySubCategories[`${el.category}-${this.othersSubcategoriesList[0]}`];
+						d.othersIdentity = this.othersSubcategoriesList.map(o => this.selectionIdBySubCategories[`${el.category}-${o}`]);
+					}
+
 					if (el.category.includes(this.othersLabel)) {
-						d.identity = this.selectionIdBySubCategories[`${this.othersCategoriesList[0].category}-${d.category}`];
-						d.othersIdentity = this.othersCategoriesList.map(o => this.selectionIdBySubCategories[`${o.category}-${d.category}`]);
+						if (d.category.includes(this.othersLabel)) {
+							const othersIdentity = [];
+							this.othersCategoriesList.forEach(c => {
+								d.identity = this.selectionIdBySubCategories[`${c.category}-${this.othersSubcategoriesList[0]}`];
+								othersIdentity.push(this.othersSubcategoriesList.map(o => this.selectionIdBySubCategories[`${c.category}-${o}`]));
+							})
+
+							d.othersIdentity = othersIdentity;
+						} else {
+							d.identity = this.selectionIdBySubCategories[`${this.othersCategoriesList[0].category}-${d.category}`];
+							d.othersIdentity = this.othersCategoriesList.map(c => this.selectionIdBySubCategories[`${c.category}-${d.category}`]);
+						}
 					}
 				});
 			});

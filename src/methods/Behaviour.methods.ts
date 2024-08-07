@@ -48,7 +48,7 @@ export class Behavior implements IInteractiveBehavior {
 				visualAnnotations.onAnnotationNodeClick(event, data);
 			} else {
 				if (isLollipopTypePie) {
-					if (data.parentCategory.includes("Others")) {
+					if (data.parentCategory.includes("Others") || data.category.includes("Others")) {
 						const othersData = data.othersIdentity.map(d => ({ selected: false, identity: d }));
 						selectionHandler.handleSelection(othersData, event.ctrlKey);
 					} else {

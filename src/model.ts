@@ -34,6 +34,7 @@ export interface ILollipopChartRow {
 	isOthersSmallMultiples?: boolean;
 	othersIdentity?: ISelectionId[];
 	parentCategory?: string;
+	SMCategory?: string;
 }
 
 export interface IErrorBarValue {
