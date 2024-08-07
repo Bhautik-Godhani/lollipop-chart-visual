@@ -2105,12 +2105,11 @@ export class Visual extends Shadow {
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
-		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs)
+		this.setCategoricalDataPairsByRanking();
+
+		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
 		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
-		this.categoricalDataPairs = clonedCategoricalDataPairs;
-
-		this.setCategoricalDataPairsByRanking();
 
 		if (this.sortingSettings.category.enabled) {
 			const sortFields = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
@@ -6594,12 +6593,14 @@ export class Visual extends Shadow {
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+				if (smallMultiplesGridItemContent) {
+					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+				}
 
 				this.brushScaleBand.range(yScale.range());
 
@@ -6877,12 +6878,14 @@ export class Visual extends Shadow {
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+				if (smallMultiplesGridItemContent) {
+					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+				}
 
 				this.brushScaleBand.range(this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
