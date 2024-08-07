@@ -31,6 +31,7 @@ import {
   Breadcrumb,
   AccordionAlt,
   Label,
+  Quote,
 } from "@truviz/shadow/dist/Components";
 import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVerticalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "./SettingsIcons";
 import { ICategoryValuePair, ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
@@ -700,6 +701,14 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
           selectorAppearance="secondary"
           handleChange={value => handleChange(value, "labelPosition", EReferenceLinesSettings.LabelStyle)}
         />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <Quote>
+          <strong>Note: </strong>Position might switch depending on available space for the first and last labels.
+        </Quote>
       </Column>
     </Row>
 
