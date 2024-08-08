@@ -4020,7 +4020,7 @@ export class Visual extends Shadow {
 			categoricalDataPairs.push(this.categoricalDataPairs);
 		});
 
-		const data = categoricalDataPairs.reduce((arr: string[], cur) => {
+		let data = categoricalDataPairs.reduce((arr: string[], cur) => {
 			cur.forEach(d => {
 				arr.push(d);
 			});
@@ -4090,10 +4090,10 @@ export class Visual extends Shadow {
 
 		this.elementToMoveOthers(data, true, categoryKey, true);
 
-		// const clonedCategoricalPair = cloneDeep(data);
-		// if (this.isHorizontalChart) {
-		// 	data = clonedCategoricalPair.reverse();
-		// }
+		const clonedCategoricalPair = cloneDeep(data);
+		if (this.isHorizontalChart) {
+			data = clonedCategoricalPair.reverse();
+		}
 
 		const categoricalData = cloneDeep(this.originalCategoricalData);
 

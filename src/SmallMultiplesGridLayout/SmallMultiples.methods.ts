@@ -709,8 +709,6 @@ export const GetSmallMultiplesUniformLeftYAxis = (config: ISmallMultiplesGridLay
     const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
     const isUniformTopXAxis = config.xAxisPosition !== ESmallMultiplesXAxisPosition.FrozenBottomColumn;
 
-    console.log({ xAxisGNodeHeight });
-
     const uniformYAxis = d3.create("div");
 
     uniformYAxis
