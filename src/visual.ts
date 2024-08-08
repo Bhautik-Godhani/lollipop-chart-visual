@@ -6492,6 +6492,8 @@ export class Visual extends Shadow {
 				}
 
 				SMItemsList.forEach(d => {
+					this.smallMultiplesGridItemId = d.content.category;
+
 					const smallMultiplesGridItemContent = d.content;
 					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
 
@@ -7035,7 +7037,9 @@ export class Visual extends Shadow {
 					this.xAxisSettings.position = Position.Top;
 				}
 
-				SMItemsList.forEach(d => {
+				SMItemsList.forEach((d) => {
+					this.smallMultiplesGridItemId = d.content.category;
+
 					const smallMultiplesGridItemContent = d.content;
 					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
 
