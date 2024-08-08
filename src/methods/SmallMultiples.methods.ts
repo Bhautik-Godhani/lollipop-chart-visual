@@ -391,6 +391,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             const content: ISmallMultiplesGridItemContent = {
                 category: isOthersSM ? self.othersBarText : config.categories[smallMultipleIndex].toString(),
+                index: gridItemId,
                 width: newItemWidth,
                 height: newItemHeight,
                 svg: svg.node(),

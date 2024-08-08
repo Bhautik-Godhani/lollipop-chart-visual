@@ -6493,6 +6493,7 @@ export class Visual extends Shadow {
 
 				SMItemsList.forEach(d => {
 					this.smallMultiplesGridItemId = d.content.category;
+					this.currentSmallMultipleIndex = d.content.index;
 
 					const smallMultiplesGridItemContent = d.content;
 					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
@@ -6560,6 +6561,8 @@ export class Visual extends Shadow {
 
 						this.setCategoricalDataFields(categoricalData2);
 						this.setChartData(categoricalData2);
+
+						this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
 
 						if (this.isExpandAllApplied) {
 							RenderExpandAllYAxis(this, categoricalData2);
@@ -7045,8 +7048,9 @@ export class Visual extends Shadow {
 					this.xAxisSettings.position = Position.Top;
 				}
 
-				SMItemsList.forEach((d) => {
+				SMItemsList.forEach(d => {
 					this.smallMultiplesGridItemId = d.content.category;
+					this.currentSmallMultipleIndex = d.content.index;
 
 					const smallMultiplesGridItemContent = d.content;
 					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
@@ -7114,6 +7118,9 @@ export class Visual extends Shadow {
 
 						this.setCategoricalDataFields(categoricalData2);
 						this.setChartData(categoricalData2);
+
+						this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
+
 						this.configLegend();
 
 						if (smallMultiplesGridItemContent) {
