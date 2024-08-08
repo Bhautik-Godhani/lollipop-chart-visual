@@ -1171,7 +1171,7 @@ export class Visual extends Shadow {
 		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 
 		if (categoryRankingSettings.enabled) {
-			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
+			if (categoryRankingSettings.rankingType === ERankingType.BottomN) {
 				if (this.isHorizontalChart) {
 					if (categoryRankingSettings.count <= this.categoricalDataPairs.length) {
 						othersBarData = this.categoricalDataPairs.slice(categoryRankingSettings.count, this.categoricalDataPairs.length);
@@ -1184,7 +1184,7 @@ export class Visual extends Shadow {
 					this.categoricalDataPairs = this.categoricalDataPairs.slice(0, categoryRankingSettings.count);
 				}
 			}
-			if (categoryRankingSettings.rankingType === ERankingType.BottomN) {
+			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
 				if (this.isHorizontalChart) {
 					othersBarData = this.categoricalDataPairs.slice(0, this.categoricalDataPairs.length - categoryRankingSettings.count);
 					othersStartIndex = 0;
