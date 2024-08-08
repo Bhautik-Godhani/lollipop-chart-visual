@@ -394,6 +394,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 width: newItemWidth,
                 height: newItemHeight,
                 svg: svg.node(),
+                container: container as any,
                 xScale: self.xScale,
                 yScale: self.yScale,
                 lollipopG: lollipopG as any,

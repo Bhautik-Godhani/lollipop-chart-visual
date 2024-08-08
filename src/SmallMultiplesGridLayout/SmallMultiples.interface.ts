@@ -106,6 +106,7 @@ export interface ISmallMultiplesGridItemContent {
     width: number,
     height: number,
     svg: SVGElement,
+    container: D3Selection<SVGElement>,
     xAxisG: SVGElement,
     yAxisG: SVGElement,
     lollipopG: D3Selection<SVGElement>,

@@ -6574,6 +6574,8 @@ export class Visual extends Shadow {
 
 							this.yAxisG = d3.select(config.SMUniformYAxisG);
 
+							this.svg = d3.select(smallMultiplesGridItemContent.svg);
+							this.container = smallMultiplesGridItemContent.container;
 							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
@@ -6695,6 +6697,8 @@ export class Visual extends Shadow {
 							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
 						}
 
+						this.svg = d3.select(smallMultiplesGridItemContent.svg);
+						this.container = smallMultiplesGridItemContent.container;
 						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
@@ -6867,6 +6871,9 @@ export class Visual extends Shadow {
 		this.drawXGridLines();
 		this.drawYGridLines();
 
+		// this.referenceLinesData = GetReferenceLinesData(this);
+		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
+
 		this.drawLollipopChart();
 	}
 
@@ -6988,6 +6995,7 @@ export class Visual extends Shadow {
 						this.viewPortHeight = smallMultiplesGridItemContent.height;
 
 						this.svg = d3.select(smallMultiplesGridItemContent.svg);
+						this.container = smallMultiplesGridItemContent.container;
 						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
@@ -7119,6 +7127,7 @@ export class Visual extends Shadow {
 							this.viewPortHeight = smallMultiplesGridItemContent.height;
 
 							this.svg = d3.select(smallMultiplesGridItemContent.svg);
+							this.container = smallMultiplesGridItemContent.container;
 							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
 							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
 							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
