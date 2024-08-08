@@ -20,11 +20,11 @@ import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptio
 
 const RANKING_TYPES: ILabelValuePair[] = [
 	{
-		label: "Top",
+		label: "Top N",
 		value: ERankingType.TopN,
 	},
 	{
-		label: "Bottom",
+		label: "Bottom N",
 		value: ERankingType.BottomN,
 	},
 ];
