@@ -8880,22 +8880,22 @@ export class Visual extends Shadow {
 			font1Style[EFontStyle.Italic],
 			font1Style[EFontStyle.UnderLine]).width;
 
-		let dataLabelHeight = data1LabelHeight;
-		let dataLabelWidth = data1LabelWidth;
+		const dataLabelHeight = data1LabelHeight;
+		const dataLabelWidth = data1LabelWidth;
 
-		if (this.isHasMultiMeasure) {
-			const data2LabelHeight = getSVGTextSize('100K', font2Family, font2Size, font2Style[EFontStyle.Bold], font2Style[EFontStyle.Italic], font2Style[EFontStyle.UnderLine]).height;
-			const data2Labels = d3.map(this.chartData, d => this.formatNumber(d.value2, this.numberSettings, this.measureNumberFormatter[0], true, true));
-			const data2LabelWidth = getSVGTextSize((data2Labels.find(d => d.length === d3.max(data2Labels, d => d.length))),
-				font2Family,
-				font2Size,
-				font2Style[EFontStyle.Bold],
-				font2Style[EFontStyle.Italic],
-				font2Style[EFontStyle.UnderLine]).width;
+		// if (this.isHasMultiMeasure) {
+		// 	const data2LabelHeight = getSVGTextSize('100K', font2Family, font2Size, font2Style[EFontStyle.Bold], font2Style[EFontStyle.Italic], font2Style[EFontStyle.UnderLine]).height;
+		// 	const data2Labels = d3.map(this.chartData, d => this.formatNumber(d.value2, this.numberSettings, this.measureNumberFormatter[0], true, true));
+		// 	const data2LabelWidth = getSVGTextSize((data2Labels.find(d => d.length === d3.max(data2Labels, d => d.length))),
+		// 		font2Family,
+		// 		font2Size,
+		// 		font2Style[EFontStyle.Bold],
+		// 		font2Style[EFontStyle.Italic],
+		// 		font2Style[EFontStyle.UnderLine]).width;
 
-			dataLabelHeight = d3.max([data2LabelHeight, data1LabelHeight]);
-			dataLabelWidth = d3.max([data1LabelWidth, data2LabelWidth]);
-		}
+		// 	dataLabelHeight = d3.max([data2LabelHeight, data1LabelHeight]);
+		// 	dataLabelWidth = d3.max([data1LabelWidth, data2LabelWidth]);
+		// }
 
 		const isOutsideLabel =
 			((label1Placement === DataLabelsPlacement.Outside || (this.isHasMultiMeasure ? label2Placement === DataLabelsPlacement.Outside : false))) ||
@@ -9419,7 +9419,7 @@ export class Visual extends Shadow {
 		this.pieYScaleDiffs = [];
 
 		if (isSetXYScaleDiffs) {
-			this.chartData.forEach(d => {
+			chartData.forEach(d => {
 				let flag: boolean = true;
 
 				const test = (isCircle2) => {
