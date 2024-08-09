@@ -12231,12 +12231,16 @@ export class Visual extends Shadow {
 					const ele = d3.select(nodes[i]);
 					let fill: string;
 					let isHasPattern: boolean;
-					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && (this.isLollipopTypeCircle ? !this.CFCategoryColorPair[d.category].isMarker1Color : true);
+					const isPosNegColorScheme = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFCategoryColorPair[d.category].isMarker1Color;
 					const posNegColor = d.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-					const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersCategoryColorPair : this.categoryColorPair;
+					const categoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples && !this.CFCategoryColorPair[d.category].isMarker1Color ? this.othersCategoryColorPair : this.categoryColorPair;
 					let color = this.getColor(isPosNegColorScheme && (this.isSmallMultiplesEnabled ? !d.isOthersSmallMultiples : true) && (this.dataColorsSettings.isCustomizeCategoryOthersColor ? !d.category.includes(this.othersLabel) : true) ? posNegColor : (categoryColorPair[d.category] ? categoryColorPair[d.category].marker1Color : null), EHighContrastColorType.Foreground);
 
-					if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+					if (!color) {
+						color = "rgba(0, 99, 178, 1)";
+					}
+
+					if (((d.category === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor && !this.CFCategoryColorPair[d.category].isMarker1Color) {
 						color = this.dataColorsSettings.categoryOthersColor;
 					}
 
@@ -12257,12 +12261,12 @@ export class Visual extends Shadow {
 
 					if (marker1Style.isShowMarkerOutline && marker1Style.showOutlineOnly) {
 						ele
-							.attr("fill", !isHasPattern ? "rgba(255, 255, 255, 1)" : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
-							.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+							.attr("fill", !isHasPattern ? this.getColor("rgba(255, 255, 255, 1)", EHighContrastColorType.Background) : `url('#${generatePattern(this.svg, pattern, marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)}')`)
+							.attr("stroke", this.getColor(marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor, EHighContrastColorType.Foreground))
 					} else {
 						ele
 							.attr("fill", fill)
-							.attr("stroke", marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor)
+							.attr("stroke", this.getColor(marker1Style.sameOutlineAsMarkerColor ? color : marker1Style.outlineColor, EHighContrastColorType.Background))
 					}
 				}
 				);
