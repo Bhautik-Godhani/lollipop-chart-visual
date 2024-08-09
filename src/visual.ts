@@ -6845,7 +6845,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.drawXYAxis(categoricalData, this.chartData, isShowXAxis, isShowYAxis);
+		this.drawXYAxis(categoricalData, this.chartData, isShowXAxis, isShowYAxis, true, false);
 
 		// if (this.isChartIsRaceChart && this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 		// RenderExpandAllXAxis(this, this.categoricalData);
@@ -9304,6 +9304,7 @@ export class Visual extends Shadow {
 		isShowXAxis: boolean,
 		isShowYAxis: boolean,
 		isSetXYScaleDiffs: boolean = true,
+		isSetXYScaleSpace: boolean = true
 	): { xAxisG: D3Selection<SVGElement>, yAxisG: D3Selection<SVGElement> } {
 		// if (!isShowYAxis) {
 		// 	this.xAxisStartMargin = 0;
@@ -9555,27 +9556,29 @@ export class Visual extends Shadow {
 			this.setYAxisTickStyle();
 		}
 
-		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
-			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
-				const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
+		if (isSetXYScaleSpace) {
+			if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
+				if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+					const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
 
-				if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
-					this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
-				} else {
-					this.xScaleGHeight = 0;
+					if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+						this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+					} else {
+						this.xScaleGHeight = 0;
+					}
 				}
+			} else {
+				this.xScaleGHeight = 0;
 			}
-		} else {
-			this.xScaleGHeight = 0;
-		}
 
-		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
-			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
-				const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
-				this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+			if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
+				if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+					const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+					this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+				}
+			} else {
+				this.yScaleGWidth = 0;
 			}
-		} else {
-			this.yScaleGWidth = 0;
 		}
 
 		if (this.categoricalCategoriesLastIndex > 0) {
@@ -9623,27 +9626,29 @@ export class Visual extends Shadow {
 			this.setYAxisTickStyle();
 		}
 
-		if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
-			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
-				const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
+		if (isSetXYScaleSpace) {
+			if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
+				if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
+					const xScaleGHeight = (this.xAxisG.node()).getBoundingClientRect().height;
 
-				if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
-					this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
-				} else {
-					this.xScaleGHeight = 0;
+					if (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual)) {
+						this.xScaleGHeight = xScaleGHeight > 0 ? xScaleGHeight : this.xScaleGHeight;
+					} else {
+						this.xScaleGHeight = 0;
+					}
 				}
+			} else {
+				this.xScaleGHeight = 0;
 			}
-		} else {
-			this.xScaleGHeight = 0;
-		}
 
-		if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
-			if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
-				const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
-				this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+			if (this.yAxisSettings.isDisplayLabel && isShowYAxis) {
+				if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && this.isHorizontalChart)) {
+					const yScaleGWidth = this.yAxisG.node().getBoundingClientRect().width;
+					this.yScaleGWidth = yScaleGWidth > 0 ? yScaleGWidth : this.yScaleGWidth;
+				}
+			} else {
+				this.yScaleGWidth = 0;
 			}
-		} else {
-			this.yScaleGWidth = 0;
 		}
 
 		// second round
