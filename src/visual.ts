@@ -6874,7 +6874,7 @@ export class Visual extends Shadow {
 		this.drawXGridLines();
 		this.drawYGridLines();
 
-		// this.referenceLinesData = GetReferenceLinesData(this);
+		this.referenceLinesData = GetReferenceLinesData(this);
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 
 		this.drawLollipopChart();
