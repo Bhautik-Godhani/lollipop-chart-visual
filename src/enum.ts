@@ -67,6 +67,11 @@ export enum CircleType {
 	Circle2 = "circle2",
 }
 
+export enum EImageType {
+	Image1 = "image1",
+	Image2 = "image2",
+}
+
 export enum LegendType {
 	Legend = "legend",
 }

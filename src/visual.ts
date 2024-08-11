@@ -68,6 +68,7 @@ import {
 	EGeneralTemplates,
 	EDynamicDeviationSettings,
 	EReferenceType,
+	EImageType,
 } from "./enum";
 import { createTooltipServiceWrapper, ITooltipServiceWrapper } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService, interactivityBaseService } from "powerbi-visuals-utils-interactivityutils";
@@ -10283,6 +10284,7 @@ export class Visual extends Shadow {
 				// marker 1
 				if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
 					const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
+						.attr("id", EImageType.Image1)
 						.classed(this.circleClass, true)
 						.classed(this.imageMarkerClass, true)
 						.classed("image-marker1", true);
@@ -10340,6 +10342,7 @@ export class Visual extends Shadow {
 				if (this.isHasMultiMeasure) {
 					if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker2Style.markerShapeBase64Url))) {
 						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
+							.attr("id", EImageType.Image2)
 							.classed(this.circleClass, true)
 							.classed(this.imageMarkerClass, true)
 							.classed("image-marker2", true);

@@ -12,7 +12,7 @@ import VisualAnnotations from "@truviz/viz-annotations/dist/VisualAnnotations";
 import { ILollipopChartRow } from "../model";
 
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import { CircleType, DataValuesType, PieType } from "../enum";
+import { CircleType, DataValuesType, EImageType, PieType } from "../enum";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export interface BehaviorOptions extends IBehaviorOptions<ILollipopChartRow> {
@@ -76,13 +76,13 @@ export class Behavior implements IInteractiveBehavior {
 
 			const clickedElement = e.target;
 
-			if (clickedElement.id === CircleType.Circle1) {
+			if (clickedElement.id === CircleType.Circle1 || clickedElement.id === EImageType.Image1) {
 				select(this)
 					.datum((d: any) => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					})
 				handleSelection(this, e);
-			} else if (clickedElement.id === CircleType.Circle2) {
+			} else if (clickedElement.id === CircleType.Circle2 || clickedElement.id === EImageType.Image2) {
 				select(this)
 					.datum((d: any) => {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }

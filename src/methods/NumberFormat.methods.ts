@@ -209,6 +209,10 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
     const formatter = valueFormatter ? valueFormatter.formatter : undefined;
     let isPercentageNumber: boolean;
 
+    if (number === undefined || number === null) {
+        return;
+    }
+
     if (valueFormatter && number && valueFormatter.format && valueFormatter.format.includes("%")) {
         isPercentageNumber = true;
 
