@@ -6380,7 +6380,7 @@ export class Visual extends Shadow {
 				this.isHorizontalBrushDisplayed = false;
 				this.isVerticalBrushDisplayed = true;
 
-				const xPos = this.viewPortWidth - this.brushWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth;
+				const xPos = this.viewPortWidth - this.brushWidth - this.legendViewPort.width - this.brushYAxisTicksMaxWidth - this.settingsPopupOptionsWidth;
 				const yPos = this.margin.top ? this.margin.top : 0;
 
 				const config: IBrushConfig = {
@@ -6520,7 +6520,7 @@ export class Visual extends Shadow {
 					if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
 
 					yScaleDomain.forEach((d, i) => {
-						const pos = this.brushScaleBand(d);
+						const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
 						if (pos >= brushArea[0] && pos <= brushArea[1]) {
 							newYScaleDomain.push(d);
 
@@ -6647,7 +6647,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = this.yScale.range();
 
 				yScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d);
+					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newYScaleDomain.push(d);
 
@@ -6937,7 +6937,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 				xScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d) - this.brushScaleBand.range()[0];
+					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newXScaleDomain.push(d);
 
@@ -7077,7 +7077,7 @@ export class Visual extends Shadow {
 					if (brushArea === null) brushArea = xScale.range();
 
 					xScaleDomain.forEach((d, i) => {
-						const pos = this.brushScaleBand(d);
+						const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
 						if (pos >= brushArea[0] && pos <= brushArea[1]) {
 							newXScaleDomain.push(d);
 
