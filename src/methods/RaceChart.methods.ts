@@ -73,7 +73,7 @@ export const StartChartRace = (self: Visual) => {
                 // self.margin.bottom = 0;         
 
                 if (self.chartData.length > 0) {
-                    self.initAndRenderLollipopChart(self.categoricalData, self.width, self.height, true, true);
+                    self.initAndRenderLollipopChart(self.categoricalData, self.chartData, self.width, self.height, true, true);
 
                     if (self.brushAndZoomAreaSettings.enabled) {
                         self.drawBrushLollipopChart(self.clonedCategoricalData);

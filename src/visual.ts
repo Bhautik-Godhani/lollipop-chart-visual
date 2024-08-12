@@ -6601,9 +6601,9 @@ export class Visual extends Shadow {
 							this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
 							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 
-							this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 						} else {
-							this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 						}
 
 						isBrushRendered = true;
@@ -6724,9 +6724,9 @@ export class Visual extends Shadow {
 						this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
 						this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 
-						this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					} else {
-						this.initAndRenderLollipopChart(categoricalData2, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					}
 
 					isBrushRendered = true;
@@ -6821,7 +6821,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	initAndRenderLollipopChart(categoricalData: powerbi.DataViewCategorical, scaleWidth: number, scaleHeight: number, isShowXAxis: boolean, isShowYAxis: boolean): void {
+	initAndRenderLollipopChart(categoricalData: powerbi.DataViewCategorical, chartData: ILollipopChartRow[], scaleWidth: number, scaleHeight: number, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		// if (this.rankingSettings.category.enabled || this.rankingSettings.subCategory.enabled) {
 		// 	this.setRemainingAsOthersDataColor();
 		// }
@@ -6846,7 +6846,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.drawXYAxis(categoricalData, this.chartData, isShowXAxis, isShowYAxis, true, false);
+		this.drawXYAxis(categoricalData, chartData, isShowXAxis, isShowYAxis, true, false);
 
 		// if (this.isChartIsRaceChart && this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 		// RenderExpandAllXAxis(this, this.categoricalData);
@@ -7021,9 +7021,9 @@ export class Visual extends Shadow {
 						this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
 						this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 
-						this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 					} else {
-						this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 					}
 					isBrushRendered = true;
 					this.brushG.attr("display", "block");
@@ -7157,11 +7157,11 @@ export class Visual extends Shadow {
 							this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
 							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 
-							this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 
 							this.xAxisG.attr("transform", `translate(${0}, ${0})`);
 						} else {
-							this.initAndRenderLollipopChart(categoricalData2, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 						}
 
 						isBrushRendered = true;
@@ -9314,6 +9314,17 @@ export class Visual extends Shadow {
 		// if (!isShowXAxis) {
 		// 	this.yAxisStartMargin = 0;
 		// }
+
+		this.circleYScaleDiffs = [];
+		this.circleXScaleDiffs = [];
+
+		this.pieXScaleDiffs = [];
+		this.pieYScaleDiffs = [];
+
+		this.maxCircleXScaleDiff = 0;
+		this.maxCircleYScaleDiff = 0;
+		this.maxPieXScaleDiff = 0;
+		this.maxPieYScaleDiff = 0;
 
 		this.setXAxisDomain(categoricalData, chartData);
 		this.setYAxisDomain(chartData);
