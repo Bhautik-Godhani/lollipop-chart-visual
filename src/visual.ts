@@ -5099,6 +5099,13 @@ export class Visual extends Shadow {
 			});
 		}
 
+		data.forEach(d => {
+			d.category = d.category.toString();
+			d.subCategories.forEach(s => {
+				s.category = s.category.toString();
+			})
+		})
+
 		this.setSelectionIds(data);
 
 		// if (this.isChartIsRaceChart) {
