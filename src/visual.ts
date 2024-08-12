@@ -6853,7 +6853,7 @@ export class Visual extends Shadow {
 			}
 		}
 
-		this.drawXYAxis(categoricalData, chartData, isShowXAxis, isShowYAxis, true, false);
+		this.drawXYAxis(categoricalData, chartData, isShowXAxis, isShowYAxis, true, this.isSmallMultiplesEnabled ? false : true);
 
 		// if (this.isChartIsRaceChart && this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 		// RenderExpandAllXAxis(this, this.categoricalData);

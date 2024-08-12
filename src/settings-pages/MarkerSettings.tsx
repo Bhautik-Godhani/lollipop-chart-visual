@@ -126,6 +126,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 											<SwitchOption
 												value={configValues.dropdownMarkerType}
 												optionsList={MARKERS_LIST}
+												selectorAppearance="secondary"
 												handleChange={(e) => {
 													handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
 													handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
@@ -160,7 +161,6 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 								<Row>
 									<Column>
 										<SwitchOption
-											label="Marker Type"
 											value={configValues.dropdownMarkerType}
 											optionsList={MARKERS_LIST}
 											selectorAppearance="secondary"
