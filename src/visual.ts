@@ -12317,6 +12317,13 @@ export class Visual extends Shadow {
 			linesSelection
 				.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 				.attr("stroke-width", this.lineSettings.lineWidth)
+				.attr(
+					"stroke-dasharray",
+					this.lineSettings.lineType === ELineType.Dotted
+						? `0, ${this.lineSettings.lineWidth * 2}`
+						: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
+				)
+				.style("display", this.lineSettings.show ? "block" : "none")
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)
 				.ease(easeLinear)
@@ -12356,6 +12363,13 @@ export class Visual extends Shadow {
 			linesSelection
 				.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 				.attr("stroke-width", this.lineSettings.lineWidth)
+				.attr(
+					"stroke-dasharray",
+					this.lineSettings.lineType === ELineType.Dotted
+						? `0, ${this.lineSettings.lineWidth * 2} `
+						: `${this.lineSettings.lineWidth * 2}, ${this.lineSettings.lineWidth * 2} `
+				)
+				.style("display", this.lineSettings.show ? "block" : "none")
 				.transition()
 				.duration(isEnter ? 0 : this.tickDuration)
 				.ease(easeLinear)
