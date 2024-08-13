@@ -753,7 +753,12 @@ export class Visual extends Shadow {
 				sectionName: "visualGeneralSettings",
 				propertyName: "darkMode",
 			},
-			servicePlanIds: [],
+			servicePlanIds: [
+				"truvizinc1674781244292.lollipop-chart-by-powerviz.lollipop-chart-tier-1",
+				"truvizinc1674781244292.lollipop-chart-by-powerviz.lollipop-chart-tier-2",
+				"truvizinc1674781244292.lollipop-chart-by-powerviz.lollipop-chart-tier-3",
+				"truvizinc1674781244292.lollipop-chart-by-powerviz.lollipop-chart-testing"
+			],
 			isDragSelection: false,
 			summaryTable: true,
 			advancedSettingsToggle: {
