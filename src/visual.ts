@@ -11836,7 +11836,18 @@ export class Visual extends Shadow {
 			}
 		}
 
-		if (this.isSmallMultiplesEnabled) {
+		if (this.isChartIsRaceChart && !this.isSmallMultiplesEnabled) {
+			const originalCategoricalData: powerbi.DataViewCategorical = cloneDeep(this.clonedCategoricalDataForRaceChart);
+			const categoricalData = this.setInitialChartData(
+				originalCategoricalData,
+				cloneDeep(originalCategoricalData),
+				this.categoricalMetadata,
+				this.vizOptions.options.viewport.width,
+				this.vizOptions.options.viewport.height
+			);
+
+			setSeedDataFromVisual(categoricalData);
+		} else if (this.isSmallMultiplesEnabled) {
 			this.smallMultiplesGridItemsList.forEach(d => {
 				const smallMultiplesGridItemContent = d.content;
 				const categoricalData = smallMultiplesGridItemContent.categoricalData;
