@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { POSITIVE_COLOR } from "../constants";
 import { ColorPaletteType, DataLabelsPlacement, DisplayUnits, EChartSettings, EDataColorsSettings, EDataLabelsMeasureTypes, EDataLabelsSettings, EGridLinesSettings, EIBCSThemes, ELineSettings, ELineType, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerTypes, ENumberFormatting, ETemplatesSettings, EVisualConfig, EVisualSettings, EXAxisSettings, EYAxisSettings, Orientation, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { NumberFormatting } from "../settings";
@@ -108,6 +107,186 @@ export const ApplyBeforeIBCSAppliedSettingsBack = (self: Visual): void => {
     });
 }
 
+const getPropertiesObject1 = (
+    self: Visual,
+    beforeIBCSSettings,
+) => {
+    return [
+        {
+            objectName: EVisualConfig.Editor,
+            displayName: EVisualSettings.BeforeIBCSSettings,
+            properties: {
+                [EVisualSettings.BeforeIBCSSettings]: JSON.stringify(beforeIBCSSettings),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.ChartConfig,
+            displayName: EVisualSettings.ChartSettings,
+            properties: {
+                [EVisualSettings.ChartSettings]: JSON.stringify({
+                    ...self.chartSettings,
+                    [EChartSettings.isShowZeroBaseLine]: true,
+                    [EChartSettings.orientation]:
+                        (self.templateSettings.theme === EIBCSThemes.DefaultHorizontal ||
+                            self.templateSettings.theme === EIBCSThemes.Diverging1Horizontal ||
+                            self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.LineConfig,
+            displayName: EVisualSettings.LineSettings,
+            properties: {
+                [EVisualSettings.LineSettings]: JSON.stringify({
+                    ...self.lineSettings,
+                    [ELineSettings.show]: true,
+                    [ELineSettings.lineColor]: (self.templateSettings.theme === EIBCSThemes.DefaultVertical || self.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(64, 64, 64, 1)" : POSITIVE_COLOR,
+                    [ELineSettings.lineWidth]: 4,
+                    [ELineSettings.lineType]: ELineType.Solid,
+                    [ELineSettings.isApplyMarkerColor]: (self.templateSettings.theme === EIBCSThemes.Diverging2Vertical || self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.MarkerConfig,
+            displayName: EVisualSettings.MarkerSettings,
+            properties: {
+                [EVisualSettings.MarkerSettings]: JSON.stringify({
+                    ...self.markerSettings,
+                    [EMarkerSettings.Marker1Style]: {
+                        ...self.markerSettings.marker1Style,
+                        [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+                        [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+                        [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
+                        [EMarkerSettings.MarkerSize]: 20,
+                    },
+                    [EMarkerSettings.Marker2Style]: {
+                        ...self.markerSettings.marker2Style,
+                        [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
+                        [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
+                        [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
+                        [EMarkerSettings.MarkerSize]: 20,
+                    }
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.DataColorsConfig,
+            displayName: EVisualSettings.DataColorsSettings,
+            properties: {
+                [EVisualSettings.DataColorsSettings]: JSON.stringify({
+                    ...self.dataColorsSettings,
+                    [EDataColorsSettings.FillType]: ((self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal || self.templateSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
+                    [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
+                    [EDataColorsSettings.SingleColor2]: "rgba(64, 64, 64, 1)",
+                }),
+            },
+            selector: null,
+        },
+    ]
+}
+
+const getPropertiesObject2 = (
+    self: Visual
+) => {
+    return [
+        {
+            objectName: EVisualConfig.DataLabelsConfig,
+            displayName: EVisualSettings.DataLabelsSettings,
+            properties: {
+                [EVisualSettings.DataLabelsSettings]: JSON.stringify({
+                    ...self.dataLabelsSettings,
+                    [EDataLabelsMeasureTypes.Measure1]: {
+                        ...self.dataLabelsSettings.measure1,
+                        [EDataLabelsSettings.show]: true,
+                        [EDataLabelsSettings.showBackground]: true,
+                        [EDataLabelsSettings.fontSize]: 12,
+                        [EDataLabelsSettings.placement]: DataLabelsPlacement.Outside,
+                        [EDataLabelsSettings.color]: "rgba(64, 64, 64, 1)",
+                        [EDataLabelsSettings.backgroundColor]: "rgba(255, 255, 255, 1)",
+                    }
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.XAxisConfig,
+            displayName: EVisualSettings.XAxisSettings,
+            properties: {
+                [EVisualSettings.XAxisSettings]: JSON.stringify({
+                    ...self.xAxisSettings,
+                    [EXAxisSettings.LabelColor]: "rgba(64, 64, 64, 1)",
+                    [EXAxisSettings.LabelFontSize]: 10,
+
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.YAxisConfig,
+            displayName: EVisualSettings.YAxisSettings,
+            properties: {
+                [EVisualSettings.YAxisSettings]: JSON.stringify({
+                    ...self.yAxisSettings,
+                    [EYAxisSettings.Show]: false,
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualSettings.Legend,
+            properties: {
+                show: false
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualSettings.NumberFormatting,
+            properties: {
+                [ENumberFormatting.Scaling]: DisplayUnits.Auto,
+                [ENumberFormatting.SemanticFormatting]: true,
+                [ENumberFormatting.NegativeFormat]: SemanticNegativeNumberFormats.MinusX,
+                [ENumberFormatting.PositiveFormat]: SemanticPositiveNumberFormats.PlusX,
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.GridLinesConfig,
+            displayName: EVisualSettings.GridLinesSettings,
+            properties: {
+                [EVisualSettings.GridLinesSettings]: JSON.stringify({
+                    ...self.gridSettings,
+                    [EGridLinesSettings.xGridLines]: {
+                        ...self.gridSettings.xGridLines,
+                        [EGridLinesSettings.show]: false,
+                    },
+                    [EGridLinesSettings.yGridLines]: {
+                        ...self.gridSettings.yGridLines,
+                        [EGridLinesSettings.show]: false,
+                    },
+                }),
+            },
+            selector: null,
+        },
+        {
+            objectName: EVisualConfig.TemplatesConfig,
+            displayName: EVisualSettings.TemplatesSettings,
+            properties: {
+                [EVisualSettings.TemplatesSettings]: JSON.stringify({
+                    ...self.templateSettings,
+                    [ETemplatesSettings.IsIBCSEnabled]: true,
+                    [ETemplatesSettings.PrevTheme]: self.templateSettings.theme,
+                }),
+            },
+            selector: null,
+        },
+    ]
+}
+
 export const ApplyIBCSTheme = (self: Visual): void => {
     let beforeIBCSSettings;
 
@@ -129,179 +308,8 @@ export const ApplyIBCSTheme = (self: Visual): void => {
 
     self._host.persistProperties({
         merge: [
-            {
-                objectName: EVisualConfig.Editor,
-                displayName: EVisualSettings.BeforeIBCSSettings,
-                properties: {
-                    [EVisualSettings.BeforeIBCSSettings]: JSON.stringify(beforeIBCSSettings),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.ChartConfig,
-                displayName: EVisualSettings.ChartSettings,
-                properties: {
-                    [EVisualSettings.ChartSettings]: JSON.stringify({
-                        ...self.chartSettings,
-                        [EChartSettings.isShowZeroBaseLine]: true,
-                        [EChartSettings.orientation]:
-                            (self.templateSettings.theme === EIBCSThemes.DefaultHorizontal ||
-                                self.templateSettings.theme === EIBCSThemes.Diverging1Horizontal ||
-                                self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? Orientation.Horizontal : Orientation.Vertical,
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.LineConfig,
-                displayName: EVisualSettings.LineSettings,
-                properties: {
-                    [EVisualSettings.LineSettings]: JSON.stringify({
-                        ...self.lineSettings,
-                        [ELineSettings.show]: true,
-                        [ELineSettings.lineColor]: (self.templateSettings.theme === EIBCSThemes.DefaultVertical || self.templateSettings.theme === EIBCSThemes.DefaultHorizontal) ? "rgba(64, 64, 64, 1)" : POSITIVE_COLOR,
-                        [ELineSettings.lineWidth]: 4,
-                        [ELineSettings.lineType]: ELineType.Solid,
-                        [ELineSettings.isApplyMarkerColor]: (self.templateSettings.theme === EIBCSThemes.Diverging2Vertical || self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal) ? true : false
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.MarkerConfig,
-                displayName: EVisualSettings.MarkerSettings,
-                properties: {
-                    [EVisualSettings.MarkerSettings]: JSON.stringify({
-                        ...self.markerSettings,
-                        [EMarkerSettings.Marker1Style]: {
-                            ...self.markerSettings.marker1Style,
-                            [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
-                            [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
-                            [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
-                            [EMarkerSettings.MarkerSize]: 20,
-                        },
-                        [EMarkerSettings.Marker2Style]: {
-                            ...self.markerSettings.marker2Style,
-                            [EMarkerSettings.MarkerType]: EMarkerTypes.SHAPE,
-                            [EMarkerSettings.MarkerShape]: EMarkerShapeTypes.DEFAULT,
-                            [EMarkerSettings.DropdownMarkerType]: EMarkerDefaultShapes.SQUARE,
-                            [EMarkerSettings.MarkerSize]: 20,
-                        }
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.DataColorsConfig,
-                displayName: EVisualSettings.DataColorsSettings,
-                properties: {
-                    [EVisualSettings.DataColorsSettings]: JSON.stringify({
-                        ...self.dataColorsSettings,
-                        [EDataColorsSettings.FillType]: ((self.templateSettings.theme === EIBCSThemes.Diverging2Horizontal || self.templateSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single),
-                        [EDataColorsSettings.SingleColor1]: "rgba(64, 64, 64, 1)",
-                        [EDataColorsSettings.SingleColor2]: "rgba(64, 64, 64, 1)",
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.DataLabelsConfig,
-                displayName: EVisualSettings.DataLabelsSettings,
-                properties: {
-                    [EVisualSettings.DataLabelsSettings]: JSON.stringify({
-                        ...self.dataLabelsSettings,
-                        [EDataLabelsMeasureTypes.Measure1]: {
-                            ...self.dataLabelsSettings.measure1,
-                            [EDataLabelsSettings.show]: true,
-                            [EDataLabelsSettings.showBackground]: true,
-                            [EDataLabelsSettings.fontSize]: 12,
-                            [EDataLabelsSettings.placement]: DataLabelsPlacement.Outside,
-                            [EDataLabelsSettings.color]: "rgba(64, 64, 64, 1)",
-                            [EDataLabelsSettings.backgroundColor]: "rgba(255, 255, 255, 1)",
-                        }
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.XAxisConfig,
-                displayName: EVisualSettings.XAxisSettings,
-                properties: {
-                    [EVisualSettings.XAxisSettings]: JSON.stringify({
-                        ...self.xAxisSettings,
-                        [EXAxisSettings.LabelColor]: "rgba(64, 64, 64, 1)",
-                        [EXAxisSettings.LabelFontSize]: 10,
-
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.YAxisConfig,
-                displayName: EVisualSettings.YAxisSettings,
-                properties: {
-                    [EVisualSettings.YAxisSettings]: JSON.stringify({
-                        ...self.yAxisSettings,
-                        [EYAxisSettings.Show]: false,
-                    }),
-                },
-                selector: null,
-            },
-            // {
-            //     objectName: EVisualConfig.SortingConfig,
-            //     displayName: EVisualSettings.Sorting,
-            //     properties: {
-            //         [EVisualSettings.Sorting]: JSON.stringify(SORTING_SETTINGS),
-            //     },
-            //     selector: null,
-            // },
-            {
-                objectName: EVisualSettings.Legend,
-                properties: {
-                    show: false
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualSettings.NumberFormatting,
-                properties: {
-                    [ENumberFormatting.Scaling]: DisplayUnits.Auto,
-                    [ENumberFormatting.SemanticFormatting]: true,
-                    [ENumberFormatting.NegativeFormat]: SemanticNegativeNumberFormats.MinusX,
-                    [ENumberFormatting.PositiveFormat]: SemanticPositiveNumberFormats.PlusX,
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.GridLinesConfig,
-                displayName: EVisualSettings.GridLinesSettings,
-                properties: {
-                    [EVisualSettings.GridLinesSettings]: JSON.stringify({
-                        ...self.gridSettings,
-                        [EGridLinesSettings.xGridLines]: {
-                            ...self.gridSettings.xGridLines,
-                            [EGridLinesSettings.show]: false,
-                        },
-                        [EGridLinesSettings.yGridLines]: {
-                            ...self.gridSettings.yGridLines,
-                            [EGridLinesSettings.show]: false,
-                        },
-                    }),
-                },
-                selector: null,
-            },
-            {
-                objectName: EVisualConfig.TemplatesConfig,
-                displayName: EVisualSettings.TemplatesSettings,
-                properties: {
-                    [EVisualSettings.TemplatesSettings]: JSON.stringify({
-                        ...self.templateSettings,
-                        [ETemplatesSettings.IsIBCSEnabled]: true,
-                        [ETemplatesSettings.PrevTheme]: self.templateSettings.theme,
-                    }),
-                },
-                selector: null,
-            },
+            ...getPropertiesObject1(self, beforeIBCSSettings),
+            ...getPropertiesObject2(self)
         ],
     });
 }
