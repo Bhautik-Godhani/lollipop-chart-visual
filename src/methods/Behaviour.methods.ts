@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { select as d3Select, select, Selection } from "d3-selection";
 import {
 	IBehaviorOptions,

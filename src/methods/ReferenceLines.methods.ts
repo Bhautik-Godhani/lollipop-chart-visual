@@ -531,7 +531,6 @@ const setValueForYAxisRefLine = (self: Visual, rLine: IReferenceLineSettings, rL
     return { x1: newX1, x2: newX2, y1: newY1, y2: newY2, textX1: newTextX1, textY1: newTextY1, textAnchor: newTextAnchor, textAlignment: newTextAlignment };
 }
 
-// eslint-disable-next-line max-lines-per-function
 export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] => {
     const setData = (rLine: IReferenceLineSettings, isLine2: boolean) => {
         let x1: number,
@@ -556,28 +555,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
                 values = self.chartData.map((d) => d.value1);
             }
 
-            switch (rLineValue.computation) {
-                case EReferenceLineComputation.ZeroBaseline:
-                    rLineValue.value = 0 + "";
-                    break;
-                case EReferenceLineComputation.Min:
-                    rLineValue.value = d3Min(values, (d) => d) + "";
-                    break;
-                case EReferenceLineComputation.Max:
-                    rLineValue.value = d3Max(values, (d) => d) + "";
-                    break;
-                case EReferenceLineComputation.Average:
-                    rLineValue.value = mean(values, (d) => d) + "";
-                    break;
-                case EReferenceLineComputation.Median:
-                    rLineValue.value = median(values, (d) => d) + "";
-                    break;
-                case EReferenceLineComputation.StandardDeviation:
-                    rLineValue.value = calculateStandardDeviation(values) + "";
-                    break;
-                case EReferenceLineComputation.Fixed:
-                    break;
-            }
+            setReferenceLineComputation(rLineValue, values);
         }
 
         let value: string;
@@ -652,88 +630,7 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
             rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
             rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
 
-            if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
-                if (rLine.lineValue1.axis === EXYAxisNames.X) {
-                    if ((rLine.line1Coord.x1 > rLine.line2Coord.x1 && !self.isHorizontalChart) || (rLine.line1Coord.y1 > rLine.line2Coord.y1 && self.isHorizontalChart)) {
-                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
-                        // rLine.line1Coord = rLine.line2Coord;
-                        // rLine.line2Coord = clonedRLine.line1Coord;
-                        switch (rLine.labelStyle.labelPosition) {
-                            case EBeforeAfterPosition.Before:
-                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
-                                break;
-                            case EBeforeAfterPosition.Center:
-                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
-                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
-                                break;
-                            case EBeforeAfterPosition.After:
-                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
-                                break;
-                        }
-                    } else {
-                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
-                        // rLine.line1Coord = rLine.line2Coord;
-                        // rLine.line2Coord = clonedRLine.line1Coord;
-                        switch (rLine.labelStyle.labelPosition) {
-                            case EBeforeAfterPosition.Before:
-                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
-                                break;
-                            case EBeforeAfterPosition.Center:
-                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
-                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
-                                break;
-                            case EBeforeAfterPosition.After:
-                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
-                                break;
-                        }
-                    }
-                }
-
-                if (rLine.lineValue1.axis === EXYAxisNames.Y) {
-                    if ((rLine.line1Coord.y1 > rLine.line2Coord.y1 && !self.isHorizontalChart) || (rLine.line1Coord.x1 > rLine.line2Coord.x1 && self.isHorizontalChart)) {
-                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
-                        // rLine.line1Coord = rLine.line2Coord;
-                        // rLine.line2Coord = clonedRLine.line1Coord;
-                        switch (rLine.labelStyle.labelPosition) {
-                            case EBeforeAfterPosition.Before:
-                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
-                                break;
-                            case EBeforeAfterPosition.Center:
-                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
-                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
-                                break;
-                            case EBeforeAfterPosition.After:
-                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
-                                break;
-                        }
-                    } else {
-                        // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
-                        // rLine.line1Coord = rLine.line2Coord;
-                        // rLine.line2Coord = clonedRLine.line1Coord;
-
-                        switch (rLine.labelStyle.labelPosition) {
-                            case EBeforeAfterPosition.Before:
-                                rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
-                                break;
-                            case EBeforeAfterPosition.Center:
-                                rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
-                                rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
-                                break;
-                            case EBeforeAfterPosition.After:
-                                rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
-                                rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
-                                break;
-                        }
-                    }
-                }
-            }
+            setLineLabelCoord(self, rLine);
 
             arr = [...arr, rLine];
 
@@ -741,4 +638,114 @@ export const GetReferenceLinesData = (self: Visual): IReferenceLineSettings[] =>
         },
         []
     );
+}
+
+const setReferenceLineComputation = (rLineValue: IReferenceLineValueProps, values: any[]): void => {
+    switch (rLineValue.computation) {
+        case EReferenceLineComputation.ZeroBaseline:
+            rLineValue.value = 0 + "";
+            break;
+        case EReferenceLineComputation.Min:
+            rLineValue.value = d3Min(values, (d) => d) + "";
+            break;
+        case EReferenceLineComputation.Max:
+            rLineValue.value = d3Max(values, (d) => d) + "";
+            break;
+        case EReferenceLineComputation.Average:
+            rLineValue.value = mean(values, (d) => d) + "";
+            break;
+        case EReferenceLineComputation.Median:
+            rLineValue.value = median(values, (d) => d) + "";
+            break;
+        case EReferenceLineComputation.StandardDeviation:
+            rLineValue.value = calculateStandardDeviation(values) + "";
+            break;
+        case EReferenceLineComputation.Fixed:
+            break;
+    }
+}
+
+const setLineLabelCoord = (self: Visual, rLine: IReferenceLineSettings) => {
+    if (rLine.referenceType === EReferenceType.REFERENCE_BAND) {
+        if (rLine.lineValue1.axis === EXYAxisNames.X) {
+            if ((rLine.line1Coord.x1 > rLine.line2Coord.x1 && !self.isHorizontalChart) || (rLine.line1Coord.y1 > rLine.line2Coord.y1 && self.isHorizontalChart)) {
+                // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
+                // rLine.line1Coord = rLine.line2Coord;
+                // rLine.line2Coord = clonedRLine.line1Coord;
+                switch (rLine.labelStyle.labelPosition) {
+                    case EBeforeAfterPosition.Before:
+                        rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                        break;
+                    case EBeforeAfterPosition.Center:
+                        rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                        rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                        break;
+                    case EBeforeAfterPosition.After:
+                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                        break;
+                }
+            } else {
+                // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
+                // rLine.line1Coord = rLine.line2Coord;
+                // rLine.line2Coord = clonedRLine.line1Coord;
+                switch (rLine.labelStyle.labelPosition) {
+                    case EBeforeAfterPosition.Before:
+                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                        break;
+                    case EBeforeAfterPosition.Center:
+                        rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                        rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                        break;
+                    case EBeforeAfterPosition.After:
+                        rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                        break;
+                }
+            }
+        }
+
+        if (rLine.lineValue1.axis === EXYAxisNames.Y) {
+            if ((rLine.line1Coord.y1 > rLine.line2Coord.y1 && !self.isHorizontalChart) || (rLine.line1Coord.x1 > rLine.line2Coord.x1 && self.isHorizontalChart)) {
+                // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
+                // rLine.line1Coord = rLine.line2Coord;
+                // rLine.line2Coord = clonedRLine.line1Coord;
+                switch (rLine.labelStyle.labelPosition) {
+                    case EBeforeAfterPosition.Before:
+                        rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                        break;
+                    case EBeforeAfterPosition.Center:
+                        rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                        rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                        break;
+                    case EBeforeAfterPosition.After:
+                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                        break;
+                }
+            } else {
+                // const clonedRLine: IReferenceLineSettings = cloneDeep(rLine));
+                // rLine.line1Coord = rLine.line2Coord;
+                // rLine.line2Coord = clonedRLine.line1Coord;
+
+                switch (rLine.labelStyle.labelPosition) {
+                    case EBeforeAfterPosition.Before:
+                        rLine.labelCoord.textX1 = rLine.line1Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line1Coord.textY1;
+                        break;
+                    case EBeforeAfterPosition.Center:
+                        rLine.labelCoord.textX1 = (rLine.line1Coord.textX1 + rLine.line2Coord.textX1) / 2;
+                        rLine.labelCoord.textY1 = (rLine.line1Coord.textY1 + rLine.line2Coord.textY1) / 2;
+                        break;
+                    case EBeforeAfterPosition.After:
+                        rLine.labelCoord.textX1 = rLine.line2Coord.textX1;
+                        rLine.labelCoord.textY1 = rLine.line2Coord.textY1;
+                        break;
+                }
+            }
+        }
+    }
 }
