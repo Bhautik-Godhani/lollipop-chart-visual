@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
 import { Visual } from "../visual";
 import { axisBottom, axisLeft, axisRight, axisTop, scaleLinear, scaleSymlog } from "d3";
 import { EFontStyle, Position } from "../enum";
@@ -162,48 +161,6 @@ export const CallLinearCutScaleOnAxisGroup = (self: Visual): void => {
             self.afterCutLinearYAxisG
                 .attr("transform", `translate(${0}, 0)`)
                 .call(axisRight(self.afterCutLinearScale).ticks(self.afterCutLinearScaleArea / 50));
-        }
-    }
-}
-
-export function GetCutAndClipXScale(value: number | string): number {
-    const self = this;
-    if (self.isCutAndClipAxisEnabled && self.isHorizontalChart) {
-        const beforeCutDomain = self.beforeCutLinearScale.domain();
-        const afterCutDomain = self.afterCutLinearScale.domain();
-        if (value >= beforeCutDomain[0] && value <= beforeCutDomain[1]) {
-            return self.beforeCutLinearScale(value);
-        } else if (value >= afterCutDomain[0] && value <= afterCutDomain[1]) {
-            return self.afterCutLinearScale(value);
-        } else if (value > beforeCutDomain[1] && value < afterCutDomain[0]) {
-            let diff = 0;
-            if (self.isHorizontalChart) {
-                diff = self.isLeftYAxis ? -self.barCutAndClipMarkerLinesGap / 2 : self.barCutAndClipMarkerLinesGap / 2;
-            } else {
-                // diff = self.isBottomXAxis ? self.barCutAndClipMarkerLinesGap / 2 : -self.barCutAndClipMarkerLinesGap / 2;
-            }
-            return self.beforeCutLinearScale(beforeCutDomain[1]) - diff;
-        }
-    }
-}
-
-export function GetCutAndClipYScale(value: number | string): number {
-    const self = this;
-    if (self.isCutAndClipAxisEnabled && !self.isHorizontalChart) {
-        const beforeCutDomain = self.beforeCutLinearScale.domain();
-        const afterCutDomain = self.afterCutLinearScale.domain();
-        if (value >= beforeCutDomain[0] && value <= beforeCutDomain[1]) {
-            return self.beforeCutLinearScale(value);
-        } else if (value >= afterCutDomain[0] && value <= afterCutDomain[1]) {
-            return self.afterCutLinearScale(value);
-        } else if (value > beforeCutDomain[1] && value < afterCutDomain[0]) {
-            let diff = 0;
-            if (!self.isHorizontalChart) {
-                diff = self.isBottomXAxis ? self.barCutAndClipMarkerLinesGap / 2 : -self.barCutAndClipMarkerLinesGap / 2;
-            } else {
-                // diff = this.isBottomXAxis ? this.barCutAndClipMarkerLinesGap / 2 : this.barCutAndClipMarkerLinesGap / 2;
-            }
-            return self.beforeCutLinearScale(beforeCutDomain[1]) - diff;
         }
     }
 }

@@ -84,14 +84,3 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
         }
     }
 }
-
-export function GetPositiveNegativeLogXScale(self: Visual, value: number | string): number {
-    if (self.isHorizontalChart && self.isShowPositiveNegativeLogScale) {
-        if (parseFloat((value ? value : 0).toString()) < 0) {
-            value = Math.abs(+value);
-            return self.negativeLogScale(Math.abs(value as number)) + (self.isBottomXAxis ? (!isNaN(self.positiveLogScale(0.1)) ? self.positiveLogScale(0.1) : 0) : 0);
-        } else {
-            return self.positiveLogScale(value === 0 ? 0.1 : value) + (self.isBottomXAxis ? (!isNaN(self.negativeLogScale(0.1)) ? self.negativeLogScale(0.1) : 0) : 0);
-        }
-    }
-}

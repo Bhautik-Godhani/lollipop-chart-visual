@@ -188,10 +188,10 @@ import { RenderConnectingLine } from "./methods/ConnectingLine.methods";
 import CutAndClipAxisSettings from "./settings-pages/CutAndClipAxisSettings";
 import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClipMarkerOnAxis } from "./methods/CutAndClipMarker.methods";
 import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
-import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
-import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
+import { CallXScaleOnAxisGroup } from "./methods/XAxis.methods";
+import { CallYScaleOnAxisGroup } from "./methods/YAxis.methods";
 import { DrawSmallMultipleLollipopChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
-import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
+import { RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";
 import { DrawSmallMultiplesGridLayout, ESmallMultiplesAxisType, ESmallMultiplesXAxisPosition, ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "./SmallMultiplesGridLayout";
@@ -4189,10 +4189,10 @@ export class Visual extends Shadow {
 			}
 
 			if (!this.isHorizontalChart) {
-				this.yScale = GetCutAndClipYScale.bind(this);
+				this.yScale = this.getCutAndClipYScale.bind(this);
 				this.setYAxisTickStyle();
 			} else {
-				this.xScale = GetCutAndClipXScale.bind(this);
+				this.xScale = this.getCutAndClipXScale.bind(this);
 				this.setXAxisTickStyle();
 			}
 		} else {
@@ -6852,9 +6852,9 @@ export class Visual extends Shadow {
 
 		if (this.isLogarithmScale && this.isShowPositiveNegativeLogScale) {
 			if (this.isHorizontalChart) {
-				this.xScale = GetPositiveNegativeLogXScale.bind(this);
+				this.xScale = this.getPositiveNegativeLogXScale.bind(this);
 			} else {
-				this.yScale = GetPositiveNegativeLogYScale.bind(this);
+				this.yScale = this.getPositiveNegativeLogYScale.bind(this);
 			}
 		}
 
@@ -12532,5 +12532,67 @@ export class Visual extends Shadow {
 			}
 		}
 		return color;
+	}
+
+	getPositiveNegativeLogXScale(value: number | string): number {
+		if (this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
+			if (parseFloat((value ? value : 0).toString()) < 0) {
+				value = Math.abs(+value);
+				return this.negativeLogScale(Math.abs(value as number)) + (this.isBottomXAxis ? (!isNaN(this.positiveLogScale(0.1)) ? this.positiveLogScale(0.1) : 0) : 0);
+			} else {
+				return this.positiveLogScale(value === 0 ? 0.1 : value) + (this.isBottomXAxis ? (!isNaN(this.negativeLogScale(0.1)) ? this.negativeLogScale(0.1) : 0) : 0);
+			}
+		}
+	}
+
+	getPositiveNegativeLogYScale(value: number | string): number {
+		if (!this.isHorizontalChart && this.isShowPositiveNegativeLogScale) {
+			if (parseFloat((value ? value : 0).toString()) < 0) {
+				value = Math.abs(+value);
+				return this.negativeLogScale(Math.abs(value as number)) + (this.isBottomXAxis ? this.positiveLogScale(0.1) : 0);
+			} else {
+				return this.positiveLogScale(value === 0 ? 0.1 : value) + (!this.isBottomXAxis ? this.negativeLogScale(0.1) : 0);
+			}
+		}
+	}
+
+	getCutAndClipXScale(value: number | string): number {
+		if (this.isCutAndClipAxisEnabled && this.isHorizontalChart) {
+			const beforeCutDomain = this.beforeCutLinearScale.domain();
+			const afterCutDomain = this.afterCutLinearScale.domain();
+			if (value >= beforeCutDomain[0] && value <= beforeCutDomain[1]) {
+				return this.beforeCutLinearScale(value);
+			} else if (value >= afterCutDomain[0] && value <= afterCutDomain[1]) {
+				return this.afterCutLinearScale(value);
+			} else if (value > beforeCutDomain[1] && value < afterCutDomain[0]) {
+				let diff = 0;
+				if (this.isHorizontalChart) {
+					diff = this.isLeftYAxis ? -this.barCutAndClipMarkerLinesGap / 2 : this.barCutAndClipMarkerLinesGap / 2;
+				} else {
+					// diff = this.isBottomXAxis ? this.barCutAndClipMarkerLinesGap / 2 : -this.barCutAndClipMarkerLinesGap / 2;
+				}
+				return this.beforeCutLinearScale(beforeCutDomain[1]) - diff;
+			}
+		}
+	}
+
+	getCutAndClipYScale(value: number | string): number {
+		if (this.isCutAndClipAxisEnabled && !this.isHorizontalChart) {
+			const beforeCutDomain = this.beforeCutLinearScale.domain();
+			const afterCutDomain = this.afterCutLinearScale.domain();
+			if (value >= beforeCutDomain[0] && value <= beforeCutDomain[1]) {
+				return this.beforeCutLinearScale(value);
+			} else if (value >= afterCutDomain[0] && value <= afterCutDomain[1]) {
+				return this.afterCutLinearScale(value);
+			} else if (value > beforeCutDomain[1] && value < afterCutDomain[0]) {
+				let diff = 0;
+				if (!this.isHorizontalChart) {
+					diff = this.isBottomXAxis ? this.barCutAndClipMarkerLinesGap / 2 : -this.barCutAndClipMarkerLinesGap / 2;
+				} else {
+					// diff = this.isBottomXAxis ? this.barCutAndClipMarkerLinesGap / 2 : this.barCutAndClipMarkerLinesGap / 2;
+				}
+				return this.beforeCutLinearScale(beforeCutDomain[1]) - diff;
+			}
+		}
 	}
 }
