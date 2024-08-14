@@ -1,5 +1,3 @@
-/* eslint-disable max-lines-per-function */
-/* eslint-disable no-self-assign */
 import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "../enum";
 import { IValueFormatter } from "../model";
 import { NumberFormatting } from "../settings";
@@ -275,18 +273,6 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
     }
 
     switch (numberSettings.scaling) {
-        case DisplayUnits.Auto: {
-            formattedNumber = formattedNumber;
-            break;
-        }
-        case DisplayUnits.Relative: {
-            formattedNumber = formattedNumber;
-            break;
-        }
-        case DisplayUnits.None: {
-            formattedNumber = formattedNumber;
-            break;
-        }
         case DisplayUnits.Thousands: {
             formattedNumber = formattedNumber + numberSettings.thousandScalingLabel;
             break;
@@ -302,9 +288,6 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
         case DisplayUnits.Trillions: {
             formattedNumber = formattedNumber + numberSettings.trillionScalingLabel;
             break;
-        }
-        default: {
-            formattedNumber = formattedNumber;
         }
     }
 
