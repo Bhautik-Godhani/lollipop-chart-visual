@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { EFontStyle, EHighContrastColorType, EPlayPauseButton, Position } from '../enum';
 import { Visual } from '../visual';
 import { group, interval, max, min, select, sum } from "d3";
@@ -175,15 +174,6 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
         .attr("font-size", subTextStyles.isLabelAutoFontSize ? headerFontSize / 2 : subTextStyles.labelFontSize)
         .text(`${self.measure1DisplayName} : ${getTotal1ValueForRaceChartLabel(self)}`);
 
-    // if (self.isHasMultiMeasure) {
-    //     self.raceChartDataLabelText
-    //         .append("tspan")
-    //         .attr("x", "0")
-    //         .attr("dy", labelFontSize / 1.5)
-    //         .attr("font-size", labelFontSize / 2)
-    //         .text(`${self.measure2DisplayName} : ${getTotal2Value()}`);
-    // }
-
     const textBBox = self.raceChartDataLabelText.node().getBBox();
     const tickerButtonRadius = GetTickerButtonRadius(self);
 
@@ -205,9 +195,7 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             "translate(" +
             (-max([self.raceChartDataLabelLength / 2, tickerButtonRadius])) +
             "," +
-            // (self.raceChartSettings.placement === Position.Bottom ?
             (tickerButtonRadius) +
-            // (self.margin.top + (tickerButtonRadius * 2) + tickerButtonRadius)) +
             ")"
         )
 
