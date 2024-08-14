@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { Visual } from "../visual";
 import { create, select as d3Select, Selection } from "d3-selection";
 import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, EDynamicDeviationLabelDisplayTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
@@ -158,23 +157,6 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             return 1;
         });
 
-    // self.dynamicDeviationG
-    //     .append("line")
-    //     .attr("class", self.dynamicDeviationSettings.connectingLineType)
-    //     .classed("connecting-line-2", true)
-    //     .attr("x1", self.getXPosition(to.value))
-    //     .attr("x2", self.getXPosition(to.value))
-    //     .attr("y1", start)
-    //     .attr("y2", (self.getYPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
-    //     .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
-    //     .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
-    //     .attr(
-    //         "stroke-dasharray",
-    //         self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
-    //             ? `0, ${8} `
-    //             : `${8}, ${8}`
-    //     );
-
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
 
     const connectorLine = self.dynamicDeviationG
@@ -201,6 +183,13 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .attr("x2", self.getXPosition(to.value) - dynamicDeviationSettings.connectingLineWidth / 2);
     }
 
+    drawHorizontalDDElements(self, from, to, start, end, isFromCategoryYPosTrue, isFromCategoryYPosTrue, isToGreaterThenFrom, hide, connectorLine, isPositiveDeviation);
+
+    dataLabelG.raise();
+}
+
+const drawHorizontalDDElements = (self: Visual, from, to, start, end, isFromCategoryYPosTrue, isToCategoryYPosTrue, isToGreaterThenFrom, hide, connectorLine, isPositiveDeviation) => {
+    const dynamicDeviationSettings = self.dynamicDeviationSettings;
     if (dynamicDeviationSettings.isShowStartIndicator) {
         self.dynamicDeviationG
             .append("circle")
@@ -282,8 +271,6 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", dynamicDeviationSettings.connectingLineWidth + "px");
     }
-
-    dataLabelG.raise();
 }
 
 export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
@@ -362,23 +349,6 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             return 1;
         });
 
-    // self.dynamicDeviationG
-    //     .append("line")
-    //     .attr("class", self.dynamicDeviationSettings.connectingLineType)
-    //     .classed("connecting-line-2", true)
-    //     .attr("x1", (self.getXPosition(to.category) ?? 0) + self.scaleBandWidth / 2)
-    //     .attr("x2", end)
-    //     .attr("y1", self.getYPosition(to.value))
-    //     .attr("y2", self.getYPosition(to.value))
-    //     .attr("stroke", self.getColor(self.dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Foreground))
-    //     .attr("stroke-width", self.dynamicDeviationSettings.connectingLineWidth)
-    //     .attr(
-    //         "stroke-dasharray",
-    //         self.dynamicDeviationSettings.connectingLineType === ELineType.Dotted
-    //             ? `0, ${8} `
-    //             : `${8}, ${8}`
-    //     );
-
     self.DDConnectorFill = isPositiveDeviation ? self.dynamicDeviationSettings.connectorPositiveColor : self.dynamicDeviationSettings.connectorNegativeColor;
 
     const connectorLine = self.dynamicDeviationG
@@ -404,6 +374,14 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .attr("y1", self.getYPosition(from.value) - dynamicDeviationSettings.connectingLineWidth / 2)
             .attr("y2", self.getYPosition(to.value) + dynamicDeviationSettings.connectingLineWidth / 2);
     }
+
+    drawVerticalDDElements(self, from, to, start, end, isFromCategoryXPosTrue, isToCategoryXPosTrue, isToGreaterThenFrom, hide, connectorLine, isPositiveDeviation);
+
+    dataLabelG.raise();
+}
+
+const drawVerticalDDElements = (self: Visual, from, to, start, end, isFromCategoryXPosTrue, isToCategoryXPosTrue, isToGreaterThenFrom, hide, connectorLine, isPositiveDeviation) => {
+    const dynamicDeviationSettings = self.dynamicDeviationSettings;
 
     if (dynamicDeviationSettings.isShowStartIndicator) {
         self.dynamicDeviationG
@@ -486,8 +464,6 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px");
     }
-
-    dataLabelG.raise();
 }
 
 export const ShowStaticTooltip = (self: Visual, event: MouseEvent, displayName: string): void => {
@@ -559,48 +535,10 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             }
             break;
         case EDynamicDeviationDisplayTypes.CreateYourOwn:
-            {
-                if ((self.lastDynamicDeviationSettings &&
-                    self.lastDynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) ||
-                    self.isDynamicDeviationButtonSelected
-                ) {
-                    RemoveDynamicDeviation(self);
-                    self.fromCategoryValueDataPair = undefined;
-                    self.toCategoryValueDataPair = undefined;
-                    self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
-                }
-
-                if (self.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && self.dynamicDeviationSettings.removeCurrentDeviation) {
-                    RemoveDynamicDeviation(self);
-                    self.fromCategoryValueDataPair = undefined;
-                    self.toCategoryValueDataPair = undefined;
-                    self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
-                }
-
-                const { from, to } = self.dynamicDeviationSettings.createYourOwnDeviation;
-                if (from && to) {
-                    RenderDynamicDeviation(self, from, to);
-                }
-            }
+            drawCreateYourOwnDD(self);
             break;
         case EDynamicDeviationDisplayTypes.CustomRange:
-            {
-                const clonedCategoricalDataPairs = cloneDeep(self.categoricalDataPairs);
-                const categoricalDataPairs = self.isHorizontalChart ? clonedCategoricalDataPairs.reverse() : clonedCategoricalDataPairs;
-                const fromIndex = categoricalDataPairs[dynamicDeviationSettings.fromIndex - 1];
-                const toIndex = categoricalDataPairs[dynamicDeviationSettings.toIndex - 1];
-                const measureKey = Object.keys(categoricalDataPairs[0]).find(d => d.includes("measure"));
-                const fromTotal = sum(Object.keys(fromIndex).filter(d => d.includes("measure")), d => fromIndex[d]);
-                const toTotal = sum(Object.keys(toIndex).filter(d => d.includes("measure")), d => toIndex[d]);
-                const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: self.isHasSubcategories ? fromTotal * (self.isPercentageMeasure ? 100 : 1) : fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
-                const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: self.isHasSubcategories ? toTotal * (self.isPercentageMeasure ? 100 : 1) : toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
-
-                RenderDynamicDeviation(
-                    self,
-                    { category: from.category, value: from.value1 },
-                    { category: to.category, value: to.value1 }
-                );
-            }
+            drawCustomRangeDD(self);
             break;
         case EDynamicDeviationDisplayTypes.FirstToLast:
             {
@@ -676,4 +614,47 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             }
             break;
     }
+}
+
+const drawCreateYourOwnDD = (self: Visual) => {
+    if ((self.lastDynamicDeviationSettings &&
+        self.lastDynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) ||
+        self.isDynamicDeviationButtonSelected
+    ) {
+        RemoveDynamicDeviation(self);
+        self.fromCategoryValueDataPair = undefined;
+        self.toCategoryValueDataPair = undefined;
+        self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
+    }
+
+    if (self.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn && self.dynamicDeviationSettings.removeCurrentDeviation) {
+        RemoveDynamicDeviation(self);
+        self.fromCategoryValueDataPair = undefined;
+        self.toCategoryValueDataPair = undefined;
+        self.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
+    }
+
+    const { from, to } = self.dynamicDeviationSettings.createYourOwnDeviation;
+    if (from && to) {
+        RenderDynamicDeviation(self, from, to);
+    }
+}
+
+const drawCustomRangeDD = (self: Visual) => {
+    const dynamicDeviationSettings = self.dynamicDeviationSettings;
+    const clonedCategoricalDataPairs = cloneDeep(self.categoricalDataPairs);
+    const categoricalDataPairs = self.isHorizontalChart ? clonedCategoricalDataPairs.reverse() : clonedCategoricalDataPairs;
+    const fromIndex = categoricalDataPairs[dynamicDeviationSettings.fromIndex - 1];
+    const toIndex = categoricalDataPairs[dynamicDeviationSettings.toIndex - 1];
+    const measureKey = Object.keys(categoricalDataPairs[0]).find(d => d.includes("measure"));
+    const fromTotal = sum(Object.keys(fromIndex).filter(d => d.includes("measure")), d => fromIndex[d]);
+    const toTotal = sum(Object.keys(toIndex).filter(d => d.includes("measure")), d => toIndex[d]);
+    const from = dynamicDeviationSettings.fromIndex <= categoricalDataPairs.length ? { ...fromIndex, value1: self.isHasSubcategories ? fromTotal * (self.isPercentageMeasure ? 100 : 1) : fromIndex[measureKey] } : { ...self.firstCategoryValueDataPair, value1: self.firstCategoryValueDataPair.value };
+    const to = dynamicDeviationSettings.toIndex <= categoricalDataPairs.length ? { ...toIndex, value1: self.isHasSubcategories ? toTotal * (self.isPercentageMeasure ? 100 : 1) : toIndex[measureKey] } : { ...self.lastCategoryValueDataPair, value1: self.lastCategoryValueDataPair.value };
+
+    RenderDynamicDeviation(
+        self,
+        { category: from.category, value: from.value1 },
+        { category: to.category, value: to.value1 }
+    );
 }
