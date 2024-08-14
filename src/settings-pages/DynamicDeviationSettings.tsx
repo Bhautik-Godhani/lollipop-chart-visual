@@ -8,7 +8,6 @@ import {
   EDynamicDeviationLabelDisplayTypes,
   EDynamicDeviationSettings,
   ELineType,
-  Position,
 } from "../enum";
 import {
   InputControl,
@@ -40,17 +39,6 @@ const LINE_TYPES = [
     label: <DottedLineIcon fill="currentColor" />,
     value: ELineType.Dotted,
   },
-];
-
-const LABEL_POSITION: ILabelValuePair[] = [
-  {
-    label: "TOP",
-    value: Position.Top,
-  },
-  {
-    label: "BOTTOM",
-    value: Position.Bottom,
-  }
 ];
 
 const DynamicDeviationSettings = (props) => {

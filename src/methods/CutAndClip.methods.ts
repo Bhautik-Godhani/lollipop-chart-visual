@@ -1,18 +1,17 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
 import { Visual } from "../visual";
-import powerbi from "powerbi-visuals-api";
 import { axisBottom, axisLeft, axisRight, axisTop, scaleLinear, scaleSymlog } from "d3";
 import { EFontStyle, Position } from "../enum";
 import { GetAxisDomainMinMax } from "./Axis.methods";
 import { getSVGTextSize } from "./methods";
 
 export const RenderLinearCutAxis = (self: Visual): void => {
-    SetLinearCutAxisDomain(self, false, self.categoricalData);
+    SetLinearCutAxisDomain(self, false);
     SetLinearCutAxisRange(self, self.width, self.height);
     CallLinearCutScaleOnAxisGroup(self);
 }
 
-export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, categoricalData: powerbi.DataViewCategorical): void => {
+export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean): void => {
     const { min, max } = GetAxisDomainMinMax(self);
     const isLinearScale: boolean = typeof self.chartData.map((d) => d.value1)[0] === "number";
     // const isLogarithmScale: boolean | undefined = self.axisByBarOrientation.isLogarithmScale;

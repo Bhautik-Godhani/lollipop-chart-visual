@@ -13,9 +13,9 @@ function ConditionRecord({
 }) {
   const DEFAULT_COLOR = "rgba(65, 164, 255, 1)";
 
-  const isFieldBasedOn = typeof shadow.config?.CFConfig?.fieldsBasedOn != "undefined" ? true : false;
-  const fieldsBasedOn = isFieldBasedOn && shadow.config?.CFConfig?.fieldsBasedOn;
-  const messageNoteBasedOnField: { fieldName: string, note: string } = shadow.config?.CFConfig?.messageNoteBasedOnField;
+  const isFieldBasedOn = typeof shadow.config.CFConfig.fieldsBasedOn != "undefined" ? true : false;
+  const fieldsBasedOn = isFieldBasedOn && shadow.config.CFConfig.fieldsBasedOn;
+  const messageNoteBasedOnField: { fieldName: string, note: string } = shadow.config.CFConfig.messageNoteBasedOnField;
 
   const [pickedColor, setpickedColor] = useState(record.color ? record.color : DEFAULT_COLOR);
 
@@ -63,11 +63,11 @@ function ConditionRecord({
         {record.valueType === "ranking" && rankingCF(rankingTypes, record, dropdownHandler, index, inputChangeHandler, pickedColor, handleColor, shadow)}
         {record.valueType === "percent" && percentCF(record, index, inputChangeHandler, pickedColor, handleColor, shadow, dropdownHandler)}
 
-        <ConditionalWrapper visible={(messageNoteBasedOnField && messageNoteBasedOnField?.fieldName === record.valueType)}>
+        <ConditionalWrapper visible={(messageNoteBasedOnField && messageNoteBasedOnField.fieldName === record.valueType)}>
           <Row>
             <Column>
               <Quote>
-                <strong>Note: </strong>{messageNoteBasedOnField?.note}
+                <strong>Note: </strong>{messageNoteBasedOnField.note}
               </Quote>
             </Column>
           </Row>
@@ -78,8 +78,8 @@ function ConditionRecord({
 }
 
 const valueCF = (applyToDropdownList, record, dropdownHandler, index, measureOptions, categoryOptions, inputChangeHandler, pickedColor, handleColor, shadow, CFConfig) => {
-  const isShowCategoriesTypeDropdown: boolean = CFConfig?.isShowCategoriesTypeDropdown;
-  const categoriesList: { label: string, value: string }[] = CFConfig?.categoriesList ?? [];
+  const isShowCategoriesTypeDropdown: boolean = CFConfig.isShowCategoriesTypeDropdown;
+  const categoriesList: { label: string, value: string }[] = CFConfig.categoriesList ? CFConfig.categoriesList : [];
 
   return (<>
     <Row>
@@ -93,7 +93,7 @@ const valueCF = (applyToDropdownList, record, dropdownHandler, index, measureOpt
           />
         )}
         {applyToDropdownList.length <= 1 && (
-          <Label style={{ marginBottom: "0px" }} text={`Apply To ${applyToDropdownList?.[0]?.label || ""}`} />
+          <Label style={{ marginBottom: "0px" }} text={`Apply To ${applyToDropdownList[0].label || ""}`} />
         )}
       </Column>
     </Row>
@@ -102,7 +102,7 @@ const valueCF = (applyToDropdownList, record, dropdownHandler, index, measureOpt
       <Row>
         <Column>
           <SelectInput
-            value={record.categoryType ?? categoriesList[0].value}
+            value={record.categoryType ? record.categoryType : categoriesList[0].value}
             optionsList={categoriesList}
             handleChange={(newValue) => dropdownHandler(newValue, "categoryType", index)}
             defaultWrapper={false}

@@ -8,7 +8,7 @@ import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { EDataRolesName, ERankingCalcMethod, ERankingType, ESortOrderTypes } from "../enum";
 import { ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
 import { cloneDeep } from "lodash";
-import { CallExpandAllXScaleOnAxisGroup, RenderExpandAllXAxis } from "./expandAllXAxis.methods";
+import { RenderExpandAllXAxis } from "./expandAllXAxis.methods";
 import { MonthNames } from "../constants";
 import { ISortingProps } from "../visual-settings.interface";
 
@@ -135,7 +135,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     });
 
                     if (d.source.roles[EDataRolesName.SmallMultiples]) {
-                        d.values = d.values.map(d => self.othersBarText);
+                        d.values = d.values.map(() => self.othersBarText);
                     }
                 });
 

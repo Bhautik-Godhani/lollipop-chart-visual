@@ -64,7 +64,7 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
                 .attr("transform", "translate(0," + height + ")")
                 .call(axisBottom(self.xScale).ticks(width / 90)
                     .tickFormat(d => {
-                        const isOthersTick = d.toString().includes(self.othersLabel);
+                        // const isOthersTick = d.toString().includes(self.othersLabel);
                         // if (self.isXIsDateTimeAxis && self.isXIsContinuousAxis && !isOthersTick) {
                         //     return timeFormat("%b %Y")(new Date(d.toString()));
                         // } else {
@@ -85,11 +85,9 @@ export const CallXScaleOnAxisGroup = (self: Visual, width: number, height: numbe
     }
 }
 
-export function GetPositiveNegativeLogXScale(value: number | string): number {
-    const self = this;
-
+export function GetPositiveNegativeLogXScale(self: Visual, value: number | string): number {
     if (self.isHorizontalChart && self.isShowPositiveNegativeLogScale) {
-        if (parseFloat(value?.toString()) < 0) {
+        if (parseFloat((value ? value : 0).toString()) < 0) {
             value = Math.abs(+value);
             return self.negativeLogScale(Math.abs(value as number)) + (self.isBottomXAxis ? (!isNaN(self.positiveLogScale(0.1)) ? self.positiveLogScale(0.1) : 0) : 0);
         } else {

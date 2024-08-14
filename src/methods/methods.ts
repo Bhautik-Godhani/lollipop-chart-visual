@@ -6,13 +6,14 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { IValueFormatter, TooltipData } from "../model";
-import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, ETemplatesSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { ECFApplyOnCategories, ECFValueTypes, EDataRolesName, EFontStyle, ETemplatesSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { select } from "d3-selection";
 import { PATTERNS } from "@truviz/shadow/dist/Components";
+import { randomBytes } from 'crypto';
 
-export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any, isTemplateSettings = false) => {
+export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any) => {
 	if (shadow.templateSettings && shadow.templateSettings.isIBCSEnabled) {
 		ApplyBeforeIBCSAppliedSettingsBack(shadow);
 	}
@@ -132,71 +133,6 @@ export const GetWordsSplitByWidth = (text: string, textProperties: TextPropertie
 	};
 
 	return wordBreaker.splitByWidth(text.toString(), textProperties, calcTextWidth, maxWidth, maxLines, textTruncator);
-};
-
-const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
-	if (scaling === "auto") {
-		const l = Math.floor(num).toString().length;
-		if (l <= 3) {
-			return {
-				n: num,
-				scaledTo: "none",
-			};
-		} else if (l <= 6) {
-			return {
-				n: num / 1000,
-				scaledTo: "thousands",
-			};
-		} else if (l <= 9) {
-			return {
-				n: num / 1000000,
-				scaledTo: "million",
-			};
-		} else if (l <= 12) {
-			return {
-				n: num / 1000000000,
-				scaledTo: "billion",
-			};
-		} else {
-			return {
-				n: num / 1000000000000,
-				scaledTo: "trillion",
-			};
-		}
-	}
-
-	if (scaling === "thousands") {
-		return {
-			n: num / 1000,
-			scaledTo: "thousands",
-		};
-	}
-
-	if (scaling === "million") {
-		return {
-			n: num / 1000000,
-			scaledTo: "million",
-		};
-	}
-
-	if (scaling === "billion") {
-		return {
-			n: num / 1000000000,
-			scaledTo: "billion",
-		};
-	}
-
-	if (scaling === "trillion") {
-		return {
-			n: num / 1000000000000,
-			scaledTo: "trillion",
-		};
-	}
-
-	return {
-		n: num,
-		scaledTo: "none",
-	};
 };
 
 // export const formatNumber = (number: number | string, options: NumberFormatting, formatter: IValueFormatter = undefined): string => {
@@ -462,7 +398,7 @@ export const parseConditionalFormatting = (SETTINGS) => {
 
 export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, sValue1: number, sValue2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[])
 	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
-	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number) => {
 		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;
@@ -534,12 +470,12 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 					if (el.measureType.measure) {
 						const isSubcategory = subCategory && el.categoryType === EDataRolesName.SubCategory;
 						if (el.measureType.measure1) {
-							(isMeasureMatch(result, el, isSubcategory ? sValue1 : value1, el.sourceName, EDataRolesName.Measure1));
+							(isMeasureMatch(result, el, isSubcategory ? sValue1 : value1));
 						} else if (el.measureType.measure2) {
-							isMeasureMatch(result, el, isSubcategory ? sValue2 : value2, el.sourceName, EDataRolesName.Measure2);
+							isMeasureMatch(result, el, isSubcategory ? sValue2 : value2);
 						}
 					} else if (el.measureType.tooltip) {
-						const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
+						const results = tooltips.map(d => isMeasureMatch(result, el, +d.value));
 						result = results.find(d => d.match && d.sourceName === el.sourceName);
 					}
 					// if (result.match) {
@@ -617,7 +553,7 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 
 export const isConditionMatch1 = (category: string, subCategory: string, value1: number, value2: number, sValue1: number, sValue2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps)
 	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
-	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number) => {
 		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;
@@ -689,12 +625,12 @@ export const isConditionMatch1 = (category: string, subCategory: string, value1:
 				if (el.measureType.measure) {
 					const isSubcategory = subCategory && el.categoryType === EDataRolesName.SubCategory;
 					if (el.measureType.measure1) {
-						(isMeasureMatch(result, el, isSubcategory ? sValue1 : value1, el.sourceName, EDataRolesName.Measure1));
+						(isMeasureMatch(result, el, isSubcategory ? sValue1 : value1));
 					} else if (el.measureType.measure2) {
-						isMeasureMatch(result, el, isSubcategory ? sValue2 : value2, el.sourceName, EDataRolesName.Measure2);
+						isMeasureMatch(result, el, isSubcategory ? sValue2 : value2);
 					}
 				} else if (el.measureType.tooltip) {
-					const results = tooltips.map(d => isMeasureMatch(result, el, +d.value, d.displayName));
+					const results = tooltips.map(d => isMeasureMatch(result, el, +d.value));
 					result = results.find(d => d.match && d.sourceName === el.sourceName);
 				}
 				// if (result.match) {
@@ -987,4 +923,10 @@ export const CreateDate = (day: number, monthName: string, quarter: number, year
 	} catch (error) {
 		throw new Error(`Invalid date: ${day} ${finalMonthName} (${quarter}) ${year}`);
 	}
+}
+
+// Generate a random number between 0 and 1
+export const GenerateSecureRandom = () => {
+	const randomBytesBuffer = randomBytes(4); // Generates 4 random bytes
+	return randomBytesBuffer.readUInt32BE(0) / 0xffffffff;
 }

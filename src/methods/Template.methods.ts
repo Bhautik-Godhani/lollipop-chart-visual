@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { ISmallMultiplesGridItemContent } from "../SmallMultiplesGridLayout";
 import { EVisualConfig, EVisualSettings } from "../enum";
 import { NumberFormatting } from "../settings";

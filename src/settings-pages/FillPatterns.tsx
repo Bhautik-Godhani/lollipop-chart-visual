@@ -3,10 +3,10 @@ import * as React from "react";
 import { IPatternData, PatternPicker, Quote, SelectInput } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
-import { ColorPaletteType, EMarkerShapeTypes, EPatternByDataTypes, EPatternSettings } from "../enum";
+import { EMarkerShapeTypes, EPatternByDataTypes, EPatternSettings } from "../enum";
 import { ILabelValuePair, IMarkerSettings, IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
-import { parseObject, persistProperties } from "../methods/methods";
+import { parseObject } from "../methods/methods";
 import { Visual } from "../visual";
 
 const BASED_ON_TYPES: ILabelValuePair[] = [

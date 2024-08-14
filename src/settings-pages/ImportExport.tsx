@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { get, isEmpty, merge } from "lodash";
+import { get, isEmpty } from "lodash";
 import copy from "copy-to-clipboard";
 import { Button, Column, ConditionalWrapper, Footer, IconButton, InputControl, Label, Quote, RadioOption, Row, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { CopyExportIcon, GreenCheckmark, ImportSuccessfulUploadIcon, ImportUploadClose, ImportUploadIcon } from "./SettingsIcons";
@@ -8,29 +8,19 @@ import TooltipElement from "@truviz/shadow/dist/Components/Label/TooltipElement"
 import { EVisualConfig, EVisualSettings } from "../enum";
 
 const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConfig: { sectionName, propertyName } }) => {
-  const [notification, setNotification] = React.useState("");
-  const initNotification = text => {
-    setNotification(text);
-    setTimeout(() => {
-      setNotification("");
-    }, 4000);
-  };
+  // const [notification, setNotification] = React.useState("");
+  // const initNotification = text => {
+  //   setNotification(text);
+  //   setTimeout(() => {
+  //     setNotification("");
+  //   }, 4000);
+  // };
 
   const initialState = vizOptions.formatTab[sectionName][propertyName];
 
   const [isThemeApplied, setIsThemeApplied] = React.useState(initialState === "THEME_APPLIED");
 
   const [showDownloadNote, setShowDownloadNote] = React.useState(false);
-
-  const onDrop = React.useCallback(acceptedFiles => {
-    const reader = new FileReader();
-    reader.onload = onReaderLoad;
-    reader.readAsText(acceptedFiles[0]);
-  }, []);
-
-  const onReaderLoad = event => {
-    applyThemeJson(event.target.result);
-  };
 
   const configs = {
     [EVisualSettings.BrushAndZoomAreaSettings]: EVisualConfig.BrushAndZoomAreaConfig,
@@ -108,8 +98,8 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
 
   const urlData = React.useMemo(() => {
     const config = getConfig();
-    var jsonse = JSON.stringify(config);
-    var blob = new Blob([jsonse], { type: "application/json" });
+    const jsonse = JSON.stringify(config);
+    const blob = new Blob([jsonse], { type: "application/json" });
     return URL.createObjectURL(blob);
   }, [vizOptions.formatTab]);
 
@@ -145,7 +135,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
             })
           }
         } else {
-          if (obj.hasOwnProperty(el)) {
+          if (Object.keys(obj).includes(el)) {
             mergeObject.push({
               objectName: configs[el],
               properties: {
@@ -167,14 +157,14 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
         });
       }
 
-      initNotification("Theme applied successfully");
+      // initNotification("Theme applied successfully");
       shadow.persistProperties(sectionName, propertyName, "THEME_APPLIED");
       closeCurrentSettingHandler();
     } catch (e) {
       setDetails(s => ({ ...s, status: "FAILED" }));
       console.log("Error parsing file");
       shadow.persistProperties(sectionName, propertyName, "FAILED");
-      initNotification("Error parsing file");
+      // initNotification("Error parsing file");
     }
   };
 
@@ -236,7 +226,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
       return;
     }
     if (file && file[0]) {
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function (event) {
         try {
           const val = JSON.parse(event.target.result as any);
@@ -265,7 +255,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
     });
   };
 
-  const handleUploadClick = event => {
+  const handleUploadClick = () => {
     hiddenFileInput.current.click();
   };
 

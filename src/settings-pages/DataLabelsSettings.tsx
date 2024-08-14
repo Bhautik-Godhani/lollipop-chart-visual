@@ -1,8 +1,8 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { DATA_LABELS_SETTINGS as DATA_LABELS_SETTINGS_IMP } from "../constants";
-import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsDisplayTypes, EDataLabelsMeasureTypes, EDataLabelsSettings, EVisualConfig, EVisualSettings } from "../enum";
-import { EInsideTextColorTypes, IChartSettings, IDataLabelsProps, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
+import { DataLabelsPlacement, EDataLabelsBGApplyFor, EDataLabelsDisplayTypes, EDataLabelsMeasureTypes, EDataLabelsSettings } from "../enum";
+import { EInsideTextColorTypes, IDataLabelsProps, IDataLabelsSettings, ILabelValuePair } from "../visual-settings.interface";
 import {
 	ColorPicker,
 	Column,
@@ -509,20 +509,6 @@ const UIInsideLabelsTextColorSettings = (
 	</>
 }
 
-const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
-	return (
-		<Footer
-			cancelButtonHandler={closeCurrentSettingHandler}
-			saveButtonConfig={{
-				isDisabled: false,
-				text: "APPLY",
-				handler: applyChanges,
-			}}
-			resetButtonHandler={resetChanges}
-		/>
-	);
-};
-
 const DataLabelsSettings = (props) => {
 	const {
 		shadow,
@@ -571,12 +557,6 @@ const DataLabelsSettings = (props) => {
 	});
 
 	const [selectedMeasure, setSelectedMeasure] = React.useState<EDataLabelsMeasureTypes>(EDataLabelsMeasureTypes.Measure1);
-
-	const chartSettings: IChartSettings = shadow.chartSettings;
-
-	const dataLabelsSettings: IDataLabelsSettings = JSON.parse(
-		vizOptions.formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]
-	);
 
 	// if (!vizOptions.options.dataViews[0].categorical.categories[1]) {
 	// 	chartSettings.lollipopType = LollipopType.CIRCLE;

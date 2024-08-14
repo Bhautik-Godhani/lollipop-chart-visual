@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React, { useState, useEffect } from "react";
 import ConditionRecord from "./ConditionRecord";
 import { cloneDeep, isEmpty } from "lodash";
@@ -134,10 +135,10 @@ function CformattingForm({
   setSelectedApplyOnCategoryState
 }) {
   const isAddNew = isEmpty(formDetails);
-  const [isEditableRuleName, setIsEditableRuleName] = useState(formDetails ? (formDetails?.name as string)?.includes("CFR") ? false : true : false);
+  const [isEditableRuleName, setIsEditableRuleName] = useState(formDetails ? (formDetails.name as string).includes("CFR") ? false : true : false);
   const [applyOnCategories, setApplyOnCategories] = useState(applyOnCategoriesList);
   const [ruleDetails, setRuleDetails] = useState(!formDetails ? {
-    name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails?.name,
+    name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails ? formDetails.name : '',
     isEditableRuleName: false,
     applyOnCategories: selectedApplyOnCategory ? selectedApplyOnCategory === "all" ? [...applyOnCategoriesList.map(d => d.value)] : [selectedApplyOnCategory] : [],
     conditions: [
@@ -149,7 +150,7 @@ function CformattingForm({
         categoryType: EDataRolesName.Category,
       },
     ]
-  } : { name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails?.name, ...formDetails });
+  } : { name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails ? formDetails.name : "", ...formDetails });
 
   useEffect(() => {
     const record = ruleDetails.conditions[0];
@@ -167,7 +168,7 @@ function CformattingForm({
   useEffect(() => {
     setRuleDetails(d => ({
       ...d,
-      name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : (formDetails?.name ?? "")
+      name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : (formDetails ? formDetails.name : "")
     }));
   }, [isEditableRuleName]);
 
@@ -246,9 +247,9 @@ function CformattingForm({
   return (
     <>
       {GetCFormattingFormUI(shadow, isAddNew, isSupportApplyOn, isShowBasedOnValueDropDown, applyOnCategories, ruleDetails, CFConfig, isEditableRuleName, dropdownHandler, measureOptions, categoryOptions, inputChangeHandler, setColorHandler, handleChangeContent, closeCurrentSettingHandler, setRuleDetails, setIsEditableRuleName, setSelectedApplyOnCategoryState)}
-      <Footer isShowResetButton={false} resetButtonHandler={() => { }} cancelButtonHandler={() => handleChangeContent("homePage")} saveButtonConfig={{
+      <Footer isShowResetButton={false} resetButtonHandler={() => undefined} cancelButtonHandler={() => handleChangeContent("homePage")} saveButtonConfig={{
         text: "Save", handler: saveHandler, isDisabled:
-          (ruleDetails.name === "" || isEditableRuleName && ruleDetails.name.includes("CFR") || (isSupportApplyOn && applyOnCategories?.length > 0 && ruleDetails.applyOnCategories.length === 0)) ? true : false
+          (ruleDetails.name === "" || isEditableRuleName && ruleDetails.name.includes("CFR") || (isSupportApplyOn && applyOnCategories && applyOnCategories.length > 0 && ruleDetails.applyOnCategories.length === 0)) ? true : false
       }} />
     </>
   );

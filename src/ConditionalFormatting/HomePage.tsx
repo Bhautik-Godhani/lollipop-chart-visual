@@ -156,7 +156,7 @@ const EmptyRulesScreen = ({ createRule, closeCurrentSettingHandler }) => {
       <div className={`config-btn-wrapper flex-end`}>
         <div className="btn-group">
           <Button text={"Cancel"} variant={"secondary"} clickHandler={() => closeCurrentSettingHandler()} />
-          <Button text={"Save"} variant={"primary"} disabled={true} clickHandler={() => { }} />
+          <Button text={"Save"} variant={"primary"} disabled={true} clickHandler={() => undefined} />
         </div>
       </div>
     </>
@@ -197,11 +197,11 @@ const handleDrop = (ev, dragId: number, setRules: React.Dispatch<React.SetStateA
 const createRuleNameTitle = (condition) => {
   let title = '';
   if (condition.valueType === 'value') {
-    title = condition.operator === '<>' ? `when Value from ${condition.staticValue} to ${condition.secondaryStaticValue}` : `when Value is ${measureComparisionOptions.find(d => d.value === condition.operator)?.label.split(') ')[1]} ${condition.staticValue}`
+    title = condition.operator === '<>' ? `when Value from ${condition.staticValue} to ${condition.secondaryStaticValue}` : `when Value is ${measureComparisionOptions.find(d => d.value === condition.operator).label.split(') ')[1]} ${condition.staticValue}`
   } else if (condition.valueType === 'ranking') {
-    title = `when Ranking is ${rankingTypes.find(d => d.value === condition.rankingType)?.kind} {condition.staticRankingValue}`
+    title = `when Ranking is ${rankingTypes.find(d => d.value === condition.rankingType).kind} {condition.staticRankingValue}`
   } else if (condition.valueType === 'percent') {
-    title = condition.operator === '<>' ? `when % from ${condition.staticPercentValue} to ${condition.secondaryStaticPercentValue}` : `when % is ${measureComparisionOptions.find(d => d.value === condition.operator)?.label.split(') ')[1]} ${condition.percentValue}`
+    title = condition.operator === '<>' ? `when % from ${condition.staticPercentValue} to ${condition.secondaryStaticPercentValue}` : `when % is ${measureComparisionOptions.find(d => d.value === condition.operator).label.split(') ')[1]} ${condition.percentValue}`
   }
   return title;
 }
@@ -211,7 +211,7 @@ function RuleName(rule, condition: any) {
     return <><span>{rule.name && rule.name.length > 30 ? rule.name.substring(0, 30) + '...' : rule.name}</span></>
   } else {
     return <>
-      {!rule?.isEditableRuleName && (
+      {!rule.isEditableRuleName && (
         <>
           {condition.valueType === "value" && (
             <>
@@ -239,7 +239,7 @@ function RuleName(rule, condition: any) {
               <span> when </span>
               <span className="highlighted-text"> Ranking </span>
               <span> is </span>
-              <span className="highlighted-text"> {rankingTypes.find(d => d.value === condition.rankingType)?.kind} {condition.staticRankingValue} </span>
+              <span className="highlighted-text"> {rankingTypes.find(d => d.value === condition.rankingType).kind} {condition.staticRankingValue} </span>
             </>
           )}
 
@@ -271,8 +271,8 @@ function RuleName(rule, condition: any) {
         </>
       )}
 
-      {rule?.isEditableRuleName && (
-        rule?.name
+      {rule.isEditableRuleName && (
+        rule.name
       )
       }
 
@@ -322,10 +322,10 @@ function HomePage({
             <p className="section-delete-alert-subtext">
               <span
                 className="section-delete-alert-subtext-color"
-                style={{ background: rules?.[showConfirmPrompt.id]?.conditions?.[0]?.color }}
+                style={{ background: rules[showConfirmPrompt.id].conditions[0].color }}
               ></span>
               <span className="section-delete-alert-subtext-text">
-                {rules?.[showConfirmPrompt.id]?.isDuplicateRule ? RuleName(rules?.[showConfirmPrompt.id], rules?.[showConfirmPrompt.id]?.conditions[0]) : RuleName(rules?.[showConfirmPrompt.id], rules?.[showConfirmPrompt.id]?.conditions[0])}
+                {rules[showConfirmPrompt.id].isDuplicateRule ? RuleName(rules[showConfirmPrompt.id], rules[showConfirmPrompt.id].conditions[0]) : RuleName(rules[showConfirmPrompt.id], rules[showConfirmPrompt.id].conditions[0])}
               </span>
             </p>
           </div>
@@ -342,7 +342,7 @@ function HomePage({
         </>
       ) : (rules.length > 0) ? (
         <>
-          {(isSupportApplyOn && applyOnCategories?.length > 0) && (
+          {(isSupportApplyOn && applyOnCategories && applyOnCategories.length > 0) && (
             <Row>
               <Column>
                 <SwitchOption

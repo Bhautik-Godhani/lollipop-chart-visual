@@ -162,15 +162,6 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
             return self.raceBarLabelsFormatter[i].formatter.format(d);
         }).join(" "));
 
-
-    const getTotal2Value = () => {
-        if (self.isLollipopTypePie) {
-            return self.formatNumber(sum(self.chartData, d => sum(d.subCategories, s => s.value2)), self.numberSettings, undefined, true, true);
-        } else {
-            return self.formatNumber(sum(self.chartData, d => d.value2), self.numberSettings, undefined, true, true);
-        }
-    }
-
     self.raceChartDataLabelText
         .append("tspan")
         .attr("class", "sub-text-label")
@@ -242,7 +233,6 @@ export const RenderRaceChartDataLabel = (self: Visual): void => {
 
 export const RenderRaceTickerButton = (self: Visual): void => {
     self.tickerButtonG.selectAll("*").remove();
-    const raceBarDateLabelTextBBox = (self.raceChartDataLabelText.node() as SVGSVGElement).getBBox();
     const tickerButtonRadius = GetTickerButtonRadius(self);
     const tickerButton = self.tickerButtonG
         .attr("id", "tickerButton")

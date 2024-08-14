@@ -453,17 +453,6 @@ const DataColors = (props) => {
 	const initialStates: typeof DATA_COLORS = parseObject(_initialStates, DATA_COLORS);
 	const rankingSettings = (shadow as Visual).rankingSettings;
 
-	const MARKER_TYPES: ILabelValuePair[] = [
-		{
-			label: shadow.measure1DisplayName,
-			value: EMarkerColorTypes.Marker1,
-		},
-		{
-			label: shadow.measure2DisplayName,
-			value: EMarkerColorTypes.Marker2,
-		},
-	];
-
 	const applyChanges = () => {
 
 		if (configValues.fillType !== ((shadow.chartSettings.theme === EIBCSThemes.Diverging2Horizontal || shadow.chartSettings.theme === EIBCSThemes.Diverging2Vertical) ? ColorPaletteType.PositiveNegative : ColorPaletteType.Single) ||

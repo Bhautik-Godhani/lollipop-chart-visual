@@ -14,7 +14,6 @@ import {
   EReferenceLinesType,
   EReferenceType,
   EXYAxisNames,
-  Orientation,
   Position,
 } from "../enum";
 import {
@@ -34,7 +33,7 @@ import {
   Quote,
 } from "@truviz/shadow/dist/Components";
 import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon, CenterVerticalAlignmentIcon, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon, RightAlignmentIcon, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "./SettingsIcons";
-import { ICategoryValuePair, ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
+import { ILabelValuePair, IReferenceBandStyleProps, IReferenceLineLabelStyleProps, IReferenceLineSettings, IReferenceLineStyleProps, IReferenceLineValueProps } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 import { min as d3Min, max as d3Max, mean, median } from "d3-array";
@@ -74,17 +73,6 @@ const LABEL_NAME_TYPES: ILabelValuePair[] = [
   {
     label: "Text & Value",
     value: EReferenceLineNameTypes.TEXT_VALUE,
-  },
-];
-
-const LABEL_ORIENTATION: ILabelValuePair[] = [
-  {
-    label: "Vertical",
-    value: Orientation.Vertical,
-  },
-  {
-    label: "Horizontal",
-    value: Orientation.Horizontal,
   },
 ];
 
@@ -273,11 +261,6 @@ const Get_RANK_ORDER = (shadow: Visual, configValues: IReferenceLineValueProps) 
 const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
   const AXIS_NAMES = Get_AXIS_NAMES(shadow, isValue2 ? configValues.lineValue2.axis : configValues.lineValue1.axis);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
-  const line1Measure = [{
-    label: AXIS_NAMES.find(d => d.value === configValues.lineValue1.measureName) ? AXIS_NAMES.find(d => d.value === configValues.lineValue1.measureName).label : "",
-    value: configValues.lineValue1.measureName,
-    axis: configValues.lineValue1.axis,
-  }];
 
   let categoriesNameList: ILabelValuePair[];
   if (shadow.isHorizontalChart) {

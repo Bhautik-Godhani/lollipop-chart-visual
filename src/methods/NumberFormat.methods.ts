@@ -33,7 +33,7 @@ export const getNumberDisplayUnit = (number: number, isMinThousandsLimit: boolea
     }
 }
 
-export const GetInvertAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, displayUnit: DisplayUnits, number: number, isUseSematicFormat: boolean, isMinThousandsLimit: boolean): string => {
+export const GetInvertAutoUnitFormattedNumber = (numberFormatting: NumberFormatting, displayUnit: DisplayUnits, number: number, isUseSematicFormat: boolean): string => {
     let formattedNumber: string;
     const numberSettings = numberFormatting;
     const isScaling = numberSettings.scalingLabel;
@@ -242,7 +242,7 @@ export const GetFormattedNumber = (self: Visual, number: number | string, number
             break;
         }
         case DisplayUnits.Relative: {
-            formattedNumber = GetInvertAutoUnitFormattedNumber(numberFormatting, self.axisDomainMaxValueDisplayUnit, number, isUseSematicFormat, isMinThousandsLimit);
+            formattedNumber = GetInvertAutoUnitFormattedNumber(numberFormatting, self.axisDomainMaxValueDisplayUnit, number, isUseSematicFormat);
             break;
         }
         case DisplayUnits.None: {

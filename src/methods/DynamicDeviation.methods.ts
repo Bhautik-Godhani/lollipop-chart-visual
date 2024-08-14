@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { Visual } from "../visual";
 import { create, select as d3Select, Selection } from "d3-selection";
 import { EDynamicDeviationConnectingLineTypes, EDynamicDeviationDisplayTypes, EDynamicDeviationLabelDisplayTypes, EFontStyle, EHighContrastColorType, ELineType } from "../enum";
@@ -34,8 +35,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
 
     const dataLabelG = self.dynamicDeviationG.append("g").lower().attr("class", "dynamic-deviation-label");
 
-    let dataLabelText;
-    dataLabelText = dataLabelG
+    const dataLabelText = dataLabelG
         .append("text")
         .attr("fill", self.getColor(self.dynamicDeviationSettings.labelFontColor, EHighContrastColorType.Foreground))
         .attr("text-anchor", "start")
@@ -91,7 +91,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const toCategoryYPos = self.getYPosition(to.category);
     const isFromCategoryYPosTrue = fromCategoryYPos !== undefined;
     const isToCategoryYPosTrue = toCategoryYPos !== undefined;
-    const isToGreaterThenFrom: Boolean = to.value > from.value;
+    const isToGreaterThenFrom: boolean = to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryYPosTrue : isToCategoryYPosTrue;
     const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? 0 : self.height) : self.height);
     const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? self.height : 0) : 0);
@@ -207,7 +207,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .attr("class", "connecting-circle-1")
             .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.getXPosition(from.value) ?? 0}, ${start})`)
+            .attr("transform", `translate(${self.getXPosition(from.value) ? self.getXPosition(from.value) : 0}, ${start})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
@@ -218,7 +218,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
             .attr("class", "connecting-circle-2")
             .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${self.getXPosition(to.value) ?? 0}, ${end})`)
+            .attr("transform", `translate(${self.getXPosition(to.value) ? self.getXPosition(to.value) : 0}, ${end})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
@@ -290,11 +290,6 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
     const labelToConnectorDistance = 10;
-    let dynamicDeviationSpace = 0;
-    if (self.dynamicDeviationSettings.isEnabled) {
-        dynamicDeviationSpace = self.width * 0.05;
-    }
-    const xScaleWidth = Math.abs(self.xScale.range()[0] - self.xScale.range()[1]) - dataLabelBBox.width;
     const fromCategoryXPos = self.getXPosition(from.category);
     const toCategoryXPos = self.getXPosition(to.category);
     const isFromCategoryXPosTrue = fromCategoryXPos !== undefined;
@@ -416,7 +411,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .attr("class", "connecting-circle-1")
             .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${start}, ${self.getYPosition(from.value) ?? 0})`)
+            .attr("transform", `translate(${start}, ${self.getYPosition(from.value) ? self.getYPosition(from.value) : 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
@@ -427,7 +422,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
             .attr("class", "connecting-circle-2")
             .attr("display", self.dynamicDeviationSettings.isShowConnectorLine ? "block" : "none")
             .attr("r", dynamicDeviationSettings.connectingLineWidth * 1.25)
-            .attr("transform", `translate(${end}, ${self.getYPosition(to.value) ?? 0})`)
+            .attr("transform", `translate(${end}, ${self.getYPosition(to.value) ? self.getYPosition(to.value) : 0})`)
             .attr("fill", self.getColor(dynamicDeviationSettings.connectingLineColor, EHighContrastColorType.Background))
             .attr("stroke", self.getColor("rgb(102,102,102)", EHighContrastColorType.Foreground))
             .attr("stroke-width", "1px")
@@ -533,7 +528,7 @@ export const RenderDynamicDeviationIcon = (self: Visual): void => {
     //     HideStaticTooltip(self);
     // });
 
-    button.on("click", (e) => {
+    button.on("click", () => {
         const buttonNode = button.node();
         buttonNode.classList.toggle("selected");
         if (buttonNode.classList.contains("selected")) {
@@ -565,8 +560,8 @@ export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
             break;
         case EDynamicDeviationDisplayTypes.CreateYourOwn:
             {
-                if (
-                    self.lastDynamicDeviationSettings?.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn ||
+                if ((self.lastDynamicDeviationSettings &&
+                    self.lastDynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) ||
                     self.isDynamicDeviationButtonSelected
                 ) {
                     RemoveDynamicDeviation(self);

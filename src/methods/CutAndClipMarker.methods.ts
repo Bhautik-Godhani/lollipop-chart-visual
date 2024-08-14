@@ -2,6 +2,7 @@ import { ECutAndClipMarkerPlacementTypes, EHighContrastColorType } from "../enum
 import { ILollipopChartRow } from "../model";
 import { Visual } from "../visual";
 import { Selection } from "d3-selection";
+import { GenerateSecureRandom } from "./methods";
 type D3Selection<T extends d3.BaseType> = Selection<T, any, any, any>;
 
 export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
@@ -14,12 +15,10 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
             .append("g")
             .attr("class", "cutAndClipMarkerG")
             .attr("clip-path", "url(#cutMarkerClipOnAxis)");
-        const beforeCutDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
-        const afterCutDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
+        const beforeCutDomain = self.beforeCutLinearScale ? self.beforeCutLinearScale.domain() : [0, 0];
+        const afterCutDomain = self.afterCutLinearScale ? self.afterCutLinearScale.domain() : [0, 0];
         const secG = cutAndClipMarkerG.append("g");
         const transX = self.getXPosition(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
-
-        const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
         if (self.isHorizontalChart) {
             secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : width + width / 4})`);
@@ -65,7 +64,7 @@ export const GetIsCutAndClipAxisEnabled = (self: Visual): boolean => {
     const minValue = self.minCategoryValueDataPair.value;
     const maxValue = self.maxCategoryValueDataPair.value;
 
-    let isEnabled = false;
+    const isEnabled = false;
 
     if (self.cutAndClipAxisSettings.isEnabled) {
         if (breakEnd < 0 && breakStart < 0) {
@@ -95,7 +94,7 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
         }
     } else {
         if (self.isLeftYAxis) {
-            const ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
+            // const ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
             // if (ticks.nodes().length > 1) {
             self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "middle");
             // }
@@ -120,7 +119,7 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
 
     const imageGSelection = self.barCutAndClipMarkersG
         .selectAll(".barCutAndClipMarkersG")
-        .data(filteredData, (d) => Math.random());
+        .data(filteredData, () => GenerateSecureRandom());
     imageGSelection.join(
         (enter) => {
             const clipG = enter.append("g");
@@ -140,14 +139,14 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
 }
 
 export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
-    const beforeCutScaleDomain = self.beforeCutLinearScale?.domain() ?? [0, 0];
-    const afterCutScaleDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
+    const beforeCutScaleDomain = self.beforeCutLinearScale ? self.beforeCutLinearScale.domain() : [0, 0];
+    const afterCutScaleDomain = self.afterCutLinearScale ? self.afterCutLinearScale.domain() : [0, 0];
 
     const transX = self.getXPosition(self.isLeftYAxis ? beforeCutScaleDomain[1] : afterCutScaleDomain[0]);
     const rectHeight = 20;
 
     imageGSelection.attr("transform", (d) => {
-        return `translate(${transX - (!self.isLeftYAxis ? -self.cutAndClipMarkerWidth : 0)}, ${self.getYPosition(d?.category) + self.scaleBandWidth / 2 - rectHeight / 2 + self.lineSettings.lineWidth})`;
+        return `translate(${transX - (!self.isLeftYAxis ? -self.cutAndClipMarkerWidth : 0)}, ${self.getYPosition(d.category) + self.scaleBandWidth / 2 - rectHeight / 2 + self.lineSettings.lineWidth})`;
     });
 
     rectSelection
@@ -161,8 +160,8 @@ export const FormattingVerticalBarCutAndClipMarker = (self: Visual, imageGSelect
 }
 
 export const FormattingHorizontalBarCutAndClipMarker = (self: Visual, imageGSelection: D3Selection<SVGElement>, rectSelection: D3Selection<SVGElement>): void => {
-    const afterCutScaleDomain = self.afterCutLinearScale?.domain() ?? [0, 0];
-    const transY = self.getYPosition(afterCutScaleDomain?.length ? afterCutScaleDomain[0] : 0);
+    const afterCutScaleDomain = self.afterCutLinearScale ? self.afterCutLinearScale.domain() : [0, 0];
+    const transY = self.getYPosition(afterCutScaleDomain.length ? afterCutScaleDomain[0] : 0);
     const rectWidth = 20;
 
     imageGSelection.attr("transform", (d) => {

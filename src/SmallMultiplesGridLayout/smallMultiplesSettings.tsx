@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
-import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
+import { BoldIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
 import { AccordionAlt, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Quote, RangeSlider, Row, SelectInput, SwitchOption, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
@@ -32,36 +32,6 @@ const XY_AXIS_TYPES: ILabelValuePair[] = [
     value: ESmallMultiplesAxisType.Individual,
     label: "Individual",
   },
-];
-
-const X_AXIS_POSITIONS: ILabelValuePair[] = [
-  // {
-  //   value: ESmallMultiplesXAxisPosition.All,
-  //   label: "All",
-  // },
-  {
-    value: ESmallMultiplesXAxisPosition.FrozenBottomColumn,
-    label: "Frozen Bottom Column",
-  },
-  // {
-  //   value: ESmallMultiplesXAxisPosition.FrozenTopColumn,
-  //   label: "Frozen Top Column",
-  // },
-];
-
-const Y_AXIS_POSITIONS: ILabelValuePair[] = [
-  // {
-  //   value: ESmallMultiplesYAxisPosition.All,
-  //   label: "All",
-  // },
-  {
-    value: ESmallMultiplesYAxisPosition.FrozenLeftColumn,
-    label: "Frozen Left Column",
-  },
-  // {
-  //   value: ESmallMultiplesYAxisPosition.FrozenRightColumn,
-  //   label: "Frozen Right Column",
-  // },
 ];
 
 const HEADER_DISPLAY_TYPES: ILabelValuePair[] = [
@@ -255,32 +225,12 @@ const handleShadowChange = (val, n, setConfigValues: React.Dispatch<React.SetSta
   }));
 };
 
-const handleHeaderCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => {
-  setConfigValues((d) => ({
-    ...d,
-    [ESmallMultiplesSettings.Header]: {
-      ...d[ESmallMultiplesSettings.Header],
-      [n]: !d[ESmallMultiplesSettings.Header][n],
-    },
-  }));
-};
-
 const handleBorderCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => {
   setConfigValues((d) => ({
     ...d,
     [ESmallMultiplesSettings.Border]: {
       ...d[ESmallMultiplesSettings.Border],
       [n]: !d[ESmallMultiplesSettings.Border][n],
-    },
-  }));
-};
-
-const handleShadowCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => {
-  setConfigValues((d) => ({
-    ...d,
-    [ESmallMultiplesSettings.Shadow]: {
-      ...d[ESmallMultiplesSettings.Shadow],
-      [n]: !d[ESmallMultiplesSettings.Shadow][n],
     },
   }));
 };
@@ -614,8 +564,7 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
   configValues: ISmallMultiplesGridLayoutSettings,
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
   handleHeaderChange: (...any) => void,
-  handleHeaderColor: (...any) => void,
-  handleHeaderCheckbox: (...any) => void) => {
+  handleHeaderColor: (...any) => void) => {
   return <>
     <AccordionAlt title="Header" open={true} >
       <Row>
@@ -930,7 +879,6 @@ const SmallMultiplesSettings = (props) => {
   const {
     shadow,
     compConfig: { sectionName, propertyName },
-    config,
     vizOptions,
     closeCurrentSettingHandler,
   } = props;
@@ -1028,7 +976,7 @@ const SmallMultiplesSettings = (props) => {
               </Tab>
 
               <Tab title="Style" identifier="style">
-                {UIHeader(vizOptions, configValues, setConfigValues, handleHeaderChange, handleHeaderColor, handleHeaderCheckbox)}
+                {UIHeader(vizOptions, configValues, setConfigValues, handleHeaderChange, handleHeaderColor)}
                 {UIBackground(vizOptions, configValues, setConfigValues, handleBackgroundChange, handleBackgroundColor)}
                 {UIShadow(vizOptions, configValues, setConfigValues, handleShadowChange)}
                 {UIBorder(vizOptions, configValues, setConfigValues, handleBorderCheckbox, handleBorderChange, handleBorderColor)}

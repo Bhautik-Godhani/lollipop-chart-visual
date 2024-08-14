@@ -5,14 +5,11 @@ import {
   EErrorBandFillTypes,
   EErrorBarsCalcTypes,
   EErrorBarsDirection,
-  EErrorBarsMarkerShape,
   EErrorBarsSettings,
   EErrorBarsTooltipLabelFormat,
   ELineType,
   ERelationshipToMeasure,
 } from "../enum";
-import { faCircle, faSquare, faMinus, faPlus, faClose } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   InputControl,
   Row,
@@ -29,7 +26,6 @@ import { IErrorBarsSettings, ILabelValuePair } from "../visual-settings.interfac
 import { Visual } from "../visual";
 import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { BoldIcon, DashedLineIcon, DottedLineIcon, ErrorBarsPlaceholderIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
-import { persistProperties } from "../methods/methods";
 import { ErrorBarsMarkers } from "../error-bars-markers";
 
 let MARKERS_LIST: IMarkerData[] = [];
@@ -100,29 +96,6 @@ const ErrorBarsSettings = (props) => {
       }]
     }
   });
-
-  const markerIconsList: { label: any; value: string }[] = [
-    {
-      label: <FontAwesomeIcon icon={faCircle} />,
-      value: EErrorBarsMarkerShape.Circle,
-    },
-    {
-      label: <FontAwesomeIcon icon={faSquare} />,
-      value: EErrorBarsMarkerShape.Square,
-    },
-    {
-      label: <FontAwesomeIcon icon={faClose} />,
-      value: EErrorBarsMarkerShape.Close,
-    },
-    {
-      label: <FontAwesomeIcon icon={faMinus} />,
-      value: EErrorBarsMarkerShape.Minus,
-    },
-    {
-      label: <FontAwesomeIcon icon={faPlus} />,
-      value: EErrorBarsMarkerShape.Plus,
-    },
-  ];
 
   const RELATIONSHIP_TO_MEASURE: ILabelValuePair[] = [
     {
@@ -200,49 +173,6 @@ const ErrorBarsSettings = (props) => {
     {
       label: <DottedLineIcon fill="currentColor" />,
       value: ELineType.Dotted,
-    },
-  ];
-
-  const MARKER_TYPES = [
-    {
-      label: "Dash",
-      value: EErrorBarsMarkerShape.Dash,
-    },
-    {
-      label: "Circle",
-      value: EErrorBarsMarkerShape.Circle,
-    },
-    {
-      label: "Square",
-      value: EErrorBarsMarkerShape.Square,
-    },
-    {
-      label: "Cross",
-      value: EErrorBarsMarkerShape.Close,
-    },
-    {
-      label: "Minus",
-      value: EErrorBarsMarkerShape.Minus,
-    },
-    {
-      label: "Plus",
-      value: EErrorBarsMarkerShape.Plus,
-    },
-    {
-      label: "Triangle Down",
-      value: EErrorBarsMarkerShape.TriangleDown,
-    },
-    {
-      label: "Triangle Left",
-      value: EErrorBarsMarkerShape.TriangleLeft,
-    },
-    {
-      label: "Triangle Right",
-      value: EErrorBarsMarkerShape.TriangleRight,
-    },
-    {
-      label: "Triangle Up",
-      value: EErrorBarsMarkerShape.TriangleUp,
     },
   ];
 

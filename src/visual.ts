@@ -142,7 +142,7 @@ import * as echarts from "echarts/core";
 import { PieChart } from "echarts/charts";
 import { SVGRenderer } from "echarts/renderers";
 import { EChartsOption, number } from "echarts";
-import { CreateDate, GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch, isConditionMatch1, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
+import { CreateDate, GetWordsSplitByWidth, createMarkerDefs, createPatternsDefs, generatePattern, getSVGTextSize, hexToRGB, invertColorByBrightness, isConditionMatch1, parseConditionalFormatting, powerBiNumberFormat, rgbaToHex } from "./methods/methods";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 import {
 	CallExpandAllXScaleOnAxisGroup,
@@ -166,7 +166,6 @@ import SortingSettings from "./settings-pages/SortingSettings";
 import BrushAndZoomAreaSettings from "./settings-pages/BrushAndZoomAreaSettings";
 import PatternSettings from "./settings-pages/FillPatterns";
 import AxisSettings from "./settings-pages/AxisSettings";
-import YAxisSettings from "./settings-pages/YAxisSettings";
 import RaceChartSettings from "./settings-pages/RaceChartSettings";
 import ReferenceLinesSettings from "./settings-pages/ReferenceLines";
 import TemplatesSettings from "./settings-pages/Templates";
@@ -174,7 +173,7 @@ import TemplatesSettings from "./settings-pages/Templates";
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { CATEGORY_MARKERS } from "./settings-pages/markers";
 import { IMarkerData } from "./settings-pages/markerSelector";
-import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, UnderlineIcon, XAxisSettingsIcon, YAxisSettingsIcon } from "./settings-pages/SettingsIcons";
+import { BrushAndZoomAreaSettingsIcon, ChartSettingsIcon, ConditionalFormattingIcon, CutAndClipAxisIcon, DataColorIcon, DataLabelsIcon, DynamicDeviationIcon, ErrorBarsIcon, FillPatternsIcon, GridIcon, ImportExportIcon, LineSettingsIcon, MarkerSettingsIcon, RaceChartSettingsIcon, RankingIcon, ReferenceLinesIcon, ShowConditionIcon, SmallMultipleIcon, SortIcon, TemplatesSettingsIcon, XAxisSettingsIcon } from "./settings-pages/SettingsIcons";
 import chroma from "chroma-js";
 import { GetRaceChartDataPairsByItem, RenderRaceChartDataLabel, RenderRaceTickerButton, getTotal1ValueForRaceChartLabel } from "./methods/RaceChart.methods";
 import { RenderReferenceLines, GetReferenceLinesData } from './methods/ReferenceLines.methods';
@@ -1896,10 +1895,6 @@ export class Visual extends Shadow {
 			});
 		}
 
-		const categoricalCategoriesValues = categoricalData.categories[this.categoricalCategoriesLastIndex];
-		let categories = categoricalCategoriesValues.values.filter((item, i, ar) => ar.indexOf(item) === i);
-		categories = categories.length > 0 ? categories : [];
-
 		this.isSortDataFieldsAdded = categoricalSortFields.length > 0 || categoricalTooltipFields.length > 0;
 		this.sortFieldsDisplayName =
 			categoricalSortFields.length > 0
@@ -1972,13 +1967,6 @@ export class Visual extends Shadow {
 		}
 
 		this.setCategoricalDataBySubcategoryRanking(categoricalData);
-
-		const getRaceBarKey = (index) => {
-			return categoricalRaceBarValues.reduce((str, cur) => {
-				str = str === "" ? cur.values[index].toString() : str + "--" + cur.values[index];
-				return str;
-			}, "");
-		}
 
 		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
 
@@ -2178,10 +2166,6 @@ export class Visual extends Shadow {
 		});
 
 		this.setColorsByDataColorsSettings();
-
-		const clonedCategoricalRaceBarValues = clonedCategoricalData.categories.filter(
-			(value) => value.source.roles[EDataRolesName.RaceChartData]
-		);
 
 		// if (this.isChartIsRaceChart) {
 		// 	let iterator: number = 0;
@@ -3371,7 +3355,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { xAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
+								this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, true, this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -3457,7 +3441,7 @@ export class Visual extends Shadow {
 							// }
 
 							if (isDrawAxis) {
-								const { yAxisG } = this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
+								this.drawXYAxis(this.SMCategoricalInitBrushScaleBandData, this.SMChartData, this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual, true, false);
 							}
 
 							if (isAxisPositionChanged) {
@@ -4269,7 +4253,7 @@ export class Visual extends Shadow {
 		const value1Total = d3.sum(chartData, d => d.value1);
 		const value2Total = d3.sum(chartData, d => d.value2);
 
-		chartData.forEach((d, i) => {
+		chartData.forEach(d => {
 			conditionalFormattingConditions.forEach(c => {
 				const conditionalFormattingResult = isConditionMatch1(d.category, undefined, d.value1, d.value2, undefined, undefined, d.tooltipFields, c);
 				const percentage1 = this.isPercentageMeasure ? d.value1 : (d.value1 / value1Total) * 100;
@@ -4394,7 +4378,7 @@ export class Visual extends Shadow {
 								}
 							}
 						} else {
-							d.subCategories.forEach((s, j) => {
+							d.subCategories.forEach(s => {
 								conditionalFormattingConditions.forEach((c) => {
 									if (c.valueType === ECFValueTypes.Ranking) {
 										if (c.rankingType === ECFRankingTypes.TopN) {
@@ -4767,7 +4751,7 @@ export class Visual extends Shadow {
 		const isErrorBarsAbsoluteRelation = this.errorBarsSettings.measurement.relationshipToMeasure === ERelationshipToMeasure.Absolute && !this.errorBarsSettings.measurement.makeSymmetrical;
 		const { errorLabels, tooltip } = this.errorBarsSettings;
 
-		const getUpperLowerBoundsValue = (idx: number, value: number, data: ILollipopChartRow[]): {
+		const getUpperLowerBoundsValue = (idx: number, value: number): {
 			upperBoundValue: number,
 			lowerBoundValue: number,
 			tooltipUpperBoundValue: string,
@@ -4978,7 +4962,7 @@ export class Visual extends Shadow {
 				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
 				const value1 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value1) : d.value1;
 				const value2 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value2) : d.value2;
-				const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1, data);
+				const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1);
 
 				const obj: IErrorBarValue = {};
 				obj.upperBoundValue = upperBoundValue;
@@ -4993,7 +4977,7 @@ export class Visual extends Shadow {
 
 				// 	ERROR BAR 2
 				if (this.isRenderBothErrorBars) {
-					const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value1 : value2, data);
+					const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value1 : value2);
 
 					const obj: IErrorBarValue = {};
 					obj.upperBoundValue = upperBoundValue;
@@ -5056,7 +5040,6 @@ export class Visual extends Shadow {
 		// }
 
 		if (!this.isLollipopTypePie) {
-			const categoricalSmallMultiplesFields = this.clonedCategoricalData.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
 				const selectionId = this.vizOptions.host
 					.createSelectionIdBuilder()
@@ -5074,7 +5057,6 @@ export class Visual extends Shadow {
 			});
 		} else {
 			const categoricalData = this.vizOptions.options.dataViews[0];
-			const categoricalSmallMultiplesFields = categoricalData.categorical.categories.filter((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			const series: any[] = categoricalData.categorical.values.grouped();
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i: number) => {
 				const selectionId = this.vizOptions.host
@@ -5484,7 +5466,7 @@ export class Visual extends Shadow {
 				case ColorPaletteType.BySubCategory:
 				case ColorPaletteType.Gradient:
 					// only this needs to be change for pattern
-					legendDataPoints = this.subCategoriesName.map((d, i) => ({
+					legendDataPoints = this.subCategoriesName.map((d) => ({
 						data: {
 							name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d).replace(new RegExp("-1234567890123", 'g'), ''),
 							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
@@ -6068,7 +6050,7 @@ export class Visual extends Shadow {
 		const markerSeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings);
 
 		// const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
-		const measureKeys = this.categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
+		// const measureKeys = this.categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
 		// this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, this.categoricalMeasureFields);
 
 		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
@@ -6461,7 +6443,6 @@ export class Visual extends Shadow {
 	}
 
 	drawVerticalBrush(self: Visual, config: IBrushConfig): void {
-		const width = config.width;
 		const height = config.height;
 		const brushXPos: number = config.brushXPos;
 		const brushYPos: number = config.brushYPos;
@@ -6471,9 +6452,6 @@ export class Visual extends Shadow {
 		let categoricalData: any = cloneDeep(config.categoricalData);
 		let isBrushRendered: boolean = false;
 
-		let brushG: SVGElement = config.brushG;
-
-		const yScaleDomain = this.brushScaleBand.domain();
 		this.brushScaleBand.range(this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse());
 
 		categoricalData.categories.forEach((d, i) => {
@@ -6652,8 +6630,6 @@ export class Visual extends Shadow {
 
 				this.brushScaleBand.range(yScale.range());
 
-				brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
-
 				const newYScaleDomain = [];
 				let brushArea = selection;
 				if (brushArea === null) brushArea = this.yScale.range();
@@ -6786,7 +6762,7 @@ export class Visual extends Shadow {
 
 		const scrolled = false;
 		if (this.isScrollBrushDisplayed && isBrushRendered && !this.isSmallMultiplesEnabled) {
-			d3.select(this.hostContainer).on("wheel", (event, d) => {
+			d3.select(this.hostContainer).on("wheel", (event) => {
 				if (!scrolled && isBrushRendered) {
 					// scrolled = true;
 					const prevExtent = d3.brushSelection(this.brushG.node() as any);
@@ -6794,20 +6770,20 @@ export class Visual extends Shadow {
 					const isBottomDirection = direction === "down";
 					if (this.isHorizontalChart) {
 						if (isBottomDirection) {
-							if (prevExtent![1] as number < scaleHeight) {
-								if ((+prevExtent![1] + heightByExpectedBar) <= scaleHeight) {
+							if (prevExtent[1] as number < scaleHeight) {
+								if ((+prevExtent[1] + heightByExpectedBar) <= scaleHeight) {
 									this.brushG
-										.call(brush.move as any, [+prevExtent![0] + (heightByExpectedBar / expectedBar), +prevExtent![1] + (heightByExpectedBar / expectedBar)]);
+										.call(brush.move as any, [+prevExtent[0] + (heightByExpectedBar / expectedBar), +prevExtent[1] + (heightByExpectedBar / expectedBar)]);
 								} else {
 									this.brushG
 										.call(brush.move as any, [scaleHeight - heightByExpectedBar, scaleHeight]);
 								}
 							}
 						} else {
-							if (prevExtent![0] as number > 0) {
-								if (((+prevExtent![0] - heightByExpectedBar) >= 0) && ((+prevExtent![1] - heightByExpectedBar) >= 0)) {
+							if (prevExtent[0] as number > 0) {
+								if (((+prevExtent[0] - heightByExpectedBar) >= 0) && ((+prevExtent[1] - heightByExpectedBar) >= 0)) {
 									this.brushG
-										.call(brush.move as any, [+prevExtent![0] - (heightByExpectedBar / expectedBar), +prevExtent![1] - (heightByExpectedBar / expectedBar)]);
+										.call(brush.move as any, [+prevExtent[0] - (heightByExpectedBar / expectedBar), +prevExtent[1] - (heightByExpectedBar / expectedBar)]);
 								} else {
 									this.brushG
 										.call(brush.move as any, [0, heightByExpectedBar]);
@@ -7218,7 +7194,7 @@ export class Visual extends Shadow {
 
 		let scrolled = false;
 		if (this.isScrollBrushDisplayed && isBrushRendered && !this.isSmallMultiplesEnabled) {
-			((self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData && smallMultiplesGridItemContent) ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event, d) => {
+			((self.isSmallMultiplesEnabled && self.isHasSmallMultiplesData && smallMultiplesGridItemContent) ? d3.select(smallMultiplesGridItemContent.svg) : this.svg).on("wheel", (event) => {
 				if (!scrolled && isBrushRendered) {
 					scrolled = true;
 					const prevExtent = d3.brushSelection(brushG as any);
@@ -7227,20 +7203,20 @@ export class Visual extends Shadow {
 					if (!self.isHorizontalChart) {
 						const movableWidth = widthByExpectedBar / 2;
 						if (isRightDirection) {
-							if (prevExtent![1] as number < scaleWidth) {
-								if ((+prevExtent![1] + movableWidth) <= scaleWidth) {
+							if (prevExtent[1] as number < scaleWidth) {
+								if ((+prevExtent[1] + movableWidth) <= scaleWidth) {
 									d3.select(brushG)
-										.call(brush.move as any, [+prevExtent![0] + movableWidth, +prevExtent![1] + movableWidth]);
+										.call(brush.move as any, [+prevExtent[0] + movableWidth, +prevExtent[1] + movableWidth]);
 								} else {
 									d3.select(brushG)
 										.call(brush.move as any, [scaleWidth - widthByExpectedBar, scaleWidth]);
 								}
 							}
 						} else {
-							if (prevExtent![0] as number > 0) {
-								if (((+prevExtent![0] - movableWidth) >= 0) && ((+prevExtent![1] - movableWidth) >= 0)) {
+							if (prevExtent[0] as number > 0) {
+								if (((+prevExtent[0] - movableWidth) >= 0) && ((+prevExtent[1] - movableWidth) >= 0)) {
 									d3.select(brushG)
-										.call(brush.move as any, [+prevExtent![0] - movableWidth, +prevExtent![1] - movableWidth]);
+										.call(brush.move as any, [+prevExtent[0] - movableWidth, +prevExtent[1] - movableWidth]);
 								} else {
 									d3.select(brushG)
 										.call(brush.move as any, [0, widthByExpectedBar]);
@@ -7598,8 +7574,7 @@ export class Visual extends Shadow {
 		return { x, y };
 	}
 
-	transformData1LabelOutside(labelSelection: any, isEnter: boolean, isBestFitOutside: boolean = false): void {
-		const dataLabelsSettings = this.data1LabelsSettings;
+	transformData1LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const markerSize = this.isLollipopTypeCircle ? this.circle1Size / 2 : this.pie1Radius;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
@@ -7659,8 +7634,7 @@ export class Visual extends Shadow {
 			});
 	}
 
-	transformData2LabelOutside(labelSelection: any, isEnter: boolean, isBestFitOutside: boolean = false): void {
-		const dataLabelsSettings = this.data2LabelsSettings;
+	transformData2LabelOutside(labelSelection: any, isEnter: boolean): void {
 		const markerSize = this.isLollipopTypeCircle ? this.circle2Size / 2 : this.pie2Radius;
 
 		const fn = (d, bBox): { translate: string, x: number, y: number } => {
@@ -7721,7 +7695,7 @@ export class Visual extends Shadow {
 	}
 
 	transformDataLabelInside(labelsSelection: any, isEnter: boolean, isData2Label: boolean): void {
-		const fn = (d, labelBBox: any) => {
+		const fn = (d) => {
 			const cx = this.getXPosition(this.isHorizontalChart ? (isData2Label ? d.value2 : d.value1) : d.category);
 			const xScaleDiff = this.isLollipopTypeCircle ? this.getCircleXScaleDiff(cx, isData2Label) : this.getPieXScaleDiff(cx, isData2Label);
 			let x;
@@ -7750,8 +7724,7 @@ export class Visual extends Shadow {
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
 			.attr("transform", function (d) {
-				const labelBBox = this.getBBox();
-				return fn(d, labelBBox);
+				return fn(d);
 			});
 	}
 
@@ -7824,11 +7797,11 @@ export class Visual extends Shadow {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
+									// const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-										THIS.transformData1LabelOutside(ele, false, true);
+										THIS.transformData1LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
@@ -7842,7 +7815,7 @@ export class Visual extends Shadow {
 										if (d.positions.dataLabel1X <= getBBox.width) {
 											// if (isHideInsideLabel) {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false, true);
+											THIS.transformData1LabelOutside(ele, false);
 											// } else {
 											// 	return 0;
 											// }
@@ -7853,18 +7826,18 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false, true);
+											THIS.transformData1LabelOutside(ele, false);
 											// }
 										}
 									}
 								}
 							} else {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
+									// const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-										THIS.transformData1LabelOutside(ele, false, true);
+										THIS.transformData1LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
@@ -7880,7 +7853,7 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false, true);
+											THIS.transformData1LabelOutside(ele, false);
 											// }
 										}
 									} else {
@@ -7889,7 +7862,7 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false, true);
+											THIS.transformData1LabelOutside(ele, false);
 											// }
 										}
 									}
@@ -7987,12 +7960,12 @@ export class Visual extends Shadow {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
+									// const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
 
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-										THIS.transformData2LabelOutside(ele, false, true);
+										THIS.transformData2LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
@@ -8008,7 +7981,7 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false, true);
+											THIS.transformData2LabelOutside(ele, false);
 											// }
 										}
 									} else {
@@ -8017,18 +7990,18 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false, true);
+											THIS.transformData2LabelOutside(ele, false);
 											// }
 										}
 									}
 								}
 							} else {
-								const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
+								// const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-										THIS.transformData2LabelOutside(ele, false, true);
+										THIS.transformData2LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
@@ -8044,7 +8017,7 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false, true);
+											THIS.transformData2LabelOutside(ele, false);
 											// }
 										}
 									} else {
@@ -8053,7 +8026,7 @@ export class Visual extends Shadow {
 											// 	return 0;
 											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false, true);
+											THIS.transformData2LabelOutside(ele, false);
 											// }
 										}
 									}
@@ -8387,7 +8360,6 @@ export class Visual extends Shadow {
 
 		if ((!this.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
 			const xAxisDomain: string[] = this.xScale.domain();
-			const maxTextCount = d3.max(xAxisDomain, d => d.length);
 
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
 				const newText = xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit);
@@ -8776,8 +8748,8 @@ export class Visual extends Shadow {
 		if (this.isXIsContinuousAxis || this.isYIsContinuousAxis) {
 			if (((this.isXIsDateTimeAxis || this.isDateCategoryNames) && this.isXIsContinuousAxis) || (this.isYIsDateTimeAxis && this.isYIsContinuousAxis)) {
 				const dates = chartData.map((d) => d.category);
-				const minDate = d3.min(dates, d => new Date(d).getTime());
-				const maxDate = d3.max(dates, d => new Date(d).getTime());
+				// const minDate = d3.min(dates, d => new Date(d).getTime());
+				// const maxDate = d3.max(dates, d => new Date(d).getTime());
 
 				this.xScale = d3.scaleBand();
 				this.xScale.domain(dates);
@@ -8882,7 +8854,7 @@ export class Visual extends Shadow {
 		let endDiff = 0;
 
 		const { fontSize: font1Size, fontFamily: font1Family, fontStyle: font1Style, placement: label1Placement } = this.data1LabelsSettings;
-		const { fontSize: font2Size, fontFamily: font2Family, fontStyle: font2Style, placement: label2Placement } = this.data2LabelsSettings;
+		const { placement: label2Placement } = this.data2LabelsSettings;
 
 		const data1LabelHeight = getSVGTextSize('100K', font1Family, font1Size, font1Style[EFontStyle.Bold], font1Style[EFontStyle.Italic], font1Style[EFontStyle.UnderLine]).height;
 		const data1Labels = d3.map(this.chartData, d => this.formatNumber(d.value1, this.numberSettings, this.measureNumberFormatter[0], true, true));
@@ -10667,7 +10639,7 @@ export class Visual extends Shadow {
 						const data: any = d3.select(this).datum();
 						const toCategoryValueDataPair = { category: data.category, value: data.value1 };
 						RenderDynamicDeviation(THIS, THIS.fromCategoryValueDataPair, toCategoryValueDataPair);
-						THIS.toCategoryValueDataPair = undefined!;
+						THIS.toCategoryValueDataPair = undefined;
 					}
 				}
 			});
@@ -11035,7 +11007,6 @@ export class Visual extends Shadow {
 
 		const getPieFill = (d: IChartSubCategory, parent: ILollipopChartRow) => {
 			let color;
-			const valueType = isPie2 ? "value2" : "value1";
 			let isHasPattern: boolean;
 
 			const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
@@ -11434,9 +11405,7 @@ export class Visual extends Shadow {
 		const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
 			const subCategoryColorPair = this.isSmallMultiplesEnabled && pieData.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
 			const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
-			const isPosNegColorScheme2 = this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker2Color;
 			const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-			const posNegColor2 = pieData.value2 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
 
 			const tooltipData: TooltipData[] = [
 				{

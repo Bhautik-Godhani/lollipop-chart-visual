@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import React, { useState, useEffect, useMemo } from "react";
 import CformattingForm from "./CformattingForm";
 import HomePage from "./HomePage";
@@ -22,7 +23,7 @@ const EmptyDataMessage = (closeCurrentSettingHandler) => (
           text={"Save"}
           variant={"primary"}
           disabled={true}
-          clickHandler={() => { }}
+          clickHandler={() => undefined}
         />
       </div>
     </div>
@@ -36,18 +37,18 @@ const getMeasureOptions = (vizOptions, config) => {
     let dvValue;
     if (dataView.categorical) {
       if (config.categoricalGroupByRole && config.categoricalGroupByRole.length > 0) {
-        dvValue = dataView.categorical?.values?.grouped()[0]?.values?.filter(
+        dvValue = dataView.categorical.values.grouped()[0].values.filter(
           (value) => value.source.roles[role]
         );
       }
       else {
-        dvValue = dataView.categorical?.values?.filter(
+        dvValue = dataView.categorical.values.filter(
           (value) => value.source.roles[role]
         );
       }
     }
     else if (dataView.matrix) {
-      dvValue = dataView.matrix.valueSources?.filter(
+      dvValue = dataView.matrix.valueSources.filter(
         (value) => value.roles[role]
       );
     }
@@ -72,12 +73,12 @@ const getCategoryOptions = (vizOptions, config) => {
   config.measureRole.forEach((role) => {
     let dvValue;
     if (dataView.categorical) {
-      dvValue = vizOptions.options.dataViews[0].categorical?.categories?.filter(
+      dvValue = vizOptions.options.dataViews[0].categorical.categories.filter(
         (value) => value.source.roles[role]
       );
     }
     else if (dataView.matrix) {
-      dvValue = dataView.matrix.rows.levels?.filter(
+      dvValue = dataView.matrix.rows.levels.filter(
         (value) => value.sources[0].roles[role]
       );
     }
@@ -87,7 +88,7 @@ const getCategoryOptions = (vizOptions, config) => {
   });
 
   config.categoricalGroupByRole && config.categoricalGroupByRole.forEach((role) => {
-    const groupByDataviewValues = vizOptions.options.dataViews[0].categorical?.values;
+    const groupByDataviewValues = vizOptions.options.dataViews[0].categorical.values;
     if (groupByDataviewValues.source && groupByDataviewValues.source.roles[role]) {
       dataViewValues.push(groupByDataviewValues);
     }
@@ -116,9 +117,9 @@ const ConditionalFormatting = (props) => {
 
   const config = shadow.config;
 
-  const isSupportApplyOn: boolean = config.CFConfig?.isSupportApplyOn;
-  const isShowBasedOnValueDropDown: boolean = config.CFConfig?.isShowBasedOnValueDropDown;
-  const applyOnCategories: { label: string, value: string }[] = config.CFConfig?.applyOnCategories ?? [];
+  const isSupportApplyOn: boolean = config.CFConfig.isSupportApplyOn;
+  const isShowBasedOnValueDropDown: boolean = config.CFConfig.isShowBasedOnValueDropDown;
+  const applyOnCategories: { label: string, value: string }[] = config.CFConfig.applyOnCategories ? config.CFConfig.applyOnCategories : [];
   // const isShowCategoriesDropdown: boolean = config.CFConfig?.isShowCategoriesDropdown;
   // const categoriesList: { label: string, value: string }[] = config.CFConfig?.categoriesList ?? [];
 
@@ -141,10 +142,10 @@ const ConditionalFormatting = (props) => {
   const [selectedApplyOnCategory, setSelectedApplyOnCategory] = React.useState("all");
 
   useEffect(() => {
-    let retrievedRules = vizOptions.formatTab?.[sectionName]?.[propertyName];
+    let retrievedRules = vizOptions.formatTab[sectionName][propertyName];
     if (Object.keys(retrievedRules).length !== 0) {
       retrievedRules = JSON.parse(retrievedRules);
-      retrievedRules = retrievedRules?.values;
+      retrievedRules = retrievedRules.values;
       if (retrievedRules) {
         setRules(retrievedRules);
       }

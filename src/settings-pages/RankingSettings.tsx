@@ -13,9 +13,8 @@ import {
 	SwitchOption,
 	ToggleButton,
 } from "@truviz/shadow/dist/Components";
-import { ICategoryRankingProps, ILabelValuePair, IRankingSettings, ISubCategoryRankingProps } from "../visual-settings.interface";
+import { ICategoryRankingProps, ILabelValuePair, IRankingSettings } from "../visual-settings.interface";
 import { ERankingCalcMethod, ERankingSettings, ERankingSuffix, ERankingType } from "../enum";
-import { persistProperties } from "../methods/methods";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const RANKING_TYPES: ILabelValuePair[] = [
@@ -76,13 +75,6 @@ const handleCheckbox = (n, key, setConfigValues: React.Dispatch<React.SetStateAc
 			...d[key],
 			[n]: !d[key][n],
 		},
-	}));
-};
-
-const handleColorChange = (rgb, n, key, setConfigValues: React.Dispatch<React.SetStateAction<IRankingSettings>>) => {
-	setConfigValues((d) => ({
-		...d,
-		[key]: { ...d[key], [n]: rgb },
 	}));
 };
 
