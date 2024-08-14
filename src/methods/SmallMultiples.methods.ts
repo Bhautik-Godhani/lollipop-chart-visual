@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import { create, select } from "d3-selection";
 import { Visual } from "../visual";
 import { Primitive, group, sum } from "d3-array";

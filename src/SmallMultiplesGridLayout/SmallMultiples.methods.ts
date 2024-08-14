@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
@@ -133,40 +132,66 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
             const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
             const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
 
-            if (isUniformXScale) {
-                switch (config.xAxisPosition) {
-                    case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
-                        RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
-                        break;
-                    case ESmallMultiplesXAxisPosition.FrozenTopColumn:
-                        RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
-                        break;
-                    case ESmallMultiplesXAxisPosition.All:
-                        RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
-                        RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
-                        break;
-                }
-            }
-
-            if (isUniformYScale) {
-                switch (config.yAxisPosition) {
-                    case ESmallMultiplesYAxisPosition.FrozenLeftColumn:
-                        RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
-                        break;
-                    case ESmallMultiplesYAxisPosition.FrozenRightColumn:
-                        RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
-                        break;
-                    case ESmallMultiplesYAxisPosition.All:
-                        RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
-                        RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
-                        break;
-                }
-            }
+            callUniformXYAxis(config, hyperListMainContainer, totalRows, columns, xAxisMargin, yAxisMargin, xAxisGNodeHeight, yAxisGNodeWidth, xAxisTitleGNode,
+                yAxisTitleGNode, yAxisTitleWidth, uniformBottomXAxis, uniformTopXAxis, uniformLeftYAxis, uniformRightYAxis, panelTitleSize
+            )
         }
     }
 
     return renderUniformXYAxisToContainer;
 };
+
+const callUniformXYAxis = (
+    config: ISmallMultiplesGridLayoutSettings,
+    hyperListMainContainer: D3Selection<HTMLElement>,
+    totalRows: number,
+    columns: number,
+    xAxisMargin: number,
+    yAxisMargin: number,
+    xAxisGNodeHeight: number,
+    yAxisGNodeWidth: number,
+    xAxisTitleGNode: D3Selection<SVGElement>,
+    yAxisTitleGNode: D3Selection<SVGElement>,
+    yAxisTitleWidth: number,
+    uniformBottomXAxis: D3Selection<HTMLElement>,
+    uniformTopXAxis: D3Selection<HTMLElement>,
+    uniformLeftYAxis: D3Selection<HTMLElement>,
+    uniformRightYAxis: D3Selection<HTMLElement>,
+    panelTitleSize: { width: number, height: number }
+) => {
+    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
+    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+
+    if (isUniformXScale) {
+        switch (config.xAxisPosition) {
+            case ESmallMultiplesXAxisPosition.FrozenBottomColumn:
+                RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
+                break;
+            case ESmallMultiplesXAxisPosition.FrozenTopColumn:
+                RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
+                break;
+            case ESmallMultiplesXAxisPosition.All:
+                RenderSmallMultiplesUniformBottomXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformBottomXAxis);
+                RenderSmallMultiplesUniformTopXAxis(config, xAxisGNodeHeight, xAxisMargin, yAxisMargin, columns, hyperListMainContainer, xAxisTitleGNode, xAxisGNodeHeight, uniformTopXAxis);
+                break;
+        }
+    }
+
+    if (isUniformYScale) {
+        switch (config.yAxisPosition) {
+            case ESmallMultiplesYAxisPosition.FrozenLeftColumn:
+                RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
+                break;
+            case ESmallMultiplesYAxisPosition.FrozenRightColumn:
+                RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                break;
+            case ESmallMultiplesYAxisPosition.All:
+                RenderSmallMultiplesUniformLeftYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformLeftYAxis, isUniformYScale, panelTitleSize);
+                RenderSmallMultiplesUniformRightYAxis(config, xAxisGNodeHeight, yAxisGNodeWidth, yAxisMargin, totalRows, hyperListMainContainer, yAxisTitleGNode, yAxisTitleWidth, uniformRightYAxis, isUniformYScale, panelTitleSize);
+                break;
+        }
+    }
+}
 
 export const CreateSmallMultiplesContainer = (config: ISmallMultiplesGridLayoutSettings): { hyperListMainContainer: D3Selection<any>, SMPaginationPanel: D3Selection<HTMLDivElement>, uniformAxisContainer: D3Selection<any> } => {
     const hostContainer = d3.select(`#${config.hostContainerId}`);
