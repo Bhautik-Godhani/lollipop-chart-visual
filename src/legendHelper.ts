@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as d3 from "d3";
 import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
 import { generatePattern } from "./methods/methods";
@@ -96,34 +95,7 @@ export const renderLegendTitle = (shadow, legendTitle, legendFormattingOptions, 
     return legendTitleElement;
 }
 
-export const renderLegends = (
-    self: Visual,
-    mainContainer: HTMLElement,
-    bottomSpace: number,
-    legendTitle: string,
-    legendsData, //: LegendDataPoint[],
-    legendFormattingOptions,
-    isPatternEnabled,
-    isShowImageMarker
-) => {
-    initializeLegends(mainContainer, legendFormattingOptions);
-
-    let circleRadius = 5;
-    circleRadius = Math.max(circleRadius, legendFormattingOptions.fontSize / 4);
-    legend.selectAll("*").remove();
-
-    let labelOffsetX = 0, labelOffsetY = 10, legendTitleElement;
-    if (legendFormattingOptions.showTitle) {
-        legendTitleElement = renderLegendTitle(self, legendTitle, legendFormattingOptions, circleRadius);
-
-        labelOffsetX = legendTitleElement.node().getBBox().width + 5;
-        labelOffsetY = legendTitleElement.node().getBBox().height + 5;
-    }
-
-    const legendItemsGroup = legend.append("g").attr("class", "legend-group").attr("clip-path", "url(#scrollbox-clip-path)");
-
-    const legendItems = legendItemsGroup.selectAll(".legendItem").data(legendsData).enter().append("g").attr("class", "legendItem").attr("transform", (d, i) => getTranslateValues(i, legendFormattingOptions));
-
+const setLegendElements = (self: Visual, isShowImageMarker, legendItems, circleRadius, isPatternEnabled, legendFormattingOptions): void => {
     if (!isShowImageMarker) {
         legendItems
             .append("circle")
@@ -166,6 +138,37 @@ export const renderLegends = (
                 addEllipsisToLegends(textNodes, legendFormattingOptions, circleRadius);
             }
         });
+}
+
+export const renderLegends = (
+    self: Visual,
+    mainContainer: HTMLElement,
+    bottomSpace: number,
+    legendTitle: string,
+    legendsData, //: LegendDataPoint[],
+    legendFormattingOptions,
+    isPatternEnabled,
+    isShowImageMarker
+) => {
+    initializeLegends(mainContainer, legendFormattingOptions);
+
+    let circleRadius = 5;
+    circleRadius = Math.max(circleRadius, legendFormattingOptions.fontSize / 4);
+    legend.selectAll("*").remove();
+
+    let labelOffsetX = 0, labelOffsetY = 10, legendTitleElement;
+    if (legendFormattingOptions.showTitle) {
+        legendTitleElement = renderLegendTitle(self, legendTitle, legendFormattingOptions, circleRadius);
+
+        labelOffsetX = legendTitleElement.node().getBBox().width + 5;
+        labelOffsetY = legendTitleElement.node().getBBox().height + 5;
+    }
+
+    const legendItemsGroup = legend.append("g").attr("class", "legend-group").attr("clip-path", "url(#scrollbox-clip-path)");
+
+    const legendItems = legendItemsGroup.selectAll(".legendItem").data(legendsData).enter().append("g").attr("class", "legendItem").attr("transform", (d, i) => getTranslateValues(i, legendFormattingOptions));
+
+    setLegendElements(self, isShowImageMarker, legendItems, circleRadius, isPatternEnabled, legendFormattingOptions);
 
     let previousNodeWidth = 0, previousNodeHeight = 0, horizontalLegendsHeight, verticalLegendElementWidth = 0;
 
