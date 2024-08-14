@@ -12,11 +12,40 @@ import { RenderExpandAllXAxis } from "./expandAllXAxis.methods";
 import { MonthNames } from "../constants";
 import { ISortingProps } from "../visual-settings.interface";
 
-export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => {
-    const headerSettings = config.header;
-    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
-    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+interface ISMElements {
+    svg,
+    container,
+    lollipopG,
+    xAxisG,
+    yAxisG,
+    brushG,
+    dataLabels1G,
+    dataLabels2G,
+    referenceLineLayersG,
+    referenceLinesContainerG,
+    xGridLinesG,
+    yGridLinesG,
+    errorBarsContainer,
+    errorBarsMarkerDefsG,
+    errorBarsAreaG,
+    errorBarsAreaPath,
+    errorBarsLinesDashG,
+    errorBarsLinesG,
+    errorBarsMarkersG,
+    errorBarsMarkerDef,
+    errorBarsMarker,
+    errorBarsMarkerPath,
+    dynamicDeviationG,
+    zeroSeparatorLine,
+    connectingLineG,
+    xAxisTitleG,
+    yAxisTitleG,
+    xAxisLineG,
+    yAxisLineG
+}
 
+export const DrawSmallMultipleLollipopChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, gridItemId: number, rowIndex: number, colIndex: number, elementRef: HTMLDivElement) => {
+    const headerSettings = config.header;
     const ele = select(elementRef);
     const hostElementsBBox = ele.node().getBoundingClientRect();
 
@@ -44,8 +73,8 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                 headerSettings.fontStyles[EFontStyle.Italic],
                 headerSettings.fontStyles[EFontStyle.UnderLine]).height + 5;
 
-            let newItemWidth = hostElementsBBox.width - (config.innerSpacing * 2);
-            let newItemHeight = hostElementsBBox.height - (config.innerSpacing * 2) - panelTitleSize;
+            const newItemWidth = hostElementsBBox.width - (config.innerSpacing * 2);
+            const newItemHeight = hostElementsBBox.height - (config.innerSpacing * 2) - panelTitleSize;
 
             if (newItemWidth <= 0 || newItemHeight <= 0) {
                 return;
@@ -70,21 +99,6 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             svgDiv.style("height", `calc(${100}% - ${svgDivMargin + (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize : 0)}px)`);
 
-            // svgDiv.style("height", `calc(${100}% - ${headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None ? panelTitleSize.height : 0}px)`);
-
-            // if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
-            //     if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
-            //         svgDiv.style("margin-bottom", "0px");
-            //         svgDiv.style("margin-top", "10px");
-            //     } else if (headerSettings.position === ESmallMultiplesHeaderPosition.Bottom) {
-            //         svgDiv.style("margin-top", "0px");
-            //         svgDiv.style("margin-bottom", "10px");
-            //     }
-            // } else {
-            //     svgDiv.style("margin-top", "0px");
-            //     svgDiv.style("margin-bottom", "0px");
-            // }
-
             if (headerSettings.position === ESmallMultiplesHeaderPosition.Top) {
                 (ele.node() as HTMLDivElement).appendChild(div.node());
                 (ele.node() as HTMLDivElement).appendChild(svgDiv.node());
@@ -100,96 +114,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
 
             self.isCurrentSmallMultipleIsOthers = false;
 
-            if (isOthersSM) {
-                self.isCurrentSmallMultipleIsOthers = true;
-                const SMRaking = self.rankingSettings.smallMultiples;
-                let othersSMData: any[];
-
-                if (SMRaking.enabled) {
-                    if (SMRaking.rankingType === ERankingType.TopN) {
-                        if (self.isHorizontalChart) {
-                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
-                                othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
-                            }
-                        } else {
-                            othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
-                        }
-                    }
-                    if (SMRaking.rankingType === ERankingType.BottomN) {
-                        if (self.isHorizontalChart) {
-                            othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
-                        } else {
-                            if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
-                                othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
-                            }
-                        }
-                    }
-                }
-
-                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
-                clonedCategoricalData.categories.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
-
-                    if (d.source.roles[EDataRolesName.SmallMultiples]) {
-                        d.values = d.values.map(() => self.othersBarText);
-                    }
-                });
-
-                clonedCategoricalData.values.forEach((d) => {
-                    const values: Primitive[][] = [];
-
-                    if (d.source.roles[EDataRolesName.Measure]) {
-                        othersSMData.forEach(o => {
-                            const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
-                            const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
-
-                            const values1 = dataValuesIndexes.map((valueIndex) => {
-                                const id = +valueIndex.split("-")[1];
-                                return d.values[id];
-                            });
-
-                            values.push(values1);
-                        });
-
-                        d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
-                    } else if (d.source.roles[EDataRolesName.ImagesData]) {
-                        d.values = dataValuesIndexes.map((valueIndex) => {
-                            const id = +valueIndex.split("-")[1];
-                            return d.values[id];
-                        });
-                    }
-                });
-
-                self.smallMultiplesGridItemId = self.othersBarText;
-            } else {
-                const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
-                const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
-
-                clonedCategoricalData.categories.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
-                });
-
-                clonedCategoricalData.values.forEach((d) => {
-                    d.values = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return d.values[id];
-                    });
-
-                    d.highlights = dataValuesIndexes.map((valueIndex) => {
-                        const id = +valueIndex.split("-")[1];
-                        return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
-                    });
-                });
-
-                self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
-            }
+            setCategoricalData(self, config, smallMultipleIndex, isOthersSM, clonedCategoricalData);
 
             // const initialChartDataByBrushScaleBand = self.setInitialChartData(
             //     clonedCategoricalData,
@@ -200,403 +125,557 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
             // );
             // self.categoricalData = initialChartDataByBrushScaleBand;
 
-            const svg = create("svg");
-            svg.classed("small-multiple-chart", true);
-            svg.style("width", newItemWidth + "px");
-            svg.style("height", newItemHeight + "px");
+            const elements = createVisualElements(self, config, newItemWidth, newItemHeight);
 
-            const container = create("svg:g");
-            container.classed("container", true);
-
-            if (!isUniformYScale) {
-                container.attr("transform", `translate(${self.margin.left}, ${0})`);
-            }
-
-            const xAxisG = create("svg:g");
-            xAxisG.attr("class", "xAxisG small-multiple-axis");
-
-            const yAxisG = create("svg:g");
-            yAxisG.attr("class", "yAxisG small-multiple-axis");
-
-            const brushG = create("svg:g");
-            brushG.classed("brush", true);
-
-            const lollipopG = create("svg:g");
-            lollipopG.classed("lollipopG", true);
-
-            const dataLabels1G = create("svg:g");
-            dataLabels1G.classed("dataLabels1G", true);
-
-            const dataLabels2G = create("svg:g");
-            dataLabels2G.classed("dataLabels2G");
-
-            const referenceLineLayersG = create("svg:g").classed("referenceLineLayersG", true);
-            const referenceLinesContainerG = create("svg:g").classed("referenceLinesContainerG", true);
-            const xGridLinesG = create("svg:g").classed("xGridLinesG", true);
-            const yGridLinesG = create("svg:g").classed("yGridLinesG", true);
-            const errorBarsContainer = create("svg:g").classed("errorBarsContainer", true);
-            const errorBarsMarkerDefsG = create("svg:g").classed("errorBarsMarkerDefsG", true);
-            const errorBarsAreaG = create("svg:g").classed("errorBarsAreaG", true);
-            const errorBarsAreaPath = create("svg:path").attr("class", "errorBarsArea");
-            const errorBarsLinesDashG = create("svg:g").classed("errorBarsLinesDashG", true);
-            const errorBarsLinesG = create("svg:g").classed("errorBarsLinesG", true);
-            const errorBarsMarkersG = create("svg:g").classed("errorBarsMarkersG", true);
-            const errorBarsMarkerDef = create("svg:defs").attr("class", "errorBarsMarkerDefs");
-            const errorBarsMarker = create("svg:marker").attr("class", "errorBarsMarker");
-            const errorBarsMarkerPath = create("svg:path").attr("class", "errorBarsMarkerPath");
-            const dynamicDeviationG = create("svg:g").classed("dynamicDeviationG", true);
-            const zeroSeparatorLine = create("svg:line").classed("zeroSeparatorLine", true);
-            const connectingLineG = create("svg:g").classed("connectingLineG", true);
-            const xAxisTitleG = create("svg:g").classed("xAxisTitleG", true);
-            const yAxisTitleG = create("svg:g").classed("yAxisTitleG", true);
-            const xAxisLineG = create("svg:g").classed("xAxisLineG", true);
-            const yAxisLineG = create("svg:g").classed("yAxisLineG", true);
-
-            svg.node().append(container.node());
-            container.node().append(xAxisLineG.node());
-            container.node().append(yAxisLineG.node());
-            container.node().append(xGridLinesG.node());
-            container.node().append(yGridLinesG.node());
-            container.node().append(zeroSeparatorLine.node());
-            container.node().append(lollipopG.node());
-            container.node().append(xAxisG.node());
-            container.node().append(yAxisG.node());
-            container.node().append(dataLabels1G.node());
-            container.node().append(dataLabels2G.node());
-            container.node().append(referenceLineLayersG.node());
-            container.node().append(referenceLinesContainerG.node());
-            container.node().append(connectingLineG.node());
-            container.node().append(xAxisTitleG.node());
-            container.node().append(yAxisTitleG.node());
-
-            // error bars
-            container.node().append(errorBarsContainer.node());
-            errorBarsContainer.node().append(errorBarsMarkerDefsG.node());
-            errorBarsContainer.node().append(errorBarsAreaG.node());
-            errorBarsAreaG.node().append(errorBarsAreaPath.node());
-            errorBarsContainer.node().append(errorBarsLinesDashG.node());
-            errorBarsContainer.node().append(errorBarsLinesG.node());
-            errorBarsContainer.node().append(errorBarsMarkersG.node());
-            errorBarsMarkersG.node().append(errorBarsMarkerDef.node());
-            errorBarsMarkerDef.node().append(errorBarsMarker.node());
-            errorBarsMarker.node().append(errorBarsMarkerPath.node());
-
-            container.node().append(dynamicDeviationG.node());
-
-            svg.node().append(brushG.node());
-            svgDiv.node().appendChild(svg.node());
-
-            self.brushG = brushG as any;
-
-            self.viewPortWidth = newItemWidth;
-            self.viewPortHeight = newItemHeight;
-            self.width = newItemWidth;
-            self.height = newItemHeight;
-
-            const initialChartDataByBrushScaleBand = self.setInitialChartData(
-                clonedCategoricalData,
-                cloneDeep(clonedCategoricalData),
-                self.categoricalMetadata,
-                newItemWidth,
-                newItemHeight
-            );
-            self.categoricalData = initialChartDataByBrushScaleBand;
-
-            if (self.isScrollBrushDisplayed) {
-                if (self.isHorizontalBrushDisplayed) {
-                    self.brushHeight = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaHeight : 10;
-                } else {
-                    self.brushWidth = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaWidth : 10;
-                }
-            }
-
-            if (isUniformYScale) {
-                self.brushWidth = 0;
-            }
-
-            if (isUniformXScale) {
-                self.brushHeight = 0;
-            }
-
-            if (!isUniformXScale) {
-                newItemHeight -= self.brushHeight;
-            }
-
-            if (!isUniformYScale) {
-                newItemWidth -= self.brushWidth;
-            }
-
-            if (!self.isScrollBrushDisplayed) {
-                self.setCategoricalDataFields(self.categoricalData);
-                self.setChartData(self.categoricalData);
-            }
-
-            self.setColorsByDataColorsSettings();
-
-            if (self.conditionalFormattingConditions.length) {
-                self.setConditionalFormattingColor();
-            }
-
-            const textEle = create("div");
-            div.node().append(textEle.node());
-
-            textEle.style("font-family", headerSettings.fontFamily);
-            textEle.style("font-size", headerSettings.fontSize + "px");
-            textEle.style("color", headerSettings.fontColor);
-            textEle.style("font-weight", headerSettings.fontStyles.includes(EFontStyle.Bold) ? "bold" : "");
-            textEle.style("font-style", headerSettings.fontStyles.includes(EFontStyle.Italic) ? "italic" : "");
-            textEle.style("text-decoration", () => {
-                const referenceLineTextDecor: string[] = [];
-                if (headerSettings.fontStyles.includes(EFontStyle.UnderLine)) referenceLineTextDecor.push("underline");
-                return referenceLineTextDecor.length ? referenceLineTextDecor.join(" ") : "";
-            });
-            textEle.style("text-align", headerSettings.alignment);
-
-            if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
-                textEle.style("display", "block");
-            } else {
-                textEle.style("display", "none");
-            }
-
-            // if (self.smallMultiplesSettings.header.isTextWrapEnabled) {
-            textEle.classed("text-ellipsis", true);
-            // } else {
-            //     textEle.classed("text-ellipsis", false);
-            // }
-
-            const total = config.gridDataItemsTotals[smallMultipleIndex];
-
-            const categoryName = config.categories[smallMultipleIndex].replace(new RegExp("-1234567890123", 'g'), '');
-            const categoryTotal = self.formatNumber(total, self.numberSettings, self.measureNumberFormatter[0], true, true);
-            const categoryAvg = self.formatNumber(total / self.chartData.length, self.numberSettings, self.measureNumberFormatter[0], true, true);
-
-            switch (headerSettings.displayType) {
-                case ESmallMultiplesHeaderDisplayType.None:
-                    textEle.text("");
-                    textEle.attr("title", "");
-                    break;
-                case ESmallMultiplesHeaderDisplayType.TitleAndTotalValue:
-                    textEle.text(categoryName + " : " + categoryTotal);
-                    textEle.attr("title", categoryName + " : " + categoryTotal);
-                    break;
-                case ESmallMultiplesHeaderDisplayType.TitleAndAverageValue:
-                    textEle.text(categoryName + " : " + categoryAvg);
-                    textEle.attr("title", categoryName + " : " + categoryAvg);
-                    break;
-                case ESmallMultiplesHeaderDisplayType.TitleOnly:
-                    textEle.text(categoryName);
-                    textEle.attr("title", categoryName);
-                    break;
-            }
-
-            const content: ISmallMultiplesGridItemContent = {
-                category: isOthersSM ? self.othersBarText : config.categories[smallMultipleIndex].toString(),
-                index: gridItemId,
-                width: newItemWidth,
-                height: newItemHeight,
-                svg: svg.node(),
-                container: container as any,
-                xScale: self.xScale,
-                yScale: self.yScale,
-                lollipopG: lollipopG as any,
-                brushScaleBand: self.brushScaleBand,
-                xAxisG: xAxisG.node() as any,
-                yAxisG: yAxisG.node() as any,
-                categoricalData: self.isSMUniformXAxis ? initialChartDataByBrushScaleBand : self.categoricalData,
-                brush: null,
-                brushG: brushG.node() as any,
-                categoricalDataPairs: self.categoricalDataPairs,
-                firstCategoryValueDataPair: self.firstCategoryValueDataPair,
-                lastCategoryValueDataPair: self.lastCategoryValueDataPair,
-                chartData: self.chartData,
-                dataLabels1G: dataLabels1G as any,
-                dataLabels2G: dataLabels2G as any,
-                referenceLineLayersG: referenceLineLayersG as any,
-                referenceLinesContainerG: referenceLinesContainerG as any,
-                xGridLinesG: xGridLinesG as any,
-                yGridLinesG: yGridLinesG as any,
-                dynamicDeviationG: dynamicDeviationG as any,
-                zeroSeparatorLine: zeroSeparatorLine as any,
-                connectingLineG: connectingLineG as any,
-                errorBarsContainer: errorBarsContainer as any,
-                errorBarsMarkerDefsG: errorBarsMarkerDefsG as any,
-                errorBarsAreaG: errorBarsAreaG as any,
-                errorBarsAreaPath: errorBarsAreaPath as any,
-                errorBarsLinesDashG: errorBarsLinesDashG as any,
-                errorBarsLinesG: errorBarsLinesG as any,
-                errorBarsMarkersG: errorBarsMarkersG as any,
-                errorBarsMarkerDef: errorBarsMarkerDef as any,
-                errorBarsMarker: errorBarsMarker as any,
-                errorBarsMarkerPath: errorBarsMarkerPath as any,
-                categoryColorPair: cloneDeep(self.categoryColorPair),
-                othersCategoryColorPair: cloneDeep(self.othersCategoryColorPair),
-                subCategoryColorPair: cloneDeep(self.subCategoryColorPair),
-                othersSubCategoryColorPair: cloneDeep(self.othersSubCategoryColorPair),
-                CFCategoryColorPair: cloneDeep(self.CFCategoryColorPair),
-                CFSubCategoryColorPair: cloneDeep(self.CFSubCategoryColorPair)
-            };
-
-            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;
-
-            self.smallMultiplesGridItemsList.push({
-                rowIndex,
-                colIndex,
-                content
-            });
-
-            self.svg = svg;
-            self.container = container;
-            self.viewPortWidth = newItemWidth;
-            self.viewPortHeight = newItemHeight;
-            // self.width = newItemWidth;
-            // self.height = newItemHeight;
-            self.settingsBtnWidth = 0;
-            self.settingsBtnHeight = 0;
-            // self.xAxisG = xAxisG as any;
-            self.dataLabels1G = dataLabels1G;
-            self.dataLabels2G = dataLabels2G;
-            self.referenceLineLayersG = referenceLineLayersG as any;
-            self.referenceLinesContainerG = referenceLinesContainerG as any;
-            self.xGridLinesG = xGridLinesG as any;
-            self.yGridLinesG = yGridLinesG as any;
-            self.dynamicDeviationG = dynamicDeviationG as any;
-            self.zeroSeparatorLine = zeroSeparatorLine as any;
-            self.connectingLineG = connectingLineG as any;
-            self.xAxisLineG = xAxisLineG as any;
-            self.yAxisLineG = yAxisLineG as any;
-
-            if (!isUniformXScale) {
-                self.xAxisTitleG = xAxisTitleG as any;
-                self.xAxisTitleText = xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
-            }
-
-            if (!isUniformYScale) {
-                self.yAxisTitleG = yAxisTitleG as any;
-                self.yAxisTitleText = yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
-            }
-
-            self.errorBarsContainer = errorBarsContainer as any;
-            self.errorBarsMarkerDefsG = errorBarsMarkerDefsG as any;
-            self.errorBarsAreaG = errorBarsAreaG as any;
-            self.errorBarsAreaPath = errorBarsAreaPath as any;
-            self.errorBarsLinesDashG = errorBarsLinesDashG as any;
-            self.errorBarsLinesG = errorBarsLinesG as any;
-            self.errorBarsMarkersG = errorBarsMarkersG as any;
-            self.errorBarsMarkerDef = errorBarsMarkerDef as any;
-            self.errorBarsMarker = errorBarsMarker as any;
-            self.errorBarsMarkerPath = errorBarsMarkerPath as any;
-
-            if (config.xAxisType === ESmallMultiplesAxisType.Individual) {
-                self.xAxisG = xAxisG as any;
-            }
-
-            if (config.yAxisType === ESmallMultiplesAxisType.Individual) {
-                self.yAxisG = yAxisG as any;
-            }
-
-            self.lollipopG = lollipopG as any;
-
-            const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]];
-
-            self.xAxisG = select(smallMultiplesGridItemContent.xAxisG);
-            self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);
-            self.lollipopG = smallMultiplesGridItemContent.lollipopG;
-
-            if (isUniformXScale) {
-                self.xAxisTitleMargin = 0;
-            }
-
-            if (isUniformYScale) {
-                self.yAxisTitleMargin = 0;
-            }
-
-            self.setMargins();
-
-            self.drawXYAxis(isUniformXScale ? self.SMCategoricalInitBrushScaleBandData : self.categoricalData, self.SMChartData.length > 0 && isUniformXScale ? self.SMChartData : self.chartData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
-
-            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].xScale = self.xScale;
-            self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].yScale = self.yScale;
-
-            let isDisplayBrushCalled: boolean = false;
-
-            if (self.categoricalCategoriesLastIndex > 0) {
-                if (!self.isHorizontalChart) {
-                    RenderExpandAllXAxis(self, self.categoricalData);
-                }
-                // else {
-                // 	RenderExpandAllYAxis(this, this.categoricalData);
-                // }
-            }
-
-            if (self.isScrollBrushDisplayed) {
-                self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, self.isHorizontalChart ? config.yAxisType === ESmallMultiplesAxisType.Individual : config.xAxisType === ESmallMultiplesAxisType.Individual);
-                isDisplayBrushCalled = true;
-            } else {
-                // self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
-                // self.drawXYAxis(true, true);
-                // self.margin.left = 0;
-                // self.margin.bottom = 0;               
-                self.drawLollipopChart();
-            }
-
-            if (isDisplayBrushCalled && !self.isScrollBrushDisplayed) {
-                self.drawLollipopChart();
-            }
-
-            // zero separator line
-            if (self.chartSettings.isShowZeroBaseLine) {
-                self.drawZeroSeparatorLine();
-            } else {
-                self.zeroSeparatorLine.attr("display", "none");
-            }
-
-            // connecting line
-            if (self.chartSettings.showConnectingLine) {
-                self.connectingLineG.selectAll("*").remove();
-
-                RenderConnectingLine(self, self.chartData, false);
-                if (self.isHasMultiMeasure) {
-                    RenderConnectingLine(self, self.chartData, true);
-                }
-            } else {
-                self.connectingLineG.selectAll("*").remove();
-            }
-
-            if (self.xAxisSettings.isShowAxisLine) {
-                self.drawXAxisLine();
-            } else {
-                self.xAxisLineG.select(".xAxisLine").remove();
-            }
-
-            if (self.yAxisSettings.isShowAxisLine) {
-                self.drawYAxisLine();
-            } else {
-                self.yAxisLineG.select(".yAxisLine").remove();
-            }
-
-            self.setMargins();
-            self.drawXYAxisTitle();
-            // self.configLegend();
-            self.drawXGridLines();
-            self.drawYGridLines();
-
-            if (isUniformXScale) {
-                xAxisG.attr("display", "none");
-                xAxisG.classed("display-none", true);
-            }
-
-            if (isUniformYScale) {
-                yAxisG.attr("display", "none");
-                // yAxisG.classed("display-none", true);
-            }
-
-            if (!isUniformXScale) {
-                // xAxisG.selectAll("text").attr("y", 0);
-                // xAxisG.selectAll("tspan").attr("y", 0);
-            }
+            drawLollipopChartExtended(self, config, rowIndex, colIndex, newItemWidth, newItemHeight, isOthersSM, gridItemId, div, smallMultipleIndex, svgDiv, elements.svg, elements.brushG, clonedCategoricalData, elements);
         }
     }
 };
+
+const setCategoricalData = (self: Visual, config: ISmallMultiplesGridLayoutSettings, smallMultipleIndex: number, isOthersSM: boolean, clonedCategoricalData: powerbi.DataViewCategorical): void => {
+    if (isOthersSM) {
+        self.isCurrentSmallMultipleIsOthers = true;
+        const SMRaking = self.rankingSettings.smallMultiples;
+        let othersSMData: any[];
+
+        if (SMRaking.enabled) {
+            if (SMRaking.rankingType === ERankingType.TopN) {
+                if (self.isHorizontalChart) {
+                    if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+                        othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+                    }
+                } else {
+                    othersSMData = self.smallMultiplesDataPairs.slice(SMRaking.count, self.smallMultiplesDataPairs.length);
+                }
+            }
+            if (SMRaking.rankingType === ERankingType.BottomN) {
+                if (self.isHorizontalChart) {
+                    othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+                } else {
+                    if (SMRaking.count <= self.smallMultiplesDataPairs.length) {
+                        othersSMData = self.smallMultiplesDataPairs.slice(0, self.smallMultiplesDataPairs.length - SMRaking.count);
+                    }
+                }
+            }
+        }
+
+        const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === self.smallMultiplesCategories[0]);
+        const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+        clonedCategoricalData.categories.forEach((d) => {
+            d.values = dataValuesIndexes.map((valueIndex) => {
+                const id = +valueIndex.split("-")[1];
+                return d.values[id];
+            });
+
+            if (d.source.roles[EDataRolesName.SmallMultiples]) {
+                d.values = d.values.map(() => self.othersBarText);
+            }
+        });
+
+        clonedCategoricalData.values.forEach((d) => {
+            const values: Primitive[][] = [];
+
+            if (d.source.roles[EDataRolesName.Measure]) {
+                othersSMData.forEach(o => {
+                    const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === o.category);
+                    const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+
+                    const values1 = dataValuesIndexes.map((valueIndex) => {
+                        const id = +valueIndex.split("-")[1];
+                        return d.values[id];
+                    });
+
+                    values.push(values1);
+                });
+
+                d.values = values[0].map((_, i) => (SMRaking.calcMethod === ERankingCalcMethod.Sum ? sum(values, d => <number>d[i]) : sum(values, d => <number>d[i]) / othersSMData.length));
+            } else if (d.source.roles[EDataRolesName.ImagesData]) {
+                d.values = dataValuesIndexes.map((valueIndex) => {
+                    const id = +valueIndex.split("-")[1];
+                    return d.values[id];
+                });
+            }
+        });
+
+        self.smallMultiplesGridItemId = self.othersBarText;
+    } else {
+        const smallMultiplesDataPair = self.smallMultiplesDataPairs.find((d) => d.category === config.categories[smallMultipleIndex]);
+        const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
+
+        clonedCategoricalData.categories.forEach((d) => {
+            d.values = dataValuesIndexes.map((valueIndex) => {
+                const id = +valueIndex.split("-")[1];
+                return d.values[id];
+            });
+        });
+
+        clonedCategoricalData.values.forEach((d) => {
+            d.values = dataValuesIndexes.map((valueIndex) => {
+                const id = +valueIndex.split("-")[1];
+                return d.values[id];
+            });
+
+            d.highlights = dataValuesIndexes.map((valueIndex) => {
+                const id = +valueIndex.split("-")[1];
+                return (d.highlights && d.highlights.length > 0) ? d.highlights[id] : null;
+            });
+        });
+
+        self.smallMultiplesGridItemId = smallMultiplesDataPair.category;
+    }
+}
+
+const createVisualElements = (self: Visual, config: ISmallMultiplesGridLayoutSettings, newItemWidth: number, newItemHeight: number): ISMElements => {
+    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+    const svg = create("svg");
+    svg.classed("small-multiple-chart", true);
+    svg.style("width", newItemWidth + "px");
+    svg.style("height", newItemHeight + "px");
+
+    const container = create("svg:g");
+    container.classed("container", true);
+
+    if (!isUniformYScale) {
+        container.attr("transform", `translate(${self.margin.left}, ${0})`);
+    }
+
+    const xAxisG = create("svg:g");
+    xAxisG.attr("class", "xAxisG small-multiple-axis");
+
+    const yAxisG = create("svg:g");
+    yAxisG.attr("class", "yAxisG small-multiple-axis");
+
+    const brushG = create("svg:g");
+    brushG.classed("brush", true);
+
+    const lollipopG = create("svg:g");
+    lollipopG.classed("lollipopG", true);
+
+    const dataLabels1G = create("svg:g");
+    dataLabels1G.classed("dataLabels1G", true);
+
+    const dataLabels2G = create("svg:g");
+    dataLabels2G.classed("dataLabels2G");
+
+    const referenceLineLayersG = create("svg:g").classed("referenceLineLayersG", true);
+    const referenceLinesContainerG = create("svg:g").classed("referenceLinesContainerG", true);
+    const xGridLinesG = create("svg:g").classed("xGridLinesG", true);
+    const yGridLinesG = create("svg:g").classed("yGridLinesG", true);
+    const errorBarsContainer = create("svg:g").classed("errorBarsContainer", true);
+    const errorBarsMarkerDefsG = create("svg:g").classed("errorBarsMarkerDefsG", true);
+    const errorBarsAreaG = create("svg:g").classed("errorBarsAreaG", true);
+    const errorBarsAreaPath = create("svg:path").attr("class", "errorBarsArea");
+    const errorBarsLinesDashG = create("svg:g").classed("errorBarsLinesDashG", true);
+    const errorBarsLinesG = create("svg:g").classed("errorBarsLinesG", true);
+    const errorBarsMarkersG = create("svg:g").classed("errorBarsMarkersG", true);
+    const errorBarsMarkerDef = create("svg:defs").attr("class", "errorBarsMarkerDefs");
+    const errorBarsMarker = create("svg:marker").attr("class", "errorBarsMarker");
+    const errorBarsMarkerPath = create("svg:path").attr("class", "errorBarsMarkerPath");
+    const dynamicDeviationG = create("svg:g").classed("dynamicDeviationG", true);
+    const zeroSeparatorLine = create("svg:line").classed("zeroSeparatorLine", true);
+    const connectingLineG = create("svg:g").classed("connectingLineG", true);
+    const xAxisTitleG = create("svg:g").classed("xAxisTitleG", true);
+    const yAxisTitleG = create("svg:g").classed("yAxisTitleG", true);
+    const xAxisLineG = create("svg:g").classed("xAxisLineG", true);
+    const yAxisLineG = create("svg:g").classed("yAxisLineG", true);
+
+    svg.node().append(container.node());
+    container.node().append(xAxisLineG.node());
+    container.node().append(yAxisLineG.node());
+    container.node().append(xGridLinesG.node());
+    container.node().append(yGridLinesG.node());
+    container.node().append(zeroSeparatorLine.node());
+    container.node().append(lollipopG.node());
+    container.node().append(xAxisG.node());
+    container.node().append(yAxisG.node());
+    container.node().append(dataLabels1G.node());
+    container.node().append(dataLabels2G.node());
+    container.node().append(referenceLineLayersG.node());
+    container.node().append(referenceLinesContainerG.node());
+    container.node().append(connectingLineG.node());
+    container.node().append(xAxisTitleG.node());
+    container.node().append(yAxisTitleG.node());
+
+    // error bars
+    container.node().append(errorBarsContainer.node());
+    errorBarsContainer.node().append(errorBarsMarkerDefsG.node());
+    errorBarsContainer.node().append(errorBarsAreaG.node());
+    errorBarsAreaG.node().append(errorBarsAreaPath.node());
+    errorBarsContainer.node().append(errorBarsLinesDashG.node());
+    errorBarsContainer.node().append(errorBarsLinesG.node());
+    errorBarsContainer.node().append(errorBarsMarkersG.node());
+    errorBarsMarkersG.node().append(errorBarsMarkerDef.node());
+    errorBarsMarkerDef.node().append(errorBarsMarker.node());
+    errorBarsMarker.node().append(errorBarsMarkerPath.node());
+
+    container.node().append(dynamicDeviationG.node());
+
+    svg.node().append(brushG.node());
+
+    const elements: ISMElements = {
+        svg, container, lollipopG, xAxisG, yAxisG, brushG, dataLabels1G, dataLabels2G,
+        referenceLineLayersG,
+        referenceLinesContainerG,
+        xGridLinesG,
+        yGridLinesG,
+        errorBarsContainer,
+        errorBarsMarkerDefsG,
+        errorBarsAreaG,
+        errorBarsAreaPath,
+        errorBarsLinesDashG,
+        errorBarsLinesG,
+        errorBarsMarkersG,
+        errorBarsMarkerDef,
+        errorBarsMarker,
+        errorBarsMarkerPath,
+        dynamicDeviationG,
+        zeroSeparatorLine,
+        connectingLineG,
+        xAxisTitleG,
+        yAxisTitleG,
+        xAxisLineG,
+        yAxisLineG
+    }
+
+    return elements;
+}
+
+const drawLollipopChartExtended = (self: Visual, config: ISmallMultiplesGridLayoutSettings, rowIndex: number, colIndex: number, newItemWidth: number, newItemHeight: number, isOthersSM: boolean, gridItemId: number, div, smallMultipleIndex, svgDiv, svg, brushG, clonedCategoricalData: powerbi.DataViewCategorical, elements: ISMElements) => {
+    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
+    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+
+    svgDiv.node().appendChild(svg.node());
+    self.brushG = brushG as any;
+
+    self.viewPortWidth = newItemWidth;
+    self.viewPortHeight = newItemHeight;
+    self.width = newItemWidth;
+    self.height = newItemHeight;
+
+    const initialChartDataByBrushScaleBand = self.setInitialChartData(
+        clonedCategoricalData,
+        cloneDeep(clonedCategoricalData),
+        self.categoricalMetadata,
+        newItemWidth,
+        newItemHeight
+    );
+    self.categoricalData = initialChartDataByBrushScaleBand;
+
+    if (self.isScrollBrushDisplayed) {
+        if (self.isHorizontalBrushDisplayed) {
+            self.brushHeight = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaHeight : 10;
+        } else {
+            self.brushWidth = self.brushAndZoomAreaSettings.enabled ? self.brushAndZoomAreaWidth : 10;
+        }
+    }
+
+    if (isUniformYScale) {
+        self.brushWidth = 0;
+    }
+
+    if (isUniformXScale) {
+        self.brushHeight = 0;
+    }
+
+    if (!isUniformXScale) {
+        newItemHeight -= self.brushHeight;
+    }
+
+    if (!isUniformYScale) {
+        newItemWidth -= self.brushWidth;
+    }
+
+    if (!self.isScrollBrushDisplayed) {
+        self.setCategoricalDataFields(self.categoricalData);
+        self.setChartData(self.categoricalData);
+    }
+
+    self.setColorsByDataColorsSettings();
+
+    if (self.conditionalFormattingConditions.length) {
+        self.setConditionalFormattingColor();
+    }
+
+    setSMHeaderTexts(self, config, div, smallMultipleIndex);
+    const content = setSmallMultiplesGridItemContent(self, config, newItemWidth, newItemHeight, isOthersSM, smallMultipleIndex, gridItemId, initialChartDataByBrushScaleBand, elements);
+    setAllElements(self, config, newItemWidth, newItemHeight, rowIndex, colIndex, smallMultipleIndex, content, elements);
+    initAndConfigChart(self, config, smallMultipleIndex, elements.xAxisG, elements.yAxisG);
+}
+
+const setSMHeaderTexts = (self: Visual, config: ISmallMultiplesGridLayoutSettings, div, smallMultipleIndex: number): void => {
+    const headerSettings = config.header;
+    const textEle = create("div");
+    div.node().append(textEle.node());
+
+    textEle.style("font-family", headerSettings.fontFamily);
+    textEle.style("font-size", headerSettings.fontSize + "px");
+    textEle.style("color", headerSettings.fontColor);
+    textEle.style("font-weight", headerSettings.fontStyles.includes(EFontStyle.Bold) ? "bold" : "");
+    textEle.style("font-style", headerSettings.fontStyles.includes(EFontStyle.Italic) ? "italic" : "");
+    textEle.style("text-decoration", () => {
+        const referenceLineTextDecor: string[] = [];
+        if (headerSettings.fontStyles.includes(EFontStyle.UnderLine)) referenceLineTextDecor.push("underline");
+        return referenceLineTextDecor.length ? referenceLineTextDecor.join(" ") : "";
+    });
+    textEle.style("text-align", headerSettings.alignment);
+
+    if (headerSettings.displayType !== ESmallMultiplesHeaderDisplayType.None) {
+        textEle.style("display", "block");
+    } else {
+        textEle.style("display", "none");
+    }
+
+    // if (self.smallMultiplesSettings.header.isTextWrapEnabled) {
+    textEle.classed("text-ellipsis", true);
+    // } else {
+    //     textEle.classed("text-ellipsis", false);
+    // }
+
+    const total = config.gridDataItemsTotals[smallMultipleIndex];
+
+    const categoryName = config.categories[smallMultipleIndex].replace(new RegExp("-1234567890123", 'g'), '');
+    const categoryTotal = self.formatNumber(total, self.numberSettings, self.measureNumberFormatter[0], true, true);
+    const categoryAvg = self.formatNumber(total / self.chartData.length, self.numberSettings, self.measureNumberFormatter[0], true, true);
+
+    switch (headerSettings.displayType) {
+        case ESmallMultiplesHeaderDisplayType.None:
+            textEle.text("");
+            textEle.attr("title", "");
+            break;
+        case ESmallMultiplesHeaderDisplayType.TitleAndTotalValue:
+            textEle.text(categoryName + " : " + categoryTotal);
+            textEle.attr("title", categoryName + " : " + categoryTotal);
+            break;
+        case ESmallMultiplesHeaderDisplayType.TitleAndAverageValue:
+            textEle.text(categoryName + " : " + categoryAvg);
+            textEle.attr("title", categoryName + " : " + categoryAvg);
+            break;
+        case ESmallMultiplesHeaderDisplayType.TitleOnly:
+            textEle.text(categoryName);
+            textEle.attr("title", categoryName);
+            break;
+    }
+}
+
+const setSmallMultiplesGridItemContent = (self: Visual, config: ISmallMultiplesGridLayoutSettings, newItemWidth: number, newItemHeight: number, isOthersSM: boolean, smallMultipleIndex: number, gridItemId: number, initialChartDataByBrushScaleBand, elements: ISMElements): ISmallMultiplesGridItemContent => {
+    const content: ISmallMultiplesGridItemContent = {
+        category: isOthersSM ? self.othersBarText : config.categories[smallMultipleIndex].toString(),
+        index: gridItemId,
+        width: newItemWidth,
+        height: newItemHeight,
+        svg: elements.svg.node(),
+        container: elements.container as any,
+        xScale: self.xScale,
+        yScale: self.yScale,
+        lollipopG: elements.lollipopG as any,
+        brushScaleBand: self.brushScaleBand,
+        xAxisG: elements.xAxisG.node() as any,
+        yAxisG: elements.yAxisG.node() as any,
+        categoricalData: self.isSMUniformXAxis ? initialChartDataByBrushScaleBand : self.categoricalData,
+        brush: null,
+        brushG: elements.brushG.node() as any,
+        categoricalDataPairs: self.categoricalDataPairs,
+        firstCategoryValueDataPair: self.firstCategoryValueDataPair,
+        lastCategoryValueDataPair: self.lastCategoryValueDataPair,
+        chartData: self.chartData,
+        dataLabels1G: elements.dataLabels1G as any,
+        dataLabels2G: elements.dataLabels2G as any,
+        referenceLineLayersG: elements.referenceLineLayersG as any,
+        referenceLinesContainerG: elements.referenceLinesContainerG as any,
+        xGridLinesG: elements.xGridLinesG as any,
+        yGridLinesG: elements.yGridLinesG as any,
+        dynamicDeviationG: elements.dynamicDeviationG as any,
+        zeroSeparatorLine: elements.zeroSeparatorLine as any,
+        connectingLineG: elements.connectingLineG as any,
+        errorBarsContainer: elements.errorBarsContainer as any,
+        errorBarsMarkerDefsG: elements.errorBarsMarkerDefsG as any,
+        errorBarsAreaG: elements.errorBarsAreaG as any,
+        errorBarsAreaPath: elements.errorBarsAreaPath as any,
+        errorBarsLinesDashG: elements.errorBarsLinesDashG as any,
+        errorBarsLinesG: elements.errorBarsLinesG as any,
+        errorBarsMarkersG: elements.errorBarsMarkersG as any,
+        errorBarsMarkerDef: elements.errorBarsMarkerDef as any,
+        errorBarsMarker: elements.errorBarsMarker as any,
+        errorBarsMarkerPath: elements.errorBarsMarkerPath as any,
+        categoryColorPair: cloneDeep(self.categoryColorPair),
+        othersCategoryColorPair: cloneDeep(self.othersCategoryColorPair),
+        subCategoryColorPair: cloneDeep(self.subCategoryColorPair),
+        othersSubCategoryColorPair: cloneDeep(self.othersSubCategoryColorPair),
+        CFCategoryColorPair: cloneDeep(self.CFCategoryColorPair),
+        CFSubCategoryColorPair: cloneDeep(self.CFSubCategoryColorPair)
+    };
+
+    self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]] = content;
+
+    return content;
+}
+
+const setAllElements = (self: Visual, config: ISmallMultiplesGridLayoutSettings, newItemWidth: number, newItemHeight: number, rowIndex: number, colIndex: number, smallMultipleIndex: number, content, elements: ISMElements) => {
+    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
+    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+
+    self.smallMultiplesGridItemsList.push({
+        rowIndex,
+        colIndex,
+        content
+    });
+
+    self.svg = elements.svg;
+    self.container = elements.container;
+    self.viewPortWidth = newItemWidth;
+    self.viewPortHeight = newItemHeight;
+    // self.width = newItemWidth;
+    // self.height = newItemHeight;
+    self.settingsBtnWidth = 0;
+    self.settingsBtnHeight = 0;
+    // self.xAxisG = xAxisG as any;
+    self.dataLabels1G = elements.dataLabels1G;
+    self.dataLabels2G = elements.dataLabels2G;
+    self.referenceLineLayersG = elements.referenceLineLayersG as any;
+    self.referenceLinesContainerG = elements.referenceLinesContainerG as any;
+    self.xGridLinesG = elements.xGridLinesG as any;
+    self.yGridLinesG = elements.yGridLinesG as any;
+    self.dynamicDeviationG = elements.dynamicDeviationG as any;
+    self.zeroSeparatorLine = elements.zeroSeparatorLine as any;
+    self.connectingLineG = elements.connectingLineG as any;
+    self.xAxisLineG = elements.xAxisLineG as any;
+    self.yAxisLineG = elements.yAxisLineG as any;
+
+    if (!isUniformXScale) {
+        self.xAxisTitleG = elements.xAxisTitleG as any;
+        self.xAxisTitleText = elements.xAxisTitleG.append("text").classed("xAxisTitle", true).attr("text-anchor", "middle");
+    }
+
+    if (!isUniformYScale) {
+        self.yAxisTitleG = elements.yAxisTitleG as any;
+        self.yAxisTitleText = elements.yAxisTitleG.append("text").classed("yAxisTitle", true).attr("transform", "rotate(-90)").attr("text-anchor", "middle");
+    }
+
+    self.errorBarsContainer = elements.errorBarsContainer as any;
+    self.errorBarsMarkerDefsG = elements.errorBarsMarkerDefsG as any;
+    self.errorBarsAreaG = elements.errorBarsAreaG as any;
+    self.errorBarsAreaPath = elements.errorBarsAreaPath as any;
+    self.errorBarsLinesDashG = elements.errorBarsLinesDashG as any;
+    self.errorBarsLinesG = elements.errorBarsLinesG as any;
+    self.errorBarsMarkersG = elements.errorBarsMarkersG as any;
+    self.errorBarsMarkerDef = elements.errorBarsMarkerDef as any;
+    self.errorBarsMarker = elements.errorBarsMarker as any;
+    self.errorBarsMarkerPath = elements.errorBarsMarkerPath as any;
+
+    if (config.xAxisType === ESmallMultiplesAxisType.Individual) {
+        self.xAxisG = elements.xAxisG as any;
+    }
+
+    if (config.yAxisType === ESmallMultiplesAxisType.Individual) {
+        self.yAxisG = elements.yAxisG as any;
+    }
+
+    self.lollipopG = elements.lollipopG as any;
+
+    const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]];
+
+    self.xAxisG = select(smallMultiplesGridItemContent.xAxisG);
+    self.yAxisG = select(smallMultiplesGridItemContent.yAxisG);
+    self.lollipopG = smallMultiplesGridItemContent.lollipopG;
+
+    if (isUniformXScale) {
+        self.xAxisTitleMargin = 0;
+    }
+
+    if (isUniformYScale) {
+        self.yAxisTitleMargin = 0;
+    }
+}
+
+const initAndConfigChart = (self: Visual, config: ISmallMultiplesGridLayoutSettings, smallMultipleIndex: number, xAxisG, yAxisG) => {
+    const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
+    const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+
+    self.setMargins();
+
+    self.drawXYAxis(isUniformXScale ? self.SMCategoricalInitBrushScaleBandData : self.categoricalData, self.SMChartData.length > 0 && isUniformXScale ? self.SMChartData : self.chartData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+
+    self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].xScale = self.xScale;
+    self.smallMultiplesGridItemContent[config.categories[smallMultipleIndex]].yScale = self.yScale;
+
+    let isDisplayBrushCalled: boolean = false;
+
+    if (self.categoricalCategoriesLastIndex > 0) {
+        if (!self.isHorizontalChart) {
+            RenderExpandAllXAxis(self, self.categoricalData);
+        }
+        // else {
+        // 	RenderExpandAllYAxis(this, this.categoricalData);
+        // }
+    }
+
+    if (self.isScrollBrushDisplayed) {
+        self.displayBrush(config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual, self.isHorizontalChart ? config.yAxisType === ESmallMultiplesAxisType.Individual : config.xAxisType === ESmallMultiplesAxisType.Individual);
+        isDisplayBrushCalled = true;
+    } else {
+        // self.drawXYAxis(self.categoricalData, config.xAxisType === ESmallMultiplesAxisType.Individual, config.yAxisType === ESmallMultiplesAxisType.Individual);
+        // self.drawXYAxis(true, true);
+        // self.margin.left = 0;
+        // self.margin.bottom = 0;               
+        self.drawLollipopChart();
+    }
+
+    if (isDisplayBrushCalled && !self.isScrollBrushDisplayed) {
+        self.drawLollipopChart();
+    }
+
+    // zero separator line
+    if (self.chartSettings.isShowZeroBaseLine) {
+        self.drawZeroSeparatorLine();
+    } else {
+        self.zeroSeparatorLine.attr("display", "none");
+    }
+
+    // connecting line
+    if (self.chartSettings.showConnectingLine) {
+        self.connectingLineG.selectAll("*").remove();
+
+        RenderConnectingLine(self, self.chartData, false);
+        if (self.isHasMultiMeasure) {
+            RenderConnectingLine(self, self.chartData, true);
+        }
+    } else {
+        self.connectingLineG.selectAll("*").remove();
+    }
+
+    if (self.xAxisSettings.isShowAxisLine) {
+        self.drawXAxisLine();
+    } else {
+        self.xAxisLineG.select(".xAxisLine").remove();
+    }
+
+    if (self.yAxisSettings.isShowAxisLine) {
+        self.drawYAxisLine();
+    } else {
+        self.yAxisLineG.select(".yAxisLine").remove();
+    }
+
+    self.setMargins();
+    self.drawXYAxisTitle();
+    // self.configLegend();
+    self.drawXGridLines();
+    self.drawYGridLines();
+
+    if (isUniformXScale) {
+        xAxisG.attr("display", "none");
+        xAxisG.classed("display-none", true);
+    }
+
+    if (isUniformYScale) {
+        yAxisG.attr("display", "none");
+        // yAxisG.classed("display-none", true);
+    }
+
+    if (!isUniformXScale) {
+        // xAxisG.selectAll("text").attr("y", 0);
+        // xAxisG.selectAll("tspan").attr("y", 0);
+    }
+}
 
 export const GetSmallMultiplesDataPairsByItem = (self: Visual): any => {
     const categoricalSmallMultiplesDataFields = self.categoricalSmallMultiplesDataFields;

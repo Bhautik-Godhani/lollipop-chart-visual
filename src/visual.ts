@@ -190,7 +190,7 @@ import { GetIsCutAndClipAxisEnabled, RenderBarCutAndClipMarker, RenderCutAndClip
 import { FormatAxisDate, GetAxisDomainMinMax } from "./methods/Axis.methods";
 import { CallXScaleOnAxisGroup, GetPositiveNegativeLogXScale } from "./methods/XAxis.methods";
 import { CallYScaleOnAxisGroup, GetPositiveNegativeLogYScale } from "./methods/YAxis.methods";
-import { DrawSmallMultipleBarChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
+import { DrawSmallMultipleLollipopChart, GetSmallMultiplesDataPairsByItem } from "./methods/SmallMultiples.methods";
 import { GetCutAndClipXScale, GetCutAndClipYScale, RenderLinearCutAxis } from "./methods/CutAndClip.methods";
 import ShowCondition from "./settings-pages/ShowBucket";
 import { COLORBREWER } from "./color-schemes";
@@ -3253,7 +3253,7 @@ export class Visual extends Shadow {
 					gridDataItemsTotals: this.smallMultiplesDataPairs.map(d => d.total),
 					itemsPerPage: smallMultiplesCategories.length,
 					onCellRendered: (category, index, rowIndex, colIndex, ele) => {
-						DrawSmallMultipleBarChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), rowIndex, colIndex, ele);
+						DrawSmallMultipleLollipopChart(this, settings, smallMultiplesCategories.findIndex(d => d === category), rowIndex, colIndex, ele);
 
 						if (index === this.smallMultiplesCategories.length - 1) {
 							// this.configLegend();
