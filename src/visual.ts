@@ -6454,197 +6454,155 @@ export class Visual extends Shadow {
 		}
 	}
 
-	drawVerticalBrush(self: Visual, config: IBrushConfig): void {
-		const height = config.height;
-		const brushXPos: number = config.brushXPos;
-		const brushYPos: number = config.brushYPos;
-		const barDistance: number = config.barDistance;
-		const totalBarsCount: number = config.totalBarsCount;
-		const scaleHeight: number = config.scaleHeight;
-		let categoricalData: any = cloneDeep(config.categoricalData);
+	verticalBrushMethod(config: IBrushConfig, selection, scaleHeight: number): { isBrushRendered: boolean } {
 		let isBrushRendered: boolean = false;
+		const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+		const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
+		const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+		const categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+		this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+		this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+		this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+		this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-		this.brushScaleBand.range(this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse());
+		if (smallMultiplesGridItemContent) {
+			this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+			this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+			this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+			this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+			this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+			this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+		}
 
-		categoricalData.categories.forEach((d, i) => {
-			if (i < categoricalData.categories.length - 1) {
-				const yScaleCopy = this.yScale.copy();
-				this[`${d.source.displayName}Scale`] = yScaleCopy;
-				this[`${d.source.displayName}ScaleDomain`] = d.values;
+		this.brushScaleBand.range(yScale.range());
+
+		const newYScaleDomain = [];
+		let brushArea = selection;
+		if (brushArea === null) brushArea = this.yScale.range();
+
+		yScaleDomain.forEach((d, i) => {
+			const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+			if (pos >= brushArea[0] && pos <= brushArea[1]) {
+				newYScaleDomain.push(d);
+
+				if (this.isExpandAllApplied) {
+					this.expandAllCategoriesName.forEach((d) => {
+						if (this[`${d}ScaleDomain`]) {
+							this[`${d}ScaleNewDomain`].push(this[`${d}ScaleDomain`][i]);
+						}
+					});
+				}
 			}
 		});
 
-		const brushed = ({ selection }) => {
-			if (this.isExpandAllApplied) {
-				this.expandAllCategoriesName.forEach((d) => {
-					if (this[`${d}ScaleDomain`]) {
-						this[`${d}ScaleNewDomain`] = [];
-					}
-				});
+		this.newScaleDomainByBrush = newYScaleDomain;
+
+		if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+			const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+			const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+			);
+
+			if (startIndex === -1 || endIndex === -1) {
+				return;
 			}
 
-			if (config.isSMUniformYAxis) {
-				const SMItemsList = this.smallMultiplesGridItemsList.filter(d => d.rowIndex === config.SMUniformYAxisId);
+			const categoricalData2 = cloneDeep(categoricalData);
 
-				if (config.isSMUniformYAxisIsLeft) {
-					this.isLeftYAxis = true;
-					this.yAxisSettings.position = Position.Left;
-				} else {
-					this.isLeftYAxis = false;
-					this.yAxisSettings.position = Position.Right;
+			categoricalData2.categories.forEach((d, i) => {
+				d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+			});
+
+			categoricalData2.values.forEach((d, i) => {
+				d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+				if (d.highlights) {
+					d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+				}
+			});
+
+			this.setCategoricalDataFields(categoricalData2);
+			this.setChartData(categoricalData2);
+
+			this.configLegend();
+
+			if (smallMultiplesGridItemContent) {
+				if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
+					this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
 				}
 
-				SMItemsList.forEach(d => {
-					this.smallMultiplesGridItemId = d.content.category;
-					this.currentSmallMultipleIndex = d.content.index;
+				if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+					this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+				}
 
-					const smallMultiplesGridItemContent = d.content;
-					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
+				this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
 
-					const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
-					const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
-					categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
-					this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
-					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
-					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
-
-					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
-
-					this.brushScaleBand.range(this.isBottomXAxis ? yScale.range() : yScale.range().reverse());
-
-					const newYScaleDomain = [];
-					let brushArea = selection;
-					if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
-
-					yScaleDomain.forEach((d, i) => {
-						const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
-						if (pos >= brushArea[0] && pos <= brushArea[1]) {
-							newYScaleDomain.push(d);
-
-							if (this.isExpandAllApplied) {
-								this.expandAllCategoriesName.forEach((d) => {
-									if (this[`${d}ScaleDomain`]) {
-										this[`${d}ScaleNewDomain`].push(this[`${d}ScaleDomain`][i]);
-									}
-								});
-							}
-						}
-					});
-
-					this.newScaleDomainByBrush = newYScaleDomain;
-
-					if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
-						const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-						const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-							this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-						);
-
-						if (startIndex === -1 || endIndex === -1) {
-							return;
-						}
-
-						const categoricalData2 = cloneDeep(categoricalData);
-
-						categoricalData2.categories.forEach((d, i) => {
-							d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-						});
-
-						categoricalData2.values.forEach((d, i) => {
-							d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-							if (d.highlights) {
-								d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-							}
-						});
-
-						this.setCategoricalDataFields(categoricalData2);
-						this.setChartData(categoricalData2);
-
-						this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
-
-						if (this.isExpandAllApplied) {
-							RenderExpandAllYAxis(this, categoricalData2);
-						}
-
-						this.configLegend();
-
-						if (smallMultiplesGridItemContent) {
-							if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
-								this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
-							}
-
-							this.yAxisG = d3.select(config.SMUniformYAxisG);
-
-							this.svg = d3.select(smallMultiplesGridItemContent.svg);
-							this.container = smallMultiplesGridItemContent.container;
-							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
-							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
-							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
-							this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
-							this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
-							this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
-							this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
-							this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
-							this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
-							this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
-							this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
-							this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
-							this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
-							this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
-							this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
-							this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
-							this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
-							this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
-							this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
-							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
-
-							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
-						} else {
-							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
-						}
-
-						isBrushRendered = true;
-						this.brushG.attr("display", "block");
-					} else {
-						isBrushRendered = false;
-						this.isScrollBrushDisplayed = false;
-						this.isVerticalBrushDisplayed = false;
-						this.isHorizontalBrushDisplayed = false;
-						this.brushWidth = 0;
-						this.brushMargin = 0;
-						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
-						this.brushG.attr("display", "none");
-					}
-				});
+				this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 			} else {
-				const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+				this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+			}
+
+			isBrushRendered = true;
+			this.brushG.attr("display", "block");
+		} else {
+			isBrushRendered = false;
+			this.isScrollBrushDisplayed = false;
+			this.isVerticalBrushDisplayed = false;
+			this.isHorizontalBrushDisplayed = false;
+			this.brushWidth = 0;
+			this.brushMargin = 0;
+			this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+			this.brushG.attr("display", "none");
+		}
+
+		return { isBrushRendered };
+	}
+
+	verticalBrushed(config: IBrushConfig, selection, scaleHeight: number): { isBrushRendered: boolean } {
+		let isBrushRendered: boolean = false;
+		if (this.isExpandAllApplied) {
+			this.expandAllCategoriesName.forEach((d) => {
+				if (this[`${d}ScaleDomain`]) { this[`${d}ScaleNewDomain`] = []; }
+			});
+		}
+
+		if (config.isSMUniformYAxis) {
+			const SMItemsList = this.smallMultiplesGridItemsList.filter(d => d.rowIndex === config.SMUniformYAxisId);
+
+			if (config.isSMUniformYAxisIsLeft) {
+				this.isLeftYAxis = true;
+				this.yAxisSettings.position = Position.Left;
+			} else {
+				this.isLeftYAxis = false;
+				this.yAxisSettings.position = Position.Right;
+			}
+
+			SMItemsList.forEach(d => {
+				this.smallMultiplesGridItemId = d.content.category;
+				this.currentSmallMultipleIndex = d.content.index;
+
+				const smallMultiplesGridItemContent = d.content;
+				this.isCurrentSmallMultipleIsOthers = d.content.category.includes(this.othersLabel);
+
 				const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
 				const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
-				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
-				this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+				const categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-				if (smallMultiplesGridItemContent) {
-					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
-				}
+				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
 
-				this.brushScaleBand.range(yScale.range());
+				this.brushScaleBand.range(this.isBottomXAxis ? yScale.range() : yScale.range().reverse());
 
 				const newYScaleDomain = [];
 				let brushArea = selection;
-				if (brushArea === null) brushArea = this.yScale.range();
+				if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
 
 				yScaleDomain.forEach((d, i) => {
 					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
@@ -6669,9 +6627,7 @@ export class Visual extends Shadow {
 						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 					);
 
-					if (startIndex === -1 || endIndex === -1) {
-						return;
-					}
+					if (startIndex === -1 || endIndex === -1) { return; }
 
 					const categoricalData2 = cloneDeep(categoricalData);
 
@@ -6690,6 +6646,10 @@ export class Visual extends Shadow {
 					this.setCategoricalDataFields(categoricalData2);
 					this.setChartData(categoricalData2);
 
+					this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
+
+					if (this.isExpandAllApplied) { RenderExpandAllYAxis(this, categoricalData2); }
+
 					this.configLegend();
 
 					if (smallMultiplesGridItemContent) {
@@ -6697,36 +6657,13 @@ export class Visual extends Shadow {
 							this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
 						}
 
-						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
-							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
-						}
+						this.yAxisG = d3.select(config.SMUniformYAxisG);
 
-						this.svg = d3.select(smallMultiplesGridItemContent.svg);
-						this.container = smallMultiplesGridItemContent.container;
-						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
-						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
-						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
-						this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
-						this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
-						this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
-						this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
-						this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
-						this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
-						this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
-						this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
-						this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
-						this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
-						this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
-						this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
-						this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
-						this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
-						this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
-						this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
-						this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
 
-						this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					} else {
-						this.initAndRenderLollipopChart(categoricalData2, this.chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					}
 
 					isBrushRendered = true;
@@ -6741,8 +6678,38 @@ export class Visual extends Shadow {
 					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 					this.brushG.attr("display", "none");
 				}
+			});
+		} else {
+			this.verticalBrushMethod(config, selection, scaleHeight);
+		}
+
+		return { isBrushRendered };
+	}
+
+	drawVerticalBrush(self: Visual, config: IBrushConfig): void {
+		const height = config.height;
+		const brushXPos: number = config.brushXPos;
+		const brushYPos: number = config.brushYPos;
+		const barDistance: number = config.barDistance;
+		const totalBarsCount: number = config.totalBarsCount;
+		const scaleHeight: number = config.scaleHeight;
+		const categoricalData: any = cloneDeep(config.categoricalData);
+		let isBrushRendered: boolean = false;
+
+		this.brushScaleBand.range(this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse());
+
+		categoricalData.categories.forEach((d, i) => {
+			if (i < categoricalData.categories.length - 1) {
+				const yScaleCopy = this.yScale.copy();
+				this[`${d.source.displayName}Scale`] = yScaleCopy;
+				this[`${d.source.displayName}ScaleDomain`] = d.values;
 			}
-		};
+		});
+
+		const brushed = ({ selection }) => {
+			const { isBrushRendered: isBrushRendered1 } = this.verticalBrushed(config, selection, scaleHeight);
+			isBrushRendered = isBrushRendered1;
+		}
 
 		const brush = d3
 			.brushY()
@@ -6881,70 +6848,197 @@ export class Visual extends Shadow {
 		this.drawLollipopChart();
 	}
 
-	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
-		const width = config.width;
-		const brushYPos: number = config.brushYPos;
-		const barDistance: number = config.barDistance;
-		const totalBarsCount: number = config.totalBarsCount;
-		const scaleWidth: number = config.scaleWidth;
-		let categoricalData: any = cloneDeep(config.categoricalData);
-		let isBrushRendered: boolean = false;
+	setBrushSMGridItemContent(smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
+		this.svg = d3.select(smallMultiplesGridItemContent.svg);
+		this.container = smallMultiplesGridItemContent.container;
+		this.lollipopG = smallMultiplesGridItemContent.lollipopG;
+		this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
+		this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
+		this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
+		this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
+		this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
+		this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
+		this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
+		this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
+		this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
+		this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
+		this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
+		this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
+		this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
+		this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
+		this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
+		this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
+		this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
+		this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
+		this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+	}
 
+	horizontalBrushMethod(config: IBrushConfig, smallMultiplesGridItemContent: ISmallMultiplesGridItemContent, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number): { brushG: SVGElement, isBrushRendered: boolean } {
 		let brushG: SVGElement = config.brushG;
+		let isBrushRendered: boolean = false;
+		const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
+		const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+		categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
+		this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
+		this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
+		this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
+		this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-		categoricalData.categories.forEach((d, i) => {
-			if (i < categoricalData.categories.length - 1) {
-				const xScaleCopy = self.xScale.copy();
-				self[d.source.displayName + "Scale"] = xScaleCopy;
-				self[`${d.source.displayName}ScaleDomain`] = d.values;
+		if (smallMultiplesGridItemContent) {
+			this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+			this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+			this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+			this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+			this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+			this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
+		}
+
+		this.brushScaleBand.range(this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
+
+		brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
+
+		const newXScaleDomain = [];
+		let brushArea = selection;
+		if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
+
+		xScaleDomain.forEach((d, i) => {
+			const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+			if (pos >= brushArea[0] && pos <= brushArea[1]) {
+				newXScaleDomain.push(d);
+
+				if (this.isExpandAllApplied) {
+					this.expandAllCategoriesName.forEach((d) => {
+						if (this[`${d}ScaleDomain`]) {
+							this[`${d}ScaleNewDomain`].push(this[`${d}ScaleDomain`][i]);
+						}
+					});
+				}
 			}
 		});
 
-		// const minPos = this.getXPosition(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
-		const brushed = ({ selection }) => {
-			if (this.isExpandAllApplied) {
-				this.expandAllCategoriesName.forEach((d) => {
-					if (self[`${d}ScaleDomain`]) {
-						self[`${d}ScaleNewDomain`] = [];
-					}
-				});
+		this.newScaleDomainByBrush = newXScaleDomain;
+
+		if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+			const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+			const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+			);
+
+			if (startIndex === -1 || endIndex === -1) {
+				return;
 			}
 
-			const method = (smallMultiplesGridItemContent: ISmallMultiplesGridItemContent) => {
+			const categoricalData2 = cloneDeep(categoricalData);
+
+			categoricalData2.categories.forEach((d, i) => {
+				d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+			});
+
+			categoricalData2.values.forEach((d, i) => {
+				d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+				if (d.highlights) {
+					d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+				}
+			});
+
+			this.setCategoricalDataFields(categoricalData2);
+			this.setChartData(categoricalData2);
+
+			if (this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
+				RenderExpandAllXAxis(this, categoricalData2);
+			}
+
+			this.configLegend();
+
+			if (smallMultiplesGridItemContent) {
+				if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
+					this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
+				}
+
+				if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+					this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+				}
+
+				this.viewPortWidth = smallMultiplesGridItemContent.width;
+				this.viewPortHeight = smallMultiplesGridItemContent.height;
+
+				this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
+
+				this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+			} else {
+				this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+			}
+			isBrushRendered = true;
+			this.brushG.attr("display", "block");
+		} else {
+			isBrushRendered = false;
+			this.isScrollBrushDisplayed = false;
+			this.isHorizontalBrushDisplayed = false;
+			this.isVerticalBrushDisplayed = false;
+			this.brushHeight = 0;
+			this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
+			this.brushG.attr("display", "none");
+		}
+
+		return { brushG, isBrushRendered };
+	}
+
+	horizontalBrushed = (config: IBrushConfig, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number): { brushG: SVGElement, isBrushRendered: boolean } => {
+		let isBrushRendered: boolean;
+		let brushG: SVGElement;
+
+		if (this.isExpandAllApplied) {
+			this.expandAllCategoriesName.forEach((d) => {
+				if (this[`${d}ScaleDomain`]) { this[`${d}ScaleNewDomain`] = []; }
+			});
+		}
+
+		if (config.isSMUniformXAxis) {
+			const SMItemsList = this.smallMultiplesGridItemsList.filter(d => d.colIndex === config.SMUniformXAxisId);
+
+			if (config.isSMUniformXAxisIsBottom) {
+				this.isBottomXAxis = true; this.xAxisSettings.position = Position.Bottom;
+			} else {
+				this.isBottomXAxis = false; this.xAxisSettings.position = Position.Top;
+			}
+
+			SMItemsList.forEach(d => {
+				this.smallMultiplesGridItemId = d.content.category;
+				this.currentSmallMultipleIndex = d.content.index;
+
+				const smallMultiplesGridItemContent = d.content;
+				this.isCurrentSmallMultipleIsOthers = d.content.category.includes(this.othersLabel);
+
 				const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
 				const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
 				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
-				this.brushScaleBand = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand : this.brushScaleBand;
 				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
 				this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
 
-				if (smallMultiplesGridItemContent) {
-					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
-				}
+				this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
+				this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
+				this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
+				this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
+				this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
+				this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
 
-				this.brushScaleBand.range(this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
-
-				brushG = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushG : config.brushG;
+				this.brushScaleBand.range(xScale.range());
 
 				const newXScaleDomain = [];
 				let brushArea = selection;
-				if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
+				if (brushArea === null) brushArea = xScale.range();
 
 				xScaleDomain.forEach((d, i) => {
 					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newXScaleDomain.push(d);
 
-						if (self.isExpandAllApplied) {
-							self.expandAllCategoriesName.forEach((d) => {
-								if (self[`${d}ScaleDomain`]) {
-									self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
+						if (this.isExpandAllApplied) {
+							this.expandAllCategoriesName.forEach((d) => {
+								if (this[`${d}ScaleDomain`]) {
+									this[`${d}ScaleNewDomain`].push(this[`${d}ScaleDomain`][i]);
 								}
 							});
 						}
@@ -6959,9 +7053,7 @@ export class Visual extends Shadow {
 						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 					);
 
-					if (startIndex === -1 || endIndex === -1) {
-						return;
-					}
+					if (startIndex === -1 || endIndex === -1) { return; }
 
 					const categoricalData2 = cloneDeep(categoricalData);
 
@@ -6972,24 +7064,18 @@ export class Visual extends Shadow {
 					categoricalData2.values.forEach((d, i) => {
 						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
 
-						if (d.highlights) {
-							d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-						}
+						if (d.highlights) { d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1); }
 					});
 
 					this.setCategoricalDataFields(categoricalData2);
 					this.setChartData(categoricalData2);
 
-					if (this.isExpandAllApplied && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
-						RenderExpandAllXAxis(this, categoricalData2);
-					}
+					this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
 
 					this.configLegend();
 
 					if (smallMultiplesGridItemContent) {
-						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
-							this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
-						}
+						this.xAxisG = d3.select(config.SMUniformXAxisG);
 
 						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
 							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
@@ -6998,33 +7084,15 @@ export class Visual extends Shadow {
 						this.viewPortWidth = smallMultiplesGridItemContent.width;
 						this.viewPortHeight = smallMultiplesGridItemContent.height;
 
-						this.svg = d3.select(smallMultiplesGridItemContent.svg);
-						this.container = smallMultiplesGridItemContent.container;
-						this.lollipopG = smallMultiplesGridItemContent.lollipopG;
-						this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
-						this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
-						this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
-						this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
-						this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
-						this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
-						this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
-						this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
-						this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
-						this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
-						this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
-						this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
-						this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
-						this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
-						this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
-						this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
-						this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
-						this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
-						this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
+						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
 
-						this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+
+						this.xAxisG.attr("transform", `translate(${0}, ${0})`);
 					} else {
-						this.initAndRenderLollipopChart(categoricalData2, this.chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 					}
+
 					isBrushRendered = true;
 					this.brushG.attr("display", "block");
 				} else {
@@ -7036,151 +7104,40 @@ export class Visual extends Shadow {
 					this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
 					this.brushG.attr("display", "none");
 				}
+			})
+		} else {
+			const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
+			this.method(config, smallMultiplesGridItemContent, categoricalData, selection, scaleWidth);
+		}
+
+		return { brushG, isBrushRendered };
+	};
+
+	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
+		const width = config.width;
+		const brushYPos: number = config.brushYPos;
+		const barDistance: number = config.barDistance;
+		const totalBarsCount: number = config.totalBarsCount;
+		const scaleWidth: number = config.scaleWidth;
+		const categoricalData: any = cloneDeep(config.categoricalData);
+		let isBrushRendered: boolean = false;
+		let brushG: SVGElement = config.brushG;
+
+		categoricalData.categories.forEach((d, i) => {
+			if (i < categoricalData.categories.length - 1) {
+				const xScaleCopy = self.xScale.copy();
+				self[d.source.displayName + "Scale"] = xScaleCopy;
+				self[`${d.source.displayName}ScaleDomain`] = d.values;
 			}
+		});
 
-			if (config.isSMUniformXAxis) {
-				const SMItemsList = this.smallMultiplesGridItemsList.filter(d => d.colIndex === config.SMUniformXAxisId);
+		// const minPos = this.getXPosition(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
 
-				if (config.isSMUniformXAxisIsBottom) {
-					this.isBottomXAxis = true;
-					this.xAxisSettings.position = Position.Bottom;
-				} else {
-					this.isBottomXAxis = false;
-					this.xAxisSettings.position = Position.Top;
-				}
-
-				SMItemsList.forEach(d => {
-					this.smallMultiplesGridItemId = d.content.category;
-					this.currentSmallMultipleIndex = d.content.index;
-
-					const smallMultiplesGridItemContent = d.content;
-					this.isCurrentSmallMultipleIsOthers = d.content.category.includes(self.othersLabel);
-
-					const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
-					const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
-					categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
-					this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
-					this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
-					this.lastCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.lastCategoryValueDataPair) : this.lastCategoryValueDataPair;
-
-					this.categoryColorPair = smallMultiplesGridItemContent.categoryColorPair;
-					this.othersCategoryColorPair = smallMultiplesGridItemContent.othersCategoryColorPair;
-					this.subCategoryColorPair = smallMultiplesGridItemContent.subCategoryColorPair;
-					this.othersSubCategoryColorPair = smallMultiplesGridItemContent.othersSubCategoryColorPair;
-					this.CFCategoryColorPair = smallMultiplesGridItemContent.CFCategoryColorPair;
-					this.CFSubCategoryColorPair = smallMultiplesGridItemContent.CFSubCategoryColorPair;
-
-					this.brushScaleBand.range(xScale.range());
-
-					const newXScaleDomain = [];
-					let brushArea = selection;
-					if (brushArea === null) brushArea = xScale.range();
-
-					xScaleDomain.forEach((d, i) => {
-						const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
-						if (pos >= brushArea[0] && pos <= brushArea[1]) {
-							newXScaleDomain.push(d);
-
-							if (self.isExpandAllApplied) {
-								self.expandAllCategoriesName.forEach((d) => {
-									if (self[`${d}ScaleDomain`]) {
-										self[`${d}ScaleNewDomain`].push(self[`${d}ScaleDomain`][i]);
-									}
-								});
-							}
-						}
-					});
-
-					this.newScaleDomainByBrush = newXScaleDomain;
-
-					if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
-						const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-						const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-							this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-						);
-
-						if (startIndex === -1 || endIndex === -1) {
-							return;
-						}
-
-						const categoricalData2 = cloneDeep(categoricalData);
-
-						categoricalData2.categories.forEach((d, i) => {
-							d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-						});
-
-						categoricalData2.values.forEach((d, i) => {
-							d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-							if (d.highlights) {
-								d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-							}
-						});
-
-						this.setCategoricalDataFields(categoricalData2);
-						this.setChartData(categoricalData2);
-
-						this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
-
-						this.configLegend();
-
-						if (smallMultiplesGridItemContent) {
-							this.xAxisG = d3.select(config.SMUniformXAxisG);
-
-							if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
-								this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
-							}
-
-							this.viewPortWidth = smallMultiplesGridItemContent.width;
-							this.viewPortHeight = smallMultiplesGridItemContent.height;
-
-							this.svg = d3.select(smallMultiplesGridItemContent.svg);
-							this.container = smallMultiplesGridItemContent.container;
-							this.lollipopG = smallMultiplesGridItemContent.lollipopG;
-							this.dataLabels1G = smallMultiplesGridItemContent.dataLabels1G;
-							this.dataLabels2G = smallMultiplesGridItemContent.dataLabels2G;
-							this.referenceLineLayersG = smallMultiplesGridItemContent.referenceLineLayersG;
-							this.referenceLinesContainerG = smallMultiplesGridItemContent.referenceLinesContainerG;
-							this.xGridLinesG = smallMultiplesGridItemContent.xGridLinesG;
-							this.yGridLinesG = smallMultiplesGridItemContent.yGridLinesG;
-							this.dynamicDeviationG = smallMultiplesGridItemContent.dynamicDeviationG;
-							this.zeroSeparatorLine = smallMultiplesGridItemContent.zeroSeparatorLine;
-							this.connectingLineG = smallMultiplesGridItemContent.connectingLineG;
-							this.errorBarsContainer = smallMultiplesGridItemContent.errorBarsContainer;
-							this.errorBarsMarkerDefsG = smallMultiplesGridItemContent.errorBarsMarkerDefsG;
-							this.errorBarsAreaG = smallMultiplesGridItemContent.errorBarsAreaG;
-							this.errorBarsAreaPath = smallMultiplesGridItemContent.errorBarsAreaPath;
-							this.errorBarsLinesDashG = smallMultiplesGridItemContent.errorBarsLinesDashG;
-							this.errorBarsLinesG = smallMultiplesGridItemContent.errorBarsLinesG;
-							this.errorBarsMarkersG = smallMultiplesGridItemContent.errorBarsMarkersG;
-							this.errorBarsMarkerDef = smallMultiplesGridItemContent.errorBarsMarkerDef;
-							this.errorBarsMarker = smallMultiplesGridItemContent.errorBarsMarker;
-							this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
-
-							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-
-							this.xAxisG.attr("transform", `translate(${0}, ${0})`);
-						} else {
-							this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-						}
-
-						isBrushRendered = true;
-						this.brushG.attr("display", "block");
-					} else {
-						isBrushRendered = false;
-						this.isScrollBrushDisplayed = false;
-						this.isHorizontalBrushDisplayed = false;
-						this.isVerticalBrushDisplayed = false;
-						this.brushHeight = 0;
-						this.drawXYAxis(this.categoricalData, this.chartData, config.isShowXAxis, config.isShowYAxis);
-						this.brushG.attr("display", "none");
-					}
-				})
-			} else {
-				const smallMultiplesGridItemContent = self.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
-				method(smallMultiplesGridItemContent)
-			}
-		};
+		const brushed = ({ selection }) => {
+			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushed(config, categoricalData, selection, scaleWidth);
+			isBrushRendered = isBrushRendered1;
+			brushG = brushG1;
+		}
 
 		const brush = d3
 			.brushX()
@@ -7474,6 +7431,12 @@ export class Visual extends Shadow {
 					}
 				});
 		}
+
+		this.setDataLabelsFormattingExtended(labelSelection, textSelection, labelPlacement, fontSize, isAutoBGColor, isData2Label);
+	}
+
+	setDataLabelsFormattingExtended(labelSelection: D3Selection<SVGElement>, textSelection: D3Selection<SVGElement>, labelPlacement: DataLabelsPlacement, fontSize: number, isAutoBGColor: boolean, isData2Label: boolean): void {
+		const dataLabelsSettings = isData2Label ? this.data2LabelsSettings : this.data1LabelsSettings;
 
 		if (labelPlacement === DataLabelsPlacement.Inside) {
 			let textShadow = labelSelection.select(".dataLabelTextShadow");
