@@ -11754,10 +11754,8 @@ export class Visual extends Shadow {
 		});
 	}
 
-	setSummaryTableConfig(): void {
-		let seedDataFromVisual = [];
+	setSeedDataFromVisual = (categoricalData: powerbi.DataViewCategorical, seedDataFromVisual: any[]) => {
 		const axisSettings = !this.isHorizontalChart ? this.xAxisSettings : this.yAxisSettings;
-
 		const formatDate = (text: string, format: string) => {
 			if (!axisSettings.isAutoDateFormat) {
 				return FormatAxisDate(axisSettings.dateFormat === EAxisDateFormats.Custom ? axisSettings.customDateFormat : axisSettings.dateFormat, text);
@@ -11766,9 +11764,33 @@ export class Visual extends Shadow {
 			}
 		}
 
-		const setSeedDataFromVisual = (categoricalData) => {
-			if (!this.isHasSubcategories) {
-				categoricalData.categories[0].values.forEach((d, i) => {
+		if (!this.isHasSubcategories) {
+			categoricalData.categories[0].values.forEach((d, i) => {
+				const obj = {};
+
+				categoricalData.categories.forEach(c => {
+					let text = c.values[i] ? c.values[i] : 0;
+					if (text.toString().split("--").length > 1) {
+						text = text.toString().split("--")[0];
+					}
+					if (text.toString().split("&&").length > 1) {
+						text = text.toString().split("&&")[text.toString().split("&&").length - 1];
+					}
+
+					obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
+				});
+
+				categoricalData.values.forEach(v => {
+					obj[v.source.displayName] = v.source.type.dateTime ? formatDate(v.values[i] as string, v.source.format) : (v.values[i] ? v.values[i] : 0);
+				});
+
+				seedDataFromVisual.push(obj);
+			});
+		} else {
+			const group = d3.group(categoricalData.values, (d: any) => d.source.groupName);
+
+			categoricalData.categories[0].values.forEach((d, i) => {
+				[...group.keys()].forEach(g => {
 					const obj = {};
 
 					categoricalData.categories.forEach(c => {
@@ -11783,45 +11805,22 @@ export class Visual extends Shadow {
 						obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
 					});
 
-					categoricalData.values.forEach(v => {
-						obj[v.source.displayName] = v.source.type.dateTime ? formatDate(v.values[i] as string, v.source.format) : (v.values[i] ? v.values[i] : 0);
+					obj[this.categoricalSubCategoryField.displayName] = g.toString().replace(new RegExp("-1234567890123", 'g'), '');
+
+					const groupBy = group.get(g);
+
+					groupBy.forEach((d: any) => {
+						obj[d.source.displayName] = (d.source.type.dateTime ? formatDate(d.values[i] as string, d.source.format) : (d.values[i] ? d.values[i] : 0)).toString().replace(new RegExp("-1234567890123", 'g'), '');
 					});
 
 					seedDataFromVisual.push(obj);
 				});
-			} else {
-				const group = d3.group(categoricalData.values, (d: any) => d.source.groupName);
-
-				categoricalData.categories[0].values.forEach((d, i) => {
-					[...group.keys()].forEach(g => {
-						const obj = {};
-
-						categoricalData.categories.forEach(c => {
-							let text = c.values[i] ? c.values[i] : 0;
-							if (text.toString().split("--").length > 1) {
-								text = text.toString().split("--")[0];
-							}
-							if (text.toString().split("&&").length > 1) {
-								text = text.toString().split("&&")[text.toString().split("&&").length - 1];
-							}
-
-							obj[c.source.displayName] = (c.source.type.dateTime ? formatDate(text as string, c.source.format) : text).toString().replace(new RegExp("-1234567890123", 'g'), '');
-						});
-
-						obj[this.categoricalSubCategoryField.displayName] = g.toString().replace(new RegExp("-1234567890123", 'g'), '');
-
-						const groupBy = group.get(g);
-
-						groupBy.forEach((d: any) => {
-							obj[d.source.displayName] = (d.source.type.dateTime ? formatDate(d.values[i] as string, d.source.format) : (d.values[i] ? d.values[i] : 0)).toString().replace(new RegExp("-1234567890123", 'g'), '');
-						});
-
-						seedDataFromVisual.push(obj);
-					});
-				});
-			}
+			});
 		}
+	}
 
+	setSummaryTableConfig(): void {
+		let seedDataFromVisual = [];
 		if (this.isChartIsRaceChart && !this.isSmallMultiplesEnabled) {
 			const originalCategoricalData: powerbi.DataViewCategorical = cloneDeep(this.clonedCategoricalDataForRaceChart);
 			const categoricalData = this.setInitialChartData(
@@ -11832,15 +11831,15 @@ export class Visual extends Shadow {
 				this.vizOptions.options.viewport.height
 			);
 
-			setSeedDataFromVisual(categoricalData);
+			this.setSeedDataFromVisual(categoricalData, seedDataFromVisual);
 		} else if (this.isSmallMultiplesEnabled) {
 			this.smallMultiplesGridItemsList.forEach(d => {
 				const smallMultiplesGridItemContent = d.content;
 				const categoricalData = smallMultiplesGridItemContent.categoricalData;
-				setSeedDataFromVisual(categoricalData);
+				this.setSeedDataFromVisual(categoricalData, seedDataFromVisual);
 			})
 		} else {
-			setSeedDataFromVisual(this.categoricalData);
+			this.setSeedDataFromVisual(this.categoricalData, seedDataFromVisual);
 		}
 
 		seedDataFromVisual = this.elementToMoveOthers(seedDataFromVisual, true, this.categoryDisplayName, this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
@@ -11849,23 +11848,6 @@ export class Visual extends Shadow {
 			const clonedData = cloneDeep(seedDataFromVisual);
 			seedDataFromVisual = clonedData.reverse();
 		}
-
-		// seedDataFromVisual.forEach(d => {
-		// 	d[this.categoryDisplayName] = this.getTooltipCategoryText(d[this.categoryDisplayName], false);
-		// })
-
-		// if (this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers) {
-		// 	const elementToMove = seedDataFromVisual.filter(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
-		// 	if (elementToMove) {
-		// 		const index = seedDataFromVisual.findIndex(obj => obj[this.categoryDisplayName].includes(this.othersLabel));
-		// 		seedDataFromVisual.splice(index, elementToMove.length);
-		// 		if (this.isHorizontalChart) {
-		// 			seedDataFromVisual.unshift(...elementToMove);
-		// 		} else {
-		// 			seedDataFromVisual.push(...elementToMove);
-		// 		}
-		// 	}
-		// }
 
 		const rowGroupIndexByFields: IRowGroupIndexByField[] = [];
 
@@ -11912,44 +11894,6 @@ export class Visual extends Shadow {
 			},
 			rowGroupIndexByFields: rowGroupIndexByFields
 		};
-
-		// if (this.rankingSettings.category.enabled) {
-		// 	this.summaryTableConfig = {
-		// 		...this.summaryTableConfig,
-		// 		matrixRanking: {
-		// 			row: {
-		// 				rank: this.rankingSettings.category.rankingType,
-		// 				count: this.rankingSettings.category.count,
-		// 			},
-		// 			column: {
-		// 				rank: this.rankingSettings.subCategory.rankingType,
-		// 				count: this.rankingSettings.subCategory.count,
-		// 			},
-		// 		},
-		// 	};
-		// }
-
-		// if (this.sortingSettings.category.enabled || this.sortingSettings.subCategory.enabled) {
-		// 	const matrixSorting = { row: [], column: [] };
-		// 	if (this.sortingSettings.category.enabled) {
-		// 		matrixSorting.row.push({
-		// 			column: this.sortingSettings.category.sortBy,
-		// 			order: +this.sortingSettings.category.sortOrder === 1 ? "asc" : "desc",
-		// 		});
-		// 	}
-
-		// 	if (this.sortingSettings.subCategory.enabled) {
-		// 		matrixSorting.column.push({
-		// 			column: this.sortingSettings.subCategory.sortBy,
-		// 			order: +this.sortingSettings.subCategory.sortOrder === 1 ? "asc" : "desc",
-		// 		});
-		// 	}
-
-		// 	this.summaryTableConfig = {
-		// 		...this.summaryTableConfig,
-		// 		matrixSorting: matrixSorting,
-		// 	};
-		// }
 	}
 
 	private setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues): void {
