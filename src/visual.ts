@@ -5712,18 +5712,6 @@ export class Visual extends Shadow {
 			...gridLinesConfig,
 		};
 
-		// Data Colors Settings
-		// if (this.isLollipopTypeCircle) {
-		//     DATA_COLORS.dataType = CircleType.Circle1;
-		// } else {
-		//     DATA_COLORS.dataType = PieType.Pie1;
-		// }
-
-		// if (this.isHasMultiMeasure) {
-		// 	DATA_COLORS.circle1.fillType = ColorPaletteType.Single;
-		// 	DATA_COLORS.circle2.fillType = ColorPaletteType.Single;
-		// }
-
 		const dataColorsConfig = JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]);
 
 		this.dataColorsSettings = {
@@ -5781,6 +5769,14 @@ export class Visual extends Shadow {
 			...errorBarsConfig,
 		};
 
+		this.setVisualSettingsExtended();
+
+		this.changeVisualSettings();
+	}
+
+	setVisualSettingsExtended(): void {
+		const formatTab = this.vizOptions.formatTab;
+
 		this.beforeIBCSSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeIBCSSettings]);
 
 		this.beforeTemplateSettings = JSON.parse(formatTab[EVisualConfig.Editor][EVisualSettings.BeforeTemplateSettings]);
@@ -5810,33 +5806,6 @@ export class Visual extends Shadow {
 			...TEMPLATES_SETTINGS,
 			...templateConfig,
 		};
-
-		this.changeVisualSettings();
-
-		// if (!this.isHasSubcategories) {
-		// 	this.isLollipopTypeCircle;
-		// 	CHART_SETTINGS.isLollipopTypeChanged = false;
-		// 	this.chartSettings.isLollipopTypeChanged = false;
-		// 	const chartConfig: IChartSettings = {...this.chartSettings, lollipopType: LollipopType.CIRCLE, isLollipopTypeChanged: false};
-		// 	formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings] = JSON.stringify(chartConfig);
-		// 	const dataColorsConfig: IDataColorsSettings = {...this.dataColorsSettings, dataType: CircleType.Circle1};
-		// 	formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings] = JSON.stringify(dataColorsConfig);
-		// } else {
-		// 	if (!this.chartSettings.isLollipopTypeChanged) {
-		// 		this.chartSettings.lollipopType = LollipopType.Donut;
-		// 		const chartConfig: IChartSettings = {...this.chartSettings, lollipopType: LollipopType.Donut};
-		// 		formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings] = JSON.stringify(chartConfig);
-		// 		const dataColorsConfig: IDataColorsSettings = {...this.dataColorsSettings, dataType: PieType.Pie1};
-		// 		formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings] = JSON.stringify(dataColorsConfig);
-		// 	}
-		// }
-
-		// if (!Object.keys(clonedDataLabelsSettings).length || isLollipopTypePie) {
-		// 	const color = this.dataLabelsSettings.color;
-		// 	if (color === "#fff" || color === "rgba(255, 255, 255, 1)") {
-		// 		this.dataLabelsSettings.color = "rgb(102,102,102)";
-		// 	}
-		// }
 	}
 
 	changeVisualSettings(): void {
@@ -5906,10 +5875,6 @@ export class Visual extends Shadow {
 
 		this.data1LabelsSettings = this.dataLabelsSettings.measure1;
 		this.data2LabelsSettings = this.dataLabelsSettings.measure2;
-
-		// if (!this.dataColorsSettings.reverse) {
-		// 	this.dataColorsSettings.schemeColors = cloneDeep(this.schemeColors.reverse());
-		// }
 
 		if (this.data1LabelsSettings.placement === DataLabelsPlacement.Inside && this.data1LabelsSettings.textColorTypes !== EInsideTextColorTypes.CONTRAST && !this.data1LabelsSettings.isTextColorTypeChanged) {
 			this.data1LabelsSettings.textColorTypes = EInsideTextColorTypes.CONTRAST;
