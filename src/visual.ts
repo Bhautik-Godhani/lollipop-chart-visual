@@ -4688,60 +4688,150 @@ export class Visual extends Shadow {
 		this.setChartWidthHeight();
 	}
 
+	getSubCategoryData(categoricalData: powerbi.DataViewCategorical, idx: number, parentCategory: string): IChartSubCategory[] {
+		const subCategoriesGroup = d3.group(categoricalData.values, (d: any) => d.source.groupName);
+		const data = this.subCategoriesName.reduce((arr, cur) => {
+			const subCategoryGroup = subCategoriesGroup.get(cur);
+			const measure1 = subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName);
+			const measure1Highlights: any[] = measure1 ? measure1.highlights : [];
+
+			const value1 = <number>subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx];
+
+			const obj: IChartSubCategory = {
+				category: cur,
+				parentCategory,
+				value1: this.isPercentageMeasure ? value1 * 100 : value1,
+				value2: this.isHasMultiMeasure ? <number>(
+					subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure2DisplayName).values[idx]
+				) : 0,
+				tooltipFields: subCategoryGroup
+					.filter((d) => d.source.roles[EDataRolesName.Tooltip])
+					.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
+				selected: false,
+				isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false,
+				allMeasures: subCategoryGroup.reduce((obj, cur) => {
+					obj[cur.source.displayName] = { roles: cur.source.roles, value: this.isPercentageMeasure ? cur.values[idx] * 100 : cur.values[idx] };
+					return obj;
+				}, {}),
+				isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
+			};
+			return [...arr, obj];
+		}, []);
+		return data;
+	}
+
+	getUpperLowerBoundsValue(idx: number, value: number): {
+		upperBoundValue: number,
+		lowerBoundValue: number,
+		tooltipUpperBoundValue: string,
+		tooltipLowerBoundValue: string,
+		labelUpperBoundValue: string,
+		labelLowerBoundValue: string
+	} {
+		const isErrorBarsAbsoluteRelation = this.errorBarsSettings.measurement.relationshipToMeasure === ERelationshipToMeasure.Absolute && !this.errorBarsSettings.measurement.makeSymmetrical;
+		const { errorLabels, tooltip } = this.errorBarsSettings;
+
+		let ub: number = 0;
+		let lb: number = 0;
+		let upperBoundValue: number = 0;
+		let lowerBoundValue: number = 0;
+
+		const percentageMultiplier = this.isPercentageMeasure ? 100 : 1;
+
+		switch (this.errorBarsSettings.measurement.calcType) {
+			case EErrorBarsCalcTypes.ByField:
+				if (this.isHasErrorUpperBounds && this.errorBarsSettings.measurement.upperBoundMeasure) {
+					const categoricalUpperBoundFields = this.categoricalUpperBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.upperBoundMeasure);
+					ub = this.isHasSubcategories ? d3.sum(categoricalUpperBoundFields, d => <number>d.values[idx]) : <number>categoricalUpperBoundFields[0].values[idx];
+					upperBoundValue = (isErrorBarsAbsoluteRelation && !this.errorBarsSettings.measurement.makeSymmetrical ? ub : ub + value) * percentageMultiplier;
+				}
+
+				if (this.isHasErrorLowerBounds && this.errorBarsSettings.measurement.lowerBoundMeasure && !this.errorBarsSettings.measurement.makeSymmetrical) {
+					const categoricalLowerBoundFields = this.categoricalLowerBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.lowerBoundMeasure);
+					lb = this.isHasSubcategories ? d3.sum(categoricalLowerBoundFields, d => <number>d.values[idx]) : <number>categoricalLowerBoundFields[0].values[idx];
+					lowerBoundValue = (isErrorBarsAbsoluteRelation ? lb : lb + value) * percentageMultiplier;
+				}
+
+				if (this.errorBarsSettings.measurement.makeSymmetrical) {
+					lb = lowerBoundValue = (value - Math.abs(value - upperBoundValue)) * percentageMultiplier;
+				}
+
+				break;
+			case EErrorBarsCalcTypes.ByPercentage:
+				this.isHasErrorUpperBounds = true;
+				this.isHasErrorLowerBounds = true;
+				ub = upperBoundValue = value + (value * this.errorBarsSettings.measurement.upperBoundPercentage) / 100;
+				lb = lowerBoundValue = value - (value * this.errorBarsSettings.measurement.lowerBoundPercentage) / 100;
+				break;
+			case EErrorBarsCalcTypes.ByPercentile: {
+				this.isHasErrorUpperBounds = true;
+				this.isHasErrorLowerBounds = true;
+				ub = upperBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.upperBoundPercentage / 100);
+				lb = lowerBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.lowerBoundPercentage / 100);
+				break;
+			}
+			case EErrorBarsCalcTypes.ByValue: {
+				this.isHasErrorUpperBounds = true;
+				this.isHasErrorLowerBounds = true;
+				ub = upperBoundValue = value + this.errorBarsSettings.measurement.upperBoundValue;
+				lb = lowerBoundValue = value - this.errorBarsSettings.measurement.lowerBoundValue;
+				break;
+			}
+		}
+
+		switch (this.errorBarsSettings.measurement.direction) {
+			case EErrorBarsDirection.Both:
+				break;
+			case EErrorBarsDirection.Minus:
+				ub = upperBoundValue = value;
+				break;
+			case EErrorBarsDirection.Plus:
+				lb = lowerBoundValue = value;
+				break;
+		}
+
+		const getBoundForTooltip = (labelFormat: EErrorBarsLabelFormat, isUpperBound: boolean): string => {
+			let bound: number;
+			switch (labelFormat) {
+				case EErrorBarsLabelFormat.Absolute:
+					bound = isUpperBound ? upperBoundValue : lowerBoundValue;
+					break;
+				case EErrorBarsLabelFormat.RelativeNumeric:
+					if (isErrorBarsAbsoluteRelation || this.errorBarsSettings.measurement.calcType !== EErrorBarsCalcTypes.ByField) {
+						bound = isUpperBound ? ub - value : lb - value;
+					} else {
+						bound = isUpperBound ? ub : lb;
+					}
+					break;
+				case EErrorBarsLabelFormat.RelativePercentage:
+					if (isErrorBarsAbsoluteRelation || this.errorBarsSettings.measurement.calcType !== EErrorBarsCalcTypes.ByField) {
+						bound = isUpperBound ? (ub - value) / value * 100 : (lb - value) / value * 100;
+					} else {
+						bound = isUpperBound ? ub / value * 100 : lb / value * 100;
+					}
+					break;
+			}
+
+			return (bound !== undefined && bound !== null)
+				? labelFormat !== EErrorBarsLabelFormat.RelativePercentage
+					? this.formatNumber(+bound, this.numberSettings, this.measureNumberFormatter[0], true, true)
+					: bound.toFixed(2) + "%"
+				: undefined;
+		};
+
+		return {
+			upperBoundValue, lowerBoundValue,
+			tooltipUpperBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, true) : '0',
+			tooltipLowerBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, false) : '0',
+			labelUpperBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, true) : '0',
+			labelLowerBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, false) : '0',
+		};
+	}
+
 	setChartData(categoricalData: powerbi.DataViewCategorical): void {
-		// if (this.isExpandAllApplied) {
-		// 	this.categoricalCategoriesFields.forEach((d) => {
-		// 		if (!d["isIdToCategoryAdded"]) {
-		// 			d.values = d.values.map((d: string, i: number) => {
-		// 				if (d.split("-").length === 2) {
-		// 					return d;
-		// 				} else {
-		// 					return d + "-" + i.toString();
-		// 				}
-		// 			});
-		// 			d["isIdToCategoryAdded"] = true;
-		// 		}
-		// 	});
-		// }
-
-		// this.raceChartKeysList = [];
-
 		this.categoriesName = this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].values.filter(
 			(v, i, a) => a.findIndex((t) => t === v) === i
 		) as string[];
-
-		const subCategoriesGroup = d3.group(categoricalData.values, (d: any) => d.source.groupName);
-
-		const getSubCategoryData = (idx: number, parentCategory: string): IChartSubCategory[] => {
-			const data = this.subCategoriesName.reduce((arr, cur) => {
-				const subCategoryGroup = subCategoriesGroup.get(cur);
-				const measure1 = subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName);
-				const measure1Highlights: any[] = measure1 ? measure1.highlights : [];
-
-				const value1 = <number>subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure1DisplayName).values[idx];
-
-				const obj: IChartSubCategory = {
-					category: cur,
-					parentCategory,
-					value1: this.isPercentageMeasure ? value1 * 100 : value1,
-					value2: this.isHasMultiMeasure ? <number>(
-						subCategoryGroup.find((d) => d.source.roles[EDataRolesName.Measure] && d.source.displayName === this.measure2DisplayName).values[idx]
-					) : 0,
-					tooltipFields: subCategoryGroup
-						.filter((d) => d.source.roles[EDataRolesName.Tooltip])
-						.map((d) => ({ displayName: d.source.displayName, value: d.values[idx], color: "" } as TooltipData)),
-					selected: false,
-					isHighlight: measure1Highlights && measure1Highlights.length > 0 ? !!measure1Highlights[idx] : false,
-					allMeasures: subCategoryGroup.reduce((obj, cur) => {
-						obj[cur.source.displayName] = { roles: cur.source.roles, value: this.isPercentageMeasure ? cur.values[idx] * 100 : cur.values[idx] };
-						return obj;
-					}, {}),
-					isOthersSmallMultiples: this.isCurrentSmallMultipleIsOthers
-				};
-				return [...arr, obj];
-			}, []);
-			return data;
-		};
 
 		const getUID = (category: string) => {
 			return `${category}-
@@ -4760,132 +4850,12 @@ export class Visual extends Shadow {
 			${this.isShowImageMarker2}`;
 		}
 
-		const isErrorBarsAbsoluteRelation = this.errorBarsSettings.measurement.relationshipToMeasure === ERelationshipToMeasure.Absolute && !this.errorBarsSettings.measurement.makeSymmetrical;
-		const { errorLabels, tooltip } = this.errorBarsSettings;
-
-		const getUpperLowerBoundsValue = (idx: number, value: number): {
-			upperBoundValue: number,
-			lowerBoundValue: number,
-			tooltipUpperBoundValue: string,
-			tooltipLowerBoundValue: string,
-			labelUpperBoundValue: string,
-			labelLowerBoundValue: string
-		} => {
-			let ub: number = 0;
-			let lb: number = 0;
-			let upperBoundValue: number = 0;
-			let lowerBoundValue: number = 0;
-
-			const percentageMultiplier = this.isPercentageMeasure ? 100 : 1;
-
-			switch (this.errorBarsSettings.measurement.calcType) {
-				case EErrorBarsCalcTypes.ByField:
-					if (this.isHasErrorUpperBounds && this.errorBarsSettings.measurement.upperBoundMeasure) {
-						const categoricalUpperBoundFields = this.categoricalUpperBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.upperBoundMeasure);
-						ub = this.isHasSubcategories ? d3.sum(categoricalUpperBoundFields, d => <number>d.values[idx]) : <number>categoricalUpperBoundFields[0].values[idx];
-						upperBoundValue = (isErrorBarsAbsoluteRelation && !this.errorBarsSettings.measurement.makeSymmetrical ? ub : ub + value) * percentageMultiplier;
-					}
-
-					if (this.isHasErrorLowerBounds && this.errorBarsSettings.measurement.lowerBoundMeasure && !this.errorBarsSettings.measurement.makeSymmetrical) {
-						const categoricalLowerBoundFields = this.categoricalLowerBoundFields.filter(d => d.source.displayName === this.errorBarsSettings.measurement.lowerBoundMeasure);
-						lb = this.isHasSubcategories ? d3.sum(categoricalLowerBoundFields, d => <number>d.values[idx]) : <number>categoricalLowerBoundFields[0].values[idx];
-						lowerBoundValue = (isErrorBarsAbsoluteRelation ? lb : lb + value) * percentageMultiplier;
-					}
-
-					if (this.errorBarsSettings.measurement.makeSymmetrical) {
-						lb = lowerBoundValue = (value - Math.abs(value - upperBoundValue)) * percentageMultiplier;
-					}
-
-					break;
-				case EErrorBarsCalcTypes.ByPercentage:
-					this.isHasErrorUpperBounds = true;
-					this.isHasErrorLowerBounds = true;
-					ub = upperBoundValue = value + (value * this.errorBarsSettings.measurement.upperBoundPercentage) / 100;
-					lb = lowerBoundValue = value - (value * this.errorBarsSettings.measurement.lowerBoundPercentage) / 100;
-					break;
-				case EErrorBarsCalcTypes.ByPercentile: {
-					this.isHasErrorUpperBounds = true;
-					this.isHasErrorLowerBounds = true;
-					ub = upperBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.upperBoundPercentage / 100);
-					lb = lowerBoundValue = d3.quantile([value], this.errorBarsSettings.measurement.lowerBoundPercentage / 100);
-					break;
-				}
-				case EErrorBarsCalcTypes.ByStandardDeviation: {
-					// const isMeasure2 = this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-					// const sd = calculatePowerBiStandardDeviation(this.chartData.map(d => isMeasure2 ? d.value2 : d.value1));
-					// ub = upperBoundValue = value + sd;
-					// lb = lowerBoundValue = value - sd;
-					break;
-				}
-				case EErrorBarsCalcTypes.ByValue: {
-					this.isHasErrorUpperBounds = true;
-					this.isHasErrorLowerBounds = true;
-					ub = upperBoundValue = value + this.errorBarsSettings.measurement.upperBoundValue;
-					lb = lowerBoundValue = value - this.errorBarsSettings.measurement.lowerBoundValue;
-					break;
-				}
-			}
-
-			switch (this.errorBarsSettings.measurement.direction) {
-				case EErrorBarsDirection.Both:
-					break;
-				case EErrorBarsDirection.Minus:
-					ub = upperBoundValue = value;
-					break;
-				case EErrorBarsDirection.Plus:
-					lb = lowerBoundValue = value;
-					break;
-			}
-
-			const getBoundForTooltip = (labelFormat: EErrorBarsLabelFormat, isUpperBound: boolean): string => {
-				let bound: number;
-				switch (labelFormat) {
-					case EErrorBarsLabelFormat.Absolute:
-						bound = isUpperBound ? upperBoundValue : lowerBoundValue;
-						break;
-					case EErrorBarsLabelFormat.RelativeNumeric:
-						if (isErrorBarsAbsoluteRelation || this.errorBarsSettings.measurement.calcType !== EErrorBarsCalcTypes.ByField) {
-							bound = isUpperBound ? ub - value : lb - value;
-						} else {
-							bound = isUpperBound ? ub : lb;
-						}
-						break;
-					case EErrorBarsLabelFormat.RelativePercentage:
-						if (isErrorBarsAbsoluteRelation || this.errorBarsSettings.measurement.calcType !== EErrorBarsCalcTypes.ByField) {
-							bound = isUpperBound ? (ub - value) / value * 100 : (lb - value) / value * 100;
-						} else {
-							bound = isUpperBound ? ub / value * 100 : lb / value * 100;
-						}
-						break;
-				}
-
-				return (bound !== undefined && bound !== null)
-					? labelFormat !== EErrorBarsLabelFormat.RelativePercentage
-						? this.formatNumber(+bound, this.numberSettings, this.measureNumberFormatter[0], true, true)
-						: bound.toFixed(2) + "%"
-					: undefined;
-			};
-
-			return {
-				upperBoundValue, lowerBoundValue,
-				tooltipUpperBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, true) : '0',
-				tooltipLowerBoundValue: tooltip.isEnabled ? getBoundForTooltip(this.errorBarsSettings.tooltip.labelFormat, false) : '0',
-				labelUpperBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, true) : '0',
-				labelLowerBoundValue: errorLabels.isEnabled ? getBoundForTooltip(errorLabels.labelFormat, false) : '0',
-			};
-		}
-
 		let idx = 0;
 
 		const data: ILollipopChartRow[] = this.categoriesName.reduce((arr, cat) => {
 			// (this.isChartIsRaceChart && this.raceChartKeyLabelList.length > 0 ? this.raceChartKeyLabelList : [{ key: "", label: "" }]).forEach((raceBarKeyLabel) => {
 			const raceChartKey = this.raceChartCategories[0];
 			const raceChartDataLabel = this.raceChartCategories[0];
-
-			// if ((this.isChartIsRaceChart && raceKeyCategoryAvailable) || !this.isChartIsRaceChart) {
-			// if (this.isChartIsRaceChart) {
-			// 	this.raceChartKeysList.push(raceChartKey);
-			// }
 
 			const selectedImageDataFieldIndex1 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker1Style.selectedImageDataField);
 			const selectedImageDataFieldIndex2 = this.imagesDataFieldsName.findIndex(d => d === this.markerSettings.marker2Style.selectedImageDataField);
@@ -4957,6 +4927,10 @@ export class Visual extends Shadow {
 			return arr;
 		}, []);
 
+		this.setChartDataExtended1(data);
+	}
+
+	setChartDataExtended1(data: ILollipopChartRow[]): void {
 		if (this.isHasSubcategories) {
 			data.forEach((d) => {
 				if (d.subCategories.length) {
@@ -4974,7 +4948,7 @@ export class Visual extends Shadow {
 				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
 				const value1 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value1) : d.value1;
 				const value2 = this.isLollipopTypePie ? d3.sum(d.subCategories, s => s.value2) : d.value2;
-				const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value2 : value1);
+				const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = this.getUpperLowerBoundsValue(i, isValue2 ? value2 : value1);
 
 				const obj: IErrorBarValue = {};
 				obj.upperBoundValue = upperBoundValue;
@@ -4989,7 +4963,7 @@ export class Visual extends Shadow {
 
 				// 	ERROR BAR 2
 				if (this.isRenderBothErrorBars) {
-					const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = getUpperLowerBoundsValue(i, isValue2 ? value1 : value2);
+					const { upperBoundValue, lowerBoundValue, tooltipUpperBoundValue, tooltipLowerBoundValue, labelLowerBoundValue, labelUpperBoundValue } = this.getUpperLowerBoundsValue(i, isValue2 ? value1 : value2);
 
 					const obj: IErrorBarValue = {};
 					obj.upperBoundValue = upperBoundValue;
@@ -5004,52 +4978,6 @@ export class Visual extends Shadow {
 				}
 			}
 		});
-
-		// const category = this.categoricalData.categories[0];
-		// data.forEach((d, i) => {
-		// 	const selectionId: ISelectionId = this.vizOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
-		// 	d.selectionId = selectionId;
-		// });
-		// data.forEach((d, i) => {
-		// 	d.subCategories.forEach((subCategory) => {
-		// 		const selectionId: ISelectionId = this.vizOptions.host.createSelectionIdBuilder().withCategory(category, i).createSelectionId();
-		// 		subCategory.selectionId = selectionId;
-		// 	});
-		// });
-
-		// if (this.isChartIsRaceChart) {
-		// 	this.raceChartKeysList = this.raceChartKeysList.filter((item, i, ar) => ar.indexOf(item) === i);
-		// 	this.raceChartKeysLength = this.raceChartKeysList.length - 1;
-		// 	this.raceChartKeysList.forEach((raceBarKey) => {
-		// 		this.categoriesName.forEach((category) => {
-		// 			const isHasCategoryOnDate = data.find((d) => d.raceChartKey === raceBarKey && d.category === category);
-		// 			if (!isHasCategoryOnDate) {
-		// 				data.push({
-		// 					uid: "",
-		// 					category: <string>category,
-		// 					raceChartKey: raceBarKey,
-		// 					raceChartDataLabel: "",
-		// 					value1: 0,
-		// 					value2: 0,
-		// 					imageDataUrl1: null,
-		// 					imageDataUrl2: null,
-		// 					subCategories: [],
-		// 					selected: false,
-		// 					identity: null,
-		// 					isHighlight: false,
-		// 					positions: { dataLabel1X: 0, dataLabel1Y: 0, dataLabel2X: 0, dataLabel2Y: 0 },
-		// 					errorBar1: undefined,
-		// 					errorBar2: undefined,
-		// 					extraLabel1: "",
-		// 					extraLabel2: "",
-		// 					data1Label: "",
-		// 					data2Label: "",
-		// 					allMeasures: undefined
-		// 				});
-		// 			}
-		// 		});
-		// 	});
-		// }
 
 		if (!this.isLollipopTypePie) {
 			this.clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values.forEach((category: string, i) => {
@@ -5098,6 +5026,10 @@ export class Visual extends Shadow {
 			});
 		}
 
+		this.setChartDataExtended2(data);
+	}
+
+	setChartDataExtended2(data: ILollipopChartRow[]): void {
 		data.forEach(d => {
 			d.category = d.category.toString();
 			d.subCategories.forEach(s => {
@@ -5106,29 +5038,7 @@ export class Visual extends Shadow {
 		})
 
 		this.setSelectionIds(data);
-
-		// if (this.isChartIsRaceChart) {
-		// 	this.raceChartData = cloneDeep(data);
-		// 	// this.raceChartData = this.categoriesName.reduce((acc, category) => {
-		// 	// 	this.raceChartKeysList.forEach((key) => {
-		// 	// 		acc = [...acc, this.raceChartData.find((d) => d.category === category && d.raceChartKey === key)];
-		// 	// 	});
-		// 	// 	return acc;
-		// 	// }, []);
-
-		// 	this.tickIndex = -1;
-		// 	const setDataWithAllPositiveCategory = () => {
-		// 		this.tickIndex++;
-		// 		this.chartData = this.raceChartData.filter((d) => d.raceChartKey === this.raceChartKeysList[this.tickIndex]);
-		// 	};
-
-		// 	setDataWithAllPositiveCategory();
-
-		// 	this.raceChartKeyOnTick = this.raceChartKeysList[this.tickIndex];
-		// 	this.raceChartDataLabelOnTick = this.chartData[0].raceChartDataLabel;
-		// } else {
 		this.chartData = data;
-		// }
 
 		if (this.isXIsContinuousAxis) {
 			if (this.xAxisSettings.isMinimumRangeEnabled && this.xAxisSettings.minimumRange) {
@@ -5197,7 +5107,6 @@ export class Visual extends Shadow {
 
 		// this.chartData = this.elementToMoveOthers(this.chartData, true, "category");
 
-		const isPatternTemplateApplied = this.templateSettings.isTemplatesEnabled && (this.templateSettings.selectedTemplate === EGeneralTemplates.FillPatternTemplate || this.templateSettings.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate);
 		this.categoryPatterns = this.chartData.map(d => ({ name: d.category.replace(/--\d+/g, ''), patternIdentifier: undefined, isImagePattern: undefined, dimensions: undefined }));
 		this.categoryPatterns
 			.forEach((c, i) => {
@@ -5234,6 +5143,11 @@ export class Visual extends Shadow {
 				});
 		}
 
+		this.setChartDataExtended3();
+	}
+
+	setChartDataExtended3(): void {
+		const isPatternTemplateApplied = this.templateSettings.isTemplatesEnabled && (this.templateSettings.selectedTemplate === EGeneralTemplates.FillPatternTemplate || this.templateSettings.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate);
 		if (isPatternTemplateApplied) {
 			this.patternSettings.categoryPatterns.forEach((d, i) => {
 				if (this.categoryPatterns[i]) {
