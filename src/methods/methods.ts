@@ -706,6 +706,25 @@ export const isConditionMatch1 = (category: string, subCategory: string, value1:
 	return { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined };
 };
 
+export const isPercentageMatch = (c: IConditionalFormattingProps, percentage: number): boolean => {
+	switch (c.operator) {
+		case "===":
+			return +percentage.toFixed(0) === +c.percentValue.toFixed(0);
+		case "!==":
+			return +percentage.toFixed(0) !== +c.percentValue.toFixed(0);
+		case "<":
+			return percentage < c.percentValue;
+		case ">":
+			return percentage > c.percentValue;
+		case "<=":
+			return percentage <= c.percentValue;
+		case ">=":
+			return percentage >= c.percentValue;
+		case "<>":
+			return percentage > 0 ? percentage >= c.staticPercentValue && percentage <= c.secondaryStaticPercentValue : percentage <= c.staticPercentValue && percentage >= c.secondaryStaticPercentValue;
+	}
+}
+
 function matchRuleShort(str, rule) {
 	const escapeRegex = (str) => str.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
 	return new RegExp("^" + rule.split("*").map(escapeRegex).join(".*") + "$").test(str);
