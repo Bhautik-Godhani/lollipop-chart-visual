@@ -6037,11 +6037,7 @@ export class Visual extends Shadow {
 
 	setCircleColors(): void {
 		const marker = this.dataColorsSettings;
-
 		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
-		const colorIdxRangeScale = d3.scaleLinear()
-			.domain([0, keys.length - 1])
-			.range(this.isHorizontalChart ? [0, 1] : [1, 0]);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(keys.length / marker.schemeColors.length);
@@ -6065,130 +6061,7 @@ export class Visual extends Shadow {
 		// const measureKeys = this.categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
 		// this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, this.categoricalMeasureFields);
 
-		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
-			if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor && this.markerSettings.marker1Style.showOutlineOnly) {
-				(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach((data, i) => {
-					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
-					this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
-				});
-			} else {
-				switch (marker.fillType) {
-					case ColorPaletteType.Single: {
-						this.categoricalDataPairs.forEach((data, i) => {
-							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = marker.singleColor1;
-							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = marker.singleColor2;
-						});
-						break;
-					}
-					case ColorPaletteType.PowerBi: {
-						this.categoricalDataPairs.forEach((data, i) => {
-							if (this.isHasMultiMeasure) {
-								this.measureNames.forEach((d, j) => {
-									const color = this.colorPalette.getColor(d).value;
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
-								})
-							} else {
-								this.measureNames.forEach((d, j) => {
-									const color = this.colorPalette.getColor(data.category).value;
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
-								})
-							}
-						});
-						break;
-					}
-					case ColorPaletteType.Gradient: {
-						const getMarkerColor = (i: number): string => {
-							const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
-							const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
-							return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
-						}
-
-						if (this.isHasMultiMeasure) {
-							this.categoricalDataPairs.forEach((data, i: number) => {
-								this.measureNames.forEach((d, j) => {
-									const color = getMarkerColor(j);
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${this.measureNamesByTotal.findIndex(t => t.name === d) + 1}Color`] = color;
-								});
-							});
-						} else {
-							this.sortedCategoricalDataPairs.forEach((data, i: number) => {
-								const color = getMarkerColor(i);
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
-							});
-						}
-						break;
-					}
-					case ColorPaletteType.ByCategory: {
-						if (!this.isHasMultiMeasure) {
-							const categoryColors = marker.categoryColors.reduce((obj, cur) => {
-								obj[cur.name] = { markerColor: cur.marker };
-								return obj;
-							}, {});
-							this.categoricalDataPairs.forEach((data, i) => {
-								if (categoryColors[data.category]) {
-									const color = categoryColors[data.category]["markerColor"];
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
-								} else {
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
-									this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
-								}
-							});
-						}
-						break;
-					}
-					case ColorPaletteType.Sequential:
-					case ColorPaletteType.Diverging:
-					case ColorPaletteType.Qualitative: {
-						const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
-						const getMarkerColor = (i: number) => {
-							const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
-							if (marker.isGradient) {
-								return "rgb(" + scaleColors(colorIdxRangeScale((keys.length - 1) - i)).rgb().join() + ")";
-							} else {
-								return markerSeqColorsArray[i];
-							}
-						}
-
-						if (this.isHasMultiMeasure) {
-							this.categoricalDataPairs.forEach((data, i: number) => {
-								this.measureNames.forEach((d, j) => {
-									const color = getMarkerColor(j);
-									if (this.categoryColorPairWithIndex[`${i}-${data.category}`]) {
-										this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
-									}
-								});
-							});
-						} else {
-							this.categoricalDataPairs.forEach((data, i: number) => {
-								const color = getMarkerColor(i);
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
-							});
-						}
-						break;
-					}
-					case ColorPaletteType.PositiveNegative:
-						this.categoricalDataPairs.forEach((data, i) => {
-							if (data.measure1 >= 0) {
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.positiveColor;
-							} else {
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.negativeColor;
-							}
-
-							if (data.measure2 >= 0) {
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.positiveColor;
-							} else {
-								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.negativeColor;
-							}
-						});
-						break;
-				}
-			}
-		}
-
-		setMarkerColor(marker, markerSeqColorsArray);
+		this.setCircleMarkerColor(marker, keys, markerSeqColorsArray);
 
 		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs;
 
@@ -6214,6 +6087,140 @@ export class Visual extends Shadow {
 			}
 		}
 	}
+
+	setCircleMarkerColor(marker: IDataColorsSettings, keys: string[], markerSeqColorsArray: any[]): void {
+		const colorIdxRangeScale = d3.scaleLinear()
+			.domain([0, keys.length - 1])
+			.range(this.isHorizontalChart ? [0, 1] : [1, 0]);
+
+		if (this.markerSettings.marker1Style.isShowMarkerOutline && !this.markerSettings.marker1Style.sameOutlineAsMarkerColor && this.markerSettings.marker1Style.showOutlineOnly) {
+			(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach((data, i) => {
+				this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
+				this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
+			});
+		} else {
+			switch (marker.fillType) {
+				case ColorPaletteType.Single: {
+					this.categoricalDataPairs.forEach((data, i) => {
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = marker.singleColor1;
+						this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = marker.singleColor2;
+					});
+					break;
+				}
+				case ColorPaletteType.PowerBi: {
+					this.setCircleMarkerPowerBiColor();
+					break;
+				}
+				case ColorPaletteType.Gradient: {
+					this.setCircleMarkerGradientColor(marker, colorIdxRangeScale);
+					break;
+				}
+				case ColorPaletteType.ByCategory: {
+					if (!this.isHasMultiMeasure) {
+						const categoryColors = marker.categoryColors.reduce((obj, cur) => {
+							obj[cur.name] = { markerColor: cur.marker };
+							return obj;
+						}, {});
+						this.categoricalDataPairs.forEach((data, i) => {
+							if (categoryColors[data.category]) {
+								const color = categoryColors[data.category]["markerColor"];
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
+							} else {
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
+								this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
+							}
+						});
+					}
+					break;
+				}
+				case ColorPaletteType.Sequential:
+				case ColorPaletteType.Diverging:
+				case ColorPaletteType.Qualitative: {
+					const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
+					const getMarkerColor = (i: number) => {
+						const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
+						if (marker.isGradient) {
+							return "rgb(" + scaleColors(colorIdxRangeScale((keys.length - 1) - i)).rgb().join() + ")";
+						} else { return markerSeqColorsArray[i]; }
+					}
+
+					if (this.isHasMultiMeasure) {
+						this.categoricalDataPairs.forEach((data, i: number) => {
+							this.measureNames.forEach((d, j) => {
+								const color = getMarkerColor(j);
+								if (this.categoryColorPairWithIndex[`${i}-${data.category}`]) {
+									this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
+								}
+							});
+						});
+					} else {
+						this.categoricalDataPairs.forEach((data, i: number) => {
+							const color = getMarkerColor(i);
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
+						});
+					}
+					break;
+				}
+				case ColorPaletteType.PositiveNegative:
+					this.categoricalDataPairs.forEach((data, i) => {
+						if (data.measure1 >= 0) {
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.positiveColor;
+						} else {
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.negativeColor;
+						}
+
+						if (data.measure2 >= 0) {
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.positiveColor;
+						} else {
+							this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.negativeColor;
+						}
+					});
+					break;
+			}
+		}
+	}
+
+	setCircleMarkerPowerBiColor() {
+		this.categoricalDataPairs.forEach((data, i) => {
+			if (this.isHasMultiMeasure) {
+				this.measureNames.forEach((d, j) => {
+					const color = this.colorPalette.getColor(d).value;
+					this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
+				})
+			} else {
+				this.measureNames.forEach((d, j) => {
+					const color = this.colorPalette.getColor(data.category).value;
+					this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${j + 1}Color`] = color;
+				})
+			}
+		});
+	}
+
+	setCircleMarkerGradientColor(marker: IDataColorsSettings, colorIdxRangeScale: (i: number) => number) {
+		const getMarkerColor = (i: number): string => {
+			const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
+			const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
+			return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
+		}
+
+		if (this.isHasMultiMeasure) {
+			this.categoricalDataPairs.forEach((data, i: number) => {
+				this.measureNames.forEach((d, j) => {
+					const color = getMarkerColor(j);
+					this.categoryColorPairWithIndex[`${i}-${data.category}`][`marker${this.measureNamesByTotal.findIndex(t => t.name === d) + 1}Color`] = color;
+				});
+			});
+		} else {
+			this.sortedCategoricalDataPairs.forEach((data, i: number) => {
+				const color = getMarkerColor(i);
+				this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker1] = color;
+				this.categoryColorPairWithIndex[`${i}-${data.category}`][EMarkerColorTypes.Marker2] = color;
+			});
+		}
+	}
+
 
 	setPieColors(): void {
 
