@@ -5322,107 +5322,210 @@ export class Visual extends Shadow {
 		}
 	}
 
-	public drawLegend() {
+	setLegendDataForCircle(): any {
+		let legendDataPoints: { data: { name: string, color: string, pattern: IPatternProps, imageUrl: string } }[] = [];
+
+		switch (this.dataColorsSettings.fillType) {
+			// case ColorPaletteType.Single:
+			// if (!this.isHasMultiMeasure) {
+			// 	legendDataPoints = [{
+			// 		data: {
+			// 			name: this.measure1DisplayName,
+			// 			color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+			// 			pattern: undefined,
+			// 			imageUrl: undefined
+			// 		}
+			// 	}]
+			// } else {
+			// 	legendDataPoints = [
+			// 		{
+			// 			data: {
+			// 				name: this.measure1DisplayName,
+			// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+			// 				pattern: this.patternByMeasures[DataValuesType.Value1],
+			// 				imageUrl: undefined
+			// 			},
+			// 		},
+			// 		{
+			// 			data: {
+			// 				name: this.measure2DisplayName,
+			// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
+			// 				pattern: this.patternByMeasures[DataValuesType.Value2],
+			// 				imageUrl: undefined
+			// 			},
+			// 		}
+			// 	]
+			// }
+			// break;
+			case ColorPaletteType.Single:
+			case ColorPaletteType.PowerBi:
+			case ColorPaletteType.Diverging:
+			case ColorPaletteType.Qualitative:
+			case ColorPaletteType.Sequential:
+			case ColorPaletteType.ByCategory:
+			case ColorPaletteType.Gradient:
+				if (this.isHasMultiMeasure) {
+					legendDataPoints = this.measureNames.map((d, i) => ({
+						data: {
+							name: d,
+							color: this.getColor(this.categoryColorPair[this.chartData[0].category][`marker${i + 1}Color`], EHighContrastColorType.Foreground),
+							pattern: this.patternByMeasures[`value${i + 1}`],
+							imageUrl: undefined
+						}
+					}))
+				} else {
+					const chartData = cloneDeep(this.chartData);
+					legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
+						data: {
+							name: valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(this.isXIsDateTimeAxis ? new Date(d.category.replace(/--\d+/g, '')) : d.category.replace(/--\d+/g, '')).replace(new RegExp("-1234567890123", 'g'), ''),
+							color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
+							pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category),
+							imageUrl: undefined
+						}
+					}));
+				}
+				break;
+			case ColorPaletteType.PositiveNegative:
+				legendDataPoints = [
+					{
+						data: {
+							name: "Positive",
+							color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
+							pattern: undefined,
+							imageUrl: undefined
+						},
+					},
+				]
+
+				if (this.isHasGlobalMinValue) {
+					legendDataPoints.push({
+						data: {
+							name: "Negative",
+							color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
+							pattern: undefined,
+							imageUrl: undefined
+						},
+					})
+				}
+
+				if (this.categoriesName.includes(this.othersBarText)) {
+					legendDataPoints.push(
+						{
+							data: {
+								name: this.othersBarText.replace(new RegExp("-1234567890123", 'g'), ''),
+								color: this.categoryColorPair[this.othersBarText].marker1Color,
+								pattern: undefined,
+								imageUrl: undefined
+							},
+						})
+				}
+				break;
+		}
+
+		return legendDataPoints;
+	}
+
+	setLegendDataForPie(): any {
+		let legendDataPoints: { data: { name: string, color: string, pattern: IPatternProps, imageUrl: string } }[] = [];
+
+		switch (this.dataColorsSettings.fillType) {
+			// case ColorPaletteType.Single:
+			// 	if (!this.isHasMultiMeasure) {
+			// 		legendDataPoints = [{
+			// 			data: {
+			// 				name: this.measure1DisplayName,
+			// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+			// 				pattern: this.chartData[0].subCategories[0].pattern,
+			// 				imageUrl: undefined
+			// 			}
+			// 		}]
+			// 	} else {
+			// 		legendDataPoints = [
+			// 			{
+			// 				data: {
+			// 					name: this.measure1DisplayName,
+			// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
+			// 					pattern: this.patternByMeasures[DataValuesType.Value1],
+			// 					imageUrl: undefined
+			// 				},
+			// 			},
+			// 			{
+			// 				data: {
+			// 					name: this.measure2DisplayName,
+			// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
+			// 					pattern: this.patternByMeasures[DataValuesType.Value2],
+			// 					imageUrl: undefined
+			// 				},
+			// 			}
+			// 		]
+			// 	}
+			// 	break;
+			case ColorPaletteType.Single:
+			case ColorPaletteType.PowerBi:
+			case ColorPaletteType.Diverging:
+			case ColorPaletteType.Qualitative:
+			case ColorPaletteType.Sequential:
+			case ColorPaletteType.ByCategory:
+			case ColorPaletteType.BySubCategory:
+			case ColorPaletteType.Gradient:
+				// only this needs to be change for pattern
+				legendDataPoints = this.subCategoriesName.map((d) => ({
+					data: {
+						name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d).replace(new RegExp("-1234567890123", 'g'), ''),
+						color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
+						pattern: this.subCategoryPatterns.find(s => s.name === d),
+						imageUrl: undefined
+					}
+				}))
+				break;
+			case ColorPaletteType.PositiveNegative:
+				legendDataPoints = [
+					{
+						data: {
+							name: "Positive",
+							color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
+							pattern: undefined,
+							imageUrl: undefined
+						},
+					},
+				]
+
+				if (this.isHasGlobalMinValue) {
+					legendDataPoints.push(
+						{
+							data: {
+								name: "Negative",
+								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
+								pattern: undefined,
+								imageUrl: undefined
+							},
+						})
+				}
+
+				if (this.subCategoriesName.includes(this.othersSubcategoryText)) {
+					legendDataPoints.push(
+						{
+							data: {
+								name: this.othersSubcategoryText.replace(new RegExp("-1234567890123", 'g'), ''),
+								color: this.subCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
+								pattern: undefined,
+								imageUrl: undefined
+							},
+						})
+				}
+
+				break;
+		}
+
+		return legendDataPoints;
+	}
+
+	public drawLegend(): void {
 		let legendDataPoints: { data: { name: string, color: string, pattern: IPatternProps, imageUrl: string } }[] = [];
 
 		if (this.isLollipopTypeCircle) {
 			if (!this.isShowImageMarker1) {
-				switch (this.dataColorsSettings.fillType) {
-					// case ColorPaletteType.Single:
-					// if (!this.isHasMultiMeasure) {
-					// 	legendDataPoints = [{
-					// 		data: {
-					// 			name: this.measure1DisplayName,
-					// 			color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-					// 			pattern: undefined,
-					// 			imageUrl: undefined
-					// 		}
-					// 	}]
-					// } else {
-					// 	legendDataPoints = [
-					// 		{
-					// 			data: {
-					// 				name: this.measure1DisplayName,
-					// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-					// 				pattern: this.patternByMeasures[DataValuesType.Value1],
-					// 				imageUrl: undefined
-					// 			},
-					// 		},
-					// 		{
-					// 			data: {
-					// 				name: this.measure2DisplayName,
-					// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-					// 				pattern: this.patternByMeasures[DataValuesType.Value2],
-					// 				imageUrl: undefined
-					// 			},
-					// 		}
-					// 	]
-					// }
-					// break;
-					case ColorPaletteType.Single:
-					case ColorPaletteType.PowerBi:
-					case ColorPaletteType.Diverging:
-					case ColorPaletteType.Qualitative:
-					case ColorPaletteType.Sequential:
-					case ColorPaletteType.ByCategory:
-					case ColorPaletteType.Gradient:
-						if (this.isHasMultiMeasure) {
-							legendDataPoints = this.measureNames.map((d, i) => ({
-								data: {
-									name: d,
-									color: this.getColor(this.categoryColorPair[this.chartData[0].category][`marker${i + 1}Color`], EHighContrastColorType.Foreground),
-									pattern: this.patternByMeasures[`value${i + 1}`],
-									imageUrl: undefined
-								}
-							}))
-						} else {
-							const chartData = cloneDeep(this.chartData);
-							legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
-								data: {
-									name: valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(this.isXIsDateTimeAxis ? new Date(d.category.replace(/--\d+/g, '')) : d.category.replace(/--\d+/g, '')).replace(new RegExp("-1234567890123", 'g'), ''),
-									color: this.getColor(this.categoryColorPair[d.category].marker1Color, EHighContrastColorType.Foreground),
-									pattern: this.patternSettings.categoryPatterns.find((p) => p.name === d.category),
-									imageUrl: undefined
-								}
-							}));
-						}
-						break;
-					case ColorPaletteType.PositiveNegative:
-						legendDataPoints = [
-							{
-								data: {
-									name: "Positive",
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
-									pattern: undefined,
-									imageUrl: undefined
-								},
-							},
-						]
-
-						if (this.isHasGlobalMinValue) {
-							legendDataPoints.push({
-								data: {
-									name: "Negative",
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
-									pattern: undefined,
-									imageUrl: undefined
-								},
-							})
-						}
-
-						if (this.categoriesName.includes(this.othersBarText)) {
-							legendDataPoints.push(
-								{
-									data: {
-										name: this.othersBarText.replace(new RegExp("-1234567890123", 'g'), ''),
-										color: this.categoryColorPair[this.othersBarText].marker1Color,
-										pattern: undefined,
-										imageUrl: undefined
-									},
-								})
-						}
-						break;
-				}
+				legendDataPoints = this.setLegendDataForCircle();
 			} else {
 				const chartData: ILollipopChartRow[] = cloneDeep(this.chartData);
 				legendDataPoints = (this.isHorizontalChart ? chartData.reverse() : chartData).map(d => ({
@@ -5437,94 +5540,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isHasSubcategories && this.isLollipopTypePie) {
-			switch (this.dataColorsSettings.fillType) {
-				// case ColorPaletteType.Single:
-				// 	if (!this.isHasMultiMeasure) {
-				// 		legendDataPoints = [{
-				// 			data: {
-				// 				name: this.measure1DisplayName,
-				// 				color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-				// 				pattern: this.chartData[0].subCategories[0].pattern,
-				// 				imageUrl: undefined
-				// 			}
-				// 		}]
-				// 	} else {
-				// 		legendDataPoints = [
-				// 			{
-				// 				data: {
-				// 					name: this.measure1DisplayName,
-				// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor1, EHighContrastColorType.Foreground),
-				// 					pattern: this.patternByMeasures[DataValuesType.Value1],
-				// 					imageUrl: undefined
-				// 				},
-				// 			},
-				// 			{
-				// 				data: {
-				// 					name: this.measure2DisplayName,
-				// 					color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : this.dataColorsSettings.singleColor2, EHighContrastColorType.Foreground),
-				// 					pattern: this.patternByMeasures[DataValuesType.Value2],
-				// 					imageUrl: undefined
-				// 				},
-				// 			}
-				// 		]
-				// 	}
-				// 	break;
-				case ColorPaletteType.Single:
-				case ColorPaletteType.PowerBi:
-				case ColorPaletteType.Diverging:
-				case ColorPaletteType.Qualitative:
-				case ColorPaletteType.Sequential:
-				case ColorPaletteType.ByCategory:
-				case ColorPaletteType.BySubCategory:
-				case ColorPaletteType.Gradient:
-					// only this needs to be change for pattern
-					legendDataPoints = this.subCategoriesName.map((d) => ({
-						data: {
-							name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d).replace(new RegExp("-1234567890123", 'g'), ''),
-							color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
-							pattern: this.subCategoryPatterns.find(s => s.name === d),
-							imageUrl: undefined
-						}
-					}))
-					break;
-				case ColorPaletteType.PositiveNegative:
-					legendDataPoints = [
-						{
-							data: {
-								name: "Positive",
-								color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : POSITIVE_COLOR, EHighContrastColorType.Foreground),
-								pattern: undefined,
-								imageUrl: undefined
-							},
-						},
-					]
-
-					if (this.isHasGlobalMinValue) {
-						legendDataPoints.push(
-							{
-								data: {
-									name: "Negative",
-									color: this.getColor(this.isShowMarker1OutlineColor ? this.markerSettings.marker1Style.outlineColor : NEGATIVE_COLOR, EHighContrastColorType.Foreground),
-									pattern: undefined,
-									imageUrl: undefined
-								},
-							})
-					}
-
-					if (this.subCategoriesName.includes(this.othersSubcategoryText)) {
-						legendDataPoints.push(
-							{
-								data: {
-									name: this.othersSubcategoryText.replace(new RegExp("-1234567890123", 'g'), ''),
-									color: this.subCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
-									pattern: undefined,
-									imageUrl: undefined
-								},
-							})
-					}
-
-					break;
-			}
+			legendDataPoints = this.setLegendDataForPie();
 		}
 
 		if (this.legendSettings.show) {
