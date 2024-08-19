@@ -9398,6 +9398,12 @@ export class Visual extends Shadow {
 		// 	this.setYScaleGWidth();
 		// }
 
+		this.drawXYAxisExtended1(categoricalData, chartData, isSetXYScaleDiffs, isSetXYScaleSpace, isShowXAxis, isShowYAxis);
+
+		return { xAxisG: this.xAxisG, yAxisG: this.yAxisG };
+	}
+
+	drawXYAxisExtended1(categoricalData: powerbi.DataViewCategorical, chartData: ILollipopChartRow[], isSetXYScaleDiffs: boolean, isSetXYScaleSpace: boolean, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		this.setMargins();
 
 		if (isShowYAxis && this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
@@ -9426,6 +9432,10 @@ export class Visual extends Shadow {
 		this.pieXScaleDiffs = [];
 		this.pieYScaleDiffs = [];
 
+		this.drawXYAxisExtended2(categoricalData, chartData, isSetXYScaleDiffs, isSetXYScaleSpace, isShowXAxis, isShowYAxis);
+	}
+
+	drawXYAxisExtended2(categoricalData: powerbi.DataViewCategorical, chartData: ILollipopChartRow[], isSetXYScaleDiffs: boolean, isSetXYScaleSpace: boolean, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		if (isSetXYScaleDiffs) {
 			chartData.forEach(d => {
 				let flag: boolean = true;
@@ -9529,6 +9539,10 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.drawXYAxisExtended3(categoricalData, isSetXYScaleSpace, isShowXAxis, isShowYAxis);
+	}
+
+	drawXYAxisExtended3(categoricalData: powerbi.DataViewCategorical, isSetXYScaleSpace: boolean, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		this.setXYAxisRange(this.width, this.height);
 
 		if (isNaN(this.width) || isNaN(this.height)) {
@@ -9634,6 +9648,10 @@ export class Visual extends Shadow {
 			this.setYAxisTickStyle();
 		}
 
+		this.drawXYAxisExtended4(isSetXYScaleSpace, isShowXAxis, isShowYAxis);
+	}
+
+	drawXYAxisExtended4(isSetXYScaleSpace: boolean, isShowXAxis: boolean, isShowYAxis: boolean): void {
 		if (isSetXYScaleSpace) {
 			if (this.xAxisSettings.isDisplayLabel && isShowXAxis) {
 				if (!this.isCutAndClipAxisEnabled || (this.isCutAndClipAxisEnabled && !this.isHorizontalChart)) {
@@ -9710,29 +9728,6 @@ export class Visual extends Shadow {
 
 		this.yScaleMinRange = d3.min(this.yScaleRange);
 		this.yScaleMaxRange = d3.max(this.yScaleRange);
-
-		return { xAxisG: this.xAxisG, yAxisG: this.yAxisG };
-
-		// if (i === 0) {
-		// 	xAxisMaxHeight = d3.min([xAxisMaxHeight, THIS.scaleBandWidth / 2 + THIS.yScaleGWidth]);
-		// }
-
-		// if (this.chartSettings.lollipopCategoryWidthType === lollipopCategoryWidthType.Custom) {
-		// 	if (this.width > this.xScaleWidth && this.height > this.yScaleHeight) {
-		// 		if (this.isHorizontalChart) {
-		// 			this.setXYAxisRange(this.width, this.yScaleHeight);
-		// 			this.setScaleBandwidth();
-		// 		} else {
-		// 			this.setXYAxisRange(this.xScaleWidth, this.height);
-		// 			this.setScaleBandwidth();
-		// 		}
-		// 	}
-		// }
-
-		// this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-		// this.callXYScaleOnAxisGroup();
-		// this.setXAxisTickStyle();
-		// this.setYAxisTickStyle();
 	}
 
 	// Lines
