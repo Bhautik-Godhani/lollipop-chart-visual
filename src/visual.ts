@@ -6221,16 +6221,8 @@ export class Visual extends Shadow {
 		}
 	}
 
-
 	setPieColors(): void {
-
-
 		const marker = this.dataColorsSettings;
-
-		const keys = this.subCategoriesName.map(d => d);
-		const colorIdxRangeScale = d3.scaleLinear()
-			.domain([0, keys.length - 1])
-			.range([1, 0]);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(this.subCategoriesName.length / marker.schemeColors.length);
@@ -6249,104 +6241,8 @@ export class Visual extends Shadow {
 		}
 
 		const markerSeqColorsArray = getMarkerSeqColorsArray(this.dataColorsSettings);
-		const setMarkerColor = (marker: IDataColorsSettings, markerSeqColorsArray: any[]) => {
-			//.CIRCLE 1 Colors
-			if (this.isShowMarker1OutlineColor) {
-				this.categoricalDataPairs.forEach(d => {
-					this.subCategoriesName.forEach((data, i) => {
-						this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
-						this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
-					});
-				});
-			} else {
-				(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach(d => {
-					switch (marker.fillType) {
-						case ColorPaletteType.Single: {
-							this.subCategoriesName.forEach((data, i) => {
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = marker.singleColor1;
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = marker.singleColor2;
-							});
-							break;
-						}
-						case ColorPaletteType.PowerBi: {
-							this.subCategoriesName.forEach((data, i) => {
-								const color = this.colorPalette.getColor(data).value;
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = color;
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = color;
-							});
-							break;
-						}
-						case ColorPaletteType.Gradient: {
-							const getMarkerColor = (i: number): string => {
-								const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
-								const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
-								return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
-							}
 
-							this.subCategoriesName.forEach((data, i) => {
-								const index = this.groupNamesByTotal.findIndex(t => t.name === data);
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = getMarkerColor(index);
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = getMarkerColor(index);
-							});
-							break;
-						}
-						case ColorPaletteType.PositiveNegative: {
-							break;
-						}
-						case ColorPaletteType.ByCategory: {
-							const categoryColors = marker.categoryColors.reduce((obj, cur) => {
-								obj[cur.name] = { markerColor: cur.marker };
-								return obj;
-							}, {});
-							this.subCategoriesName.forEach((data, i) => {
-								if (categoryColors[data]) {
-									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = categoryColors[data][EMarkerColorTypes.Marker1];
-								}
-							});
-							break;
-						}
-						case ColorPaletteType.BySubCategory: {
-							const subCategoryColors = marker.subCategoryColors.reduce((obj, cur) => {
-								obj[cur.name] = { markerColor: cur.marker };
-								return obj;
-							}, {});
-							this.categoricalDataPairs.forEach(d => {
-								this.subCategoriesName.forEach((s, i) => {
-									if (subCategoryColors[s]) {
-										const color = subCategoryColors[s]["markerColor"];
-										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = color;
-										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = color;
-									} else {
-										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
-										this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
-									}
-								});
-							})
-							break;
-						}
-						case ColorPaletteType.Sequential:
-						case ColorPaletteType.Diverging:
-						case ColorPaletteType.Qualitative: {
-							const getMarkerColor = (i: number) => {
-								const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
-								if (marker.isGradient) {
-									return "rgb(" + scaleColors(colorIdxRangeScale((this.subCategoriesName.length - 1) - i)).rgb().join() + ")";
-								} else {
-									return markerSeqColorsArray[i];
-								}
-							}
-
-							this.subCategoriesName.forEach((data, i: number) => {
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = getMarkerColor(i);
-								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = getMarkerColor(i);
-							});
-						}
-					}
-				});
-			}
-		}
-
-		setMarkerColor(marker, markerSeqColorsArray);
+		this.setPieMarkerColor(marker, markerSeqColorsArray);
 
 		this.categoricalDataPairs.forEach(d => {
 			this.subCategoriesName.forEach((c, i) => {
@@ -6376,6 +6272,108 @@ export class Visual extends Shadow {
 					}
 				});
 			}
+		}
+	}
+
+	setPieMarkerColor(marker: IDataColorsSettings, markerSeqColorsArray: any[]): void {
+		const keys = this.subCategoriesName.map(d => d);
+		const colorIdxRangeScale = d3.scaleLinear()
+			.domain([0, keys.length - 1])
+			.range([1, 0]);
+
+		//.CIRCLE 1 Colors
+		if (this.isShowMarker1OutlineColor) {
+			this.categoricalDataPairs.forEach(d => {
+				this.subCategoriesName.forEach((data, i) => {
+					this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = this.markerSettings.marker1Style.outlineColor;
+					this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = this.markerSettings.marker1Style.outlineColor;
+				});
+			});
+		} else {
+			(marker.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs).forEach(d => {
+				switch (marker.fillType) {
+					case ColorPaletteType.Single: {
+						this.subCategoriesName.forEach((data, i) => {
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = marker.singleColor1;
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = marker.singleColor2;
+						});
+						break;
+					}
+					case ColorPaletteType.PowerBi: {
+						this.subCategoriesName.forEach((data, i) => {
+							const color = this.colorPalette.getColor(data).value;
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = color;
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = color;
+						});
+						break;
+					}
+					case ColorPaletteType.Gradient: {
+						const getMarkerColor = (i: number): string => {
+							const { fillMin, fillMid, fillMax, isAddMidColor } = marker;
+							const scaleColors = chroma.scale(isAddMidColor ? [fillMin, fillMid, fillMax] : [fillMin, fillMax]);
+							return "rgb(" + scaleColors(colorIdxRangeScale(i)).rgb().join() + ")";
+						}
+
+						this.subCategoriesName.forEach((data, i) => {
+							const index = this.groupNamesByTotal.findIndex(t => t.name === data);
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = getMarkerColor(index);
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = getMarkerColor(index);
+						});
+						break;
+					}
+					case ColorPaletteType.PositiveNegative: {
+						break;
+					}
+					case ColorPaletteType.ByCategory: {
+						const categoryColors = marker.categoryColors.reduce((obj, cur) => {
+							obj[cur.name] = { markerColor: cur.marker };
+							return obj;
+						}, {});
+						this.subCategoriesName.forEach((data, i) => {
+							if (categoryColors[data]) {
+								this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = categoryColors[data][EMarkerColorTypes.Marker1];
+							}
+						});
+						break;
+					}
+					case ColorPaletteType.BySubCategory: {
+						const subCategoryColors = marker.subCategoryColors.reduce((obj, cur) => {
+							obj[cur.name] = { markerColor: cur.marker };
+							return obj;
+						}, {});
+						this.categoricalDataPairs.forEach(d => {
+							this.subCategoriesName.forEach((s, i) => {
+								if (subCategoryColors[s]) {
+									const color = subCategoryColors[s]["markerColor"];
+									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = color;
+									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = color;
+								} else {
+									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker1] = this.dataColorsSettings.singleColor1;
+									this.subCategoryColorPairWithIndex[`${i}-${d.category}-${s}`][EMarkerColorTypes.Marker2] = this.dataColorsSettings.singleColor1;
+								}
+							});
+						})
+						break;
+					}
+					case ColorPaletteType.Sequential:
+					case ColorPaletteType.Diverging:
+					case ColorPaletteType.Qualitative: {
+						const getMarkerColor = (i: number) => {
+							const scaleColors = chroma.scale(cloneDeep(marker.schemeColors).reverse());
+							if (marker.isGradient) {
+								return "rgb(" + scaleColors(colorIdxRangeScale((this.subCategoriesName.length - 1) - i)).rgb().join() + ")";
+							} else {
+								return markerSeqColorsArray[i];
+							}
+						}
+
+						this.subCategoriesName.forEach((data, i: number) => {
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker1] = getMarkerColor(i);
+							this.subCategoryColorPairWithIndex[`${i}-${d.category}-${data}`][EMarkerColorTypes.Marker2] = getMarkerColor(i);
+						});
+					}
+				}
+			});
 		}
 	}
 
