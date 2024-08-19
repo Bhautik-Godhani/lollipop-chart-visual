@@ -7741,7 +7741,6 @@ export class Visual extends Shadow {
 	}
 
 	drawData1Labels(data: ILollipopChartRow[]): void {
-		const THIS = this;
 		const dataLabelsSettings = this.data1LabelsSettings;
 
 		const labelsData = data.filter((data) => {
@@ -7790,6 +7789,12 @@ export class Visual extends Shadow {
 		);
 
 		// this.dataLabels1G.selectAll(".dataLabelG").select("text").raise();
+		this.drawData1LabelsExtended();
+	}
+
+	drawData1LabelsExtended() {
+		const THIS = this;
+		const dataLabelsSettings = this.data1LabelsSettings;
 
 		this.dataLabels1G.selectAll(".dataLabelG")
 			.each(function () {
@@ -7809,14 +7814,10 @@ export class Visual extends Shadow {
 						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
 							if (THIS.isHorizontalChart) {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									// const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel1X <= getBBox.width : d.positions.dataLabel1X + getBBox.width > THIS.width;
 									if (isHideInsideLabel) {
-										// if (!isHideOutSideLabel) {
 										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
 										THIS.transformData1LabelOutside(ele, false);
-										// } else {
-										// 	return 0;
-										// }
+
 									} else {
 										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside, true);
 										THIS.transformDataLabelInside(ele, false, false);
@@ -7825,21 +7826,13 @@ export class Visual extends Shadow {
 								} else {
 									if (THIS.isLeftYAxis) {
 										if (d.positions.dataLabel1X <= getBBox.width) {
-											// if (isHideInsideLabel) {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
 											THIS.transformData1LabelOutside(ele, false);
-											// } else {
-											// 	return 0;
-											// }
 										}
 									} else {
 										if (d.positions.dataLabel1X + getBBox.width > THIS.width) {
-											// if (isHideInsideLabel) {
-											// 	return 0;
-											// } else {
 											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
 											THIS.transformData1LabelOutside(ele, false);
-											// }
 										}
 									}
 								}
@@ -7906,7 +7899,6 @@ export class Visual extends Shadow {
 	}
 
 	drawData2Labels(data: ILollipopChartRow[]): void {
-		const THIS = this;
 		const dataLabelsSettings = this.data2LabelsSettings;
 		// const clonedXScale = this.isHorizontalChart ? this.yScale.copy() : this.xScale.copy();
 		// this.scaleBandWidth = clonedXScale.padding(0).bandwidth();
@@ -7957,6 +7949,12 @@ export class Visual extends Shadow {
 		);
 
 		// this.dataLabels2G.selectAll(".dataLabelG").select("text").raise();
+		this.drawData2LabelsExtended();
+	}
+
+	drawData2LabelsExtended(): void {
+		const THIS = this;
+		const dataLabelsSettings = this.data2LabelsSettings;
 
 		this.dataLabels2G
 			.selectAll(".dataLabelG")
@@ -8047,20 +8045,6 @@ export class Visual extends Shadow {
 						} else {
 							if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 								return isHideInsideLabel ? 0 : 1;
-							} else if (dataLabelsSettings.placement === DataLabelsPlacement.Outside) {
-								// if (THIS.isHorizontalChart) {
-								// 	if (THIS.isLeftYAxis) {
-								// 		return d.positions.dataLabel2X < 1 ? 0 : 1;
-								// 	} else {
-								// 		return 1;
-								// 	}
-								// } else {
-								// 	if (THIS.isBottomXAxis) {
-								// 		return d.positions.dataLabel2Y + getBBox.height > THIS.height ? 0 : 1;
-								// 	} else {
-								// 		return d.positions.dataLabel2Y < 1 ? 0 : 1;
-								// 	}
-								// }
 							}
 						}
 
@@ -8070,38 +8054,6 @@ export class Visual extends Shadow {
 	}
 
 	drawTooltip(): void {
-		this.tooltipServiceWrapper.addTooltip(
-			d3.select(this.chartContainer).selectAll(".lollipop-circle"),
-			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
-			(datapoint: any) => datapoint.identity
-		);
-
-		this.tooltipServiceWrapper.addTooltip(
-			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
-			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
-			(datapoint: any) => datapoint.identity
-		);
-
-		this.tooltipServiceWrapper.addTooltip(
-			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
-			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
-			(datapoint: any) => datapoint.identity
-		);
-
-		this.tooltipServiceWrapper.addTooltip(
-			d3.select(this.chartContainer).selectAll(".errorBar1G"),
-			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
-			(datapoint: any) => datapoint.identity
-		);
-
-		if (this.isRenderBothErrorBars) {
-			this.tooltipServiceWrapper.addTooltip(
-				d3.select(this.chartContainer).selectAll(".errorBar2G"),
-				(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
-				(datapoint: any) => datapoint.identity
-			);
-		}
-
 		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
 			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
 		};
@@ -8175,43 +8127,11 @@ export class Visual extends Shadow {
 				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-					if (this.isHasErrorUpperBounds) {
-						if (this.isRenderBothErrorBars) {
-							tooltipData.push({
-								displayName: "Upper",
-								value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
-								color: "transparent",
-							});
-						} else {
-							if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
-								tooltipData.push({
-									displayName: "Upper",
-									value: errorBar1.tooltipUpperBoundValue,
-									color: "transparent",
-								});
-							}
-						}
-					}
+					this.handleErrorBarsDirectionMinus(tooltipData, errorBar1, errorBar2, isCircle1, isValue2);
 				}
 
 				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-					if (this.isHasErrorLowerBounds) {
-						if (this.isRenderBothErrorBars) {
-							tooltipData.push({
-								displayName: "Lower",
-								value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
-								color: "transparent",
-							});
-						} else {
-							if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
-								tooltipData.push({
-									displayName: "Lower",
-									value: errorBar1.tooltipLowerBoundValue,
-									color: "transparent",
-								});
-							}
-						}
-					}
+					this.handleErrorBarsDirectionPlus(tooltipData, errorBar1, errorBar2, isCircle1, isValue2);
 				}
 			}
 
@@ -8227,6 +8147,82 @@ export class Visual extends Shadow {
 
 			return tooltipData;
 		};
+
+		this.addTooltipToElements(getTooltipData);
+	}
+
+	addTooltipToElements(getTooltipData: (value: ILollipopChartRow, isCircle1: boolean, isMultiMeasure: boolean) => VisualTooltipDataItem[]): void {
+		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(".lollipop-circle"),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+			(datapoint: any) => datapoint.identity
+		);
+
+		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(this.circle1ClassSelector),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+			(datapoint: any) => datapoint.identity
+		);
+
+		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(this.circle2ClassSelector),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
+			(datapoint: any) => datapoint.identity
+		);
+
+		this.tooltipServiceWrapper.addTooltip(
+			d3.select(this.chartContainer).selectAll(".errorBar1G"),
+			(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, true, true) : getTooltipData(datapoint, true, false)),
+			(datapoint: any) => datapoint.identity
+		);
+
+		if (this.isRenderBothErrorBars) {
+			this.tooltipServiceWrapper.addTooltip(
+				d3.select(this.chartContainer).selectAll(".errorBar2G"),
+				(datapoint: any) => (this.isHasMultiMeasure ? getTooltipData(datapoint, false, true) : getTooltipData(datapoint, false, false)),
+				(datapoint: any) => datapoint.identity
+			);
+		}
+	}
+
+	handleErrorBarsDirectionMinus(tooltipData: TooltipData[], errorBar1: IErrorBarValue, errorBar2: IErrorBarValue, isCircle1: boolean, isValue2: boolean): void {
+		if (this.isHasErrorUpperBounds) {
+			if (this.isRenderBothErrorBars) {
+				tooltipData.push({
+					displayName: "Upper",
+					value: isCircle1 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
+					color: "transparent",
+				});
+			} else {
+				if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
+					tooltipData.push({
+						displayName: "Upper",
+						value: errorBar1.tooltipUpperBoundValue,
+						color: "transparent",
+					});
+				}
+			}
+		}
+	}
+
+	handleErrorBarsDirectionPlus(tooltipData: TooltipData[], errorBar1: IErrorBarValue, errorBar2: IErrorBarValue, isCircle1: boolean, isValue2: boolean): void {
+		if (this.isHasErrorLowerBounds) {
+			if (this.isRenderBothErrorBars) {
+				tooltipData.push({
+					displayName: "Lower",
+					value: isCircle1 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
+					color: "transparent",
+				});
+			} else {
+				if ((isValue2 && !isCircle1) || (!isValue2 && isCircle1)) {
+					tooltipData.push({
+						displayName: "Lower",
+						value: errorBar1.tooltipLowerBoundValue,
+						color: "transparent",
+					});
+				}
+			}
+		}
 	}
 
 	// XY Axis Title
