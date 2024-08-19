@@ -8409,12 +8409,6 @@ export class Visual extends Shadow {
 			xAxisMaxWordHeight = d3.max(xAxisTicks, (d) => d.length);
 		}
 
-		const ticks = [];
-
-		const posTiltDx = d3.scaleLinear().domain([30, 90]).range([0.35, -0.5]);
-		const negTiltDx = d3.scaleLinear().domain([-30, -90]).range([0.35, -0.5]);
-		const getY9 = (val) => d3.scaleLinear().domain(val > 0 ? [0, 90] : [0, -90]).range([0, 9])(val);
-
 		let rotateDegree = 0;
 		if (THIS.isBottomXAxis) {
 			if (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
@@ -8441,6 +8435,15 @@ export class Visual extends Shadow {
 		if (!this.isSmallMultiplesEnabled && ((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
 			rotateDegree = 0;
 		}
+
+		this.setXYAxisTickStyleExtended1(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
+	}
+
+	setXYAxisTickStyleExtended1(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
+		const xAxisSettings = this.xAxisSettings;
+		const posTiltDx = d3.scaleLinear().domain([30, 90]).range([0.35, -0.5]);
+		const negTiltDx = d3.scaleLinear().domain([-30, -90]).range([0.35, -0.5]);
+		const getY9 = (val) => d3.scaleLinear().domain(val > 0 ? [0, 90] : [0, -90]).range([0, 9])(val);
 
 		this.xAxisG
 			.selectAll("text")
@@ -8476,13 +8479,24 @@ export class Visual extends Shadow {
 					return isApplyTilt && rotateDegree !== 0 ? rotateDegree > 0 ? "end" : "start" : "middle";
 				}
 			})
-			// .attr("transform", () => {
-			// 	if (xAxisSettings.position === Position.Bottom) {
-			// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, 10)rotate(-${this.getXAxisLabelTilt()})`;
-			// 	} else if (xAxisSettings.position === Position.Top) {
-			// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, -10)rotate(${this.getXAxisLabelTilt()})`;
-			// 	}
-			// })
+		// .attr("transform", () => {
+		// 	if (xAxisSettings.position === Position.Bottom) {
+		// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, 10)rotate(-${this.getXAxisLabelTilt()})`;
+		// 	} else if (xAxisSettings.position === Position.Top) {
+		// 		return `translate(${xAxisSettings.labelTilt > maxLabelTilt ? -10 : 0}, -10)rotate(${this.getXAxisLabelTilt()})`;
+		// 	}
+		// })
+
+		this.setXYAxisTickStyleExtended2(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
+	}
+
+	setXYAxisTickStyleExtended2(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
+		const THIS = this;
+		const ticks = [];
+		const xAxisSettings = this.xAxisSettings;
+
+		this.xAxisG
+			.selectAll("text")
 			.each(function () {
 				const ele = d3.select(this);
 				let text = ele.text().toString();
@@ -8491,7 +8505,6 @@ export class Visual extends Shadow {
 
 				const isOthersTick = text.includes(THIS.othersLabel);
 
-				// if (!text.includes(THIS.othersLabel)) {}
 				if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
 					if (ticks.includes(text)) {
 						ele.attr("opacity", "0");
@@ -8500,17 +8513,11 @@ export class Visual extends Shadow {
 
 				ticks.push(text);
 
-				if (text.includes("isZero")) {
-					text = "0";
-				}
+				if (text.includes("isZero")) { text = "0"; }
 
-				if (text.includes("--")) {
-					text = text.split("--")[0];
-				}
+				if (text.includes("--")) { text = text.split("--")[0]; }
 
-				if (text.includes("&&")) {
-					text = text.replace(/&&/g, " ");
-				}
+				if (text.includes("&&")) { text = text.replace(/&&/g, " "); }
 
 				if (THIS.isXIsDateTimeAxis && !THIS.isHorizontalChart && !isOthersTick) {
 					if (!xAxisSettings.isAutoDateFormat) {
@@ -8574,11 +8581,6 @@ export class Visual extends Shadow {
 					const firstChar = text.charAt(0);
 					const unicodeValue = firstChar.charCodeAt(0);
 					const isNegativeNumber = unicodeValue === 8722 || text.includes("-");
-					const isDecimalNumber = text.includes(".");
-
-					if (isDecimalNumber) {
-						// text = text.split(".")[0];
-					}
 
 					if (isNegativeNumber) {
 						text = (extractDigitsFromString(text.substring(1)) * -1).toString();
