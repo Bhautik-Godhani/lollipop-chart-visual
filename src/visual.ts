@@ -2615,6 +2615,10 @@ export class Visual extends Shadow {
 					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
 				: [];
 
+		this.setCategoricalDataFieldsExtended();
+	}
+
+	setCategoricalDataFieldsExtended(): void {
 		this.tooltipFieldsDisplayName =
 			this.categoricalTooltipFields.length > 0
 				? this.categoricalTooltipFields
@@ -2688,8 +2692,6 @@ export class Visual extends Shadow {
 			this.categoricalMeasure1Field = this.categoricalMeasureFields[0];
 		}
 
-		// this.setNumberFormatters(this.categoricalMeasureFields, categoricalTooltipFields);
-
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = this.categoricalImagesDataFields.length > 0;
@@ -2705,36 +2707,6 @@ export class Visual extends Shadow {
 		if (this.isSmallMultiplesEnabled) {
 			this.brushAndZoomAreaSettings.enabled = false;
 		}
-
-		// if (this.isHasSmallMultiplesData) {
-		// 	this.smallMultiplesCategories = [...new Set(this.categoricalSmallMultiplesDataField.values)] as string[];
-		// }
-
-		// if (this.isChartIsRaceChart) {
-		// 	this.raceChartKeyLabelList =
-		// 		this.categoricalRaceChartDataFields[0].values.reduce((arr, cur, index) => {
-		// 			const values = this.categoricalRaceChartDataFields.map((r) => r.values[index]);
-		// 			const key = values.join("--");
-		// 			const label = values.join(" ");
-		// 			arr = [...arr, { key, label }];
-		// 			return arr;
-		// 		}, []).filter((item, i, ar) => ar.findIndex((f) => f.key === item.key) === i);
-
-		// 	if (this.rankingSettings.raceChartData.enabled) {
-		// 		this.raceChartKeyLabelList = this.raceChartKeyLabelList.slice(0, this.rankingSettings.raceChartData.count);
-		// 	}
-		// }
-
-		// const xAxisTicksWidth = [...this.raceChartCategories, `${this.measure1DisplayName} : ${getTotal1ValueForRaceChartLabel(this)}`].map((d) => {
-		// 	const textProperties: any = {
-		// 		text: d,
-		// 		fontFamily: this.raceChartSettings.headerTextStyles.labelFontFamily,
-		// 		fontSize: this.raceChartSettings.headerTextStyles.labelFontSize + "px",
-		// 	};
-		// 	return textMeasurementService.measureSvgTextWidth(textProperties);
-		// });
-
-		// this.raceChartDataLabelLength = d3.max(xAxisTicksWidth);
 
 		if (this.isHasImagesData && (!this.markerSettings.marker1Style.selectedImageDataField || !this.imagesDataFieldsName.includes(this.markerSettings.marker1Style.selectedImageDataField))) {
 			this.markerSettings.marker1Style.selectedImageDataField = this.imagesDataFieldsName[0];
@@ -2763,15 +2735,6 @@ export class Visual extends Shadow {
 				this.minMaxValuesByMeasures[d.toString()] = { min: d3.min(measureFields, d => d3.min(d.values, v => +v)), max: d3.max(measureFields, d => d3.max(d.values, v => +v)) };
 			})
 		}
-
-		// if (!this.isHasSubcategories) {
-		// 	const isAllNegative = d3.every(this.categoricalMeasureFields, (d) => d3.every(d.values, (d) => +d < 0));
-		// 	if (isAllNegative && this.categoricalCategoriesFields.length > 0) {
-		// 		this.displayValidationPage("Negative data not supported");
-		// 		this._events.renderingFailed(this.vizOptions.options, "Negative data not supported");
-		// 		return;
-		// 	}
-		// }
 	}
 
 	expandAllCode(): void {
