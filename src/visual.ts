@@ -3913,7 +3913,6 @@ export class Visual extends Shadow {
 
 	setSmallMultiplesChartDataBySMCategory(width: number, height: number): void {
 		this.smallMultiplesGridItemsCategoricalData = {};
-
 		const categoricalDataPairs: any[] = [];
 
 		this.smallMultiplesCategories.forEach((d, i) => {
@@ -3964,8 +3963,7 @@ export class Visual extends Shadow {
 							const dataValuesIndexes = Object.keys(smallMultiplesDataPair).filter(key => key.includes("index-"));
 
 							const values1 = dataValuesIndexes.map((valueIndex) => {
-								const id = +valueIndex.split("-")[1];
-								return d.values[id];
+								const id = +valueIndex.split("-")[1]; return d.values[id];
 							});
 
 							values.push(values1);
@@ -4022,7 +4020,7 @@ export class Visual extends Shadow {
 			categoricalDataPairs.push(this.categoricalDataPairs);
 		});
 
-		let data = categoricalDataPairs.reduce((arr: string[], cur) => {
+		const data = categoricalDataPairs.reduce((arr: string[], cur) => {
 			cur.forEach(d => {
 				arr.push(d);
 			});
@@ -4030,6 +4028,10 @@ export class Visual extends Shadow {
 			return arr;
 		}, []).filter((v, i, a) => a.findIndex((t) => t.category === v.category) === i);
 
+		this.setSmallMultiplesChartDataBySMCategoryExtended(data);
+	}
+
+	setSmallMultiplesChartDataBySMCategoryExtended(data: any[]): void {
 		const sortingSettings = this.sortingSettings.category;
 		const categoryKey = "category";
 
