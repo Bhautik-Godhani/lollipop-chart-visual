@@ -10191,419 +10191,344 @@ export class Visual extends Shadow {
 		return label;
 	}
 
-	drawLollipopChart(): void {
-		this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-		this.chartData.forEach(d => {
-			d.data1Label = this.getDataLabel(d, false);
-			d.data2Label = this.getDataLabel(d, true);
+	enterLollipop = (lollipopG: D3Selection<SVGElement>, marker1Style: MarkerStyleProps, marker2Style: MarkerStyleProps, marker1: IMarkerData, marker2: IMarkerData) => {
+		lollipopG.on("click", () => {
+			this.handleCreateOwnDynamicDeviationOnBarClick(lollipopG.node());
+		});
 
-			if (!this.isHasMultiMeasure) {
-				if (!this.isHorizontalChart) {
-					d.value2 = 0;
-				} else {
-					d.value2 = 0;
-				}
-			}
-		})
-
-		if (this.isLollipopTypeCircle) {
-			this.setCircle1Radius();
-			this.setCircle2Radius();
-		} else {
-			this.setPie1Radius();
-			this.setPie2Radius();
-		}
-
-		if (this.isHasMultiMeasure) {
-			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
-		} else {
-			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
-		}
-
-		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
-
-		let marker1: IMarkerData;
-		let marker2: IMarkerData;
+		const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
 
 		// marker 1
-		const marker1Style = this.markerSettings.marker1Style;
-		if (marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-			const markerShapeValue = marker1Style.markerShapeValue;
-			marker1 = {
-				label: marker1Style.markerShapeValue.iconName,
-				value: marker1Style.markerShapeValue.iconName,
-				w: markerShapeValue.icon[0],
-				h: markerShapeValue.icon[1],
-				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
-			}
+		if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
+			const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
+				.attr("id", EImageType.Image1)
+				.classed(this.circleClass, true)
+				.classed(this.imageMarkerClass, true)
+				.classed("image-marker1", true);
+
+			imageMarker1Selection
+				.datum(d => {
+					return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+				});
+
+			this.imageMarkerFormatting(imageMarker1Selection, false, true);
 		} else {
-			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
-		}
+			if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+				const symbol1 = lollipopG.append("defs")
+					.append("symbol")
+					.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
+					.attr("class", "marker1-symbol")
+					.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
 
-		// marker 2
-		const marker2Style = this.markerSettings.marker2Style;
-		if (marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-			const markerShapeValue = marker2Style.markerShapeValue;
-			marker2 = {
-				label: marker2Style.markerShapeValue.iconName,
-				value: marker2Style.markerShapeValue.iconName,
-				w: markerShapeValue.icon[0],
-				h: markerShapeValue.icon[1],
-				paths: [{ d: marker2Style.markerShapePath, stroke: undefined }]
-			}
-		} else {
-			marker2 = CATEGORY_MARKERS.find(d => d.value === marker2Style.dropdownMarkerType);
-		}
+				const path1Selection = symbol1.append("path")
+					.attr("d", marker1.paths[0].d)
+					.attr("class", "marker1-path");
 
-		this.lollipopSelection = lollipopSelection.join(
-			(enter) => {
-				const lollipopG = enter.append("g").attr("class", "lollipop-group").attr("display", d => {
-					if (this.isHorizontalChart) {
-						if (this.xAxisSettings.isMinimumRangeEnabled) {
-							if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
-								return "none";
-							} else {
-								return "block";
-							}
-						} else {
-							return "block";
-						}
-					} else {
-						if (this.yAxisSettings.isMinimumRangeEnabled) {
-							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
-								return "none";
-							} else {
-								return "block";
-							}
-						} else {
-							return "block";
-						}
-					}
-				});
+				const circle1Selection = lollipopG.append("use")
+					.attr("id", CircleType.Circle1)
+					.classed(this.circleClass, true)
+					.classed(this.circle1Class, true);
 
-				lollipopG.on("click", () => {
-					this.handleCreateOwnDynamicDeviationOnBarClick(lollipopG.node());
-				});
-
-				const lineSelection = lollipopG.append("line").attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
-
-
-				// marker 1
-				if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker1Style.markerShapeBase64Url))) {
-					const imageMarker1Selection: D3Selection<any> = lollipopG.append("svg:image")
-						.attr("id", EImageType.Image1)
-						.classed(this.circleClass, true)
-						.classed(this.imageMarkerClass, true)
-						.classed("image-marker1", true);
-
-					imageMarker1Selection
-						.datum(d => {
-							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-						});
-
-					this.imageMarkerFormatting(imageMarker1Selection, false, true);
-				} else {
-					if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-						const symbol1 = lollipopG.append("defs")
-							.append("symbol")
-							.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
-							.attr("class", "marker1-symbol")
-							.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
-
-						const path1Selection = symbol1.append("path")
-							.attr("d", marker1.paths[0].d)
-							.attr("class", "marker1-path");
-
-						const circle1Selection = lollipopG.append("use")
-							.attr("id", CircleType.Circle1)
-							.classed(this.circleClass, true)
-							.classed(this.circle1Class, true);
-
-						this.setPath1Formatting(path1Selection);
-						this.setCircle1Formatting(circle1Selection, marker1, true);
-
-						circle1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
-
-						path1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
-					} else {
-						const pie1Selection = lollipopG.append("foreignObject")
-							.attr("id", "pie1ForeignObject");
-						this.enterPieChart(pie1Selection, false, true);
-						this.setPieDataLabelsDisplayStyle();
-
-						pie1Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-							});
-					}
-				}
-
-
-				// marker 2
-				if (this.isHasMultiMeasure) {
-					if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker2Style.markerShapeBase64Url))) {
-						const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
-							.attr("id", EImageType.Image2)
-							.classed(this.circleClass, true)
-							.classed(this.imageMarkerClass, true)
-							.classed("image-marker2", true);
-
-						imageMarker2Selection
-							.datum(d => {
-								return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-							});
-
-						this.imageMarkerFormatting(imageMarker2Selection, true, true);
-					} else {
-						if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-							const symbol2 = lollipopG.append("defs")
-								.append("symbol")
-								.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
-								.attr("class", "marker2-symbol")
-								.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
-
-							const path2Selection = symbol2.append("path")
-								.attr("d", marker2.paths[0].d)
-								.attr("class", "marker2-path");
-
-							const circle2Selection = lollipopG.append("use")
-								.attr("id", CircleType.Circle2)
-								.classed(this.circleClass, true).classed(this.circle2Class, true);
-
-							this.setPath2Formatting(path2Selection);
-							this.setCircle2Formatting(circle2Selection, marker2, true);
-
-							path2Selection
-								.datum(d => {
-									return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-								});
-
-							circle2Selection
-								.datum(d => {
-									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-								});
-						} else {
-							const pie2Selection = lollipopG.append("foreignObject")
-								.attr("id", "pie2ForeignObject");
-							this.enterPieChart(pie2Selection, true, true);
-							this.setPieDataLabelsDisplayStyle(true);
-
-							pie2Selection
-								.datum(d => {
-									return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-								})
-						}
-					}
-				}
-
-				if (this.isHorizontalChart) {
-					this.setHorizontalLinesFormatting(lineSelection, true);
-				} else {
-					this.setVerticalLinesFormatting(lineSelection, true);
-				}
-
-				if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
-					const categoryLabelSelection = lollipopG.append("text").attr("class", "category-label");
-					this.categoryLabelsFormatting(categoryLabelSelection);
-				}
-				return lollipopG;
-			},
-			(update) => {
-				update.attr("display", d => {
-					if (this.isHorizontalChart) {
-						if (this.xAxisSettings.isMinimumRangeEnabled) {
-							if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
-								return "none";
-							} else {
-								return "block";
-							}
-						} else {
-							return "block";
-						}
-					} else {
-						if (this.yAxisSettings.isMinimumRangeEnabled) {
-							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
-								return "none";
-							} else {
-								return "block";
-							}
-						} else {
-							return "block";
-						}
-					}
-				});
-
-				const marker1Style = this.markerSettings.marker1Style;
-				const marker2Style = this.markerSettings.marker2Style;
-
-				const lineSelection = update.select(this.lineClassSelector).attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
-
-				const marker1SymbolSelection = update.select(".marker1-symbol");
-
-				const marker2SymbolSelection = update.select(".marker2-symbol");
-
-				// marker 1
-				if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-					marker1SymbolSelection
-						.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
-						.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
-				}
-
-				// marker 2
-				if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-					marker2SymbolSelection
-						.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
-						.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
-				}
-
-				const path1Selection = update.select(".marker1-path").attr("d", this.isLollipopTypeCircle ? marker1.paths[0].d : "");
-
-				const circle1Selection = update.select(this.circle1ClassSelector);
-
-				const path2Selection = update.select(".marker2-path").attr("d", this.isLollipopTypeCircle ? marker2.paths[0].d : "");
-
-				const circle2Selection = update.select(this.circle2ClassSelector);
-
-				const pie1Selection = update.select("#pie1ForeignObject");
-
-				const pie2Selection = update.select("#pie2ForeignObject");
-
-				const categoryLabelSelection: D3Selection<SVGElement> = update.select(".category-label");
-				const imageMarker1Selection: D3Selection<any> = update.select(".image-marker1");
-				const imageMarker2Selection: D3Selection<any> = update.select(".image-marker2");
-
-				if (this.isHorizontalChart) {
-					this.setHorizontalLinesFormatting(lineSelection, false);
-				} else {
-					this.setVerticalLinesFormatting(lineSelection, false);
-				}
-
-				// marker 1
-				if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker1Style.markerShapeBase64Url))) {
-					this.imageMarkerFormatting(imageMarker1Selection, false, false);
-
-					if (this.isHasMultiMeasure) {
-						this.imageMarkerFormatting(imageMarker2Selection, true, false);
-					}
-				} else {
-					if (this.isLollipopTypeCircle && (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-						pie1Selection.remove();
-						pie2Selection.remove();
-
-						this.setPath1Formatting(path1Selection);
-						this.setCircle1Formatting(circle1Selection, marker1, false);
-
-						if (this.isHasMultiMeasure) {
-							this.setPath2Formatting(path2Selection);
-							this.setCircle2Formatting(circle2Selection, marker2, false);
-						} else {
-							circle2Selection.remove();
-						}
-					} else {
-						circle1Selection.remove();
-						circle2Selection.remove();
-
-						this.updatePieChart(pie1Selection, false, false);
-						this.setPieDataLabelsDisplayStyle();
-
-						if (this.isHasMultiMeasure) {
-							this.updatePieChart(pie2Selection, true, false);
-							this.setPieDataLabelsDisplayStyle(true);
-						}
-					}
-				}
-
-				// marker 2
-				if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker2Style.markerShapeBase64Url))) {
-					this.imageMarkerFormatting(imageMarker1Selection, false, false);
-
-					if (this.isHasMultiMeasure) {
-						this.imageMarkerFormatting(imageMarker2Selection, true, false);
-					}
-				} else {
-					if (this.isLollipopTypeCircle && (this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
-						pie1Selection.remove();
-						pie2Selection.remove();
-
-						this.setPath1Formatting(path1Selection);
-						this.setCircle1Formatting(circle1Selection, marker1, false);
-
-						if (this.isHasMultiMeasure) {
-							this.setPath2Formatting(path2Selection);
-							this.setCircle2Formatting(circle2Selection, marker2, false);
-						} else {
-							circle2Selection.remove();
-						}
-					} else {
-						circle1Selection.remove();
-						circle2Selection.remove();
-
-						this.updatePieChart(pie1Selection, false, false);
-						this.setPieDataLabelsDisplayStyle();
-
-						if (this.isHasMultiMeasure) {
-							this.updatePieChart(pie2Selection, true, false);
-							this.setPieDataLabelsDisplayStyle(true);
-						}
-					}
-				}
-
-				if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
-					this.categoryLabelsFormatting(categoryLabelSelection);
-				} else {
-					categoryLabelSelection.attr("display", "none");
-				}
-
-				path1Selection
-					.datum(d => {
-						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-					});
+				this.setPath1Formatting(path1Selection);
+				this.setCircle1Formatting(circle1Selection, marker1, true);
 
 				circle1Selection
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					});
 
-				path2Selection
+				path1Selection
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					});
-
-				circle2Selection
-					.datum(d => {
-						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-					});
+			} else {
+				const pie1Selection = lollipopG.append("foreignObject")
+					.attr("id", "pie1ForeignObject");
+				this.enterPieChart(pie1Selection, false, true);
+				this.setPieDataLabelsDisplayStyle();
 
 				pie1Selection
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
 					});
+			}
+		}
 
-				pie2Selection
-					.datum(d => {
-						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
-					});
+		this.enterLollipopExtended(lollipopG, lineSelection, marker2Style, marker2);
+	}
 
-				imageMarker1Selection
-					.datum(d => {
-						return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
-					});
+	enterLollipopExtended = (lollipopG: D3Selection<SVGElement>, lineSelection: D3Selection<SVGElement>, marker2Style: MarkerStyleProps, marker2: IMarkerData) => {
+		// marker 2
+		if (this.isHasMultiMeasure) {
+			if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && marker2Style.markerShapeBase64Url))) {
+				const imageMarker2Selection: D3Selection<any> = lollipopG.append("svg:image")
+					.attr("id", EImageType.Image2)
+					.classed(this.circleClass, true)
+					.classed(this.imageMarkerClass, true)
+					.classed("image-marker2", true);
 
 				imageMarker2Selection
 					.datum(d => {
 						return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
 					});
 
-				return update;
-			}
-		) as any;
+				this.imageMarkerFormatting(imageMarker2Selection, true, true);
+			} else {
+				if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+					const symbol2 = lollipopG.append("defs")
+						.append("symbol")
+						.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
+						.attr("class", "marker2-symbol")
+						.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
 
+					const path2Selection = symbol2.append("path")
+						.attr("d", marker2.paths[0].d)
+						.attr("class", "marker2-path");
+
+					const circle2Selection = lollipopG.append("use")
+						.attr("id", CircleType.Circle2)
+						.classed(this.circleClass, true).classed(this.circle2Class, true);
+
+					this.setPath2Formatting(path2Selection);
+					this.setCircle2Formatting(circle2Selection, marker2, true);
+
+					path2Selection
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+						});
+
+					circle2Selection
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+						});
+				} else {
+					const pie2Selection = lollipopG.append("foreignObject")
+						.attr("id", "pie2ForeignObject");
+					this.enterPieChart(pie2Selection, true, true);
+					this.setPieDataLabelsDisplayStyle(true);
+
+					pie2Selection
+						.datum(d => {
+							return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+						})
+				}
+			}
+		}
+
+		if (this.isHorizontalChart) {
+			this.setHorizontalLinesFormatting(lineSelection, true);
+		} else {
+			this.setVerticalLinesFormatting(lineSelection, true);
+		}
+
+		if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
+			const categoryLabelSelection = lollipopG.append("text").attr("class", "category-label");
+			this.categoryLabelsFormatting(categoryLabelSelection);
+		}
+	}
+
+	updateLollipop = (update: D3Selection<d3.BaseType>, marker1: IMarkerData, marker2: IMarkerData) => {
+		update.attr("display", d => {
+			if (this.isHorizontalChart) {
+				if (this.xAxisSettings.isMinimumRangeEnabled) {
+					if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
+						return "none";
+					} else {
+						return "block";
+					}
+				} else {
+					return "block";
+				}
+			} else {
+				if (this.yAxisSettings.isMinimumRangeEnabled) {
+					if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
+						return "none";
+					} else {
+						return "block";
+					}
+				} else {
+					return "block";
+				}
+			}
+		});
+
+		const marker1Style = this.markerSettings.marker1Style;
+		const marker2Style = this.markerSettings.marker2Style;
+
+		const lineSelection = update.select(this.lineClassSelector).attr("class", this.lineSettings.lineType).classed(this.lineClass, true);
+
+		const marker1SymbolSelection = update.select(".marker1-symbol");
+
+		const marker2SymbolSelection = update.select(".marker2-symbol");
+
+		// marker 1
+		if (this.isLollipopTypeCircle && (marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+			marker1SymbolSelection
+				.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker1.value}_MARKER1` : `${d.category}_${marker1.value}_MARKER1`)
+				.attr("viewBox", `${-this.marker1OutlineWidth} ${-this.marker1OutlineWidth} ${marker1.w + (this.marker1OutlineWidth * 2)} ${marker1.h + (this.marker1OutlineWidth * 2)}`);
+		}
+
+		// marker 2
+		if (this.isLollipopTypeCircle && (marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+			marker2SymbolSelection
+				.attr("id", d => this.isSmallMultiplesEnabled ? `${d.category}_${this.currentSmallMultipleIndex}_${marker2.value}_MARKER2` : `${d.category}_${marker2.value}_MARKER2`)
+				.attr("viewBox", `${-this.marker2OutlineWidth} ${-this.marker2OutlineWidth} ${marker2.w + (this.marker2OutlineWidth * 2)} ${marker2.h + (this.marker2OutlineWidth * 2)}`);
+		}
+
+		const path1Selection = update.select(".marker1-path").attr("d", this.isLollipopTypeCircle ? marker1.paths[0].d : "");
+
+		const circle1Selection = update.select(this.circle1ClassSelector);
+
+		const path2Selection = update.select(".marker2-path").attr("d", this.isLollipopTypeCircle ? marker2.paths[0].d : "");
+
+		const circle2Selection = update.select(this.circle2ClassSelector);
+
+		const pie1Selection = update.select("#pie1ForeignObject");
+
+		const pie2Selection = update.select("#pie2ForeignObject");
+
+		const categoryLabelSelection: D3Selection<SVGElement> = update.select(".category-label");
+		const imageMarker1Selection: D3Selection<any> = update.select(".image-marker1");
+		const imageMarker2Selection: D3Selection<any> = update.select(".image-marker2");
+
+		if (this.isHorizontalChart) {
+			this.setHorizontalLinesFormatting(lineSelection, false);
+		} else {
+			this.setVerticalLinesFormatting(lineSelection, false);
+		}
+
+		// marker 1
+		if (((this.isHasImagesData && this.isShowImageMarker1) || (this.isLollipopTypeCircle && this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker1Style.markerShapeBase64Url))) {
+			this.imageMarkerFormatting(imageMarker1Selection, false, false);
+
+			if (this.isHasMultiMeasure) {
+				this.imageMarkerFormatting(imageMarker2Selection, true, false);
+			}
+		} else {
+			if (this.isLollipopTypeCircle && (this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+				pie1Selection.remove();
+				pie2Selection.remove();
+
+				this.setPath1Formatting(path1Selection);
+				this.setCircle1Formatting(circle1Selection, marker1, false);
+
+				if (this.isHasMultiMeasure) {
+					this.setPath2Formatting(path2Selection);
+					this.setCircle2Formatting(circle2Selection, marker2, false);
+				} else {
+					circle2Selection.remove();
+				}
+			} else {
+				circle1Selection.remove();
+				circle2Selection.remove();
+
+				this.updatePieChart(pie1Selection, false, false);
+				this.setPieDataLabelsDisplayStyle();
+
+				if (this.isHasMultiMeasure) {
+					this.updatePieChart(pie2Selection, true, false);
+					this.setPieDataLabelsDisplayStyle(true);
+				}
+			}
+		}
+
+		this.updateLollipopExtended(imageMarker1Selection, imageMarker2Selection, pie1Selection, pie2Selection, path1Selection, path2Selection, circle1Selection, circle2Selection, categoryLabelSelection, marker1, marker2)
+	}
+
+	updateLollipopExtended = (
+		imageMarker1Selection: D3Selection<SVGImageElement>,
+		imageMarker2Selection: D3Selection<SVGImageElement>,
+		pie1Selection: D3Selection<d3.BaseType>,
+		pie2Selection: D3Selection<d3.BaseType>,
+		path1Selection: D3Selection<d3.BaseType>,
+		path2Selection: D3Selection<d3.BaseType>,
+		circle1Selection: D3Selection<d3.BaseType>,
+		circle2Selection: D3Selection<d3.BaseType>,
+		categoryLabelSelection: D3Selection<SVGElement>,
+		marker1: IMarkerData, marker2: IMarkerData) => {
+		// marker 2
+		if (((this.isHasImagesData && this.isShowImageMarker2) || (this.isLollipopTypeCircle && this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.markerSettings.marker2Style.markerShapeBase64Url))) {
+			this.imageMarkerFormatting(imageMarker1Selection, false, false);
+
+			if (this.isHasMultiMeasure) {
+				this.imageMarkerFormatting(imageMarker2Selection, true, false);
+			}
+		} else {
+			if (this.isLollipopTypeCircle && (this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.DEFAULT || this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST)) {
+				pie1Selection.remove();
+				pie2Selection.remove();
+
+				this.setPath1Formatting(path1Selection);
+				this.setCircle1Formatting(circle1Selection, marker1, false);
+
+				if (this.isHasMultiMeasure) {
+					this.setPath2Formatting(path2Selection);
+					this.setCircle2Formatting(circle2Selection, marker2, false);
+				} else {
+					circle2Selection.remove();
+				}
+			} else {
+				circle1Selection.remove();
+				circle2Selection.remove();
+
+				this.updatePieChart(pie1Selection, false, false);
+				this.setPieDataLabelsDisplayStyle();
+
+				if (this.isHasMultiMeasure) {
+					this.updatePieChart(pie2Selection, true, false);
+					this.setPieDataLabelsDisplayStyle(true);
+				}
+			}
+		}
+
+		if (this.isHorizontalChart && this.yAxisSettings.isShowLabelsAboveLine) {
+			this.categoryLabelsFormatting(categoryLabelSelection);
+		} else {
+			categoryLabelSelection.attr("display", "none");
+		}
+
+		path1Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+			});
+
+		circle1Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+			});
+
+		path2Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+			});
+
+		circle2Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+			});
+
+		pie1Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+			});
+
+		pie2Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+			});
+
+		imageMarker1Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value1, defaultValue: d.value1 }
+			});
+
+		imageMarker2Selection
+			.datum(d => {
+				return { ...d, valueType: DataValuesType.Value2, defaultValue: d.value2 }
+			});
+	}
+
+	drawLollipopChartExtended = () => {
 		if (this.isLollipopTypeCircle || (this.isLollipopTypePie)) {
 			this.drawData1Labels(this.dataLabelsSettings.show ? this.chartData : []);
 			this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure ? this.chartData : []);
@@ -10696,6 +10621,107 @@ export class Visual extends Shadow {
 		this.behavior.renderSelection(this.interactivityService.hasSelection());
 
 		this.drawTooltip();
+	}
+
+	drawLollipopChart(): void {
+		this.container.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+		this.chartData.forEach(d => {
+			d.data1Label = this.getDataLabel(d, false);
+			d.data2Label = this.getDataLabel(d, true);
+
+			if (!this.isHasMultiMeasure) {
+				if (!this.isHorizontalChart) {
+					d.value2 = 0;
+				} else {
+					d.value2 = 0;
+				}
+			}
+		})
+
+		if (this.isLollipopTypeCircle) {
+			this.setCircle1Radius();
+			this.setCircle2Radius();
+		} else {
+			this.setPie1Radius();
+			this.setPie2Radius();
+		}
+
+		if (this.isHasMultiMeasure) {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? d3.max([this.circle1Size, this.circle2Size]) : d3.max([this.pie1Radius * 2, this.pie2Radius * 2]));
+		} else {
+			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
+		}
+
+		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
+
+		let marker1: IMarkerData;
+		let marker2: IMarkerData;
+
+		// marker 1
+		const marker1Style = this.markerSettings.marker1Style;
+		if (marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker1Style.markerShapeValue;
+			marker1 = {
+				label: marker1Style.markerShapeValue.iconName,
+				value: marker1Style.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
+		}
+
+		// marker 2
+		const marker2Style = this.markerSettings.marker2Style;
+		if (marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker2Style.markerShapeValue;
+			marker2 = {
+				label: marker2Style.markerShapeValue.iconName,
+				value: marker2Style.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: marker2Style.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker2 = CATEGORY_MARKERS.find(d => d.value === marker2Style.dropdownMarkerType);
+		}
+
+		this.lollipopSelection = lollipopSelection.join(
+			(enter) => {
+				const lollipopG = enter.append("g").attr("class", "lollipop-group").attr("display", d => {
+					if (this.isHorizontalChart) {
+						if (this.xAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					} else {
+						if (this.yAxisSettings.isMinimumRangeEnabled) {
+							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
+								return "none";
+							} else {
+								return "block";
+							}
+						} else {
+							return "block";
+						}
+					}
+				});
+				this.enterLollipop(lollipopG, marker1Style, marker2Style, marker1, marker2);
+				return lollipopG;
+			},
+			(update) => {
+				this.updateLollipop(update, marker1, marker2);
+				return update;
+			}
+		) as any;
+
+		this.drawLollipopChartExtended();
 	}
 
 	drawZeroSeparatorLine(): void {
