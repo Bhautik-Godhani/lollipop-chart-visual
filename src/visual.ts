@@ -11367,6 +11367,148 @@ export class Visual extends Shadow {
 		}
 	}
 
+	handleErrorBarsDirectionMinus = (tooltipData: TooltipData[], errorBar1: IErrorBarValue, errorBar2: IErrorBarValue, isValue2: boolean, isPie2: boolean) => {
+		if (this.isHasErrorUpperBounds) {
+			if (this.isRenderBothErrorBars) {
+				tooltipData.push({
+					displayName: "Upper",
+					value: !isPie2 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
+					color: "transparent",
+				});
+			} else {
+				if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+					tooltipData.push({
+						displayName: "Upper",
+						value: errorBar1.tooltipUpperBoundValue,
+						color: "transparent",
+					});
+				}
+			}
+		}
+	}
+
+	handleErrorBarsDirectionPlus = (tooltipData: TooltipData[], errorBar1: IErrorBarValue, errorBar2: IErrorBarValue, isValue2: boolean, isPie2: boolean) => {
+		if (this.isHasErrorLowerBounds) {
+			if (this.isRenderBothErrorBars) {
+				tooltipData.push({
+					displayName: "Lower",
+					value: !isPie2 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
+					color: "transparent",
+				});
+			} else {
+				if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
+					tooltipData.push({
+						displayName: "Lower",
+						value: errorBar1.tooltipLowerBoundValue,
+						color: "transparent",
+					});
+				}
+			}
+		}
+	}
+
+	getTooltipData = (pieData: IChartSubCategory, isPie2: boolean, d: ILollipopChartRow): VisualTooltipDataItem[] => {
+		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
+			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
+		};
+
+		const subCategoryColorPair = this.isSmallMultiplesEnabled && pieData.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
+		const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
+		const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
+
+		const tooltipData: TooltipData[] = [
+			{
+				displayName: this.categoryDisplayName,
+				value: this.getTooltipCategoryText(pieData.parentCategory).toString(),
+				color: "transparent",
+			},
+			{
+				displayName: this.subCategoryDisplayName,
+				value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : this.getTooltipCategoryText(pieData.category)),
+				color: "transparent",
+			},
+			{
+				displayName: this.measure1DisplayName,
+				value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
+				color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.categoryOthersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
+			}
+		];
+
+		if (this.isSmallMultiplesEnabled) {
+			tooltipData.push({
+				displayName: this.smallMultiplesCategoricalDataSourceName,
+				value: this.getTooltipCategoryText(pieData.smallMultipleCategory),
+				color: "transparent",
+			})
+		}
+
+		// if (this.isHasMultiMeasure) {
+		// 	tooltipData.push({
+		// 		displayName: this.measure2DisplayName,
+		// 		value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+		// 		color: (isPosNegColorScheme2 ? posNegColor2 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
+		// 	})
+		// }
+
+		pieData.tooltipFields.forEach((data, i: number) => {
+			let text = data.value;
+
+			if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
+				text = this.othersBarText;
+				text = text.replace(new RegExp("-1234567890123", 'g'), '');
+			} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
+				text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
+			} else {
+				if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
+					text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
+				} else {
+					text = data.value;
+				}
+			}
+
+			tooltipData.push({
+				displayName: data.displayName,
+				value: text,
+				color: data.color ? data.color : "transparent",
+			});
+		});
+
+		if (this.errorBarsSettings.tooltip.isEnabled) {
+			const errorBar1 = d.errorBar1;
+			const errorBar2 = d.errorBar2;
+			const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
+
+			if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
+				this.handleErrorBarsDirectionMinus(tooltipData, errorBar1, errorBar2, isValue2, isPie2);
+			}
+
+			if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
+				this.handleErrorBarsDirectionPlus(tooltipData, errorBar1, errorBar2, isValue2, isPie2);
+			}
+		}
+
+		if (d.isHighlight) {
+			tooltipData.push({
+				displayName: "Highlighted",
+				value: !isPie2
+					? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
+					: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
+				color: "transparent",
+			});
+		}
+
+		const data = this.isSmallMultiplesEnabled ? this.smallMultiplesGridItemContent[pieData.smallMultipleCategory].chartData.find(d => d.category === pieData.parentCategory && d.SMCategory === pieData.smallMultipleCategory) : this.chartData.find(d => d.category === pieData.parentCategory);
+		if (data) {
+			tooltipData.push({
+				displayName: "Total",
+				value: numberFormatter(d3.sum(data.subCategories, (s: any) => s.value1), this.measureNumberFormatter[0]),
+				color: "transparent",
+			});
+		}
+
+		return tooltipData;
+	};
+
 	configurePieChart(d: ILollipopChartRow, ele: D3Selection<SVGElement>, i: number, isPie2: boolean): void {
 		d.subCategories.forEach(s => {
 			s.defaultValue = isPie2 ? s.value2 : s.value1;
@@ -11406,143 +11548,9 @@ export class Visual extends Shadow {
 
 		this.tooltipServiceWrapper.addTooltip(
 			ele.selectAll(".pie-slice"),
-			(datapoint: IChartSubCategory) => getTooltipData(datapoint, isPie2),
+			(datapoint: IChartSubCategory) => this.getTooltipData(datapoint, isPie2, d),
 			(datapoint: IChartSubCategory) => datapoint.identity
 		);
-
-		const numberFormatter = (value: number, numberFormatter: IValueFormatter) => {
-			return this.numberSettings.show ? this.formatNumber(value, this.numberSettings, numberFormatter, true, true) : powerBiNumberFormat(value, numberFormatter);
-		};
-
-		const getTooltipData = (pieData: IChartSubCategory, isPie2: boolean): VisualTooltipDataItem[] => {
-			const subCategoryColorPair = this.isSmallMultiplesEnabled && pieData.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
-			const isPosNegColorScheme1 = !this.isShowMarker1OutlineColor && this.dataColorsSettings.fillType === ColorPaletteType.PositiveNegative && !this.CFSubCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].isMarker1Color;
-			const posNegColor1 = pieData.value1 >= 0 ? this.dataColorsSettings.positiveColor : this.dataColorsSettings.negativeColor;
-
-			const tooltipData: TooltipData[] = [
-				{
-					displayName: this.categoryDisplayName,
-					value: this.getTooltipCategoryText(pieData.parentCategory).toString(),
-					color: "transparent",
-				},
-				{
-					displayName: this.subCategoryDisplayName,
-					value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : this.getTooltipCategoryText(pieData.category)),
-					color: "transparent",
-				},
-				{
-					displayName: this.measure1DisplayName,
-					value: numberFormatter(pieData.value1, this.measureNumberFormatter[0]),
-					color: (pieData.parentCategory.toString().includes(this.othersLabel) ? this.dataColorsSettings.categoryOthersColor : isPosNegColorScheme1 ? posNegColor1 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker1Color)
-				}
-			];
-
-			if (this.isSmallMultiplesEnabled) {
-				tooltipData.push({
-					displayName: this.smallMultiplesCategoricalDataSourceName,
-					value: this.getTooltipCategoryText(pieData.smallMultipleCategory),
-					color: "transparent",
-				})
-			}
-
-			// if (this.isHasMultiMeasure) {
-			// 	tooltipData.push({
-			// 		displayName: this.measure2DisplayName,
-			// 		value: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-			// 		color: (isPosNegColorScheme2 ? posNegColor2 : subCategoryColorPair[`${pieData.parentCategory}-${pieData.category}`].marker2Color),
-			// 	})
-			// }
-
-			pieData.tooltipFields.forEach((data, i: number) => {
-				let text = data.value;
-
-				if (this.categoricalTooltipFields[i].source.type.text && pieData.category === this.othersBarText) {
-					text = this.othersBarText;
-					text = text.replace(new RegExp("-1234567890123", 'g'), '');
-				} else if (this.categoricalTooltipFields[i].source.type.dateTime) {
-					text = powerBiNumberFormat(new Date(data.value), this.tooltipNumberFormatter[i]);
-				} else {
-					if (this.categoricalTooltipFields[i].source.type.integer || this.categoricalTooltipFields[i].source.type.numeric) {
-						text = powerBiNumberFormat(data.value, this.tooltipNumberFormatter[i]);
-					} else {
-						text = data.value;
-					}
-				}
-
-				tooltipData.push({
-					displayName: data.displayName,
-					value: text,
-					color: data.color ? data.color : "transparent",
-				});
-			});
-
-			if (this.errorBarsSettings.tooltip.isEnabled) {
-				const errorBar1 = d.errorBar1;
-				const errorBar2 = d.errorBar2;
-				const isValue2 = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === this.measure2DisplayName;
-
-				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Minus) {
-					if (this.isHasErrorUpperBounds) {
-						if (this.isRenderBothErrorBars) {
-							tooltipData.push({
-								displayName: "Upper",
-								value: !isPie2 ? errorBar1.tooltipUpperBoundValue : errorBar2.tooltipUpperBoundValue,
-								color: "transparent",
-							});
-						} else {
-							if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
-								tooltipData.push({
-									displayName: "Upper",
-									value: errorBar1.tooltipUpperBoundValue,
-									color: "transparent",
-								});
-							}
-						}
-					}
-				}
-
-				if (this.errorBarsSettings.measurement.direction !== EErrorBarsDirection.Plus) {
-					if (this.isHasErrorLowerBounds) {
-						if (this.isRenderBothErrorBars) {
-							tooltipData.push({
-								displayName: "Lower",
-								value: !isPie2 ? errorBar1.tooltipLowerBoundValue : errorBar2.tooltipLowerBoundValue,
-								color: "transparent",
-							});
-						} else {
-							if ((isValue2 && isPie2) || (!isValue2 && !isPie2)) {
-								tooltipData.push({
-									displayName: "Lower",
-									value: errorBar1.tooltipLowerBoundValue,
-									color: "transparent",
-								});
-							}
-						}
-					}
-				}
-			}
-
-			if (d.isHighlight) {
-				tooltipData.push({
-					displayName: "Highlighted",
-					value: !isPie2
-						? numberFormatter(pieData.value1, this.measureNumberFormatter[0])
-						: numberFormatter(pieData.value2, this.measureNumberFormatter[1]),
-					color: "transparent",
-				});
-			}
-
-			const data = this.isSmallMultiplesEnabled ? this.smallMultiplesGridItemContent[pieData.smallMultipleCategory].chartData.find(d => d.category === pieData.parentCategory && d.SMCategory === pieData.smallMultipleCategory) : this.chartData.find(d => d.category === pieData.parentCategory);
-			if (data) {
-				tooltipData.push({
-					displayName: "Total",
-					value: numberFormatter(d3.sum(data.subCategories, (s: any) => s.value1), this.measureNumberFormatter[0]),
-					color: "transparent",
-				});
-			}
-
-			return tooltipData;
-		};
 	}
 
 	transformPieForeignObject(pieForeignObjectSelection: D3Selection<SVGElement>, isEnter: boolean, valueKey: string, pieRadius: number, isPie2: boolean): void {
