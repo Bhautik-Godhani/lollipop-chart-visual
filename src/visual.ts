@@ -4684,7 +4684,6 @@ export class Visual extends Shadow {
 		const categoricalMeasureFields = this.vizOptions.options.dataViews[0].categorical.values
 			? this.vizOptions.options.dataViews[0].categorical.values.filter(
 				(d) => !!d.source.roles[EDataRolesName.Measure]
-				// eslint-disable-next-line no-mixed-spaces-and-tabs
 			)
 			: [];
 		if (categoricalMeasureFields.length === 0) {
