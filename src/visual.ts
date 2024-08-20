@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-this-alias */
 "use strict";
 
 import "core-js/stable";
@@ -7721,72 +7720,71 @@ export class Visual extends Shadow {
 	}
 
 	drawData1LabelsExtended() {
-		const THIS = this;
 		const dataLabelsSettings = this.data1LabelsSettings;
 
 		this.dataLabels1G.selectAll(".dataLabelG")
-			.each(function () {
-				const ele = d3.select(this);
+			.each((d, i, nodes) => {
+				const ele = d3.select(nodes[i]);
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
-				const borderSize = dataLabelsSettings.showBackground || THIS.dataLabelsSettings.isShowBestFitLabels ? 3 : 0;
-				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
+				const borderSize = dataLabelsSettings.showBackground || this.dataLabelsSettings.isShowBestFitLabels ? 3 : 0;
+				const isHideInsideLabel = (getBBox.width + borderSize) > this.markerMaxSize || (getBBox.height + borderSize) > this.markerMaxSize;
 
-				// if (getBBox.width > THIS.scaleBandWidth) {
+				// if (getBBox.width > this.scaleBandWidth) {
 				// 	ele.attr("opacity", 0);
 				// 	return;
 				// }
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
-							if (THIS.isHorizontalChart) {
+						if (this.dataLabelsSettings.isShowBestFitLabels) {
+							if (this.isHorizontalChart) {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
-										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-										THIS.transformData1LabelOutside(ele, false);
+										this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+										this.transformData1LabelOutside(ele, false);
 
 									} else {
-										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside, true);
-										THIS.transformDataLabelInside(ele, false, false);
+										this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside, true);
+										this.transformDataLabelInside(ele, false, false);
 										return 1;
 									}
 								} else {
-									if (THIS.isLeftYAxis) {
+									if (this.isLeftYAxis) {
 										if (d.positions.dataLabel1X <= getBBox.width) {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+											this.transformData1LabelOutside(ele, false);
 										}
 									} else {
-										if (d.positions.dataLabel1X + getBBox.width > THIS.width) {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false);
+										if (d.positions.dataLabel1X + getBBox.width > this.width) {
+											this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+											this.transformData1LabelOutside(ele, false);
 										}
 									}
 								}
 							} else {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									// const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > THIS.height : d.positions.dataLabel1Y <= getBBox.height;
+									// const isHideOutSideLabel = this.isBottomXAxis ? d.positions.dataLabel1Y + getBBox.height > this.height : d.positions.dataLabel1Y <= getBBox.height;
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
-										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-										THIS.transformData1LabelOutside(ele, false);
+										this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+										this.transformData1LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside, true);
-										THIS.transformDataLabelInside(ele, false, false);
+										this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Inside, true);
+										this.transformDataLabelInside(ele, false, false);
 										return 1;
 									}
 								} else {
-									if (THIS.isBottomXAxis) {
-										if (d.positions.dataLabel1Y + getBBox.height > THIS.height) {
+									if (this.isBottomXAxis) {
+										if (d.positions.dataLabel1Y + getBBox.height > this.height) {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+											this.transformData1LabelOutside(ele, false);
 											// }
 										}
 									} else {
@@ -7794,8 +7792,8 @@ export class Visual extends Shadow {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
-											THIS.transformData1LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, false, DataLabelsPlacement.Outside, true);
+											this.transformData1LabelOutside(ele, false);
 											// }
 										}
 									}
@@ -7881,81 +7879,80 @@ export class Visual extends Shadow {
 	}
 
 	drawData2LabelsExtended(): void {
-		const THIS = this;
 		const dataLabelsSettings = this.data2LabelsSettings;
 
 		this.dataLabels2G
 			.selectAll(".dataLabelG")
-			.each(function () {
-				const ele = d3.select(this);
+			.each((d, i, nodes) => {
+				const ele = d3.select(nodes[i]);
 				const textEle = ele.select(".dataLabelText");
 				const getBBox = (textEle.node() as SVGSVGElement).getBBox();
 				const borderSize = dataLabelsSettings.showBackground ? 3 : 0;
-				const isHideInsideLabel = (getBBox.width + borderSize) > THIS.markerMaxSize || (getBBox.height + borderSize) > THIS.markerMaxSize;
+				const isHideInsideLabel = (getBBox.width + borderSize) > this.markerMaxSize || (getBBox.height + borderSize) > this.markerMaxSize;
 
 				ele
 					.attr("opacity", (d: ILollipopChartRow) => {
-						if (THIS.dataLabelsSettings.isShowBestFitLabels) {
-							if (THIS.isHorizontalChart) {
+						if (this.dataLabelsSettings.isShowBestFitLabels) {
+							if (this.isHorizontalChart) {
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
-									// const isHideOutSideLabel = THIS.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > THIS.width;
+									// const isHideOutSideLabel = this.isLeftYAxis ? d.positions.dataLabel2X <= getBBox.width : d.positions.dataLabel2X + getBBox.width > this.width;
 
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
-										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-										THIS.transformData2LabelOutside(ele, false);
+										this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+										this.transformData2LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside, true);
-										THIS.transformDataLabelInside(ele, false, true);
+										this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside, true);
+										this.transformDataLabelInside(ele, false, true);
 										return 1;
 									}
 								} else {
-									if (THIS.isLeftYAxis) {
+									if (this.isLeftYAxis) {
 										if (d.positions.dataLabel2X <= getBBox.width) {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+											this.transformData2LabelOutside(ele, false);
 											// }
 										}
 									} else {
-										if (d.positions.dataLabel2X + getBBox.width > THIS.width) {
+										if (d.positions.dataLabel2X + getBBox.width > this.width) {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+											this.transformData2LabelOutside(ele, false);
 											// }
 										}
 									}
 								}
 							} else {
-								// const isHideOutSideLabel = THIS.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > THIS.height : d.positions.dataLabel2Y <= getBBox.height;
+								// const isHideOutSideLabel = this.isBottomXAxis ? d.positions.dataLabel2Y + getBBox.height > this.height : d.positions.dataLabel2Y <= getBBox.height;
 								if (dataLabelsSettings.placement === DataLabelsPlacement.Inside) {
 									if (isHideInsideLabel) {
 										// if (!isHideOutSideLabel) {
-										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-										THIS.transformData2LabelOutside(ele, false);
+										this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+										this.transformData2LabelOutside(ele, false);
 										// } else {
 										// 	return 0;
 										// }
 									} else {
-										THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside, true);
-										THIS.transformDataLabelInside(ele, false, true);
+										this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Inside, true);
+										this.transformDataLabelInside(ele, false, true);
 										return 1;
 									}
 								} else {
-									if (THIS.isBottomXAxis) {
-										if (d.positions.dataLabel2Y + getBBox.height > THIS.height) {
+									if (this.isBottomXAxis) {
+										if (d.positions.dataLabel2Y + getBBox.height > this.height) {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+											this.transformData2LabelOutside(ele, false);
 											// }
 										}
 									} else {
@@ -7963,8 +7960,8 @@ export class Visual extends Shadow {
 											// if (isHideInsideLabel) {
 											// 	return 0;
 											// } else {
-											THIS.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
-											THIS.transformData2LabelOutside(ele, false);
+											this.setDataLabelsFormatting(ele, textEle, true, DataLabelsPlacement.Outside, true);
+											this.transformData2LabelOutside(ele, false);
 											// }
 										}
 									}
@@ -8277,7 +8274,6 @@ export class Visual extends Shadow {
 
 	// Scale & Axis
 	setXAxisTickStyle(): void {
-		const THIS = this;
 		const xAxisSettings = this.xAxisSettings;
 		let isApplyTilt: boolean;
 		let xAxisMaxHeight: number = 0;
@@ -8294,7 +8290,7 @@ export class Visual extends Shadow {
 		).width;
 		const maxWidth = xAxisSettings.isLabelAutoCharLimit ? (this.scaleBandWidth > 0 ? this.scaleBandWidth : this.brushScaleBandBandwidth) : maxCharsLength;
 
-		if ((!this.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && THIS.isXIsDateTimeAxis)) {
+		if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (!this.isHorizontalChart && this.isXIsDateTimeAxis)) {
 			const xAxisDomain: string[] = this.xScale.domain();
 
 			const xAxisTicks: string[][] = xAxisDomain.map((text) => {
@@ -8304,7 +8300,7 @@ export class Visual extends Shadow {
 					fontFamily: xAxisSettings.labelFontFamily,
 					fontSize: xAxisSettings.labelFontSize + "px",
 				};
-				return GetWordsSplitByWidth(newText, textProperties, maxWidth, THIS.isSmallMultiplesEnabled ? 1 : 3);
+				return GetWordsSplitByWidth(newText, textProperties, maxWidth, this.isSmallMultiplesEnabled ? 1 : 3);
 			});
 
 			const xAxisTicksWidth = xAxisDomain.map((d) => {
@@ -8334,12 +8330,12 @@ export class Visual extends Shadow {
 		}
 
 		let rotateDegree = 0;
-		if (THIS.isBottomXAxis) {
+		if (this.isBottomXAxis) {
 			if (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform) {
 				rotateDegree = -90;
 			} else {
 				if (xAxisSettings.isLabelAutoTilt) {
-					rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? -90 : -35;
+					rotateDegree = (this.markerMaxSize > this.scaleBandWidth) ? -90 : -35;
 				} else {
 					rotateDegree = xAxisSettings.labelTilt;
 				}
@@ -8349,7 +8345,7 @@ export class Visual extends Shadow {
 				rotateDegree = 90;
 			} else {
 				if (xAxisSettings.isLabelAutoTilt) {
-					rotateDegree = (THIS.markerMaxSize > THIS.scaleBandWidth) ? 90 : 35;
+					rotateDegree = (this.markerMaxSize > this.scaleBandWidth) ? 90 : 35;
 				} else {
 					rotateDegree = -xAxisSettings.labelTilt;
 				}
@@ -8415,21 +8411,20 @@ export class Visual extends Shadow {
 	}
 
 	setXYAxisTickStyleExtended2(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
-		const THIS = this;
 		const ticks = [];
 		const xAxisSettings = this.xAxisSettings;
 
 		this.xAxisG
 			.selectAll("text")
-			.each(function () {
-				const ele = d3.select(this);
+			.each((d, i, nodes) => {
+				const ele = d3.select(nodes[i]);
 				let text = ele.text().toString();
 
 				text = text.replace(new RegExp("-1234567890123", 'g'), '');
 
-				const isOthersTick = text.includes(THIS.othersLabel);
+				const isOthersTick = text.includes(this.othersLabel);
 
-				if (THIS.isXIsNumericAxis && THIS.isXIsContinuousAxis) {
+				if (this.isXIsNumericAxis && this.isXIsContinuousAxis) {
 					if (ticks.includes(text)) {
 						ele.attr("opacity", "0");
 					}
@@ -8443,11 +8438,11 @@ export class Visual extends Shadow {
 
 				if (text.includes("&&")) { text = text.replace(/&&/g, " "); }
 
-				if (THIS.isXIsDateTimeAxis && !THIS.isHorizontalChart && !isOthersTick) {
+				if (this.isXIsDateTimeAxis && !this.isHorizontalChart && !isOthersTick) {
 					if (!xAxisSettings.isAutoDateFormat) {
-						text = FormatAxisDate(THIS.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : THIS.xAxisSettings.dateFormat, text);
+						text = FormatAxisDate(this.xAxisSettings.dateFormat === EAxisDateFormats.Custom ? xAxisSettings.customDateFormat : this.xAxisSettings.dateFormat, text);
 					} else {
-						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+						text = valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 					}
 				}
 
@@ -8461,17 +8456,17 @@ export class Visual extends Shadow {
 				};
 
 				const getFinalTruncatedText = (d: string) => {
-					if (THIS.isXIsNumericAxis && (!THIS.isXIsDateTimeAxis && !THIS.isDateCategoryNames)) {
-						return THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
+					if (this.isXIsNumericAxis && (!this.isXIsDateTimeAxis && !this.isDateCategoryNames)) {
+						return this.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : this.numberSettings);
 					} else {
 						return !xAxisSettings.isLabelAutoCharLimit && text.length > xAxisSettings.labelCharLimit ? d.concat("...") : d;
 					}
 				}
 
-				if ((!THIS.isHorizontalChart && !THIS.isXIsContinuousAxis) || (!THIS.isHorizontalChart && (THIS.isXIsDateTimeAxis || THIS.isDateCategoryNames))) {
+				if ((!this.isHorizontalChart && !this.isXIsContinuousAxis) || (!this.isHorizontalChart && (this.isXIsDateTimeAxis || this.isDateCategoryNames))) {
 					if (!isApplyTilt) {
 						ele.attr("transform", `rotate(0)`);
-						if (!THIS.isBottomXAxis) {
+						if (!this.isBottomXAxis) {
 							ele.attr("y", () => {
 								if (xAxisMaxWordHeight === 1) {
 									return 0;
@@ -8483,7 +8478,7 @@ export class Visual extends Shadow {
 							});
 						}
 
-						const words: string[] = GetWordsSplitByWidth(newText, textProperties, maxWidth - xAxisSettings.labelFontSize / 2, THIS.isSmallMultiplesEnabled ? 1 : 3);
+						const words: string[] = GetWordsSplitByWidth(newText, textProperties, maxWidth - xAxisSettings.labelFontSize / 2, this.isSmallMultiplesEnabled ? 1 : 3);
 						words.forEach((d, i) => {
 							ele
 								.append("tspan")
@@ -8493,7 +8488,7 @@ export class Visual extends Shadow {
 						});
 					} else {
 						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, xAxisMaxHeight);
-						if (THIS.isBottomXAxis) {
+						if (this.isBottomXAxis) {
 							ele.attr("transform", `rotate( ${rotateDegree})`);
 						} else {
 							ele.attr("transform", `rotate( ${rotateDegree})`);
@@ -8511,16 +8506,16 @@ export class Visual extends Shadow {
 					}
 
 					let isPercentageNumber = false;
-					if (THIS.measureNumberFormatter[0].format && THIS.measureNumberFormatter[0].format.includes("%")) {
+					if (this.measureNumberFormatter[0].format && this.measureNumberFormatter[0].format.includes("%")) {
 						isPercentageNumber = true;
 					}
 
-					const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : THIS.numberSettings);
+					const truncatedText = this.axisNumberFormatter(parseFloat(extractDigitsFromString((xAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, xAxisSettings.labelCharLimit))).toString()), xAxisSettings.numberFormatting.show ? xAxisSettings.numberFormatting : this.numberSettings);
 					const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : truncatedText);
 					ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 
 					if (!xAxisSettings.isLabelAutoTilt) {
-						if (THIS.isBottomXAxis) {
+						if (this.isBottomXAxis) {
 							ele.attr("transform", `rotate( ${rotateDegree})`);
 						} else {
 							ele.attr("transform", `rotate( ${rotateDegree})`);
@@ -8531,7 +8526,6 @@ export class Visual extends Shadow {
 	}
 
 	setYAxisTickStyle(): void {
-		const THIS = this;
 		const ticks = [];
 		const yAxisSettings = this.yAxisSettings;
 		this.yAxisG
@@ -8550,15 +8544,15 @@ export class Visual extends Shadow {
 			// 	}
 			// 	return d;
 			// })
-			.each(function () {
-				const ele = d3.select(this);
+			.each((d, i, nodes) => {
+				const ele = d3.select(nodes[i]);
 				let text = ele.text();
 
 				text = text.replace(new RegExp("-1234567890123", 'g'), '');
 
-				const isOthersTick = text.includes(THIS.othersLabel);
+				const isOthersTick = text.includes(this.othersLabel);
 
-				// if (!text.includes(THIS.othersLabel)) { }
+				// if (!text.includes(this.othersLabel)) { }
 				if (text.includes("isZero")) {
 					text = "0";
 				}
@@ -8571,7 +8565,7 @@ export class Visual extends Shadow {
 					text = text.replace(/&&/g, " ");
 				}
 
-				if (THIS.isYIsNumericAxis && THIS.isYIsContinuousAxis) {
+				if (this.isYIsNumericAxis && this.isYIsContinuousAxis) {
 					if (ticks.includes(text)) {
 						ele.attr("opacity", "0");
 					}
@@ -8583,15 +8577,15 @@ export class Visual extends Shadow {
 					return !yAxisSettings.isLabelAutoCharLimit && d.length === yAxisSettings.labelCharLimit && text.length > yAxisSettings.labelCharLimit ? d.concat("...") : d;
 				}
 
-				if (THIS.isYIsDateTimeAxis && !THIS.isYIsContinuousAxis && THIS.isHorizontalChart && !isOthersTick) {
+				if (this.isYIsDateTimeAxis && !this.isYIsContinuousAxis && this.isHorizontalChart && !isOthersTick) {
 					if (!yAxisSettings.isAutoDateFormat) {
 						text = FormatAxisDate(yAxisSettings.dateFormat === EAxisDateFormats.Custom ? yAxisSettings.customDateFormat : yAxisSettings.dateFormat, text);
 					} else {
-						text = valueFormatter.create({ format: THIS.categoricalCategoriesFields[THIS.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
+						text = valueFormatter.create({ format: this.categoricalCategoriesFields[this.categoricalCategoriesLastIndex].source.format }).format(new Date(text));
 					}
 				}
 
-				if ((!THIS.isYIsDateTimeAxis && THIS.isHorizontalChart) || !THIS.isHorizontalChart) {
+				if ((!this.isYIsDateTimeAxis && this.isHorizontalChart) || !this.isHorizontalChart) {
 					const firstChar = text.charAt(0);
 					const unicodeValue = firstChar.charCodeAt(0);
 					const isNegativeNumber = (unicodeValue === 8722 || text.includes("-")) && extractDigitsFromString(text);
@@ -8614,17 +8608,17 @@ export class Visual extends Shadow {
 					};
 
 					let isPercentageNumber = false;
-					if (THIS.measureNumberFormatter[0].format && THIS.measureNumberFormatter[0].format.includes("%")) {
+					if (this.measureNumberFormatter[0].format && this.measureNumberFormatter[0].format.includes("%")) {
 						isPercentageNumber = true;
 					}
 
-					if (!THIS.isHorizontalChart || THIS.isYIsContinuousAxis) {
-						const truncatedText = THIS.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : THIS.numberSettings);
+					if (!this.isHorizontalChart || this.isYIsContinuousAxis) {
+						const truncatedText = this.axisNumberFormatter(parseFloat(extractDigitsFromString(yAxisSettings.isLabelAutoCharLimit ? text : text.substring(0, yAxisSettings.labelCharLimit)).toString()), yAxisSettings.numberFormatting.show ? yAxisSettings.numberFormatting : this.numberSettings);
 						const finalText = getFinalTruncatedText(!isNegativeNumber ? truncatedText : truncatedText);
 						ele.append("tspan").text(isPercentageNumber ? finalText.concat("%") : finalText);
 					} else {
-						const width = THIS.isSmallMultiplesEnabled && THIS.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? THIS.origViewPortWidth : THIS.viewPortWidth;
-						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * THIS.yAxisTicksMaxWidthRatio);
+						const width = this.isSmallMultiplesEnabled && this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? this.origViewPortWidth : this.viewPortWidth;
+						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * this.yAxisTicksMaxWidthRatio);
 						ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 					}
 				} else {
@@ -8636,8 +8630,8 @@ export class Visual extends Shadow {
 
 					ele.text("");
 
-					const width = THIS.isSmallMultiplesEnabled && THIS.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? THIS.origViewPortWidth : THIS.viewPortWidth;
-					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * THIS.yAxisTicksMaxWidthRatio);
+					const width = this.isSmallMultiplesEnabled && this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Uniform ? this.origViewPortWidth : this.viewPortWidth;
+					const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, width * this.yAxisTicksMaxWidthRatio);
 					ele.append("tspan").text(getFinalTruncatedText(truncatedText));
 				}
 			});
@@ -9622,27 +9616,30 @@ export class Visual extends Shadow {
 
 		const SVGBBox = (this.svg.node() as SVGSVGElement).getBoundingClientRect();
 
+		const cb = (eleRef) => {
+			const ele = d3.select(eleRef);
+			const start = SVGBBox.x;
+			const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
+
+			if ((bBox.x - start) < 0) {
+				const textProperties: TextProperties = {
+					text: ele.text(),
+					fontFamily: this.xAxisSettings.labelFontFamily,
+					fontSize: this.xAxisSettings.labelFontSize + "px",
+				};
+
+				const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
+				ele.text(truncatedText);
+			}
+		}
+
 		// Truncate the ticks which are overlaps with the Y axis
-		const THIS = this;
 		if (!this.isHorizontalChart && (!this.isSmallMultiplesEnabled || (this.isSmallMultiplesEnabled && this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual))) {
 			this.xAxisG
 				.selectAll(".tick")
 				.selectAll("text")
 				.each(function () {
-					const ele = d3.select(this);
-					const start = SVGBBox.x;
-					const bBox = (ele.node() as SVGSVGElement).getBoundingClientRect();
-
-					if ((bBox.x - start) < 0) {
-						const textProperties: TextProperties = {
-							text: ele.text(),
-							fontFamily: THIS.xAxisSettings.labelFontFamily,
-							fontSize: THIS.xAxisSettings.labelFontSize + "px",
-						};
-
-						const truncatedText = textMeasurementService.getTailoredTextOrDefault(textProperties, bBox.width + (bBox.x - start));
-						ele.text(truncatedText);
-					}
+					cb(this);
 				});
 		}
 
@@ -9659,7 +9656,6 @@ export class Visual extends Shadow {
 	// Lines
 
 	setHorizontalLinesFormatting(linesSelection: any, isEnter: boolean): void {
-		const THIS = this;
 		linesSelection
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
@@ -9667,15 +9663,15 @@ export class Visual extends Shadow {
 			.attr("x1", (d: ILollipopChartRow) => {
 				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
 					if (d.value1 >= d.value2) {
-						return this.getXPosition(d.value1) + THIS.markerMaxSize / 2;
+						return this.getXPosition(d.value1) + this.markerMaxSize / 2;
 					} else {
-						return this.getXPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getXPosition(d.value2) + (this.isHasMultiMeasure ? this.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 >= d.value2) {
 						const Y1 = this.getXPosition(d.value2);
-						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
-						const Y2 = this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
+						const newY1 = Y1 + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieXScaleDiff(Y1, true) : this.circle2Size / 2 + this.getCircleXScaleDiff(Y1, true) : 0)
+						const Y2 = this.getXPosition(d.value1) - this.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -9683,9 +9679,9 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.getXPosition(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
-						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y1, true) : 0)
-						const Y2 = this.getXPosition(d.value2) - THIS.markerMaxSize / 2;
+						const Y1 = this.getXPosition(d.value1) + (this.isHasMultiMeasure ? 0 : this.markerMaxSize / 2);
+						const newY1 = Y1 + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieXScaleDiff(Y1, true) : this.circle2Size / 2 + this.getCircleXScaleDiff(Y1, true) : 0)
+						const Y2 = this.getXPosition(d.value2) - this.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -9698,9 +9694,9 @@ export class Visual extends Shadow {
 			.attr("x2", (d: ILollipopChartRow) => {
 				if ((!this.isLeftYAxis && !this.xAxisSettings.isInvertRange) || (this.isLeftYAxis && this.xAxisSettings.isInvertRange)) {
 					if (d.value1 >= d.value2) {
-						const Y1 = THIS.getXPosition(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.getXPosition(d.value2);
-						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
+						const Y1 = this.getXPosition(d.value1) + this.markerMaxSize / 2;
+						const Y2 = this.getXPosition(d.value2);
+						const newY2 = Y2 - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieXScaleDiff(Y2, true) : this.circle2Size / 2 + this.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
 							return newY2;
@@ -9708,9 +9704,9 @@ export class Visual extends Shadow {
 							return Y1;
 						}
 					} else {
-						const Y1 = THIS.getXPosition(d.value2) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.getXPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
-						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieXScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleXScaleDiff(Y2, true) : 0)
+						const Y1 = this.getXPosition(d.value2) + this.markerMaxSize / 2;
+						const Y2 = this.getXPosition(d.value1) - (this.isHasMultiMeasure ? 0 : this.markerMaxSize / 2);
+						const newY2 = Y2 - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieXScaleDiff(Y2, true) : this.circle2Size / 2 + this.getCircleXScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
 							return newY2;
@@ -9720,9 +9716,9 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (d.value1 >= d.value2) {
-						return this.getXPosition(d.value1) - THIS.markerMaxSize / 2;
+						return this.getXPosition(d.value1) - this.markerMaxSize / 2;
 					} else {
-						return this.getXPosition(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getXPosition(d.value2) - (this.isHasMultiMeasure ? this.markerMaxSize / 2 : 0);
 					}
 				}
 			})
@@ -9792,7 +9788,6 @@ export class Visual extends Shadow {
 	}
 
 	setVerticalLinesFormatting(linesSelection: D3Selection<any>, isEnter: boolean): void {
-		const THIS = this;
 		linesSelection
 			.attr("stroke", (d: ILollipopChartRow) => this.getLineStroke(d))
 			.attr("stroke-width", this.lineSettings.lineWidth)
@@ -9806,20 +9801,20 @@ export class Visual extends Shadow {
 			.transition()
 			.duration(isEnter ? 0 : this.tickDuration)
 			.ease(easeLinear)
-			.attr("x1", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
-			.attr("x2", d => this.getXPosition(d.category) + THIS.scaleBandWidth / 2)
+			.attr("x1", d => this.getXPosition(d.category) + this.scaleBandWidth / 2)
+			.attr("x2", d => this.getXPosition(d.category) + this.scaleBandWidth / 2)
 			.attr("y1", (d: ILollipopChartRow) => {
 				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
 					if (d.value1 >= d.value2) {
-						return this.getYPosition(d.value1) + THIS.markerMaxSize / 2;
+						return this.getYPosition(d.value1) + this.markerMaxSize / 2;
 					} else {
-						return this.getYPosition(d.value2) + (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getYPosition(d.value2) + (this.isHasMultiMeasure ? this.markerMaxSize / 2 : 0);
 					}
 				} else {
 					if (d.value1 >= d.value2) {
 						const Y1 = this.getYPosition(d.value2);
-						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
-						const Y2 = this.getYPosition(d.value1) - THIS.markerMaxSize / 2;
+						const newY1 = Y1 + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieYScaleDiff(Y1, true) : this.circle2Size / 2 + this.getCircleYScaleDiff(Y1, true) : 0)
+						const Y2 = this.getYPosition(d.value1) - this.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -9827,9 +9822,9 @@ export class Visual extends Shadow {
 							return Y2;
 						}
 					} else {
-						const Y1 = this.getYPosition(d.value1) + (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
-						const newY1 = Y1 + (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y1, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y1, true) : 0)
-						const Y2 = this.getYPosition(d.value2) - THIS.markerMaxSize / 2;
+						const Y1 = this.getYPosition(d.value1) + (this.isHasMultiMeasure ? 0 : this.markerMaxSize / 2);
+						const newY1 = Y1 + (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieYScaleDiff(Y1, true) : this.circle2Size / 2 + this.getCircleYScaleDiff(Y1, true) : 0)
+						const Y2 = this.getYPosition(d.value2) - this.markerMaxSize / 2;
 
 						if (newY1 < Y2) {
 							return newY1;
@@ -9842,9 +9837,9 @@ export class Visual extends Shadow {
 			.attr("y2", (d: ILollipopChartRow) => {
 				if ((this.isBottomXAxis && !this.yAxisSettings.isInvertRange) || (!this.isBottomXAxis && this.yAxisSettings.isInvertRange)) {
 					if (d.value1 >= d.value2) {
-						const Y1 = THIS.getYPosition(d.value1) + THIS.markerMaxSize / 2;
-						const Y2 = THIS.getYPosition(d.value2);
-						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
+						const Y1 = this.getYPosition(d.value1) + this.markerMaxSize / 2;
+						const Y2 = this.getYPosition(d.value2);
+						const newY2 = Y2 - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieYScaleDiff(Y2, true) : this.circle2Size / 2 + this.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 > Y1) {
 							return newY2;
@@ -9852,9 +9847,9 @@ export class Visual extends Shadow {
 							return Y1;
 						}
 					} else {
-						const Y1 = THIS.getYPosition(d.value2) + (THIS.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
-						const Y2 = THIS.getYPosition(d.value1) - (this.isHasMultiMeasure ? 0 : THIS.markerMaxSize / 2);
-						const newY2 = Y2 - (THIS.isHasMultiMeasure ? THIS.isLollipopTypePie ? THIS.pie2Radius + THIS.getPieYScaleDiff(Y2, true) : THIS.circle2Size / 2 + THIS.getCircleYScaleDiff(Y2, true) : 0)
+						const Y1 = this.getYPosition(d.value2) + (this.isHasMultiMeasure ? this.markerMaxSize / 2 : 0);
+						const Y2 = this.getYPosition(d.value1) - (this.isHasMultiMeasure ? 0 : this.markerMaxSize / 2);
+						const newY2 = Y2 - (this.isHasMultiMeasure ? this.isLollipopTypePie ? this.pie2Radius + this.getPieYScaleDiff(Y2, true) : this.circle2Size / 2 + this.getCircleYScaleDiff(Y2, true) : 0)
 
 						if (newY2 >= Y1) {
 							return newY2;
@@ -9864,9 +9859,9 @@ export class Visual extends Shadow {
 					}
 				} else {
 					if (d.value1 > d.value2) {
-						return this.getYPosition(d.value1) - THIS.markerMaxSize / 2;
+						return this.getYPosition(d.value1) - this.markerMaxSize / 2;
 					} else {
-						return this.getYPosition(d.value2) - (this.isHasMultiMeasure ? THIS.markerMaxSize / 2 : 0);
+						return this.getYPosition(d.value2) - (this.isHasMultiMeasure ? this.markerMaxSize / 2 : 0);
 					}
 				}
 			});
@@ -9961,29 +9956,28 @@ export class Visual extends Shadow {
 	}
 
 	handleCreateOwnDynamicDeviationOnBarClick(barElement: SVGElement): void {
-		const THIS = this;
 		const isCreateOwnDynamicDeviation: boolean =
 			this.dynamicDeviationSettings.isEnabled && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn;
 
-		if (isCreateOwnDynamicDeviation || THIS.isDynamicDeviationButtonSelected) {
+		if (isCreateOwnDynamicDeviation || this.isDynamicDeviationButtonSelected) {
 			const data: any = d3.select(barElement).datum();
-			if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
-				THIS.toCategoryValueDataPair = { category: data.category, value: data.value1 };
-				RenderDynamicDeviation(this, THIS.fromCategoryValueDataPair, THIS.toCategoryValueDataPair);
+			if (this.fromCategoryValueDataPair && !this.toCategoryValueDataPair) {
+				this.toCategoryValueDataPair = { category: data.category, value: data.value1 };
+				RenderDynamicDeviation(this, this.fromCategoryValueDataPair, this.toCategoryValueDataPair);
 
 				if (!this.dynamicDeviationSettings.createYourOwnDeviation || !this.dynamicDeviationSettings.createYourOwnDeviation.from) {
-					THIS.visualHost.persistProperties({
+					this.visualHost.persistProperties({
 						merge: [
 							{
 								objectName: "dynamicDeviationConfig",
 								displayName: "dynamicDeviationSettings",
 								properties: {
 									dynamicDeviationSettings: JSON.stringify({
-										...THIS.dynamicDeviationSettings,
+										...this.dynamicDeviationSettings,
 										[EDynamicDeviationSettings.CreateYourOwnDeviation]: {
-											...THIS.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
-											from: THIS.fromCategoryValueDataPair,
-											to: THIS.toCategoryValueDataPair,
+											...this.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
+											from: this.fromCategoryValueDataPair,
+											to: this.toCategoryValueDataPair,
 										},
 										[EDynamicDeviationSettings.RemoveCurrentDeviation]: false
 									}),
@@ -9995,27 +9989,27 @@ export class Visual extends Shadow {
 				}
 
 				d3.select(".dynamic-deviation-button").classed("selected", false);
-				THIS.isDynamicDeviationButtonSelected = false;
-				THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "unset");
+				this.isDynamicDeviationButtonSelected = false;
+				this.lollipopG.selectAll(".lollipop-group").style("cursor", "unset");
 
-				if (!THIS.isDeviationCreatedAfterButtonClicked && THIS.dynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) {
-					THIS.isDeviationCreatedAfterButtonClicked = true;
-					THIS.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.CreateYourOwn;
+				if (!this.isDeviationCreatedAfterButtonClicked && this.dynamicDeviationSettings.displayType !== EDynamicDeviationDisplayTypes.CreateYourOwn) {
+					this.isDeviationCreatedAfterButtonClicked = true;
+					this.dynamicDeviationSettings.displayType = EDynamicDeviationDisplayTypes.CreateYourOwn;
 
-					THIS.visualHost.persistProperties({
+					this.visualHost.persistProperties({
 						merge: [
 							{
 								objectName: "dynamicDeviationConfig",
 								displayName: "dynamicDeviationSettings",
 								properties: {
 									dynamicDeviationSettings: JSON.stringify({
-										...THIS.dynamicDeviationSettings,
+										...this.dynamicDeviationSettings,
 										displayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
 										lastDisplayType: EDynamicDeviationDisplayTypes.CreateYourOwn,
 										[EDynamicDeviationSettings.CreateYourOwnDeviation]: {
-											...THIS.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
-											from: THIS.fromCategoryValueDataPair,
-											to: THIS.toCategoryValueDataPair,
+											...this.dynamicDeviationSettings[EDynamicDeviationSettings.CreateYourOwnDeviation],
+											from: this.fromCategoryValueDataPair,
+											to: this.toCategoryValueDataPair,
 										},
 									}),
 								},
@@ -10026,12 +10020,12 @@ export class Visual extends Shadow {
 				}
 			}
 
-			if (!THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
-				THIS.fromCategoryValueDataPair = { category: data.category, value: data.value1 };
+			if (!this.fromCategoryValueDataPair && !this.toCategoryValueDataPair) {
+				this.fromCategoryValueDataPair = { category: data.category, value: data.value1 };
 			}
 		}
 
-		if (!isCreateOwnDynamicDeviation && !THIS.isDynamicDeviationButtonSelected) {
+		if (!isCreateOwnDynamicDeviation && !this.isDynamicDeviationButtonSelected) {
 			// HighlightActiveBar(d3.select(barElement), THIS.normalBarG.selectAll("foreignObject"));
 		}
 	}
@@ -10486,20 +10480,23 @@ export class Visual extends Shadow {
 		this.referenceLinesData = GetReferenceLinesData(this);
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 
-		const THIS = this;
+		const cbMouseOver = (ele) => {
+			if (isCreateOwnDynamicDeviation || this.isDynamicDeviationButtonSelected) {
+				this.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
+				if (this.fromCategoryValueDataPair && !this.toCategoryValueDataPair) {
+					const data: any = d3.select(ele).datum();
+					const toCategoryValueDataPair = { category: data.category, value: data.value1 };
+					RenderDynamicDeviation(this, this.fromCategoryValueDataPair, toCategoryValueDataPair);
+					this.toCategoryValueDataPair = undefined;
+				}
+			}
+		}
+
 		const isCreateOwnDynamicDeviation: boolean =
 			this.dynamicDeviationSettings.isEnabled && this.dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn;
 		this.lollipopG.selectAll(".lollipop-group")
 			.on("mouseover", function () {
-				if (isCreateOwnDynamicDeviation || THIS.isDynamicDeviationButtonSelected) {
-					THIS.lollipopG.selectAll(".lollipop-group").style("cursor", "cell");
-					if (THIS.fromCategoryValueDataPair && !THIS.toCategoryValueDataPair) {
-						const data: any = d3.select(this).datum();
-						const toCategoryValueDataPair = { category: data.category, value: data.value1 };
-						RenderDynamicDeviation(THIS, THIS.fromCategoryValueDataPair, toCategoryValueDataPair);
-						THIS.toCategoryValueDataPair = undefined;
-					}
-				}
+				cbMouseOver(this);
 			});
 
 		if (this.dynamicDeviationSettings.isEnabled && !this.isHasMultiMeasure) {
@@ -11473,8 +11470,7 @@ export class Visual extends Shadow {
 			// return this.getPieSliceClass(d.category, pieData ? pieData.category + " " + "pie-slice" : "");
 		});
 
-		const THIS = this;
-
+		const smallMultiplesGridItemId = this.smallMultiplesGridItemId;
 		ele.selectAll(".pie-slice").each(function (_, i) {
 			const bBox = (d3.select(this).node() as SVGSVGElement).getBBox();
 			d3.select(this).datum((datum: any) => {
@@ -11484,7 +11480,7 @@ export class Visual extends Shadow {
 					valueType: isPie2 ? DataValuesType.Value2 : DataValuesType.Value1,
 					sliceWidth: bBox.width,
 					sliceHeight: bBox.height,
-					smallMultipleCategory: THIS.smallMultiplesGridItemId
+					smallMultipleCategory: smallMultiplesGridItemId
 				}
 			})
 		})
