@@ -1,4 +1,3 @@
-/* eslint-disable no-empty */
 /* eslint-disable @typescript-eslint/no-this-alias */
 "use strict";
 
@@ -1658,61 +1657,25 @@ export class Visual extends Shadow {
 		this.errorBarsSettings.isEnabled = this.errorBarsSettings.isEnabled && this.isShowErrorBars;
 		this.isHasExtraDataLabels = categoricalExtraDataLabelsFields.length > 0;
 
-		if ((this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
-			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
-			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
-		}
+		this.setVisualSettingsFromInitialChartData(categoricalData, categoricalCategoriesFields, categoricalCategoriesLastIndex, categoricalMeasureFields, categoricalSubCategoryField);
+		this.setInitialChartDataExtended1(categoricalData, categoricalCategoriesFields, categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues, categoricalSubCategoryField, categoricalCategoriesLastIndex, isOnlyCreateDataPairs);
+		this.setInitialChartDataExtended2(categoricalData, categoricalMeasureFields, categoricalRaceBarValues, categoricalCategoriesFields, categoricalSortFields, categoricalTooltipFields, categoricalSmallMultiplesFields, categoricalCategoriesLastIndex);
+		this.setInitialChartDataExtended3(categoricalData, width, height, isRenderBrush);
 
-		if ((this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
-			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
-			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
-		}
+		return categoricalData;
+	}
 
-		const dataColorsSettings = this.dataColorsSettings;
-
-		if (this.lineSettings.isApplyMarkerColor && this.isLollipopTypePie) {
-			if (this.isHasMultiMeasure || (!this.isHasMultiMeasure && dataColorsSettings.fillType !== ColorPaletteType.Single)) {
-				this.lineSettings.isApplyMarkerColor = false;
-			}
-		}
-
-		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
-		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
-		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("month") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
-		this.isDateCategoryNames = ["year", "month", "quarter", "day"].includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase());
-
-		if (this.isHasSubcategories) {
-			const subCategoriesName = categoricalMeasureFields
-				.map((d) => d.source.groupName)
-				.filter((d) => d && d !== null && d !== undefined && d !== "")
-				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
-
-			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toString().toLowerCase()));
-			this.isDateSubcategoryNames = categoricalSubCategoryField.type.dateTime;
-
-			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
-				this.sortingSettings.category.sortBy = this.categoryDisplayName;
-
-				if (!this.sortingSettings.isDefaultSortOrderChanged) {
-					this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
-				}
-
-				this.handleSortByCategoryChange(this.sortingSettings.category);
-			}
-		}
-
-		if ((this.isDateCategoryNames || this.isXIsDateTimeAxis || this.isYIsDateTimeAxis) && !this.sortingSettings.isDefaultSortByChanged) {
-			this.sortingSettings.category.sortBy = this.categoryDisplayName;
-
-			if (!this.sortingSettings.isDefaultSortOrderChanged) {
-				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
-			}
-
-			this.handleSortByCategoryChange(this.sortingSettings.category);
-		}
-
-		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
-
+	setInitialChartDataExtended1(
+		categoricalData: powerbi.DataViewCategorical,
+		categoricalCategoriesFields: powerbi.DataViewCategoryColumn[],
+		categoricalMeasureFields: powerbi.DataViewValueColumn[],
+		categoricalTooltipFields: powerbi.DataViewValueColumn[],
+		categoricalSortFields: powerbi.DataViewValueColumn[],
+		categoricalRaceBarValues: powerbi.DataViewCategoryColumn[],
+		categoricalSubCategoryField: any,
+		categoricalCategoriesLastIndex: number,
+		isOnlyCreateDataPairs: boolean
+	) {
 		if (this.isExpandAllApplied) {
 			if (this.isSmallMultiplesEnabled) {
 				const startCategories = categoricalCategoriesFields.slice(0, this.categoricalCategoriesLastIndex);
@@ -1731,6 +1694,270 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.setVisualMargeProperties(isOnlyCreateDataPairs);
+		this.setVisualPropertiesValues(categoricalData);
+		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues);
+
+		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
+		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
+
+		if (!this.isSmallMultiplesEnabled && this.legendSettings.legendTitle.length === 0) {
+			if (this.isLollipopTypePie) {
+				this.legendSettings.legendTitle = this.subCategoryDisplayName;
+			} else {
+				this.legendSettings.legendTitle = this.categoryDisplayName;
+			}
+
+			this._host.persistProperties({
+				merge: [
+					{
+						objectName: EVisualSettings.Legend,
+						properties: { legendTitle: this.legendSettings.legendTitle },
+						selector: null,
+					},
+				],
+			});
+		}
+
+		this.isSortDataFieldsAdded = categoricalSortFields.length > 0 || categoricalTooltipFields.length > 0;
+		this.sortFieldsDisplayName =
+			categoricalSortFields.length > 0
+				? categoricalSortFields
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
+
+		this.tooltipFieldsDisplayName =
+			categoricalTooltipFields.length > 0
+				? categoricalTooltipFields
+					.map((d) => ({
+						label: d.source.displayName,
+						value: d.source.displayName,
+						isSortByCategory: d.source.type.text,
+						isSortByMeasure: d.source.type.numeric,
+						isSortByExtraSortField: true,
+					}))
+					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
+				: [];
+	}
+
+	setInitialChartDataExtended2(
+		categoricalData: powerbi.DataViewCategorical,
+		categoricalMeasureFields: powerbi.DataViewValueColumn[],
+		categoricalRaceBarValues: powerbi.DataViewCategoryColumn[],
+		categoricalCategoriesFields: powerbi.DataViewCategoryColumn[],
+		categoricalSortFields: powerbi.DataViewValueColumn[],
+		categoricalTooltipFields: powerbi.DataViewValueColumn[],
+		categoricalSmallMultiplesDataFields: powerbi.DataViewCategoryColumn[],
+		categoricalCategoriesLastIndex: number
+	) {
+		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : undefined;
+		this.measure2DisplayName = this.isHasMultiMeasure && categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : undefined;
+
+		const errorBarValues = [this.measure1DisplayName];
+
+		if (this.isHasMultiMeasure) {
+			errorBarValues.push(this.measure2DisplayName, "Both");
+		}
+
+		if (!errorBarValues.includes(this.errorBarsSettings.measurement.applySettingsToMeasure)) {
+			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
+		}
+
+		if (
+			this.sortingSettings.category.isSortByExtraSortField &&
+			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
+		) {
+			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
+			this.sortingSettings.category.isSortByCategory = false;
+			this.sortingSettings.category.isSortByMeasure = true;
+			this.sortingSettings.category.isSortByMultiMeasure = false;
+			this.sortingSettings.category.isSortByExtraSortField = false;
+		}
+
+		this.measureNamesByTotal = [];
+		const measureGroup = d3.group(categoricalMeasureFields, d => d.source.displayName);
+		[...new Set(measureGroup.keys())].forEach(d => {
+			this.measureNamesByTotal.push({ name: d, total: d3.max(measureGroup.get(d), d => d3.sum(d.values, t => +t)) });
+		});
+
+		this.measureNamesByTotal = this.measureNamesByTotal.sort((a, b) => b.total - a.total);
+
+		if (this.isLollipopTypePie) {
+			this.groupNamesByTotal = [];
+			const subCategoriesGroup = d3.group(categoricalMeasureFields.filter(d => d.source.displayName === (this.dataColorsSettings.gradientAppliedToMeasure === EMarkerColorTypes.Marker1 ? this.measure1DisplayName : this.measure2DisplayName)), d => d.source.groupName ? d.source.groupName.toString() : d.source.groupName);
+			[...new Set(subCategoriesGroup.keys())].forEach(d => {
+				this.groupNamesByTotal.push({ name: d ? d.toString() : undefined, total: d3.max(subCategoriesGroup.get(d ? d.toString() : d), m => d3.sum(m.values, t => +t)) });
+			});
+
+			this.groupNamesByTotal.sort((a, b) => b.total - a.total);
+		} else {
+			this.groupNamesByTotal = [];
+		}
+
+		this.setCategoricalDataBySubcategoryRanking(categoricalData);
+
+		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
+
+		if (this.isChartRacePossible && categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
+			this.isChartRacePossible = false;
+		}
+
+		this.setCategoricalDataPairs(categoricalData, categoricalSmallMultiplesDataFields, categoricalCategoriesLastIndex);
+
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
+
+		const measureKeys = categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
+
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
+		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
+
+		this.setCategoricalDataPairsByRanking();
+
+		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
+		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
+		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
+
+		if (this.sortingSettings.category.enabled) {
+			const sortFields = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+			const sortByTooltipFields = categoricalTooltipFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
+			const isSortByTooltipField = sortFields.length === 0 && sortByTooltipFields.length > 0;
+			const externalFieldSortKey = isSortByTooltipField ? EDataRolesName.Tooltip : EDataRolesName.Sort;
+
+			if (!this.isHasSubcategories) {
+				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index);
+				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index) : sortFields.map((d) => EDataRolesName.Sort + d.source.index);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
+			} else {
+				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
+				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index + d.source.groupName) : sortFields.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
+				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
+			}
+		}
+
+		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category", this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
+
+		const clonedCategoricalPair = cloneDeep(this.categoricalDataPairs);
+		if (this.isHorizontalChart) {
+			this.categoricalDataPairs = clonedCategoricalPair.reverse();
+			this.sortedCategoricalDataPairs = this.sortedCategoricalDataPairs.reverse();
+		}
+
+		this.categoryColorPairWithIndex = {};
+		this.subCategoryColorPairWithIndex = {};
+
+		this.sortSubcategoryData(categoricalData);
+	}
+
+	setInitialChartDataExtended3(
+		categoricalData: powerbi.DataViewCategorical,
+		width: number, height: number, isRenderBrush: boolean
+	) {
+		const categoricalValues = categoricalData.values as any;
+		const measures: any[] = categoricalValues.filter((d) => d.source.roles[EDataRolesName.Measure]);
+
+		this.subCategoriesName = measures
+			.map((d) => d.source.groupName)
+			.filter((d) => d && d !== null && d !== undefined && d !== "")
+			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
+
+		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs;
+
+		// set colors for all pairs
+		categoricalDataPairs.forEach((data, i) => {
+			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
+		});
+
+		categoricalDataPairs.forEach(d => {
+			this.subCategoriesName.forEach((name, i) => {
+				this.subCategoryColorPairWithIndex[`${i}-${d.category}-${name}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
+			});
+		});
+
+		this.setColorsByDataColorsSettings();
+
+		this.setCategoricalDataFromPairs(categoricalData);
+
+		const categoricalDataValues = this.originalCategoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
+
+		const min = d3.min(categoricalDataValues, d => d3.min(d.values, v => <number>v));
+		const max = d3.max(categoricalDataValues, d => d3.max(d.values, v => <number>v));
+
+		if (!this.dataColorsSettings.isFillTypeChanged && min < 0 && max > 0 && !this.isIBCSEnabled) {
+			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
+		}
+
+		const dataLength = categoricalData.categories[this.categoricalCategoriesLastIndex].values.length;
+
+		this.setBrushScaleBandDomain(categoricalData);
+		this.setBrushScaleBandRange(width, height);
+
+		if (
+			this.chartSettings.lollipopWidth > this.minScaleBandWidth &&
+			!this.chartSettings.isAutoLollipopWidth
+		) {
+			this.brushScaleBandBandwidth = this.chartSettings.lollipopWidth;
+		} else if (this.brushScaleBand.bandwidth() > this.minScaleBandWidth) {
+			this.brushScaleBandBandwidth = this.brushScaleBand.bandwidth();
+		} else {
+			this.brushScaleBandBandwidth = this.minScaleBandWidth;
+		}
+
+		this.categoryLabelHeight = getSVGTextSize("Label", this.yAxisSettings.labelFontFamily, this.yAxisSettings.labelFontSize).height;
+
+		// if (this.brushScaleBandBandwidth < this.markerMaxSize + this.markerMaxSize * 0.2) {
+		// 	this.brushScaleBandBandwidth = this.markerMaxSize + this.markerMaxSize * 0.2;
+		// }
+
+		// if (!this.markerSettings.marker1Style.isAutoMarkerSize || (this.isHasMultiMeasure && !this.markerSettings.marker2Style.isAutoMarkerSize)) {
+		// 	if (this.isLollipopTypeCircle) {
+		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize : 0)]);
+		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+		// 			this.brushScaleBandBandwidth = maxMarkerSize + 5;
+		// 		}
+		// 	} else {
+		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize * 2, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize * 2 : 0)]);
+		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
+		// 			this.brushScaleBandBandwidth = maxMarkerSize + 10;
+		// 		}
+		// 	}
+		// }
+
+		this.scaleBandWidth = this.brushScaleBandBandwidth;
+
+		this.totalLollipopCount = [...new Set(categoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
+
+		this.xScale = this.brushScaleBand;
+
+		// const minIndex = d3.minIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
+		// const maxIndex = d3.maxIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
+
+		this.firstCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[0],
+			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[0]) : <number>categoricalData.values[0].values[0],
+		};
+
+		this.lastCategoryValueDataPair = {
+			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[dataLength - 1],
+			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[dataLength - 1]) : <number>categoricalData.values[0].values[dataLength - 1],
+		};
+
+		if (this.brushAndZoomAreaSettings.enabled) {
+			if (this.categoricalDataPairs.length < this.brushAndZoomAreaSettings.minLollipopCount) {
+				this.brushAndZoomAreaSettings.enabled = false;
+			}
+		}
+
+		this.displayBrushFromSetInitialChatData(categoricalData, width, height, isRenderBrush);
+	}
+
+	setVisualMargeProperties(isOnlyCreateDataPairs: boolean): void {
 		if (!isOnlyCreateDataPairs) {
 			if (!this.isHasImagesData) {
 				if (this.isHasSubcategories && this.markerSettings.markerType === EMarkerTypes.SHAPE && !this.markerSettings.isAutoLollipopTypePie) {
@@ -1830,7 +2057,72 @@ export class Visual extends Shadow {
 				});
 			}
 		}
+	}
 
+	setVisualSettingsFromInitialChartData(
+		categoricalData: powerbi.DataViewCategorical,
+		categoricalCategoriesFields: powerbi.DataViewCategoryColumn[],
+		categoricalCategoriesLastIndex: number,
+		categoricalMeasureFields: powerbi.DataViewValueColumn[],
+		categoricalSubCategoryField: any
+	): void {
+		if ((this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
+			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
+			this.markerSettings.marker1Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
+		if ((this.markerSettings.marker2Style.markerShape === EMarkerShapeTypes.IMAGES && this.imagesDataFieldsName.length > 0 && this.isLollipopTypePie) ||
+			(this.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON && this.isLollipopTypePie)) {
+			this.markerSettings.marker2Style.markerShape = EMarkerShapeTypes.DEFAULT;
+		}
+
+		const dataColorsSettings = this.dataColorsSettings;
+
+		if (this.lineSettings.isApplyMarkerColor && this.isLollipopTypePie) {
+			if (this.isHasMultiMeasure || (!this.isHasMultiMeasure && dataColorsSettings.fillType !== ColorPaletteType.Single)) {
+				this.lineSettings.isApplyMarkerColor = false;
+			}
+		}
+
+		this.isXIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
+		this.isYIsDateTimeAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.dateTime;
+		this.isMonthCategoryNames = categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase().includes("month") || categoricalCategoriesFields[categoricalCategoriesLastIndex].values.some(d => MonthNames.includes(d.toString().toLowerCase()));
+		this.isDateCategoryNames = ["year", "month", "quarter", "day"].includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName.toLowerCase());
+
+		if (this.isHasSubcategories) {
+			const subCategoriesName = categoricalMeasureFields
+				.map((d) => d.source.groupName)
+				.filter((d) => d && d !== null && d !== undefined && d !== "")
+				.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
+
+			this.isMonthSubcategoryNames = categoricalSubCategoryField.displayName.toLowerCase().includes("month") || subCategoriesName.some(d => MonthNames.includes(d.toString().toLowerCase()));
+			this.isDateSubcategoryNames = categoricalSubCategoryField.type.dateTime;
+
+			if (this.isMonthCategoryNames && !this.sortingSettings.isDefaultSortByChanged) {
+				this.sortingSettings.category.sortBy = this.categoryDisplayName;
+
+				if (!this.sortingSettings.isDefaultSortOrderChanged) {
+					this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+				}
+
+				this.handleSortByCategoryChange(this.sortingSettings.category);
+			}
+		}
+
+		if ((this.isDateCategoryNames || this.isXIsDateTimeAxis || this.isYIsDateTimeAxis) && !this.sortingSettings.isDefaultSortByChanged) {
+			this.sortingSettings.category.sortBy = this.categoryDisplayName;
+
+			if (!this.sortingSettings.isDefaultSortOrderChanged) {
+				this.sortingSettings.category.sortOrder = ESortOrderTypes.ASC;
+			}
+
+			this.handleSortByCategoryChange(this.sortingSettings.category);
+		}
+
+		this.isRenderBothErrorBars = this.isHasMultiMeasure && this.errorBarsSettings.measurement.applySettingsToMeasure === "Both";
+	}
+
+	setVisualPropertiesValues(categoricalData: powerbi.DataViewCategorical): void {
 		this.isXIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 		this.isYIsNumericAxis = categoricalData.categories[this.categoricalCategoriesLastIndex].source.type.numeric;
 
@@ -1896,150 +2188,54 @@ export class Visual extends Shadow {
 		} else {
 			this.minScaleBandWidth = 90;
 		}
+	}
 
-		this.setNumberFormatters(categoricalMeasureFields, categoricalTooltipFields, categoricalSortFields, categoricalRaceBarValues);
+	// if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
+	// let raceBarKeys = [];
+	// const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
+	// 	(arr, category: string, index: number) => {
+	// 		const obj = { category: category, [`index-${index}`]: index };
+	// 		return [...arr, obj];
+	// 	},
+	// 	[]
+	// );
 
-		this.categoryDisplayName = categoricalData.categories[this.categoricalCategoriesLastIndex].source.displayName;
-		this.subCategoryDisplayName = categoricalSubCategoryField ? categoricalSubCategoryField.displayName : "";
+	// const raceBarDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
+	// 	(arr, category: string, index: number) => {
+	// 		const raceBarKey = getRaceBarKey(index);
+	// 		raceBarKeys.push(raceBarKey);
+	// 		const obj = { category: category, raceBarKey, index };
+	// 		return [...arr, obj];
+	// 	},
+	// 	[]
+	// );
 
-		if (!this.isSmallMultiplesEnabled && this.legendSettings.legendTitle.length === 0) {
-			if (this.isLollipopTypePie) {
-				this.legendSettings.legendTitle = this.subCategoryDisplayName;
-			} else {
-				this.legendSettings.legendTitle = this.categoryDisplayName;
-			}
+	// raceBarKeys = raceBarKeys.filter((item, i, ar) => ar.indexOf(item) === i && item);
+	// const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
+	// [...raceBarValueGroup.keys()].forEach(d => {
+	// 	const value = raceBarValueGroup.get(d);
+	// 	const newValue = value.map(d => d.category);
+	// 	this.raceBarValueGroup[d] = newValue;
+	// })
+	// const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 0);
+	// this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
 
-			this._host.persistProperties({
-				merge: [
-					{
-						objectName: EVisualSettings.Legend,
-						properties: { legendTitle: this.legendSettings.legendTitle },
-						selector: null,
-					},
-				],
-			});
-		}
+	// if (categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
+	// 	this.isChartIsRaceChart = false;
+	// }
 
-		this.isSortDataFieldsAdded = categoricalSortFields.length > 0 || categoricalTooltipFields.length > 0;
-		this.sortFieldsDisplayName =
-			categoricalSortFields.length > 0
-				? categoricalSortFields
-					.map((d) => ({
-						label: d.source.displayName,
-						value: d.source.displayName,
-						isSortByCategory: d.source.type.text,
-						isSortByMeasure: d.source.type.numeric,
-						isSortByExtraSortField: true,
-					}))
-					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
-				: [];
-
-		this.tooltipFieldsDisplayName =
-			categoricalTooltipFields.length > 0
-				? categoricalTooltipFields
-					.map((d) => ({
-						label: d.source.displayName,
-						value: d.source.displayName,
-						isSortByCategory: d.source.type.text,
-						isSortByMeasure: d.source.type.numeric,
-						isSortByExtraSortField: true,
-					}))
-					.filter((v, i, a) => a.findIndex((t) => t.label === v.label) === i)
-				: [];
-
-		this.measure1DisplayName = categoricalMeasureFields.length > 0 ? categoricalMeasureFields[0].source.displayName : undefined;
-		this.measure2DisplayName = this.isHasMultiMeasure && categoricalMeasureFields.length > 1 ? categoricalMeasureFields[1].source.displayName : undefined;
-
-		const errorBarValues = [this.measure1DisplayName];
-
-		if (this.isHasMultiMeasure) {
-			errorBarValues.push(this.measure2DisplayName, "Both");
-		}
-
-		if (!errorBarValues.includes(this.errorBarsSettings.measurement.applySettingsToMeasure)) {
-			this.errorBarsSettings.measurement.applySettingsToMeasure = errorBarValues[0];
-		}
-
-		if (
-			this.sortingSettings.category.isSortByExtraSortField &&
-			![...this.sortFieldsDisplayName, ...this.tooltipFieldsDisplayName].find((d) => d.label === this.sortingSettings.category.sortBy)
-		) {
-			this.sortingSettings.category.sortBy = ESortByTypes.VALUE;
-			this.sortingSettings.category.isSortByCategory = false;
-			this.sortingSettings.category.isSortByMeasure = true;
-			this.sortingSettings.category.isSortByMultiMeasure = false;
-			this.sortingSettings.category.isSortByExtraSortField = false;
-		}
-
-		this.measureNamesByTotal = [];
-		const measureGroup = d3.group(categoricalMeasureFields, d => d.source.displayName);
-		[...new Set(measureGroup.keys())].forEach(d => {
-			this.measureNamesByTotal.push({ name: d, total: d3.max(measureGroup.get(d), d => d3.sum(d.values, t => +t)) });
-		});
-
-		this.measureNamesByTotal = this.measureNamesByTotal.sort((a, b) => b.total - a.total);
-
-		if (this.isLollipopTypePie) {
-			this.groupNamesByTotal = [];
-			const subCategoriesGroup = d3.group(categoricalMeasureFields.filter(d => d.source.displayName === (this.dataColorsSettings.gradientAppliedToMeasure === EMarkerColorTypes.Marker1 ? this.measure1DisplayName : this.measure2DisplayName)), d => d.source.groupName ? d.source.groupName.toString() : d.source.groupName);
-			[...new Set(subCategoriesGroup.keys())].forEach(d => {
-				this.groupNamesByTotal.push({ name: d ? d.toString() : undefined, total: d3.max(subCategoriesGroup.get(d ? d.toString() : d), m => d3.sum(m.values, t => +t)) });
-			});
-
-			this.groupNamesByTotal.sort((a, b) => b.total - a.total);
-		} else {
-			this.groupNamesByTotal = [];
-		}
-
-		this.setCategoricalDataBySubcategoryRanking(categoricalData);
-
-		this.isChartRacePossible = categoricalRaceBarValues.length > 0;
-
-		if (this.isChartRacePossible && categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
-			this.isChartRacePossible = false;
-		}
-
-		// if (this.isChartRacePossible && this.raceChartSettings.isEnabled) {
-		// let raceBarKeys = [];
-		// const categoricalDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
-		// 	(arr, category: string, index: number) => {
-		// 		const obj = { category: category, [`index-${index}`]: index };
-		// 		return [...arr, obj];
-		// 	},
-		// 	[]
-		// );
-
-		// const raceBarDataPairsForGrouping = categoricalData.categories[this.categoricalCategoriesLastIndex].values.reduce(
-		// 	(arr, category: string, index: number) => {
-		// 		const raceBarKey = getRaceBarKey(index);
-		// 		raceBarKeys.push(raceBarKey);
-		// 		const obj = { category: category, raceBarKey, index };
-		// 		return [...arr, obj];
-		// 	},
-		// 	[]
-		// );
-
-		// raceBarKeys = raceBarKeys.filter((item, i, ar) => ar.indexOf(item) === i && item);
-		// const raceBarValueGroup = d3.group(raceBarDataPairsForGrouping, (d: any) => d.raceBarKey);
-		// [...raceBarValueGroup.keys()].forEach(d => {
-		// 	const value = raceBarValueGroup.get(d);
-		// 	const newValue = value.map(d => d.category);
-		// 	this.raceBarValueGroup[d] = newValue;
-		// })
-		// const isRacePossible = raceBarKeys.some(d => raceBarValueGroup.get(d).length > 0);
-		// this.isChartIsRaceChart = isRacePossible && this.raceChartSettings.isEnabled;
-
-		// if (categoricalRaceBarValues.map(d => d.source.displayName).includes(categoricalCategoriesFields[categoricalCategoriesLastIndex].source.displayName)) {
-		// 	this.isChartIsRaceChart = false;
-		// }
-
-		// if (this.isChartIsRaceChart) {
-		// 	const categoricalDataPairsGroup = d3.group(categoricalDataPairsForGrouping, (d: any) => d.category);
-		// 	this.categoricalDataPairs = categories.map((category) =>
-		// 		Object.assign({}, ...(this.rankingSettings.raceChartData.enabled ? categoricalDataPairsGroup.get(category).slice(0, this.rankingSettings.raceChartData.count) : categoricalDataPairsGroup.get(category)))
-		// 	);
-		// }
-		// } else {
+	// if (this.isChartIsRaceChart) {
+	// 	const categoricalDataPairsGroup = d3.group(categoricalDataPairsForGrouping, (d: any) => d.category);
+	// 	this.categoricalDataPairs = categories.map((category) =>
+	// 		Object.assign({}, ...(this.rankingSettings.raceChartData.enabled ? categoricalDataPairsGroup.get(category).slice(0, this.rankingSettings.raceChartData.count) : categoricalDataPairsGroup.get(category)))
+	// 	);
+	// }
+	// } else {
+	setCategoricalDataPairs(
+		categoricalData: powerbi.DataViewCategorical,
+		categoricalSmallMultiplesFields: powerbi.DataViewCategoryColumn[],
+		categoricalCategoriesLastIndex: number,
+	): void {
 		this.categoricalDataPairs = categoricalData.categories[categoricalCategoriesLastIndex].values.reduce((arr, category: string, index: number) => {
 			const obj = {
 				category: category !== null && category !== undefined && category !== "" ? category : this.blankText,
@@ -2125,132 +2321,68 @@ export class Visual extends Shadow {
 			return [...arr, obj];
 		}, []);
 		// }
+	}
 
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
+	// if (this.isChartIsRaceChart) {
+	// 	let iterator: number = 0;
+	// 	const categoricalCategories: { categories: string[] }[] = [];
+	// 	const categoricalValues: { values: number[], highlights: number[] }[] = [];
 
-		const measureKeys = categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
+	// 	this.categoricalDataPairs.forEach((dataPair) => {
+	// 		const keys = Object.keys(dataPair).splice(1);
+	// 		keys.forEach((key) => {
+	// 			const index = +key.toString().split("-")[1];
+	// 			// categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+	// 			// categoricalCategories.push(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index]);
 
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
+	// 			// if (categoricalSmallMultiplesFields.length) {
+	// 			// 	categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
+	// 			// }
 
-		this.setCategoricalDataPairsByRanking();
+	// 			const categories = []
 
-		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
-		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
-		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
+	// 			categoricalData.categories.forEach((categoricalValue, i: number) => {
+	// 				categories.push(clonedCategoricalData.categories[i].values[index]);
+	// 			});
 
-		if (this.sortingSettings.category.enabled) {
-			const sortFields = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
-			const sortByTooltipFields = categoricalTooltipFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
-			const isSortByTooltipField = sortFields.length === 0 && sortByTooltipFields.length > 0;
-			const externalFieldSortKey = isSortByTooltipField ? EDataRolesName.Tooltip : EDataRolesName.Sort;
+	// 			categoricalCategories.push({ categories });
 
-			if (!this.isHasSubcategories) {
-				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index);
-				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index) : sortFields.map((d) => EDataRolesName.Sort + d.source.index);
-				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
-			} else {
-				const measureKeys = categoricalMeasureFields.map((d) => EDataRolesName.Measure + d.source.index + d.source.groupName);
-				const sortKeys = isSortByTooltipField ? sortByTooltipFields.map((d) => EDataRolesName.Tooltip + d.source.index + d.source.groupName) : sortFields.map((d) => EDataRolesName.Sort + d.source.index + d.source.groupName);
-				this.sortCategoryDataPairs(this.categoricalDataPairs, "category", measureKeys, sortKeys, externalFieldSortKey, categoricalMeasureFields, isSortByTooltipField ? categoricalTooltipFields : categoricalSortFields);
-			}
-		}
+	// 			categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
+	// 				categoricalRaceBarValue.values[iterator] = clonedCategoricalRaceBarValues[i].values[index];
+	// 			});
 
-		this.categoricalDataPairs = this.elementToMoveOthers(this.categoricalDataPairs, true, "category", this.rankingSettings.category.enabled && this.rankingSettings.category.showRemainingAsOthers);
+	// 			const values = [];
+	// 			const highlights = [];
 
-		const clonedCategoricalPair = cloneDeep(this.categoricalDataPairs);
-		if (this.isHorizontalChart) {
-			this.categoricalDataPairs = clonedCategoricalPair.reverse();
-			this.sortedCategoricalDataPairs = this.sortedCategoricalDataPairs.reverse();
-		}
+	// 			categoricalData.values.forEach((categoricalValue, i: number) => {
+	// 				values.push(clonedCategoricalData.values[i].values[index]);
+	// 				// categoricalValue.values[iterator] = clonedCategoricalData.values[i].values[index];
 
-		this.categoryColorPairWithIndex = {};
-		this.subCategoryColorPairWithIndex = {};
+	// 				if (categoricalValue.highlights) {
+	// 					highlights.push(clonedCategoricalData.values[i].highlights[index]);
+	// 					// categoricalValue.highlights[iterator] = clonedCategoricalData.values[i].highlights[index];
+	// 				}
+	// 			});
 
-		this.sortSubcategoryData(categoricalData);
+	// 			categoricalValues.push({ values, highlights });
 
-		const categoricalValues = categoricalData.values as any;
-		const measures: any[] = categoricalValues.filter((d) => d.source.roles[EDataRolesName.Measure]);
+	// 			iterator++;
+	// 		});
+	// 	});
 
-		this.subCategoriesName = measures
-			.map((d) => d.source.groupName)
-			.filter((d) => d && d !== null && d !== undefined && d !== "")
-			.filter((v, i, a) => a.findIndex((t) => t === v) === i) as string[];
+	// 	categoricalData.categories.forEach((categoricalValue, i: number) => {
+	// 		categoricalValue.values = categoricalCategories.map(d => d.categories[i]);
+	// 	});
 
-		const categoricalDataPairs = this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs;
+	// 	categoricalData.values.forEach((categoricalValue, i: number) => {
+	// 		categoricalValue.values = categoricalValues.map(d => d.values[i]);
 
-		// set colors for all pairs
-		categoricalDataPairs.forEach((data, i) => {
-			this.categoryColorPairWithIndex[`${i}-${data.category}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
-		});
-
-		categoricalDataPairs.forEach(d => {
-			this.subCategoriesName.forEach((name, i) => {
-				this.subCategoryColorPairWithIndex[`${i}-${d.category}-${name}`] = { marker1Color: undefined, marker2Color: undefined, lineColor: undefined, labelColor: undefined };
-			});
-		});
-
-		this.setColorsByDataColorsSettings();
-
-		// if (this.isChartIsRaceChart) {
-		// 	let iterator: number = 0;
-		// 	const categoricalCategories: { categories: string[] }[] = [];
-		// 	const categoricalValues: { values: number[], highlights: number[] }[] = [];
-
-		// 	this.categoricalDataPairs.forEach((dataPair) => {
-		// 		const keys = Object.keys(dataPair).splice(1);
-		// 		keys.forEach((key) => {
-		// 			const index = +key.toString().split("-")[1];
-		// 			// categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
-		// 			// categoricalCategories.push(clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index]);
-
-		// 			// if (categoricalSmallMultiplesFields.length) {
-		// 			// 	categoricalData.categories[this.categoricalCategoriesLastIndex].values[iterator] = clonedCategoricalData.categories[this.categoricalCategoriesLastIndex].values[index];
-		// 			// }
-
-		// 			const categories = []
-
-		// 			categoricalData.categories.forEach((categoricalValue, i: number) => {
-		// 				categories.push(clonedCategoricalData.categories[i].values[index]);
-		// 			});
-
-		// 			categoricalCategories.push({ categories });
-
-		// 			categoricalRaceBarValues.forEach((categoricalRaceBarValue, i: number) => {
-		// 				categoricalRaceBarValue.values[iterator] = clonedCategoricalRaceBarValues[i].values[index];
-		// 			});
-
-		// 			const values = [];
-		// 			const highlights = [];
-
-		// 			categoricalData.values.forEach((categoricalValue, i: number) => {
-		// 				values.push(clonedCategoricalData.values[i].values[index]);
-		// 				// categoricalValue.values[iterator] = clonedCategoricalData.values[i].values[index];
-
-		// 				if (categoricalValue.highlights) {
-		// 					highlights.push(clonedCategoricalData.values[i].highlights[index]);
-		// 					// categoricalValue.highlights[iterator] = clonedCategoricalData.values[i].highlights[index];
-		// 				}
-		// 			});
-
-		// 			categoricalValues.push({ values, highlights });
-
-		// 			iterator++;
-		// 		});
-		// 	});
-
-		// 	categoricalData.categories.forEach((categoricalValue, i: number) => {
-		// 		categoricalValue.values = categoricalCategories.map(d => d.categories[i]);
-		// 	});
-
-		// 	categoricalData.values.forEach((categoricalValue, i: number) => {
-		// 		categoricalValue.values = categoricalValues.map(d => d.values[i]);
-
-		// 		if (categoricalValue.highlights) {
-		// 			categoricalValue.highlights = categoricalValues.map(d => d.highlights[i]);
-		// 		}
-		// 	});
-		// } else {
+	// 		if (categoricalValue.highlights) {
+	// 			categoricalValue.highlights = categoricalValues.map(d => d.highlights[i]);
+	// 		}
+	// 	});
+	// } else {
+	setCategoricalDataFromPairs(categoricalData: powerbi.DataViewCategorical): void {
 		categoricalData.categories.forEach((d, i) => {
 			if (d.source.roles[EDataRolesName.Category]) {
 				if (i === this.categoricalCategoriesLastIndex) {
@@ -2312,77 +2444,9 @@ export class Visual extends Shadow {
 		// 			// }
 		// 		});
 		// }
+	}
 
-		const categoricalDataValues = this.originalCategoricalData.values.filter(d => d.source.roles[EDataRolesName.Measure]);
-
-		const min = d3.min(categoricalDataValues, d => d3.min(d.values, v => <number>v));
-		const max = d3.max(categoricalDataValues, d => d3.max(d.values, v => <number>v));
-
-		if (!this.dataColorsSettings.isFillTypeChanged && min < 0 && max > 0 && !this.isIBCSEnabled) {
-			this.dataColorsSettings.fillType = ColorPaletteType.PositiveNegative;
-		}
-
-		const dataLength = categoricalData.categories[this.categoricalCategoriesLastIndex].values.length;
-
-		this.setBrushScaleBandDomain(categoricalData);
-		this.setBrushScaleBandRange(width, height);
-
-		if (
-			this.chartSettings.lollipopWidth > this.minScaleBandWidth &&
-			!this.chartSettings.isAutoLollipopWidth
-		) {
-			this.brushScaleBandBandwidth = this.chartSettings.lollipopWidth;
-		} else if (this.brushScaleBand.bandwidth() > this.minScaleBandWidth) {
-			this.brushScaleBandBandwidth = this.brushScaleBand.bandwidth();
-		} else {
-			this.brushScaleBandBandwidth = this.minScaleBandWidth;
-		}
-
-		this.categoryLabelHeight = getSVGTextSize("Label", this.yAxisSettings.labelFontFamily, this.yAxisSettings.labelFontSize).height;
-
-		// if (this.brushScaleBandBandwidth < this.markerMaxSize + this.markerMaxSize * 0.2) {
-		// 	this.brushScaleBandBandwidth = this.markerMaxSize + this.markerMaxSize * 0.2;
-		// }
-
-		// if (!this.markerSettings.marker1Style.isAutoMarkerSize || (this.isHasMultiMeasure && !this.markerSettings.marker2Style.isAutoMarkerSize)) {
-		// 	if (this.isLollipopTypeCircle) {
-		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize : 0)]);
-		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
-		// 			this.brushScaleBandBandwidth = maxMarkerSize + 5;
-		// 		}
-		// 	} else {
-		// 		const maxMarkerSize = d3.max([this.markerSettings.marker1Style.markerSize * 2, (this.isHasMultiMeasure ? this.markerSettings.marker2Style.markerSize * 2 : 0)]);
-		// 		if (this.brushScaleBandBandwidth <= maxMarkerSize) {
-		// 			this.brushScaleBandBandwidth = maxMarkerSize + 10;
-		// 		}
-		// 	}
-		// }
-
-		this.scaleBandWidth = this.brushScaleBandBandwidth;
-
-		this.totalLollipopCount = [...new Set(categoricalData.categories[this.categoricalCategoriesLastIndex].values)].length;
-
-		this.xScale = this.brushScaleBand;
-
-		// const minIndex = d3.minIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
-		// const maxIndex = d3.maxIndex(this.categoricalDataPairs, (d) => d3.sum(Object.keys(d), (key) => (key.includes("measure") ? d[key] : 0)));
-
-		this.firstCategoryValueDataPair = {
-			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[0],
-			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[0]) : <number>categoricalData.values[0].values[0],
-		};
-
-		this.lastCategoryValueDataPair = {
-			category: <string>categoricalData.categories[this.categoricalCategoriesLastIndex].values[dataLength - 1],
-			value: this.isHasSubcategories ? d3.sum(categoricalData.values, d => <number>d.values[dataLength - 1]) : <number>categoricalData.values[0].values[dataLength - 1],
-		};
-
-		if (this.brushAndZoomAreaSettings.enabled) {
-			if (this.categoricalDataPairs.length < this.brushAndZoomAreaSettings.minLollipopCount) {
-				this.brushAndZoomAreaSettings.enabled = false;
-			}
-		}
-
+	displayBrushFromSetInitialChatData(categoricalData: powerbi.DataViewCategorical, width: number, height: number, isRenderBrush: boolean): void {
 		const expectedWidth = (this.brushScaleBandBandwidth * width) / this.brushScaleBand.bandwidth();
 		const expectedHeight = (this.brushScaleBandBandwidth * height) / this.brushScaleBand.bandwidth();
 
@@ -2470,7 +2534,6 @@ export class Visual extends Shadow {
 				}
 			}
 
-			// || this.height < expectedHeight
 			if (isRenderBrush && this.width < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
 				const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 				const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
@@ -2495,8 +2558,6 @@ export class Visual extends Shadow {
 				this.setChartData(categoricalData2);
 			}
 		}
-
-		return categoricalData;
 	}
 
 	handleSortByCategoryChange(props: ISortingProps): void {
