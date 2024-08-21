@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import React, { useState, useEffect, useMemo } from "react";
 import CformattingForm from "./CformattingForm";
 import HomePage from "./HomePage";
@@ -106,6 +105,25 @@ const getCategoryOptions = (vizOptions, config) => {
   return retValue;
 }
 
+const UIHomePage = (createRule, rules, setRules, addRule, updateRules, deleteRule, editRule, icon, closeCurrentSettingHandler, isSupportApplyOn, applyOnCategories, setSelectedApplyOnCategory) => {
+  return <>
+    <HomePage
+      createRule={createRule}
+      rules={rules}
+      setRules={setRules}
+      addRule={addRule}
+      updateRules={updateRules}
+      deleteRule={deleteRule}
+      editRule={editRule}
+      conditionalFormattingIcon={icon}
+      closeCurrentSettingHandler={closeCurrentSettingHandler}
+      isSupportApplyOn={isSupportApplyOn}
+      applyOnCategories={applyOnCategories}
+      setSelectedApplyOnCategoryState={setSelectedApplyOnCategory}
+    />
+  </>
+}
+
 const ConditionalFormatting = (props) => {
   const {
     shadow,
@@ -116,13 +134,9 @@ const ConditionalFormatting = (props) => {
   } = props;
 
   const config = shadow.config;
-
   const isSupportApplyOn: boolean = config.CFConfig.isSupportApplyOn;
   const isShowBasedOnValueDropDown: boolean = config.CFConfig.isShowBasedOnValueDropDown;
   const applyOnCategories: { label: string, value: string }[] = config.CFConfig.applyOnCategories ? config.CFConfig.applyOnCategories : [];
-  // const isShowCategoriesDropdown: boolean = config.CFConfig?.isShowCategoriesDropdown;
-  // const categoriesList: { label: string, value: string }[] = config.CFConfig?.categoriesList ?? [];
-
   const [applyTo, setApplyTo] = useState("category");
 
   const measureOptions: ILabelValuePair[] = useMemo(() => {
@@ -198,20 +212,7 @@ const ConditionalFormatting = (props) => {
   return (
     <>
       {contentShown === "homePage" ?
-        <HomePage
-          createRule={createRule}
-          rules={rules}
-          setRules={setRules}
-          addRule={addRule}
-          updateRules={updateRules}
-          deleteRule={deleteRule}
-          editRule={editRule}
-          conditionalFormattingIcon={icon}
-          closeCurrentSettingHandler={closeCurrentSettingHandler}
-          isSupportApplyOn={isSupportApplyOn}
-          applyOnCategories={applyOnCategories}
-          setSelectedApplyOnCategoryState={setSelectedApplyOnCategory}
-        />
+        UIHomePage(createRule, rules, setRules, addRule, updateRules, deleteRule, editRule, icon, closeCurrentSettingHandler, isSupportApplyOn, applyOnCategories, setSelectedApplyOnCategory)
         :
         <CformattingForm
           addRule={addRule}
