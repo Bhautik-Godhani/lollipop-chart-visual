@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { RANKING_SETTINGS as RANKING_SETTINGS_IMP } from "../constants";
 import {

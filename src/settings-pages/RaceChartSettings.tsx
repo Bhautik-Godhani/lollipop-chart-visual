@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { RACE_CHART_SETTINGS as RACE_CHART_SETTINGS_IMP } from "../constants";
 import {
@@ -60,6 +59,21 @@ const handleCheckbox = (n, type: ETextType, setConfigValues: React.Dispatch<Reac
   }));
 };
 
+const LINE_STYLES = [
+  {
+    label: <BoldIcon style={{ fill: "currentColor" }} />,
+    value: "bold",
+  },
+  {
+    label: <ItalicIcon style={{ fill: "currentColor" }} />,
+    value: "italic",
+  },
+  {
+    label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+    value: "underline",
+  },
+]
+
 const UITextStylesSettings = (
   shadow: Visual,
   vizOptions: ShadowUpdateOptions,
@@ -111,20 +125,7 @@ const UITextStylesSettings = (
         <SwitchOption
           label="Styling"
           value={configValues.fontStyles}
-          optionsList={[
-            {
-              label: <BoldIcon style={{ fill: "currentColor" }} />,
-              value: "bold",
-            },
-            {
-              label: <ItalicIcon style={{ fill: "currentColor" }} />,
-              value: "italic",
-            },
-            {
-              label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-              value: "underline",
-            },
-          ]}
+          optionsList={LINE_STYLES}
           isMultiple
           selectorAppearance="secondary"
           handleChange={value => handleChange(value, ERaceChartSettings.FontStyles, textType, setConfigValues)}
@@ -168,6 +169,134 @@ const UITextStylesSettings = (
         </Column>
       </Row>
     </ConditionalWrapper>
+  </>
+}
+
+const UIExtended1 = (
+  shadow: Visual, vizOptions: ShadowUpdateOptions, configValues: IRaceChartSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>, handleCheckbox, handleChange, handleColor
+) => {
+  return <>
+    <ConditionalWrapper visible={(shadow as Visual).isChartRacePossible}>
+      <ConditionalWrapper visible={configValues.isEnabled}>
+        <AccordionAlt title="Auto Play Button"
+          open={true}
+        >
+          <Row>
+            <Column>
+              <ToggleButton
+                label={"Auto Play Button Radius"}
+                value={configValues.isTickerButtonAutoRadius}
+                handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
+                appearance="toggle"
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
+            <Row appearance="padded">
+              <Column>
+                <Row disableTopPadding>
+                  <Column>
+                    <InputControl
+                      min={0}
+                      type="number"
+                      label="Radius"
+                      value={configValues.tickerButtonRadius.toString()}
+                      handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
+                    />
+                  </Column>
+
+                  <Column>
+                    <ColorPicker
+                      label={"Play Button Color"}
+                      color={configValues.tickerButtonColor}
+                      handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                      colorPalette={vizOptions.host.colorPalette}
+                    />
+                  </Column>
+                </Row>
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Play Button Color"}
+                  color={configValues.tickerButtonColor}
+                  handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <Row>
+            <Column>
+              <SwitchOption
+                label={"Placement"}
+                value={configValues.placement}
+                optionsList={TEXT_PLACEMENTS}
+                selectorAppearance="secondary"
+                handleChange={(value) => handleChange(value, ERaceChartSettings.Placement)}
+              />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column>
+              <Label text="Animation Transition"></Label>
+            </Column>
+          </Row>
+
+          <Row disableTopPadding>
+            <Column>
+              <InputControl
+                min={0}
+                type="number"
+                label="Interval"
+                value={configValues.dataChangeInterval.toString()}
+                handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
+              />
+            </Column>
+
+            <Column>
+              <InputControl
+                min={0}
+                type="number"
+                label="Duration"
+                value={configValues.transitionDuration.toString()}
+                handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
+              />
+            </Column>
+          </Row>
+        </AccordionAlt>
+
+        {UIExtended2(shadow, vizOptions, configValues, setConfigValues)}
+      </ConditionalWrapper>
+    </ConditionalWrapper>
+  </>
+}
+
+const UIExtended2 = (shadow: Visual, vizOptions: ShadowUpdateOptions, configValues: IRaceChartSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<IRaceChartSettings>>
+) => {
+  return <>
+    <AccordionAlt title="Text Styles"
+      open={true}
+    >
+      <Tabs selected={ETextType.HeaderTextStyles} >
+        <Tab title={"Header"} identifier={ETextType.HeaderTextStyles}>
+          {UITextStylesSettings(shadow, vizOptions, ETextType.HeaderTextStyles, configValues.headerTextStyles, setConfigValues)}
+        </Tab>
+        <Tab title={"Sub-Text"} identifier={ETextType.SubTextStyles}>
+          {UITextStylesSettings(shadow, vizOptions, ETextType.SubTextStyles, configValues.subTextStyles, setConfigValues)}
+        </Tab>
+      </Tabs >
+    </AccordionAlt>
   </>
 }
 
@@ -226,6 +355,8 @@ const RaceChartSettings = (props) => {
     }));
   };
 
+
+
   return (
     <>
       <ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
@@ -250,129 +381,7 @@ const RaceChartSettings = (props) => {
           </Row>
         </ConditionalWrapper>
 
-        <ConditionalWrapper visible={(shadow as Visual).isChartRacePossible}>
-          {/* <Row>
-            <Column>
-              <ToggleButton
-                label={"Enable"}
-                value={configValues.isEnabled}
-                handleChange={() => handleCheckbox(ERaceChartSettings.IsEnabled)}
-                appearance="toggle"
-              />
-            </Column>
-          </Row> */}
-
-          <ConditionalWrapper visible={configValues.isEnabled}>
-            <AccordionAlt title="Auto Play Button"
-              open={true}
-            >
-              <Row>
-                <Column>
-                  <ToggleButton
-                    label={"Auto Play Button Radius"}
-                    value={configValues.isTickerButtonAutoRadius}
-                    handleChange={() => handleCheckbox(ERaceChartSettings.IsTickerButtonAutoRadius)}
-                    appearance="toggle"
-                  />
-                </Column>
-              </Row>
-
-              <ConditionalWrapper visible={!configValues.isTickerButtonAutoRadius}>
-                <Row appearance="padded">
-                  <Column>
-                    <Row disableTopPadding>
-                      <Column>
-                        <InputControl
-                          min={0}
-                          type="number"
-                          label="Radius"
-                          value={configValues.tickerButtonRadius.toString()}
-                          handleChange={(value) => handleChange(value, ERaceChartSettings.TickerButtonRadius)}
-                        />
-                      </Column>
-
-                      <Column>
-                        <ColorPicker
-                          label={"Play Button Color"}
-                          color={configValues.tickerButtonColor}
-                          handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                          colorPalette={vizOptions.host.colorPalette}
-                        />
-                      </Column>
-                    </Row>
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
-
-              <ConditionalWrapper visible={configValues.isTickerButtonAutoRadius}>
-                <Row>
-                  <Column>
-                    <ColorPicker
-                      label={"Play Button Color"}
-                      color={configValues.tickerButtonColor}
-                      handleChange={(value) => handleColor(value, ERaceChartSettings.TickerButtonColor)}
-                      colorPalette={vizOptions.host.colorPalette}
-                      size="sm"
-                    />
-                  </Column>
-                </Row>
-              </ConditionalWrapper>
-
-              <Row>
-                <Column>
-                  <SwitchOption
-                    label={"Placement"}
-                    value={configValues.placement}
-                    optionsList={TEXT_PLACEMENTS}
-                    selectorAppearance="secondary"
-                    handleChange={(value) => handleChange(value, ERaceChartSettings.Placement)}
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <Label text="Animation Transition"></Label>
-                </Column>
-              </Row>
-
-              <Row disableTopPadding>
-                <Column>
-                  <InputControl
-                    min={0}
-                    type="number"
-                    label="Interval"
-                    value={configValues.dataChangeInterval.toString()}
-                    handleChange={(value) => handleChange(value, ERaceChartSettings.DataChangeInterval)}
-                  />
-                </Column>
-
-                <Column>
-                  <InputControl
-                    min={0}
-                    type="number"
-                    label="Duration"
-                    value={configValues.transitionDuration.toString()}
-                    handleChange={(value) => handleChange(+value, ERaceChartSettings.TransitionDuration)}
-                  />
-                </Column>
-              </Row>
-            </AccordionAlt>
-
-            <AccordionAlt title="Text Styles"
-              open={true}
-            >
-              <Tabs selected={ETextType.HeaderTextStyles} >
-                <Tab title={"Header"} identifier={ETextType.HeaderTextStyles}>
-                  {UITextStylesSettings(shadow, vizOptions, ETextType.HeaderTextStyles, configValues.headerTextStyles, setConfigValues)}
-                </Tab>
-                <Tab title={"Sub-Text"} identifier={ETextType.SubTextStyles}>
-                  {UITextStylesSettings(shadow, vizOptions, ETextType.SubTextStyles, configValues.subTextStyles, setConfigValues)}
-                </Tab>
-              </Tabs >
-            </AccordionAlt>
-          </ConditionalWrapper>
-        </ConditionalWrapper>
+        {UIExtended1(shadow, vizOptions, configValues, setConfigValues, handleCheckbox, handleChange, handleColor)}
       </ConditionalWrapper>
 
       <Footer
