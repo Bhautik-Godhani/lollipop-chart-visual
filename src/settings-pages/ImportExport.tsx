@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { get, isEmpty } from "lodash";
 import copy from "copy-to-clipboard";
@@ -6,176 +5,303 @@ import { Button, Column, ConditionalWrapper, Footer, IconButton, InputControl, L
 import { CopyExportIcon, GreenCheckmark, ImportSuccessfulUploadIcon, ImportUploadClose, ImportUploadIcon } from "./SettingsIcons";
 import TooltipElement from "@truviz/shadow/dist/Components/Label/TooltipElement";
 import { EVisualConfig, EVisualSettings } from "../enum";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
-const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConfig: { sectionName, propertyName } }) => {
-  // const [notification, setNotification] = React.useState("");
-  // const initNotification = text => {
-  //   setNotification(text);
-  //   setTimeout(() => {
-  //     setNotification("");
-  //   }, 4000);
-  // };
+const UIMain = (shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler,
+  clearUploadStatus, setSelectedTab, setIsThemeApplied, changeView, changeValue, copyThemeText, showDownloadNote, copyTheme, urlData, downloadTheme, jsonString,
+  closeCurrentSettingHandler, applyThemeJson) => {
+  return <>
+    <Row>
+      <Column>
+        <Tabs selected={selectedTab} onChange={tab => setSelectedTab(tab)}>
+          {UIImportTab(isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setIsThemeApplied, changeView, changeValue)}
+          <Tab identifier="export" title="Export">
+            <Row>
+              <Column>
+                <IconButton text={copyThemeText} icon={copyThemeText === "Copy" ? <CopyExportIcon fill="var(--blackColor)" /> : <GreenCheckmark fill="var(--blackColor)" />} onClick={copyTheme} style={{ flexDirection: "row-reverse" }} iconStyle={{ marginLeft: 0, marginRight: "8px" }} />
+              </Column>
+              <Column style={{ display: "flex", justifyContent: "flex-end" }}>
+                <TooltipElement tooltip={showDownloadNote ? 'Right click and select "Save link as" to download' : ''} style={{ textAlign: "left" }} alignTooltipTextTo="left">
+                  {!shadow.isPowerBIDesktop && <a href={urlData} download={"export.json"} onClick={() => downloadTheme()} className="export-to-file-link">
+                    EXPORT
+                  </a>}
+                </TooltipElement>
+              </Column>
+            </Row>
 
-  const initialState = vizOptions.formatTab[sectionName][propertyName];
+            <Row>
+              <Column>
+                <div className="theme-export-modal-code">
+                  <pre>{jsonString}</pre>
+                </div>
+              </Column>
+            </Row>
 
-  const [isThemeApplied, setIsThemeApplied] = React.useState(initialState === "THEME_APPLIED");
+            {showDownloadNote &&
+              <Row>
+                <Column>
+                  <Quote>
+                    <strong>Note:</strong> It's not possible to save files directly from Power BI Visuals, but this dialog will assist you with producing a valid JSON template that you can copy/paste and save elsewhere for others to use
+                  </Quote>
+                </Column>
+              </Row>
+            }
+          </Tab>
+        </Tabs>
+      </Column>
+    </Row>
 
-  const [showDownloadNote, setShowDownloadNote] = React.useState(false);
+    {selectedTab === "import" && (
+      <Footer
+        cancelButtonHandler={closeCurrentSettingHandler}
+        saveButtonConfig={{
+          isDisabled: false,
+          text: "IMPORT",
+          handler: () => applyThemeJson(details.value)
+        }}
+        resetButtonHandler={() => {
+          setIsThemeApplied(false);
+        }}
+      />
+    )}
 
-  const configs = {
-    [EVisualSettings.BrushAndZoomAreaSettings]: EVisualConfig.BrushAndZoomAreaConfig,
-    [EVisualSettings.ChartSettings]: EVisualConfig.ChartConfig,
-    [EVisualSettings.CutAndClipAxisSettings]: EVisualConfig.CutAndClipAxisConfig,
-    [EVisualSettings.DataColorsSettings]: EVisualConfig.DataColorsConfig,
-    [EVisualSettings.DataLabelsSettings]: EVisualConfig.DataLabelsConfig,
-    [EVisualSettings.DynamicDeviationSettings]: EVisualConfig.DynamicDeviationConfig,
-    [EVisualSettings.ErrorBarsSettings]: EVisualConfig.ErrorBarsConfig,
-    [EVisualSettings.GridLinesSettings]: EVisualConfig.GridLinesConfig,
-    [EVisualSettings.IBCSSettings]: EVisualConfig.IBCSConfig,
-    [EVisualSettings.LineSettings]: EVisualConfig.LineConfig,
-    [EVisualSettings.MarkerSettings]: EVisualConfig.MarkerConfig,
-    [EVisualSettings.PatternSettings]: EVisualConfig.PatternConfig,
-    [EVisualSettings.RaceChartSettings]: EVisualConfig.RaceChartConfig,
-    [EVisualSettings.RankingSettings]: EVisualConfig.RankingConfig,
-    [EVisualSettings.ReferenceLinesSettings]: EVisualConfig.ReferenceLinesConfig,
-    [EVisualSettings.ShowBucketFormatting]: EVisualConfig.ShowBucketConfig,
-    [EVisualSettings.SmallMultiplesSettings]: EVisualConfig.SmallMultiplesConfig,
-    [EVisualSettings.Sorting]: EVisualConfig.SortingConfig,
-    [EVisualSettings.XAxisSettings]: EVisualConfig.XAxisConfig,
-    [EVisualSettings.YAxisSettings]: EVisualConfig.YAxisConfig
-  };
+    {selectedTab === "export" && (
+      <Footer cancelButtonHandler={closeCurrentSettingHandler} isShowSaveButton={false}
+        resetButtonHandler={() => {
+          setIsThemeApplied(false);
+        }}
+      />
+    )}
+  </>
+}
 
+const UIImportTab = (isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler,
+  clearUploadStatus, setIsThemeApplied, changeView, changeValue) => {
+  return <>
+    <Tab identifier="import" title="Import">
+      {
+        isThemeApplied ? <ThemeAlreadyApplied onUploadNew={() => setIsThemeApplied(false)} /> :
+          <>
+            <Row>
+              <Column>
+                <RadioOption
+                  value={details.view}
+                  optionsList={IMPORT_OPTIONS}
+                  handleChange={value => changeView(value)}
+                />
+              </Column>
+            </Row>
+
+            <ConditionalWrapper visible={details.view === "import"}>
+              <Row>
+                <Column>
+                  <div className="theme-import-upload">
+                    {details.status !== "VALID" && (
+                      <>
+                        <ImportUploadIcon />
+                        <div>
+                          <Button clickHandler={handleUploadClick} text="Upload" variant="primary" />
+                          <input
+                            type="file"
+                            ref={hiddenFileInput}
+                            onChange={uploadHandler}
+                            style={{ display: "none" }}
+                            accept="application/json"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {details.status === "VALID" && (
+                      <>
+                        <div className="theme-import-upload-success">
+                          <div className="theme-import-upload-success-close" onClick={clearUploadStatus}>
+                            <ImportUploadClose />
+                          </div>
+                          <ImportSuccessfulUploadIcon />
+                        </div>
+
+                        <div className="theme-import-upload-label">
+                          <Label text="File Uploaded Successfully." />
+                        </div>
+                      </>
+                    )}
+
+                    {details.status === "FAILED" && (
+                      <div className="theme-import-upload-label">
+                        <Label text="Import Failed. Please try again with a valid file." appearance="error" textEllipsis={false} />
+                      </div>
+                    )}
+                  </div>
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+
+            <ConditionalWrapper visible={details.view === "paste"}>
+              <Row>
+                <Column>
+                  <InputControl
+                    type="textarea"
+                    value={details.value}
+                    handleChange={(value: any) => {
+                      changeValue({ value });
+                    }}
+                    rows={17}
+                    placeholder="Paste the JSON here.."
+                  />
+                  {details.status === "FAILED" && (
+                    <div className="theme-import-upload-label">
+                      <Label text="Import Failed." appearance="error" />
+                      <Label text="Please try again with a valid file." appearance="error" />
+                    </div>
+                  )}
+                </Column>
+              </Row>
+            </ConditionalWrapper>
+          </>
+      }
+    </Tab>
+  </>
+}
+
+const configs = {
+  [EVisualSettings.BrushAndZoomAreaSettings]: EVisualConfig.BrushAndZoomAreaConfig,
+  [EVisualSettings.ChartSettings]: EVisualConfig.ChartConfig,
+  [EVisualSettings.CutAndClipAxisSettings]: EVisualConfig.CutAndClipAxisConfig,
+  [EVisualSettings.DataColorsSettings]: EVisualConfig.DataColorsConfig,
+  [EVisualSettings.DataLabelsSettings]: EVisualConfig.DataLabelsConfig,
+  [EVisualSettings.DynamicDeviationSettings]: EVisualConfig.DynamicDeviationConfig,
+  [EVisualSettings.ErrorBarsSettings]: EVisualConfig.ErrorBarsConfig,
+  [EVisualSettings.GridLinesSettings]: EVisualConfig.GridLinesConfig,
+  [EVisualSettings.IBCSSettings]: EVisualConfig.IBCSConfig,
+  [EVisualSettings.LineSettings]: EVisualConfig.LineConfig,
+  [EVisualSettings.MarkerSettings]: EVisualConfig.MarkerConfig,
+  [EVisualSettings.PatternSettings]: EVisualConfig.PatternConfig,
+  [EVisualSettings.RaceChartSettings]: EVisualConfig.RaceChartConfig,
+  [EVisualSettings.RankingSettings]: EVisualConfig.RankingConfig,
+  [EVisualSettings.ReferenceLinesSettings]: EVisualConfig.ReferenceLinesConfig,
+  [EVisualSettings.ShowBucketFormatting]: EVisualConfig.ShowBucketConfig,
+  [EVisualSettings.SmallMultiplesSettings]: EVisualConfig.SmallMultiplesConfig,
+  [EVisualSettings.Sorting]: EVisualConfig.SortingConfig,
+  [EVisualSettings.XAxisSettings]: EVisualConfig.XAxisConfig,
+  [EVisualSettings.YAxisSettings]: EVisualConfig.YAxisConfig
+};
+
+const getConfig = (vizOptions: ShadowUpdateOptions) => {
   const formatTab = vizOptions.formatTab;
-
-  const getConfig = () => {
-    const obj = {
-      [EVisualSettings.BrushAndZoomAreaSettings]: JSON.parse(formatTab[EVisualConfig.BrushAndZoomAreaConfig][EVisualSettings.BrushAndZoomAreaSettings]),
-      [EVisualSettings.ChartSettings]: JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]),
-      [EVisualSettings.CutAndClipAxisSettings]: JSON.parse(formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]),
-      [EVisualSettings.DataColorsSettings]: JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]),
-      [EVisualSettings.DataLabelsSettings]: JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]),
-      [EVisualSettings.DynamicDeviationSettings]: JSON.parse(formatTab[EVisualConfig.DynamicDeviationConfig][EVisualSettings.DynamicDeviationSettings]),
-      [EVisualSettings.ErrorBarsSettings]: JSON.parse(formatTab[EVisualConfig.ErrorBarsConfig][EVisualSettings.ErrorBarsSettings]),
-      [EVisualSettings.GridLinesSettings]: JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EVisualSettings.GridLinesSettings]),
-      [EVisualSettings.LineSettings]: JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]),
-      [EVisualSettings.MarkerSettings]: JSON.parse(formatTab[EVisualConfig.MarkerConfig][EVisualSettings.MarkerSettings]),
-      [EVisualSettings.PatternSettings]: JSON.parse(formatTab[EVisualConfig.PatternConfig][EVisualSettings.PatternSettings]),
-      [EVisualSettings.RaceChartSettings]: JSON.parse(formatTab[EVisualConfig.RaceChartConfig][EVisualSettings.RaceChartSettings]),
-      [EVisualSettings.RankingSettings]: JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]),
-      [EVisualSettings.ReferenceLinesSettings]: JSON.parse(formatTab[EVisualConfig.ReferenceLinesConfig][EVisualSettings.ReferenceLinesSettings]),
-      [EVisualSettings.ShowBucketFormatting]: JSON.parse(formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]),
-      [EVisualSettings.SmallMultiplesSettings]: JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]),
-      [EVisualSettings.Sorting]: JSON.parse(formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]),
-      [EVisualSettings.XAxisSettings]: JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]),
-      [EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings]),
-    }
-
-    obj["conditionalFormatting"] = JSON.parse(formatTab["editor"]["conditionalFormatting"] !== "" ? formatTab["editor"]["conditionalFormatting"] : "{}");
-    obj["annotations"] = JSON.parse(formatTab["editor"]["annotations"]);
-
-    return obj;
-
-    // get(vizOptions, `formatTab.${EVisualConfig.BrushAndZoomAreaConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.ChartConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.CutAndClipAxisConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.DataColorsConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.DataLabelsConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.DynamicDeviationConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.ErrorBarsConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.GridLinesConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.IBCSConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.LineConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.MarkerConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.PatternConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.RaceChartConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.RankingConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.ReferenceLinesConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.ShowBucketConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.SortingConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.XAxisConfig}`),
-    //   get(vizOptions, `formatTab.${EVisualConfig.YAxisConfig}`));
+  const obj = {
+    [EVisualSettings.BrushAndZoomAreaSettings]: JSON.parse(formatTab[EVisualConfig.BrushAndZoomAreaConfig][EVisualSettings.BrushAndZoomAreaSettings]),
+    [EVisualSettings.ChartSettings]: JSON.parse(formatTab[EVisualConfig.ChartConfig][EVisualSettings.ChartSettings]),
+    [EVisualSettings.CutAndClipAxisSettings]: JSON.parse(formatTab[EVisualConfig.CutAndClipAxisConfig][EVisualSettings.CutAndClipAxisSettings]),
+    [EVisualSettings.DataColorsSettings]: JSON.parse(formatTab[EVisualConfig.DataColorsConfig][EVisualSettings.DataColorsSettings]),
+    [EVisualSettings.DataLabelsSettings]: JSON.parse(formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]),
+    [EVisualSettings.DynamicDeviationSettings]: JSON.parse(formatTab[EVisualConfig.DynamicDeviationConfig][EVisualSettings.DynamicDeviationSettings]),
+    [EVisualSettings.ErrorBarsSettings]: JSON.parse(formatTab[EVisualConfig.ErrorBarsConfig][EVisualSettings.ErrorBarsSettings]),
+    [EVisualSettings.GridLinesSettings]: JSON.parse(formatTab[EVisualConfig.GridLinesConfig][EVisualSettings.GridLinesSettings]),
+    [EVisualSettings.LineSettings]: JSON.parse(formatTab[EVisualConfig.LineConfig][EVisualSettings.LineSettings]),
+    [EVisualSettings.MarkerSettings]: JSON.parse(formatTab[EVisualConfig.MarkerConfig][EVisualSettings.MarkerSettings]),
+    [EVisualSettings.PatternSettings]: JSON.parse(formatTab[EVisualConfig.PatternConfig][EVisualSettings.PatternSettings]),
+    [EVisualSettings.RaceChartSettings]: JSON.parse(formatTab[EVisualConfig.RaceChartConfig][EVisualSettings.RaceChartSettings]),
+    [EVisualSettings.RankingSettings]: JSON.parse(formatTab[EVisualConfig.RankingConfig][EVisualSettings.RankingSettings]),
+    [EVisualSettings.ReferenceLinesSettings]: JSON.parse(formatTab[EVisualConfig.ReferenceLinesConfig][EVisualSettings.ReferenceLinesSettings]),
+    [EVisualSettings.ShowBucketFormatting]: JSON.parse(formatTab[EVisualConfig.ShowBucketConfig][EVisualSettings.ShowBucketFormatting]),
+    [EVisualSettings.SmallMultiplesSettings]: JSON.parse(formatTab[EVisualConfig.SmallMultiplesConfig][EVisualSettings.SmallMultiplesSettings]),
+    [EVisualSettings.Sorting]: JSON.parse(formatTab[EVisualConfig.SortingConfig][EVisualSettings.Sorting]),
+    [EVisualSettings.XAxisSettings]: JSON.parse(formatTab[EVisualConfig.XAxisConfig][EVisualSettings.XAxisSettings]),
+    [EVisualSettings.YAxisSettings]: JSON.parse(formatTab[EVisualConfig.YAxisConfig][EVisualSettings.YAxisSettings]),
   }
 
+  obj["conditionalFormatting"] = JSON.parse(formatTab["editor"]["conditionalFormatting"] !== "" ? formatTab["editor"]["conditionalFormatting"] : "{}");
+  obj["annotations"] = JSON.parse(formatTab["editor"]["annotations"]);
+
+  return obj;
+}
+
+const applyThemeJson = (shadow, json, getConfig, sectionName, propertyName, closeCurrentSettingHandler, setDetails) => {
+  try {
+    const obj = typeof json === "object" ? json : JSON.parse(json);
+    const keys = Object.keys(getConfig());
+    const mergeObject = [];
+    keys.forEach(el => {
+      if (el === "conditionalFormatting" || el === "annotations") {
+        if (el === "conditionalFormatting" && Object.keys(obj["conditionalFormatting"]).length > 0) {
+          mergeObject.push({
+            objectName: "editor",
+            properties: {
+              ["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
+            },
+            selector: null,
+          })
+        }
+
+        if (el === "annotations" && obj["annotations"].length > 0) {
+          mergeObject.push({
+            objectName: "editor",
+            properties: {
+              ["annotations"]: JSON.stringify(obj["annotations"]),
+            },
+            selector: null,
+          })
+        }
+      } else {
+        if (Object.keys(obj).includes(el)) {
+          mergeObject.push({
+            objectName: configs[el],
+            properties: {
+              [el]: JSON.stringify(obj[el]),
+            },
+            selector: null,
+          })
+          // shadow.persistProperties("config", el, obj[el]);
+        }
+        else {
+          throw "Invalid JSON file"
+        }
+      }
+    });
+
+    if (mergeObject.length > 0) {
+      shadow._host.persistProperties({
+        merge: mergeObject,
+      });
+    }
+
+    // initNotification("Theme applied successfully");
+    shadow.persistProperties(sectionName, propertyName, "THEME_APPLIED");
+    closeCurrentSettingHandler();
+  } catch (e) {
+    setDetails(s => ({ ...s, status: "FAILED" }));
+    console.log("Error parsing file");
+    shadow.persistProperties(sectionName, propertyName, "FAILED");
+    // initNotification("Error parsing file");
+  }
+};
+
+const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConfig: { sectionName, propertyName } }) => {
+  const initialState = vizOptions.formatTab[sectionName][propertyName];
+  const [isThemeApplied, setIsThemeApplied] = React.useState(initialState === "THEME_APPLIED");
+  const [showDownloadNote, setShowDownloadNote] = React.useState(false);
+
   const urlData = React.useMemo(() => {
-    const config = getConfig();
+    const config = getConfig(vizOptions);
     const jsonse = JSON.stringify(config);
     const blob = new Blob([jsonse], { type: "application/json" });
     return URL.createObjectURL(blob);
   }, [vizOptions.formatTab]);
 
   const jsonString = React.useMemo(() => {
-    const config = getConfig();
+    const config = getConfig(vizOptions);
     return JSON.stringify(config);
   }, [vizOptions.formatTab]);
 
-  const applyThemeJson = json => {
-    try {
-      const obj = typeof json === "object" ? json : JSON.parse(json);
-      const keys = Object.keys(getConfig());
-      const mergeObject = [];
-      keys.forEach(el => {
-        if (el === "conditionalFormatting" || el === "annotations") {
-          if (el === "conditionalFormatting" && Object.keys(obj["conditionalFormatting"]).length > 0) {
-            mergeObject.push({
-              objectName: "editor",
-              properties: {
-                ["conditionalFormatting"]: JSON.stringify(obj["conditionalFormatting"]),
-              },
-              selector: null,
-            })
-          }
-
-          if (el === "annotations" && obj["annotations"].length > 0) {
-            mergeObject.push({
-              objectName: "editor",
-              properties: {
-                ["annotations"]: JSON.stringify(obj["annotations"]),
-              },
-              selector: null,
-            })
-          }
-        } else {
-          if (Object.keys(obj).includes(el)) {
-            mergeObject.push({
-              objectName: configs[el],
-              properties: {
-                [el]: JSON.stringify(obj[el]),
-              },
-              selector: null,
-            })
-            // shadow.persistProperties("config", el, obj[el]);
-          }
-          else {
-            throw "Invalid JSON file"
-          }
-        }
-      });
-
-      if (mergeObject.length > 0) {
-        shadow._host.persistProperties({
-          merge: mergeObject,
-        });
-      }
-
-      // initNotification("Theme applied successfully");
-      shadow.persistProperties(sectionName, propertyName, "THEME_APPLIED");
-      closeCurrentSettingHandler();
-    } catch (e) {
-      setDetails(s => ({ ...s, status: "FAILED" }));
-      console.log("Error parsing file");
-      shadow.persistProperties(sectionName, propertyName, "FAILED");
-      // initNotification("Error parsing file");
-    }
-  };
-
   const copyTheme = () => {
-    const config = getConfig();
+    const config = getConfig(vizOptions);
     copy(JSON.stringify(config));
     setCopyThemeText("Copied");
   };
 
   const downloadTheme = () => {
-    const config = getConfig();
+    const config = getConfig(vizOptions);
 
     shadow.downloadService.exportVisualsContentExtended(JSON.stringify(config), "Theme.json", "json", "xlsx file").then((result) => {
       if (!result.downloadCompleted) {
@@ -261,181 +387,14 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
 
   return (
     <>
-      <Row>
-        <Column>
-          <Tabs selected={selectedTab} onChange={tab => setSelectedTab(tab)}>
-            <Tab identifier="import" title="Import">
-              {
-                isThemeApplied ? <ThemeAlreadyApplied onUploadNew={() => setIsThemeApplied(false)} /> :
-                  <>
-                    <Row>
-                      <Column>
-                        <RadioOption
-                          value={details.view}
-                          optionsList={IMPORT_OPTIONS}
-                          handleChange={value => changeView(value)}
-                        />
-                      </Column>
-                    </Row>
-
-                    <ConditionalWrapper visible={details.view === "import"}>
-                      <Row>
-                        <Column>
-                          <div className="theme-import-upload">
-                            {details.status !== "VALID" && (
-                              <>
-                                <ImportUploadIcon />
-                                <div>
-                                  <Button clickHandler={handleUploadClick} text="Upload" variant="primary" />
-                                  <input
-                                    type="file"
-                                    ref={hiddenFileInput}
-                                    onChange={uploadHandler}
-                                    style={{ display: "none" }}
-                                    accept="application/json"
-                                  />
-                                </div>
-                              </>
-                            )}
-
-                            {details.status === "VALID" && (
-                              <>
-                                <div className="theme-import-upload-success">
-                                  <div className="theme-import-upload-success-close" onClick={clearUploadStatus}>
-                                    <ImportUploadClose />
-                                  </div>
-                                  <ImportSuccessfulUploadIcon />
-                                </div>
-
-                                <div className="theme-import-upload-label">
-                                  <Label text="File Uploaded Successfully." />
-                                </div>
-                              </>
-                            )}
-
-                            {details.status === "FAILED" && (
-                              <div className="theme-import-upload-label">
-                                <Label text="Import Failed. Please try again with a valid file." appearance="error" textEllipsis={false} />
-                              </div>
-                            )}
-                          </div>
-                        </Column>
-                      </Row>
-                    </ConditionalWrapper>
-
-                    <ConditionalWrapper visible={details.view === "paste"}>
-                      <Row>
-                        <Column>
-                          <InputControl
-                            type="textarea"
-                            value={details.value}
-                            handleChange={(value: any) => {
-                              changeValue({ value });
-                            }}
-                            rows={17}
-                            placeholder="Paste the JSON here.."
-                          />
-                          {details.status === "FAILED" && (
-                            <div className="theme-import-upload-label">
-                              <Label text="Import Failed." appearance="error" />
-                              <Label text="Please try again with a valid file." appearance="error" />
-                            </div>
-                          )}
-                        </Column>
-                      </Row>
-                    </ConditionalWrapper>
-                  </>
-              }
-            </Tab>
-            <Tab identifier="export" title="Export">
-              <Row>
-                <Column>
-                  <IconButton text={copyThemeText} icon={copyThemeText === "Copy" ? <CopyExportIcon fill="var(--blackColor)" /> : <GreenCheckmark fill="var(--blackColor)" />} onClick={copyTheme} style={{ flexDirection: "row-reverse" }} iconStyle={{ marginLeft: 0, marginRight: "8px" }} />
-                </Column>
-                <Column style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <TooltipElement tooltip={showDownloadNote ? 'Right click and select "Save link as" to download' : ''} style={{ textAlign: "left" }} alignTooltipTextTo="left">
-                    {!shadow.isPowerBIDesktop && <a href={urlData} download={"export.json"} onClick={() => downloadTheme()} className="export-to-file-link">
-                      EXPORT
-                    </a>}
-                  </TooltipElement>
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <div className="theme-export-modal-code">
-                    <pre>{jsonString}</pre>
-                  </div>
-                </Column>
-              </Row>
-
-              {/* <Row>
-                <Column>
-                  <div className="export-to-file">
-                    <a href={urlData} download={"export.json"} className="export-to-file-link">
-                      Export
-                    </a>
-                    <Button text={"Download Theme"} clickHandler={downloadTheme} />
-                    <span className="export-to-file-subtext">Right click {`>`} “Save Link As...“ to download</span>
-                  </div>
-                </Column>
-              </Row> */}
-
-              {showDownloadNote &&
-                <Row>
-                  <Column>
-                    <Quote>
-                      <strong>Note:</strong> It's not possible to save files directly from Power BI Visuals, but this dialog will assist you with producing a valid JSON template that you can copy/paste and save elsewhere for others to use
-                    </Quote>
-                  </Column>
-                </Row>
-              }
-            </Tab>
-          </Tabs>
-        </Column>
-      </Row>
-
-      {selectedTab === "import" && (
-        <Footer
-          cancelButtonHandler={closeCurrentSettingHandler}
-          saveButtonConfig={{
-            isDisabled: false,
-            text: "IMPORT",
-            handler: () => applyThemeJson(details.value)
-          }}
-          resetButtonHandler={() => {
-            setIsThemeApplied(false);
-          }}
-        />
-      )}
-
-      {selectedTab === "export" && (
-        <Footer cancelButtonHandler={closeCurrentSettingHandler} isShowSaveButton={false}
-          resetButtonHandler={() => {
-            setIsThemeApplied(false);
-          }}
-        />
+      {UIMain(shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setSelectedTab,
+        setIsThemeApplied, changeView, changeValue, copyThemeText, showDownloadNote, copyTheme, urlData, downloadTheme, jsonString, closeCurrentSettingHandler,
+        applyThemeJson
       )}
     </>
-    // <div>
-    //   <div className="mb-10 export-import-container">
-    //     <button className={`mb-10 btn-primary btn`} {...getRootProps()}>
-    //       <input {...getInputProps()} />
-    //       Import Theme (JSON)
-    //     </button>
-    //     <div className="export-import-container-export">
-    //       <a href={urlData} download={"export.json"} className="export-import-container-export-link mb-10">
-    //         Export Theme (JSON)
-    //       </a>
-    //       <div className="export-import-container-export-text">Right Click {`>`} "Save link as..." to download</div>
-    //     </div>
-    //   </div>
-    //   <div className="mb-10" style={{color: "#ffffff"}}>
-    //     {notification}
-    //   </div>
-    // </div>
   );
 };
+
 export default ImportExport;
 
 
