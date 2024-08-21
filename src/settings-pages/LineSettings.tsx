@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { LINE_SETTINGS as LINE_SETTINGS_IMP, POSITIVE_COLOR } from "../constants";
 import { ColorPaletteType, EIBCSThemes, ELineSettings, ELineType, EMarkerShapeTypes } from "../enum";
@@ -7,6 +6,7 @@ import { ILineSettings } from "../visual-settings.interface";
 import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import { persistProperties } from "../methods/methods";
 import { Visual } from "../visual";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const LINE_TYPES = [
 	{
@@ -36,6 +36,82 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 		/>
 	);
 };
+
+const UIExtended1 = (
+	vizOptions: ShadowUpdateOptions,
+	shadow: Visual,
+	configValues: ILineSettings,
+	handleChange, handleColor, handleCheckbox
+) => {
+	return <>
+		<Row appearance="padded">
+			<Column>
+				<Row disableTopPadding>
+					<Column>
+						<SwitchOption
+							label="Line Style"
+							value={configValues.lineType}
+							optionsList={LINE_TYPES}
+							selectorAppearance="secondary"
+							handleChange={(value) => handleChange(value, ELineSettings.lineType)}
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<InputControl
+							min={1}
+							max={20}
+							type="number"
+							label="Line Width"
+							value={configValues.lineWidth}
+							handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
+						/>
+					</Column>
+
+					<Column>
+						<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure)) : false}>
+							<ColorPicker
+								label="Color"
+								color={configValues.lineColor}
+								handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+								colorPalette={vizOptions.host.colorPalette}
+							/>
+						</ConditionalWrapper>
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={!shadow.isShowImageMarker1 && shadow.markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.UPLOAD_ICON && (shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true)}>
+					<Row>
+						<Column>
+							<ToggleButton
+								label={"Same color as Marker"}
+								value={configValues.isApplyMarkerColor}
+								handleChange={() => handleCheckbox(ELineSettings.isApplyMarkerColor)}
+								appearance="checkbox"
+							/>
+						</Column>
+					</Row>
+
+					<ConditionalWrapper visible={!configValues.isApplyMarkerColor}>
+						<Row>
+							<Column>
+								<ColorPicker
+									label="Color"
+									color={configValues.lineColor}
+									handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
+									colorPalette={vizOptions.host.colorPalette}
+									size="sm"
+								/>
+							</Column>
+						</Row>
+					</ConditionalWrapper>
+				</ConditionalWrapper>
+			</Column>
+		</Row>
+	</>
+}
 
 const LineSettings = (props) => {
 	const {
@@ -135,72 +211,7 @@ const LineSettings = (props) => {
 			</Row>
 
 			<ConditionalWrapper visible={configValues.show}>
-				<Row appearance="padded">
-					<Column>
-						<Row disableTopPadding>
-							<Column>
-								<SwitchOption
-									label="Line Style"
-									value={configValues.lineType}
-									optionsList={LINE_TYPES}
-									selectorAppearance="secondary"
-									handleChange={(value) => handleChange(value, ELineSettings.lineType)}
-								/>
-							</Column>
-						</Row>
-
-						<Row>
-							<Column>
-								<InputControl
-									min={1}
-									max={20}
-									type="number"
-									label="Line Width"
-									value={configValues.lineWidth}
-									handleChange={(value) => handleChange(value, ELineSettings.lineWidth)}
-								/>
-							</Column>
-
-							<Column>
-								<ConditionalWrapper visible={shadow.isShowImageMarker1 || shadow.markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON || shadow.isLollipopTypePie ? (shadow.isHasMultiMeasure || (!shadow.isHasMultiMeasure)) : false}>
-									<ColorPicker
-										label="Color"
-										color={configValues.lineColor}
-										handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
-										colorPalette={vizOptions.host.colorPalette}
-									/>
-								</ConditionalWrapper>
-							</Column>
-						</Row>
-
-						<ConditionalWrapper visible={!shadow.isShowImageMarker1 && shadow.markerSettings.marker1Style.markerShape !== EMarkerShapeTypes.UPLOAD_ICON && (shadow.isLollipopTypePie ? (!shadow.isHasMultiMeasure && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single) : true)}>
-							<Row>
-								<Column>
-									<ToggleButton
-										label={"Same color as Marker"}
-										value={configValues.isApplyMarkerColor}
-										handleChange={() => handleCheckbox(ELineSettings.isApplyMarkerColor)}
-										appearance="checkbox"
-									/>
-								</Column>
-							</Row>
-
-							<ConditionalWrapper visible={!configValues.isApplyMarkerColor}>
-								<Row>
-									<Column>
-										<ColorPicker
-											label="Color"
-											color={configValues.lineColor}
-											handleChange={(value) => handleColor(value, ELineSettings.lineColor)}
-											colorPalette={vizOptions.host.colorPalette}
-											size="sm"
-										/>
-									</Column>
-								</Row>
-							</ConditionalWrapper>
-						</ConditionalWrapper>
-					</Column>
-				</Row>
+				{UIExtended1(vizOptions, shadow, configValues, handleChange, handleColor, handleCheckbox)}
 			</ConditionalWrapper>
 
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
