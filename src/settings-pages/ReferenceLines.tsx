@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import AddReferenceLine from "./AddReferenceLine";
 import {
@@ -19,6 +18,297 @@ import { IReferenceLineSettings } from "../visual-settings.interface";
 import { ELineTypeTabs, EReferenceType, EXYAxisNames } from "../enum";
 import { GetFormattedNumber } from "../methods/NumberFormat.methods";
 import { isEmpty } from "lodash";
+
+const UIDeletePage = (contentShown, mappedInitialState, deletedRuleId, setContentShown, closeCurrentSettingHandler, initialStates, setInitialStates: any, applyChanges: any, closeAddEdit: any) => {
+  return <>
+    <ConditionalWrapper visible={contentShown === "deletePage" && mappedInitialState && mappedInitialState.length > 0}>
+      <PopupModHeader
+        title={"Reference Line/Band"}
+        icon={ReferenceLinesIcon}
+        closeSettingsPopup={closeCurrentSettingHandler}
+      />
+
+      <div className="section section-delete-alert">
+        <img src={require("../../assets/icons/delete-alert-icon.svg")} />
+        <p className="section-delete-alert-text">Delete the rule?</p>
+        <p className="section-delete-alert-subtext">
+          <span className="section-delete-alert-subtext-text">
+            {mappedInitialState.length > 0 && mappedInitialState[deletedRuleId] && mappedInitialState[deletedRuleId].displayContent}
+          </span>
+        </p>
+      </div>
+
+      <div className={`config-btn-wrapper flex-end`}>
+        <div className="btn-group">
+          <Button text={"Yes"} variant={"secondary"} clickHandler={() => {
+            onDelete(deletedRuleId, initialStates, setInitialStates, applyChanges, closeAddEdit);
+            setContentShown(() => "homePage");
+          }} />
+          <Button
+            text={"No"}
+            variant={"primary"}
+            clickHandler={() => {
+              setContentShown(() => "homePage");
+            }}
+          />
+        </div>
+      </div>
+    </ConditionalWrapper>
+  </>
+}
+
+const UIHomePage = (contentShown, closeCurrentSettingHandler, selectedLineType, setSelectedLineType, setIsDetailsOpen, isDetailsOpen, initialStates,
+  mappedInitialState, setInitialStates, setContentShown, setId
+) => {
+  const LineTypeTabs = getLineTypeTabs(initialStates);
+  return <>
+    <ConditionalWrapper visible={contentShown === "homePage"}>
+      <PopupModHeader
+        title={"Reference Line/Band"}
+        icon={ReferenceLinesIcon}
+        closeSettingsPopup={closeCurrentSettingHandler}
+      />
+
+      <Row>
+        <Column>
+          <SwitchOption
+            value={selectedLineType}
+            optionsList={LineTypeTabs}
+            handleChange={(value) => {
+              setSelectedLineType(() => value);
+              setIsDetailsOpen(false);
+            }}
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.All}>
+        {!isDetailsOpen && initialStates.length > 0 && (
+          <>
+            <Row>
+              <Column>
+                <DraggableRows data={mappedInitialState} setData={setInitialStates} />
+              </Column>
+            </Row>
+
+            <Footer
+              cancelButtonHandler={() => {
+                closeCurrentSettingHandler();
+              }}
+              cancelButtonText="CLOSE"
+              isShowResetButton={false}
+              isShowSaveButton={false}
+            />
+          </>
+        )}
+
+        {!isDetailsOpen && initialStates.length === 0 && (
+          <Footer
+            cancelButtonHandler={() => {
+              closeCurrentSettingHandler();
+            }}
+            cancelButtonText="CLOSE"
+            isShowResetButton={false}
+            isShowSaveButton={false}
+          />
+        )}
+      </ConditionalWrapper>
+
+      {UILineBand(selectedLineType, isDetailsOpen, initialStates, mappedInitialState, setInitialStates, closeCurrentSettingHandler, setContentShown, setId, setIsDetailsOpen)}
+    </ConditionalWrapper>
+  </>
+}
+
+const UILineBand = (selectedLineType, isDetailsOpen, initialStates, mappedInitialState, setInitialStates, closeCurrentSettingHandler, setContentShown: any, setId: any, setIsDetailsOpen: any) => {
+  return <>
+    <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Line}>
+      {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length === 0 && (
+        <>
+          <Row>
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
+              <ReferenceLinePlaceholderIcon />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Button text="Add New Line" variant="primary" clickHandler={() => initAdd(setContentShown, setId, setIsDetailsOpen)} />
+            </Column>
+          </Row>
+
+          {UIFooter(closeCurrentSettingHandler)}
+        </>
+      )}
+
+      {
+        !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length > 0 && (
+          <>
+            <Row>
+              <Column>
+                <IconButton
+                  text="Add New Reference Line"
+                  icon={<PlusIcon fill="var(--blackColor)" />}
+                  onClick={() => initAdd(setContentShown, setId, setIsDetailsOpen)}
+                />
+              </Column>
+            </Row>
+            <Separator />
+            <Row>
+              <Column>
+                <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_LINE)} setData={setInitialStates} />
+              </Column>
+            </Row>
+            {UIFooter(closeCurrentSettingHandler)}
+          </>
+        )
+      }
+    </ConditionalWrapper>
+
+    <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Band}>
+      {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length === 0 && (
+        <>
+          <Row>
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
+              <ReferenceBandPlaceholderIcon />
+            </Column>
+          </Row>
+
+          <Row>
+            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <Button text="Add New Band" variant="primary" clickHandler={() => initAdd(setContentShown, setId, setIsDetailsOpen)} />
+            </Column>
+          </Row>
+
+          {UIFooter(closeCurrentSettingHandler)}
+        </>
+      )}
+
+      {
+        !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length > 0 && (
+          <>
+            <Row>
+              <Column>
+                <IconButton
+                  text="Add New Reference Band"
+                  icon={<PlusIcon fill="var(--blackColor)" />}
+                  onClick={() => initAdd(setContentShown, setId, setIsDetailsOpen)}
+                />
+              </Column>
+            </Row>
+            <Separator />
+            <Row>
+              <Column>
+                <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_BAND)} setData={setInitialStates} />
+              </Column>
+            </Row>
+
+            {UIFooter(closeCurrentSettingHandler)}
+          </>
+        )
+      }
+    </ConditionalWrapper>
+  </>
+}
+
+const initAdd = (setContentShown, setId, setIsDetailsOpen) => {
+  setContentShown(() => "form");
+  setId(null);
+  setIsDetailsOpen(true);
+};
+
+const initEdit = (index, setContentShown, setId, setIsDetailsOpen) => {
+  setContentShown(() => "form");
+  setId(index);
+  setIsDetailsOpen(true);
+};
+
+const closeAddEdit = (setId, setIsDetailsOpen) => {
+  setId(null);
+  setIsDetailsOpen(false);
+};
+
+const onAdd = (details: IReferenceLineSettings, selectedLineType, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
+  details.uid = new Date().getTime().toString();
+  details.referenceType = selectedLineType as any;
+  initialStates.push(details);
+  setInitialStates([...initialStates]);
+  applyChanges(initialStates);
+  closeAddEdit();
+};
+
+const showConfirmPrompt = (index, setContentShown, setDeletedRuleId) => {
+  setContentShown(() => "deletePage");
+  setDeletedRuleId(index);
+};
+
+const onDelete = (index, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
+  initialStates.splice(index, 1);
+  setInitialStates([...initialStates]);
+  applyChanges(initialStates);
+  closeAddEdit();
+};
+
+const onUpdate = (index, details, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
+  initialStates[index] = details;
+  setInitialStates([...initialStates]);
+  applyChanges(initialStates);
+  closeAddEdit();
+};
+
+const UIFooter = (closeCurrentSettingHandler: () => void) => {
+  return (
+    <Footer
+      cancelButtonHandler={() => {
+        closeCurrentSettingHandler();
+      }}
+      cancelButtonText="CLOSE"
+      isShowResetButton={false}
+      isShowSaveButton={false}
+    />
+  );
+};
+
+const UIForm = (vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown) => {
+  return <>
+    <ConditionalWrapper visible={contentShown === "form"}>
+      <AddReferenceLine
+        shadow={shadow}
+        details={details}
+        isLineUI={isEmpty(details) ? selectedLineType === ELineTypeTabs.Line : filteredInitialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
+        onAdd={onAdd}
+        onUpdate={onUpdate}
+        index={isEmpty(details) ? id : initialStates.findIndex(d => d.uid === details.uid)}
+        closeAddEdit={closeAddEdit}
+        closeCurrentSettingHandler={closeCurrentSettingHandler}
+        vizOptions={vizOptions}
+        handleChangeContent={setContentShown}
+      />
+    </ConditionalWrapper>
+  </>
+}
+
+const getLineTypeTabs = (initialStates) => {
+  const LineTypeTabs = [
+    {
+      label: "Line",
+      value: ELineTypeTabs.Line
+    },
+    {
+      label: "Band",
+      value: ELineTypeTabs.Band
+    }
+  ]
+
+  if (initialStates.length > 0) {
+    LineTypeTabs.unshift({
+      label: "All",
+      value: ELineTypeTabs.All
+    })
+  }
+
+  return LineTypeTabs;
+}
+
 
 const ReferenceLines = (props) => {
   const {
@@ -51,51 +341,6 @@ const ReferenceLines = (props) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const [selectedLineType, setSelectedLineType] = React.useState(ELineTypeTabs.All);
   const [contentShown, setContentShown] = React.useState("homePage");
-
-  const initAdd = () => {
-    setContentShown(() => "form");
-    setId(null);
-    setIsDetailsOpen(true);
-  };
-
-  const initEdit = (index) => {
-    setContentShown(() => "form");
-    setId(index);
-    setIsDetailsOpen(true);
-  };
-
-  const closeAddEdit = () => {
-    setId(null);
-    setIsDetailsOpen(false);
-  };
-
-  const onAdd = (details: IReferenceLineSettings) => {
-    details.uid = new Date().getTime().toString();
-    details.referenceType = selectedLineType as any;
-    initialStates.push(details);
-    setInitialStates([...initialStates]);
-    applyChanges(initialStates);
-    closeAddEdit();
-  };
-
-  const showConfirmPrompt = (index) => {
-    setContentShown(() => "deletePage");
-    setDeletedRuleId(index);
-  };
-
-  const onDelete = (index) => {
-    initialStates.splice(index, 1);
-    setInitialStates([...initialStates]);
-    applyChanges(initialStates);
-    closeAddEdit();
-  };
-
-  const onUpdate = (index, details) => {
-    initialStates[index] = details;
-    setInitialStates([...initialStates]);
-    applyChanges(initialStates);
-    closeAddEdit();
-  };
 
   const mappedInitialState = React.useMemo(() => {
     return (initialStates || []).map((row: IReferenceLineSettings, rowIndex) => {
@@ -142,14 +387,14 @@ const ReferenceLines = (props) => {
           {
             icon: <EditIcon />,
             onClick: i => {
-              initEdit(i);
+              initEdit(i, setContentShown, setId, setIsDetailsOpen);
             },
             toExecuteOnTitleClick: true,
           },
           {
             icon: <TrashIcon />,
             onClick: i => {
-              showConfirmPrompt(i);
+              showConfirmPrompt(i, setContentShown, setDeletedRuleId);
             },
           },
         ],
@@ -164,24 +409,6 @@ const ReferenceLines = (props) => {
     }
   }, [initialStates]);
 
-  const LineTypeTabs = [
-    {
-      label: "Line",
-      value: ELineTypeTabs.Line
-    },
-    {
-      label: "Band",
-      value: ELineTypeTabs.Band
-    }
-  ]
-
-  if (initialStates.length > 0) {
-    LineTypeTabs.unshift({
-      label: "All",
-      value: ELineTypeTabs.All
-    })
-  }
-
   React.useEffect(() => {
     setContentShown(() => "homePage");
   }, []);
@@ -191,221 +418,9 @@ const ReferenceLines = (props) => {
 
   return (
     <>
-      <ConditionalWrapper visible={contentShown === "deletePage" && mappedInitialState && mappedInitialState.length > 0}>
-        <PopupModHeader
-          title={"Reference Line/Band"}
-          icon={ReferenceLinesIcon}
-          closeSettingsPopup={closeCurrentSettingHandler}
-        />
-
-        <div className="section section-delete-alert">
-          <img src={require("../../assets/icons/delete-alert-icon.svg")} />
-          <p className="section-delete-alert-text">Delete the rule?</p>
-          <p className="section-delete-alert-subtext">
-            <span className="section-delete-alert-subtext-text">
-              {mappedInitialState.length > 0 && mappedInitialState[deletedRuleId] && mappedInitialState[deletedRuleId].displayContent}
-            </span>
-          </p>
-        </div>
-
-        <div className={`config-btn-wrapper flex-end`}>
-          <div className="btn-group">
-            <Button text={"Yes"} variant={"secondary"} clickHandler={() => {
-              onDelete(deletedRuleId);
-              setContentShown(() => "homePage");
-            }} />
-            <Button
-              text={"No"}
-              variant={"primary"}
-              clickHandler={() => {
-                setContentShown(() => "homePage");
-              }}
-            />
-          </div>
-        </div>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={contentShown === "homePage"}>
-        <PopupModHeader
-          title={"Reference Line/Band"}
-          icon={ReferenceLinesIcon}
-          closeSettingsPopup={closeCurrentSettingHandler}
-        />
-
-        <Row>
-          <Column>
-            <SwitchOption
-              value={selectedLineType}
-              optionsList={LineTypeTabs}
-              handleChange={(value) => {
-                setSelectedLineType(() => value);
-                setIsDetailsOpen(false);
-              }}
-            />
-          </Column>
-        </Row>
-
-        <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.All}>
-          {!isDetailsOpen && initialStates.length > 0 && (
-            <>
-              <Row>
-                <Column>
-                  <DraggableRows data={mappedInitialState} setData={setInitialStates} />
-                </Column>
-              </Row>
-
-              <Footer
-                cancelButtonHandler={() => {
-                  closeCurrentSettingHandler();
-                }}
-                cancelButtonText="CLOSE"
-                isShowResetButton={false}
-                isShowSaveButton={false}
-              />
-            </>
-          )}
-
-          {!isDetailsOpen && initialStates.length === 0 && (
-            <Footer
-              cancelButtonHandler={() => {
-                closeCurrentSettingHandler();
-              }}
-              cancelButtonText="CLOSE"
-              isShowResetButton={false}
-              isShowSaveButton={false}
-            />
-          )}
-        </ConditionalWrapper>
-
-        <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Line}>
-          {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length === 0 && (
-            <>
-              <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
-                  <ReferenceLinePlaceholderIcon />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <Button text="Add New Line" variant="primary" clickHandler={() => initAdd()} />
-                </Column>
-              </Row>
-
-              <Footer
-                cancelButtonHandler={() => {
-                  closeCurrentSettingHandler();
-                }}
-                cancelButtonText="CLOSE"
-                isShowResetButton={false}
-                isShowSaveButton={false}
-              />
-            </>
-          )}
-
-          {
-            !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_LINE)).length > 0 && (
-              <>
-                <Row>
-                  <Column>
-                    <IconButton
-                      text="Add New Reference Line"
-                      icon={<PlusIcon fill="var(--blackColor)" />}
-                      onClick={() => initAdd()}
-                    />
-                  </Column>
-                </Row>
-                <Separator />
-                <Row>
-                  <Column>
-                    <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_LINE)} setData={setInitialStates} />
-                  </Column>
-                </Row>
-                <Footer
-                  cancelButtonHandler={() => {
-                    closeCurrentSettingHandler();
-                  }}
-                  cancelButtonText="CLOSE"
-                  isShowResetButton={false}
-                  isShowSaveButton={false}
-                />
-              </>
-            )
-          }
-        </ConditionalWrapper>
-
-        <ConditionalWrapper visible={selectedLineType === ELineTypeTabs.Band}>
-          {!isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length === 0 && (
-            <>
-              <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: "12px" }}>
-                  <ReferenceBandPlaceholderIcon />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <Button text="Add New Band" variant="primary" clickHandler={() => initAdd()} />
-                </Column>
-              </Row>
-
-              <Footer
-                cancelButtonHandler={() => {
-                  closeCurrentSettingHandler();
-                }}
-                cancelButtonText="CLOSE"
-                isShowResetButton={false}
-                isShowSaveButton={false}
-              />
-            </>
-          )}
-
-          {
-            !isDetailsOpen && (initialStates.filter(d => d.referenceType === EReferenceType.REFERENCE_BAND)).length > 0 && (
-              <>
-                <Row>
-                  <Column>
-                    <IconButton
-                      text="Add New Reference Band"
-                      icon={<PlusIcon fill="var(--blackColor)" />}
-                      onClick={() => initAdd()}
-                    />
-                  </Column>
-                </Row>
-                <Separator />
-                <Row>
-                  <Column>
-                    <DraggableRows data={mappedInitialState.filter(d => d.row.referenceType === EReferenceType.REFERENCE_BAND)} setData={setInitialStates} />
-                  </Column>
-                </Row>
-                <Footer
-                  cancelButtonHandler={() => {
-                    closeCurrentSettingHandler();
-                  }}
-                  cancelButtonText="CLOSE"
-                  isShowResetButton={false}
-                  isShowSaveButton={false}
-                />
-              </>
-            )
-          }
-        </ConditionalWrapper>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={contentShown === "form"}>
-        <AddReferenceLine
-          shadow={shadow}
-          details={details}
-          isLineUI={isEmpty(details) ? selectedLineType === ELineTypeTabs.Line : filteredInitialStates[id].referenceType === EReferenceType.REFERENCE_LINE}
-          onAdd={onAdd}
-          onUpdate={onUpdate}
-          index={isEmpty(details) ? id : initialStates.findIndex(d => d.uid === details.uid)}
-          closeAddEdit={closeAddEdit}
-          closeCurrentSettingHandler={closeCurrentSettingHandler}
-          vizOptions={vizOptions}
-          handleChangeContent={setContentShown}
-        />
-      </ConditionalWrapper>
+      {UIDeletePage(contentShown, mappedInitialState, deletedRuleId, setContentShown, closeCurrentSettingHandler, initialStates, setInitialStates, applyChanges, closeAddEdit)}
+      {UIHomePage(contentShown, closeCurrentSettingHandler, selectedLineType, setSelectedLineType, setIsDetailsOpen, isDetailsOpen, initialStates, mappedInitialState, setInitialStates, setContentShown, setId)}
+      {UIForm(vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown)}
     </>
   );
 };
