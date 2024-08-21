@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EMarkerChartTypes, EMarkerDefaultShapes, EMarkerSettings, EMarkerShapeTypes, EMarkerStyleTypes, EMarkerTypes } from "../enum";
 import { Row, Column, SwitchOption, Footer, ConditionalWrapper, Tabs, Tab, IconPicker, FileUploader, ImageOption, SelectInput, InputControl, ToggleButton, ColorPicker, Quote } from "@truviz/shadow/dist/Components";
@@ -66,38 +65,6 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 
 const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, config: IMarkerSettings, initialStates: IMarkerSettings, markerStyleTypes: EMarkerStyleTypes, setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
 	const configValues = config[config.markerStyleType];
-	const MARKERS_LIST: any[] = [
-		{
-			label: <MarkerCircleIcon fill="currentColor" />,
-			value: EMarkerDefaultShapes.CIRCLE,
-		},
-		{
-			label: <MarkerSquareIcon fill="currentColor" />,
-			value: EMarkerDefaultShapes.SQUARE,
-		},
-		{
-			label: shadow.isHorizontalChart ? <MarkerHTriangleIcon fill="currentColor" /> : <MarkerVTriangleIcon fill="currentColor" />,
-			value: shadow.isHorizontalChart ? EMarkerDefaultShapes.HTRIANGLE : EMarkerDefaultShapes.VTRIANGLE,
-		},
-		{
-			label: <MarkerDiamondIcon fill="currentColor" />,
-			value: EMarkerDefaultShapes.DIAMOND,
-		},
-	];
-
-	const MARKER_TYPES: ILabelValuePair[] = [
-		{
-			label: "Shape",
-			value: EMarkerTypes.SHAPE,
-		},
-		{
-			label: "Chart",
-			value: EMarkerTypes.CHART,
-			disabled: !shadow.isHasSubcategories,
-			tooltip: "Enter sub-category data to enable it"
-		},
-	];
-
 	const isLollipopTypePie = shadow.isHasSubcategories && config.markerType === EMarkerTypes.CHART && (shadow.isHasMultiMeasure ? true : configValues.markerShape === EMarkerShapeTypes.DEFAULT);
 
 	return (
@@ -107,79 +74,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 					<Tabs selected={configValues.markerShape} onChange={(value) => {
 						handleMarkerStyleChange(value, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues)
 					}}>
-						<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
-							<ConditionalWrapper visible={shadow.isHasSubcategories}>
-								<Row>
-									<Column>
-										<SwitchOption
-											label={"Marker Type"}
-											value={config.markerType}
-											optionsList={MARKER_TYPES}
-											handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
-										/>
-									</Column>
-								</Row>
-
-								<ConditionalWrapper visible={config.markerType === EMarkerTypes.SHAPE}>
-									<Row>
-										<Column>
-											<SwitchOption
-												value={configValues.dropdownMarkerType}
-												optionsList={MARKERS_LIST}
-												selectorAppearance="secondary"
-												handleChange={(e) => {
-													handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
-													handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
-												}}
-											/>
-										</Column>
-									</Row>
-								</ConditionalWrapper>
-
-								<ConditionalWrapper visible={config.markerType === EMarkerTypes.CHART}>
-									<ImageOption
-										isShowImageTooltip={true}
-										value={config[config.markerStyleType].markerChart}
-										images={MARKER_CHART_TYPES}
-										handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerChart, config.markerStyleType, setConfigValues)}
-									/>
-								</ConditionalWrapper>
-							</ConditionalWrapper>
-
-							<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-								<Row>
-									<Column>
-										<SwitchOption
-											label={"Marker Type"}
-											value={config.markerType}
-											optionsList={MARKER_TYPES}
-											handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
-										/>
-									</Column>
-								</Row>
-
-								<Row>
-									<Column>
-										<SwitchOption
-											value={configValues.dropdownMarkerType}
-											optionsList={MARKERS_LIST}
-											selectorAppearance="secondary"
-											handleChange={(e) => {
-												handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
-												handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
-											}}
-										/>
-									</Column>
-								</Row>
-							</ConditionalWrapper>
-
-							{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
-						</Tab>
-
-						<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
-							<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
-							{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
-						</Tab>
+						{UIMarkerShapeTypesExtended1(shadow, vizOptions, config, markerStyleTypes, initialStates, setConfigValues)}
 
 						<Tab title={"Images"} identifier={EMarkerShapeTypes.IMAGES}>
 							<ConditionalWrapper visible={!shadow.isHasImagesData}>
@@ -243,6 +138,127 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 			</Row>
 		</>
 	)
+}
+
+const getMARKERS_LIST = (shadow: Visual) => {
+	return [
+		{
+			label: <MarkerCircleIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.CIRCLE,
+		},
+		{
+			label: <MarkerSquareIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.SQUARE,
+		},
+		{
+			label: shadow.isHorizontalChart ? <MarkerHTriangleIcon fill="currentColor" /> : <MarkerVTriangleIcon fill="currentColor" />,
+			value: shadow.isHorizontalChart ? EMarkerDefaultShapes.HTRIANGLE : EMarkerDefaultShapes.VTRIANGLE,
+		},
+		{
+			label: <MarkerDiamondIcon fill="currentColor" />,
+			value: EMarkerDefaultShapes.DIAMOND,
+		},
+	];
+}
+
+const UIMarkerShapeTypesExtended1 = (
+	shadow: Visual,
+	vizOptions: ShadowUpdateOptions,
+	config: IMarkerSettings,
+	markerStyleTypes: EMarkerStyleTypes,
+	initialStates: IMarkerSettings,
+	setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>) => {
+	const configValues = config[config.markerStyleType];
+
+	const MARKERS_LIST: any[] = getMARKERS_LIST(shadow);
+	const MARKER_TYPES: ILabelValuePair[] = [
+		{
+			label: "Shape",
+			value: EMarkerTypes.SHAPE,
+		},
+		{
+			label: "Chart",
+			value: EMarkerTypes.CHART,
+			disabled: !shadow.isHasSubcategories,
+			tooltip: "Enter sub-category data to enable it"
+		},
+	];
+
+	return <>
+		<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>
+			<ConditionalWrapper visible={shadow.isHasSubcategories}>
+				<Row>
+					<Column>
+						<SwitchOption
+							label={"Marker Type"}
+							value={config.markerType}
+							optionsList={MARKER_TYPES}
+							handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
+				<ConditionalWrapper visible={config.markerType === EMarkerTypes.SHAPE}>
+					<Row>
+						<Column>
+							<SwitchOption
+								value={configValues.dropdownMarkerType}
+								optionsList={MARKERS_LIST}
+								selectorAppearance="secondary"
+								handleChange={(e) => {
+									handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+									handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
+								}}
+							/>
+						</Column>
+					</Row>
+				</ConditionalWrapper>
+
+				<ConditionalWrapper visible={config.markerType === EMarkerTypes.CHART}>
+					<ImageOption
+						isShowImageTooltip={true}
+						value={config[config.markerStyleType].markerChart}
+						images={MARKER_CHART_TYPES}
+						handleChange={(value) => handleMarkerStyleChange(value, EMarkerSettings.MarkerChart, config.markerStyleType, setConfigValues)}
+					/>
+				</ConditionalWrapper>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+				<Row>
+					<Column>
+						<SwitchOption
+							label={"Marker Type"}
+							value={config.markerType}
+							optionsList={MARKER_TYPES}
+							handleChange={(value) => handleChange(value, EMarkerSettings.MarkerType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+
+				<Row>
+					<Column>
+						<SwitchOption
+							value={configValues.dropdownMarkerType}
+							optionsList={MARKERS_LIST}
+							selectorAppearance="secondary"
+							handleChange={(e) => {
+								handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues);
+								handleMarkerStyleChange(e, EMarkerSettings.DropdownMarkerType, markerStyleTypes, setConfigValues);
+							}}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
+		</Tab>
+
+		<Tab title={"Icons"} identifier={EMarkerShapeTypes.ICONS_LIST}>
+			<IconsTab configValues={configValues} markerStyleTypes={markerStyleTypes} setConfigValues={setConfigValues} initialStates={initialStates} />
+			{UIMarkerSizeSettings(shadow, vizOptions, config, setConfigValues)}
+		</Tab>
+	</>
 }
 
 const IconsTab = ({ configValues, markerStyleTypes, setConfigValues, initialStates }) => (
@@ -399,6 +415,55 @@ const UIMarkerSizeSettings = (shadow: Visual, vizOptions: ShadowUpdateOptions, c
 	</>
 }
 
+const UIMain = (
+	vizOptions: ShadowUpdateOptions,
+	shadow: Visual,
+	configValues: IMarkerSettings,
+	initialStates: IMarkerSettings,
+	MARKER_STYLE_TYPES: ILabelValuePair[],
+	setConfigValues: React.Dispatch<React.SetStateAction<IMarkerSettings>>,
+	closeCurrentSettingHandler, applyChanges, resetChanges
+) => {
+	return <>
+		<ConditionalWrapper visible={!shadow.isHasSubcategories}>
+			<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+				<Row>
+					<Column>
+						<SwitchOption
+							label={'Select Measure'}
+							value={configValues.markerStyleType}
+							optionsList={MARKER_STYLE_TYPES}
+							handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
+		</ConditionalWrapper>
+
+		<ConditionalWrapper visible={shadow.isHasSubcategories}>
+			<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
+				<Row>
+					<Column>
+						<SwitchOption
+							label={'Select Measure'}
+							value={configValues.markerStyleType}
+							optionsList={MARKER_STYLE_TYPES}
+							handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
+						/>
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+			<></>
+
+			{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
+		</ConditionalWrapper>
+
+		{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+	</>
+}
+
 const MarkerSettings = (props) => {
 	const {
 		shadow,
@@ -500,14 +565,6 @@ const MarkerSettings = (props) => {
 		if (configValues[configValues.markerStyleType].markerShape === EMarkerShapeTypes.UPLOAD_ICON && !configValues[configValues.markerStyleType].markerShapeBase64Url) {
 			handleMarkerStyleChange(EMarkerShapeTypes.DEFAULT, EMarkerSettings.MarkerShape, configValues.markerStyleType, setConfigValues)
 		}
-
-		// if (configValues.marker1Style.size === 0) {
-		// 	handleMarkerStyleChange(shadow.circle1Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
-		// }
-
-		// if (configValues.marker2Style.size === 0) {
-		// 	handleMarkerStyleChange(shadow.circle2Size, EMarkerStyleProps.Size, configValues.markerStyleType, setConfigValues)
-		// }
 	}, []);
 
 	React.useEffect(() => {
@@ -518,42 +575,7 @@ const MarkerSettings = (props) => {
 
 	return (
 		<>
-			<ConditionalWrapper visible={!shadow.isHasSubcategories}>
-				<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
-					<Row>
-						<Column>
-							<SwitchOption
-								label={'Select Measure'}
-								value={configValues.markerStyleType}
-								optionsList={MARKER_STYLE_TYPES}
-								handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
-
-				{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
-			</ConditionalWrapper>
-
-			<ConditionalWrapper visible={shadow.isHasSubcategories}>
-				<ConditionalWrapper visible={shadow.isHasMultiMeasure}>
-					<Row>
-						<Column>
-							<SwitchOption
-								label={'Select Measure'}
-								value={configValues.markerStyleType}
-								optionsList={MARKER_STYLE_TYPES}
-								handleChange={(value) => handleChange(value, EMarkerSettings.MarkerStyleType, setConfigValues)}
-							/>
-						</Column>
-					</Row>
-				</ConditionalWrapper>
-				<></>
-
-				{UIMarkerShapeTypes(shadow, vizOptions, configValues, initialStates, configValues.markerStyleType, setConfigValues)}
-			</ConditionalWrapper>
-
-			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+			{UIMain(vizOptions, shadow, configValues, initialStates, MARKER_STYLE_TYPES, setConfigValues, closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
 };
