@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
