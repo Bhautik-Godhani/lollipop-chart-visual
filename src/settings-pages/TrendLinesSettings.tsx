@@ -1,4 +1,3 @@
-// /* eslint-disable max-lines-per-function */
 // import * as React from "react";
 // import { ELineType, ETrendLineSettings, ETrendLinesTypes } from "../enum";
 // import { ILabelValuePair, ITrendLinesSettings } from "../visual-settings.interface";
