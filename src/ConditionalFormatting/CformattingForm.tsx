@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import React, { useState, useEffect } from "react";
 import ConditionRecord from "./ConditionRecord";
 import { cloneDeep, isEmpty } from "lodash";
@@ -74,6 +73,30 @@ const GetCFormattingFormUI = (
       )
     }
 
+    {GetCFormattingFormUIExtended(isEditableRuleName, ruleDetails, inputChangeHandler, setIsEditableRuleName)}
+
+    {
+      ruleDetails.conditions.map((record, index) => (
+        <>
+          <ConditionRecord
+            record={record}
+            index={index}
+            dropdownHandler={dropdownHandler}
+            measureOptions={measureOptions}
+            categoryOptions={categoryOptions}
+            inputChangeHandler={inputChangeHandler}
+            setColorHandler={setColorHandler}
+            shadow={shadow}
+            CFConfig={CFConfig}
+          />
+        </>
+      ))
+    }
+  </>
+}
+
+const GetCFormattingFormUIExtended = (isEditableRuleName, ruleDetails, inputChangeHandler, setIsEditableRuleName) => {
+  return <>
     <Row>
       <Column style={{ position: "relative" }}>
         <InputControl
@@ -96,25 +119,55 @@ const GetCFormattingFormUI = (
         </div>
       </Column>
     </Row >
-
-    {
-      ruleDetails.conditions.map((record, index) => (
-        <>
-          <ConditionRecord
-            record={record}
-            index={index}
-            dropdownHandler={dropdownHandler}
-            measureOptions={measureOptions}
-            categoryOptions={categoryOptions}
-            inputChangeHandler={inputChangeHandler}
-            setColorHandler={setColorHandler}
-            shadow={shadow}
-            CFConfig={CFConfig}
-          />
-        </>
-      ))
-    }
   </>
+}
+
+const UE1 = (ruleDetails, measureOptions, categoryOptions, setRuleDetails) => {
+  const record = ruleDetails.conditions[0];
+  if (record.applyTo === "measure" && (!record.applyTo || !(measureOptions as ILabelValuePair[]).map(d => d.value).includes(record.sourceName))) {
+    record.sourceName = measureOptions[0].value;
+  }
+
+  if (record.applyTo === "category" && (!record.applyTo || !(categoryOptions as ILabelValuePair[]).map(d => d.value).includes(record.sourceName))) {
+    record.sourceName = categoryOptions[0].value;
+  }
+
+  setRuleDetails(ruleDetails);
+}
+
+const UE2 = (isEditableRuleName, formDetails, setRuleDetails) => {
+  setRuleDetails(d => ({
+    ...d,
+    name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : (formDetails ? formDetails.name : "")
+  }));
+}
+
+const UE3 = (shadow, ruleDetails, setRuleDetails) => {
+  const record = ruleDetails.conditions[0];
+  if (shadow.isLollipopTypeCircle) {
+    if (record.categoryType === "subCategory") {
+      record.categoryType = EDataRolesName.Category;
+    }
+
+    if (record.sourceName === shadow.subCategoryDisplayName) {
+      record.sourceName = "";
+    }
+    setRuleDetails(ruleDetails);
+  }
+}
+
+const UE4 = (shadow, ruleDetails, applyOnCategoriesList, setApplyOnCategories, setRuleDetails) => {
+  const record = ruleDetails.conditions[0];
+  if (((record.applyTo === "category" && record.sourceName === shadow.subCategoryDisplayName)) ||
+    ((record.applyTo === "measure" && record.categoryType === "subCategory"))) {
+    setApplyOnCategories(applyOnCategoriesList.filter(d => d.value === ECFApplyOnCategories.Marker));
+
+    if ((ruleDetails.applyOnCategories.includes(ECFApplyOnCategories.Line) || ruleDetails.applyOnCategories.includes(ECFApplyOnCategories.Labels))) {
+      setRuleDetails({ ...ruleDetails, applyOnCategories: ruleDetails.applyOnCategories.filter(d => d.value === ECFApplyOnCategories.Marker) });
+    }
+  } else {
+    setApplyOnCategories(applyOnCategoriesList);
+  }
 }
 
 function CformattingForm({
@@ -153,51 +206,19 @@ function CformattingForm({
   } : { name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : formDetails ? formDetails.name : "", ...formDetails });
 
   useEffect(() => {
-    const record = ruleDetails.conditions[0];
-    if (record.applyTo === "measure" && (!record.applyTo || !(measureOptions as ILabelValuePair[]).map(d => d.value).includes(record.sourceName))) {
-      record.sourceName = measureOptions[0].value;
-    }
-
-    if (record.applyTo === "category" && (!record.applyTo || !(categoryOptions as ILabelValuePair[]).map(d => d.value).includes(record.sourceName))) {
-      record.sourceName = categoryOptions[0].value;
-    }
-
-    setRuleDetails(ruleDetails);
+    UE1(ruleDetails, measureOptions, categoryOptions, setRuleDetails);
   }, []);
 
   useEffect(() => {
-    setRuleDetails(d => ({
-      ...d,
-      name: !isEditableRuleName ? `CFR-${new Date().getTime()}` : (formDetails ? formDetails.name : "")
-    }));
+    UE2(isEditableRuleName, formDetails, setRuleDetails);
   }, [isEditableRuleName]);
 
   useEffect(() => {
-    const record = ruleDetails.conditions[0];
-    if (shadow.isLollipopTypeCircle) {
-      if (record.categoryType === "subCategory") {
-        record.categoryType = EDataRolesName.Category;
-      }
-
-      if (record.sourceName === shadow.subCategoryDisplayName) {
-        record.sourceName = "";
-      }
-      setRuleDetails(ruleDetails);
-    }
+    UE3(shadow, ruleDetails, setRuleDetails);
   }, []);
 
   useEffect(() => {
-    const record = ruleDetails.conditions[0];
-    if (((record.applyTo === "category" && record.sourceName === shadow.subCategoryDisplayName)) ||
-      ((record.applyTo === "measure" && record.categoryType === "subCategory"))) {
-      setApplyOnCategories(applyOnCategoriesList.filter(d => d.value === ECFApplyOnCategories.Marker));
-
-      if ((ruleDetails.applyOnCategories.includes(ECFApplyOnCategories.Line) || ruleDetails.applyOnCategories.includes(ECFApplyOnCategories.Labels))) {
-        setRuleDetails({ ...ruleDetails, applyOnCategories: ruleDetails.applyOnCategories.filter(d => d.value === ECFApplyOnCategories.Marker) });
-      }
-    } else {
-      setApplyOnCategories(applyOnCategoriesList);
-    }
+    UE4(shadow, ruleDetails, applyOnCategoriesList, setApplyOnCategories, setRuleDetails);
   }, [ruleDetails.conditions[0].valueType, ruleDetails.conditions[0].sourceName, ruleDetails.conditions[0].categoryType]);
 
   const inputChangeHandler = (newValue, name, index?: number) => {
