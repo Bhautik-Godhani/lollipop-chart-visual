@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { TEMPLATES_SETTINGS as TEMPLATES_SETTINGS_IMP } from "../constants";
 import { EGeneralTemplates, EIBCSThemes, ETemplateTypes, ETemplatesSettings } from "../enum";
@@ -205,103 +204,114 @@ const UIGeneralTemplates = (
           </Column>
         </Row>
 
-        <Row>
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GradientTemplate ? "selected" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.GradientTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(GradientTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/gradientTemplate.png")}></img>
-            </div>
-            <Label text="Gradient" classNames={["text-label"]}></Label>
-          </Column>
+        {UIGeneralTemplatesExtended1(shadow, configValues, setConfigValues)}
 
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ReferenceLineBandTemplate ? "selected" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.ReferenceLineBandTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(ReferenceLineBandTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/referenceLineBandTemplate.png")}></img>
-            </div>
-            <Label text="Reference Line/Band" classNames={["text-label"]}></Label>
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate ? "selected" : ""}
-            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.SubcategoryWithPatternTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(SubcategoryWithPatternTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/subcategoryWithPatternTemplate.png")}></img>
-              {!shadow.isHasSubcategories && (
-                <div className="disabled-theme"></div>
-              )
-              }
-            </div>
-            <Label text="Sub Category With Patterns" classNames={["text-label"]}></Label>
-          </Column>
-
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DynamicDeviationTemplate ? "selected" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.DynamicDeviationTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(DynamicDeviationTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/dynamicDeviationTemplate.png")}></img>
-            </div>
-            <Label text="Dynamic Deviation" classNames={["text-label"]}></Label>
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ErrorBarTemplate ? "selected" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.ErrorBarTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(ErrorBarTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/errorBarTemplate.png")}></img>
-            </div>
-            <Label text="Error Bar" classNames={["text-label"]}></Label>
-          </Column>
-
-          <Column>
-            <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DonutLollipopTemplate ? "selected" : ""}
-            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
-              onClick={
-                () => {
-                  handleChange(EGeneralTemplates.DonutLollipopTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
-                  handleChange(JSON.stringify(DonutLollipopTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
-                }
-              }>
-              <img src={require("../../assets/templates/donutLollipopTemplate.png")}></img>
-              {!shadow.isHasSubcategories && (
-                <div className="disabled-theme"></div>
-              )
-              }
-            </div>
-            <Label text="Donut Lollipop Chart" classNames={["text-label"]}></Label>
-          </Column>
-        </Row>
       </ConditionalWrapper >
     </>
   );
 };
+
+const UIGeneralTemplatesExtended1 = (
+  shadow: Visual,
+  configValues: ITemplateSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<ITemplateSettings>>
+) => {
+  return <>
+    <Row>
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.GradientTemplate ? "selected" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.GradientTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(GradientTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/gradientTemplate.png")}></img>
+        </div>
+        <Label text="Gradient" classNames={["text-label"]}></Label>
+      </Column>
+
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ReferenceLineBandTemplate ? "selected" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.ReferenceLineBandTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(ReferenceLineBandTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/referenceLineBandTemplate.png")}></img>
+        </div>
+        <Label text="Reference Line/Band" classNames={["text-label"]}></Label>
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.SubcategoryWithPatternTemplate ? "selected" : ""}
+            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.SubcategoryWithPatternTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(SubcategoryWithPatternTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/subcategoryWithPatternTemplate.png")}></img>
+          {!shadow.isHasSubcategories && (
+            <div className="disabled-theme"></div>
+          )
+          }
+        </div>
+        <Label text="Sub Category With Patterns" classNames={["text-label"]}></Label>
+      </Column>
+
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DynamicDeviationTemplate ? "selected" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.DynamicDeviationTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(DynamicDeviationTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/dynamicDeviationTemplate.png")}></img>
+        </div>
+        <Label text="Dynamic Deviation" classNames={["text-label"]}></Label>
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.ErrorBarTemplate ? "selected" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.ErrorBarTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(ErrorBarTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/errorBarTemplate.png")}></img>
+        </div>
+        <Label text="Error Bar" classNames={["text-label"]}></Label>
+      </Column>
+
+      <Column>
+        <div className={`theme-preview ${configValues.selectedTemplate === EGeneralTemplates.DonutLollipopTemplate ? "selected" : ""}
+            ${!shadow.isHasSubcategories ? "disabled" : ""}`}
+          onClick={
+            () => {
+              handleChange(EGeneralTemplates.DonutLollipopTemplate, ETemplatesSettings.SelectedTemplate, setConfigValues);
+              handleChange(JSON.stringify(DonutLollipopTemplateJS), ETemplatesSettings.TemplateSchema, setConfigValues);
+            }
+          }>
+          <img src={require("../../assets/templates/donutLollipopTemplate.png")}></img>
+          {!shadow.isHasSubcategories && (
+            <div className="disabled-theme"></div>
+          )
+          }
+        </div>
+        <Label text="Donut Lollipop Chart" classNames={["text-label"]}></Label>
+      </Column>
+    </Row>
+  </>
+}
 
 const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
   return (
