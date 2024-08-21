@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { CUT_AND_CLIP_AXIS_SETTINGS } from "../constants";
 import { ECutAndClipAxisSettings, ECutAndClipMarkerPlacementTypes } from "../enum";
@@ -15,6 +14,8 @@ import {
 } from "@truviz/shadow/dist/Components";
 import { ICutAndClipAxisSettings, ILabelValuePair } from "../visual-settings.interface";
 import { CutAndClipAxisPlaceholderIcon } from "./SettingsIcons";
+import { Visual } from "../visual";
+import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
 const MARKER_PLACEMENTS: ILabelValuePair[] = [
   {
@@ -30,6 +31,107 @@ const MARKER_PLACEMENTS: ILabelValuePair[] = [
     value: ECutAndClipMarkerPlacementTypes.Categories,
   },
 ];
+
+const UIExtended1 = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: ICutAndClipAxisSettings, handleChange, handleCheckbox, handleColor) => {
+  return <>
+    <ConditionalWrapper visible={shadow.isChartIsRaceChart}>
+      <Row>
+        <Column>
+          <Quote>
+            <strong>Note: </strong>Please remove the race chart data to use this feature.
+          </Quote>
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+
+    <ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled && !shadow.isChartIsRaceChart}>
+      <Row>
+        <Column>
+          <ToggleButton
+            label={"Enable"}
+            value={configValues.isEnabled}
+            handleChange={() => handleCheckbox(ECutAndClipAxisSettings.IsEnabled)}
+            appearance="toggle"
+            tooltip="Shortening the chart's axis by removing less important parts to make the data easier to see, usually shown with a break mark."
+          />
+        </Column>
+      </Row>
+
+      <ConditionalWrapper visible={!configValues.isEnabled}>
+        <Row>
+          <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <div className="preview-image">
+              <CutAndClipAxisPlaceholderIcon />
+            </div>
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+
+      <ConditionalWrapper visible={configValues.isEnabled}>
+        <Row appearance="padded">
+          <Column>
+            <Row disableTopPadding={true}>
+              <Column >
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label="Break Start"
+                  value={configValues.breakStart}
+                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
+                />
+              </Column>
+
+              <Column>
+                <InputControl
+                  min={-Infinity}
+                  type="number"
+                  label="Break End"
+                  value={configValues.breakEnd}
+                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Marker Line Color"}
+                  color={configValues.markerStrokeColor}
+                  handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <ColorPicker
+                  label={"Background Color"}
+                  color={configValues.markerBackgroundColor}
+                  handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
+                  colorPalette={vizOptions.host.colorPalette}
+                  size="sm"
+                />
+              </Column>
+            </Row>
+
+            <Row>
+              <Column>
+                <SelectInput
+                  label={"Placement"}
+                  value={configValues.markerPlacement}
+                  optionsList={MARKER_PLACEMENTS}
+                  handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.MarkerPlacement)}
+                />
+              </Column>
+            </Row>
+          </Column>
+        </Row>
+      </ConditionalWrapper>
+    </ConditionalWrapper>
+  </>
+}
 
 const CutAndClipAxisSettings = (props) => {
   const {
@@ -130,102 +232,7 @@ const CutAndClipAxisSettings = (props) => {
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={shadow.isChartIsRaceChart}>
-        <Row>
-          <Column>
-            <Quote>
-              <strong>Note: </strong>Please remove the race chart data to use this feature.
-            </Quote>
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled && !shadow.isChartIsRaceChart}>
-        <Row>
-          <Column>
-            <ToggleButton
-              label={"Enable"}
-              value={configValues.isEnabled}
-              handleChange={() => handleCheckbox(ECutAndClipAxisSettings.IsEnabled)}
-              appearance="toggle"
-              tooltip="Shortening the chart's axis by removing less important parts to make the data easier to see, usually shown with a break mark."
-            />
-          </Column>
-        </Row>
-
-        <ConditionalWrapper visible={!configValues.isEnabled}>
-          <Row>
-            <Column style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <div className="preview-image">
-                <CutAndClipAxisPlaceholderIcon />
-              </div>
-            </Column>
-          </Row>
-        </ConditionalWrapper>
-
-        <ConditionalWrapper visible={configValues.isEnabled}>
-          <Row appearance="padded">
-            <Column>
-              <Row disableTopPadding={true}>
-                <Column >
-                  <InputControl
-                    min={-Infinity}
-                    type="number"
-                    label="Break Start"
-                    value={configValues.breakStart}
-                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakStart)}
-                  />
-                </Column>
-
-                <Column>
-                  <InputControl
-                    min={-Infinity}
-                    type="number"
-                    label="Break End"
-                    value={configValues.breakEnd}
-                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.BreakEnd)}
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <ColorPicker
-                    label={"Marker Line Color"}
-                    color={configValues.markerStrokeColor}
-                    handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerStrokeColor)}
-                    colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <ColorPicker
-                    label={"Background Color"}
-                    color={configValues.markerBackgroundColor}
-                    handleChange={value => handleColor(value, ECutAndClipAxisSettings.MarkerBackgroundColor)}
-                    colorPalette={vizOptions.host.colorPalette}
-                    size="sm"
-                  />
-                </Column>
-              </Row>
-
-              <Row>
-                <Column>
-                  <SelectInput
-                    label={"Placement"}
-                    value={configValues.markerPlacement}
-                    optionsList={MARKER_PLACEMENTS}
-                    handleChange={(value) => handleChange(value, ECutAndClipAxisSettings.MarkerPlacement)}
-                  />
-                </Column>
-              </Row>
-            </Column>
-          </Row>
-        </ConditionalWrapper>
-      </ConditionalWrapper>
+      {UIExtended1(vizOptions, shadow, configValues, handleChange, handleCheckbox, handleColor)}
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
