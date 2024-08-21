@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { isEmpty } from "lodash";
 import { REFERENCE_LINES_SETTINGS } from "../constants";
@@ -106,8 +105,6 @@ const ComputationTypeList: ILabelValuePair[] = [
     value: EReferenceLineComputation.Fixed,
   },
 ];
-
-let ALIGNMENT_OPTIONS = []
 
 const Get_AXIS_NAMES = (shadow: Visual, axis: EXYAxisNames) => {
   if (axis === EXYAxisNames.X) {
@@ -258,6 +255,37 @@ const Get_RANK_ORDER = (shadow: Visual, configValues: IReferenceLineValueProps) 
   return RANK_ORDER;
 }
 
+const handleBasedOnChange = (shadow, e, type, lineValues, handleChange) => {
+  handleChange(e.axis, "axis", type);
+  handleChange(e.value, "measureName", type);
+
+  if (shadow.isHorizontalChart) {
+    if (
+      e.axis === EXYAxisNames.Y &&
+      (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
+    ) {
+      handleChange(Position.Start, "rankOrder", type);
+    } else if (
+      e.axis === EXYAxisNames.X &&
+      (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
+    ) {
+      handleChange(Position.Top, "rankOrder", type);
+    }
+  } else {
+    if (
+      e.axis === EXYAxisNames.X &&
+      (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
+    ) {
+      handleChange(Position.Start, "rankOrder", type);
+    } else if (
+      e.axis === EXYAxisNames.Y &&
+      (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
+    ) {
+      handleChange(Position.Top, "rankOrder", type);
+    }
+  }
+}
+
 const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
   const AXIS_NAMES = Get_AXIS_NAMES(shadow, isValue2 ? configValues.lineValue2.axis : configValues.lineValue1.axis);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
@@ -283,34 +311,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           value={lineValues.measureName}
           optionsList={AXIS_NAMES}
           handleChange={(value, e) => {
-            handleChange(e.axis, "axis", type);
-            handleChange(e.value, "measureName", type);
-
-            if (shadow.isHorizontalChart) {
-              if (
-                e.axis === EXYAxisNames.Y &&
-                (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
-              ) {
-                handleChange(Position.Start, "rankOrder", type);
-              } else if (
-                e.axis === EXYAxisNames.X &&
-                (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
-              ) {
-                handleChange(Position.Top, "rankOrder", type);
-              }
-            } else {
-              if (
-                e.axis === EXYAxisNames.X &&
-                (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
-              ) {
-                handleChange(Position.Start, "rankOrder", type);
-              } else if (
-                e.axis === EXYAxisNames.Y &&
-                (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
-              ) {
-                handleChange(Position.Top, "rankOrder", type);
-              }
-            }
+            handleBasedOnChange(shadow, e, type, lineValues, handleChange)
           }}
         />
       </Column>
@@ -588,59 +589,64 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
           </Row>
         </ConditionalWrapper>
 
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Font Family"}
-              value={configValues.labelFontFamily}
-              isFontSelector={true}
-              optionsList={[]}
-              handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <SwitchOption
-              label="Styling"
-              value={configValues.styling}
-              optionsList={[
-                {
-                  label: <BoldIcon style={{ fill: "currentColor" }} />,
-                  value: "bold",
-                },
-                {
-                  label: <ItalicIcon style={{ fill: "currentColor" }} />,
-                  value: "italic",
-                },
-                {
-                  label: <UnderlineIcon style={{ fill: "currentColor" }} />,
-                  value: "underline",
-                },
-              ]}
-              isMultiple
-              selectorAppearance="secondary"
-              handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
-            />
-          </Column>
-        </Row>
-
-        <Row>
-          <Column>
-            <ToggleButton
-              label="Auto Text Size"
-              value={configValues.autoFontSize}
-              handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
-              appearance="toggle"
-            />
-          </Column>
-        </Row>
-
+        {UILabelStylesExtended(configValues, handleChange, handleCheckbox)}
         {UILabelStyles1(shadow, config, configValues, handleChange)}
       </AccordionAlt>
     </Column>
   </Row>
+}
+
+const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
+  return <>
+    <Row>
+      <Column>
+        <SelectInput
+          label={"Font Family"}
+          value={configValues.labelFontFamily}
+          isFontSelector={true}
+          optionsList={[]}
+          handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <SwitchOption
+          label="Styling"
+          value={configValues.styling}
+          optionsList={[
+            {
+              label: <BoldIcon style={{ fill: "currentColor" }} />,
+              value: "bold",
+            },
+            {
+              label: <ItalicIcon style={{ fill: "currentColor" }} />,
+              value: "italic",
+            },
+            {
+              label: <UnderlineIcon style={{ fill: "currentColor" }} />,
+              value: "underline",
+            },
+          ]}
+          isMultiple
+          selectorAppearance="secondary"
+          handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
+        />
+      </Column>
+    </Row>
+
+    <Row>
+      <Column>
+        <ToggleButton
+          label="Auto Text Size"
+          value={configValues.autoFontSize}
+          handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
+          appearance="toggle"
+        />
+      </Column>
+    </Row>
+  </>
 }
 
 // const UIBandStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceBandStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
@@ -656,6 +662,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
 
 const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any) => {
   const LABEL_POSITION: ILabelValuePair[] = Get_LABEL_POSITION(shadow, config);
+  const ALIGNMENT_OPTIONS: ILabelValuePair[] = getALIGNMENT_OPTIONS(shadow, configValues);
 
   return <>
     <ConditionalWrapper visible={!configValues.autoFontSize}>
@@ -719,7 +726,39 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
   </>
 }
 
-const UIFooter = (isAddNew: boolean, closeCurrentSettingHandler: () => void, handleChangeContent: (path: string) => void, handleAdd: () => void, resetChanges: () => void) => {
+const UIFooter = (isAddNew: boolean, index, configValues, validateField, onAdd, onUpdate, closeCurrentSettingHandler: () => void, handleChangeContent: (path: string) => void, resetChanges) => {
+  const handleAdd = () => {
+    const values = configValues.lineValue1;
+
+    if (values.value === null) {
+      values.value = "0";
+    }
+
+    if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
+    if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
+    if (values.type === "ranking" && !validateField("rank", false)) return;
+
+    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
+      const values = configValues.lineValue2;
+
+      if (values.value === null) {
+        values.value = "0";
+      }
+
+      if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
+      if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
+      if (values.type === "ranking" && !validateField("rank", true)) return;
+    }
+
+    handleChangeContent("homePage");
+
+    if (isAddNew) {
+      onAdd(configValues);
+      return;
+    }
+    onUpdate(index, configValues);
+  };
+
   return (
     <Footer
       cancelButtonHandler={() => {
@@ -866,15 +905,26 @@ const UIReferenceBand = (
       </Column>
     </Row>
 
-    <AccordionAlt title="General"
+    {UIGeneral(vizOptions, shadow, configValues, handleChange, categoriesNameList)}
+
+    <AccordionAlt title="Line Options"
       open={true}
     >
+      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configValues.bandStyle, handleCheckbox, handleChange)}
+    </AccordionAlt>
+
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
+    {/* {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)} */}
+  </>
+}
+
+const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNameList) => {
+  return <>
+    <AccordionAlt title="General" open={true}>
       {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
 
       <Row>
-        <Column>
-          <Label text="Start Value"></Label>
-        </Column>
+        <Column><Label text="Start Value"></Label></Column>
       </Row>
 
       <ConditionalWrapper visible={configValues.lineValue1.axis === EXYAxisNames.X}>
@@ -924,9 +974,7 @@ const UIReferenceBand = (
       </ConditionalWrapper>
 
       <Row>
-        <Column>
-          <Label text="End Value"></Label>
-        </Column>
+        <Column><Label text="End Value"></Label></Column>
       </Row>
 
       <ConditionalWrapper visible={configValues.lineValue2.axis === EXYAxisNames.X}>
@@ -974,161 +1022,131 @@ const UIReferenceBand = (
           </Row>
         </ConditionalWrapper>
       </ConditionalWrapper>
-
-      {/* <Tabs selected={"Band_Start"}>
-        <Tab title={"Band Start"} identifier={"Band_Start"}>
-          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
-        </Tab>
-        <Tab title={"Band End"} identifier={"Band_End"}>
-          {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue2, handleChange, true)}
-        </Tab>
-      </Tabs > */}
     </AccordionAlt>
-
-    <AccordionAlt title="Line Options"
-      open={true}
-    >
-      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configValues.bandStyle, handleCheckbox, handleChange)}
-    </AccordionAlt>
-
-    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
-    {/* {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)} */}
   </>
 }
 
-const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeAddEdit, closeCurrentSettingHandler, handleChangeContent }) => {
-  const isAddNew = isEmpty(details);
-  const isInitialRender = React.useRef(0);
-  const [configValues, setConfigValues] = React.useState<IReferenceLineSettings>(
-    isAddNew ? REFERENCE_LINES_SETTINGS : details
-  );
-  const [errors, setErros] = React.useState({
-    value: "",
-    rank: "",
-  });
-  React.useEffect(() => {
-    if (configValues.lineValue1.type === "value") {
-      setErros((s) => ({
-        ...s,
-        rank: "",
-      }));
-    } else {
-      setErros((s) => ({
-        ...s,
-        value: "",
-      }));
+const resetChanges = (isAddNew, isLineUI, details, configValues, shadow, setConfigValues) => {
+  const defaultSettings = JSON.parse(JSON.stringify(REFERENCE_LINES_SETTINGS));
+
+  if (!isAddNew) {
+    defaultSettings.uid = details.uid;
+  }
+
+  if (isAddNew ? !isLineUI : details.referenceType === EReferenceType.REFERENCE_BAND) {
+    defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
+  } else {
+    defaultSettings.referenceType = EReferenceType.REFERENCE_LINE;
+  }
+
+  if (!defaultSettings.lineValue1.measureName) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X) {
+      defaultSettings.lineValue1.measureName = shadow.categoryDisplayName;
+    }
+    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+      defaultSettings.lineValue1.measureName = shadow.measure1DisplayName;
+    }
+  }
+
+  if (!defaultSettings.lineValue2.measureName) {
+    if (configValues.lineValue2.axis === EXYAxisNames.X) {
+      defaultSettings.lineValue2.measureName = shadow.categoryDisplayName;
+    }
+    if (configValues.lineValue2.axis === EXYAxisNames.Y) {
+      defaultSettings.lineValue2.measureName = shadow.measure1DisplayName;
+    }
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue1.value || defaultSettings.lineValue1.value === "0")) {
+    defaultSettings.lineValue1.value = shadow.chartData[0].category;
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue2.value || defaultSettings.lineValue2.value === "0")) {
+    defaultSettings.lineValue2.value = shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category;
+  }
+
+  defaultSettings.labelStyle.styling = [];
+
+  setConfigValues(() => defaultSettings);
+};
+
+const setLineValue = (isLine2: boolean, configValues, shadow, handleChange) => {
+  const rLine = configValues;
+  const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
+  const type = isLine2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
+  if (rLineValue.type === EReferenceLinesType.Value && rLineValue.axis === EXYAxisNames.Y) {
+    let values = [];
+    const isCategoricalReferenceLinesMeasure = shadow.categoricalReferenceLinesNames.includes(rLineValue.axis);
+
+    if (isCategoricalReferenceLinesMeasure) {
+      const referenceLineData = shadow.categoricalReferenceLinesDataFields.filter(
+        (d) => d.source.displayName === rLineValue.axis
+      );
+      values = referenceLineData.reduce((arr, cur) => [...arr, ...cur.values], []);
     }
 
-    if (configValues.lineValue2.type === "value") {
-      setErros((s) => ({
-        ...s,
-        rank: "",
-      }));
-    } else {
-      setErros((s) => ({
-        ...s,
-        value: "",
-      }));
-    }
-  }, [configValues]);
-
-  React.useEffect(() => {
-    if (isInitialRender.current < 2) {
-      isInitialRender.current++;
-    } else {
-      validateField("rank", false);
-    }
-  }, [configValues.lineValue1.rank]);
-
-  React.useEffect(() => {
-    if (isInitialRender.current < 2) {
-      isInitialRender.current++;
-    } else {
-      validateField("value", false);
-    }
-  }, [configValues.lineValue1.value]);
-
-  React.useEffect(() => {
-    if (isInitialRender.current < 2) {
-      isInitialRender.current++;
-    } else {
-      validateField("rank", true);
-    }
-  }, [configValues.lineValue2.rank]);
-
-  React.useEffect(() => {
-    if (isInitialRender.current < 2) {
-      isInitialRender.current++;
-    } else {
-      validateField("value", true);
-    }
-  }, [configValues.lineValue2.value]);
-
-  const validateField = (fieldName, isValue2: boolean) => {
-    if (!Object.keys(errors).includes(fieldName)) return true;
-
-    const lineValue = isValue2 ? configValues.lineValue2 : configValues.lineValue1;
-    if (!lineValue[fieldName]) {
-      setErros((s) => ({
-        ...s,
-        [fieldName]: "This field can not be empty.",
-      }));
-      return false;
-    } else {
-      setErros((s) => ({
-        ...s,
-        [fieldName]: "",
-      }));
-    }
-    return true;
-  };
-
-  const handleAdd = () => {
-    const values = configValues.lineValue1;
-
-    if (values.value === null) {
-      values.value = "0";
+    if (!isCategoricalReferenceLinesMeasure) {
+      values = shadow.chartData.map((d) => (d.value1));
     }
 
-    if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
-    if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
-    if (values.type === "ranking" && !validateField("rank", false)) return;
-
-    if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
-      const values = configValues.lineValue2;
-
-      if (values.value === null) {
-        values.value = "0";
-      }
-
-      if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
-      if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
-      if (values.type === "ranking" && !validateField("rank", true)) return;
+    switch (rLineValue.computation) {
+      case EReferenceLineComputation.ZeroBaseline:
+        handleChange(0 + "", EReferenceLineValueProps.Value, type);
+        break;
+      case EReferenceLineComputation.Min:
+        handleChange(d3Min(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        break;
+      case EReferenceLineComputation.Max:
+        handleChange(d3Max(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        break;
+      case EReferenceLineComputation.Average:
+        handleChange(mean(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        break;
+      case EReferenceLineComputation.Median:
+        handleChange(median(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        break;
+      case EReferenceLineComputation.StandardDeviation:
+        handleChange(calculateStandardDeviation(values) + "", EReferenceLineValueProps.Value, type);
+        break;
     }
+  }
+}
 
-    handleChangeContent("homePage");
+const validateField = (fieldName, isValue2: boolean, errors, configValues, setErros) => {
+  if (!Object.keys(errors).includes(fieldName)) return true;
 
-    if (isAddNew) {
-      onAdd(configValues);
-      return;
-    }
-    onUpdate(index, configValues);
-  };
-
-  const handleChange = (val, n, type: string) => {
-    setConfigValues((d) => ({
-      ...d,
-      [type]: { ...d[type], [n]: val }
+  const lineValue = isValue2 ? configValues.lineValue2 : configValues.lineValue1;
+  if (!lineValue[fieldName]) {
+    setErros((s) => ({
+      ...s,
+      [fieldName]: "This field can not be empty.",
     }));
-  };
-
-  const handleCheckbox = (n, type: string) => {
-    setConfigValues((d) => ({
-      ...d,
-      [type]: { ...d[type], [n]: !d[type][n] },
+    return false;
+  } else {
+    setErros((s) => ({
+      ...s,
+      [fieldName]: "",
     }));
-  };
+  }
+  return true;
+};
 
+const handleChange = (val, n, type: string, setConfigValues) => {
+  setConfigValues((d) => ({
+    ...d,
+    [type]: { ...d[type], [n]: val }
+  }));
+};
+
+const handleCheckbox = (n, type: string, setConfigValues) => {
+  setConfigValues((d) => ({
+    ...d,
+    [type]: { ...d[type], [n]: !d[type][n] },
+  }));
+};
+
+const getALIGNMENT_OPTIONS = (shadow, configValues) => {
+  let ALIGNMENT_OPTIONS = [];
   if ((shadow.isHorizontalChart && configValues.lineValue1.axis === EXYAxisNames.X) || (!shadow.isHorizontalChart && configValues.lineValue1.axis === EXYAxisNames.Y)) {
     ALIGNMENT_OPTIONS = [
       {
@@ -1161,231 +1179,240 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
     ];
   }
 
+  return ALIGNMENT_OPTIONS;
+}
+
+const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent) => {
+  return <>
+    <PopupModHeader
+      title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
+      icon={"BACK_BUTTON"}
+      closeSettingsPopup={() => {
+        closeCurrentSettingHandler();
+      }}
+      onIconClickHandler={() => {
+        closeAddEdit();
+        handleChangeContent("homePage");
+      }}
+    />
+
+    <Row>
+      <Column> <Breadcrumb crumbs={[(isLineUI ? "Reference Lines" : "Reference Bands"),
+      isAddNew ? (isLineUI ? "New Line" : "New Band") : (isLineUI ? "Edit Line" : "Edit Band")]} /> </Column>
+    </Row>
+
+    <ConditionalWrapper visible={isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_LINE)}>
+      {UIReferenceLine(vizOptions, shadow, configValues, configValues.bandStyle, isLineUI, isAddNew, details, handleChange, handleCheckbox)}
+    </ConditionalWrapper>
+
+    <ConditionalWrapper visible={!isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND)}>
+      {UIReferenceBand(vizOptions, shadow, configValues, isLineUI, isAddNew, details, handleCheckbox, handleChange)}
+    </ConditionalWrapper>
+
+    {UIFooter(isAddNew, index, configValues, validateField, onadd, onupdate, closeCurrentSettingHandler, handleChangeContent, resetChanges)}
+  </>
+}
+
+const UE1 = (configValues, setErros) => {
+  if (configValues.lineValue1.type === "value") {
+    setErros((s) => ({
+      ...s,
+      rank: "",
+    }));
+  } else {
+    setErros((s) => ({
+      ...s,
+      value: "",
+    }));
+  }
+
+  if (configValues.lineValue2.type === "value") {
+    setErros((s) => ({
+      ...s,
+      rank: "",
+    }));
+  } else {
+    setErros((s) => ({
+      ...s,
+      value: "",
+    }));
+  }
+}
+
+const UE2 = (isLineUI, shadow, configValues, handleChange, setConfigValues) => {
+  if (!configValues.lineValue1.measureName) {
+    if (configValues.lineValue1.axis === EXYAxisNames.X) {
+      handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+    }
+
+    if (configValues.lineValue1.axis === EXYAxisNames.Y) {
+      handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+    }
+  }
+
+  const chartData = shadow.isHorizontalChart ? shadow.chartData.reverse() : shadow.chartData;
+
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
+    handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
+    handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+  }
+
+  if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+  }
+
+  if (isLineUI) {
+    setConfigValues((d) => ({
+      ...d,
+      [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_LINE
+    }));
+  } else {
+    setConfigValues((d) => ({
+      ...d,
+      [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_BAND
+    }));
+  }
+}
+
+const UE3 = (shadow, configValues, handleChange) => {
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
+    handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+  }
+
+  if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && (configValues.lineValue1.value === undefined || configValues.lineValue1.value === null)) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+  }
+}
+
+const UE4 = (shadow, configValues, handleChange) => {
+  if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
+    handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+  }
+
+  if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+  }
+
+  if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && (configValues.lineValue2.value === undefined || configValues.lineValue2.value === null)) {
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+  }
+}
+
+const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, vizOptions, closeAddEdit, closeCurrentSettingHandler, handleChangeContent }) => {
+  const isAddNew = isEmpty(details);
+  const isInitialRender = React.useRef(0);
+  const [configValues, setConfigValues] = React.useState<IReferenceLineSettings>(
+    isAddNew ? REFERENCE_LINES_SETTINGS : details
+  );
+
+  const [errors, setErros] = React.useState({
+    value: "",
+    rank: "",
+  });
+
   React.useEffect(() => {
-    if (!configValues.lineValue1.measureName) {
-      if (configValues.lineValue1.axis === EXYAxisNames.X) {
-        handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1);
-      }
+    UE1(configValues, setErros);
+  }, [configValues]);
 
-      if (configValues.lineValue1.axis === EXYAxisNames.Y) {
-        handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1);
-      }
-    }
-
-    const chartData = shadow.isHorizontalChart ? shadow.chartData.reverse() : shadow.chartData;
-
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
-      handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
-      handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-
-    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-
-    if (isLineUI) {
-      setConfigValues((d) => ({
-        ...d,
-        [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_LINE
-      }));
+  React.useEffect(() => {
+    if (isInitialRender.current < 2) {
+      isInitialRender.current++;
     } else {
-      setConfigValues((d) => ({
-        ...d,
-        [EReferenceLinesSettings.ReferenceType]: EReferenceType.REFERENCE_BAND
-      }));
+      validateField("rank", false, errors, configValues, setErros);
     }
+  }, [configValues.lineValue1.rank]);
+
+  React.useEffect(() => {
+    if (isInitialRender.current < 2) {
+      isInitialRender.current++;
+    } else {
+      validateField("value", false, errors, configValues, setErros);
+    }
+  }, [configValues.lineValue1.value]);
+
+  React.useEffect(() => {
+    if (isInitialRender.current < 2) {
+      isInitialRender.current++;
+    } else {
+      validateField("rank", true, errors, configValues, setErros);
+    }
+  }, [configValues.lineValue2.rank]);
+
+  React.useEffect(() => {
+    if (isInitialRender.current < 2) {
+      isInitialRender.current++;
+    } else {
+      validateField("value", true, errors, configValues, setErros);
+    }
+  }, [configValues.lineValue2.value]);
+
+  React.useEffect(() => {
+    UE2(isLineUI, shadow, configValues, handleChange, setConfigValues);
   }, []);
 
   // line value 1
   React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
-      handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && (configValues.lineValue1.value === undefined || configValues.lineValue1.value === null)) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
-    }
+    UE3(shadow, configValues, handleChange);
   }, [configValues.lineValue1.axis, configValues.lineValue1.computation, configValues.lineValue1.measureName, configValues.lineValue1.type]);
 
   // line value 2
   React.useEffect(() => {
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
-      handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-
-    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
-
-    if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && (configValues.lineValue2.value === undefined || configValues.lineValue2.value === null)) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
-    }
+    UE4(shadow, configValues, handleChange);
   }, [configValues.lineValue2.axis, configValues.lineValue2.computation, configValues.lineValue2.measureName, configValues.lineValue2.type]);
 
   React.useEffect(() => {
     if (configValues.referenceType === EReferenceType.REFERENCE_LINE && configValues.labelStyle.labelPosition === EBeforeAfterPosition.Center) {
-      handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle)
+      handleChange(EBeforeAfterPosition.Before, "labelPosition", EReferenceLinesSettings.LabelStyle, setConfigValues)
     }
   }, [configValues.referenceType, configValues.labelStyle.labelPosition]);
 
   React.useEffect(() => {
     if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
-      handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2);
-      handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2);
+      handleChange(configValues.lineValue1.axis, EReferenceLineValueProps.Axis, EReferenceLinesSettings.LineValue2, setConfigValues);
+      handleChange(configValues.lineValue1.type, EReferenceLineValueProps.Type, EReferenceLinesSettings.LineValue2, setConfigValues);
 
       if (!configValues.lineValue2.computation) {
-        handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2);
+        handleChange(configValues.lineValue1.computation, EReferenceLineValueProps.Computation, EReferenceLinesSettings.LineValue2, setConfigValues);
       }
     }
   }, [configValues.lineValue1.axis, configValues.lineValue1.type, configValues.lineValue1.computation]);
 
   React.useEffect(() => {
-    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
+    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1, setConfigValues);
     if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && !configValues.lineValue1.isValueChanged) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
     }
   }, [configValues.lineValue1.computation]);
 
   React.useEffect(() => {
-    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2);
+    handleChange(false, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2, setConfigValues);
     if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && !configValues.lineValue2.isValueChanged) {
-      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+      handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
     }
   }, [configValues.lineValue2.computation]);
 
-  const setLineValue = (isLine2: boolean) => {
-    const rLine = configValues;
-    const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
-    const type = isLine2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
-    if (rLineValue.type === EReferenceLinesType.Value && rLineValue.axis === EXYAxisNames.Y) {
-      let values = [];
-      const isCategoricalReferenceLinesMeasure = shadow.categoricalReferenceLinesNames.includes(rLineValue.axis);
-
-      if (isCategoricalReferenceLinesMeasure) {
-        const referenceLineData = shadow.categoricalReferenceLinesDataFields.filter(
-          (d) => d.source.displayName === rLineValue.axis
-        );
-        values = referenceLineData.reduce((arr, cur) => [...arr, ...cur.values], []);
-      }
-
-      if (!isCategoricalReferenceLinesMeasure) {
-        values = shadow.chartData.map((d) => (d.value1));
-      }
-
-      switch (rLineValue.computation) {
-        case EReferenceLineComputation.ZeroBaseline:
-          handleChange(0 + "", EReferenceLineValueProps.Value, type);
-          break;
-        case EReferenceLineComputation.Min:
-          handleChange(d3Min(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
-          break;
-        case EReferenceLineComputation.Max:
-          handleChange(d3Max(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
-          break;
-        case EReferenceLineComputation.Average:
-          handleChange(mean(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
-          break;
-        case EReferenceLineComputation.Median:
-          handleChange(median(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
-          break;
-        case EReferenceLineComputation.StandardDeviation:
-          handleChange(calculateStandardDeviation(values) + "", EReferenceLineValueProps.Value, type);
-          break;
-      }
-    }
-  }
-
   React.useEffect(() => {
-    setLineValue(false);
+    setLineValue(false, configValues, shadow, handleChange);
   }, [configValues.lineValue1]);
 
   React.useEffect(() => {
-    setLineValue(true);
+    setLineValue(true, configValues, shadow, handleChange);
   }, [configValues.lineValue2]);
-
-  const resetChanges = () => {
-    const defaultSettings = JSON.parse(JSON.stringify(REFERENCE_LINES_SETTINGS));
-
-    if (!isAddNew) {
-      defaultSettings.uid = details.uid;
-    }
-
-    if (isAddNew ? !isLineUI : details.referenceType === EReferenceType.REFERENCE_BAND) {
-      defaultSettings.referenceType = EReferenceType.REFERENCE_BAND;
-    } else {
-      defaultSettings.referenceType = EReferenceType.REFERENCE_LINE;
-    }
-
-    if (!defaultSettings.lineValue1.measureName) {
-      if (configValues.lineValue1.axis === EXYAxisNames.X) {
-        defaultSettings.lineValue1.measureName = shadow.categoryDisplayName;
-      }
-      if (configValues.lineValue1.axis === EXYAxisNames.Y) {
-        defaultSettings.lineValue1.measureName = shadow.measure1DisplayName;
-      }
-    }
-
-    if (!defaultSettings.lineValue2.measureName) {
-      if (configValues.lineValue2.axis === EXYAxisNames.X) {
-        defaultSettings.lineValue2.measureName = shadow.categoryDisplayName;
-      }
-      if (configValues.lineValue2.axis === EXYAxisNames.Y) {
-        defaultSettings.lineValue2.measureName = shadow.measure1DisplayName;
-      }
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue1.value || defaultSettings.lineValue1.value === "0")) {
-      defaultSettings.lineValue1.value = shadow.chartData[0].category;
-    }
-
-    if (configValues.lineValue1.axis === EXYAxisNames.X && (!defaultSettings.lineValue2.value || defaultSettings.lineValue2.value === "0")) {
-      defaultSettings.lineValue2.value = shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category;
-    }
-
-    defaultSettings.labelStyle.styling = [];
-
-    setConfigValues(() => defaultSettings);
-  };
 
   return (
     <>
-      <PopupModHeader
-        title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
-        icon={"BACK_BUTTON"}
-        closeSettingsPopup={() => {
-          closeCurrentSettingHandler();
-        }}
-        onIconClickHandler={() => {
-          closeAddEdit();
-          handleChangeContent("homePage");
-        }}
-      />
-
-      <Row>
-        <Column> <Breadcrumb crumbs={[(isLineUI ? "Reference Lines" : "Reference Bands"),
-        isAddNew ? (isLineUI ? "New Line" : "New Band") : (isLineUI ? "Edit Line" : "Edit Band")]} /> </Column>
-      </Row>
-
-      <ConditionalWrapper visible={isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_LINE)}>
-        {UIReferenceLine(vizOptions, shadow, configValues, configValues.bandStyle, isLineUI, isAddNew, details, handleChange, handleCheckbox)}
-      </ConditionalWrapper>
-
-      <ConditionalWrapper visible={!isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND)}>
-        {UIReferenceBand(vizOptions, shadow, configValues, isLineUI, isAddNew, details, handleCheckbox, handleChange)}
-      </ConditionalWrapper>
-
-      {UIFooter(isAddNew, closeCurrentSettingHandler, handleChangeContent, handleAdd, resetChanges)}
+      {UIMain(index, onAdd, onUpdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent)}
     </>
   );
 };
