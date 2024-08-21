@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { SORTING_SETTINGS as SORTING_SETTINGS_IMP } from "../constants";
 import { parseObject } from "../methods/methods";
@@ -273,36 +272,8 @@ const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => vo
 	);
 };
 
-const SortingSettings = (props) => {
-	const {
-		shadow,
-		compConfig: { sectionName, propertyName },
-		vizOptions,
-		closeCurrentSettingHandler,
-	} = props;
-
-	const SORTING_SETTINGS = JSON.parse(JSON.stringify(SORTING_SETTINGS_IMP));
-	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
-	const initialStates: ISortingSettings = parseObject(_initialStates, SORTING_SETTINGS);
-
-	const applyChanges = () => {
-		shadow.persistProperties(sectionName, propertyName, configValues);
-		closeCurrentSettingHandler();
-	};
-
-	const resetChanges = () => {
-		setConfigValues({ ...SORTING_SETTINGS });
-	};
-
-	const [configValues, setConfigValues] = React.useState({
-		...initialStates,
-	});
-
-	const categorySettings = configValues.category;
-	const groupBySettings = configValues.subCategory;
-	const smallMultiplesSettings = configValues.smallMultiples;
-
-	const CATEGORY_SORT_ON: ILabelValuePair[] = [
+const getCATEGORY_SORT_ON = (shadow: Visual) => {
+	const CATEGORY_SORT_ON = [
 		{
 			label: (shadow as Visual).isExpandAllApplied ? (shadow.categoryDisplayName as string + " ").concat(cloneDeep((shadow as Visual).expandAllCategoriesName).reverse().join(" ")) : shadow.categoryDisplayName,
 			value: shadow.categoryDisplayName,
@@ -331,50 +302,6 @@ const SortingSettings = (props) => {
 			isSortByExtraSortField: false,
 		});
 	}
-
-	const GROUP_BY_SORT_ON: ILabelValuePair[] = [
-		{
-			label: shadow.subCategoryDisplayName,
-			value: shadow.subCategoryDisplayName,
-			isSortByCategory: true,
-			isSortByMeasure: false,
-			isSortByExtraSortField: false,
-		},
-		// {
-		// 	label: shadow.measure1DisplayName,
-		// 	value: shadow.measure1DisplayName,
-		// 	isSortByCategory: false,
-		// 	isSortByMeasure: true,
-		// 	isSortByExtraSortField: false,
-		// },
-	];
-
-	const SMALL_MULTIPLES_SORT_ON: ILabelValuePair[] = [
-		{
-			label: shadow.smallMultiplesCategoricalDataSourceName,
-			value: shadow.smallMultiplesCategoricalDataSourceName,
-			isSortByCategory: true,
-			isSortByMeasure: false,
-			isSortByExtraSortField: false,
-		},
-		{
-			label: shadow.measure1DisplayName,
-			value: shadow.measure1DisplayName,
-			isSortByCategory: false,
-			isSortByMeasure: true,
-			isSortByExtraSortField: false,
-		},
-	];
-
-	// if (shadow.isHasMultiMeasure) {
-	// 	GROUP_BY_SORT_ON.push({
-	// 		label: shadow.measure2DisplayName,
-	// 		value: shadow.measure2DisplayName,
-	// 		isSortByCategory: false,
-	// 		isSortByMeasure: true,
-	// 		isSortByExtraSortField: false,
-	// 	});
-	// }
 
 	if (shadow.isSortDataFieldsAdded && !shadow.isSmallMultiplesEnabled) {
 		(shadow.sortFieldsDisplayName as ILabelValuePair[]).forEach((d) => {
@@ -407,6 +334,142 @@ const SortingSettings = (props) => {
 			}
 		});
 	}
+
+	return CATEGORY_SORT_ON;
+}
+
+const getGROUP_BY_SORT_ON = (shadow: Visual) => {
+	return [
+		{
+			label: shadow.subCategoryDisplayName,
+			value: shadow.subCategoryDisplayName,
+			isSortByCategory: true,
+			isSortByMeasure: false,
+			isSortByExtraSortField: false,
+		},
+		// {
+		// 	label: shadow.measure1DisplayName,
+		// 	value: shadow.measure1DisplayName,
+		// 	isSortByCategory: false,
+		// 	isSortByMeasure: true,
+		// 	isSortByExtraSortField: false,
+		// },
+	];
+
+	// if (shadow.isHasMultiMeasure) {
+	// 	GROUP_BY_SORT_ON.push({
+	// 		label: shadow.measure2DisplayName,
+	// 		value: shadow.measure2DisplayName,
+	// 		isSortByCategory: false,
+	// 		isSortByMeasure: true,
+	// 		isSortByExtraSortField: false,
+	// 	});
+	// }
+}
+
+const getSMALL_MULTIPLES_SORT_ON = (shadow: Visual) => {
+	return [
+		{
+			label: shadow.smallMultiplesCategoricalDataSourceName,
+			value: shadow.smallMultiplesCategoricalDataSourceName,
+			isSortByCategory: true,
+			isSortByMeasure: false,
+			isSortByExtraSortField: false,
+		},
+		{
+			label: shadow.measure1DisplayName,
+			value: shadow.measure1DisplayName,
+			isSortByCategory: false,
+			isSortByMeasure: true,
+			isSortByExtraSortField: false,
+		},
+	];
+}
+
+const UIMain = (
+	shadow: Visual,
+	categorySettings: ISortingProps,
+	groupBySettings: ISortingProps,
+	smallMultiplesSettings: ISortingProps,
+	CATEGORY_SORT_ON: ILabelValuePair[],
+	GROUP_BY_SORT_ON: ILabelValuePair[],
+	SMALL_MULTIPLES_SORT_ON: ILabelValuePair[],
+	setConfigValues: React.Dispatch<React.SetStateAction<ISortingSettings>>,
+	closeCurrentSettingHandler,
+	applyChanges,
+	resetChanges
+) => {
+	return <>
+		<ConditionalWrapper visible={shadow.isHasSubcategories || shadow.isSmallMultiplesEnabled}>
+			<AccordionAlt
+				title="By Category"
+				showToggle={true}
+				toggleValue={categorySettings.enabled}
+				onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.Category, setConfigValues)}
+			>
+				{UICategorySortingSettings(categorySettings, CATEGORY_SORT_ON, setConfigValues)}
+			</AccordionAlt>
+
+			<ConditionalWrapper visible={shadow.isHasSubcategories}>
+				<AccordionAlt
+					title="By Sub-category"
+					showToggle={true}
+					toggleValue={groupBySettings.enabled}
+					onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SubCategory, setConfigValues)}
+				>
+					{UIGroupBySortingSettings(groupBySettings, GROUP_BY_SORT_ON, setConfigValues)}
+				</AccordionAlt>
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
+				<AccordionAlt
+					title="By Small Multiples"
+					showToggle={true}
+					toggleValue={smallMultiplesSettings.enabled}
+					onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SmallMultiples, setConfigValues)}
+				>
+					{UISmallMultiplesSortingSettings(smallMultiplesSettings, SMALL_MULTIPLES_SORT_ON, setConfigValues)}
+				</AccordionAlt>
+			</ConditionalWrapper>
+		</ConditionalWrapper>
+
+		{(!shadow.isHasSubcategories && !shadow.isSmallMultiplesEnabled) && UICategorySortingWithoutAccordionAltSettings(shadow, categorySettings, CATEGORY_SORT_ON, setConfigValues)}
+		{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+	</>
+}
+
+const SortingSettings = (props) => {
+	const {
+		shadow,
+		compConfig: { sectionName, propertyName },
+		vizOptions,
+		closeCurrentSettingHandler,
+	} = props;
+
+	const SORTING_SETTINGS = JSON.parse(JSON.stringify(SORTING_SETTINGS_IMP));
+	const _initialStates = vizOptions.formatTab[sectionName][propertyName];
+	const initialStates: ISortingSettings = parseObject(_initialStates, SORTING_SETTINGS);
+
+	const applyChanges = () => {
+		shadow.persistProperties(sectionName, propertyName, configValues);
+		closeCurrentSettingHandler();
+	};
+
+	const resetChanges = () => {
+		setConfigValues({ ...SORTING_SETTINGS });
+	};
+
+	const [configValues, setConfigValues] = React.useState({
+		...initialStates,
+	});
+
+	const categorySettings = configValues.category;
+	const groupBySettings = configValues.subCategory;
+	const smallMultiplesSettings = configValues.smallMultiples;
+
+	const CATEGORY_SORT_ON: ILabelValuePair[] = getCATEGORY_SORT_ON(shadow);
+	const GROUP_BY_SORT_ON: ILabelValuePair[] = getGROUP_BY_SORT_ON(shadow);
+	const SMALL_MULTIPLES_SORT_ON: ILabelValuePair[] = getSMALL_MULTIPLES_SORT_ON(shadow);
 
 	const isSmallMultipleSortBy = (shadow.isSmallMultiplesEnabled && shadow.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Uniform);
 
@@ -484,41 +547,7 @@ const SortingSettings = (props) => {
 
 	return (
 		<>
-			<ConditionalWrapper visible={shadow.isHasSubcategories || shadow.isSmallMultiplesEnabled}>
-				<AccordionAlt
-					title="By Category"
-					showToggle={true}
-					toggleValue={categorySettings.enabled}
-					onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.Category, setConfigValues)}
-				>
-					{UICategorySortingSettings(categorySettings, CATEGORY_SORT_ON, setConfigValues)}
-				</AccordionAlt>
-
-				<ConditionalWrapper visible={shadow.isHasSubcategories}>
-					<AccordionAlt
-						title="By Sub-category"
-						showToggle={true}
-						toggleValue={groupBySettings.enabled}
-						onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SubCategory, setConfigValues)}
-					>
-						{UIGroupBySortingSettings(groupBySettings, GROUP_BY_SORT_ON, setConfigValues)}
-					</AccordionAlt>
-				</ConditionalWrapper>
-
-				<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
-					<AccordionAlt
-						title="By Small Multiples"
-						showToggle={true}
-						toggleValue={smallMultiplesSettings.enabled}
-						onChangeToggle={() => handleCheckbox(ESortingSettings.Enabled, ESortingSettings.SmallMultiples, setConfigValues)}
-					>
-						{UISmallMultiplesSortingSettings(smallMultiplesSettings, SMALL_MULTIPLES_SORT_ON, setConfigValues)}
-					</AccordionAlt>
-				</ConditionalWrapper>
-			</ConditionalWrapper>
-
-			{(!shadow.isHasSubcategories && !shadow.isSmallMultiplesEnabled) && UICategorySortingWithoutAccordionAltSettings(shadow, categorySettings, CATEGORY_SORT_ON, setConfigValues)}
-			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+			{UIMain(shadow, categorySettings, groupBySettings, smallMultiplesSettings, CATEGORY_SORT_ON, GROUP_BY_SORT_ON, SMALL_MULTIPLES_SORT_ON, setConfigValues, closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
 };
