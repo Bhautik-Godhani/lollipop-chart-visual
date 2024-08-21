@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { IPatternData, PatternPicker, Quote, SelectInput } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
@@ -118,6 +117,70 @@ const UIMultipleMeasuresPatterns = (shadow: Visual, configValues: IPatternSettin
 	</>
 }
 
+const UIExtended1 = (
+	shadow: Visual,
+	configValues: IPatternSettings,
+	markerSettings: IMarkerSettings,
+	setConfigValues
+) => {
+	return <>
+		<ConditionalWrapper visible={(!shadow.isHasMultiMeasure && markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT) ||
+			(shadow.isHasMultiMeasure ? (markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT && markerSettings.marker2Style.markerShape === EMarkerShapeTypes.DEFAULT) : false)}>
+			<ConditionalWrapper visible={shadow.isHasMultiMeasure && shadow.isLollipopTypePie}>
+				<Row>
+					<Column>
+						<SelectInput
+							label={"Based On"}
+							value={configValues.basedOn}
+							optionsList={BASED_ON_TYPES}
+							handleChange={(value) => {
+								setConfigValues((d) => ({
+									...d,
+									[EPatternSettings.BasedOn]: value,
+								}));
+							}}
+						/>
+					</Column>
+				</Row>
+
+				{configValues.basedOn === EPatternByDataTypes.ByMeasures && (
+					UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+				)}
+
+				{configValues.basedOn === EPatternByDataTypes.BySubCategory && (
+					UISubCategoryPatterns(shadow, configValues, setConfigValues)
+				)}
+			</ConditionalWrapper>
+
+			<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
+				<Row disableTopPadding classNames={["normal-text-overflow"]}>
+					<Column>
+						{(shadow as Visual).isLollipopTypeCircle && (
+							UICategoryPatterns(shadow, configValues, setConfigValues)
+						)}
+
+						{shadow.isLollipopTypePie && (
+							UISubCategoryPatterns(shadow, configValues, setConfigValues)
+						)}
+
+						{/* {((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
+										UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
+									)} */}
+					</Column>
+				</Row>
+			</ConditionalWrapper>
+
+			{configValues.enabled && (
+				<div className="section">
+					<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
+						<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
+					</p>
+				</div>
+			)}
+		</ConditionalWrapper>
+	</>
+}
+
 const FillPatterns = (props) => {
 	const {
 		shadow,
@@ -213,69 +276,10 @@ const FillPatterns = (props) => {
 				</ConditionalWrapper>
 
 				<ConditionalWrapper visible={configValues.enabled}>
-					<ConditionalWrapper visible={(!shadow.isHasMultiMeasure && markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT) ||
-						(shadow.isHasMultiMeasure ? (markerSettings.marker1Style.markerShape === EMarkerShapeTypes.DEFAULT && markerSettings.marker2Style.markerShape === EMarkerShapeTypes.DEFAULT) : false)}>
-						<ConditionalWrapper visible={shadow.isHasMultiMeasure && shadow.isLollipopTypePie}>
-							<Row>
-								<Column>
-									<SelectInput
-										label={"Based On"}
-										value={configValues.basedOn}
-										optionsList={BASED_ON_TYPES}
-										handleChange={(value) => {
-											setConfigValues((d) => ({
-												...d,
-												[EPatternSettings.BasedOn]: value,
-											}));
-										}}
-									/>
-								</Column>
-							</Row>
-
-							{configValues.basedOn === EPatternByDataTypes.ByMeasures && (
-								UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-							)}
-
-							{configValues.basedOn === EPatternByDataTypes.BySubCategory && (
-								UISubCategoryPatterns(shadow, configValues, setConfigValues)
-							)}
-						</ConditionalWrapper>
-
-						<ConditionalWrapper visible={!shadow.isHasMultiMeasure || !shadow.isLollipopTypePie}>
-							<Row disableTopPadding classNames={["normal-text-overflow"]}>
-								<Column>
-									{(shadow as Visual).isLollipopTypeCircle && (
-										UICategoryPatterns(shadow, configValues, setConfigValues)
-									)}
-
-									{shadow.isLollipopTypePie && (
-										UISubCategoryPatterns(shadow, configValues, setConfigValues)
-									)}
-
-									{/* {((shadow.isHasMultiMeasure && !shadow.isLollipopTypePie) || (shadow.isLollipopTypePie && (shadow as Visual).dataColorsSettings.fillType === ColorPaletteType.Single)) && (
-										UIMultipleMeasuresPatterns(shadow, configValues, setConfigValues)
-									)} */}
-								</Column>
-							</Row>
-						</ConditionalWrapper>
-
-						{configValues.enabled && (
-							<div className="section">
-								<p style={{ fontWeight: 500, fontSize: "10px", borderLeft: "2px solid var(--brandColor)", paddingLeft: "8px" }}>
-									<b>Note:</b> For custom image fill pattern, use an image with 32*32 pixel or less.
-								</p>
-							</div>
-						)}
-					</ConditionalWrapper>
-
+					{UIExtended1(shadow, configValues, markerSettings, setConfigValues)}
 					{/* {UIPatternBorderSettings(configValues, setConfigValues)} */}
 				</ConditionalWrapper>
 			</ConditionalWrapper>
-
-
-
-			{/* </ConditionalWrapper> */}
-
 			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
