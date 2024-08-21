@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
 import { BoldIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
@@ -417,6 +416,16 @@ const UILayout = (
       </Column>
     </Row>
 
+    {UILayout1(isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
+  </>
+}
+
+const UILayout1 = (
+  isShowXYAxisSettings: boolean,
+  configValues: ISmallMultiplesGridLayoutSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
+  handleChange: (...any) => void) => {
+  return <>
     <ConditionalWrapper visible={configValues.displayType === ESmallMultiplesDisplayType.Fixed}>
       <ConditionalWrapper visible={configValues.layoutType === ESmallMultiplesLayoutType.Grid} >
         <Row>
@@ -480,84 +489,24 @@ const UILayout = (
       </Column>
     </Row>
 
-    {UILayout1(isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
+    <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType === ESmallMultiplesLayoutType.Grid}>
+      <AccordionAlt title="Axis" open={true}>
+        <Row>
+          <Column>
+            <SelectInput
+              label={"Type"}
+              value={configValues.xAxisType}
+              optionsList={XY_AXIS_TYPES}
+              handleChange={(value) => {
+                handleChange(value, ESmallMultiplesSettings.xAxisType, setConfigValues);
+                handleChange(value, ESmallMultiplesSettings.yAxisType, setConfigValues);
+              }}
+            />
+          </Column>
+        </Row>
+      </AccordionAlt>
+    </ConditionalWrapper >
   </>
-}
-
-const UILayout1 = (
-  isShowXYAxisSettings: boolean,
-  configValues: ISmallMultiplesGridLayoutSettings,
-  setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
-  handleChange: (...any) => void) => {
-  return <ConditionalWrapper visible={isShowXYAxisSettings && configValues.layoutType === ESmallMultiplesLayoutType.Grid}>
-    <AccordionAlt title="Axis" open={true}>
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Type"}
-            value={configValues.xAxisType}
-            optionsList={XY_AXIS_TYPES}
-            handleChange={(value) => {
-              handleChange(value, ESmallMultiplesSettings.xAxisType, setConfigValues);
-              handleChange(value, ESmallMultiplesSettings.yAxisType, setConfigValues);
-            }}
-          />
-        </Column>
-      </Row>
-    </AccordionAlt>
-
-    {/* <AccordionAlt title="X Axis" open={true}>
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Type"}
-            value={configValues.xAxisType}
-            optionsList={XY_AXIS_TYPES}
-            handleChange={(value) => handleChange(value, ESmallMultiplesSettings.xAxisType, setConfigValues)}
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.xAxisType === ESmallMultiplesAxisType.Uniform}>
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Position"}
-              value={configValues.xAxisPosition}
-              optionsList={X_AXIS_POSITIONS}
-              handleChange={(value) => handleChange(value, ESmallMultiplesSettings.xAxisPosition, setConfigValues)}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-    </AccordionAlt>
-
-    <AccordionAlt title="Y Axis" open={true}>
-      <Row>
-        <Column>
-          <SelectInput
-            label={"Type"}
-            value={configValues.yAxisType}
-            optionsList={XY_AXIS_TYPES}
-            handleChange={(value) => handleChange(value, ESmallMultiplesSettings.yAxisType, setConfigValues)}
-          />
-        </Column>
-      </Row>
-
-      <ConditionalWrapper visible={configValues.yAxisType === ESmallMultiplesAxisType.Uniform}>
-        <Row>
-          <Column>
-            <SelectInput
-              label={"Position"}
-              value={configValues.yAxisPosition}
-              optionsList={Y_AXIS_POSITIONS}
-              handleChange={(value) => handleChange(value, ESmallMultiplesSettings.yAxisPosition, setConfigValues)}
-            />
-          </Column>
-        </Row>
-      </ConditionalWrapper>
-    </AccordionAlt> */}
-  </ConditionalWrapper >
 }
 
 const UIHeader = (vizOptions: ShadowUpdateOptions,
@@ -875,6 +824,38 @@ const UIBorderAndShadow1 = (vizOptions: ShadowUpdateOptions,
   </>
 }
 
+const UIMain = (
+  vizOptions: ShadowUpdateOptions,
+  isShowInfoPage: boolean,
+  isShowGridLayoutOnly: boolean,
+  selectedTab: string,
+  isShowXYAxisSettings: boolean,
+  configValues: ISmallMultiplesGridLayoutSettings,
+  setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
+  setSelectedTab: React.Dispatch<React.SetStateAction<any>>,
+  handleChange: (...any) => void) => {
+  return <>
+    <ConditionalWrapper visible={!isShowInfoPage} style={{ width: "300px" }}>
+      <Row disableTopPadding>
+        <Column>
+          <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
+            <Tab title="Layout" identifier="layout">
+              {UILayout(isShowGridLayoutOnly, isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
+            </Tab>
+
+            <Tab title="Style" identifier="style">
+              {UIHeader(vizOptions, configValues, setConfigValues, handleHeaderChange, handleHeaderColor)}
+              {UIBackground(vizOptions, configValues, setConfigValues, handleBackgroundChange, handleBackgroundColor)}
+              {UIShadow(vizOptions, configValues, setConfigValues, handleShadowChange)}
+              {UIBorder(vizOptions, configValues, setConfigValues, handleBorderCheckbox, handleBorderChange, handleBorderColor)}
+            </Tab>
+          </Tabs>
+        </Column>
+      </Row>
+    </ConditionalWrapper>
+  </>
+}
+
 const SmallMultiplesSettings = (props) => {
   const {
     shadow,
@@ -967,24 +948,7 @@ const SmallMultiplesSettings = (props) => {
         </Row>
       </ConditionalWrapper>
 
-      <ConditionalWrapper visible={!isShowInfoPage} style={{ width: "300px" }}>
-        <Row disableTopPadding>
-          <Column>
-            <Tabs selected={selectedTab} onChange={(val) => setSelectedTab(val)}>
-              <Tab title="Layout" identifier="layout">
-                {UILayout(isShowGridLayoutOnly, isShowXYAxisSettings, configValues, setConfigValues, handleChange)}
-              </Tab>
-
-              <Tab title="Style" identifier="style">
-                {UIHeader(vizOptions, configValues, setConfigValues, handleHeaderChange, handleHeaderColor)}
-                {UIBackground(vizOptions, configValues, setConfigValues, handleBackgroundChange, handleBackgroundColor)}
-                {UIShadow(vizOptions, configValues, setConfigValues, handleShadowChange)}
-                {UIBorder(vizOptions, configValues, setConfigValues, handleBorderCheckbox, handleBorderChange, handleBorderColor)}
-              </Tab>
-            </Tabs>
-          </Column>
-        </Row>
-      </ConditionalWrapper>
+      {UIMain(vizOptions, isShowInfoPage, isShowGridLayoutOnly, selectedTab, isShowXYAxisSettings, configValues, setConfigValues, setSelectedTab, handleChange)}
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
