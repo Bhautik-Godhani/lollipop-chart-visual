@@ -6490,7 +6490,7 @@ export class Visual extends Shadow {
 
 		this.newScaleDomainByBrush = newYScaleDomain;
 
-		if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+		if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.brushAndZoomAreaSettings.enabled) {
 			const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 			const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 				this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
@@ -6614,7 +6614,7 @@ export class Visual extends Shadow {
 
 				this.newScaleDomainByBrush = newYScaleDomain;
 
-				if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
+				if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.brushAndZoomAreaSettings.enabled) {
 					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
 					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
