@@ -1198,7 +1198,7 @@ export class Visual extends Shadow {
 		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 
 		if (categoryRankingSettings.enabled) {
-			if (categoryRankingSettings.rankingType === ERankingType.BottomN) {
+			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
 				if (this.isHorizontalChart) {
 					if (categoryRankingSettings.count <= this.categoricalDataPairs.length) {
 						othersBarData = this.categoricalDataPairs.slice(categoryRankingSettings.count, this.categoricalDataPairs.length);
@@ -1211,7 +1211,7 @@ export class Visual extends Shadow {
 					this.categoricalDataPairs = this.categoricalDataPairs.slice(0, categoryRankingSettings.count);
 				}
 			}
-			if (categoryRankingSettings.rankingType === ERankingType.TopN) {
+			if (categoryRankingSettings.rankingType === ERankingType.BottomN) {
 				if (this.isHorizontalChart) {
 					othersBarData = this.categoricalDataPairs.slice(0, this.categoricalDataPairs.length - categoryRankingSettings.count);
 					othersStartIndex = 0;
@@ -1818,10 +1818,12 @@ export class Visual extends Shadow {
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
 		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
-		this.setCategoricalDataPairsByRanking();
-
 		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
+
+		this.categoricalDataPairs = clonedCategoricalDataPairs;
+		this.setCategoricalDataPairsByRanking();
+
 		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
 
 		if (this.sortingSettings.category.enabled) {
