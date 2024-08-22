@@ -10995,7 +10995,7 @@ export class Visual extends Shadow {
 		let color;
 		let isHasPattern: boolean;
 
-		const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
+		const subCategoryColorPair = this.isSmallMultiplesEnabled && d.isOthersSmallMultiples && !d.category.includes(this.othersLabel) ? this.othersSubCategoryColorPair : this.subCategoryColorPair;
 
 		if (((d.parentCategory === this.othersBarText)) && this.dataColorsSettings.isCustomizeCategoryOthersColor && d.category !== this.othersBarText) {
 			color = this.dataColorsSettings.categoryOthersColor;
