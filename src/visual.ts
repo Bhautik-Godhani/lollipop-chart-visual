@@ -477,6 +477,7 @@ export class Visual extends Shadow {
 	categoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	othersCategoryColorPair: { [category: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	subCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
+	clonedSubCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	othersSubCategoryColorPair: { [subCategory: string]: { marker1Color: string, marker2Color: string, lineColor: string, labelColor: string } } = {};
 	isHasPositiveValue: boolean;
 	CFCategoryColorPair: { [category: string]: { isMarker1Color: boolean, isMarker2Color: boolean, isLineColor: boolean, isLabelColor: boolean } } = {};
@@ -5449,7 +5450,7 @@ export class Visual extends Shadow {
 				legendDataPoints = this.subCategoriesName.map((d) => ({
 					data: {
 						name: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(d) : d).replace(new RegExp("-1234567890123", 'g'), ''),
-						color: this.getColor(this.subCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
+						color: this.getColor(this.clonedSubCategoryColorPair[`${this.chartData[0].category}-${d}`][`marker${1}Color`], EHighContrastColorType.Foreground),
 						pattern: this.subCategoryPatterns.find(s => s.name === d),
 						imageUrl: undefined
 					}
@@ -5484,7 +5485,7 @@ export class Visual extends Shadow {
 						{
 							data: {
 								name: this.othersSubcategoryText.replace(new RegExp("-1234567890123", 'g'), ''),
-								color: this.subCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
+								color: this.clonedSubCategoryColorPair[`${this.chartData[0].category}-${this.othersSubcategoryText}`].marker1Color,
 								pattern: undefined,
 								imageUrl: undefined
 							},
@@ -6231,6 +6232,8 @@ export class Visual extends Shadow {
 				});
 			}
 		}
+
+		this.clonedSubCategoryColorPair = cloneDeep(this.subCategoryColorPair);
 	}
 
 	setPieMarkerColor(marker: IDataColorsSettings, markerSeqColorsArray: any[]): void {
