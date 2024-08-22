@@ -4329,7 +4329,7 @@ export class Visual extends Shadow {
 						this.setConditionalFormattingColorByValue(conditionalFormattingResult, d, c);
 						break;
 					case ECFValueTypes.Ranking:
-						this.setConditionalFormattingColorByRanking(conditionalFormattingResult, d, c);
+						this.setConditionalFormattingColorByRanking(conditionalFormattingConditions, d, c);
 						break;
 					case ECFValueTypes.Percentage:
 						this.setConditionalFormattingColorByPercentage(chartData, d, c);
@@ -4413,7 +4413,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	setConditionalFormattingColorByRanking(conditionalFormattingConditions, d: ILollipopChartRow, c: IConditionalFormattingProps): void {
+	setConditionalFormattingColorByRanking(conditionalFormattingConditions: IConditionalFormattingProps[], d: ILollipopChartRow, c: IConditionalFormattingProps): void {
 		const i = this.categoricalDataPairs.findIndex(s => s.category === d.category);
 		if (this.isLollipopTypeCircle) {
 			if (c.valueType === ECFValueTypes.Ranking) {
