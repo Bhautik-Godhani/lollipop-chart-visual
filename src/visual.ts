@@ -3355,8 +3355,6 @@ export class Visual extends Shadow {
 						}));
 					}
 				}
-
-				RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 			},
 			tempCall: (width, height) => {
 				this.setSmallMultiplesChartDataBySMCategory(width, height);
@@ -6839,8 +6837,6 @@ export class Visual extends Shadow {
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 
 		this.drawLollipopChart();
-
-		RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 	}
 
 	setBrushSMGridItemContent(smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
@@ -10562,6 +10558,17 @@ export class Visual extends Shadow {
 		}
 
 		RenderBarCutAndClipMarker(this, this.isCutAndClipAxisEnabled && this.cutAndClipAxisSettings.markerPlacement !== ECutAndClipMarkerPlacementTypes.Axis ? this.chartData : []);
+
+		const element = this.svg
+			.append("a")
+			.transition()
+			.duration(this.tickDuration)
+			.ease(easeLinear)
+			.on("end", () => {
+				this.updateAnnotationNodeElements();
+			});
+
+		element.remove();
 
 		RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 
