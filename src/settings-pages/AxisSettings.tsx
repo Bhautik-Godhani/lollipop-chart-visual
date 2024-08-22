@@ -1245,54 +1245,6 @@ const UIYAxisLabelExtended = (
   </>
 }
 
-const applyChanges = (shadow: Visual, xConfigValues: IXAxisSettings, yConfigValues: IYAxisSettings, closeCurrentSettingHandler) => {
-  if (xConfigValues.categoryType === AxisCategoryType.Continuous && xConfigValues.isMinimumRangeEnabled && xConfigValues.isMaximumRangeEnabled) {
-    if (xConfigValues.maximumRange < xConfigValues.minimumRange) {
-      return;
-    }
-  }
-
-  if (yConfigValues.categoryType === AxisCategoryType.Continuous && yConfigValues.isMinimumRangeEnabled && yConfigValues.isMaximumRangeEnabled) {
-    if (yConfigValues.maximumRange < yConfigValues.minimumRange) {
-      return;
-    }
-  }
-
-  if (xConfigValues.labelColor !== "rgba(64, 64, 64, 1)" ||
-    xConfigValues.labelFontSize !== 10) {
-    persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
-  } else {
-    shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
-  }
-
-  if (yConfigValues.show !== false) {
-    persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
-  } else {
-    shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
-  }
-
-  closeCurrentSettingHandler();
-};
-
-const resetChanges = (shadow: Visual, X_AXIS_SETTINGS: IXAxisSettings, Y_AXIS_SETTINGS: IYAxisSettings, setXConfigValues, setYConfigValues) => {
-  const xConfigValues: IXAxisSettings = { ...X_AXIS_SETTINGS, isResetClicked: true };
-  if (xConfigValues.isDisplayTitle) {
-    if (xConfigValues.titleName.length === 0) {
-      xConfigValues.titleName = shadow.categoryDisplayName;
-    }
-  }
-
-  const yConfigValues: IYAxisSettings = { ...Y_AXIS_SETTINGS, isResetClicked: true };
-  if (yConfigValues.isDisplayTitle) {
-    if (yConfigValues.titleName.length === 0) {
-      yConfigValues.titleName = shadow.measureNames.join(" and ");
-    }
-  }
-
-  setXConfigValues(xConfigValues);
-  setYConfigValues(yConfigValues);
-};
-
 const xAxisUseEffect = (shadow: Visual, xConfigValues: IXAxisSettings, setXConfigValues) => {
   if (xConfigValues.isMinimumRangeEnabled) {
     if (xConfigValues.minimumRange === undefined) {
@@ -1334,6 +1286,64 @@ const yAxisUseEffect = (shadow: Visual, yConfigValues: IYAxisSettings, setYConfi
 //   }));
 // }
 // }, [xConfigValues.categoryType]);
+
+const UIFooter = (shadow: Visual, X_AXIS_SETTINGS: IXAxisSettings, Y_AXIS_SETTINGS: IYAxisSettings, setXConfigValues, setYConfigValues, xConfigValues: IXAxisSettings, yConfigValues: IYAxisSettings, closeCurrentSettingHandler) => {
+  const applyChanges = () => {
+    if (xConfigValues.categoryType === AxisCategoryType.Continuous && xConfigValues.isMinimumRangeEnabled && xConfigValues.isMaximumRangeEnabled) {
+      if (xConfigValues.maximumRange < xConfigValues.minimumRange) {
+        return;
+      }
+    }
+
+    if (yConfigValues.categoryType === AxisCategoryType.Continuous && yConfigValues.isMinimumRangeEnabled && yConfigValues.isMaximumRangeEnabled) {
+      if (yConfigValues.maximumRange < yConfigValues.minimumRange) {
+        return;
+      }
+    }
+
+    if (xConfigValues.labelColor !== "rgba(64, 64, 64, 1)" ||
+      xConfigValues.labelFontSize !== 10) {
+      persistProperties(shadow, EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    } else {
+      shadow.persistProperties(EVisualConfig.XAxisConfig, EVisualSettings.XAxisSettings, xConfigValues);
+    }
+
+    if (yConfigValues.show !== false) {
+      persistProperties(shadow, EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    } else {
+      shadow.persistProperties(EVisualConfig.YAxisConfig, EVisualSettings.YAxisSettings, yConfigValues);
+    }
+
+    closeCurrentSettingHandler();
+  };
+
+  const resetChanges = () => {
+    const xConfigValues: IXAxisSettings = { ...X_AXIS_SETTINGS, isResetClicked: true };
+    if (xConfigValues.isDisplayTitle) {
+      if (xConfigValues.titleName.length === 0) {
+        xConfigValues.titleName = shadow.categoryDisplayName;
+      }
+    }
+
+    const yConfigValues: IYAxisSettings = { ...Y_AXIS_SETTINGS, isResetClicked: true };
+    if (yConfigValues.isDisplayTitle) {
+      if (yConfigValues.titleName.length === 0) {
+        yConfigValues.titleName = shadow.measureNames.join(" and ");
+      }
+    }
+
+    setXConfigValues(xConfigValues);
+    setYConfigValues(yConfigValues);
+  };
+
+  return (
+    <Footer
+      cancelButtonHandler={closeCurrentSettingHandler}
+      saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
+      resetButtonHandler={resetChanges}
+    />
+  );
+};
 
 const XAxisSettings = (props) => {
   const {
@@ -1435,11 +1445,7 @@ const XAxisSettings = (props) => {
         </Tabs >
       </div>
 
-      <Footer
-        cancelButtonHandler={closeCurrentSettingHandler}
-        saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
-        resetButtonHandler={resetChanges}
-      />
+      {UIFooter(shadow, X_AXIS_SETTINGS, Y_AXIS_SETTINGS, setXConfigValues, setYConfigValues, xConfigValues, yConfigValues, closeCurrentSettingHandler)}
     </>
   );
 };

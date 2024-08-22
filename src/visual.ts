@@ -403,6 +403,7 @@ export class Visual extends Shadow {
 	public viewPortHeight: number;
 	public margin: { top: number; right: number; bottom: number; left: number };
 	public chartData: ILollipopChartRow[];
+	public filteredChartData: ILollipopChartRow[];
 	public isInFocusMode: boolean = false;
 	public isVisualResized: boolean = false;
 	public footerHeight: number = 0;
@@ -5268,6 +5269,30 @@ export class Visual extends Shadow {
 
 			this.raceChartDataLabelLength = d3.max([...raceChartMainLabelTextWidth, raceChartSubLabelTextWidth]);
 		}
+
+		this.filteredChartData = this.chartData.filter(d => {
+			if (this.isHorizontalChart) {
+				if (this.xAxisSettings.isMinimumRangeEnabled) {
+					if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			} else {
+				if (this.yAxisSettings.isMinimumRangeEnabled) {
+					if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
+						return false;
+					} else {
+						return true;
+					}
+				} else {
+					return true;
+				}
+			}
+		});
 	}
 
 	public elementToMoveOthers = (data: any[], isHasCategories: boolean, categoryName: string, isShowRemainingAsOthers: boolean) => {
@@ -6814,6 +6839,8 @@ export class Visual extends Shadow {
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 
 		this.drawLollipopChart();
+
+		RenderLollipopAnnotations(this, GetAnnotationDataPoint.bind(this));
 	}
 
 	setBrushSMGridItemContent(smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
@@ -6893,7 +6920,7 @@ export class Visual extends Shadow {
 			);
 
 			if (startIndex === -1 || endIndex === -1) {
-				return;
+				return { brushG, isBrushRendered };
 			}
 
 			const categoricalData2 = cloneDeep(categoricalData);
@@ -6954,7 +6981,7 @@ export class Visual extends Shadow {
 
 	horizontalBrushed = (config: IBrushConfig, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number): { brushG: SVGElement, isBrushRendered: boolean } => {
 		let isBrushRendered: boolean;
-		let brushG: SVGElement;
+		let brushG: SVGElement = config.brushG;
 
 		if (this.isExpandAllApplied) {
 			this.expandAllCategoriesName.forEach((d) => {
@@ -7075,7 +7102,8 @@ export class Visual extends Shadow {
 			})
 		} else {
 			const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
-			this.horizontalBrushMethod(config, smallMultiplesGridItemContent, categoricalData, selection, scaleWidth);
+			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushMethod(config, smallMultiplesGridItemContent, categoricalData, selection, scaleWidth);
+			brushG = brushG1; isBrushRendered = isBrushRendered1;
 		}
 
 		return { brushG, isBrushRendered };
@@ -9324,6 +9352,12 @@ export class Visual extends Shadow {
 
 		this.drawXYAxisExtended1(categoricalData, chartData, isSetXYScaleDiffs, isSetXYScaleSpace, isShowXAxis, isShowYAxis);
 
+		if (this.isHorizontalChart) {
+			this.xAxisG.attr("visibility", this.filteredChartData.length > 0 ? "visible" : "hidden");
+		} else {
+			this.yAxisG.attr("visibility", this.filteredChartData.length > 0 ? "visible" : "hidden");
+		}
+
 		return { xAxisG: this.xAxisG, yAxisG: this.yAxisG };
 	}
 
@@ -10449,8 +10483,8 @@ export class Visual extends Shadow {
 
 	drawLollipopChartExtended = () => {
 		if (this.isLollipopTypeCircle || (this.isLollipopTypePie)) {
-			this.drawData1Labels(this.dataLabelsSettings.show ? this.chartData : []);
-			this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure ? this.chartData : []);
+			this.drawData1Labels(this.dataLabelsSettings.show ? this.filteredChartData : []);
+			this.drawData2Labels(this.dataLabelsSettings.show && this.isHasMultiMeasure ? this.filteredChartData : []);
 		} else {
 			this.drawData1Labels([]);
 			this.drawData2Labels([]);
@@ -10574,7 +10608,7 @@ export class Visual extends Shadow {
 			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
 		}
 
-		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.chartData, (d: ILollipopChartRow) => d.uid);
+		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.filteredChartData, (d: ILollipopChartRow) => d.uid);
 
 		let marker1: IMarkerData;
 		let marker2: IMarkerData;
@@ -10650,7 +10684,7 @@ export class Visual extends Shadow {
 		this.zeroSeparatorLine
 			.attr("stroke", this.getColor(this.chartSettings.zeroBaseLineColor, EHighContrastColorType.Foreground))
 			.attr("stroke-width", this.chartSettings.zeroBaseLineSize)
-			.attr("display", this.chartSettings.isShowZeroBaseLine ? "block" : "none");
+			.attr("display", this.chartSettings.isShowZeroBaseLine && this.filteredChartData.length > 0 ? "block" : "none");
 
 		// let xAxisRange: number[];
 		// if (this.isCutAndClipAxisEnabled) {
