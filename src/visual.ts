@@ -2759,8 +2759,6 @@ export class Visual extends Shadow {
 		this.isHasCategories = this.categoricalCategoriesFields.length > 0;
 		this.isHasSubcategories = !!this.categoricalSubCategoryField;
 		this.isHasImagesData = this.categoricalImagesDataFields.length > 0;
-		this.isHasSmallMultiplesData = this.categoricalSmallMultiplesDataFields.length > 0;
-		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 		this.isHasMultiMeasure = this.measureNames.length > 1;
 		this.categoricalReferenceLinesNames = [...new Set(this.categoricalReferenceLinesDataFields.map((d) => d.source.displayName))];
 
@@ -2885,6 +2883,8 @@ export class Visual extends Shadow {
 			const categoricalSmallMultiplesField = this.categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			const categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 			this.isHasSubcategories = !!categoricalSubCategoryField;
+			this.isHasSmallMultiplesData = !!categoricalSmallMultiplesField;
+			this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 
 			if (!this.isChartInit) {
 				this.initChart();
