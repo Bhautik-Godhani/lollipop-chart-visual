@@ -2599,7 +2599,7 @@ export class Visual extends Shadow {
 		});
 
 		categoricalData.values.forEach(d => {
-			this.allNumberFormatter[d.source.displayName] = { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }), role: undefined };
+			this.allNumberFormatter[d.source.displayName] = { format: d.source.format, formatter: valueFormatter.create({ format: d.source.format }), role: undefined, isNumeric: d.source.type.numeric || d.source.type.integer };
 		});
 
 		this.categoricalCategoriesLastIndex = this.categoricalCategoriesFields.length - 1;
@@ -11833,8 +11833,8 @@ export class Visual extends Shadow {
 						value = value * 100;
 					}
 
-					return this.numberSettings.show ?
-						this.formatNumber(value, this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field] : undefined, false, true) :
+					return this.numberSettings.show && this.allNumberFormatter[field].isNumeric ?
+						this.formatNumber(parseFloat(value.toString()), this.numberSettings, this.allNumberFormatter[field] ? this.allNumberFormatter[field] : undefined, false, true) :
 						powerBiNumberFormat(value, this.allNumberFormatter[field]);
 				} else {
 					return powerBiNumberFormat(value, this.allNumberFormatter[field]);

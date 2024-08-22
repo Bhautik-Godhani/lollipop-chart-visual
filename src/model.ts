@@ -98,4 +98,5 @@ export interface IValueFormatter {
 	format: string;
 	formatter: valueFormatter.IValueFormatter;
 	role?: EDataRolesName;
+	isNumeric?: boolean;
 }
