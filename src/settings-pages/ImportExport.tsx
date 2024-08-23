@@ -14,7 +14,9 @@ const UIMain = (shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, ha
     <Row>
       <Column>
         <Tabs selected={selectedTab} onChange={tab => setSelectedTab(tab)}>
-          {UIImportTab(isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setIsThemeApplied, changeView, changeValue)}
+          <Tab identifier="import" title="Import">
+            {UIImportTab(isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setIsThemeApplied, changeView, changeValue)}
+          </Tab>
           <Tab identifier="export" title="Export">
             <Row>
               <Column>
@@ -78,89 +80,87 @@ const UIMain = (shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, ha
 const UIImportTab = (isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler,
   clearUploadStatus, setIsThemeApplied, changeView, changeValue) => {
   return <>
-    <Tab identifier="import" title="Import">
-      {
-        isThemeApplied ? <ThemeAlreadyApplied onUploadNew={() => setIsThemeApplied(false)} /> :
-          <>
+    {
+      isThemeApplied ? <ThemeAlreadyApplied onUploadNew={() => setIsThemeApplied(false)} /> :
+        <>
+          <Row>
+            <Column>
+              <RadioOption
+                value={details.view}
+                optionsList={IMPORT_OPTIONS}
+                handleChange={value => changeView(value)}
+              />
+            </Column>
+          </Row>
+
+          <ConditionalWrapper visible={details.view === "import"}>
             <Row>
               <Column>
-                <RadioOption
-                  value={details.view}
-                  optionsList={IMPORT_OPTIONS}
-                  handleChange={value => changeView(value)}
-                />
-              </Column>
-            </Row>
-
-            <ConditionalWrapper visible={details.view === "import"}>
-              <Row>
-                <Column>
-                  <div className="theme-import-upload">
-                    {details.status !== "VALID" && (
-                      <>
-                        <ImportUploadIcon />
-                        <div>
-                          <Button clickHandler={handleUploadClick} text="Upload" variant="primary" />
-                          <input
-                            type="file"
-                            ref={hiddenFileInput}
-                            onChange={uploadHandler}
-                            style={{ display: "none" }}
-                            accept="application/json"
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    {details.status === "VALID" && (
-                      <>
-                        <div className="theme-import-upload-success">
-                          <div className="theme-import-upload-success-close" onClick={clearUploadStatus}>
-                            <ImportUploadClose />
-                          </div>
-                          <ImportSuccessfulUploadIcon />
-                        </div>
-
-                        <div className="theme-import-upload-label">
-                          <Label text="File Uploaded Successfully." />
-                        </div>
-                      </>
-                    )}
-
-                    {details.status === "FAILED" && (
-                      <div className="theme-import-upload-label">
-                        <Label text="Import Failed. Please try again with a valid file." appearance="error" textEllipsis={false} />
+                <div className="theme-import-upload">
+                  {details.status !== "VALID" && (
+                    <>
+                      <ImportUploadIcon />
+                      <div>
+                        <Button clickHandler={handleUploadClick} text="Upload" variant="primary" />
+                        <input
+                          type="file"
+                          ref={hiddenFileInput}
+                          onChange={uploadHandler}
+                          style={{ display: "none" }}
+                          accept="application/json"
+                        />
                       </div>
-                    )}
-                  </div>
-                </Column>
-              </Row>
-            </ConditionalWrapper>
+                    </>
+                  )}
 
-            <ConditionalWrapper visible={details.view === "paste"}>
-              <Row>
-                <Column>
-                  <InputControl
-                    type="textarea"
-                    value={details.value}
-                    handleChange={(value: any) => {
-                      changeValue({ value });
-                    }}
-                    rows={17}
-                    placeholder="Paste the JSON here.."
-                  />
+                  {details.status === "VALID" && (
+                    <>
+                      <div className="theme-import-upload-success">
+                        <div className="theme-import-upload-success-close" onClick={clearUploadStatus}>
+                          <ImportUploadClose />
+                        </div>
+                        <ImportSuccessfulUploadIcon />
+                      </div>
+
+                      <div className="theme-import-upload-label">
+                        <Label text="File Uploaded Successfully." />
+                      </div>
+                    </>
+                  )}
+
                   {details.status === "FAILED" && (
                     <div className="theme-import-upload-label">
-                      <Label text="Import Failed." appearance="error" />
-                      <Label text="Please try again with a valid file." appearance="error" />
+                      <Label text="Import Failed. Please try again with a valid file." appearance="error" textEllipsis={false} />
                     </div>
                   )}
-                </Column>
-              </Row>
-            </ConditionalWrapper>
-          </>
-      }
-    </Tab>
+                </div>
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+
+          <ConditionalWrapper visible={details.view === "paste"}>
+            <Row>
+              <Column>
+                <InputControl
+                  type="textarea"
+                  value={details.value}
+                  handleChange={(value: any) => {
+                    changeValue({ value });
+                  }}
+                  rows={17}
+                  placeholder="Paste the JSON here.."
+                />
+                {details.status === "FAILED" && (
+                  <div className="theme-import-upload-label">
+                    <Label text="Import Failed." appearance="error" />
+                    <Label text="Please try again with a valid file." appearance="error" />
+                  </div>
+                )}
+              </Column>
+            </Row>
+          </ConditionalWrapper>
+        </>
+    }
   </>
 }
 
