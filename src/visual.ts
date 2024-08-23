@@ -4484,7 +4484,7 @@ export class Visual extends Shadow {
 								}
 							}
 						} else if (c.rankingType === ECFRankingTypes.BottomN) {
-							if (i >= ((d.subCategories.length - 1) - c.staticRankingValue)) {
+							if (i > ((this.categoricalDataPairs.length - 1) - c.staticRankingValue)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
 									this.subCategoryColorPair[`${d.category}-${s.category}`].marker2Color = c.color;
