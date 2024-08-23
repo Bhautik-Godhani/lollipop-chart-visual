@@ -255,38 +255,40 @@ const Get_RANK_ORDER = (shadow: Visual, configValues: IReferenceLineValueProps) 
   return RANK_ORDER;
 }
 
-const handleBasedOnChange = (shadow, e, type, lineValues, handleChange) => {
-  handleChange(e.axis, "axis", type);
-  handleChange(e.value, "measureName", type);
+const handleBasedOnChange = (shadow: Visual, e, type: EReferenceLinesSettings, lineValues: IReferenceLineValueProps,
+  handleChange: (val, n, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => {
+  handleChange(e.axis, "axis", type, setConfigValues);
+  handleChange(e.value, "measureName", type, setConfigValues);
 
   if (shadow.isHorizontalChart) {
     if (
       e.axis === EXYAxisNames.Y &&
       (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
     ) {
-      handleChange(Position.Start, "rankOrder", type);
+      handleChange(Position.Start, "rankOrder", type, setConfigValues);
     } else if (
       e.axis === EXYAxisNames.X &&
       (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
     ) {
-      handleChange(Position.Top, "rankOrder", type);
+      handleChange(Position.Top, "rankOrder", type, setConfigValues);
     }
   } else {
     if (
       e.axis === EXYAxisNames.X &&
       (lineValues.rankOrder === Position.Top || lineValues.rankOrder === Position.Bottom)
     ) {
-      handleChange(Position.Start, "rankOrder", type);
+      handleChange(Position.Start, "rankOrder", type, setConfigValues);
     } else if (
       e.axis === EXYAxisNames.Y &&
       (lineValues.rankOrder === Position.Start || lineValues.rankOrder === Position.End)
     ) {
-      handleChange(Position.Top, "rankOrder", type);
+      handleChange(Position.Top, "rankOrder", type, setConfigValues);
     }
   }
 }
 
-const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
+const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineSettings, lineValues: IReferenceLineValueProps,
+  handleChange: (val, n, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any, isValue2: boolean, setConfigValues) => {
   const AXIS_NAMES = Get_AXIS_NAMES(shadow, isValue2 ? configValues.lineValue2.axis : configValues.lineValue1.axis);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
 
@@ -311,7 +313,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
           value={lineValues.measureName}
           optionsList={AXIS_NAMES}
           handleChange={(value, e) => {
-            handleBasedOnChange(shadow, e, type, lineValues, handleChange)
+            handleBasedOnChange(shadow, e, type, lineValues, handleChange, setConfigValues)
           }}
         />
       </Column>
@@ -329,7 +331,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
                   label: LINE_TYPES.find(d => d.value === configValues.lineValue1.type) ? LINE_TYPES.find(d => d.value === configValues.lineValue1.type).label : "",
                   value: configValues.lineValue1.type,
                 }] : LINE_TYPES}
-              handleChange={value => handleChange(value, "type", type)}
+              handleChange={value => handleChange(value, "type", type, setConfigValues)}
             />
           </Column>
         </Row>
@@ -343,13 +345,13 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
                 label={"Value"}
                 value={lineValues.value}
                 optionsList={categoriesNameList}
-                handleChange={value => handleChange(value, "value", type)}
+                handleChange={value => handleChange(value, "value", type, setConfigValues)}
               />
             </Column>
           </Row>
         </ConditionalWrapper>
 
-        {UILineValueOptions1(vizOptions, shadow, lineValues, handleChange, isValue2)}
+        {UILineValueOptions1(vizOptions, shadow, lineValues, handleChange, isValue2, setConfigValues)}
       </ConditionalWrapper>
     </ConditionalWrapper>
 
@@ -361,7 +363,7 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
               label={"Value"}
               value={lineValues.computation}
               optionsList={ComputationTypeList}
-              handleChange={(value) => handleChange(value, "computation", type)}
+              handleChange={(value) => handleChange(value, "computation", type, setConfigValues)}
             />
           </Column>
         </Row>
@@ -373,8 +375,8 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
                 type="text"
                 value={lineValues.value}
                 handleChange={(value: any) => {
-                  handleChange(value, "value", type);
-                  handleChange(true, EReferenceLineValueProps.IsValueChanged, type);
+                  handleChange(value, "value", type, setConfigValues);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, type, setConfigValues);
                 }}
                 label="Value"
               />
@@ -386,7 +388,8 @@ const UILineValueOptions = (vizOptions: ShadowUpdateOptions, shadow: Visual, con
   </>
 }
 
-const UILineValueOptions1 = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineValueProps, handleChange: (...args: any) => any, isValue2: boolean) => {
+const UILineValueOptions1 = (vizOptions: ShadowUpdateOptions, shadow: Visual, configValues: IReferenceLineValueProps,
+  handleChange: (val, n, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any, isValue2: boolean, setConfigValues) => {
   const RANK_ORDER: ILabelValuePair[] = Get_RANK_ORDER(shadow, configValues);
   const type = isValue2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
 
@@ -398,7 +401,7 @@ const UILineValueOptions1 = (vizOptions: ShadowUpdateOptions, shadow: Visual, co
             label={"Ranking From"}
             value={configValues.rankOrder}
             optionsList={RANK_ORDER}
-            handleChange={newValue => handleChange(newValue, "rankOrder", type)}
+            handleChange={newValue => handleChange(newValue, "rankOrder", type, setConfigValues)}
           />
         </Column>
         <Column>
@@ -407,7 +410,7 @@ const UILineValueOptions1 = (vizOptions: ShadowUpdateOptions, shadow: Visual, co
             label="Rank"
             value={configValues.rank}
             min={1}
-            handleChange={(value: any) => handleChange(value, "rank", type)}
+            handleChange={(value: any) => handleChange(value, "rank", type, setConfigValues)}
           />
         </Column>
       </Row>
@@ -420,8 +423,9 @@ const UILineStyleOptions = (
   configValues: IReferenceLineStyleProps,
   isLineUI: boolean, isAddNew: boolean, details: IReferenceLineSettings,
   configBandValues: IReferenceBandStyleProps,
-  handleCheckbox: (...args: any) => any,
-  handleChange: (...args: any) => any,
+  handleCheckbox: (n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any,
+  handleChange: (val, n, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>
 ) => {
   const isBand = !isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND);
 
@@ -432,7 +436,7 @@ const UILineStyleOptions = (
           <ToggleButton
             label="Show Background"
             value={configBandValues.isShowBackgroundColor}
-            handleChange={() => handleCheckbox("isShowBackgroundColor", EReferenceLinesSettings.BandStyle)}
+            handleChange={() => handleCheckbox("isShowBackgroundColor", EReferenceLinesSettings.BandStyle, setConfigValues)}
             appearance="toggle"
           />
         </Column>
@@ -445,7 +449,7 @@ const UILineStyleOptions = (
               label={"Color"}
               color={configBandValues.backgroundColor}
               colorOpacity={0.2}
-              handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle)}
+              handleChange={value => handleChange(value, "backgroundColor", EReferenceLinesSettings.BandStyle, setConfigValues)}
               colorPalette={vizOptions.host.colorPalette}
               size="sm"
             />
@@ -474,7 +478,7 @@ const UILineStyleOptions = (
             },
           ]}
           selectorAppearance="secondary"
-          handleChange={value => handleChange(value, "lineStyle", EReferenceLinesSettings.LineStyle)}
+          handleChange={value => handleChange(value, "lineStyle", EReferenceLinesSettings.LineStyle, setConfigValues)}
         />
       </Column>
     </Row>
@@ -485,7 +489,7 @@ const UILineStyleOptions = (
           type="number"
           value={configValues.lineWidth}
           handleChange={(value: any) => {
-            handleChange(value, "lineWidth", EReferenceLinesSettings.LineStyle);
+            handleChange(value, "lineWidth", EReferenceLinesSettings.LineStyle, setConfigValues);
           }}
           min={1}
           label="Line Width"
@@ -496,7 +500,7 @@ const UILineStyleOptions = (
         <ColorPicker
           label={"Line Color"}
           color={configValues.lineColor}
-          handleChange={value => handleChange(value, "lineColor", EReferenceLinesSettings.LineStyle)}
+          handleChange={value => handleChange(value, "lineColor", EReferenceLinesSettings.LineStyle, setConfigValues)}
           colorPalette={vizOptions.host.colorPalette}
         />
       </Column>
@@ -509,21 +513,24 @@ const UILineStyleOptions = (
           value={configValues.linePlacement}
           optionsList={LINE_PLACEMENTS}
           selectorAppearance="secondary"
-          handleChange={(value) => handleChange(value, EReferenceLineStyleProps.LinePlacement, EReferenceLinesSettings.LineStyle)}
+          handleChange={(value) => handleChange(value, EReferenceLineStyleProps.LinePlacement, EReferenceLinesSettings.LineStyle, setConfigValues)}
         />
       </Column>
     </Row>
   </>
 }
 
-const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any, handleCheckbox: (...args: any) => any) => {
+const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any,
+  handleCheckbox: (n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any) => {
   return <Row disableTopPadding>
     <Column>
       <AccordionAlt title="Label Styles"
         open={configValues.show}
         showToggle={true}
         toggleValue={configValues.show}
-        onChangeToggle={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle)}
+        onChangeToggle={() => handleCheckbox(EReferenceLineLabelStyleProps.Show, EReferenceLinesSettings.LabelStyle, setConfigValues)}
       >
         <Row>
           <Column>
@@ -531,7 +538,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
               label={"Label Type"}
               value={configValues.labelNameType}
               optionsList={LABEL_NAME_TYPES}
-              handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle)}
+              handleChange={value => handleChange(value, EReferenceLineLabelStyleProps.LabelNameType, EReferenceLinesSettings.LabelStyle, setConfigValues)}
             />
           </Column>
         </Row>
@@ -543,7 +550,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
                 type="text"
                 value={config.referenceType === EReferenceType.REFERENCE_BAND ? configValues.bandLabel : configValues.lineLabel}
                 handleChange={(value: any) => {
-                  handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+                  handleChange(value, config.referenceType === EReferenceType.REFERENCE_BAND ? EReferenceLineLabelStyleProps.BandLabel : EReferenceLineLabelStyleProps.LineLabel, EReferenceLinesSettings.LabelStyle, setConfigValues);
                 }}
                 min={1}
                 label="Label Name"
@@ -557,7 +564,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
             <ColorPicker
               label={"Label Color"}
               color={configValues.labelColor}
-              handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle)}
+              handleChange={value => handleChange(value, "labelColor", EReferenceLinesSettings.LabelStyle, setConfigValues)}
               colorPalette={vizOptions.host.colorPalette}
               size="sm"
             />
@@ -569,7 +576,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
             <ToggleButton
               label="Show Background"
               value={configValues.isShowLabelBackground}
-              handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle)}
+              handleChange={() => handleCheckbox("isShowLabelBackground", EReferenceLinesSettings.LabelStyle, setConfigValues)}
               appearance="toggle"
             />
           </Column>
@@ -581,7 +588,7 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
               <ColorPicker
                 label={"Color"}
                 color={configValues.labelBackgroundColor}
-                handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle)}
+                handleChange={value => handleChange(value, "labelBackgroundColor", EReferenceLinesSettings.LabelStyle, setConfigValues)}
                 colorPalette={vizOptions.host.colorPalette}
                 size="sm"
               />
@@ -589,14 +596,17 @@ const UILabelStyles = (vizOptions: ShadowUpdateOptions, shadow: Visual, config: 
           </Row>
         </ConditionalWrapper>
 
-        {UILabelStylesExtended(configValues, handleChange, handleCheckbox)}
-        {UILabelStyles1(shadow, config, configValues, handleChange)}
+        {UILabelStylesExtended(configValues, setConfigValues, handleChange, handleCheckbox)}
+        {UILabelStyles1(shadow, config, configValues, setConfigValues, handleChange)}
       </AccordionAlt>
     </Column>
   </Row>
 }
 
-const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
+const UILabelStylesExtended = (configValues,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void,
+  handleCheckbox: (n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   return <>
     <Row>
       <Column>
@@ -605,7 +615,7 @@ const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
           value={configValues.labelFontFamily}
           isFontSelector={true}
           optionsList={[]}
-          handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle)}
+          handleChange={newValue => handleChange(newValue, "labelFontFamily", EReferenceLinesSettings.LabelStyle, setConfigValues)}
         />
       </Column>
     </Row>
@@ -631,7 +641,7 @@ const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
           ]}
           isMultiple
           selectorAppearance="secondary"
-          handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle)}
+          handleChange={value => handleChange(value, "styling", EReferenceLinesSettings.LabelStyle, setConfigValues)}
         />
       </Column>
     </Row>
@@ -641,7 +651,7 @@ const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
         <ToggleButton
           label="Auto Text Size"
           value={configValues.autoFontSize}
-          handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle)}
+          handleChange={() => handleCheckbox("autoFontSize", EReferenceLinesSettings.LabelStyle, setConfigValues)}
           appearance="toggle"
         />
       </Column>
@@ -660,9 +670,11 @@ const UILabelStylesExtended = (configValues, handleChange, handleCheckbox) => {
 //   </Row>
 // }
 
-const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps, handleChange: (...args: any) => any) => {
+const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configValues: IReferenceLineLabelStyleProps,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   const LABEL_POSITION: ILabelValuePair[] = Get_LABEL_POSITION(shadow, config);
-  const ALIGNMENT_OPTIONS: ILabelValuePair[] = getALIGNMENT_OPTIONS(shadow, configValues);
+  const ALIGNMENT_OPTIONS: ILabelValuePair[] = getALIGNMENT_OPTIONS(shadow, config);
 
   return <>
     <ConditionalWrapper visible={!configValues.autoFontSize}>
@@ -673,7 +685,7 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
             type="number"
             value={configValues.labelFontSize}
             handleChange={(value: any) => {
-              handleChange(value, "labelFontSize", EReferenceLinesSettings.LabelStyle, EReferenceLinesSettings.LabelStyle);
+              handleChange(value, "labelFontSize", EReferenceLinesSettings.LabelStyle, setConfigValues);
             }}
             min={1}
           />
@@ -689,7 +701,7 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
           value={configValues.labelPosition}
           optionsList={LABEL_POSITION}
           selectorAppearance="secondary"
-          handleChange={value => handleChange(value, "labelPosition", EReferenceLinesSettings.LabelStyle)}
+          handleChange={value => handleChange(value, "labelPosition", EReferenceLinesSettings.LabelStyle, setConfigValues)}
         />
       </Column>
     </Row>
@@ -709,7 +721,7 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
           value={configValues.labelAlignment}
           optionsList={ALIGNMENT_OPTIONS}
           selectorAppearance="secondary"
-          handleChange={value => handleChange(value, "labelAlignment", EReferenceLinesSettings.LabelStyle)}
+          handleChange={value => handleChange(value, "labelAlignment", EReferenceLinesSettings.LabelStyle, setConfigValues)}
         />
       </Column>
       {/* <Column>
@@ -777,8 +789,9 @@ const UIReferenceLine = (
   configValues: IReferenceLineSettings,
   configBandValues: IReferenceBandStyleProps,
   isLineUI: boolean, isAddNew: boolean, details: IReferenceLineSettings,
-  handleChange: (...args: any) => any,
-  handleCheckbox: (...args: any) => any) => {
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void,
+  handleCheckbox: (n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any) => {
   const AXIS_NAMES: ILabelValuePair[] = [
     {
       label: !shadow.isHorizontalChart ? "X - Axis" : "Y - Axis",
@@ -799,17 +812,17 @@ const UIReferenceLine = (
           optionsList={AXIS_NAMES}
           selectorAppearance="secondary"
           handleChange={(value) => {
-            handleChange(value, "axis", EReferenceLinesSettings.LineValue1);
+            handleChange(value, "axis", EReferenceLinesSettings.LineValue1, setConfigValues);
 
             if (value === EXYAxisNames.X) {
               if (!(configValues.lineValue1.measureName && configValues.lineValue1.measureName.includes(shadow.categoryDisplayName))) {
-                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
               }
             }
 
             if (value === EXYAxisNames.Y) {
               if (!(configValues.lineValue1.measureName && [shadow.measure1DisplayName, shadow.measure2DisplayName].includes(configValues.lineValue1.measureName))) {
-                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
               }
             }
           }}
@@ -820,16 +833,16 @@ const UIReferenceLine = (
     <AccordionAlt title="General"
       open={true}
     >
-      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false, setConfigValues)}
     </AccordionAlt>
 
     <AccordionAlt title="Line Options"
       open={true}
     >
-      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configBandValues, handleCheckbox, handleChange)}
+      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configBandValues, handleCheckbox, handleChange, setConfigValues)}
     </AccordionAlt>
 
-    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, setConfigValues, handleChange, handleCheckbox)}
   </>
 }
 
@@ -838,8 +851,9 @@ const UIReferenceBand = (
   shadow: Visual,
   configValues: IReferenceLineSettings,
   isLineUI: boolean, isAddNew: boolean, details: IReferenceLineSettings,
-  handleCheckbox: (...args: any) => any,
-  handleChange: (...args: any) => any,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleCheckbox: (n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => any,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void,
 ) => {
   const AXIS_NAMES: ILabelValuePair[] = [
     {
@@ -874,30 +888,30 @@ const UIReferenceBand = (
           optionsList={AXIS_NAMES}
           selectorAppearance="secondary"
           handleChange={(value) => {
-            handleChange(value, "axis", EReferenceLinesSettings.LineValue1);
-            handleChange(value, "axis", EReferenceLinesSettings.LineValue2);
+            handleChange(value, "axis", EReferenceLinesSettings.LineValue1, setConfigValues);
+            handleChange(value, "axis", EReferenceLinesSettings.LineValue2, setConfigValues);
 
             if (value === EXYAxisNames.X) {
               if (!(configValues.lineValue1.measureName && configValues.lineValue1.measureName.includes(shadow.categoryDisplayName))) {
-                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
               }
             }
 
             if (value === EXYAxisNames.Y) {
               if (!(configValues.lineValue1.measureName && [shadow.measure1DisplayName, shadow.measure2DisplayName].includes(configValues.lineValue1.measureName))) {
-                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
               }
             }
 
             if (value === EXYAxisNames.X) {
               if (!(configValues.lineValue2.measureName && configValues.lineValue2.measureName.includes(shadow.categoryDisplayName))) {
-                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue2);
+                handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue2, setConfigValues);
               }
             }
 
             if (value === EXYAxisNames.Y) {
               if (!(configValues.lineValue2.measureName && [shadow.measure1DisplayName, shadow.measure2DisplayName].includes(configValues.lineValue2.measureName))) {
-                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue2);
+                handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue2, setConfigValues);
               }
             }
           }}
@@ -905,23 +919,26 @@ const UIReferenceBand = (
       </Column>
     </Row>
 
-    {UIGeneral(vizOptions, shadow, configValues, handleChange, categoriesNameList)}
+    {UIGeneral(vizOptions, shadow, configValues, setConfigValues, handleChange, categoriesNameList)}
 
     <AccordionAlt title="Line Options"
       open={true}
     >
-      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configValues.bandStyle, handleCheckbox, handleChange)}
+      {UILineStyleOptions(vizOptions, configValues.lineStyle, isLineUI, isAddNew, details, configValues.bandStyle, handleCheckbox, handleChange, setConfigValues)}
     </AccordionAlt>
 
-    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, handleChange, handleCheckbox)}
+    {UILabelStyles(vizOptions, shadow, configValues, configValues.labelStyle, setConfigValues, handleChange, handleCheckbox)}
     {/* {UIBandStyles(vizOptions, shadow, configValues.bandStyle, handleChange, handleCheckbox)} */}
   </>
 }
 
-const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNameList) => {
+const UIGeneral = (vizOptions, shadow, configValues,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: any, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void,
+  categoriesNameList) => {
   return <>
     <AccordionAlt title="General" open={true}>
-      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false)}
+      {UILineValueOptions(vizOptions, shadow, configValues, configValues.lineValue1, handleChange, false, setConfigValues)}
 
       <Row>
         <Column><Label text="Start Value"></Label></Column>
@@ -935,14 +952,14 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
                 label={"Select Value"}
                 value={configValues.lineValue1.value}
                 optionsList={categoriesNameList}
-                handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue1)}
+                handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue1, setConfigValues)}
               />
             </Column>
           </Row>
         </ConditionalWrapper>
       </ConditionalWrapper>
 
-      {UILineValueOptions1(vizOptions, shadow, configValues.lineValue1, handleChange, false)}
+      {UILineValueOptions1(vizOptions, shadow, configValues.lineValue1, handleChange, false, setConfigValues)}
 
       <ConditionalWrapper visible={configValues.lineValue1.axis === EXYAxisNames.Y}>
         <Row disableTopPadding>
@@ -951,7 +968,7 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
               label={"Value Type"}
               value={configValues.lineValue1.computation}
               optionsList={ComputationTypeList}
-              handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue1)}
+              handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue1, setConfigValues)}
             />
           </Column>
         </Row>
@@ -963,8 +980,8 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
                 type="text"
                 value={configValues.lineValue1.value}
                 handleChange={(value: any) => {
-                  handleChange(value, "value", EReferenceLinesSettings.LineValue1);
-                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1);
+                  handleChange(value, "value", EReferenceLinesSettings.LineValue1, setConfigValues);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue1, setConfigValues);
                 }}
                 label="Value"
               />
@@ -985,14 +1002,14 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
                 label={"Select Value"}
                 value={configValues.lineValue2.value}
                 optionsList={categoriesNameList}
-                handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue2)}
+                handleChange={value => handleChange(value, "value", EReferenceLinesSettings.LineValue2, setConfigValues)}
               />
             </Column>
           </Row>
         </ConditionalWrapper>
       </ConditionalWrapper>
 
-      {UILineValueOptions1(vizOptions, shadow, configValues.lineValue2, handleChange, true)}
+      {UILineValueOptions1(vizOptions, shadow, configValues.lineValue2, handleChange, true, setConfigValues)}
 
       <ConditionalWrapper visible={configValues.lineValue2.axis === EXYAxisNames.Y}>
         <Row disableTopPadding>
@@ -1001,7 +1018,7 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
               label={"Value Type"}
               value={configValues.lineValue2.computation}
               optionsList={ComputationTypeList}
-              handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue2)}
+              handleChange={(value) => handleChange(value, "computation", EReferenceLinesSettings.LineValue2, setConfigValues)}
             />
           </Column>
         </Row>
@@ -1013,8 +1030,8 @@ const UIGeneral = (vizOptions, shadow, configValues, handleChange, categoriesNam
                 type="text"
                 value={configValues.lineValue2.value}
                 handleChange={(value: any) => {
-                  handleChange(value, "value", EReferenceLinesSettings.LineValue2);
-                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2);
+                  handleChange(value, "value", EReferenceLinesSettings.LineValue2, setConfigValues);
+                  handleChange(true, EReferenceLineValueProps.IsValueChanged, EReferenceLinesSettings.LineValue2, setConfigValues);
                 }}
                 label="Value"
               />
@@ -1070,7 +1087,9 @@ const resetChanges = (isAddNew, isLineUI, details, configValues, shadow, setConf
   setConfigValues(() => defaultSettings);
 };
 
-const setLineValue = (isLine2: boolean, configValues, shadow, handleChange) => {
+const setLineValue = (isLine2: boolean, configValues, shadow,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: string, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   const rLine = configValues;
   const rLineValue = isLine2 ? rLine.lineValue2 : rLine.lineValue1;
   const type = isLine2 ? EReferenceLinesSettings.LineValue2 : EReferenceLinesSettings.LineValue1;
@@ -1091,22 +1110,22 @@ const setLineValue = (isLine2: boolean, configValues, shadow, handleChange) => {
 
     switch (rLineValue.computation) {
       case EReferenceLineComputation.ZeroBaseline:
-        handleChange(0 + "", EReferenceLineValueProps.Value, type);
+        handleChange(0 + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
       case EReferenceLineComputation.Min:
-        handleChange(d3Min(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        handleChange(d3Min(values, (d) => d) + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
       case EReferenceLineComputation.Max:
-        handleChange(d3Max(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        handleChange(d3Max(values, (d) => d) + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
       case EReferenceLineComputation.Average:
-        handleChange(mean(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        handleChange(mean(values, (d) => d) + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
       case EReferenceLineComputation.Median:
-        handleChange(median(values, (d) => d) + "", EReferenceLineValueProps.Value, type);
+        handleChange(median(values, (d) => d) + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
       case EReferenceLineComputation.StandardDeviation:
-        handleChange(calculateStandardDeviation(values) + "", EReferenceLineValueProps.Value, type);
+        handleChange(calculateStandardDeviation(values) + "", EReferenceLineValueProps.Value, type, setConfigValues);
         break;
     }
   }
@@ -1131,7 +1150,7 @@ const validateField = (fieldName, isValue2: boolean, errors, configValues, setEr
   return true;
 };
 
-const handleChange = (val, n, type: string, setConfigValues) => {
+const handleChange = (val, n, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => {
   setConfigValues((d) => ({
     ...d,
     [type]: { ...d[type], [n]: val }
@@ -1182,7 +1201,7 @@ const getALIGNMENT_OPTIONS = (shadow, configValues) => {
   return ALIGNMENT_OPTIONS;
 }
 
-const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent) => {
+const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues) => {
   return <>
     <PopupModHeader
       title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
@@ -1202,11 +1221,11 @@ const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, 
     </Row>
 
     <ConditionalWrapper visible={isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_LINE)}>
-      {UIReferenceLine(vizOptions, shadow, configValues, configValues.bandStyle, isLineUI, isAddNew, details, handleChange, handleCheckbox)}
+      {UIReferenceLine(vizOptions, shadow, configValues, configValues.bandStyle, isLineUI, isAddNew, details, setConfigValues, handleChange, handleCheckbox)}
     </ConditionalWrapper>
 
     <ConditionalWrapper visible={!isLineUI || (!isAddNew && details.referenceType === EReferenceType.REFERENCE_BAND)}>
-      {UIReferenceBand(vizOptions, shadow, configValues, isLineUI, isAddNew, details, handleCheckbox, handleChange)}
+      {UIReferenceBand(vizOptions, shadow, configValues, isLineUI, isAddNew, details, setConfigValues, handleCheckbox, handleChange)}
     </ConditionalWrapper>
 
     {UIFooter(isAddNew, index, configValues, validateField, onadd, onupdate, closeCurrentSettingHandler, handleChangeContent, resetChanges)}
@@ -1239,33 +1258,35 @@ const UE1 = (configValues, setErros) => {
   }
 }
 
-const UE2 = (isLineUI, shadow, configValues, handleChange, setConfigValues) => {
+const UE2 = (isLineUI, shadow, configValues,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: any, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   if (!configValues.lineValue1.measureName) {
     if (configValues.lineValue1.axis === EXYAxisNames.X) {
-      handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+      handleChange(shadow.categoryDisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
     }
 
     if (configValues.lineValue1.axis === EXYAxisNames.Y) {
-      handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1);
+      handleChange(shadow.measure1DisplayName, "measureName", EReferenceLinesSettings.LineValue1, setConfigValues);
     }
   }
 
   const chartData = shadow.isHorizontalChart ? shadow.chartData.reverse() : shadow.chartData;
 
   if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
-    handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    handleChange(chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
   }
 
   if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
-    handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    handleChange(chartData.length > 1 ? chartData[1].category : chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
   }
 
   if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
   }
 
   if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
   }
 
   if (isLineUI) {
@@ -1281,31 +1302,35 @@ const UE2 = (isLineUI, shadow, configValues, handleChange, setConfigValues) => {
   }
 }
 
-const UE3 = (shadow, configValues, handleChange) => {
+const UE3 = (shadow, configValues,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: any, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue1.value || configValues.lineValue1.value === "0")) {
-    handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    handleChange(shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
   }
 
   if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue1.value))) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
   }
 
   if (configValues.lineValue1.axis === EXYAxisNames.Y && configValues.lineValue1.computation === EReferenceLineComputation.Fixed && (configValues.lineValue1.value === undefined || configValues.lineValue1.value === null)) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue1, setConfigValues);
   }
 }
 
-const UE4 = (shadow, configValues, handleChange) => {
+const UE4 = (shadow, configValues,
+  setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>,
+  handleChange: (val: any, n: string, type: string, setConfigValues: React.Dispatch<React.SetStateAction<IReferenceLineSettings>>) => void) => {
   if (configValues.lineValue1.axis === EXYAxisNames.X && (!configValues.lineValue2.value || configValues.lineValue2.value === "0")) {
-    handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    handleChange(shadow.chartData.length > 1 ? shadow.chartData[1].category : shadow.chartData[0].category, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
   }
 
   if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && isNaN(parseFloat(configValues.lineValue2.value))) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
   }
 
   if (configValues.lineValue2.axis === EXYAxisNames.Y && configValues.lineValue2.computation === EReferenceLineComputation.Fixed && (configValues.lineValue2.value === undefined || configValues.lineValue2.value === null)) {
-    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2);
+    handleChange(0, EReferenceLineValueProps.Value, EReferenceLinesSettings.LineValue2, setConfigValues);
   }
 }
 
@@ -1358,17 +1383,17 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
   }, [configValues.lineValue2.value]);
 
   React.useEffect(() => {
-    UE2(isLineUI, shadow, configValues, handleChange, setConfigValues);
+    UE2(isLineUI, shadow, configValues, setConfigValues, handleChange);
   }, []);
 
   // line value 1
   React.useEffect(() => {
-    UE3(shadow, configValues, handleChange);
+    UE3(shadow, configValues, setConfigValues, handleChange);
   }, [configValues.lineValue1.axis, configValues.lineValue1.computation, configValues.lineValue1.measureName, configValues.lineValue1.type]);
 
   // line value 2
   React.useEffect(() => {
-    UE4(shadow, configValues, handleChange);
+    UE4(shadow, configValues, setConfigValues, handleChange);
   }, [configValues.lineValue2.axis, configValues.lineValue2.computation, configValues.lineValue2.measureName, configValues.lineValue2.type]);
 
   React.useEffect(() => {
@@ -1403,16 +1428,16 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
   }, [configValues.lineValue2.computation]);
 
   React.useEffect(() => {
-    setLineValue(false, configValues, shadow, handleChange);
+    setLineValue(false, configValues, shadow, setConfigValues, handleChange);
   }, [configValues.lineValue1]);
 
   React.useEffect(() => {
-    setLineValue(true, configValues, shadow, handleChange);
+    setLineValue(true, configValues, shadow, setConfigValues, handleChange);
   }, [configValues.lineValue2]);
 
   return (
     <>
-      {UIMain(index, onAdd, onUpdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent)}
+      {UIMain(index, onAdd, onUpdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues)}
     </>
   );
 };

@@ -222,20 +222,6 @@ const initEdit = (index, setContentShown, setId, setIsDetailsOpen) => {
   setIsDetailsOpen(true);
 };
 
-const closeAddEdit = (setId, setIsDetailsOpen) => {
-  setId(null);
-  setIsDetailsOpen(false);
-};
-
-const onAdd = (details: IReferenceLineSettings, selectedLineType, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
-  details.uid = new Date().getTime().toString();
-  details.referenceType = selectedLineType as any;
-  initialStates.push(details);
-  setInitialStates([...initialStates]);
-  applyChanges(initialStates);
-  closeAddEdit();
-};
-
 const showConfirmPrompt = (index, setContentShown, setDeletedRuleId) => {
   setContentShown(() => "deletePage");
   setDeletedRuleId(index);
@@ -243,13 +229,6 @@ const showConfirmPrompt = (index, setContentShown, setDeletedRuleId) => {
 
 const onDelete = (index, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
   initialStates.splice(index, 1);
-  setInitialStates([...initialStates]);
-  applyChanges(initialStates);
-  closeAddEdit();
-};
-
-const onUpdate = (index, details, initialStates, setInitialStates, applyChanges, closeAddEdit) => {
-  initialStates[index] = details;
   setInitialStates([...initialStates]);
   applyChanges(initialStates);
   closeAddEdit();
@@ -268,7 +247,23 @@ const UIFooter = (closeCurrentSettingHandler: () => void) => {
   );
 };
 
-const UIForm = (vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown) => {
+const UIForm = (vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown, setInitialStates, applyChanges, closeAddEdit) => {
+  const onAdd = (details: IReferenceLineSettings) => {
+    details.uid = new Date().getTime().toString();
+    details.referenceType = selectedLineType as any;
+    initialStates.push(details);
+    setInitialStates([...initialStates]);
+    applyChanges(initialStates);
+    closeAddEdit();
+  };
+
+  const onUpdate = (index, details: IReferenceLineSettings) => {
+    initialStates[index] = details;
+    setInitialStates([...initialStates]);
+    applyChanges(initialStates);
+    closeAddEdit();
+  };
+
   return <>
     <ConditionalWrapper visible={contentShown === "form"}>
       <AddReferenceLine
@@ -416,11 +411,13 @@ const ReferenceLines = (props) => {
   const filteredInitialStates = selectedLineType !== ELineTypeTabs.All ? initialStates.filter(d => d.referenceType === (selectedLineType as any)) : initialStates;
   const details: IReferenceLineSettings = typeof id === "number" ? filteredInitialStates[id] : {} as any;
 
+  const closeAddEdit = () => { setId(null); setIsDetailsOpen(false); };
+
   return (
     <>
       {UIDeletePage(contentShown, mappedInitialState, deletedRuleId, setContentShown, closeCurrentSettingHandler, initialStates, setInitialStates, applyChanges, closeAddEdit)}
       {UIHomePage(contentShown, closeCurrentSettingHandler, selectedLineType, setSelectedLineType, setIsDetailsOpen, isDetailsOpen, initialStates, mappedInitialState, setInitialStates, setContentShown, setId)}
-      {UIForm(vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown)}
+      {UIForm(vizOptions, contentShown, shadow, details, selectedLineType, filteredInitialStates, id, initialStates, closeCurrentSettingHandler, setContentShown, setInitialStates, applyChanges, closeAddEdit)}
     </>
   );
 };
