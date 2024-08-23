@@ -6472,7 +6472,7 @@ export class Visual extends Shadow {
 		if (brushArea === null) brushArea = this.yScale.range();
 
 		yScaleDomain.forEach((d, i) => {
-			const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? this.brushScaleBandBandwidth / 2 : 0);
 			if (pos >= brushArea[0] && pos <= brushArea[1]) {
 				newYScaleDomain.push(d);
 
@@ -6596,7 +6596,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
 
 				yScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? this.brushScaleBandBandwidth / 2 : 0);
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newYScaleDomain.push(d);
 
@@ -6893,7 +6893,7 @@ export class Visual extends Shadow {
 		if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 		xScaleDomain.forEach((d, i) => {
-			const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? this.brushScaleBandBandwidth / 2 : 0);
 			if (pos >= brushArea[0] && pos <= brushArea[1]) {
 				newXScaleDomain.push(d);
 
@@ -7022,7 +7022,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = xScale.range();
 
 				xScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d) + this.brushScaleBandBandwidth / 2;
+					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? this.brushScaleBandBandwidth / 2 : 0);
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newXScaleDomain.push(d);
 
