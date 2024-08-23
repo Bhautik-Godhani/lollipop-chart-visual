@@ -90,7 +90,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const toCategoryYPos = self.getYPosition(to.category);
     const isFromCategoryYPosTrue = fromCategoryYPos !== undefined;
     const isToCategoryYPosTrue = toCategoryYPos !== undefined;
-    const isToGreaterThenFrom: boolean = to.value > from.value;
+    const isToGreaterThenFrom: boolean = (to.value < 0 && from.value < 0) ? to.value < from.value : to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryYPosTrue : isToCategoryYPosTrue;
     const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? 0 : self.height) : self.height);
     const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? self.height : 0) : 0);
@@ -282,7 +282,7 @@ export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategor
     const isFromCategoryXPosTrue = fromCategoryXPos !== undefined;
     const isToCategoryXPosTrue = toCategoryXPos !== undefined;
     const isPositiveDeviation = from.value < to.value;
-    const isToGreaterThenFrom: boolean = to.value > from.value;
+    const isToGreaterThenFrom: boolean = (to.value < 0 && from.value < 0) ? to.value < from.value : to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryXPosTrue : isToCategoryXPosTrue;
     const start = isFromCategoryXPosTrue ? fromCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? self.width : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isLeftYAxis ? 0 : self.width) : self.width);
     const end = isToCategoryXPosTrue ? toCategoryXPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isLeftYAxis ? 0 : self.width) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isLeftYAxis ? self.width : 0) : 0);
