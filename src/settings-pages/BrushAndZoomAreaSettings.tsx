@@ -245,7 +245,7 @@ const BrushAndZoomAreaSettings = (props) => {
 
 	return (
 		<>
-			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled}>
+			<ConditionalWrapper visible={shadow.isSmallMultiplesEnabled || shadow.isChartIsRaceChart}>
 				<Row>
 					<Column>
 						<Quote>

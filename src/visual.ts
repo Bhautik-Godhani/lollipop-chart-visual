@@ -2766,7 +2766,7 @@ export class Visual extends Shadow {
 			this.imagesDataFieldsName = [...new Set(this.categoricalImagesDataFields.map(d => d.source.displayName))];
 		}
 
-		if (this.isSmallMultiplesEnabled) {
+		if (this.isSmallMultiplesEnabled || this.isChartIsRaceChart) {
 			this.brushAndZoomAreaSettings.enabled = false;
 		}
 
@@ -11824,7 +11824,8 @@ export class Visual extends Shadow {
 				cloneDeep(originalCategoricalData),
 				this.categoricalMetadata,
 				this.vizOptions.options.viewport.width,
-				this.vizOptions.options.viewport.height
+				this.vizOptions.options.viewport.height,
+				false
 			);
 
 			this.setSeedDataFromVisual(categoricalData, seedDataFromVisual);
