@@ -115,26 +115,28 @@ export const DrawSmallMultiplesGridLayout = (config: ISmallMultiplesGridLayoutSe
     });
 
     const renderUniformXYAxisToContainer = () => {
-        const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
-        const itemWidth = bBox.width;
-        const itemHeight = bBox.height;
+        if ((hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement)) {
+            const bBox = (hyperListMainContainer.select(".react-grid-item").node() as HTMLDivElement).getBoundingClientRect();
+            const itemWidth = bBox.width;
+            const itemHeight = bBox.height;
 
-        if (itemWidth > 0 && itemHeight > 0) {
-            const { bottomMargin, leftMargin } = config.getBottomLeftMargin();
+            if (itemWidth > 0 && itemHeight > 0) {
+                const { bottomMargin, leftMargin } = config.getBottomLeftMargin();
 
-            const { yAxisTitleGNode, xAxisTitleGNode, xAxisTitleHeight, yAxisTitleWidth } = GetRootXYAxisGNode(
-                config,
-                itemWidth - (!isUniformYScale ? leftMargin : config.innerSpacing * 2),
-                itemHeight - panelTitleSize.height - (!isUniformXScale ? bottomMargin : config.innerSpacing * 2),
-                false
-            );
+                const { yAxisTitleGNode, xAxisTitleGNode, xAxisTitleHeight, yAxisTitleWidth } = GetRootXYAxisGNode(
+                    config,
+                    itemWidth - (!isUniformYScale ? leftMargin : config.innerSpacing * 2),
+                    itemHeight - panelTitleSize.height - (!isUniformXScale ? bottomMargin : config.innerSpacing * 2),
+                    false
+                );
 
-            const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
-            const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
+                const xAxisMargin = xAxisGNodeHeight + xAxisTitleHeight + titleToAxisMargin;
+                const yAxisMargin = yAxisGNodeWidth + yAxisTitleWidth + titleToAxisMargin;
 
-            callUniformXYAxis(config, hyperListMainContainer, totalRows, columns, xAxisMargin, yAxisMargin, xAxisGNodeHeight, yAxisGNodeWidth, xAxisTitleGNode,
-                yAxisTitleGNode, yAxisTitleWidth, uniformBottomXAxis, uniformTopXAxis, uniformLeftYAxis, uniformRightYAxis, panelTitleSize
-            )
+                callUniformXYAxis(config, hyperListMainContainer, totalRows, columns, xAxisMargin, yAxisMargin, xAxisGNodeHeight, yAxisGNodeWidth, xAxisTitleGNode,
+                    yAxisTitleGNode, yAxisTitleWidth, uniformBottomXAxis, uniformTopXAxis, uniformLeftYAxis, uniformRightYAxis, panelTitleSize
+                )
+            }
         }
     }
 

@@ -494,6 +494,7 @@ export class Visual extends Shadow {
 	isDateCategoryNames: boolean;
 	isPureDateCategoryNames: boolean;
 	isDateSubcategoryNames: boolean;
+	isDateSM: boolean;
 	isMonthSubcategoryNames: boolean;
 	extraDataLabelsDisplayNames: string[] = [];
 	isHasExtraDataLabels: boolean = false;
@@ -2700,6 +2701,7 @@ export class Visual extends Shadow {
 		this.measure2DisplayName = this.categoricalMeasureFields.length > 1 ? this.categoricalMeasureFields[1].source.displayName : "";
 		this.isHasSmallMultiplesData = this.categoricalSmallMultiplesDataFields.length > 0;
 		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
+		this.isDateSM = this.categoricalSmallMultiplesDataFields[0].source.type.dateTime;
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
@@ -8038,7 +8040,7 @@ export class Visual extends Shadow {
 			if (this.isSmallMultiplesEnabled) {
 				tooltipData.push({
 					displayName: this.smallMultiplesCategoricalDataSourceName,
-					value: this.getTooltipCategoryText(value.SMCategory),
+					value: this.getSMTooltipCategoryText(value.SMCategory),
 					color: "transparent",
 				})
 			}
@@ -11356,6 +11358,20 @@ export class Visual extends Shadow {
 		}
 	}
 
+	getSMTooltipCategoryText(text: string): string {
+		if (text) {
+			text = text.toString().replace(new RegExp("-1234567890123", 'g'), '').replace(/&&/g, " ");
+			const isOthersTick = text.toString().includes(this.othersString);
+			if (this.isDateSM && !isOthersTick) {
+				return valueFormatter.create({ format: this.categoricalSmallMultiplesDataFields[0].source.format }).format(new Date(text));
+			} else {
+				return text;
+			}
+		} else {
+			return "";
+		}
+	}
+
 	handleErrorBarsDirectionMinus = (tooltipData: TooltipData[], errorBar1: IErrorBarValue, errorBar2: IErrorBarValue, isValue2: boolean, isPie2: boolean) => {
 		if (this.isHasErrorUpperBounds) {
 			if (this.isRenderBothErrorBars) {
@@ -11426,7 +11442,7 @@ export class Visual extends Shadow {
 		if (this.isSmallMultiplesEnabled) {
 			tooltipData.push({
 				displayName: this.smallMultiplesCategoricalDataSourceName,
-				value: this.getTooltipCategoryText(pieData.smallMultipleCategory),
+				value: this.getSMTooltipCategoryText(pieData.smallMultipleCategory),
 				color: "transparent",
 			})
 		}

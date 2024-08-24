@@ -249,7 +249,7 @@ const BrushAndZoomAreaSettings = (props) => {
 				<Row>
 					<Column>
 						<Quote>
-							<strong>Note: </strong>Please remove the small multiples data to use this feature.
+							<strong>Note: </strong>Please remove the small multiples/race chart data to use this feature.
 						</Quote>
 					</Column>
 				</Row>

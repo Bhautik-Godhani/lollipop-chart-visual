@@ -432,7 +432,7 @@ const setSMHeaderTexts = (self: Visual, config: ISmallMultiplesGridLayoutSetting
 
     const total = config.gridDataItemsTotals[smallMultipleIndex];
 
-    const categoryName = config.categories[smallMultipleIndex].replace(new RegExp("-1234567890123", 'g'), '');
+    const categoryName = self.getSMTooltipCategoryText(config.categories[smallMultipleIndex].replace(new RegExp("-1234567890123", 'g'), ''));
     const categoryTotal = self.formatNumber(total, self.numberSettings, self.measureNumberFormatter[0], true, true);
     const categoryAvg = self.formatNumber(total / self.chartData.length, self.numberSettings, self.measureNumberFormatter[0], true, true);
 
