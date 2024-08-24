@@ -72,7 +72,7 @@ const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, s
 	return <>
 		{configValues.subCategoryPatterns.map((category, index) => (
 			<PatternPicker
-				label={shadow.getTooltipCategoryText(category.name, false, true)}
+				label={shadow.getSubCategoryTooltipCategoryText(category.name)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				imageUploadIconTooltip="Upload the pattern image"
 				handleChange={(e: IPatternData) => {

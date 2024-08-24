@@ -2701,7 +2701,7 @@ export class Visual extends Shadow {
 		this.measure2DisplayName = this.categoricalMeasureFields.length > 1 ? this.categoricalMeasureFields[1].source.displayName : "";
 		this.isHasSmallMultiplesData = this.categoricalSmallMultiplesDataFields.length > 0;
 		this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
-		this.isDateSM = this.categoricalSmallMultiplesDataFields[0].source.type.dateTime;
+		this.isDateSM = this.isHasSmallMultiplesData ? this.categoricalSmallMultiplesDataFields[0].source.type.dateTime : false;
 
 		if (
 			this.sortingSettings.category.isSortByExtraSortField &&
@@ -11328,15 +11328,10 @@ export class Visual extends Shadow {
 		}
 	}
 
-	getTooltipCategoryText(text: string, toUpperCase: boolean = false, isSubcategory: boolean = false): string {
+	getTooltipCategoryText(text: string, toUpperCase: boolean = false): string {
 		if (text) {
 			text = text.toString().replace(new RegExp("-1234567890123", 'g'), '').replace(/&&/g, " ");
-
 			const isOthersTick = text.toString().includes(this.othersString);
-
-			if (isSubcategory && this.isHasSubcategories && this.isDateSubcategoryNames) {
-				return valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(new Date(text));
-			}
 
 			if (this.isXIsDateTimeAxis && !this.isXIsContinuousAxis && !this.isHorizontalChart && !isOthersTick) {
 				if (!this.xAxisSettings.isAutoDateFormat) {
@@ -11352,6 +11347,20 @@ export class Visual extends Shadow {
 				}
 			} else {
 				return ((typeof text === "string" && toUpperCase) ? text.toUpperCase() : text).toString().replace(/--\d+/g, '');
+			}
+		} else {
+			return "";
+		}
+	}
+
+	getSubCategoryTooltipCategoryText(text: string): string {
+		if (text) {
+			text = text.toString().replace(new RegExp("-1234567890123", 'g'), '').replace(/&&/g, " ");
+			const isOthersTick = text.toString().includes(this.othersString);
+			if (this.isDateSubcategoryNames && !isOthersTick) {
+				return valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(new Date(text));
+			} else {
+				return text;
 			}
 		} else {
 			return "";
@@ -11429,7 +11438,7 @@ export class Visual extends Shadow {
 			},
 			{
 				displayName: this.subCategoryDisplayName,
-				value: valueFormatter.create({ format: this.categoricalSubCategoryField.format }).format(this.isDateSubcategoryNames ? new Date(pieData.category.toString()) : this.getTooltipCategoryText(pieData.category)),
+				value: this.getSubCategoryTooltipCategoryText(this.isDateSubcategoryNames ? new Date(pieData.category.toString()).toString() : pieData.category),
 				color: "transparent",
 			},
 			{

@@ -39,7 +39,7 @@ export class Behavior implements IInteractiveBehavior {
 	public bindEvents(options: BehaviorOptions, selectionHandler: ISelectionHandler): void {
 		this.options = options;
 		const visualAnnotations = this.visualAnnotations;
-		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isLollipopTypePie, visual, getTooltipCategoryText } = options;
+		const { lollipopSelection, lineSelection, clearCatcher, onLollipopClick, legendItems, isLollipopTypePie, visual } = options;
 
 		const handleSelection = (ele: SVGElement, event: MouseEvent) => {
 			const data: ILollipopChartRow = d3Select(ele).datum() as ILollipopChartRow;
@@ -114,12 +114,12 @@ export class Behavior implements IInteractiveBehavior {
 			legendItems.on("click", function (e) {
 				const legendData: any = d3Select(this).datum();
 				const categoryData = lollipopSelection
-					.filter((data) => legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isLollipopTypePie))
+					.filter((data) => legendData.data.name.toString() === (isLollipopTypePie ? visual.getSubCategoryTooltipCategoryText.bind(visual)(data.category.toString()) : visual.getTooltipCategoryText.bind(visual)(data.category.toString(), false)))
 					.data();
 
 				const groupByData = lollipopSelection
 					.filter((data) => {
-						return legendData.data.name.toString() === getTooltipCategoryText.bind(visual)(data.category.toString(), false, isLollipopTypePie)
+						return legendData.data.name.toString() === (isLollipopTypePie ? visual.getSubCategoryTooltipCategoryText.bind(visual)(data.category.toString()) : visual.getTooltipCategoryText.bind(visual)(data.category.toString(), false))
 					})
 					.data();
 
@@ -144,7 +144,7 @@ export class Behavior implements IInteractiveBehavior {
 	}
 
 	public renderSelection(hasSelection: boolean): void {
-		const { lollipopSelection, dataPoints, interactivityService, legendItems, getTooltipCategoryText, visual, isLollipopTypePie } = this.options;
+		const { lollipopSelection, dataPoints, interactivityService, legendItems, visual } = this.options;
 		const isHasHighlights = dataPoints.some((d) => d.isHighlight);
 
 		if (legendItems) {
@@ -157,7 +157,7 @@ export class Behavior implements IInteractiveBehavior {
 			const selectedDataPoints = dataPoints.filter(d => d.selected || d.isHighlight);
 			selectedDataPoints.forEach(d => {
 				legendItems
-					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === getTooltipCategoryText.bind(visual)(d.category.toString(), false, isLollipopTypePie) })
+					.filter(function (legendDataPoint) { return legendDataPoint.data.name.toString() === visual.getSubCategoryTooltipCategoryText.bind(visual)(d.category.toString()) })
 					.style("opacity", d.selected || d.isHighlight ? 1 : 0.4);
 			});
 		}
