@@ -2465,10 +2465,6 @@ export class Visual extends Shadow {
 				}
 
 				if (Math.ceil(this.height) < expectedHeight && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-					this.isScrollBrushDisplayed = true;
-					this.isVerticalBrushDisplayed = true;
-					this.isHorizontalBrushDisplayed = false;
-
 					const config: IBrushConfig = {
 						width: this.width,
 						height: this.height,
@@ -2486,9 +2482,9 @@ export class Visual extends Shadow {
 						isShowBrush: true
 					};
 
-					if (isRenderBrush) {
-						this.initVerticalBrush(config);
-					}
+					// if (isRenderBrush) {
+					this.initVerticalBrush(config);
+					// }
 				} else {
 					this.isScrollBrushDisplayed = false;
 					this.isVerticalBrushDisplayed = false;
@@ -2505,11 +2501,7 @@ export class Visual extends Shadow {
 				}
 
 				if (Math.ceil(this.width) < expectedWidth && (this.chartSettings.isAutoLollipopWidth ? this.brushScaleBand.bandwidth() <= this.minScaleBandWidth : true) || this.brushAndZoomAreaSettings.enabled) {
-					this.isScrollBrushDisplayed = true;
-					this.isHorizontalBrushDisplayed = true;
-					this.isVerticalBrushDisplayed = false;
 					const brushXPos = this.margin.left ? this.margin.left : 0;
-
 					const config: IBrushConfig = {
 						width: this.width,
 						height: this.height,
@@ -2527,9 +2519,9 @@ export class Visual extends Shadow {
 						isShowBrush: true
 					};
 
-					if (isRenderBrush) {
-						this.initHorizontalBrush(config);
-					}
+					// if (isRenderBrush) {
+					this.initHorizontalBrush(config);
+					// }
 				} else {
 					this.isScrollBrushDisplayed = false;
 					this.isHorizontalBrushDisplayed = false;
@@ -2651,7 +2643,7 @@ export class Visual extends Shadow {
 		}
 
 		if (this.isLollipopTypeCircle) {
-			this.minScaleBandWidth = 40;
+			this.minScaleBandWidth = 35;
 		} else {
 			this.minScaleBandWidth = 90;
 		}
@@ -2885,8 +2877,6 @@ export class Visual extends Shadow {
 			const categoricalSmallMultiplesField = this.categoricalData.categories.find((d) => !!d.source.roles[EDataRolesName.SmallMultiples]);
 			const categoricalSubCategoryField = this.categoricalMetadata.columns.find((d) => !!d.roles[EDataRolesName.SubCategory]);
 			this.isHasSubcategories = !!categoricalSubCategoryField;
-			this.isHasSmallMultiplesData = !!categoricalSmallMultiplesField;
-			this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 
 			if (!this.isChartInit) {
 				this.initChart();
@@ -2896,6 +2886,9 @@ export class Visual extends Shadow {
 				d3.select(this.chartContainer).selectAll("*").remove();
 				this.initChart();
 			}
+
+			this.isHasSmallMultiplesData = !!categoricalSmallMultiplesField;
+			this.isSmallMultiplesEnabled = this.isHasSmallMultiplesData;
 
 			this.handleShowBucket();
 
@@ -3362,7 +3355,7 @@ export class Visual extends Shadow {
 				this.setSmallMultiplesChartDataBySMCategory(width, height);
 
 				const data = this.setInitialChartData(
-					this.SMCategoricalData,
+					cloneDeep(this.SMCategoricalData),
 					cloneDeep(this.SMCategoricalData),
 					this.categoricalMetadata,
 					width,
@@ -3370,7 +3363,7 @@ export class Visual extends Shadow {
 					false
 				);
 
-				this.SMCategoricalInitBrushScaleBandData = data;
+				this.SMCategoricalInitBrushScaleBandData = cloneDeep(data);
 
 				this.categoricalData = data;
 				this.setCategoricalDataFields(data);
@@ -5272,6 +5265,10 @@ export class Visual extends Shadow {
 
 		this.filteredChartData = this.chartData.filter(d => {
 			if (this.isHorizontalChart) {
+				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+					return false;
+				}
+
 				if (this.xAxisSettings.isMinimumRangeEnabled) {
 					if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
 						return false;
@@ -5282,6 +5279,10 @@ export class Visual extends Shadow {
 					return true;
 				}
 			} else {
+				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+					return false;
+				}
+
 				if (this.yAxisSettings.isMinimumRangeEnabled) {
 					if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
 						return false;
@@ -6571,6 +6572,8 @@ export class Visual extends Shadow {
 			}
 
 			SMItemsList.forEach(d => {
+				this.setBrushScaleBandDomain(this.SMCategoricalData);
+
 				this.smallMultiplesGridItemId = d.content.category;
 				this.currentSmallMultipleIndex = d.content.index;
 
@@ -6578,7 +6581,7 @@ export class Visual extends Shadow {
 				this.isCurrentSmallMultipleIsOthers = d.content.category.includes(this.othersLabel);
 
 				const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
-				const yScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+				const yScaleDomain = smallMultiplesGridItemContent ? this.brushScaleBand.domain() : this.brushScaleBand.domain();
 				const categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
@@ -6615,10 +6618,42 @@ export class Visual extends Shadow {
 				this.newScaleDomainByBrush = newYScaleDomain;
 
 				if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.brushAndZoomAreaSettings.enabled) {
-					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+					const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 					);
+
+					if (startIndex2 === -1 || endIndex2 === -1) { return; }
+
+					const categoricalData22 = cloneDeep(this.SMCategoricalData);
+
+					categoricalData22.categories.forEach((d, i) => {
+						d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
+					});
+
+					categoricalData22.values.forEach((d, i) => {
+						d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
+
+						if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
+					});
+
+					this.setCategoricalDataFields(categoricalData22);
+					this.setChartData(categoricalData22);
+
+					const chartData22 = cloneDeep(this.chartData);
+
+					let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+					);
+
+					if (startIndex === -1) {
+						startIndex = 0;
+					}
+
+					if (endIndex === -1) {
+						endIndex = this.newScaleDomainByBrush.length - 1;
+					}
 
 					if (startIndex === -1 || endIndex === -1) { return; }
 
@@ -6654,7 +6689,7 @@ export class Visual extends Shadow {
 
 						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
 
-						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData22, chartData22, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					} else {
 						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
 					}
@@ -6997,6 +7032,8 @@ export class Visual extends Shadow {
 			}
 
 			SMItemsList.forEach(d => {
+				this.setBrushScaleBandDomain(this.SMCategoricalData);
+
 				this.smallMultiplesGridItemId = d.content.category;
 				this.currentSmallMultipleIndex = d.content.index;
 
@@ -7004,7 +7041,7 @@ export class Visual extends Shadow {
 				this.isCurrentSmallMultipleIsOthers = d.content.category.includes(this.othersLabel);
 
 				const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
-				const xScaleDomain = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.brushScaleBand.domain() : this.brushScaleBand.domain();
+				const xScaleDomain = smallMultiplesGridItemContent ? this.brushScaleBand.domain() : this.brushScaleBand.domain();
 				categoricalData = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalData) : cloneDeep(config.categoricalData);
 				this.categoricalDataPairs = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.categoricalDataPairs) : this.categoricalDataPairs;
 				this.firstCategoryValueDataPair = smallMultiplesGridItemContent ? cloneDeep(smallMultiplesGridItemContent.firstCategoryValueDataPair) : this.firstCategoryValueDataPair;
@@ -7041,10 +7078,45 @@ export class Visual extends Shadow {
 				this.newScaleDomainByBrush = newXScaleDomain;
 
 				if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
-					const startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					const endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+					// TEST
+					const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
 						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
 					);
+
+					if (startIndex2 === -1 || endIndex2 === -1) { return; }
+
+					const categoricalData22 = cloneDeep(this.SMCategoricalData);
+
+					categoricalData22.categories.forEach((d, i) => {
+						d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
+					});
+
+					categoricalData22.values.forEach((d, i) => {
+						d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
+
+						if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
+					});
+
+					this.setCategoricalDataFields(categoricalData22);
+					this.setChartData(categoricalData22);
+
+					const chartData22 = cloneDeep(this.chartData);
+
+					let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+					let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+					);
+
+					if (startIndex === -1) {
+						startIndex = 0;
+					}
+
+					if (endIndex === -1) {
+						endIndex = this.newScaleDomainByBrush.length - 1;
+					}
+
+					// if (startIndex === -1 || endIndex === -1) { return; }
 
 					if (startIndex === -1 || endIndex === -1) { return; }
 
@@ -7079,7 +7151,7 @@ export class Visual extends Shadow {
 
 						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
 
-						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+						this.initAndRenderLollipopChart(categoricalData22, chartData22, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
 
 						this.xAxisG.attr("transform", `translate(${0}, ${0})`);
 					} else {
@@ -7231,6 +7303,12 @@ export class Visual extends Shadow {
 			});
 
 			this.newScaleDomainByBrush = newYScaleDomain;
+
+			if (newYScaleDomain.length < this.brushScaleBand.domain().length) {
+				this.isScrollBrushDisplayed = true;
+				this.isVerticalBrushDisplayed = true;
+				this.isHorizontalBrushDisplayed = false;
+			}
 		};
 
 		const brush = d3
@@ -7276,6 +7354,12 @@ export class Visual extends Shadow {
 			});
 
 			this.newScaleDomainByBrush = newXScaleDomain;
+
+			if (newXScaleDomain.length < this.brushScaleBand.domain().length) {
+				this.isScrollBrushDisplayed = true;
+				this.isHorizontalBrushDisplayed = true;
+				this.isVerticalBrushDisplayed = false;
+			}
 		};
 
 		const brush = d3
