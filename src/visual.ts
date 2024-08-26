@@ -10697,6 +10697,20 @@ export class Visual extends Shadow {
 			this.markerMaxSize = (this.isLollipopTypeCircle ? this.circle1Size : this.pie1Radius * 2);
 		}
 
+		this.filteredChartData = this.filteredChartData.filter(d => {
+			if (this.isHorizontalChart) {
+				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+					return false;
+				}
+			} else {
+				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
 		const lollipopSelection = this.lollipopG.selectAll(".lollipop-group").data(this.filteredChartData, (d: ILollipopChartRow) => d.uid);
 
 		let marker1: IMarkerData;
@@ -10742,9 +10756,7 @@ export class Visual extends Shadow {
 							} else {
 								return "block";
 							}
-						} else {
-							return "block";
-						}
+						} else { return "block"; }
 					} else {
 						if (this.yAxisSettings.isMinimumRangeEnabled) {
 							if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
@@ -10752,9 +10764,7 @@ export class Visual extends Shadow {
 							} else {
 								return "block";
 							}
-						} else {
-							return "block";
-						}
+						} else { return "block"; }
 					}
 				});
 				this.enterLollipop(lollipopG, marker1Style, marker2Style, marker1, marker2);
