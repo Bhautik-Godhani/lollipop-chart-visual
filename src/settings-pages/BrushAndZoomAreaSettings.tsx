@@ -255,7 +255,7 @@ const BrushAndZoomAreaSettings = (props) => {
 				</Row>
 			</ConditionalWrapper>
 
-			<ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled}>
+			<ConditionalWrapper visible={!shadow.isSmallMultiplesEnabled && !shadow.isChartIsRaceChart}>
 				{UIGeneralChartSettings(shadow, vizOptions, configValues, setConfigValues)}
 			</ConditionalWrapper>
 
