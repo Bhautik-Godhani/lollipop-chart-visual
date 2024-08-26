@@ -6618,84 +6618,8 @@ export class Visual extends Shadow {
 				this.newScaleDomainByBrush = newYScaleDomain;
 
 				if (this.newScaleDomainByBrush.length < yScaleDomain.length || this.brushAndZoomAreaSettings.enabled) {
-					const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-					);
-
-					if (startIndex2 === -1 || endIndex2 === -1) { return; }
-
-					const categoricalData22 = cloneDeep(this.SMCategoricalData);
-
-					categoricalData22.categories.forEach((d, i) => {
-						d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
-					});
-
-					categoricalData22.values.forEach((d, i) => {
-						d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
-
-						if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
-					});
-
-					this.setCategoricalDataFields(categoricalData22);
-					this.setChartData(categoricalData22);
-
-					const chartData22 = cloneDeep(this.chartData);
-
-					let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-					);
-
-					if (startIndex === -1) {
-						startIndex = 0;
-					}
-
-					if (endIndex === -1) {
-						endIndex = this.newScaleDomainByBrush.length - 1;
-					}
-
-					if (startIndex === -1 || endIndex === -1) { return; }
-
-					const categoricalData2 = cloneDeep(categoricalData);
-
-					categoricalData2.categories.forEach((d, i) => {
-						d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-					});
-
-					categoricalData2.values.forEach((d, i) => {
-						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-						if (d.highlights) {
-							d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
-						}
-					});
-
-					this.setCategoricalDataFields(categoricalData2);
-					this.setChartData(categoricalData2);
-
-					this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
-
-					if (this.isExpandAllApplied) { RenderExpandAllYAxis(this, categoricalData2); }
-
-					this.configLegend();
-
-					if (smallMultiplesGridItemContent) {
-						if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
-							this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
-						}
-
-						this.yAxisG = d3.select(config.SMUniformYAxisG);
-
-						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
-
-						this.initAndRenderLollipopChart(categoricalData22, chartData22, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
-					} else {
-						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
-					}
-
 					isBrushRendered = true;
-					this.brushG.attr("display", "block");
+					this.verticalBrushedExtended(config, scaleHeight, categoricalData, d, smallMultiplesGridItemContent);
 				} else {
 					isBrushRendered = false;
 					this.isScrollBrushDisplayed = false;
@@ -6712,6 +6636,80 @@ export class Visual extends Shadow {
 		}
 
 		return { isBrushRendered };
+	}
+
+	verticalBrushedExtended(config: IBrushConfig, scaleHeight: number, categoricalData: powerbi.DataViewCategorical, d, smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
+		const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+		const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]);
+
+		if (startIndex2 === -1 || endIndex2 === -1) { return; }
+
+		const categoricalData22 = cloneDeep(this.SMCategoricalData);
+
+		categoricalData22.categories.forEach((d, i) => {
+			d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
+		});
+
+		categoricalData22.values.forEach((d, i) => {
+			d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
+
+			if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
+		});
+
+		this.setCategoricalDataFields(categoricalData22);
+		this.setChartData(categoricalData22);
+
+		const chartData22 = cloneDeep(this.chartData);
+
+		let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+		let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+			this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+		);
+
+		if (startIndex === -1) { startIndex = 0; }
+
+		if (endIndex === -1) { endIndex = this.newScaleDomainByBrush.length - 1; }
+
+		if (startIndex === -1 || endIndex === -1) { return; }
+
+		const categoricalData2 = cloneDeep(categoricalData);
+
+		categoricalData2.categories.forEach((d, i) => {
+			d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+		});
+
+		categoricalData2.values.forEach((d, i) => {
+			d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+			if (d.highlights) {
+				d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1);
+			}
+		});
+
+		this.setCategoricalDataFields(categoricalData2);
+		this.setChartData(categoricalData2);
+
+		this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
+
+		if (this.isExpandAllApplied) { RenderExpandAllYAxis(this, categoricalData2); }
+
+		this.configLegend();
+
+		if (smallMultiplesGridItemContent) {
+			if (this.smallMultiplesSettings.xAxisType === ESmallMultiplesAxisType.Individual) {
+				this.xAxisG = d3.select(smallMultiplesGridItemContent.xAxisG);
+			}
+
+			this.yAxisG = d3.select(config.SMUniformYAxisG);
+
+			this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
+
+			this.initAndRenderLollipopChart(categoricalData22, chartData22, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+		} else {
+			this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, this.width, scaleHeight, config.isShowXAxis, config.isShowYAxis);
+		}
+
+		this.brushG.attr("display", "block");
 	}
 
 	drawVerticalBrush(self: Visual, config: IBrushConfig): void {
@@ -7078,88 +7076,8 @@ export class Visual extends Shadow {
 				this.newScaleDomainByBrush = newXScaleDomain;
 
 				if (this.newScaleDomainByBrush.length < xScaleDomain.length || this.isExpandAllApplied || this.brushAndZoomAreaSettings.enabled) {
-					// TEST
-					const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-					);
-
-					if (startIndex2 === -1 || endIndex2 === -1) { return; }
-
-					const categoricalData22 = cloneDeep(this.SMCategoricalData);
-
-					categoricalData22.categories.forEach((d, i) => {
-						d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
-					});
-
-					categoricalData22.values.forEach((d, i) => {
-						d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
-
-						if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
-					});
-
-					this.setCategoricalDataFields(categoricalData22);
-					this.setChartData(categoricalData22);
-
-					const chartData22 = cloneDeep(this.chartData);
-
-					let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
-					let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
-						this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
-					);
-
-					if (startIndex === -1) {
-						startIndex = 0;
-					}
-
-					if (endIndex === -1) {
-						endIndex = this.newScaleDomainByBrush.length - 1;
-					}
-
-					// if (startIndex === -1 || endIndex === -1) { return; }
-
-					if (startIndex === -1 || endIndex === -1) { return; }
-
-					const categoricalData2 = cloneDeep(categoricalData);
-
-					categoricalData2.categories.forEach((d, i) => {
-						d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
-					});
-
-					categoricalData2.values.forEach((d, i) => {
-						d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
-
-						if (d.highlights) { d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1); }
-					});
-
-					this.setCategoricalDataFields(categoricalData2);
-					this.setChartData(categoricalData2);
-
-					this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
-
-					this.configLegend();
-
-					if (smallMultiplesGridItemContent) {
-						this.xAxisG = d3.select(config.SMUniformXAxisG);
-
-						if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
-							this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
-						}
-
-						this.viewPortWidth = smallMultiplesGridItemContent.width;
-						this.viewPortHeight = smallMultiplesGridItemContent.height;
-
-						this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
-
-						this.initAndRenderLollipopChart(categoricalData22, chartData22, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-
-						this.xAxisG.attr("transform", `translate(${0}, ${0})`);
-					} else {
-						this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
-					}
-
 					isBrushRendered = true;
-					this.brushG.attr("display", "block");
+					this.horizontalBrushedExtended(config, scaleWidth, categoricalData, d, smallMultiplesGridItemContent);
 				} else {
 					isBrushRendered = false;
 					this.isScrollBrushDisplayed = false;
@@ -7178,6 +7096,84 @@ export class Visual extends Shadow {
 
 		return { brushG, isBrushRendered };
 	};
+
+	horizontalBrushedExtended(config: IBrushConfig, scaleWidth: number, categoricalData: powerbi.DataViewCategorical, d, smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
+		// TEST
+		const startIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+		const endIndex2 = this.SMCategoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+			this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+		);
+
+		if (startIndex2 === -1 || endIndex2 === -1) { return; }
+
+		const categoricalData22 = cloneDeep(this.SMCategoricalData);
+
+		categoricalData22.categories.forEach((d, i) => {
+			d.values = categoricalData22.categories[i].values.slice(startIndex2, endIndex2 + 1);
+		});
+
+		categoricalData22.values.forEach((d, i) => {
+			d.values = categoricalData22.values[i].values.slice(startIndex2, endIndex2 + 1);
+
+			if (d.highlights) { d.highlights = categoricalData22.values[i].highlights.slice(startIndex2, endIndex2 + 1); }
+		});
+
+		this.setCategoricalDataFields(categoricalData22);
+		this.setChartData(categoricalData22);
+
+		const chartData22 = cloneDeep(this.chartData);
+
+		let startIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.indexOf(this.newScaleDomainByBrush[0]);
+		let endIndex = categoricalData.categories[this.categoricalCategoriesLastIndex].values.lastIndexOf(
+			this.newScaleDomainByBrush[this.newScaleDomainByBrush.length - 1]
+		);
+
+		if (startIndex === -1) { startIndex = 0; }
+
+		if (endIndex === -1) { endIndex = this.newScaleDomainByBrush.length - 1; }
+
+		if (startIndex === -1 || endIndex === -1) { return; }
+
+		const categoricalData2 = cloneDeep(categoricalData);
+
+		categoricalData2.categories.forEach((d, i) => {
+			d.values = categoricalData2.categories[i].values.slice(startIndex, endIndex + 1);
+		});
+
+		categoricalData2.values.forEach((d, i) => {
+			d.values = categoricalData2.values[i].values.slice(startIndex, endIndex + 1);
+
+			if (d.highlights) { d.highlights = categoricalData2.values[i].highlights.slice(startIndex, endIndex + 1); }
+		});
+
+		this.setCategoricalDataFields(categoricalData2);
+		this.setChartData(categoricalData2);
+
+		this.smallMultiplesGridItemContent[d.content.category].chartData = this.chartData;
+
+		this.configLegend();
+
+		if (smallMultiplesGridItemContent) {
+			this.xAxisG = d3.select(config.SMUniformXAxisG);
+
+			if (this.smallMultiplesSettings.yAxisType === ESmallMultiplesAxisType.Individual) {
+				this.yAxisG = d3.select(smallMultiplesGridItemContent.yAxisG);
+			}
+
+			this.viewPortWidth = smallMultiplesGridItemContent.width;
+			this.viewPortHeight = smallMultiplesGridItemContent.height;
+
+			this.setBrushSMGridItemContent(smallMultiplesGridItemContent);
+
+			this.initAndRenderLollipopChart(categoricalData22, chartData22, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+
+			this.xAxisG.attr("transform", `translate(${0}, ${0})`);
+		} else {
+			this.initAndRenderLollipopChart(categoricalData2, this.smallMultiplesGridItemContent[d.content.category].chartData, scaleWidth, this.height, config.isShowXAxis, config.isShowYAxis);
+		}
+
+		this.brushG.attr("display", "block");
+	}
 
 	drawHorizontalBrush(self: Visual, config: IBrushConfig): void {
 		const width = config.width;
