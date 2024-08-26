@@ -5265,10 +5265,6 @@ export class Visual extends Shadow {
 
 		this.filteredChartData = this.chartData.filter(d => {
 			if (this.isHorizontalChart) {
-				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
-					return false;
-				}
-
 				if (this.xAxisSettings.isMinimumRangeEnabled) {
 					if (d.value1 < this.xAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.xAxisSettings.minimumRange : false)) {
 						return false;
@@ -5279,10 +5275,6 @@ export class Visual extends Shadow {
 					return true;
 				}
 			} else {
-				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
-					return false;
-				}
-
 				if (this.yAxisSettings.isMinimumRangeEnabled) {
 					if (d.value1 < this.yAxisSettings.minimumRange || (this.isHasMultiMeasure ? d.value2 < this.yAxisSettings.minimumRange : false)) {
 						return false;
@@ -10699,11 +10691,11 @@ export class Visual extends Shadow {
 
 		this.filteredChartData = this.filteredChartData.filter(d => {
 			if (this.isHorizontalChart) {
-				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+				if (this.yScale(d.category) === undefined) {
 					return false;
 				}
 			} else {
-				if (!this.xScale(d.category) || this.xScale(d.category) < 0) {
+				if (this.xScale(d.category) === undefined) {
 					return false;
 				}
 			}
