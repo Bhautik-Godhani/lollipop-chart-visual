@@ -4410,7 +4410,7 @@ export class Visual extends Shadow {
 		const i = this.categoricalDataPairs.findIndex(s => s.category === d.category);
 		if (this.isLollipopTypeCircle) {
 			if (c.valueType === ECFValueTypes.Ranking) {
-				if (c.rankingType === ECFRankingTypes.TopN) {
+				if (this.isHorizontalChart ? c.rankingType === ECFRankingTypes.BottomN : c.rankingType === ECFRankingTypes.TopN) {
 					if (i < c.staticRankingValue) {
 						if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 							this.categoryColorPair[d.category].marker1Color = c.color;
@@ -4431,7 +4431,7 @@ export class Visual extends Shadow {
 							this.CFCategoryColorPair[d.category].isLabelColor = true;
 						}
 					}
-				} else if (c.rankingType === ECFRankingTypes.BottomN) {
+				} else if (this.isHorizontalChart ? c.rankingType === ECFRankingTypes.TopN : c.rankingType === ECFRankingTypes.BottomN) {
 					if (i > ((this.categoricalDataPairs.length - 1) - c.staticRankingValue)) {
 						if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 							this.categoryColorPair[d.category].marker1Color = c.color;
@@ -4458,7 +4458,7 @@ export class Visual extends Shadow {
 			d.subCategories.forEach(s => {
 				conditionalFormattingConditions.forEach((c) => {
 					if (c.valueType === ECFValueTypes.Ranking) {
-						if (c.rankingType === ECFRankingTypes.TopN) {
+						if (this.isHorizontalChart ? c.rankingType === ECFRankingTypes.BottomN : c.rankingType === ECFRankingTypes.TopN) {
 							if (i < c.staticRankingValue) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
@@ -4478,7 +4478,7 @@ export class Visual extends Shadow {
 									this.CFSubCategoryColorPair[`${d.category}-${s.category}`].isLineColor = true;
 								}
 							}
-						} else if (c.rankingType === ECFRankingTypes.BottomN) {
+						} else if (this.isHorizontalChart ? c.rankingType === ECFRankingTypes.TopN : c.rankingType === ECFRankingTypes.BottomN) {
 							if (i > ((this.categoricalDataPairs.length - 1) - c.staticRankingValue)) {
 								if (c.applyOnCategories.includes(ECFApplyOnCategories.Marker)) {
 									this.subCategoryColorPair[`${d.category}-${s.category}`].marker1Color = c.color;
