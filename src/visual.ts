@@ -6864,6 +6864,8 @@ export class Visual extends Shadow {
 		RenderReferenceLines(this, this.referenceLinesData as IReferenceLineSettings[]);
 
 		this.drawLollipopChart();
+
+		this.drawXYAxisTitle();
 	}
 
 	setBrushSMGridItemContent(smallMultiplesGridItemContent: ISmallMultiplesGridItemContent): void {
