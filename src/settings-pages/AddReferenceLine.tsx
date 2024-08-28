@@ -738,7 +738,7 @@ const UILabelStyles1 = (shadow: Visual, config: IReferenceLineSettings, configVa
   </>
 }
 
-const UIFooter = (isAddNew: boolean, index, configValues, validateField, onAdd, onUpdate, closeCurrentSettingHandler: () => void, handleChangeContent: (path: string) => void, resetChanges) => {
+const UIFooter = (errors, setErros, isAddNew: boolean, index, configValues, validateField, onAdd, onUpdate, closeCurrentSettingHandler: () => void, handleChangeContent: (path: string) => void, resetChanges) => {
   const handleAdd = () => {
     const values = configValues.lineValue1;
 
@@ -748,7 +748,7 @@ const UIFooter = (isAddNew: boolean, index, configValues, validateField, onAdd, 
 
     if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
     if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
-    if (values.type === "ranking" && !validateField("rank", false)) return;
+    if (values.type === "ranking" && !validateField("rank", false, errors, configValues, setErros)) return;
 
     if (configValues.referenceType === EReferenceType.REFERENCE_BAND) {
       const values = configValues.lineValue2;
@@ -759,7 +759,7 @@ const UIFooter = (isAddNew: boolean, index, configValues, validateField, onAdd, 
 
       if (values.type === "value" && values.axis === EXYAxisNames.Y && values.computation === EReferenceLineComputation.Fixed && !values.value) return;
       if (values.type === "value" && values.axis === EXYAxisNames.X && !values.value) return;
-      if (values.type === "ranking" && !validateField("rank", true)) return;
+      if (values.type === "ranking" && !validateField("rank", true, errors, configValues, setErros)) return;
     }
 
     handleChangeContent("homePage");
@@ -1201,7 +1201,7 @@ const getALIGNMENT_OPTIONS = (shadow, configValues) => {
   return ALIGNMENT_OPTIONS;
 }
 
-const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues) => {
+const UIMain = (errors, setErrors, index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues) => {
   return <>
     <PopupModHeader
       title={isAddNew ? (isLineUI ? "New Reference Line" : "New Reference Band") : (isLineUI ? "Edit Reference Line" : "Edit Reference Band")}
@@ -1228,7 +1228,7 @@ const UIMain = (index, onadd, onupdate, isAddNew, isLineUI, vizOptions, shadow, 
       {UIReferenceBand(vizOptions, shadow, configValues, isLineUI, isAddNew, details, setConfigValues, handleCheckbox, handleChange)}
     </ConditionalWrapper>
 
-    {UIFooter(isAddNew, index, configValues, validateField, onadd, onupdate, closeCurrentSettingHandler, handleChangeContent, resetChanges)}
+    {UIFooter(errors, setErrors, isAddNew, index, configValues, validateField, onadd, onupdate, closeCurrentSettingHandler, handleChangeContent, resetChanges)}
   </>
 }
 
@@ -1437,7 +1437,7 @@ const AddReferenceLines = ({ shadow, details, isLineUI, onAdd, onUpdate, index, 
 
   return (
     <>
-      {UIMain(index, onAdd, onUpdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues)}
+      {UIMain(errors, setErros, index, onAdd, onUpdate, isAddNew, isLineUI, vizOptions, shadow, configValues, details, closeAddEdit, closeCurrentSettingHandler, handleChangeContent, setConfigValues)}
     </>
   );
 };
