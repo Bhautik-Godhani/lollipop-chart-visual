@@ -8472,11 +8472,11 @@ export class Visual extends Shadow {
 			.attr("dx", "0")
 			// .attr("dx", isApplyTilt && !this.isHorizontalBrushDisplayed && !this.isExpandAllApplied ? "-10.5px" : "0")
 			.attr("dy", () => {
-				if (((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
-					return 0;
-				} else {
-					return ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em"));
-				}
+				// if (((this.isExpandAllApplied && this.isXIsNumericAxis) || this.isXIsNumericAxis) && xAxisSettings.isLabelAutoTilt) {
+				// 	return 0;
+				// } else {
+				return ((rotateDegree < 0 ? negTiltDx(rotateDegree) : posTiltDx(rotateDegree)).toString().concat("em"));
+				// }
 			})
 			.attr("y", () => {
 				const y = isApplyTilt ? getY9(rotateDegree) : 9;
