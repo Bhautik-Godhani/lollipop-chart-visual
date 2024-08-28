@@ -8460,10 +8460,10 @@ export class Visual extends Shadow {
 			rotateDegree = 0;
 		}
 
-		this.setXYAxisTickStyleExtended1(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
+		this.setXAxisTickStyleExtended1(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
 	}
 
-	setXYAxisTickStyleExtended1(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
+	setXAxisTickStyleExtended1(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
 		const xAxisSettings = this.xAxisSettings;
 		const posTiltDx = d3.scaleLinear().domain([30, 90]).range([0.35, -0.5]);
 		const negTiltDx = d3.scaleLinear().domain([-30, -90]).range([0.35, -0.5]);
@@ -8511,10 +8511,10 @@ export class Visual extends Shadow {
 		// 	}
 		// })
 
-		this.setXYAxisTickStyleExtended2(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
+		this.setXAxisTickStyleExtended2(isApplyTilt, xAxisMaxWordHeight, maxWidth, xAxisTickHeight, rotateDegree, xAxisMaxHeight);
 	}
 
-	setXYAxisTickStyleExtended2(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
+	setXAxisTickStyleExtended2(isApplyTilt: boolean, xAxisMaxWordHeight: number, maxWidth: number, xAxisTickHeight: number, rotateDegree: number, xAxisMaxHeight: number): void {
 		const ticks = [];
 		const xAxisSettings = this.xAxisSettings;
 
@@ -8930,10 +8930,10 @@ export class Visual extends Shadow {
 		if (this.isHorizontalChart) {
 			if ((this.yAxisSettings.position === Position.Left && !this.xAxisSettings.isInvertRange)
 				|| (this.yAxisSettings.position === Position.Right && this.xAxisSettings.isInvertRange)) {
-				startDiff = negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0);
+				startDiff = negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel && !this.isAllNegativeValue) ? outsideDataLabelWidth : 0);
 				endDiff = -outsideDataLabelWidth;
 			} else {
-				startDiff = -(negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel) ? outsideDataLabelWidth : 0));
+				startDiff = -(negDataLabelWidth + this.maxCircleXScaleDiff + this.maxPieXScaleDiff + ((isBottomOutsideLabel && !this.isAllNegativeValue) ? outsideDataLabelWidth : 0));
 				endDiff = outsideDataLabelWidth;
 			}
 		} else {
