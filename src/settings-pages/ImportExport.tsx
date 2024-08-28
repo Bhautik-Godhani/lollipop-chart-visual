@@ -7,9 +7,9 @@ import TooltipElement from "@truviz/shadow/dist/Components/Label/TooltipElement"
 import { EVisualConfig, EVisualSettings } from "../enum";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
-const UIMain = (shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler,
+const UIMain = (vizOptions: ShadowUpdateOptions, shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler,
   clearUploadStatus, setSelectedTab, setIsThemeApplied, changeView, changeValue, copyThemeText, showDownloadNote, copyTheme, urlData, downloadTheme, jsonString,
-  closeCurrentSettingHandler, applyThemeJson) => {
+  closeCurrentSettingHandler, applyThemeJson, sectionName, propertyName, setDetails) => {
   return <>
     <Row>
       <Column>
@@ -59,7 +59,7 @@ const UIMain = (shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, ha
         saveButtonConfig={{
           isDisabled: false,
           text: "IMPORT",
-          handler: () => applyThemeJson(details.value)
+          handler: () => applyThemeJson(vizOptions, shadow, details.value, getConfig, sectionName, propertyName, closeCurrentSettingHandler, setDetails)
         }}
         resetButtonHandler={() => {
           setIsThemeApplied(false);
@@ -217,10 +217,10 @@ const getConfig = (vizOptions: ShadowUpdateOptions) => {
   return obj;
 }
 
-const applyThemeJson = (shadow, json, getConfig, sectionName, propertyName, closeCurrentSettingHandler, setDetails) => {
+const applyThemeJson = (vizOptions: ShadowUpdateOptions, shadow, json, getConfig, sectionName, propertyName, closeCurrentSettingHandler, setDetails) => {
   try {
     const obj = typeof json === "object" ? json : JSON.parse(json);
-    const keys = Object.keys(getConfig());
+    const keys = Object.keys(getConfig(vizOptions));
     const mergeObject = [];
     keys.forEach(el => {
       if (el === "conditionalFormatting" || el === "annotations") {
@@ -387,9 +387,9 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
 
   return (
     <>
-      {UIMain(shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setSelectedTab,
+      {UIMain(vizOptions, shadow, selectedTab, isThemeApplied, details, IMPORT_OPTIONS, handleUploadClick, hiddenFileInput, uploadHandler, clearUploadStatus, setSelectedTab,
         setIsThemeApplied, changeView, changeValue, copyThemeText, showDownloadNote, copyTheme, urlData, downloadTheme, jsonString, closeCurrentSettingHandler,
-        applyThemeJson
+        applyThemeJson, sectionName, propertyName, setDetails
       )}
     </>
   );
