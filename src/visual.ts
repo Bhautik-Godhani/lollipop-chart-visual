@@ -7294,7 +7294,7 @@ export class Visual extends Shadow {
 
 			this.newScaleDomainByBrush = newYScaleDomain;
 
-			if (newYScaleDomain.length < this.brushScaleBand.domain().length) {
+			if ((newYScaleDomain.length < this.brushScaleBand.domain().length) || this.brushAndZoomAreaSettings.enabled) {
 				this.isScrollBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = false;
@@ -7345,7 +7345,7 @@ export class Visual extends Shadow {
 
 			this.newScaleDomainByBrush = newXScaleDomain;
 
-			if (newXScaleDomain.length < this.brushScaleBand.domain().length) {
+			if ((newXScaleDomain.length < this.brushScaleBand.domain().length) || this.brushAndZoomAreaSettings.enabled) {
 				this.isScrollBrushDisplayed = true;
 				this.isHorizontalBrushDisplayed = true;
 				this.isVerticalBrushDisplayed = false;
