@@ -16,7 +16,6 @@ import ISelectionManager = powerbi.extensibility.ISelectionManager;
 import IDownloadService = powerbi.extensibility.IDownloadService;
 
 import * as d3 from "d3";
-import 'd3-transition';
 import { easeLinear } from "d3";
 import { IBrushLollipopChartData, IChartSubCategory, IErrorBarValue, ILollipopChartRow, IValueFormatter, TooltipData } from "./model";
 import {
@@ -886,7 +885,7 @@ export class Visual extends Shadow {
 		title: "Lollipop Chart",
 		versionInfo: "1.0.0.0",
 		description:
-			"The Powerviz Lollipop chart is an advanced chart that is a bar chart where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart includes vertical and horizontal styles, IBCS templates, small multiples, race charts, etc.​",
+			"The Powerviz Lollipop chart is an advanced chart that is a bar chart where the bar is transformed into a line and a dot. This chart effectively illustrates the connection between numerical and categorical variables or depicts trends over time. This advanced lollipop chart includes vertical and horizontal styles, IBCS templates, small multiples, race charts, etc.",
 		sliderImages: [
 			{
 				imageUrl: require("../assets/landing-pages-2/page1.png"),
@@ -1785,7 +1784,7 @@ export class Visual extends Shadow {
 
 		this.measureNamesByTotal = [];
 		const measureGroup = d3.group(categoricalMeasureFields, d => d.source.displayName);
-		[...new Set(measureGroup.keys())].forEach(d => {
+		[...new Set(measureGroup.keys())].forEach((d: string) => {
 			this.measureNamesByTotal.push({ name: d, total: d3.max(measureGroup.get(d), d => d3.sum(d.values, t => +t)) });
 		});
 
