@@ -236,7 +236,7 @@ const CutAndClipAxisSettings = (props) => {
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
-        saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
+        saveButtonConfig={{ isDisabled: shadow.isChartIsRaceChart || shadow.isSmallMultiplesEnabled, text: "APPLY", handler: applyChanges }}
         resetButtonHandler={resetChanges}
       />
     </>

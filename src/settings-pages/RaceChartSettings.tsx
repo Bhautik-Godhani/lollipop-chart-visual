@@ -386,7 +386,7 @@ const RaceChartSettings = (props) => {
 
       <Footer
         cancelButtonHandler={closeCurrentSettingHandler}
-        saveButtonConfig={{ isDisabled: false, text: "APPLY", handler: applyChanges }}
+        saveButtonConfig={{ isDisabled: shadow.isSmallMultiplesEnabled || !shadow.isChartRacePossible, text: "APPLY", handler: applyChanges }}
         resetButtonHandler={resetChanges}
       />
     </>

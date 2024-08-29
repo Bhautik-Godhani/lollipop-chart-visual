@@ -179,12 +179,12 @@ const UIGeneralChartSettings = (
 	);
 };
 
-const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+const UIFooter = (shadow: Visual, closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
 			cancelButtonHandler={closeCurrentSettingHandler}
 			saveButtonConfig={{
-				isDisabled: false,
+				isDisabled: shadow.isSmallMultiplesEnabled || shadow.isChartIsRaceChart,
 				text: "APPLY",
 				handler: applyChanges,
 			}}
@@ -259,7 +259,7 @@ const BrushAndZoomAreaSettings = (props) => {
 				{UIGeneralChartSettings(shadow, vizOptions, configValues, setConfigValues)}
 			</ConditionalWrapper>
 
-			{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+			{UIFooter(shadow, closeCurrentSettingHandler, applyChanges, resetChanges)}
 		</>
 	);
 };

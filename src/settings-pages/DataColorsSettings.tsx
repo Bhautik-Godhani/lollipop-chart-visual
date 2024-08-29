@@ -544,16 +544,16 @@ const UIMain = (
 			</Row>
 		</ConditionalWrapper>
 
-		{UIFooter(closeCurrentSettingHandler, applyChanges, resetChanges)}
+		{UIFooter(shadow, closeCurrentSettingHandler, applyChanges, resetChanges)}
 	</>
 }
 
-const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+const UIFooter = (shadow: Visual, closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
 			cancelButtonHandler={closeCurrentSettingHandler}
 			saveButtonConfig={{
-				isDisabled: false,
+				isDisabled: (shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.IMAGES || (shadow as Visual).markerSettings.marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON,
 				text: "APPLY",
 				handler: applyChanges,
 			}}
