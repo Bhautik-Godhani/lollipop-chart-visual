@@ -84,12 +84,16 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
         if (self.isBottomXAxis) {
             const ticks: D3Selection<SVGElement> = self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text");
             // if (ticks.nodes().length > 1) {
-            ticks.attr("dy", `${ticks.nodes()[0].getBoundingClientRect().height}px`);
+            if (ticks.nodes()[0]) {
+                ticks.attr("dy", `${ticks.nodes()[0].getBoundingClientRect().height}px`);
+            }
             // }
             self.afterCutLinearYAxisG.select(".tick").select("text").attr("dy", "0.32em");
         } else {
             const tick = self.afterCutLinearYAxisG.select(".tick").select("text");
-            tick.attr("dy", `${tick.node().getBBox().height}px`);
+            if (tick.node()) {
+                tick.attr("dy", `${tick.node().getBBox().height}px`);
+            }
             self.beforeCutLinearYAxisG.selectAll(".tick:last-of-type text").attr("dy", "0");
         }
     } else {
@@ -99,10 +103,14 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
             self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "middle");
             // }
             const tick = self.afterCutLinearXAxisG.select(".tick").select("text");
-            tick.attr("dx", `${tick.node().getBBox().width}px`).attr("text-anchor", "middle");
+            if (tick.node()) {
+                tick.attr("dx", `${tick.node().getBBox().width}px`).attr("text-anchor", "middle");
+            }
         } else {
             const tick = self.afterCutLinearXAxisG.select(".tick").select("text");
-            tick.attr("dx", `-${tick.node().getBBox().width}px`).attr("text-anchor", "end");
+            if (tick.node()) {
+                tick.attr("dx", `-${tick.node().getBBox().width}px`).attr("text-anchor", "end");
+            }
             self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "0.32em").attr("text-anchor", "end");
         }
     }

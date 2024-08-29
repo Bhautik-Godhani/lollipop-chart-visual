@@ -6855,6 +6855,8 @@ export class Visual extends Shadow {
 			}
 		}
 
+		this.isCutAndClipAxisEnabled = GetIsCutAndClipAxisEnabled(this) && !this.isChartIsRaceChart;
+
 		this.drawCutAndClipAxis();
 
 		this.drawXGridLines();
