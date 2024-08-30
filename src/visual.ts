@@ -6011,7 +6011,7 @@ export class Visual extends Shadow {
 
 	setCircleColors(): void {
 		const marker = this.dataColorsSettings;
-		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : this.categoricalDataPairs;
+		const keys = this.isHasMultiMeasure && this.isLollipopTypeCircle ? this.measureNames : (this.dataColorsSettings.fillType === ColorPaletteType.Gradient ? this.sortedCategoricalDataPairs : this.categoricalDataPairs);
 
 		const getMarkerSeqColorsArray = (marker: IDataColorsSettings) => {
 			const markerInterval = Math.ceil(keys.length / marker.schemeColors.length);
