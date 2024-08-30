@@ -1806,12 +1806,7 @@ export class Visual extends Shadow {
 
 		this.setCategoricalDataPairs(categoricalData, categoricalSmallMultiplesDataFields, categoricalCategoriesLastIndex);
 
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter(d => d.category !== null && d.category !== undefined);
-
 		const measureKeys = categoricalMeasureFields.map((d) => this.isHasSubcategories ? (EDataRolesName.Measure + d.source.index + d.source.groupName) : (EDataRolesName.Measure + d.source.index));
-
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !d.hasNegative && !d.hasZero);
-		// this.categoricalDataPairs = this.categoricalDataPairs.filter((d) => !measureKeys.every((m) => d[m] === 0));
 
 		const clonedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
 		this.defaultSortCategoryDataPairs(clonedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
@@ -1819,7 +1814,14 @@ export class Visual extends Shadow {
 		this.categoricalDataPairs = clonedCategoricalDataPairs;
 		this.setCategoricalDataPairsByRanking();
 
-		this.sortedCategoricalDataPairs = cloneDeep(clonedCategoricalDataPairs);
+		const sortedCategoricalDataPairs = cloneDeep(this.categoricalDataPairs);
+		this.sortedCategoricalDataPairs = sortedCategoricalDataPairs.filter(d => {
+			if (this.dataColorsSettings.isCustomizeCategoryOthersColor) {
+				if (d.category === this.othersBarText) { return false }
+			}
+			return true;
+		});
+		this.defaultSortCategoryDataPairs(this.sortedCategoricalDataPairs, measureKeys, categoricalMeasureFields);
 
 		if (this.sortingSettings.category.enabled) {
 			const sortFields = categoricalSortFields.filter((d) => d.source.displayName === this.sortingSettings.category.sortBy);
