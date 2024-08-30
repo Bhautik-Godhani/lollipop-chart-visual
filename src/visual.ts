@@ -1448,11 +1448,9 @@ export class Visual extends Shadow {
 			// 	}
 			// } else {
 			if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-				data.sort((a, b) => {
-					return this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b);
-				});
+				data.sort((a, b) => getValue(a) - getValue(b));
 			} else {
-				data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
+				data.sort((a, b) => getValue(b) - getValue(a));
 			}
 			// }
 		};
@@ -1499,11 +1497,7 @@ export class Visual extends Shadow {
 					return value;
 				}, 0);
 
-			if (this.isHorizontalChart) {
-				data.sort((a, b) => (this.isHorizontalChart ? getValue(b) - getValue(a) : getValue(a) - getValue(b)));
-			} else {
-				data.sort((a, b) => (this.isHorizontalChart ? getValue(a) - getValue(b) : getValue(b) - getValue(a)));
-			}
+			data.sort((a, b) => getValue(b) - getValue(a));
 		};
 
 		if (this.isHasMultiMeasure || this.isHasSubcategories) {
