@@ -6439,7 +6439,7 @@ export class Visual extends Shadow {
 		}
 	}
 
-	verticalBrushMethod(config: IBrushConfig, selection, scaleHeight: number): { isBrushRendered: boolean } {
+	verticalBrushMethod(config: IBrushConfig, selection, scaleHeight: number, brushLollipopChartMarker: IMarkerData): { isBrushRendered: boolean } {
 		let isBrushRendered: boolean = false;
 		const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
 		const yScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.yScale : this.yScale;
@@ -6466,7 +6466,7 @@ export class Visual extends Shadow {
 		if (brushArea === null) brushArea = this.yScale.range();
 
 		yScaleDomain.forEach((d, i) => {
-			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) : 0)
+			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) - brushLollipopChartMarker.h : 0)
 			if (pos >= brushArea[0] && pos <= brushArea[1]) {
 				newYScaleDomain.push(d);
 
@@ -6543,7 +6543,7 @@ export class Visual extends Shadow {
 		return { isBrushRendered };
 	}
 
-	verticalBrushed(config: IBrushConfig, selection, scaleHeight: number): { isBrushRendered: boolean } {
+	verticalBrushed(config: IBrushConfig, selection, scaleHeight: number, brushLollipopChartMarker: IMarkerData): { isBrushRendered: boolean } {
 		let isBrushRendered: boolean = false;
 		if (this.isExpandAllApplied) {
 			this.expandAllCategoriesName.forEach((d) => {
@@ -6592,7 +6592,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse();
 
 				yScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) : 0);
+					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) - brushLollipopChartMarker.h : 0);
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newYScaleDomain.push(d);
 
@@ -6623,7 +6623,7 @@ export class Visual extends Shadow {
 				}
 			});
 		} else {
-			this.verticalBrushMethod(config, selection, scaleHeight);
+			this.verticalBrushMethod(config, selection, scaleHeight, brushLollipopChartMarker);
 		}
 
 		return { isBrushRendered };
@@ -6712,6 +6712,7 @@ export class Visual extends Shadow {
 		const scaleHeight: number = config.scaleHeight;
 		const categoricalData: any = cloneDeep(config.categoricalData);
 		let isBrushRendered: boolean = false;
+		const brushLollipopChartMarker = this.getBrushLollipopChartMarker();
 
 		this.brushScaleBand.range(this.isBottomXAxis ? this.yScale.range() : this.yScale.range().reverse());
 
@@ -6724,7 +6725,7 @@ export class Visual extends Shadow {
 		});
 
 		const brushed = ({ selection }) => {
-			const { isBrushRendered: isBrushRendered1 } = this.verticalBrushed(config, selection, scaleHeight);
+			const { isBrushRendered: isBrushRendered1 } = this.verticalBrushed(config, selection, scaleHeight, brushLollipopChartMarker);
 			isBrushRendered = isBrushRendered1;
 		}
 
@@ -6894,7 +6895,7 @@ export class Visual extends Shadow {
 		this.errorBarsMarkerPath = smallMultiplesGridItemContent.errorBarsMarkerPath;
 	}
 
-	horizontalBrushMethod(config: IBrushConfig, smallMultiplesGridItemContent: ISmallMultiplesGridItemContent, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number): { brushG: SVGElement, isBrushRendered: boolean } {
+	horizontalBrushMethod(config: IBrushConfig, smallMultiplesGridItemContent: ISmallMultiplesGridItemContent, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number, brushLollipopChartMarker: IMarkerData): { brushG: SVGElement, isBrushRendered: boolean } {
 		let brushG: SVGElement = config.brushG;
 		let isBrushRendered: boolean = false;
 		const xScale = smallMultiplesGridItemContent ? smallMultiplesGridItemContent.xScale : this.xScale;
@@ -6923,7 +6924,7 @@ export class Visual extends Shadow {
 		if (brushArea === null) brushArea = (this.isLeftYAxis ? xScale.range() : xScale.range().reverse());
 
 		xScaleDomain.forEach((d, i) => {
-			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) : 0);
+			const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) - brushLollipopChartMarker.w : 0);
 			if (pos >= brushArea[0] && pos <= brushArea[1]) {
 				newXScaleDomain.push(d);
 
@@ -7005,7 +7006,7 @@ export class Visual extends Shadow {
 		return { brushG, isBrushRendered };
 	}
 
-	horizontalBrushed = (config: IBrushConfig, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number): { brushG: SVGElement, isBrushRendered: boolean } => {
+	horizontalBrushed = (config: IBrushConfig, categoricalData: powerbi.DataViewCategorical, selection, scaleWidth: number, brushLollipopChartMarker: IMarkerData): { brushG: SVGElement, isBrushRendered: boolean } => {
 		let isBrushRendered: boolean;
 		let brushG: SVGElement = config.brushG;
 
@@ -7054,7 +7055,7 @@ export class Visual extends Shadow {
 				if (brushArea === null) brushArea = xScale.range();
 
 				xScaleDomain.forEach((d, i) => {
-					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) : 0);
+					const pos = this.brushScaleBand(d) + (this.brushAndZoomAreaSettings.enabled ? (this.isLollipopTypePie ? this.brushScaleBandBandwidth / 4 : this.brushScaleBandBandwidth / 2) - brushLollipopChartMarker.w : 0);
 					if (pos >= brushArea[0] && pos <= brushArea[1]) {
 						newXScaleDomain.push(d);
 
@@ -7085,7 +7086,7 @@ export class Visual extends Shadow {
 			})
 		} else {
 			const smallMultiplesGridItemContent = this.smallMultiplesGridItemContent[config.smallMultiplesGridItemId];
-			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushMethod(config, smallMultiplesGridItemContent, categoricalData, selection, scaleWidth);
+			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushMethod(config, smallMultiplesGridItemContent, categoricalData, selection, scaleWidth, brushLollipopChartMarker);
 			brushG = brushG1; isBrushRendered = isBrushRendered1;
 		}
 
@@ -7179,6 +7180,7 @@ export class Visual extends Shadow {
 		const categoricalData: any = cloneDeep(config.categoricalData);
 		let isBrushRendered: boolean = false;
 		let brushG: SVGElement = config.brushG;
+		const brushLollipopChartMarker = this.getBrushLollipopChartMarker();
 
 		categoricalData.categories.forEach((d, i) => {
 			if (i < categoricalData.categories.length - 1) {
@@ -7191,7 +7193,7 @@ export class Visual extends Shadow {
 		// const minPos = this.getXPosition(xScaleDomain[this.yAxisSettings.position === Position.Left ? 0 : xScaleDomain.length - 1]);
 
 		const brushed = ({ selection }) => {
-			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushed(config, categoricalData, selection, scaleWidth);
+			const { brushG: brushG1, isBrushRendered: isBrushRendered1 } = this.horizontalBrushed(config, categoricalData, selection, scaleWidth, brushLollipopChartMarker);
 			isBrushRendered = isBrushRendered1;
 			brushG = brushG1;
 		}
@@ -12466,6 +12468,32 @@ export class Visual extends Shadow {
 		}
 	}
 
+	getBrushLollipopChartMarker(): IMarkerData {
+		let marker1: IMarkerData;
+
+		const marker1Style = this.markerSettings.marker1Style;
+
+		// marker 1
+		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
+			const markerShapeValue = marker1Style.markerShapeValue;
+			marker1 = {
+				label: marker1Style.markerShapeValue.iconName,
+				value: marker1Style.markerShapeValue.iconName,
+				w: markerShapeValue.icon[0],
+				h: markerShapeValue.icon[1],
+				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
+			}
+		} else {
+			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
+		}
+
+		if (this.markerSettings.markerType === EMarkerTypes.CHART || marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
+			marker1 = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
+		}
+
+		return marker1;
+	}
+
 	drawBrushLollipopChart(clonedCategoricalData: powerbi.DataViewCategorical): void {
 		const measures = clonedCategoricalData.values.filter((d) => !!d.source.roles[EDataRolesName.Measure]);
 		const subCategoriesGroup = d3.group(clonedCategoricalData.values, (d: any) => d.source.groupName);
@@ -12523,29 +12551,11 @@ export class Visual extends Shadow {
 			this.brushYScale.domain([min, max]);
 		}
 
-		let marker1: IMarkerData;
+		const marker1: IMarkerData = this.getBrushLollipopChartMarker();
 		let marker2: IMarkerData;
 
 		const marker1Style = this.markerSettings.marker1Style;
 		const marker2Style = this.markerSettings.marker2Style;
-
-		// marker 1
-		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker1Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
-			const markerShapeValue = marker1Style.markerShapeValue;
-			marker1 = {
-				label: marker1Style.markerShapeValue.iconName,
-				value: marker1Style.markerShapeValue.iconName,
-				w: markerShapeValue.icon[0],
-				h: markerShapeValue.icon[1],
-				paths: [{ d: marker1Style.markerShapePath, stroke: undefined }]
-			}
-		} else {
-			marker1 = CATEGORY_MARKERS.find(d => d.value === marker1Style.dropdownMarkerType);
-		}
-
-		if (this.markerSettings.markerType === EMarkerTypes.CHART || marker1Style.markerShape === EMarkerShapeTypes.UPLOAD_ICON) {
-			marker1 = CATEGORY_MARKERS.find(d => d.value === EMarkerDefaultShapes.CIRCLE);
-		}
 
 		// marker 2
 		if (this.markerSettings.markerType === EMarkerTypes.SHAPE && marker2Style.markerShape === EMarkerShapeTypes.ICONS_LIST) {
