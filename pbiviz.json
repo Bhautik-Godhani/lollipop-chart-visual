@@ -5,7 +5,7 @@
 		"guid": "lollipopChart50393786178B4137A75F3257CB590B96",
 		"visualClassName": "Visual",
 		"version": "1.0.0.0",
-		"description": "Dynamic Lollipop Chart",
+		"description": "The Powerviz Lollipop Chart is an advanced variation of a bar chart. It efficiently demonstrates the relationship between numerical and categorical data or showcases trends over time. This advanced lollipop chart includes Vertical And Horizontal Styles, IBCS Templates, Small Multiples, Race Charts, Reference Lines, Dynamic Deviation, and more.",
 		"supportUrl": "https://powerviz.ai/contactus",
 		"gitHubUrl": ""
 	},
