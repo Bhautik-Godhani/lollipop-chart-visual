@@ -8,7 +8,7 @@ import { RenderConnectingLine } from "./ConnectingLine.methods";
 import { EDataRolesName, ERankingCalcMethod, ERankingType, ESortOrderTypes } from "../enum";
 import { ISmallMultiplesGridItemContent, ISmallMultiplesGridLayoutSettings } from "../SmallMultiplesGridLayout";
 import { cloneDeep } from "lodash";
-import { CallExpandAllXScaleOnAxisGroup, RenderExpandAllXAxis } from "./expandAllXAxis.methods";
+import { RenderExpandAllXAxis } from "./expandAllXAxis.methods";
 import { MonthNames } from "../constants";
 import { ISortingProps } from "../visual-settings.interface";
 
@@ -135,7 +135,7 @@ export const DrawSmallMultipleBarChart = (self: Visual, config: ISmallMultiplesG
                     });
 
                     if (d.source.roles[EDataRolesName.SmallMultiples]) {
-                        d.values = d.values.map(d => self.othersBarText);
+                        d.values = d.values.map(_d => self.othersBarText);
                     }
                 });
 
@@ -690,9 +690,21 @@ const sortSmallMultiplesDataPairs = (
                     }
                 } else {
                     if (sortingSettings.sortOrder === ESortOrderTypes.ASC) {
-                        data.sort((a, b) => [categoryKey, ...smallMultiplesCategoryNames].map(d => a[d].localeCompare(b[d])).reduce((a, b) => { return a && b }, 1));
+                        data.sort((a, b) => {
+                            for (const d of [categoryKey, ...smallMultiplesCategoryNames]) {
+                                const comparison = a[d].localeCompare(b[d]);
+                                if (comparison !== 0) return comparison;
+                            }
+                            return 0;
+                        });
                     } else {
-                        data.sort((a, b) => [categoryKey, ...smallMultiplesCategoryNames].map(d => b[d].localeCompare(a[d])).reduce((a, b) => { return a && b }, 1));
+                        data.sort((a, b) => {
+                            for (const d of [categoryKey, ...smallMultiplesCategoryNames]) {
+                                const comparison = b[d].localeCompare(a[d]);
+                                if (comparison !== 0) return comparison;
+                            }
+                            return 0;
+                        });
                     }
                 }
             }

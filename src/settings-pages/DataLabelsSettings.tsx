@@ -509,7 +509,7 @@ const UIInsideLabelsTextColorSettings = (
 	</>
 }
 
-const UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
+const _UIFooter = (closeCurrentSettingHandler: () => void, applyChanges: () => void, resetChanges: () => void) => {
 	return (
 		<Footer
 			cancelButtonHandler={closeCurrentSettingHandler}
@@ -572,9 +572,9 @@ const DataLabelsSettings = (props) => {
 
 	const [selectedMeasure, setSelectedMeasure] = React.useState<EDataLabelsMeasureTypes>(EDataLabelsMeasureTypes.Measure1);
 
-	const chartSettings: IChartSettings = shadow.chartSettings;
+	const _chartSettings: IChartSettings = shadow.chartSettings;
 
-	const dataLabelsSettings: IDataLabelsSettings = JSON.parse(
+	const _dataLabelsSettings: IDataLabelsSettings = JSON.parse(
 		vizOptions.formatTab[EVisualConfig.DataLabelsConfig][EVisualSettings.DataLabelsSettings]
 	);
 

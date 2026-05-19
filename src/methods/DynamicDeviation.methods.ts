@@ -34,8 +34,7 @@ export const RenderDynamicDeviation = (self: Visual, from: ICategoryValuePair, t
 
     const dataLabelG = self.dynamicDeviationG.append("g").lower().attr("class", "dynamic-deviation-label");
 
-    let dataLabelText;
-    dataLabelText = dataLabelG
+    const dataLabelText = dataLabelG
         .append("text")
         .attr("fill", self.getColor(self.dynamicDeviationSettings.labelFontColor, EHighContrastColorType.Foreground))
         .attr("text-anchor", "start")
@@ -81,6 +80,7 @@ export const RemoveDynamicDeviation = (self: Visual): void => {
     self.dynamicDeviationG.selectAll("*").remove();
 }
 
+// eslint-disable-next-line max-lines-per-function
 export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
@@ -91,7 +91,7 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     const toCategoryYPos = self.getYPosition(to.category);
     const isFromCategoryYPosTrue = fromCategoryYPos !== undefined;
     const isToCategoryYPosTrue = toCategoryYPos !== undefined;
-    const isToGreaterThenFrom: Boolean = to.value > from.value;
+    const isToGreaterThenFrom: boolean = to.value > from.value;
     const hide = isToGreaterThenFrom ? isFromCategoryYPosTrue : isToCategoryYPosTrue;
     const start = isFromCategoryYPosTrue ? fromCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? self.height : 0) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? 0 : self.height) : self.height);
     const end = isToCategoryYPosTrue ? toCategoryYPos + self.scaleBandWidth / 2 : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.LastToFirstActual ? (self.isBottomXAxis ? 0 : self.height) : (dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.FirstToLastActual || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CustomRange || dynamicDeviationSettings.displayType === EDynamicDeviationDisplayTypes.CreateYourOwn) ? (self.isBottomXAxis ? self.height : 0) : 0);
@@ -286,15 +286,16 @@ export const RenderHorizontalDynamicDeviationLines = (self: Visual, from: ICateg
     dataLabelG.raise();
 }
 
+// eslint-disable-next-line max-lines-per-function
 export const RenderVerticalDynamicDeviationLines = (self: Visual, from: ICategoryValuePair, to: ICategoryValuePair, dataLabelG: D3Selection<SVGElement>): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const dataLabelBBox = (dataLabelG.node() as SVGSVGElement).getBBox();
     const labelToConnectorDistance = 10;
-    let dynamicDeviationSpace = 0;
+    let _dynamicDeviationSpace = 0;
     if (self.dynamicDeviationSettings.isEnabled) {
-        dynamicDeviationSpace = self.width * 0.05;
+        _dynamicDeviationSpace = self.width * 0.05;
     }
-    const xScaleWidth = Math.abs(self.xScale.range()[0] - self.xScale.range()[1]) - dataLabelBBox.width;
+    const _xScaleWidth = Math.abs(self.xScale.range()[0] - self.xScale.range()[1]) - dataLabelBBox.width;
     const fromCategoryXPos = self.getXPosition(from.category);
     const toCategoryXPos = self.getXPosition(to.category);
     const isFromCategoryXPosTrue = fromCategoryXPos !== undefined;
@@ -533,7 +534,7 @@ export const RenderDynamicDeviationIcon = (self: Visual): void => {
     //     HideStaticTooltip(self);
     // });
 
-    button.on("click", (e) => {
+    button.on("click", (_e) => {
         const buttonNode = button.node();
         buttonNode.classList.toggle("selected");
         if (buttonNode.classList.contains("selected")) {
@@ -553,6 +554,7 @@ export const RenderDynamicDeviationIcon = (self: Visual): void => {
     self.hostContainer.querySelector(".icons-bar #general-icons-wrapper").append(button.node());
 }
 
+// eslint-disable-next-line max-lines-per-function
 export const SetDynamicDeviationDataAndDrawLines = (self: Visual): void => {
     const dynamicDeviationSettings = self.dynamicDeviationSettings;
     const chartDataLength = self.chartData.length;

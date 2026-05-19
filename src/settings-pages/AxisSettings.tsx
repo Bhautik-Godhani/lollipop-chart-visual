@@ -1128,7 +1128,7 @@ const UIYAxis = (
 const XAxisSettings = (props) => {
   const {
     shadow,
-    compConfig: { sectionName, propertyName },
+    compConfig: { sectionName: _sectionName, propertyName: _propertyName },
     vizOptions,
     closeCurrentSettingHandler,
   } = props;

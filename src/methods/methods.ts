@@ -6,13 +6,13 @@ import { Visual } from "../visual";
 import crypto from "crypto";
 import { IConditionalFormattingProps } from "../visual-settings.interface";
 import { IValueFormatter, TooltipData } from "../model";
-import { ECFApplyOnCategories, ECFValueTypes, EChartSettings, EDataRolesName, EFontStyle, ETemplatesSettings, EVisualConfig, EVisualSettings } from "../enum";
+import { ECFApplyOnCategories, ECFValueTypes, EDataRolesName, EFontStyle, ETemplatesSettings, EVisualConfig, EVisualSettings } from "../enum";
 import { CATEGORY_MARKERS } from "../settings-pages/markers";
 import { ApplyBeforeIBCSAppliedSettingsBack } from "./IBCS.methods";
 import { select } from "d3-selection";
 import { PATTERNS } from "@truviz/shadow/dist/Components";
 
-export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any, isTemplateSettings = false) => {
+export const persistProperties = (shadow: Visual, configName: EVisualConfig, settingName: EVisualSettings, configValues: any, _isTemplateSettings = false) => {
 	if (shadow.templateSettings && shadow.templateSettings.isIBCSEnabled) {
 		ApplyBeforeIBCSAppliedSettingsBack(shadow);
 	}
@@ -134,7 +134,7 @@ export const GetWordsSplitByWidth = (text: string, textProperties: TextPropertie
 	return wordBreaker.splitByWidth(text.toString(), textProperties, calcTextWidth, maxWidth, maxLines, textTruncator);
 };
 
-const scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
+const _scaleNumber = (num, scaling): { n: number; scaledTo: string } => {
 	if (scaling === "auto") {
 		const l = Math.floor(num).toString().length;
 		if (l <= 3) {
@@ -462,7 +462,7 @@ export const parseConditionalFormatting = (SETTINGS) => {
 
 export const isConditionMatch = (category: string, subCategory: string, value1: number, value2: number, sValue1: number, sValue2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps[])
 	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
-	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, _measureType: EDataRolesName = undefined) => {
 		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;
@@ -617,7 +617,7 @@ export const isConditionMatch = (category: string, subCategory: string, value1: 
 
 export const isConditionMatch1 = (category: string, subCategory: string, value1: number, value2: number, sValue1: number, sValue2: number, tooltips: TooltipData[], flattened: IConditionalFormattingProps)
 	: { match: boolean, markerColor: string, labelColor: string, lineColor: string, sourceName?: string, measureType?: EDataRolesName } => {
-	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, measureType: EDataRolesName = undefined) => {
+	const isMeasureMatch = (result, el: IConditionalFormattingProps, value: number, sourceName: string, _measureType: EDataRolesName = undefined) => {
 		// const result = { match: false, markerColor: undefined, labelColor: undefined, lineColor: undefined, sourceName, measureType };
 		const v = +el.staticValue;
 		const v2 = el.secondaryStaticValue;

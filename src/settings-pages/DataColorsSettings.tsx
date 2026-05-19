@@ -261,7 +261,7 @@ const UIByCategoryColorPalette = (
 				const categoryName = textMeasurementService.getTailoredTextOrDefault(categoryNameProperties, 170);
 
 				return (
-					<Row classNames={["normal-text-overflow"]}>
+					<Row key={ci} classNames={["normal-text-overflow"]}>
 						<Column>
 							<ColorPicker
 								label={categoryName}
@@ -298,7 +298,7 @@ const UIBySubCategoryColorPalette = (
 				const categoryName = textMeasurementService.getTailoredTextOrDefault(categoryNameProperties, 170);
 
 				return (
-					<Row classNames={["normal-text-overflow"]}>
+					<Row key={ci} classNames={["normal-text-overflow"]}>
 						<Column>
 							<ColorPicker
 								label={categoryName}
@@ -453,7 +453,7 @@ const DataColors = (props) => {
 	const initialStates: typeof DATA_COLORS = parseObject(_initialStates, DATA_COLORS);
 	const rankingSettings = (shadow as Visual).rankingSettings;
 
-	const MARKER_TYPES: ILabelValuePair[] = [
+	const _MARKER_TYPES: ILabelValuePair[] = [
 		{
 			label: shadow.measure1DisplayName,
 			value: EMarkerColorTypes.Marker1,

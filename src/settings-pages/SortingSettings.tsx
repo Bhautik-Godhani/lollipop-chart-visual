@@ -304,7 +304,7 @@ const SortingSettings = (props) => {
 
 	const CATEGORY_SORT_ON: ILabelValuePair[] = [
 		{
-			label: (shadow as Visual).isExpandAllApplied ? (shadow.categoryDisplayName as string + " ").concat(cloneDeep((shadow as Visual).expandAllCategoriesName).reverse().join(" ")) : shadow.categoryDisplayName,
+			label: (shadow as Visual).isExpandAllApplied ? (cloneDeep((shadow as Visual).expandAllCategoriesName).reverse().join(" ")) + " " + shadow.categoryDisplayName : shadow.categoryDisplayName,
 			value: shadow.categoryDisplayName,
 			isSortByCategory: true,
 			isSortByMeasure: false,

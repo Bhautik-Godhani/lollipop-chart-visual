@@ -52,10 +52,8 @@ import {
 	PieSize,
 	PieType,
 	Position,
-	RankingDataValuesType,
 } from "./enum";
 import { NumberFormatting } from "./settings";
-import { Selection } from "d3-selection";
 
 export interface IXAxisSettings {
 	show: boolean,

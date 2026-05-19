@@ -3,10 +3,10 @@ import * as React from "react";
 import { IPatternData, PatternPicker, Quote, SelectInput } from "@truviz/shadow/dist/Components";
 import { PATTERN_SETTINGS as PATTERN_SETTINGS_IMP } from "../constants";
 import { Column, ConditionalWrapper, Footer, Row, ToggleButton } from "@truviz/shadow/dist/Components";
-import { ColorPaletteType, EMarkerShapeTypes, EPatternByDataTypes, EPatternSettings } from "../enum";
+import { EMarkerShapeTypes, EPatternByDataTypes, EPatternSettings } from "../enum";
 import { ILabelValuePair, IMarkerSettings, IPatternSettings } from "../visual-settings.interface";
 import PreviewPatterns from "./PreviewPatterns";
-import { parseObject, persistProperties } from "../methods/methods";
+import { parseObject } from "../methods/methods";
 import { Visual } from "../visual";
 
 const BASED_ON_TYPES: ILabelValuePair[] = [
@@ -45,6 +45,7 @@ const UICategoryPatterns = (shadow: Visual, configValues: IPatternSettings, setC
 	return <>{
 		configValues.categoryPatterns.map((category, index) => (
 			<PatternPicker
+				key={index}
 				label={shadow.getTooltipCategoryText(category.name, false)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				imageUploadIconTooltip="Upload the pattern image"
@@ -73,6 +74,7 @@ const UISubCategoryPatterns = (shadow: Visual, configValues: IPatternSettings, s
 	return <>
 		{configValues.subCategoryPatterns.map((category, index) => (
 			<PatternPicker
+				key={index}
 				label={shadow.getTooltipCategoryText(category.name, false, true)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				imageUploadIconTooltip="Upload the pattern image"
@@ -98,6 +100,7 @@ const UIMultipleMeasuresPatterns = (shadow: Visual, configValues: IPatternSettin
 	return <>
 		{configValues.measuresPatterns.map((category, index) => (
 			<PatternPicker
+				key={index}
 				label={shadow.getTooltipCategoryText(category.name, false)}
 				pattern={{ value: category.patternIdentifier, d: category.patternIdentifier }}
 				handleChange={(e: IPatternData) => {

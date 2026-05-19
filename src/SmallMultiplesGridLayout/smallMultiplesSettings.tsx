@@ -1,7 +1,7 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
 import { EFontStyle, ELineType, ESmallMultiplesAxisType, ESmallMultiplesBackgroundType, ESmallMultiplesDisplayType, ESmallMultiplesHeaderAlignment, ESmallMultiplesHeaderDisplayType, ESmallMultiplesHeaderPosition, ESmallMultiplesLayoutType, ESmallMultiplesSettings, ESmallMultiplesShadowOffset, ESmallMultiplesShadowPosition, ESmallMultiplesViewType, ESmallMultiplesXAxisPosition, ESmallMultiplesYAxisPosition, ILabelValuePair, ISmallMultiplesGridLayoutSettings } from ".";
-import { BoldIcon, BottomAlignmentIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, TopAlignmentIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
+import { BoldIcon, CenterHorizontalAlignmentIcon2, DashedLineIcon, DottedLineIcon, ItalicIcon, LeftAlignmentIcon2, RightAlignmentIcon2, SolidLineIcon, UnderlineIcon } from "../settings-pages/SettingsIcons";
 import { AccordionAlt, ColorPicker, Column, ConditionalWrapper, Footer, InputControl, Quote, RangeSlider, Row, SelectInput, SwitchOption, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
 
@@ -34,7 +34,7 @@ const XY_AXIS_TYPES: ILabelValuePair[] = [
   },
 ];
 
-const X_AXIS_POSITIONS: ILabelValuePair[] = [
+const _X_AXIS_POSITIONS: ILabelValuePair[] = [
   // {
   //   value: ESmallMultiplesXAxisPosition.All,
   //   label: "All",
@@ -49,7 +49,7 @@ const X_AXIS_POSITIONS: ILabelValuePair[] = [
   // },
 ];
 
-const Y_AXIS_POSITIONS: ILabelValuePair[] = [
+const _Y_AXIS_POSITIONS: ILabelValuePair[] = [
   // {
   //   value: ESmallMultiplesYAxisPosition.All,
   //   label: "All",
@@ -275,7 +275,7 @@ const handleBorderCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateA
   }));
 };
 
-const handleShadowCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => {
+const _handleShadowCheckbox = (n, setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>) => {
   setConfigValues((d) => ({
     ...d,
     [ESmallMultiplesSettings.Shadow]: {
@@ -615,7 +615,7 @@ const UIHeader = (vizOptions: ShadowUpdateOptions,
   setConfigValues: React.Dispatch<React.SetStateAction<ISmallMultiplesGridLayoutSettings>>,
   handleHeaderChange: (...any) => void,
   handleHeaderColor: (...any) => void,
-  handleHeaderCheckbox: (...any) => void) => {
+  _handleHeaderCheckbox: (...any) => void) => {
   return <>
     <AccordionAlt title="Header" open={true} >
       <Row>
@@ -930,7 +930,7 @@ const SmallMultiplesSettings = (props) => {
   const {
     shadow,
     compConfig: { sectionName, propertyName },
-    config,
+    config: _config,
     vizOptions,
     closeCurrentSettingHandler,
   } = props;

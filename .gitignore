@@ -3,3 +3,4 @@ node_modules
 dist
 webpack.statistics.dev.html
 webpack.statistics.prod.html
+.npmrc

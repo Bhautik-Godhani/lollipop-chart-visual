@@ -17,7 +17,6 @@ import { EditIcon, PlusIcon, ReferenceBandPlaceholderIcon, ReferenceLinePlacehol
 import { Visual } from "../visual";
 import { IReferenceLineSettings } from "../visual-settings.interface";
 import { ELineTypeTabs, EReferenceType, EXYAxisNames } from "../enum";
-import { persistProperties } from "../methods/methods";
 import { GetFormattedNumber } from "../methods/NumberFormat.methods";
 import { isEmpty } from "lodash";
 

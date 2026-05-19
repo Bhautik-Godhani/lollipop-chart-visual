@@ -3,7 +3,7 @@ import { Position } from "../enum";
 import { Visual } from "../visual";
 import { axisBottom, axisLeft, axisTop } from "d3";
 import { getSVGTextSize } from "./methods";
-import { textMeasurementService } from "powerbi-visuals-utils-formattingutils";
+import { textMeasurementService, valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { TextProperties } from "powerbi-visuals-utils-formattingutils/lib/src/interfaces";
 
 export const RenderExpandAllXAxis = (self: Visual, categoricalData: powerbi.DataViewCategorical): void => {
@@ -29,8 +29,11 @@ export const RenderExpandAllXAxis = (self: Visual, categoricalData: powerbi.Data
 	categoricalData.categories.forEach((d, i) => {
 		if (i < self.categoricalData.categories.length - 1) {
 			const xScaleCopy = self.xScale.copy();
-			xScaleCopy.domain(d.values);
-			self[`${d.source.displayName}ScaleDomain`] = d.values;
+			const values = d.values.map((v, i) => {
+				return valueFormatter.create({ format: d.source.format }).format(d.source.type.dateTime ? new Date(v.toString().split("--")[0]) : v.toString().split("--")[0]).concat("--" + i)
+			});
+			xScaleCopy.domain(values);
+			self[`${d.source.displayName}ScaleDomain`] = values;
 			self[`${d.source.displayName}ScaleNewDomain`] = [];
 			self[d.source.displayName + "Scale"] = xScaleCopy;
 		}

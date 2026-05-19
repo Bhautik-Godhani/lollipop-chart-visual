@@ -46,6 +46,7 @@ export const SetBeforeTemplateSettings = (self: Visual, templateSettings: ITempl
     }
 }
 
+// eslint-disable-next-line max-lines-per-function
 export const ApplyBeforeTemplateAppliedSettingsBack = (self: Visual): void => {
     const beforeIBCSSettings = self.beforeTemplateSettings;
 

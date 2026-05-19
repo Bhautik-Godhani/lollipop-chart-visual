@@ -12,5 +12,12 @@ module.exports = {
 	},
 	plugins: ["powerbi-visuals"],
 	extends: ["plugin:powerbi-visuals/recommended"],
-	rules: {},
+	rules: {
+		"@typescript-eslint/no-unused-vars": ["warn", {
+			"varsIgnorePattern": "^_",
+			"argsIgnorePattern": "^_",
+			"caughtErrorsIgnorePattern": "^_",
+			"destructuredArrayIgnorePattern": "^_"
+		}],
+	},
 };

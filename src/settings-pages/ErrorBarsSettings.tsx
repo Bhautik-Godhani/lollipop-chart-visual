@@ -29,7 +29,6 @@ import { IErrorBarsSettings, ILabelValuePair } from "../visual-settings.interfac
 import { Visual } from "../visual";
 import { IMarkerData, MarkerPicker } from "./markerSelector";
 import { BoldIcon, DashedLineIcon, DottedLineIcon, ErrorBarsPlaceholderIcon, ItalicIcon, SolidLineIcon, UnderlineIcon } from "./SettingsIcons";
-import { persistProperties } from "../methods/methods";
 import { ErrorBarsMarkers } from "../error-bars-markers";
 
 let MARKERS_LIST: IMarkerData[] = [];
@@ -101,7 +100,7 @@ const ErrorBarsSettings = (props) => {
     }
   });
 
-  const markerIconsList: { label: any; value: string }[] = [
+  const _markerIconsList: { label: any; value: string }[] = [
     {
       label: <FontAwesomeIcon icon={faCircle} />,
       value: EErrorBarsMarkerShape.Circle,
@@ -203,7 +202,7 @@ const ErrorBarsSettings = (props) => {
     },
   ];
 
-  const MARKER_TYPES = [
+  const _MARKER_TYPES = [
     {
       label: "Dash",
       value: EErrorBarsMarkerShape.Dash,
@@ -440,7 +439,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Upper Bound (%)"
-                    value={configValues.measurement.upperBoundPercentage}
+                    value={configValues.measurement.upperBoundPercentage || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -449,7 +448,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Lower Bound (%)"
-                    value={configValues.measurement.lowerBoundPercentage}
+                    value={configValues.measurement.lowerBoundPercentage || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -462,7 +461,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Value (%)"
-                    value={configValues.measurement.upperBoundPercentage}
+                    value={configValues.measurement.upperBoundPercentage || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundPercentage, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -476,7 +475,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Value (%)"
-                    value={configValues.measurement.lowerBoundPercentage}
+                    value={configValues.measurement.lowerBoundPercentage || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundPercentage, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -491,7 +490,7 @@ const ErrorBarsSettings = (props) => {
                 <InputControl
                   type="number"
                   label="Standard Deviations"
-                  value={configValues.measurement.standardDeviation}
+                  value={configValues.measurement.standardDeviation || 0}
                   handleChange={(value: any) => handleChange(value, EErrorBarsSettings.StandardDeviation, EErrorBarsSettings.Measurement)}
                 />
               </Column>
@@ -506,7 +505,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Upper Bound"
-                    value={configValues.measurement.upperBoundValue}
+                    value={configValues.measurement.upperBoundValue || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -515,7 +514,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Lower Bound"
-                    value={configValues.measurement.lowerBoundValue}
+                    value={configValues.measurement.lowerBoundValue || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -528,7 +527,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Value"
-                    value={configValues.measurement.upperBoundValue}
+                    value={configValues.measurement.upperBoundValue || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.UpperBoundValue, EErrorBarsSettings.Measurement)}
                   />
                 </Column>
@@ -542,7 +541,7 @@ const ErrorBarsSettings = (props) => {
                   <InputControl
                     type="number"
                     label="Value"
-                    value={configValues.measurement.lowerBoundValue}
+                    value={configValues.measurement.lowerBoundValue || 0}
                     handleChange={(value: any) => handleChange(value, EErrorBarsSettings.LowerBoundValue, EErrorBarsSettings.Measurement)}
                   />
                 </Column>

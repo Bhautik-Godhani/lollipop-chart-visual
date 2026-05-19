@@ -19,7 +19,7 @@ export const RenderCutAndClipMarkerOnAxis = (self: Visual): void => {
         const secG = cutAndClipMarkerG.append("g");
         const transX = self.getXPosition(self.isLeftYAxis ? beforeCutDomain[1] : afterCutDomain[0]);
 
-        const cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
+        const _cutMarkerClipG = self.axisCutAndClipMarkerG.append("g").attr("class", "cutMarkerClipG");
 
         if (self.isHorizontalChart) {
             secG.attr("transform", `translate(${transX}, ${self.isBottomXAxis ? self.height - width / 2 : width + width / 4})`);
@@ -65,7 +65,7 @@ export const GetIsCutAndClipAxisEnabled = (self: Visual): boolean => {
     const minValue = self.minCategoryValueDataPair.value;
     const maxValue = self.maxCategoryValueDataPair.value;
 
-    let isEnabled = false;
+    const isEnabled = false;
 
     if (self.cutAndClipAxisSettings.isEnabled) {
         if (breakEnd < 0 && breakStart < 0) {
@@ -95,8 +95,8 @@ const SetOverlappedAxisTicksPosition = (self: Visual): void => {
         }
     } else {
         if (self.isLeftYAxis) {
-            const ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
-            // if (ticks.nodes().length > 1) {
+            const _ticks: D3Selection<SVGElement> = self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text");
+            // if (_ticks.nodes().length > 1) {
             self.beforeCutLinearXAxisG.selectAll(".tick:last-of-type text").attr("dx", "-0.32em").attr("text-anchor", "middle");
             // }
             const tick = self.afterCutLinearXAxisG.select(".tick").select("text");
@@ -120,7 +120,7 @@ export const RenderBarCutAndClipMarker = (self: Visual, barData: ILollipopChartR
 
     const imageGSelection = self.barCutAndClipMarkersG
         .selectAll(".barCutAndClipMarkersG")
-        .data(filteredData, (d) => Math.random());
+        .data(filteredData, (_d) => window.crypto.getRandomValues(new Uint32Array(1))[0].toString());
     imageGSelection.join(
         (enter) => {
             const clipG = enter.append("g");

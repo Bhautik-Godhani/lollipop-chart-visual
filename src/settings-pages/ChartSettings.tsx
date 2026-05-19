@@ -2,12 +2,11 @@
 import * as React from "react";
 import { CHART_SETTINGS as CHART_SETTINGS_IMP } from "../constants";
 import { EChartSettings, EIBCSThemes, ELineType, Orientation } from "../enum";
-import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, AccordionAlt, Label, ImageOption, RangeSlider } from "@truviz/shadow/dist/Components";
+import { InputControl, Row, Column, ConditionalWrapper, SwitchOption, Footer, ToggleButton, ColorPicker, AccordionAlt, ImageOption, RangeSlider } from "@truviz/shadow/dist/Components";
 import { IChartSettings } from "../visual-settings.interface";
 import { Visual } from "../visual";
 import { ShadowUpdateOptions } from "@truviz/shadow/dist/types/ShadowUpdateOptions";
-import { DashedLineIcon, DottedLineIcon, IBCSDefaultHIcon, IBCSDefaultVIcon, IBCSDiverging1HIcon, IBCSDiverging1VIcon, IBCSDiverging2HIcon, IBCSDiverging2VIcon, SolidLineIcon } from "./SettingsIcons";
-import { ApplyBeforeIBCSAppliedSettingsBack } from "../methods/IBCS.methods";
+import { DashedLineIcon, DottedLineIcon, SolidLineIcon } from "./SettingsIcons";
 import VerticalOrientationIcon from "../../assets/icons/Vertical-orientation.svg";
 import HorizontalOrientationIcon from "../../assets/icons/horizontal-orientation.svg";
 import { persistProperties } from "../methods/methods";

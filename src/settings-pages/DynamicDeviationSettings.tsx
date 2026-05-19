@@ -42,7 +42,7 @@ const LINE_TYPES = [
   },
 ];
 
-const LABEL_POSITION: ILabelValuePair[] = [
+const _LABEL_POSITION: ILabelValuePair[] = [
   {
     label: "TOP",
     value: Position.Top,

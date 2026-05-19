@@ -208,10 +208,10 @@
 	],
 	"objects": {
 		"license": {
-			"displayName": "PowerVIZ License",
+			"displayName": "Powerviz License",
 			"properties": {
 				"purchased": {
-					"displayName": "",
+					"displayName": "Purchased",
 					"description": "",
 					"type": {
 						"text": true
@@ -225,7 +225,22 @@
 					}
 				},
 				"key": {
-					"displayName": "License",
+					"displayName": "License Key",
+					"description": "Visit our website to purchase a license key",
+					"type": {
+						"text": true
+					}
+				},
+				"status": {
+					"displayName": "Status",
+					"description": "",
+					"type": {
+						"text": true
+					}
+				},
+				"validity": {
+					"displayName": "Validity",
+					"description": "",
 					"type": {
 						"text": true
 					}

@@ -7,6 +7,9 @@ import { categoryComparisionOptions, measureComparisionOptions } from "@truviz/s
 import { Components } from "@truviz/shadow/dist/types/EditorTypes";
 import { cloneDeep } from "lodash";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 const GetActionMenuUI = (
   index: number,
   rule: any,
@@ -156,7 +159,7 @@ const EmptyRulesScreen = ({ createRule, closeCurrentSettingHandler }) => {
       <div className={`config-btn-wrapper flex-end`}>
         <div className="btn-group">
           <Button text={"Cancel"} variant={"secondary"} clickHandler={() => closeCurrentSettingHandler()} />
-          <Button text={"Save"} variant={"primary"} disabled={true} clickHandler={() => { }} />
+          <Button text={"Save"} variant={"primary"} disabled={true} clickHandler={noop} />
         </div>
       </div>
     </>

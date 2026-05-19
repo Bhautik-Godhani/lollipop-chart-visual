@@ -104,7 +104,7 @@ const UIMarkerShapeTypes = (shadow: Visual, vizOptions: ShadowUpdateOptions, con
 		<>
 			<Row disableTopPadding>
 				<Column>
-					<Tabs selected={configValues.markerShape} onChange={(value) => {
+					<Tabs selected={configValues.markerShape} hideScrollers={true} onChange={(value) => {
 						handleMarkerStyleChange(value, EMarkerSettings.MarkerShape, markerStyleTypes, setConfigValues)
 					}}>
 						<Tab title={"Default"} identifier={EMarkerShapeTypes.DEFAULT}>

@@ -83,6 +83,7 @@ export const CallYScaleOnAxisGroup = (self: Visual, width: number, height: numbe
 }
 
 export function GetPositiveNegativeLogYScale(value: number | string): number {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     if (!self.isHorizontalChart && self.isShowPositiveNegativeLogScale) {
         if (parseFloat(value?.toString()) < 0) {

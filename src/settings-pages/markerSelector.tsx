@@ -33,8 +33,8 @@ const getPatternPreviewSVG = (svgHeight, selectValue, data: IMarkerData) => (
                 id={data.value}
                 viewBox={`0 0 ${data.w} ${data.h}`}
             >
-                {data.paths.map(path => {
-                    return <path d={path.d} fill={path.fill} stroke={path.stroke} ></path>
+                {data.paths.map((path, i) => {
+                    return <path key={i} d={path.d} fill={path.fill} stroke={path.stroke} ></path>
                 })}
             </symbol>
         </defs>

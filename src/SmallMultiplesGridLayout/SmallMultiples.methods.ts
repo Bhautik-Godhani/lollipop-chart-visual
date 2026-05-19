@@ -365,7 +365,7 @@ export const GetSmallMultiplesLayoutProps = (
     const layoutClassName = "small-multiples-layout";
     const layoutWidth = config.containerWidth;
     const layoutRowHeight = itemHeight;
-    const dynamicRow = config.categories.length / columns;
+    const _dynamicRow = config.categories.length / columns;
 
     const measureBeforeMount = false;
     const orientation = Orientation.Vertical;
@@ -671,7 +671,7 @@ export const RenderSmallMultiplesUniformRightYAxis = (
                 axisSVG.node().appendChild(yAxisTitleGNode.node().cloneNode(true));
             }
 
-            const { xAxisNodeHeight, isVerticalBrushDisplayed } = config.getUniformYAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth, itemHeight - xAxisGNodeHeight - config.innerSpacing, false);
+            const { xAxisNodeHeight: _xAxisNodeHeight, isVerticalBrushDisplayed: _isVerticalBrushDisplayed } = config.getUniformYAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth, itemHeight - xAxisGNodeHeight - config.innerSpacing, false);
 
             // if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
             //     yAxisGNode.attr("transform", `translate(${0}, ${0})`);
@@ -775,7 +775,7 @@ export const GetRootXYAxisGNode = (config: ISmallMultiplesGridLayoutSettings, it
         // const rightYAxisGNode = d3.select(rightYAxisNode.cloneNode(true));
 
         const isUniformXScale = config.xAxisType === ESmallMultiplesAxisType.Uniform;
-        const isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
+        const _isUniformYScale = config.yAxisType === ESmallMultiplesAxisType.Uniform;
 
         const xAxisTitleGNode = d3.select(xAxisTitleG.cloneNode(true));
         const yAxisTitleGNode = d3.select(yAxisTitleG.cloneNode(true));
@@ -1032,7 +1032,7 @@ export const RenderSmallMultiplesUniformTopXAxis = (
                 axisSVG.node().appendChild(xAxisTitleGNode.node().cloneNode(true));
             }
 
-            const { xAxisNodeHeight, isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - yAxisGNodeWidth - config.innerSpacing * 2, itemHeight, false);
+            const { xAxisNodeHeight: _xAxisNodeHeight2, isHorizontalBrushDisplayed: _isHorizontalBrushDisplayed } = config.getUniformXAxisAndBrushNode(i, axisSVG.select(".test").node() as any, uniformBrushSVG.select(".brush").node() as any, itemWidth - yAxisGNodeWidth - config.innerSpacing * 2, itemHeight, false);
 
             if (config.yAxisType === ESmallMultiplesAxisType.Uniform) {
                 g.attr("transform", `translate(${yAxisGNodeWidth}, ${xAxisGNodeHeight - 5 - 12})`);
@@ -1076,7 +1076,7 @@ export const RenderSmallMultiplesUniformXAxisBrush = (isBottomXAxis: boolean, co
     return brushSVG;
 };
 
-export const RenderSmallMultiplesUniformYAxisBrush = (isLeftYAxis: boolean, scaleHeight: number, yAxisGNodeWidth: number, yAxisTitleWidth: number): D3Selection<SVGElement> => {
+export const RenderSmallMultiplesUniformYAxisBrush = (isLeftYAxis: boolean, scaleHeight: number, yAxisGNodeWidth: number, _yAxisTitleWidth: number): D3Selection<SVGElement> => {
     const brushSVG = d3.create("svg");
     brushSVG.classed("uniformYAxisBrush", true);
     brushSVG.style("width", 18 + "px");

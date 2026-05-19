@@ -1,6 +1,6 @@
 /* eslint-disable max-lines-per-function */
 import * as React from "react";
-import { get, isEmpty, merge } from "lodash";
+import { get, isEmpty } from "lodash";
 import copy from "copy-to-clipboard";
 import { Button, Column, ConditionalWrapper, Footer, IconButton, InputControl, Label, Quote, RadioOption, Row, Tab, Tabs } from "@truviz/shadow/dist/Components";
 import { CopyExportIcon, GreenCheckmark, ImportSuccessfulUploadIcon, ImportUploadClose, ImportUploadIcon } from "./SettingsIcons";
@@ -8,7 +8,7 @@ import TooltipElement from "@truviz/shadow/dist/Components/Label/TooltipElement"
 import { EVisualConfig, EVisualSettings } from "../enum";
 
 const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConfig: { sectionName, propertyName } }) => {
-  const [notification, setNotification] = React.useState("");
+  const [_notification, setNotification] = React.useState("");
   const initNotification = text => {
     setNotification(text);
     setTimeout(() => {
@@ -22,7 +22,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
 
   const [showDownloadNote, setShowDownloadNote] = React.useState(false);
 
-  const onDrop = React.useCallback(acceptedFiles => {
+  const _onDrop = React.useCallback(acceptedFiles => {
     const reader = new FileReader();
     reader.onload = onReaderLoad;
     reader.readAsText(acceptedFiles[0]);
@@ -108,8 +108,8 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
 
   const urlData = React.useMemo(() => {
     const config = getConfig();
-    var jsonse = JSON.stringify(config);
-    var blob = new Blob([jsonse], { type: "application/json" });
+    const jsonse = JSON.stringify(config);
+    const blob = new Blob([jsonse], { type: "application/json" });
     return URL.createObjectURL(blob);
   }, [vizOptions.formatTab]);
 
@@ -145,7 +145,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
             })
           }
         } else {
-          if (obj.hasOwnProperty(el)) {
+          if (Object.prototype.hasOwnProperty.call(obj, el)) {
             mergeObject.push({
               objectName: configs[el],
               properties: {
@@ -236,7 +236,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
       return;
     }
     if (file && file[0]) {
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function (event) {
         try {
           const val = JSON.parse(event.target.result as any);
@@ -265,7 +265,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
     });
   };
 
-  const handleUploadClick = event => {
+  const handleUploadClick = _event => {
     hiddenFileInput.current.click();
   };
 
@@ -273,7 +273,7 @@ const ImportExport = ({ shadow, vizOptions, closeCurrentSettingHandler, compConf
     <>
       <Row>
         <Column>
-          <Tabs selected={selectedTab} onChange={tab => setSelectedTab(tab)}>
+          <Tabs selected={selectedTab} onChange={tab => setSelectedTab(tab)} hideScrollers={true}>
             <Tab identifier="import" title="Import">
               {
                 isThemeApplied ? <ThemeAlreadyApplied onUploadNew={() => setIsThemeApplied(false)} /> :
@@ -461,7 +461,7 @@ const ThemeAlreadyApplied = ({ onUploadNew }) => {
         alignItems: 'center',
       }}>
         <svg style={{ marginTop: 'auto', marginBottom: '10px' }} width="44" height="48" viewBox="0 0 44 48" fill="none">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M18.1315 19.8631C18.704 19.5784 19.3513 19.418 20.0366 19.418H34.1327C36.4682 19.418 38.3616 21.2809 38.3616 23.5789V34.6749C38.3616 36.973 36.4682 38.8359 34.1327 38.8359H29.3202C29.5772 37.9419 29.7534 37.0145 29.8407 36.0619H34.1327C34.9112 36.0619 35.5423 35.4409 35.5423 34.6749V30.5139H29.3202C29.0422 29.5468 28.6697 28.6187 28.2132 27.7399H35.5423V23.5789C35.5423 22.8129 34.9112 22.192 34.1327 22.192H24.2654V22.9053C22.5051 21.4748 20.4183 20.4193 18.1315 19.8631ZM12.9886 19.4802C12.0204 19.566 11.0779 19.7394 10.1693 19.9923V5.54799C10.1693 2.48392 12.6938 0 15.8078 0H28.7361C29.8577 0 30.9333 0.438389 31.7264 1.21873L42.7614 12.0767C43.5545 12.8571 44 13.9154 44 15.019V38.8359C44 41.9 41.4756 44.3839 38.3616 44.3839H26.3597C27.0747 43.532 27.6975 42.6024 28.2132 41.6099H38.3616C39.9186 41.6099 41.1808 40.3679 41.1808 38.8359V16.644H31.3135C28.978 16.644 27.0847 14.781 27.0847 12.483V2.77399H15.8078C14.2508 2.77399 12.9886 4.01595 12.9886 5.54799V19.4802ZM31.3135 13.87H40.5969L29.9039 3.34851V12.483C29.9039 13.249 30.535 13.87 31.3135 13.87ZM4.01069 44.0536C-1.3369 38.7918 -1.3369 30.2608 4.01069 24.999C9.35828 19.7372 18.0284 19.7372 23.376 24.999C28.7236 30.2608 28.7236 38.7918 23.376 44.0536C18.0284 49.3154 9.35828 49.3154 4.01069 44.0536ZM19.2686 28.476C19.8935 27.8413 20.9065 27.8413 21.5314 28.476C22.1562 29.1106 22.1562 30.1394 21.5314 30.7741L11.9314 40.524C11.3065 41.1586 10.2935 41.1586 9.66863 40.524L6.46863 37.2741C5.84379 36.6394 5.84379 35.6106 6.46863 34.976C7.09347 34.3414 8.10653 34.3414 8.73137 34.976L10.8 37.0769L19.2686 28.476Z" fill="#4C9E72" />
+          <path fillRule="evenodd" clipRule="evenodd" d="M18.1315 19.8631C18.704 19.5784 19.3513 19.418 20.0366 19.418H34.1327C36.4682 19.418 38.3616 21.2809 38.3616 23.5789V34.6749C38.3616 36.973 36.4682 38.8359 34.1327 38.8359H29.3202C29.5772 37.9419 29.7534 37.0145 29.8407 36.0619H34.1327C34.9112 36.0619 35.5423 35.4409 35.5423 34.6749V30.5139H29.3202C29.0422 29.5468 28.6697 28.6187 28.2132 27.7399H35.5423V23.5789C35.5423 22.8129 34.9112 22.192 34.1327 22.192H24.2654V22.9053C22.5051 21.4748 20.4183 20.4193 18.1315 19.8631ZM12.9886 19.4802C12.0204 19.566 11.0779 19.7394 10.1693 19.9923V5.54799C10.1693 2.48392 12.6938 0 15.8078 0H28.7361C29.8577 0 30.9333 0.438389 31.7264 1.21873L42.7614 12.0767C43.5545 12.8571 44 13.9154 44 15.019V38.8359C44 41.9 41.4756 44.3839 38.3616 44.3839H26.3597C27.0747 43.532 27.6975 42.6024 28.2132 41.6099H38.3616C39.9186 41.6099 41.1808 40.3679 41.1808 38.8359V16.644H31.3135C28.978 16.644 27.0847 14.781 27.0847 12.483V2.77399H15.8078C14.2508 2.77399 12.9886 4.01595 12.9886 5.54799V19.4802ZM31.3135 13.87H40.5969L29.9039 3.34851V12.483C29.9039 13.249 30.535 13.87 31.3135 13.87ZM4.01069 44.0536C-1.3369 38.7918 -1.3369 30.2608 4.01069 24.999C9.35828 19.7372 18.0284 19.7372 23.376 24.999C28.7236 30.2608 28.7236 38.7918 23.376 44.0536C18.0284 49.3154 9.35828 49.3154 4.01069 44.0536ZM19.2686 28.476C19.8935 27.8413 20.9065 27.8413 21.5314 28.476C22.1562 29.1106 22.1562 30.1394 21.5314 30.7741L11.9314 40.524C11.3065 41.1586 10.2935 41.1586 9.66863 40.524L6.46863 37.2741C5.84379 36.6394 5.84379 35.6106 6.46863 34.976C7.09347 34.3414 8.10653 34.3414 8.73137 34.976L10.8 37.0769L19.2686 28.476Z" fill="#4C9E72" />
         </svg>
         <Label text="Theme is applied" />
         <div className={`btn-primary`}

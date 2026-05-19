@@ -4,6 +4,9 @@ import HomePage from "./HomePage";
 import { Button } from "@truviz/shadow/dist/Components";
 import { ILabelValuePair } from "../visual-settings.interface";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 const EmptyDataMessage = (closeCurrentSettingHandler) => (
   <>
     <div className="config-options-wrapper">
@@ -22,7 +25,7 @@ const EmptyDataMessage = (closeCurrentSettingHandler) => (
           text={"Save"}
           variant={"primary"}
           disabled={true}
-          clickHandler={() => { }}
+          clickHandler={noop}
         />
       </div>
     </div>
@@ -105,6 +108,7 @@ const getCategoryOptions = (vizOptions, config) => {
   return retValue;
 }
 
+// eslint-disable-next-line max-lines-per-function
 const ConditionalFormatting = (props) => {
   const {
     shadow,

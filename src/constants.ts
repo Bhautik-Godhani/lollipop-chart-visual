@@ -20,7 +20,6 @@ import {
 	Orientation,
 	PieSize,
 	Position,
-	RankingDataValuesType,
 	EDataLabelsBGApplyFor,
 	EReferenceType,
 	ERelationshipToMeasure,

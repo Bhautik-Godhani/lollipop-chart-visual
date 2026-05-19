@@ -6,6 +6,7 @@ import { EditIcon } from "../settings-pages/SettingsIcons";
 import { ILabelValuePair } from "../visual-settings.interface";
 import { ECFApplyOnCategories, EDataRolesName } from "../enum";
 
+// eslint-disable-next-line max-lines-per-function
 const GetCFormattingFormUI = (
   shadow: any,
   isAddNew: boolean,
@@ -116,6 +117,10 @@ const GetCFormattingFormUI = (
   </>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
+// eslint-disable-next-line max-lines-per-function
 function CformattingForm({
   handleChangeContent,
   addRule,
@@ -246,7 +251,7 @@ function CformattingForm({
   return (
     <>
       {GetCFormattingFormUI(shadow, isAddNew, isSupportApplyOn, isShowBasedOnValueDropDown, applyOnCategories, ruleDetails, CFConfig, isEditableRuleName, dropdownHandler, measureOptions, categoryOptions, inputChangeHandler, setColorHandler, handleChangeContent, closeCurrentSettingHandler, setRuleDetails, setIsEditableRuleName, setSelectedApplyOnCategoryState)}
-      <Footer isShowResetButton={false} resetButtonHandler={() => { }} cancelButtonHandler={() => handleChangeContent("homePage")} saveButtonConfig={{
+      <Footer isShowResetButton={false} resetButtonHandler={noop} cancelButtonHandler={() => handleChangeContent("homePage")} saveButtonConfig={{
         text: "Save", handler: saveHandler, isDisabled:
           (ruleDetails.name === "" || isEditableRuleName && ruleDetails.name.includes("CFR") || (isSupportApplyOn && applyOnCategories?.length > 0 && ruleDetails.applyOnCategories.length === 0)) ? true : false
       }} />

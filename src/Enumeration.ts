@@ -40,20 +40,28 @@ export class Enumeration {
 function getLicenseSelection(): EnumerateSectionType {
 	return {
 		name: "license",
-		isShow: false,
+		isShow: true,
 		properties: [
 			{
-				name: "purchased",
-				isShow: true,
+				name: "customer",
+				isShow: true
 			},
 			{
-				name: "customer",
+				name: "validity",
 				isShow: true,
 			},
 			{
 				name: "key",
 				isShow: true,
 			},
+			{
+				name: "purchased",
+				isShow: false,
+			},
+			{
+				name: "status",
+				isShow: false,
+			}
 		],
 	};
 }

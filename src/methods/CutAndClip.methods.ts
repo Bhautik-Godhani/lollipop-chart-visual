@@ -12,7 +12,7 @@ export const RenderLinearCutAxis = (self: Visual): void => {
     CallLinearCutScaleOnAxisGroup(self);
 }
 
-export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, categoricalData: powerbi.DataViewCategorical): void => {
+export const SetLinearCutAxisDomain = (self: Visual, isOnlySetDomain: boolean, _categoricalData: powerbi.DataViewCategorical): void => {
     const { min, max } = GetAxisDomainMinMax(self);
     const isLinearScale: boolean = typeof self.chartData.map((d) => d.value1)[0] === "number";
     // const isLogarithmScale: boolean | undefined = self.axisByBarOrientation.isLogarithmScale;

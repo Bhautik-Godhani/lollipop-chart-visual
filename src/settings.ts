@@ -29,6 +29,7 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 import { DisplayUnits, EAxisNumberValueType, SemanticNegativeNumberFormats, SemanticPositiveNumberFormats } from "./enum";
+import { purchased, key } from "./license";
 
 export class VisualSettings extends DataViewObjectsParser {
 	public license = new License();
@@ -63,9 +64,11 @@ export class VisualSettings extends DataViewObjectsParser {
 }
 
 export class License {
-	public purchased: string = "";
 	public customer: string = "";
-	public key: string = "";
+	public purchased: string = purchased;
+	public validity: string = "";
+	public key: string = key;
+	public status: string = "";
 }
 export class VisualGeneralSettings {
 	public darkMode: boolean = false;

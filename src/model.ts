@@ -35,6 +35,7 @@ export interface ILollipopChartRow {
 	othersIdentity?: ISelectionId[];
 	parentCategory?: string;
 	SMCategory?: string;
+	isNullValue1?: boolean;
 }
 
 export interface IErrorBarValue {
